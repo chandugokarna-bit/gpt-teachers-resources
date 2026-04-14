@@ -24,7 +24,14 @@
     ಸರ್ವರಿಗೂ ಸುಸ್ವಾಗತ
   </div>
   <h3>📚 ಇತ್ತೀಚಿನ ಸಂಪನ್ಮೂಲಗಳು</h3>
-<div id="latest-resources"></div>
+<h3>🎬 Latest Videos</h3>
+<div class="marquee"><div id="video-list"></div></div>
+
+<h3>📄 Latest PDFs</h3>
+<div class="marquee"><div id="pdf-list"></div></div>
+
+<h3>📊 Latest PPTs</h3>
+<div class="marquee"><div id="ppt-list"></div></div>
   
   <!-- main Grid -->
   <div class="grid">
@@ -78,36 +85,37 @@ const firebaseConfig = {
   appId: "1:870508661355:web:abc7960ee3786769983f2e"
 };
 
-// Init
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// Fetch data
 async function loadResources() {
-  const container = document.getElementById("latest-resources");
-  container.innerHTML = "Loading...";
+  const videoList = document.getElementById("video-list");
+  const pdfList = document.getElementById("pdf-list");
+  const pptList = document.getElementById("ppt-list");
 
   const querySnapshot = await getDocs(collection(db, "resources"));
-
-  container.innerHTML = "";
 
   querySnapshot.forEach((doc) => {
     const data = doc.data();
 
-    const item = document.createElement("a");
-    item.href = data.link;
-    item.target = "_blank";
-    item.className = "grid-card";
+    const link = document.createElement("a");
+    link.href = data.link;
+    link.target = "_blank";
+    link.innerText = data.title;
 
-    item.innerText = data.title;
-
-    container.appendChild(item);
+    if (data.type === "video") {
+      videoList.appendChild(link);
+    } else if (data.type === "pdf") {
+      pdfList.appendChild(link);
+    } else if (data.type === "ppt") {
+      pptList.appendChild(link);
+    }
   });
 }
 
 loadResources();
 </script>
-
+  
 </body>
 </html>
 
