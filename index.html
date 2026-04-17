@@ -24,19 +24,22 @@
     ಸರ್ವರಿಗೂ ಸುಸ್ವಾಗತ
   </div>
   <h3>📚 ಇತ್ತೀಚಿನ ಸಂಪನ್ಮೂಲಗಳು</h3>
-<h3>🎬 Latest Videos</h3>
-<div class="marquee">
-  <div id="video-list"></div>
+<div class="scrolling-container">
+  <div id="videoContent" class="scrolling-content">
+    Loading videos...
+  </div>
 </div>
 
-<h3>📄 Latest PDFs</h3>
-<div class="marquee">
-  <div id="pdf-list"></div>
+<div class="scrolling-container">
+  <div id="pdfContent" class="scrolling-content">
+    Loading PDFs...
+  </div>
 </div>
 
-<h3>📊 Latest PPTs</h3>
-<div class="marquee">
-  <div id="ppt-list"></div>
+<div class="scrolling-container">
+  <div id="pptContent" class="scrolling-content">
+    Loading PPTs...
+  </div>
 </div>
   
   <!-- main Grid -->
@@ -79,52 +82,40 @@
   </div>
 <!-- Firebase -->
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getFirestore, collection, getDocs } from 
+"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-const firebaseConfig = {
-  apiKey: "YOUR_KEY",
-  authDomain: "gpt-teachers-resources.firebaseapp.com",
-  projectId: "gpt-teachers-resources",
-  storageBucket: "gpt-teachers-resources.firebasestorage.app",
-  messagingSenderId: "870508661355",
-  appId: "1:870508661355:web:abc7960ee3786769983f2e"
-};
+const db = getFirestore();
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
-async function loadResources() {
-  const videoList = document.getElementById("video-list");
-  const pdfList = document.getElementById("pdf-list");
-  const pptList = document.getElementById("ppt-list");
-
-  videoList.innerHTML = "";
-  pdfList.innerHTML = "";
-  pptList.innerHTML = "";
-
+async function loadData() {
   const querySnapshot = await getDocs(collection(db, "resources"));
+
+  let videos = "";
+  let pdfs = "";
+  let ppts = "";
 
   querySnapshot.forEach((doc) => {
     const data = doc.data();
 
-    const link = document.createElement("a");
-    link.href = data.link;
-    link.target = "_blank";
-    link.innerText = data.title;
-
     if (data.type === "video") {
-      videoList.appendChild(link);
-    } else if (data.type === "pdf") {
-      pdfList.appendChild(link);
-    } else if (data.type === "ppt") {
-      pptList.appendChild(link);
+      videos += `<a href="${data.link}" target="_blank">${data.title}</a> | `;
+    }
+
+    if (data.type === "pdf") {
+      pdfs += `<a href="${data.link}" target="_blank">${data.title}</a> | `;
+    }
+
+    if (data.type === "ppt") {
+      ppts += `<a href="${data.link}" target="_blank">${data.title}</a> | `;
     }
   });
+
+  document.getElementById("videoContent").innerHTML = videos || "No videos";
+  document.getElementById("pdfContent").innerHTML = pdfs || "No PDFs";
+  document.getElementById("pptContent").innerHTML = ppts || "No PPTs";
 }
 
-loadResources();
-</script>
+loadData();
   
 </body>
 </html>
