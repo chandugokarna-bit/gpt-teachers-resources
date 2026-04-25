@@ -41,19 +41,19 @@
   </div>
   <h3>📚 ಇತ್ತೀಚಿನ ಸಂಪನ್ಮೂಲಗಳು</h3>
 <div class="scrolling-container">
-  <div id="videoContent" class="scrolling-content">
+  <div id="resourceList" class="scrolling-content">
     Loading videos...
   </div>
 </div>
 
 <div class="scrolling-container">
-  <div id="pdfContent" class="scrolling-content">
+  <div id="resourceList" class="scrolling-content">
     Loading PDFs...
   </div>
 </div>
 
 <div class="scrolling-container">
-  <div id="pptContent" class="scrolling-content">
+  <div id="resourceList" class="scrolling-content">
     Loading PPTs...
   </div>
 </div>
@@ -98,10 +98,9 @@
   </div>
 <!-- Firebase -->
 <script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-  
 const firebaseConfig = {
  apiKey: "AIzaSyCiTuPXMhf17eqmMl5o_ol6R1B9iUm7dJE",
   authDomain: "gpt-teachers-resources.firebaseapp.com",
@@ -112,42 +111,30 @@ const firebaseConfig = {
   measurementId: "G-VMRPZ9BKWX"
 };
   
-// ✅ Initialize Firebase
 const app = initializeApp(firebaseConfig);
-
-// ✅ Firestore connect
 const db = getFirestore(app);
 
-async function loadData() {
+async function loadResources() {
   const querySnapshot = await getDocs(collection(db, "resources"));
+  const container = document.getElementById("resourceList");
 
-  let videos = "";
-  let pdfs = "";
-  let ppts = "";
+  container.innerHTML = "";
 
   querySnapshot.forEach((doc) => {
     const data = doc.data();
 
-    if (data.type === "video") {
-      videos += `<a href="${data.link}" target="_blank">${data.title}</a> | `;
-    }
+    const link = document.createElement("a");
+    link.href = data.link;
+    link.target = "_blank";
+    link.className = "order";
 
-    if (data.type === "pdf") {
-      pdfs += `<a href="${data.link}" target="_blank">${data.title}</a> | `;
-    }
+    link.innerText = data.title + " | ";
 
-    if (data.type === "ppt") {
-      ppts += `<a href="${data.link}" target="_blank">${data.title}</a> | `;
-    }
+    container.appendChild(link);
   });
-
-  document.getElementById("videoContent").innerHTML = videos || "No videos";
-  document.getElementById("pdfContent").innerHTML = pdfs || "No PDFs";
-  document.getElementById("pptContent").innerHTML = ppts || "No PPTs";
 }
 
-loadData();
-
+loadResources();
 </script>
   
 </body>
