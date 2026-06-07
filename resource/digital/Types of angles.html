@@ -1,0 +1,176 @@
+<div class="angle-interactive-container">
+  <h2>Interactive Angle Classifier</h2>
+  <p>Drag the slider to change the angle and see its classification.</p>
+
+  <div class="visualizer-box">
+    <svg id="angle-svg" viewBox="0 0 200 200" width="200" height="200">
+      <line x1="100" y1="100" x2="190" y2="100" stroke="#ccc" stroke-dasharray="4" stroke-width="1.5" />
+      <line x1="100" y1="100" x2="100" y2="10" stroke="#eee" stroke-dasharray="4" stroke-width="1.5" />
+      
+      <line x1="100" y1="100" x2="180" y2="100" stroke="#333" stroke-width="4" stroke-linecap="round" />
+      
+      <line id="angle-arm" x1="100" y1="100" x2="180" y2="100" stroke="#007bff" stroke-width="4" stroke-linecap="round" />
+      
+      <path id="angle-arc" d="" fill="rgba(0, 123, 255, 0.2)" stroke="#007bff" stroke-width="1.5" />
+      
+      <circle cx="100" cy="100" r="6" fill="#333" />
+    </svg>
+  </div>
+
+  <div class="display-panel">
+    <div class="angle-value"><span id="degrees-text">0</span>°</div>
+    <div id="classification-badge" class="badge acute">Acute Angle</div>
+    <p id="description-text">An acute angle is sharp and narrow.</p>
+  </div>
+
+  <div class="control-panel">
+    <input type="range" id="angle-slider" min="0" max="360" value="45" step="1" style="width: 100%;">
+  </div>
+</div>
+
+<style>
+  .angle-interactive-container {
+    font-family: system-ui, -apple-system, sans-serif;
+    max-width: 400px;
+    margin: 20px auto;
+    padding: 25px;
+    border: 1px solid #e0e0e0;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    background: #fff;
+    text-align: center;
+  }
+  .angle-interactive-container h2 {
+    margin-top: 0;
+    color: #222;
+    font-size: 1.5rem;
+  }
+  .angle-interactive-container p {
+    color: #666;
+    font-size: 0.9rem;
+  }
+  .visualizer-box {
+    background: #fdfdfd;
+    border: 1px solid #f0f0f0;
+    border-radius: 12px;
+    padding: 20px;
+    margin: 20px 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .display-panel {
+    margin-bottom: 20px;
+  }
+  .angle-value {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 5px;
+  }
+  .badge {
+    display: inline-block;
+    padding: 6px 16px;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: white;
+    transition: background 0.2s ease;
+  }
+  /* Category Colors */
+  .acute { background-color: #28a745; }
+  .right-angle { background-color: #dc3545; }
+  .obtuse { background-color: #fd7e14; }
+  .straight { background-color: #6f42c1; }
+  .reflex { background-color: #17a2b8; }
+  .full { background-color: #343a40; }
+  
+  #description-text {
+    font-style: italic;
+    min-height: 40px;
+    margin-top: 10px;
+  }
+  input[type=range] {
+    cursor: pointer;
+  }
+</style>
+
+<script>
+  const slider = document.getElementById('angle-slider');
+  const degreesText = document.getElementById('degrees-text');
+  const arm = document.getElementById('angle-arm');
+  const arc = document.getElementById('angle-arc');
+  const badge = document.getElementById('classification-badge');
+  const description = document.getElementById('description-text');
+
+  function updateAngle(deg) {
+    degreesText.innerText = deg;
+    
+    // Convert degrees to radians for math (SVG coordinates)
+    // We invert the Y axis because SVG (0,0) is top-left
+    const rad = (deg * Math.PI) / 180;
+    const radius = 80;
+    const cx = 100;
+    const cy = 100;
+    
+    const x = cx + radius * Math.cos(-rad);
+    const y = cy + radius * Math.sin(-rad);
+    
+    // Update the moving arm
+    arm.setAttribute('x2', x);
+    arm.setAttribute('y2', y);
+    
+    // Draw the SVG filled arc sweep
+    let arcRadius = 25;
+    if (deg === 90) arcRadius = 20; // Perfect square corner shortcut could go here, keeping it simple
+    
+    const arcX = cx + arcRadius * Math.cos(-rad);
+    const arcY = cy + arcRadius * Math.sin(-rad);
+    const largeArcFlag = deg > 180 ? 1 : 0;
+    
+    let d = `M ${cx + arcRadius} ${cy} A ${arcRadius} ${arcRadius} 0 ${largeArcFlag} 0 ${arcX} ${arcY} L ${cx} ${cy} Z`;
+    if (deg >= 360) {
+      d = `M ${cx + arcRadius} ${cy} A ${arcRadius} ${arcRadius} 0 1 0 ${cx - arcRadius} ${cy} A ${arcRadius} ${arcRadius} 0 1 0 ${cx + arcRadius} ${cy} Z`;
+    }
+    arc.setAttribute('d', d);
+
+    // Classification Logic
+    badge.className = "badge"; // Reset styles
+    
+    if (deg === 0) {
+      badge.textContent = "Zero Angle";
+      badge.classList.add('full');
+      description.textContent = "The arms completely overlap. There is no opening.";
+    } else if (deg > 0 && deg < 90) {
+      badge.textContent = "Acute Angle";
+      badge.classList.add('acute');
+      description.textContent = "Greater than 0° but less than 90°. It's sharp and narrow.";
+    } else if (deg === 90) {
+      badge.textContent = "Right Angle";
+      badge.classList.add('right-angle');
+      description.textContent = "Exactly 90°. Forms a perfect square corner.";
+    } else if (deg > 90 && deg < 180) {
+      badge.textContent = "Obtuse Angle";
+      badge.classList.add('obtuse');
+      description.textContent = "Greater than 90° but less than 180°. Wide and blunt.";
+    } else if (deg === 180) {
+      badge.textContent = "Straight Angle";
+      badge.classList.add('straight');
+      description.textContent = "Exactly 180°. Forms a perfectly flat line.";
+    } else if (deg > 180 && deg < 360) {
+      badge.textContent = "Reflex Angle";
+      badge.classList.add('reflex');
+      description.textContent = "Greater than 180° but less than 360°. It measures the outer bend.";
+    } else if (deg === 360) {
+      badge.textContent = "Full / Complete Angle";
+      badge.classList.add('full');
+      description.textContent = "Exactly 360°. One arm made a full circle rotation.";
+    }
+  }
+
+  // Listen to slider changes
+  slider.addEventListener('input', (e) => updateAngle(parseInt(e.target.value)));
+  
+  // Initialize on load
+  updateAngle(45);
+</script>
