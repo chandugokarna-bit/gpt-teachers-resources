@@ -1,0 +1,181 @@
+<div class="solar-quiz-container" style="max-width: 800px; margin: 30px auto; background-color: #0b132b; color: #ffffff; border-radius: 12px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); border: 2px solid #00b4d8; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+    
+    <div style="text-align: center; border-bottom: 2px dashed #00b4d8; padding-bottom: 15px; margin-bottom: 20px;">
+        <h2 style="margin: 0; color: #00b4d8; font-size: 24px;">🚀 ಸೌರಮಂಡಲ ರಸಪ್ರಶ್ನೆ ಜಗತ್ತು</h2>
+        <p style="margin: 5px 0 0 0; color: #a5a5a5; font-size: 14px;">ನಿಮ್ಮ ಸೌರಮಂಡಲದ ಜ್ಞಾನವನ್ನು ಇಲ್ಲಿ ಪರೀಕ್ಷಿಸಿಕೊಳ್ಳಿ!</p>
+    </div>
+
+    <div style="display: flex; justify-content: space-between; margin-bottom: 15px; font-weight: bold; color: #ffcc00; font-size: 15px;">
+        <span id="question-number">ಪ್ರಶ್ನೆ: 1 / 5</span>
+        <span id="score-display">ಅಂಕಗಳು: 0</span>
+    </div>
+
+    <div id="quiz-body">
+        <h3 id="quiz-question" style="font-size: 18px; line-height: 1.5; margin-bottom: 20px; color: #ffffff;">ಪ್ರಶ್ನೆ ಇಲ್ಲಿ ಮೂಡುತ್ತದೆ...</h3>
+        
+        <div id="options-container" style="display: grid; grid-template-columns: 1fr; gap: 12px;">
+            </div>
+    </div>
+
+    <div id="result-board" style="display: none; text-align: center; padding: 20px;">
+        <h2 style="color: #ffcc00; margin-0 0 10px 0;">🎉 ಕ್ವಿಜ್ ಮುಕ್ತಾಯವಾಯಿತು!</h2>
+        <p id="final-score-text" style="font-size: 18px; font-weight: bold; margin-bottom: 20px;">ನಿಮ್ಮ ಒಟ್ಟು ಅಂಕಗಳು: 0</p>
+        <button onclick="restartQuiz()" style="background-color: #00b4d8; color: white; border: none; padding: 10px 25px; font-size: 16px; font-weight: bold; border-radius: 5px; cursor: pointer; transition: 0.2s;">ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ 🔄</button>
+    </div>
+</div>
+
+<script>
+    // ಪ್ರಶ್ನೆಗಳ ಬ್ಯಾಂಕ್ (ಇಲ್ಲಿ ನೀವು ಪ್ರಶ್ನೆಗಳನ್ನು ಸುಲಭವಾಗಿ ಬದಲಾಯಿಸಬಹುದು ಅಥವಾ ಹೆಚ್ಚಿಸಬಹುದು)
+    const quizData = [
+        {
+            question: "1. ಸೌರಮಂಡಲದ ಅತ್ಯಂತ ದೊಡ್ಡ ಗ್ರಹ ಯಾವುದು?",
+            options: ["ಮಂಗಳ (Mars)", "ಗುರು (Jupiter)", "ಶನಿ (Saturn)", "ಭೂಮಿ (Earth)"],
+            correct: 1
+        },
+        {
+            question: "2. ಸೂರ್ಯನಿಗೆ ಅತ್ಯಂತ ಹತ್ತಿರವಿರುವ ಗ್ರಹ ಯಾವುದು?",
+            options: ["ಶುಕ್ರ (Venus)", "ಬುಧ (Mercury)", "ನೆಪ್ಚೂನ್ (Neptune)", "ಯುರೇನಸ್ (Uranus)"],
+            correct: 1
+        },
+        {
+            question: "3. ಸೌರಮಂಡಲದ 'ಕೆಂಪು ಗ್ರಹ' (Red Planet) ಎಂದು ಯಾವ ಗ್ರಹವನ್ನು ಕರೆಯಲಾಗುತ್ತದೆ?",
+            options: ["ಮಂಗಳ (Mars)", "ಗುರು (Jupiter)", "ಬುಧ (Mercury)", "ಶುಕ್ರ (Venus)"],
+            correct: 0
+        },
+        {
+            question: "4. ಸುಂದರವಾದ ಬಳೆಗಳನ್ನು (Rings) ಹೊಂದಿರುವ ಸೌರಮಂಡಲದ ಗ್ರಹ ಯಾವುದು?",
+            options: ["ಭೂಮಿ", "ನೆಪ್ಚೂನ್", "ಶನಿ (Saturn)", "ಗುರು"],
+            correct: 2
+        },
+        {
+            question: "5. ಜೀವ ಸಂಕುಲವನ್ನು ಹೊಂದಿರುವ ಸೌರಮಂಡಲದ ಏಕೈಕ ವಿಶಿಷ್ಟ ಗ್ರಹ ಯಾವುದು?",
+            options: ["ಶುಕ್ರ", "ಭೂಮಿ (Earth)", "ಮಂಗಳ", "ಯುರೇನಸ್"],
+            correct: 1
+        }
+    ];
+
+    let currentQuestionIndex = 0;
+    let score = 0;
+    let canAnswer = true;
+
+    // ಆಡಿಯೋ ಎಫೆಕ್ಟ್ಸ್ (ಬ್ರೌಸರ್ ಬೆಂಬಲಿತ ಆಟೋ-ಟೋನ್ಸ್)
+    const playSound = (isCorrect) => {
+        const context = new (window.AudioContext || window.webkitAudioContext)();
+        const oscillator = context.createOscillator();
+        const gainNode = context.createGain();
+        oscillator.connect(gainNode);
+        gainNode.connect(context.destination);
+        
+        if (isCorrect) {
+            oscillator.frequency.setValueAtTime(600, context.currentTime); // ಹೈ ಟೋನ್ (ಸರಿ)
+            gainNode.gain.setValueAtTime(0.1, context.currentTime);
+            oscillator.start();
+            oscillator.stop(context.currentTime + 0.15);
+        } else {
+            oscillator.frequency.setValueAtTime(250, context.currentTime); // ಲೋ ಟೋನ್ (ತಪ್ಪು)
+            gainNode.gain.setValueAtTime(0.1, context.currentTime);
+            oscillator.start();
+            oscillator.stop(context.currentTime + 0.25);
+        }
+    };
+
+    function loadQuestion() {
+        canAnswer = true;
+        const currentQuiz = quizData[currentQuestionIndex];
+        
+        // ಪ್ರಶ್ನೆ ಸಂಖ್ಯೆ ಮತ್ತು ಸ್ಕೋರ್ ಅಪ್ಡೇಟ್
+        document.getElementById("question-number").innerText = `ಪ್ರಶ್ನೆ: ${currentQuestionIndex + 1} / ${quizData.length}`;
+        document.getElementById("score-display").innerText = `ಅಂಕಗಳು: ${score}`;
+        
+        // ಪ್ರಶ್ನೆ ಪ್ರದರ್ಶನ
+        document.getElementById("quiz-question").innerText = currentQuiz.question;
+        
+        // ಆಯ್ಕೆಗಳ ಬಟನ್ ಸೃಜನೆ
+        const optionsContainer = document.getElementById("options-container");
+        optionsContainer.innerHTML = "";
+        
+        currentQuiz.options.forEach((option, index) => {
+            const button = document.createElement("button");
+            button.innerText = option;
+            button.style.width = "100%";
+            button.style.padding = "12px 15px";
+            button.style.fontSize = "15px";
+            button.style.fontWeight = "500";
+            button.style.textAlign = "left";
+            button.style.backgroundColor = "#1d2d44";
+            button.style.color = "#ffffff";
+            button.style.border = "1px solid #3e5c76";
+            button.style.border_radius = "6px";
+            button.style.cursor = "pointer";
+            button.style.transition = "0.2s";
+            
+            // ಮೌಸ್ ಇಟ್ಟಾಗ ಬದಲಾಗುವ ಶೈಲಿ
+            button.onmouseover = () => { if(canAnswer) button.style.backgroundColor = "#3e5c76"; };
+            button.onmouseout = () => { if(canAnswer) button.style.backgroundColor = "#1d2d44"; };
+            
+            // ಕ್ಲಿಕ್ ಮಾಡಿದಾಗ ಉತ್ತರ ಪರಿಶೀಲನೆ
+            button.onclick = () => selectOption(index, button);
+            
+            optionsContainer.appendChild(button);
+        });
+    }
+
+    function selectOption(selectedIndex, selectedButton) {
+        if (!canAnswer) return;
+        canAnswer = false;
+        
+        const currentQuiz = quizData[currentQuestionIndex];
+        const buttons = document.getElementById("options-container").getElementsByTagName("button");
+        
+        if (selectedIndex === currentQuiz.correct) {
+            // ಸರಿಯಾದ ಉತ್ತರ
+            selectedButton.style.backgroundColor = "#28a745"; // ಹಸಿರು ಬಣ್ಣ
+            selectedButton.style.borderColor = "#28a745";
+            selectedButton.innerText += " 🎉";
+            score += 10;
+            document.getElementById("score-display").innerText = `ಅಂಕಗಳು: ${score}`;
+            playSound(true);
+        } else {
+            // ತಪ್ಪು ಉತ್ತರ
+            selectedButton.style.backgroundColor = "#dc3545"; // ಕೆಂಪು ಬಣ್ಣ
+            selectedButton.style.borderColor = "#dc3545";
+            selectedButton.innerText += " ❌";
+            
+            // ಸರಿಯಾದ ಉತ್ತರವನ್ನು ಹೈಲೈಟ್ ಮಾಡುವುದು
+            buttons[currentQuiz.correct].style.backgroundColor = "#28a745";
+            buttons[currentQuiz.correct].style.borderColor = "#28a745";
+            playSound(false);
+        }
+
+        // 1.5 ಸೆಕೆಂಡ್ ನಂತರ ಮುಂದಿನ ಪ್ರಶ್ನೆಗೆ ಹೋಗುವುದು
+        setTimeout(() => {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < quizData.length) {
+                loadQuestion();
+            } else {
+                showFinalResults();
+            }
+        }, 1500);
+    }
+
+    function showFinalResults() {
+        document.getElementById("quiz-body").style.display = "none";
+        document.getElementById("question-number").style.display = "none";
+        document.getElementById("result-board").style.display = "block";
+        
+        const maxScore = quizData.length * 10;
+        document.getElementById("final-score-text").innerText = `ನಿಮ್ಮ ಒಟ್ಟು ಅಂಕಗಳು: ${score} / ${maxScore}`;
+    }
+
+    function restartQuiz() {
+        currentQuestionIndex = 0;
+        score = 0;
+        document.getElementById("quiz-body").style.display = "block";
+        document.getElementById("question-number").style.display = "block";
+        document.getElementById("result-board").style.display = "none";
+        loadQuestion();
+    }
+
+    // ಪ್ರಥಮ ಬಾರಿಗೆ ಕ್ವಿಜ್ ಲೋಡ್ ಮಾಡಲು
+    loadQuestion();
+</script>
