@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಬ್ರಿಟಿಷ್ ಪ್ರಾಬಲ್ಯದ ಬೆಳವಣಿಗೆ - 5ನೇ ಪಾಠ</title>
+    <style>
+        /* 1. ULTRA COMPATIBLE SYSTEM FONTS - 100% Offline Compatible */
+        :root {
+            --primary: #0f172a;      /* Slate Black */
+            --primary-card: #1e293b; /* Slate Gray */
+            --accent: #eab308;       /* Gold */
+            --danger: #ef4444;       /* Crimson */
+            --text-light: #f8fafc;   /* White */
+            --text-muted: #94a3b8;   /* Light Gray */
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+
+        body {
+            background-color: #0b0f19;
+            color: var(--text-light);
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans Kannada", sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 10px;
+        }
+
+        /* Presentation Frame */
+        .presentation-container {
+            width: 100%;
+            max-width: 1000px;
+            height: 585px;
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border-radius: 16px;
+            border: 2px solid #334155;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* Global Header Watermark on Every Slide */
+        .global-watermark {
+            position: absolute;
+            top: 20px;
+            right: 35px;
+            font-size: 13px;
+            color: var(--text-muted);
+            z-index: 10;
+            background: rgba(15, 23, 42, 0.6);
+            padding: 4px 12px;
+            border-radius: 20px;
+            border: 1px solid rgba(234, 179, 8, 0.2);
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .global-watermark::before {
+            content: "👤";
+            font-size: 11px;
+        }
+
+        /* Hide global watermark on slide 1 (since it already has a big presenter block) */
+        .slide[data-index="0"] ~ .global-watermark {
+            display: none;
+        }
+
+        /* Slide Deck Area */
+        .slides-viewport {
+            position: relative;
+            flex-grow: 1;
+            width: 100%;
+            height: 100%;
+        }
+
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            visibility: hidden;
+            transform: scale(0.98);
+            transition: opacity 0.4s ease, transform 0.4s ease, visibility 0.4s;
+            padding: 40px 45px 30px 45px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            z-index: 1;
+        }
+
+        .slide.active {
+            opacity: 1;
+            visibility: visible;
+            transform: scale(1);
+            z-index: 2;
+        }
+
+        /* Typography & Headings */
+        h1, h2, h3 {
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .slide-title {
+            font-size: 32px;
+            color: var(--accent);
+            border-bottom: 2px solid #334155;
+            padding-bottom: 8px;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        p, li {
+            font-size: 18px;
+            line-height: 1.5;
+            color: #cbd5e1;
+        }
+
+        /* Title Slide Custom Layout */
+        .title-slide {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+        }
+
+        .title-slide h1 {
+            font-size: 48px;
+            color: var(--text-light);
+            margin-bottom: 10px;
+            line-height: 1.2;
+        }
+
+        .title-slide .sub {
+            font-size: 22px;
+            color: var(--accent);
+            font-weight: 600;
+            margin-bottom: 25px;
+        }
+
+        /* Presenter Details Box on Title Slide */
+        .presenter-box {
+            background: rgba(234, 179, 8, 0.1);
+            border: 1px solid var(--accent);
+            padding: 12px 24px;
+            border-radius: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            margin-top: 10px;
+        }
+
+        .presenter-box p {
+            font-size: 17px;
+            color: var(--text-light);
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin: 0;
+        }
+
+        /* Two-Column Grid */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 30px;
+            align-items: center;
+            height: calc(100% - 60px);
+        }
+
+        .bullet-list {
+            list-style: none;
+        }
+
+        .bullet-list li {
+            position: relative;
+            padding-left: 30px;
+            margin-bottom: 15px;
+        }
+
+        /* Pure CSS bullet checkmark */
+        .bullet-list li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            top: 0;
+            color: var(--accent);
+            font-weight: bold;
+            font-size: 20px;
+        }
+
+        /* Self-contained Vector Illustration Container */
+        .graphic-box {
+            background-color: rgba(30, 41, 59, 0.7);
+            border: 2px solid var(--accent);
+            border-radius: 12px;
+            padding: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 260px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+        }
+
+        .graphic-box svg {
+            width: 100%;
+            height: 100%;
+            max-height: 220px;
+        }
+
+        /* Key Metrics / Highlights */
+        .highlight-container {
+            display: flex;
+            align-items: center;
+            background: rgba(234, 179, 8, 0.1);
+            border: 2px dashed var(--accent);
+            border-radius: 12px;
+            padding: 15px 20px;
+            margin-top: 15px;
+        }
+
+        .big-num {
+            font-size: 60px;
+            font-weight: 800;
+            color: var(--accent);
+            margin-right: 20px;
+            line-height: 1;
+        }
+
+        /* Three Grid Cards */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .card {
+            background: #1e293b;
+            border-radius: 12px;
+            padding: 20px 15px;
+            border-top: 4px solid var(--accent);
+            text-align: center;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+
+        .card h3 {
+            font-size: 18px;
+            color: var(--text-light);
+            margin-bottom: 8px;
+        }
+
+        .card p {
+            font-size: 14px;
+            color: #94a3b8;
+        }
+
+        /* Simple Table Styling */
+        .table-area {
+            background: #1e293b;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 5px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background-color: #334155;
+            color: var(--accent);
+            text-align: left;
+            padding: 10px 15px;
+            font-size: 17px;
+        }
+
+        td {
+            padding: 10px 15px;
+            border-bottom: 1px solid #334155;
+            font-size: 15px;
+            color: #e2e8f0;
+        }
+
+        /* Slide Footer Controller */
+        .footer-control {
+            height: 55px;
+            background-color: #111827;
+            border-top: 1px solid #334155;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 25px;
+            z-index: 15;
+        }
+
+        .btn {
+            background: transparent;
+            border: 2px solid var(--accent);
+            color: var(--accent);
+            border-radius: 20px;
+            padding: 5px 15px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn:hover:not(:disabled) {
+            background-color: var(--accent);
+            color: #0f172a;
+        }
+
+        .btn:disabled {
+            opacity: 0.25;
+            cursor: not-allowed;
+            border-color: #475569;
+            color: #475569;
+        }
+
+        .dots-row {
+            display: flex;
+            gap: 6px;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            background-color: #475569;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .dot.active {
+            background-color: var(--accent);
+            transform: scale(1.2);
+        }
+
+        .bottom-counter {
+            font-size: 15px;
+            color: #64748b;
+            margin-top: 10px;
+            font-weight: 600;
+        }
+
+        .keyboard-info {
+            font-size: 13px;
+            color: #475569;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Presentation Viewport Frame -->
+    <div class="presentation-container">
+
+        <!-- Global Header Watermark (Hidden on first slide via Javascript) -->
+        <div class="global-watermark" id="global-presenter">
+            ಪ್ರಸ್ತುತಿ: ಶ್ರೀ ಚಂದ್ರಕಾಂತ ಗೌಡ, ಜಿಪಿಟಿ ಸಮಾಜ ವಿಜ್ಞಾನ ಶಿಕ್ಷಕರು
+        </div>
+
+        <!-- Slides Wrapper -->
+        <div class="slides-viewport">
+
+            <!-- Slide 1: Title Slide -->
+            <div class="slide active">
+                <div class="title-slide">
+                    <!-- Simple SVG Royal Crown (Instantly rendered) -->
+                    <svg width="60" height="60" viewBox="0 0 100 100" style="margin-bottom: 12px;">
+                        <path d="M10,80 L90,80 L80,30 L60,55 L50,25 L40,55 L20,30 Z" fill="none" stroke="#eab308" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+                        <circle cx="50" cy="25" r="4" fill="#eab308"/>
+                        <circle cx="20" cy="30" r="4" fill="#eab308"/>
+                        <circle cx="80" cy="30" r="4" fill="#eab308"/>
+                        <rect x="20" y="80" width="60" height="8" rx="2" fill="#eab308"/>
+                    </svg>
+                    <p style="font-size: 18px; color: var(--accent); font-weight: 600;">ಸಮಾಜ ವಿಜ್ಞಾನ - ಏಳನೇ ತರಗತಿ</p>
+                    <h1>ಬ್ರಿಟಿಷ್ ಪ್ರಾಬಲ್ಯದ ಬೆಳವಣಿಗೆ</h1>
+                    <div class="sub">ಸಾ.ಶ. 1758 - 1856</div>
+                    
+                    <!-- Beautiful Presenter Badge -->
+                    <div class="presenter-box">
+                        <p>ಪ್ರಸ್ತುತಿ: ಶ್ರೀ ಚಂದ್ರಕಾಂತ ಗೌಡ, ಜಿಪಿಟಿ ಸಮಾಜ ವಿಜ್ಞಾನ ಶಿಕ್ಷಕರು</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 2: Battle of Buxar -->
+            <div class="slide">
+                <div class="slide-title">⚔ ಬಕ್ಸಾರ್ ಕದನ (ಸಾ.ಶ. 1764)</div>
+                <div class="grid-2">
+                    <div>
+                        <ul class="bullet-list">
+                            <li><strong>ಹಿನ್ನೆಲೆ:</strong> ಬಂಗಾಳದ ನವಾಬ ಮೀರ್ ಕಾಸಿಂ ಭಾರತೀಯ ವರ್ತಕರಿಗೆ ತೆರಿಗೆ ಮುಕ್ತ ವ್ಯಾಪಾರಕ್ಕೆ ಅವಕಾಶ ನೀಡಿದ್ದರಿಂದ ಬ್ರಿಟಿಷರು ಕೋಪಗೊಂಡರು.</li>
+                            <li><strong>ತ್ರಿಕೂಟ ಸೈನ್ಯ:</strong> ಮೀರ್ ಕಾಸಿಂ, ಔದ್‌ನ ನವಾಬ ಮತ್ತು ಮೊಘಲ್ ಚಕ್ರವರ್ತಿ ಷಾ ಆಲಂ ಬ್ರಿಟಿಷರ ವಿರುದ್ಧ ಜಂಟಿ ಸೈನ್ಯ ರಚಿಸಿದರು.</li>
+                            <li><strong>ಫಲಿತಾಂಶ:</strong> ಬಕ್ಸಾರ್ ಕದನದಲ್ಲಿ ಬ್ರಿಟಿಷರು ಈ ಜಂಟಿ ಸೈನ್ಯವನ್ನು ಸೋಲಿಸಿ, ಭಾರತದಲ್ಲಿ ಸಂಪೂರ್ಣ ಹಿಡಿತ ಸಾಧಿಸಿದರು.</li>
+                        </ul>
+                    </div>
+                    <div class="graphic-box">
+                        <!-- Swords Cross Graphic -->
+                        <svg viewBox="0 0 100 100">
+                            <circle cx="50" cy="50" r="45" fill="none" stroke="#eab308" stroke-width="2"/>
+                            <path d="M25,75 L75,25" stroke="#ef4444" stroke-width="4" stroke-linecap="round"/>
+                            <path d="M75,75 L25,25" stroke="#ef4444" stroke-width="4" stroke-linecap="round"/>
+                            <path d="M50,20 C65,20 65,50 50,70 C35,50 35,20 50,20 Z" fill="#eab308" opacity="0.3"/>
+                            <path d="M50,20 C65,20 65,50 50,70 C35,50 35,20 50,20 Z" fill="none" stroke="#eab308" stroke-width="2"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 3: Diwani Rights -->
+            <div class="slide">
+                <div class="slide-title">📜 ದಿವಾನಿ ಹಕ್ಕು (ಸಾ.ಶ. 1765)</div>
+                <div class="grid-2">
+                    <div>
+                        <ul class="bullet-list">
+                            <li><strong>ಮಹಾ ಒಪ್ಪಂದ:</strong> ಬಕ್ಸಾರ್ ಕದನದ ಸೋಲಿನ ನಂತರ ಬ್ರಿಟಿಷರು ಮತ್ತು ಮೊಘಲ್ ಚಕ್ರವರ್ತಿ ನಡುವೆ ಒಪ್ಪಂದವಾಯಿತು.</li>
+                            <li><strong>ತೆರಿಗೆ ಸಂಗ್ರಹ:</strong> ಬಂಗಾಳ, ಬಿಹಾರ ಮತ್ತು ಒರಿಸ್ಸಾ ಪ್ರಾಂತ್ಯಗಳಲ್ಲಿ ಭೂಕಂದಾಯ ವಸೂಲಿ ಮಾಡುವ 'ದಿವಾನಿ ಹಕ್ಕು' ಬ್ರಿಟಿಷರಿಗೆ ಲಭಿಸಿತು.</li>
+                        </ul>
+                        <div class="highlight-container">
+                            <div class="big-num">26</div>
+                            <div>
+                                <h3 style="color: var(--accent);">ಲಕ್ಷ ರೂಪಾಯಿ ಕರ</h3>
+                                <p style="font-size:15px; margin:0;">ಬ್ರಿಟಿಷರು ಚಕ್ರವರ್ತಿಗೆ ವರ್ಷಕ್ಕೆ ಕೇವಲ 26 ಲಕ್ಷ ರೂ. ನೀಡಿ ಆ ಪ್ರಾಂತ್ಯಗಳ ಸಂಪೂರ್ಣ ಖಜಾನೆಯನ್ನು ಸ್ವಾಧೀನಪಡಿಸಿಕೊಂಡರು.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="graphic-box">
+                        <!-- Scroll/Document and Coins Graphic -->
+                        <svg viewBox="0 0 100 100">
+                            <rect x="30" y="20" width="40" height="60" rx="3" fill="#f8fafc" stroke="#eab308" stroke-width="2"/>
+                            <line x1="38" y1="35" x2="62" y2="35" stroke="#475569" stroke-width="3" stroke-linecap="round"/>
+                            <line x1="38" y1="45" x2="62" y2="45" stroke="#475569" stroke-width="3" stroke-linecap="round"/>
+                            <line x1="38" y1="55" x2="52" y2="55" stroke="#475569" stroke-width="3" stroke-linecap="round"/>
+                            <circle cx="50" cy="65" r="5" fill="#ef4444"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 4: Regulating Act -->
+            <div class="slide">
+                <div class="slide-title">⚖ ರೆಗ್ಯುಲೇಟಿಂಗ್ ಕಾಯ್ದೆ (ಸಾ.ಶ. 1773)</div>
+                <div class="grid-2">
+                    <div>
+                        <ul class="bullet-list">
+                            <li><strong>ಆಡಳಿತ ಸುಧಾರಣೆ:</strong> ಈಸ್ಟ್ ಇಂಡಿಯಾ ಕಂಪನಿಯ ಮಿತಿಮೀರಿದ ಭ್ರಷ್ಟಾಚಾರವನ್ನು ತಡೆಗಟ್ಟಲು ಬ್ರಿಟಿಷ್ ಸಂಸತ್ತು ಈ ಕಾಯ್ದೆಯನ್ನು ಜಾರಿಗೆ ತಂದಿತು.</li>
+                            <li><strong>ಗವರ್ನರ್ ಜನರಲ್:</strong> ಬಂಗಾಳದ ಗವರ್ನರ್ ಹುದ್ದೆಯನ್ನು "ಗವರ್ನರ್ ಜನರಲ್" ಎಂದು ಬದಲಾಯಿಸಲಾಯಿತು. <strong>ವಾರನ್ ಹೇಸ್ಟಿಂಗ್ಸ್</strong> ಪ್ರಥಮ ಗವರ್ನರ್ ಜನರಲ್ ಆದನು.</li>
+                            <li><strong>ಸುಪ್ರೀಂ ಕೋರ್ಟ್:</strong> ಕಲ್ಕತ್ತಾದಲ್ಲಿ ಮೊದಲ ಬಾರಿಗೆ ಸುಪ್ರೀಂ ಕೋರ್ಟ್ ಸ್ಥಾಪಿಸಲು ಅವಕಾಶ ನೀಡಲಾಯಿತು.</li>
+                        </ul>
+                    </div>
+                    <div class="graphic-box">
+                        <!-- Scales of Justice Graphic -->
+                        <svg viewBox="0 0 100 100">
+                            <line x1="50" y1="20" x2="50" y2="80" stroke="#94a3b8" stroke-width="4"/>
+                            <line x1="25" y1="30" x2="75" y2="30" stroke="#eab308" stroke-width="4" stroke-linecap="round"/>
+                            <path d="M25,30 L15,60 L35,60 Z" fill="none" stroke="#eab308" stroke-width="2"/>
+                            <path d="M75,30 L65,60 L85,60 Z" fill="none" stroke="#eab308" stroke-width="2"/>
+                            <rect x="40" y="80" width="20" height="6" fill="#94a3b8"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 5: Ranjit Singh -->
+            <div class="slide">
+                <div class="slide-title">🦁 ಪಂಜಾಬ್ ಸಿಂಹ: ರಣಜಿತ್ ಸಿಂಗ್</div>
+                <div class="grid-2">
+                    <div>
+                        <ul class="bullet-list">
+                            <li><strong>ಸಿಖ್ಖರ ಯಶೋಗಾಥೆ:</strong> ಚದುರಿಹೋಗಿದ್ದ ಹನ್ನೆರಡು ಸಿಖ್ ಪಂಗಡಗಳನ್ನು (ಮಿಸಲ್) ಸಂಘಟಿಸಿ ಪ್ರಬಲ ಸಿಖ್ ಸಾಮ್ರಾಜ್ಯ ಕಟ್ಟಿದರು.</li>
+                            <li><strong>ಲಾಹೋರ್ ವಶ:</strong> ಸಾ.ಶ. 1799ರಲ್ಲಿ ಲಾಹೋರನ್ನು ಆಕ್ರಮಿಸಿ ತಮ್ಮ ಸಾಮ್ರಾಜ್ಯದ ರಾಜಧಾನಿಯನ್ನಾಗಿ ಮಾಡಿಕೊಂಡರು.</li>
+                            <li><strong>ಬಲಿಷ್ಠ ಸೇನೆ:</strong> ಬ್ರಿಟಿಷರಿಗೆ ದಶಕಗಳ ಕಾಲ ಪೈಪೋಟಿ ನೀಡಿದ ಏಕೈಕ ಮಹಾನ್ ಭಾರತೀಯ ರಾಜರಾಗಿದ್ದರು. ಇವರ ನಿಧನದ ನಂತರ ಸಿಖ್ ಸಾಮ್ರಾಜ್ಯ ಪತನವಾಯಿತು.</li>
+                        </ul>
+                    </div>
+                    <div class="graphic-box">
+                        <!-- Lion representation / Shield Graphic -->
+                        <svg viewBox="0 0 100 100">
+                            <polygon points="50,15 80,30 80,70 50,90 20,70 20,30" fill="none" stroke="#eab308" stroke-width="3"/>
+                            <circle cx="50" cy="50" r="18" fill="none" stroke="#eab308" stroke-width="2"/>
+                            <line x1="50" y1="32" x2="50" y2="68" stroke="#ffffff" stroke-width="4"/>
+                            <line x1="32" y1="50" x2="68" y2="50" stroke="#ffffff" stroke-width="4"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 6: Subsidiary Alliance -->
+            <div class="slide">
+                <div class="slide-title">🤝 ಸಹಾಯಕ ಸೈನ್ಯ ಪದ್ಧತಿ (ಸಾ.ಶ. 1799)</div>
+                <div class="grid-2">
+                    <div>
+                        <h3 style="color: var(--accent); margin-bottom: 10px;">ಲಾರ್ಡ್ ವೆಲ್ಲೆಸ್ಲಿಯ ಜಾಲ</h3>
+                        <p>ಭಾರತದ ದೇಶಿ ರಾಜರನ್ನು ನಿಯಂತ್ರಿಸಲು ರಚಿಸಿದ ಸೈನಿಕ ತಂತ್ರವಿದು.</p>
+                        <ul class="bullet-list" style="margin-top: 8px;">
+                            <li>ರಾಜರು ಬ್ರಿಟಿಷ್ ಸೈನ್ಯವನ್ನು ತಮ್ಮ ರಾಜ್ಯದಲ್ಲಿಟ್ಟುಕೊಂಡು ಅದರ ಎಲ್ಲಾ ಖರ್ಚನ್ನು ತಾವೇ ಭರಿಸಬೇಕಿತ್ತು.</li>
+                            <li>ಆಸ್ಥಾನದಲ್ಲಿ ಬ್ರಿಟಿಷ್ ಅಧಿಕಾರಿಯನ್ನು (ರೆಸಿಡೆಂಟ್) ಇಟ್ಟುಕೊಳ್ಳುವುದು ಕಡ್ಡಾಯವಾಗಿತ್ತು.</li>
+                            <li><strong>ಮೊದಲ ಬಲಿ:</strong> ಹೈದರಾಬಾದ್ ನಿಜಾಮ ಇದನ್ನು ಮೊದಲು ಒಪ್ಪಿಕೊಂಡನು. ನಂತರ ಮೈಸೂರು ಮತ್ತು ಇತರ ಸಂಸ್ಥಾನಗಳು ಇದಕ್ಕೆ ಬಲಿಯಾದವು.</li>
+                        </ul>
+                    </div>
+                    <div class="graphic-box">
+                        <!-- Handshake Trap Graphic -->
+                        <svg viewBox="0 0 100 100">
+                            <rect x="20" y="20" width="60" height="60" rx="10" fill="none" stroke="#ef4444" stroke-dasharray="4,4" stroke-width="2"/>
+                            <!-- Handshake representation -->
+                            <path d="M25,50 L45,50" stroke="#94a3b8" stroke-width="8" stroke-linecap="round"/>
+                            <path d="M75,50 L55,50" stroke="#eab308" stroke-width="8" stroke-linecap="round"/>
+                            <circle cx="50" cy="50" r="8" fill="#ef4444"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 7: Doctrine of Lapse -->
+            <div class="slide">
+                <div class="slide-title">👑 ದತ್ತು ಮಕ್ಕಳಿಗೆ ಹಕ್ಕಿಲ್ಲ ನೀತಿ (ಸಾ.ಶ. 1848)</div>
+                <div class="grid-2">
+                    <div>
+                        <h3 style="color: var(--danger); margin-bottom: 10px;">ಲಾರ್ಡ್ ಡಾಲ್‌ಹೌಸಿಯ ಧೋರಣೆ</h3>
+                        <p>ಬ್ರಿಟಿಷ್ ಸಾಮ್ರಾಜ್ಯವನ್ನು ಇನ್ನಷ್ಟು ವಿಸ್ತರಿಸಲು ಬಳಸಿದ ಅತ್ಯಂತ ಅನ್ಯಾಯದ ನೀತಿ.</p>
+                        <ul class="bullet-list" style="margin-top: 8px;">
+                            <li>ಮಕ್ಕಳಿಲ್ಲದ ಭಾರತೀಯ ರಾಜರು ದತ್ತು ಮಗನನ್ನು ಉತ್ತರಾಧಿಕಾರಿಯನ್ನಾಗಿ ಮಾಡುವಂತಿರಲಿಲ್ಲ.</li>
+                            <li>ರಾಜನು ಮೃತಪಟ್ಟರೆ ಆತನ ಇಡೀ ಸಾಮ್ರಾಜ್ಯವು ಬ್ರಿಟಿಷರ ವಶವಾಗುತ್ತಿತ್ತು.</li>
+                            <li><strong>ಬಲಿಯಾದ ರಾಜ್ಯಗಳು:</strong> ಸತಾರ, ಝಾನ್ಸಿ, ಜೈಪುರ ಮತ್ತು ನಾಗಪುರಗಳನ್ನು ಬ್ರಿಟಿಷರು ಈ ಮೂಲಕ ಆಕ್ರಮಿಸಿಕೊಂಡರು.</li>
+                        </ul>
+                    </div>
+                    <div class="graphic-box">
+                        <!-- Broken Crown Graphic -->
+                        <svg viewBox="0 0 100 100">
+                            <!-- Throne Outline -->
+                            <path d="M30,70 L70,70 L70,45 L30,45 Z" fill="none" stroke="#eab308" stroke-width="2"/>
+                            <!-- Broken crown path -->
+                            <path d="M35,38 L42,28 L50,35 L58,28 L65,38 Z" fill="none" stroke="#ef4444" stroke-width="3"/>
+                            <line x1="48" y1="28" x2="52" y2="38" stroke="#ef4444" stroke-width="2"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 8: Major Wars -->
+            <div class="slide">
+                <div class="slide-title">🔥 ಬ್ರಿಟಿಷ್ ವಿಸ್ತರಣಾ ಯುದ್ಧಗಳು</div>
+                <p style="margin-bottom: 10px;">ಬ್ರಿಟಿಷರು ಕೇವಲ ಒಪ್ಪಂದಗಳಿಂದಲ್ಲದೆ ತೀವ್ರ ಯುದ್ಧಗಳ ಮೂಲಕವೂ ಭಾರತವನ್ನು ವಶಪಡಿಸಿಕೊಂಡರು:</p>
+                <div class="card-grid">
+                    <div class="card">
+                        <h3>ಆಂಗ್ಲೋ-ಮೈಸೂರು</h3>
+                        <p>ನಾಲ್ಕು ದೊಡ್ಡ ಯುದ್ಧಗಳ ನಂತರ ಟಿಪ್ಪು ಸುಲ್ತಾನ್ ಪತನಗೊಂಡು ಮೈಸೂರು ರಾಜ್ಯ ಬ್ರಿಟಿಷರ ಕೈವಶವಾಯಿತು.</p>
+                    </div>
+                    <div class="card">
+                        <h3>ಆಂಗ್ಲೋ-ಮರಾಠ</h3>
+                        <p>ಮೂರು ಕದನಗಳ ಮೂಲಕ ಮರಾಠರ ಆಂತರಿಕ ಜಗಳಗಳನ್ನು ಬಳಸಿಕೊಂಡು ಪಶ್ಚಿಮ ಭಾರತವನ್ನು ವಶಪಡಿಸಿಕೊಂಡರು.</p>
+                    </div>
+                    <div class="card">
+                        <h3>ಆಂಗ್ಲೋ-ಸಿಖ್</h3>
+                        <p>ರಣಜಿತ್ ಸಿಂಗ್ ಮರಣದ ನಂತರ ಸಿಖ್ ವೀರರನ್ನು ಸರಣಿ ಯುದ್ಧಗಳಲ್ಲಿ ಸೋಲಿಸಿ ಇಡೀ ಪಂಜಾಬ್ ಅನ್ನು ಆಕ್ರಮಿಸಿದರು.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 9: Timeline Table -->
+            <div class="slide">
+                <div class="slide-title">📅 ಪ್ರಮುಖ ಕಾಲಗಣನೆ</div>
+                <div class="table-area">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ವರ್ಷ (ಸಾ.ಶ.)</th>
+                                <th>ಐತಿಹಾಸಿಕ ಘಟನೆಗಳು</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>1764</strong></td>
+                                <td>ಬಕ್ಸಾರ್ ಕದನ - ಬ್ರಿಟಿಷರ ನಿರ್ಣಾಯಕ ಗೆಲುವು.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>1765</strong></td>
+                                <td>ಬಂಗಾಳದ ದಿವಾನಿ ಹಕ್ಕು ಈಸ್ಟ್ ಇಂಡಿಯಾ ಕಂಪನಿಯ ವಶ.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>1773</strong></td>
+                                <td>ರೆಗ್ಯುಲೇಟಿಂಗ್ ಕಾಯ್ದೆ ಜಾರಿ - ವಾರನ್ ಹೇಸ್ಟಿಂಗ್ಸ್ ಆಗಮನ.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>1799</strong></td>
+                                <td>ಲಾರ್ಡ್ ವೆಲ್ಲೆಸ್ಲಿಯ ಸಹಾಯಕ ಸೈನ್ಯ ಪದ್ಧತಿ ಆರಂಭ.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>1848</strong></td>
+                                <td>ಲಾರ್ಡ್ ಡಾಲ್‌ಹೌಸಿಯಿಂದ 'ದತ್ತು ಮಕ್ಕಳಿಗೆ ಹಕ್ಕಿಲ್ಲ' ನೀತಿ ಜಾರಿ.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Slide 10: Conclusion & Thanks -->
+            <div class="slide">
+                <div class="title-slide">
+                    <h1 style="color: var(--accent); font-size: 45px;">ಧನ್ಯವಾದಗಳು!</h1>
+                    <p style="font-size: 20px; max-width: 700px; margin-top: 15px; text-align: center;">
+                        ಈ ಪಾಠದಲ್ಲಿ ನಾವು ಕೇವಲ ವ್ಯಾಪಾರಿಗಳಾಗಿ ಬಂದ ಬ್ರಿಟಿಷರು, ಭಾರತದ ದೇಶಿ ರಾಜರ ನಡುವಿನ ಒಡಕನ್ನು ಬಳಸಿಕೊಂಡು ಇಡೀ ಭಾರತವನ್ನು ಕಬಳಿಸಿದ ಇತಿಹಾಸವನ್ನು ವಿವರವಾಗಿ ಕಲಿತ್ತಿದ್ದೇವೆ.
+                    </p>
+                    <p style="color: var(--accent); font-weight: bold; margin-top: 25px; font-size: 18px;">
+                        ಅಭ್ಯಾಸ ಮುಂದುವರಿಸಿ • ಪ್ರಶ್ನೆಗಳಿಗೆ ಉತ್ತರಿಸಿ
+                    </p>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Static Responsive Control Bar -->
+        <div class="footer-control">
+            <button class="btn" id="prev-button" onclick="slideNav(-1)" disabled>← ಹಿಂದಿನ ಸ್ಲೈಡ್</button>
+            <div class="dots-row" id="dots-container"></div>
+            <button class="btn" id="next-button" onclick="slideNav(1)">ಮುಂದಿನ ಸ್ಲೈಡ್ →</button>
+        </div>
+
+    </div>
+
+    <!-- Counters & Help Texts -->
+    <div class="bottom-counter" id="counter-label">ಸ್ಲೈಡ್: 1 / 10</div>
+    <div class="keyboard-info">
+        ಕೀಬೋರ್ಡ್‌ನ <b>← (Left) ಮತ್ತು → (Right) Arrow</b> ಕೀಗಳನ್ನು ಬಳಸಿ ಸಹ ಸ್ಲೈಡ್ ಬದಲಾಯಿಸಬಹುದು.
+    </div>
+
+    <!-- Presentation Controller JavaScript -->
+    <script>
+        const allSlides = document.querySelectorAll('.slide');
+        const prevButton = document.getElementById('prev-button');
+        const nextButton = document.getElementById('next-button');
+        const counterLabel = document.getElementById('counter-label');
+        const dotsContainer = document.getElementById('dots-container');
+        const globalPresenterWatermark = document.getElementById('global-presenter');
+
+        let activeIndex = 0;
+        const totalNum = allSlides.length;
+
+        // Generate Indicator Dots
+        function buildDots() {
+            dotsContainer.innerHTML = '';
+            for (let i = 0; i < totalNum; i++) {
+                const dotElement = document.createElement('div');
+                dotElement.className = 'dot' + (i === 0 ? ' active' : '');
+                dotElement.addEventListener('click', () => {
+                    showSlide(i);
+                });
+                dotsContainer.appendChild(dotElement);
+            }
+        }
+
+        // Show Slide by index
+        function showSlide(targetIndex) {
+            allSlides[activeIndex].classList.remove('active');
+            document.querySelectorAll('.dot')[activeIndex].classList.remove('active');
+
+            activeIndex = targetIndex;
+
+            allSlides[activeIndex].classList.add('active');
+            document.querySelectorAll('.dot')[activeIndex].classList.add('active');
+
+            // Set button disabled status
+            prevButton.disabled = activeIndex === 0;
+            nextButton.disabled = activeIndex === totalNum - 1;
+
+            // Update Label
+            counterLabel.innerText = `ಸ್ಲೈಡ್: ${activeIndex + 1} / ${totalNum}`;
+
+            // Toggle Global Watermark visibility (hide on title/first slide to prevent redundancy)
+            if (activeIndex === 0) {
+                globalPresenterWatermark.style.display = 'none';
+            } else {
+                globalPresenterWatermark.style.display = 'flex';
+            }
+        }
+
+        // Navigate slides
+        function slideNav(direction) {
+            let nextIndex = activeIndex + direction;
+            if (nextIndex >= 0 && nextIndex < totalNum) {
+                showSlide(nextIndex);
+            }
+        }
+
+        // Keyboard Support
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') {
+                slideNav(1);
+            } else if (e.key === 'ArrowLeft') {
+                slideNav(-1);
+            }
+        });
+
+        // Initialize presentation
+        window.onload = function() {
+            buildDots();
+            // Initially hide watermark on first slide
+            globalPresenterWatermark.style.display = 'none';
+        };
+    </script>
+</body>
+</html>
