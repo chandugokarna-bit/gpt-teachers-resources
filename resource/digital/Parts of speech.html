@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parts of Speech Quest</title>
+    <style>
+        :root {
+            --primary: #4a90e2;
+            --success: #2ec4b6;
+            --danger: #e71d36;
+            --dark: #011627;
+            --light: #f6f7f8;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #e0eafc, #cfdef3);
+            color: var(--dark);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .game-container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 650px;
+            text-align: center;
+        }
+
+        h1 {
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background-color: #eee;
+            border-radius: 4px;
+            margin-bottom: 25px;
+            overflow: hidden;
+        }
+
+        .progress {
+            height: 100%;
+            background-color: var(--primary);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .sentence-box {
+            background-color: var(--light);
+            padding: 20px;
+            border-radius: 10px;
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            border-left: 5px solid var(--primary);
+        }
+
+        .highlight {
+            background-color: #fff3cd;
+            border-bottom: 3px solid #ffc107;
+            padding: 0 5px;
+            font-weight: bold;
+            color: #856404;
+        }
+
+        .instruction {
+            font-style: italic;
+            color: #666;
+            margin-bottom: 25px;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .btn {
+            background-color: white;
+            border: 2px solid #e2e8f0;
+            padding: 12px 20px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn:hover:not(:disabled) {
+            border-color: var(--primary);
+            color: var(--primary);
+            background-color: rgba(74, 144, 226, 0.05);
+        }
+
+        .btn.correct {
+            background-color: var(--success);
+            color: white;
+            border-color: var(--success);
+        }
+
+        .btn.wrong {
+            background-color: var(--danger);
+            color: white;
+            border-color: var(--danger);
+        }
+
+        .feedback {
+            height: 24px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+        }
+
+        .score-board {
+            display: flex;
+            justify-content: space-between;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .results-screen {
+            display: none;
+        }
+
+        .results-screen h2 {
+            color: var(--success);
+            font-size: 2rem;
+        }
+
+        .restart-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        
+        .restart-btn:hover {
+            background-color: #357abd;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="game-container">
+        <!-- Quiz Gameplay Screen -->
+        <div id="quiz-screen">
+            <h1>Parts of Speech Quest</h1>
+            <div class="progress-bar">
+                <div class="progress" id="progress"></div>
+            </div>
+
+            <div class="sentence-box" id="sentence-container">
+                <!-- Sentence injected here -->
+            </div>
+
+            <p class="instruction">Identify the part of speech of the highlighted word.</p>
+
+            <div class="options-grid" id="options-container">
+                <!-- Buttons injected here -->
+            </div>
+
+            <div class="feedback" id="feedback-text"></div>
+
+            <div class="score-board">
+                <span id="question-count">Question: 1/8</span>
+                <span id="score-display">Score: 0</span>
+            </div>
+        </div>
+
+        <!-- End Game Screen -->
+        <div id="results-screen" class="results-screen">
+            <h2>Quest Completed!</h2>
+            <p style="font-size: 1.2rem; margin: 20px 0;">You scored <span id="final-score" style="font-weight: bold; color: var(--primary);">0</span> out of 8!</p>
+            <p id="performance-msg"></p>
+            <button class="restart-btn" onclick="resetGame()">Play Again</button>
+        </div>
+    </div>
+
+    <script>
+        // Game Data covering all 8 parts of speech requested
+        const questions = [
+            {
+                sentence: "The sneaky <span class='highlight'>fox</span> jumped over the lazy dog.",
+                answer: "Noun",
+                definition: "A noun names a person, place, thing, or idea."
+            },
+            {
+                sentence: "She quickly ran to the store because <span class='highlight'>she</span> was late.",
+                answer: "Pronoun",
+                definition: "A pronoun takes the place of a noun."
+            },
+            {
+                sentence: "They decided to <span class='highlight'>explore</span> the mysterious haunted house.",
+                answer: "Verb",
+                definition: "A verb expresses an action, occurrence, or state of being."
+            },
+            {
+                sentence: "The magician <span class='highlight'>gracefully</span> pulled a white rabbit out of his hat.",
+                answer: "Adverb",
+                definition: "An adverb modifies a verb, adjective, or another adverb, often telling how."
+            },
+            {
+                sentence: "We found a <span class='highlight'>shiny</span> gold coin buried deep in the sandbox.",
+                answer: "Adjective",
+                definition: "An adjective describes or modifies a noun or pronoun."
+            },
+            {
+                sentence: "The keys were hidden <span class='highlight'>under</span> the heavy welcome mat.",
+                answer: "Preposition",
+                definition: "A preposition shows the relationship (like time or place) between a noun and other words."
+            },
+            {
+                sentence: "<span class='highlight'>Wow</span>! That fireworks display was absolutely breathtaking.",
+                answer: "Interjection",
+                definition: "An interjection expresses strong emotion and is often followed by an exclamation point."
+            },
+            {
+                sentence: "I wanted to go for a swim, <span class='highlight'>but</span> the pool was freezing cold.",
+                answer: "Conjunction",
+                definition: "A conjunction connects words, phrases, or clauses together."
+            }
+        ];
+
+        const partsOfSpeech = ["Noun", "Pronoun", "Verb", "Adverb", "Adjective", "Preposition", "Interjection", "Conjunction"];
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let acceptInput = true;
+
+        function loadQuestion() {
+            acceptInput = true;
+            const currentQuestion = questions[currentQuestionIndex];
+            
+            // Update progress elements
+            document.getElementById('progress').style.width = `${(currentQuestionIndex / questions.length) * 100}%`;
+            document.getElementById('question-count').innerText = `Question: ${currentQuestionIndex + 1}/${questions.length}`;
+            document.getElementById('score-display').innerText = `Score: ${score}`;
+            document.getElementById('feedback-text').innerText = '';
+
+            // Set sentence
+            document.getElementById('sentence-container').innerHTML = currentQuestion.sentence;
+
+            // Generate option buttons
+            const optionsContainer = document.getElementById('options-container');
+            optionsContainer.innerHTML = '';
+            
+            partsOfSpeech.forEach(pos => {
+                const button = document.createElement('button');
+                button.className = 'btn';
+                button.innerText = pos;
+                button.onclick = () => handleAnswer(pos, button);
+                optionsContainer.appendChild(button);
+            });
+        }
+
+        function handleAnswer(selectedOption, selectedButton) {
+            if (!acceptInput) return;
+            acceptInput = false;
+
+            const correctAswer = questions[currentQuestionIndex].answer;
+            const feedbackText = document.getElementById('feedback-text');
+            const buttons = document.querySelectorAll('.btn');
+
+            // Disable all options momentarily
+            buttons.forEach(btn => btn.disabled = true);
+
+            if (selectedOption === correctAswer) {
+                selectedButton.classList.add('correct');
+                feedbackText.style.color = 'var(--success)';
+                feedbackText.innerText = `Correct! ${questions[currentQuestionIndex].definition}`;
+                score++;
+                document.getElementById('score-display').innerText = `Score: ${score}`;
+            } else {
+                selectedButton.classList.add('wrong');
+                feedbackText.style.color = 'var(--danger)';
+                feedbackText.innerText = `Incorrect. The correct answer was ${correctAswer}.`;
+                
+                // Highlight the correct answer button
+                buttons.forEach(btn => {
+                    if (btn.innerText === correctAswer) {
+                        btn.classList.add('correct');
+                    }
+                });
+            }
+
+            // Transition to next question or results after a short delay
+            setTimeout(() => {
+                currentQuestionIndex++;
+                if (currentQuestionIndex < questions.length) {
+                    loadQuestion();
+                } else {
+                    showResults();
+                }
+            }, 3500); // 3.5 seconds to read the feedback/definition
+        }
+
+        function showResults() {
+            document.getElementById('quiz-screen').style.display = 'none';
+            const resultsScreen = document.getElementById('results-screen');
+            resultsScreen.style.display = 'block';
+            
+            document.getElementById('final-score').innerText = score;
+            
+            const msgEl = document.getElementById('performance-msg');
+            if(score === questions.length) {
+                msgEl.innerText = "Masterful! You know your grammar perfectly! ⭐";
+            } else if (score >= 5) {
+                msgEl.innerText = "Great job! You have a solid grasp on parts of speech! 👍";
+            } else {
+                msgEl.innerText = "Good effort! A little more practice and you'll be a pro. 📚";
+            }
+        }
+
+        function resetGame() {
+            currentQuestionIndex = 0;
+            score = 0;
+            document.getElementById('results-screen').style.display = 'none';
+            document.getElementById('quiz-screen').style.display = 'block';
+            loadQuestion();
+        }
+
+        // Initialize game on load
+        window.onload = loadQuestion;
+    </script>
+</body>
+</html>

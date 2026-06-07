@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Opposite Words Challenge</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #fff1eb, #ace0f9);
+            margin: 0;
+            padding: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            background-color: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #ff5e62;
+            margin-bottom: 5px;
+            font-size: 2rem;
+        }
+
+        .subtitle {
+            color: #3a7bd5;
+            font-weight: bold;
+            margin-top: 0;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .instruction {
+            background-color: #f0f4f8;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 1rem;
+            color: #333;
+            margin-bottom: 25px;
+            border-left: 5px solid #3a7bd5;
+            line-height: 1.5;
+        }
+
+        .question-box {
+            background-color: #f9f9f9;
+            border: 2px solid #ff7675;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+
+        .main-word {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #d63031;
+            margin: 0;
+            letter-spacing: 2px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            background-color: #ffffff;
+            border: 2px solid #dfe6e9;
+            padding: 15px 10px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #2d3436;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn:hover:not(:disabled) {
+            border-color: #ff5e62;
+            background-color: #fff5f5;
+            transform: translateY(-2px);
+        }
+
+        .correct {
+            background-color: #2ecc71 !important;
+            border-color: #2ecc71 !important;
+            color: white !important;
+        }
+
+        .wrong {
+            background-color: #e74c3c !important;
+            border-color: #e74c3c !important;
+            color: white !important;
+        }
+
+        .feedback-box {
+            min-height: 50px;
+            margin-top: 15px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            line-height: 1.5;
+        }
+
+        .score-hud {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+            color: #2d3436;
+            font-weight: bold;
+        }
+
+        .result-screen {
+            display: none;
+        }
+
+        .restart-btn {
+            background-color: #3a7bd5;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1.1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+        
+        .restart-btn:hover {
+            background-color: #2a66b8;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Game Screen -->
+        <div id="game-screen">
+            <h1>Opposite Words Game</h1>
+            <p class="subtitle">Vocabulary Builder</p>
+
+            <div class="instruction">
+                <strong>Instruction:</strong> Look at the word in the box and choose its correct <strong>opposite word</strong>.
+            </div>
+
+            <div class="question-box">
+                <div class="main-word" id="current-word">BIG</div>
+            </div>
+
+            <div class="grid" id="options-grid">
+                <!-- Dynamic choices injection -->
+            </div>
+
+            <div class="feedback-box" id="feedback"></div>
+
+            <div class="score-hud">
+                <span id="q-count">Question: 1/8</span>
+                <span id="score-text">Score: 0</span>
+            </div>
+        </div>
+
+        <!-- Result Screen -->
+        <div id="result-screen" class="result-screen">
+            <h2 style="color: #2ecc71;">Congratulations!</h2>
+            <p style="font-size: 1.3rem;">Your Final Score: <span id="final-score" style="color:#ff5e62; font-weight:bold;">0</span> / 8</p>
+            <p id="msg" style="font-size: 1.1rem; font-weight: 500;"></p>
+            <button class="restart-btn" onclick="start()">Play Again</button>
+        </div>
+    </div>
+
+    <script>
+        const gameData = [
+            {
+                word: "BIG",
+                options: ["Small", "Tall", "Heavy", "Long"],
+                answer: "Small",
+                explain: "The opposite of <b>BIG</b> is <b>SMALL</b>."
+            },
+            {
+                word: "HAPPY",
+                options: ["Angry", "Sad", "Good", "Kind"],
+                answer: "Sad",
+                explain: "The opposite of <b>HAPPY</b> is <b>SAD</b>."
+            },
+            {
+                word: "HOT",
+                options: ["Dry", "Warm", "Cold", "Sweet"],
+                answer: "Cold",
+                explain: "The opposite of <b>HOT</b> is <b>COLD</b>."
+            },
+            {
+                word: "DAY",
+                options: ["Night", "Morning", "Evening", "Sun"],
+                answer: "Night",
+                explain: "The opposite of <b>DAY</b> is <b>NIGHT</b>."
+            },
+            {
+                word: "FAST",
+                options: ["Quick", "Slow", "High", "Hard"],
+                answer: "Slow",
+                explain: "The opposite of <b>FAST</b> is <b>SLOW</b>."
+            },
+            {
+                word: "RICH",
+                options: ["Kind", "Poor", "Strong", "Clever"],
+                answer: "Poor",
+                explain: "The opposite of <b>RICH</b> is <b>POOR</b>."
+            },
+            {
+                word: "UP",
+                options: ["Down", "In", "Out", "Near"],
+                answer: "Down",
+                explain: "The opposite of <b>UP</b> is <b>DOWN</b>."
+            },
+            {
+                word: "OPEN",
+                options: ["Lock", "Close", "Push", "Pull"],
+                answer: "Close",
+                explain: "The opposite of <b>OPEN</b> is <b>CLOSE</b>."
+            }
+        ];
+
+        let index = 0;
+        let score = 0;
+        let active = true;
+
+        function start() {
+            index = 0;
+            score = 0;
+            document.getElementById('result-screen').style.display = 'none';
+            document.getElementById('game-screen').style.display = 'block';
+            showQuestion();
+        }
+
+        function showQuestion() {
+            active = true;
+            let currentData = gameData[index];
+            document.getElementById('current-word').innerText = currentData.word;
+            document.getElementById('feedback').innerHTML = "";
+            document.getElementById('q-count').innerText = `Question: ${index + 1}/${gameData.length}`;
+            document.getElementById('score-text').innerText = `Score: ${score}`;
+
+            let grid = document.getElementById('options-grid');
+            grid.innerHTML = "";
+
+            currentData.options.forEach(opt => {
+                let b = document.createElement('button');
+                b.className = 'btn';
+                b.innerText = opt;
+                b.onclick = () => check(opt, b);
+                grid.appendChild(b);
+            });
+        }
+
+        function check(selected, btn) {
+            if(!active) return;
+            active = false;
+
+            let correctAns = gameData[index].answer;
+            let feed = document.getElementById('feedback');
+            let allBtns = document.querySelectorAll('.btn');
+
+            allBtns.forEach(b => b.disabled = true);
+
+            if(selected === correctAns) {
+                btn.classList.add('correct');
+                feed.style.color = '#2ecc71';
+                feed.innerHTML = `✓ Correct! <br> ${gameData[index].explain}`;
+                score++;
+            } else {
+                btn.classList.add('wrong');
+                feed.style.color = '#e74c3c';
+                feed.innerHTML = `✗ Incorrect. <br> ${gameData[index].explain}`;
+                
+                // Highlight the correct answer button
+                allBtns.forEach(b => {
+                    if(b.innerText === correctAns) {
+                        b.classList.add('correct');
+                    }
+                });
+            }
+
+            setTimeout(() => {
+                index++;
+                if(index < gameData.length) {
+                    showQuestion();
+                } else {
+                    endGame();
+                }
+            }, 3000); // 3 seconds delay to see the feedback
+        }
+
+        function endGame() {
+            document.getElementById('game-screen').style.display = 'none';
+            document.getElementById('result-screen').style.display = 'block';
+            document.getElementById('final-score').innerText = score;
+
+            let msg = document.getElementById('msg');
+            if(score === 8) {
+                msg.innerText = "Excellent! You scored 100%! Perfect job! 🏆";
+            } else if(score >= 5) {
+                msg.innerText = "Great job! You know your opposite words well! 👍";
+            } else {
+                msg.innerText = "Nice try! Play again to improve your score! 📚";
+            }
+        }
+
+        window.onload = start;
+    </script>
+</body>
+</html>
