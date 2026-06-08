@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ನಾಮಪದಗಳ ಪ್ರಕಾರಗಳು - ಡ್ರಾಗ್ ಅಂಡ್ ಡ್ರಾಪ್</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #eef2f3;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        p.instruction {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+        }
+        /* ಪದಗಳ ಬಾಕ್ಸ್ (Drag Items) */
+        .words-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
+            max-width: 800px;
+            margin-bottom: 40px;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+        .word {
+            background-color: #3498db;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: grab;
+            font-weight: bold;
+            user-select: none;
+            transition: transform 0.2s;
+        }
+        .word:active {
+            cursor: grabbing;
+            transform: scale(0.95);
+        }
+        /* ಡ್ರಾಪ್ ಮಾಡುವ ಬಾಕ್ಸ್‌ಗಳು (Drop Zones) */
+        .targets-container {
+            display: flex;
+            gap: 25px;
+            justify-content: center;
+            width: 100%;
+            max-width: 900px;
+            flex-wrap: wrap;
+        }
+        .target-box {
+            background-color: white;
+            border: 3px dashed #bdc3c7;
+            border-radius: 10px;
+            min-width: 250px;
+            flex: 1;
+            min-height: 200px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+        .target-box h3 {
+            margin-top: 0;
+            color: #2c3e50;
+            border-bottom: 2px solid #34495e;
+            padding-bottom: 5px;
+            width: 100%;
+            text-align: center;
+        }
+        .target-box.hovered {
+            border-color: #2ecc71;
+            background-color: #eafaf1;
+        }
+        /* ಸರಿಯಾದ ಮತ್ತು ತಪ್ಪಾದ ಡ್ರಾಪ್ ಸ್ಟೈಲ್ */
+        .dropped-word {
+            margin: 5px 0;
+            padding: 8px 15px;
+            border-radius: 4px;
+            color: white;
+            font-weight: bold;
+            width: 80%;
+            text-align: center;
+            animation: popIn 0.3s ease;
+        }
+        .correct { background-color: #2ecc71; }
+        .wrong { background-color: #e74c3c; }
+
+        @keyframes popIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        #score-board {
+            margin-top: 30px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #27ae60;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>ನಾಮಪದಗಳ ಪ್ರಕಾರಗಳು 🧠</h1>
+    <p class="instruction">ಕೆಳಗಿನ ಪದಗಳನ್ನು ಎಳೆದು ತಂದು (Drag ಮಾಡಿ) ಅವುಗಳಿಗೆ ಸಂಬಂಧಿಸಿದ ಸರಿಯಾದ ಬಾಕ್ಸ್‌ಗೆ ಹಾಕಿ!</p>
+
+    <div class="words-container" id="wordsContainer">
+        </div>
+
+    <div class="targets-container">
+        <div class="target-box" data-type="ರೂಢನಾಮ">
+            <h3>ರೂಢನಾಮ</h3>
+        </div>
+        <div class="target-box" data-type="ಅಂಕಿತನಾಮ">
+            <h3>ಅಂಕಿತನಾಮ</h3>
+        </div>
+        <div class="target-box" data-type="ಅನ್ವರ್ಥನಾಮ">
+            <h3>ಅನ್ವರ್ಥನಾಮ</h3>
+        </div>
+    </div>
+
+    <div id="score-board"></div>
+
+<script>
+    // ವ್ಯಾಕರಣದ ಪದಗಳ ಡೇಟಾ ಬೇಸ್
+    const wordsData = [
+        { text: "ನದಿ", type: "ರೂಢನಾಮ" },
+        { text: "ಪರ್ವತ", type: "ರೂಢನಾಮ" },
+        { text: "ಪಟ್ಟಣ", type: "ರೂಢನಾಮ" },
+        { text: "ಗಂಗಾ", type: "ಅಂಕಿತನಾಮ" },
+        { text: "ಹಿಮಾಲಯ", type: "ಅಂಕಿತನಾಮ" },
+        { text: "ಬೆಂಗಳೂರು", type: "ಅಂಕಿತನಾಮ" },
+        { text: "ವೈದ್ಯ", type: "ಅನ್ವರ್ಥನಾಮ" },
+        { text: "ಶಿಕ್ಷಕ", type: "ಅನ್ವರ್ಥನಾಮ" },
+        { text: "ಕುರುಡ", type: "ಅನ್ವರ್ಥನಾಮ" }
+    ];
+
+    let totalItems = wordsData.length;
+    let correctCount = 0;
+    let draggedElement = null;
+
+    const wordsContainer = document.getElementById('wordsContainer');
+    const targetBoxes = document.querySelectorAll('.target-box');
+    const scoreBoard = document.getElementById('score-board');
+
+    // ಪದಗಳನ್ನು ಶಫಲ್ (Shuffle) ಮಾಡಿ ಸ್ಕ್ರೀನ್ ಮೇಲೆ ತೋರಿಸುವುದು
+    function initializeGame() {
+        const shuffledWords = [...wordsData].sort(() => Math.random() - 0.5);
+        
+        shuffledWords.forEach((wordObj, index) => {
+            const wordDiv = document.createElement('div');
+            wordDiv.classList.add('word');
+            wordDiv.innerText = wordObj.text;
+            wordDiv.setAttribute('draggable', 'true');
+            wordDiv.setAttribute('id', `word-${index}`);
+            wordDiv.setAttribute('data-type', wordObj.type);
+
+            // Drag Events
+            wordDiv.addEventListener('dragstart', dragStart);
+            wordDiv.addEventListener('dragend', dragEnd);
+
+            wordsContainer.appendChild(wordDiv);
+        });
+    }
+
+    // Drag Functions
+    function dragStart(e) {
+        draggedElement = e.target;
+        setTimeout(() => e.target.style.display = 'none', 0);
+    }
+
+    function dragEnd(e) {
+        setTimeout(() => {
+            if (draggedElement) {
+                draggedElement.style.display = 'block';
+            }
+        }, 0);
+    }
+
+    // Drop Zone Events
+    targetBoxes.forEach(box => {
+        box.addEventListener('dragover', dragOver);
+        box.addEventListener('dragenter', dragEnter);
+        box.addEventListener('dragleave', dragLeave);
+        box.addEventListener('drop', dragDrop);
+    });
+
+    function dragOver(e) { e.preventDefault(); }
+    function dragEnter(e) { e.preventDefault(); this.classList.add('hovered'); }
+    function dragLeave() { this.classList.remove('hovered'); }
+
+    function dragDrop(e) {
+        this.classList.remove('hovered');
+        if (!draggedElement) return;
+
+        const wordText = draggedElement.innerText;
+        const wordType = draggedElement.getAttribute('data-type');
+        const targetType = this.getAttribute('data-type');
+
+        // ಹೊಸ ಎಲಿಮೆಂಟ್ ಸೃಷ್ಟಿಸಿ ಬಾಕ್ಸ್ ಒಳಗೆ ಹಾಕುವುದು
+        const resultDiv = document.createElement('div');
+        resultDiv.classList.add('dropped-word');
+        resultDiv.innerText = wordText;
+
+        if (wordType === targetType) {
+            resultDiv.classList.add('correct');
+            correctCount++;
+        } else {
+            resultDiv.classList.add('wrong');
+        }
+
+        this.appendChild(resultDiv);
+        draggedElement.remove(); // ಮೂಲ ಪದವನ್ನು ಲಿಸ್ಟ್‌ನಿಂದ ತೆಗೆಯುವುದು
+        draggedElement = null;
+
+        checkGameEnd();
+    }
+
+    function checkGameEnd() {
+        if (wordsContainer.children.length === 0) {
+            scoreBoard.innerHTML = `ಆಟ ಮುಗಿಯಿತು! 🎉 <br> ಸರಿಯಾದ ವರ್ಗೀಕರಣ: ${correctCount} / ${totalItems}`;
+        }
+    }
+
+    // ಆಟ ಆರಂಭಿಸಿ
+    initializeGame();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಇತಿಹಾಸದ ಚಕ್ರ - ಇಂಟರಾಕ್ಟಿವ್ ಸ್ಪಿನ್ನರ್ ಆಟ</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f7f9fa;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+            user-select: none;
+        }
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        .instruction {
+            color: #555;
+            font-size: 18px;
+            margin-bottom: 30px;
+        }
+
+        /* ಮುಖ್ಯ ಗೇಮ್ ಕಂಟೇನರ್ */
+        .wheel-container {
+            position: relative;
+            width: 400px;
+            height: 400px;
+            margin: 0 auto;
+        }
+
+        /* ಚಕ್ರದ ಮೇಲಿರುವ ಪಾಯಿಂಟರ್ (ಬಾಣದ ಗುರುತು) */
+        .pointer {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 20px solid transparent;
+            border-right: 20px solid transparent;
+            border-top: 30px solid #e74c3c;
+            z-index: 10;
+        }
+
+        /* ಕ್ಯಾನ್ವಾಸ್ (ಚಕ್ರ) */
+        #wheel {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            transition: transform 4s cubic-bezier(0.1, 0.8, 0.1, 1);
+        }
+
+        /* ಬಟನ್ ವಿನ್ಯಾಸ */
+        #spin-btn {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 20px;
+            font-weight: bold;
+            border-radius: 30px;
+            cursor: pointer;
+            margin-top: 30px;
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.4);
+            transition: all 0.2s ease;
+        }
+        #spin-btn:hover {
+            background-color: #c0392b;
+            transform: scale(1.05);
+        }
+        #spin-btn:disabled {
+            background-color: #bdc3c7;
+            box-shadow: none;
+            cursor: not-allowed;
+        }
+
+        /* ಪ್ರಶ್ನೆ ಪ್ರದರ್ಶಿಸುವ ಪಾಪ್-ಅಪ್ */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            z-index: 20;
+            width: 80%;
+            max-width: 500px;
+            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .modal h2 {
+            color: #2980b9;
+            margin-top: 0;
+        }
+        #question-display {
+            font-size: 22px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin: 20px 0;
+            line-height: 1.5;
+        }
+        .modal button {
+            background-color: #2ecc71;
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 15;
+        }
+
+        @keyframes popIn {
+            from { opacity: 0; transform: translate(-50%, -60%) scale(0.8); }
+            to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>೧ನೇ ಪಾಠ: "ಇತಿಹಾಸದ ಚಕ್ರ" ಸ್ಪಿನ್ನರ್</h1>
+    <p class="instruction">ಬಟನ್ ಒತ್ತಿ ಚಕ್ರವನ್ನು ತಿರುಗಿಸಿ! ಬಾಣದ ಗುರುತು ನಿಲ್ಲುವ ಪ್ರಶ್ನೆಗೆ ವಿದ್ಯಾರ್ಥಿಗಳು ಉತ್ತರಿಸಬೇಕು.</p>
+
+    <div class="wheel-container">
+        <div class="pointer"></div>
+        <canvas id="wheel" width="400" height="400"></canvas>
+    </div>
+
+    <button id="spin-btn" onclick="spinWheel()">🔄 ಚಕ್ರ ತಿರುಗಿಸಿ (Spin)</button>
+
+    <div class="overlay" id="overlay"></div>
+    <div class="popup modal" id="question-modal">
+        <h2>❓ ಅದೃಷ್ಟದ ಪ್ರಶ್ನೆ:</h2>
+        <div id="question-display">ಪ್ರಶ್ನೆ ಇಲ್ಲಿ ಮೂಡುತ್ತದೆ...</div>
+        <button onclick="closeModal()">ಮುಂದೆ ಆಡಿ</button>
+    </div>
+
+    <script>
+        // ಚಕ್ರದಲ್ಲಿರುವ 6 ಇತಿಹಾಸದ ಪ್ರಶ್ನೆಗಳು
+        const questions = [
+            "ಇತಿಹಾಸದ ಪಿತಾಮಹ ಎಂದು ಯಾರನ್ನು ಕರೆಯುತ್ತಾರೆ?",
+            "ಇತಿಹಾಸ ಎಂದರೇನು? ಅದರ ಮಹತ್ವವೇನು?",
+            "ಸಾಹಿತ್ಯ ಆಧಾರಗಳಲ್ಲಿ ಎಷ್ಟು ವಿಧ? ಅವು ಯಾವುವು?",
+            "ಶಿಲಾಯುಗದ ಆಯುಧಗಳನ್ನು ಯಾವುದರಿಂದ ಮಾಡುತ್ತಿದ್ದರು?",
+            "ಯಾವ ಸ್ಥಳದಲ್ಲಿ ಹಳೆಯ ಶಿಲಾಯುಗದ ಬೂದಿಯ ಕುರುಹುಗಳು ಸಿಕ್ಕಿವೆ?",
+            "ಸಾ.ಶ. (CE) ಮತ್ತು ಸಾ.ಶ.ಪೂ. (BCE) ಪದಗಳ ವಿಸ್ತೃತ ರೂಪವೇನು?"
+        ];
+
+        // ಬಣ್ಣಗಳ ಪಟ್ಟಿ (ಚಕ್ರದ ಪ್ರತಿಯೊಂದು ಭಾಗಕ್ಕೆ)
+        const colors = ["#1abc9c", "#3498db", "#9b59b6", "#f1c40f", "#e67e22", "#e74c3c"];
+        
+        const canvas = document.getElementById("wheel");
+        const ctx = canvas.getContext("2d");
+        const numSegments = questions.length;
+        const anglePerSegment = (2 * Math.PI) / numSegments;
+        let currentRotation = 0;
+
+        // ಚಕ್ರವನ್ನು ಸುಂದರವಾಗಿ ಬಿಡಿಸುವ ಫಂಕ್ಷನ್
+        function drawWheel() {
+            for (let i = 0; i < numSegments; i++) {
+                const startAngle = i * anglePerSegment;
+                const endAngle = startAngle + anglePerSegment;
+
+                // ಚಕ್ರದ ಭಾಗ ಬರೆಯುವುದು
+                ctx.beginPath();
+                ctx.moveTo(200, 200);
+                ctx.arc(200, 200, 200, startAngle, endAngle);
+                ctx.fillStyle = colors[i];
+                ctx.fill();
+                ctx.stroke();
+
+                // ಚಕ್ರದ ಮೇಲೆ ಸಂಖ್ಯೆಗಳನ್ನು ಬರೆಯುವುದು (ಪ್ರಶ್ನೆ ೧, ೨...)
+                ctx.save();
+                ctx.translate(200, 200);
+                ctx.rotate(startAngle + anglePerSegment / 2);
+                ctx.textAlign = "right";
+                ctx.fillStyle = "#ffffff";
+                ctx.font = "bold 18px 'Segoe UI'";
+                ctx.fillText(`ಪ್ರಶ್ನೆ  ${i + 1}`, 170, 10);
+                ctx.restore();
+            }
+
+            // ಚಕ್ರದ ಮಧ್ಯದ ಸಣ್ಣ ಬಿಳಿ ವೃತ್ತ
+            ctx.beginPath();
+            ctx.arc(200, 200, 20, 0, 2 * Math.PI);
+            ctx.fillStyle = "#ffffff";
+            ctx.fill();
+            ctx.stroke();
+        }
+
+        // ಚಕ್ರವನ್ನು ತಿರುಗಿಸುವ ಮುಖ್ಯ ಫಂಕ್ಷನ್
+        function spinWheel() {
+            const spinBtn = document.getElementById("spin-btn");
+            spinBtn.disabled = true;
+
+            // 5 ರಿಂದ 10 ರೌಂಡ್‌ಗಳ ನಡುವೆ ಯಾದೃಚ್ಛಿಕವಾಗಿ (Random) ಸುತ್ತಿಸುವುದು
+            const randomDegrees = Math.floor(3000 + Math.random() * 2000);
+            currentRotation += randomDegrees;
+
+            // ಚಕ್ರ ಸುತ್ತುವಾಗ ಟಿಕ್-ಟಿಕ್ ಧ್ವನಿ ಎಫೆಕ್ಟ್
+            playSpinSound();
+
+            const wheelElement = document.getElementById("wheel");
+            wheelElement.style.transform = `rotate(${currentRotation}deg)`;
+
+            // ಚಕ್ರ ನಿಂತ ನಂತರ ರಿಸಲ್ಟ್ ಲೆಕ್ಕಾಚಾರ ಮಾಡುವುದು (4 ಸೆಕೆಂಡ್ ಟೈಮ್‌ಔಟ್)
+            setTimeout(() => {
+                // ಪ್ರಸ್ತುತ ನಿಂತ ಕೋನವನ್ನು ಕಂಡುಹಿಡಿಯುವುದು
+                const actualDegrees = currentRotation % 360;
+                // ಬಾಣದ ಗುರುತು ಮೇಲಿರುವುದರಿಂದ (270 ಡಿಗ್ರಿ), ಅದಕ್ಕೆ ತಕ್ಕಂತೆ ಭಾಗವನ್ನು ಲೆಕ್ಕ ಹಾಕಲಾಗುತ್ತದೆ
+                const correctedDegrees = (360 - actualDegrees + 270) % 360;
+                const selectedIndex = Math.floor(correctedDegrees / (360 / numSegments)) % numSegments;
+
+                // ವಿನ್ನಿಂಗ್ ಸೌಂಡ್ ಪ್ಲೇ ಮಾಡುವುದು
+                playWinSound();
+
+                // ಪಾಪ್-ಅಪ್‌ನಲ್ಲಿ ಪ್ರಶ್ನೆಯನ್ನು ಪ್ರದರ್ಶಿಸುವುದು
+                document.getElementById("question-display").innerText = questions[selectedIndex];
+                document.getElementById("overlay").style.display = "block";
+                document.getElementById("question-modal").style.display = "block";
+
+                spinBtn.disabled = false;
+            }, 4000); // CSS ಬ್ರೌಸರ್ ಟ್ರಾನ್ಸಿಶನ್‌ಗೆ ಮ್ಯಾಚ್ ಆಗುತ್ತದೆ
+        }
+
+        function closeModal() {
+            document.getElementById("overlay").style.display = "none";
+            document.getElementById("question-modal").style.display = "none";
+        }
+
+        // ಕೋಡಿಂಗ್ ಮೂಲಕವೇ ಸುತ್ತುವ ಶಬ್ದ ಸೃಷ್ಟಿಸುವುದು (ಯಾವುದೇ ಫೈಲ್ ಬೇಕಾಗಿಲ್ಲ)
+        function playSpinSound() {
+            let count = 0;
+            const interval = setInterval(() => {
+                if (count > 25) clearInterval(interval);
+                playBeep(400, 0.04);
+                count++;
+            }, 120);
+        }
+
+        // ವಿಜೇತ ಧ್ವನಿ (ಪ್ರಶ್ನೆ ಬಂದಾಗ ಬರುವ ಸೌಂಡ್)
+        function playWinSound() {
+            playBeep(523.25, 0.1); // C5 ನೋಟ್
+            setTimeout(() => playBeep(659.25, 0.1), 100); // E5 ನೋಟ್
+            setTimeout(() => playBeep(783.99, 0.2), 200); // G5 ನೋಟ್
+        }
+
+        // ಧ್ವನಿ ಜನರೇಟರ್
+        function playBeep(freq, duration) {
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            oscillator.frequency.value = freq;
+            oscillator.start();
+            gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+            oscillator.stop(audioCtx.currentTime + duration);
+        }
+
+        // ಆರಂಭದಲ್ಲಿ ಚಕ್ರವನ್ನು ರಚಿಸುವುದು
+        drawWheel();
+    </script>
+</body>
+</html>

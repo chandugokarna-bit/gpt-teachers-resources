@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಇತಿಹಾಸ ಕಾಲಗಣನೆ - ಇಂಟರಾಕ್ಟಿವ್ ಟೈಮ್‌ಲೈನ್ ಆಟ</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+            user-select: none;
+        }
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        p.instruction {
+            color: #555;
+            font-size: 18px;
+            margin-bottom: 30px;
+        }
+        
+        /* ಟೈಮ್‌ಲೈನ್ ವಿನ್ಯಾಸ */
+        .timeline-container {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            max-width: 1100px;
+            margin: 40px auto;
+            position: relative;
+            background: #fff;
+            padding: 30px 10px;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+        }
+        /* ಮಧ್ಯದ ಮುಖ್ಯ ಗೆರೆ */
+        .timeline-line {
+            position: absolute;
+            top: 140px;
+            left: 5%;
+            width: 90%;
+            height: 6px;
+            background-color: #34495e;
+            z-index: 1;
+        }
+        .timeline-slots {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            z-index: 2;
+        }
+        
+        /* ಡ್ರಾಪ್ ಮಾಡುವ ಬಾಕ್ಸ್‌ಗಳು */
+        .slot {
+            width: 18%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .slot-box {
+            border: 3px dashed #bdc3c7;
+            background-color: #fafafa;
+            border-radius: 8px;
+            width: 100%;
+            min-height: 100px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+        }
+        .slot-box.drag-over {
+            background-color: #e8f4f8;
+            border-color: #3498db;
+            transform: scale(1.05);
+        }
+        .time-label {
+            font-weight: bold;
+            font-size: 16px;
+            color: #2c3e50;
+            background: #e1e8ed;
+            padding: 6px 12px;
+            border-radius: 20px;
+            margin-top: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        /* ಕ್ರಿಸ್ತನ ಜನನದ ಕೇಂದ್ರ ಬಿಂದು */
+        #center-slot .time-label {
+            background: #e74c3c;
+            color: white;
+        }
+
+        /* ಡ್ರ್ಯಾಗ್ ಮಾಡುವ ಕಾರ್ಡ್‌ಗಳು */
+        .cards-container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            max-width: 1100px;
+            margin: 30px auto;
+            background: #fff;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+        .event-card {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            padding: 14px 18px;
+            border-radius: 8px;
+            cursor: move;
+            font-size: 15px;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+            transition: transform 0.2s, opacity 0.2s;
+            max-width: 180px;
+        }
+        .event-card:active {
+            opacity: 0.6;
+        }
+        
+        /* ಸರಿ ಮತ್ತು ತಪ್ಪು ಬಣ್ಣಗಳು */
+        .correct-animation {
+            background: linear-gradient(135deg, #2ecc71, #27ae60) !important;
+            animation: pop 0.3s ease;
+        }
+        .wrong-animation {
+            background: linear-gradient(135deg, #e74c3c, #c0392b) !important;
+        }
+
+        /* ಬಟನ್ ಮತ್ತು ಫಲಿತಾಂಶ */
+        #check-btn {
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            padding: 12px 35px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 25px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: background 0.2s;
+        }
+        #check-btn:hover { background-color: #219653; }
+        #score-board {
+            font-size: 22px;
+            font-weight: bold;
+            margin-top: 20px;
+            color: #2c3e50;
+        }
+
+        @keyframes pop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>೧ನೇ ಪಾಠ: ಕಾಲಗಣನೆ ಟೈಮ್‌ಲೈನ್ ಆಟ</h1>
+    <p class="instruction">ಕೆಳಗಿನ ಇತಿಹಾಸದ ಘಟನೆಗಳನ್ನು ಕಾಲಾನುಕ್ರಮದಲ್ಲಿ ಸರಿಯಾದ ಸಮಯದ ಪೆಟ್ಟಿಗೆಗೆ (Slot) ಎಳೆದು ಹಾಕಿ!</p>
+
+    <div class="timeline-container">
+        <div class="timeline-line"></div>
+        <div class="timeline-slots">
+            
+            <div class="slot">
+                <div class="slot-box" data-time="bce-ancient"></div>
+                <div class="time-label">ಬಹಳ ಹಿಂದೆ (ಸಾ.ಶ.ಪೂ.)</div>
+            </div>
+            
+            <div class="slot">
+                <div class="slot-box" data-time="bce-ashoka"></div>
+                <div class="time-label">ಸಾ.ಶ.ಪೂ. ೩ನೇ ಶತಮಾನ</div>
+            </div>
+
+            <div class="slot" id="center-slot">
+                <div class="slot-box" data-time="jesus"></div>
+                <div class="time-label">ಸಾಮಾನ್ಯ ಶಕ ಆರಂಭ (೦)</div>
+            </div>
+
+            <div class="slot">
+                <div class="slot-box" data-time="ce-past"></div>
+                <div class="time-label">ಸಾ.ಶ. ೨೦ ವರ್ಷಗಳ ಹಿಂದೆ</div>
+            </div>
+
+            <div class="slot">
+                <div class="slot-box" data-time="ce-present"></div>
+                <div class="time-label">ಪ್ರಸ್ತುತ ವರ್ಷ (ಸಾ.ಶ.)</div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="cards-container" id="cards-deck">
+        <div class="event-card" draggable="true" id="card1" data-match="bce-ancient">ಶಿಲಾಯುಗದ ಮಾನವರ ಆರಂಭ</div>
+        <div class="event-card" draggable="true" id="card2" data-match="bce-ashoka">ಸಾಮ್ರಾಟ್ ಅಶೋಕನ ಆಳ್ವಿಕೆ</div>
+        <div class="event-card" draggable="true" id="card3" data-match="jesus">ಯೇಸು ಕ್ರಿಸ್ತನ ಜನನ</div>
+        <div class="event-card" draggable="true" id="card4" data-match="ce-past">ನಿಮ್ಮ ಶಾಲೆಯ ಸ್ಥಾಪನೆ</div>
+        <div class="event-card" draggable="true" id="card5" data-match="ce-present">ಪ್ರಸಕ್ತ ಸಾಲಿನ ತರಗತಿಗಳು (೨೦೨೬)</div>
+    </div>
+
+    <br>
+    <button id="check-btn" onclick="verifyTimeline()">ಉತ್ತರ ಪರಿಶೀಲಿಸಿ</button>
+    <div id="score-board"></div>
+
+    <script>
+        const cards = document.querySelectorAll('.event-card');
+        const slots = document.querySelectorAll('.slot-box');
+
+        // ಕಾರ್ಡ್‌ಗಳ ಡ್ರ್ಯಾಗ್ ನಿಯಂತ್ರಣ
+        cards.forEach(card => {
+            card.addEventListener('dragstart', () => {
+                card.classList.add('dragging');
+            });
+
+            card.addEventListener('dragend', () => {
+                card.classList.remove('dragging');
+            });
+        });
+
+        // ಪೆಟ್ಟಿಗೆಗಳ (Slots) ಡ್ರಾಪ್ ನಿಯಂತ್ರಣ
+        slots.forEach(slot => {
+            slot.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                slot.classList.add('drag-over');
+            });
+
+            slot.addEventListener('dragleave', () => {
+                slot.classList.remove('drag-over');
+            });
+
+            slot.addEventListener('drop', (e) => {
+                e.preventDefault();
+                slot.classList.remove('drag-over');
+                const draggingCard = document.querySelector('.dragging');
+                
+                // ಒಂದು ಸ್ಲಾಟ್‌ನಲ್ಲಿ ಕೇವಲ ಒಂದು ಕಾರ್ಡ್ ಇರಲು ಮಾತ್ರ ಅನುಮತಿ
+                if (draggingCard && slot.children.length === 0) {
+                    slot.appendChild(draggingCard);
+                }
+            });
+        });
+
+        // ರಿಸಲ್ಟ್ ಚೆಕ್ ಮಾಡುವ ಫಂಕ್ಷನ್
+        function verifyTimeline() {
+            let correctCount = 0;
+            const totalCards = cards.length;
+
+            slots.forEach(slot => {
+                const targetTime = slot.getAttribute('data-time');
+                const childCard = slot.querySelector('.event-card');
+
+                if (childCard) {
+                    const cardMatch = childCard.getAttribute('data-match');
+                    if (targetTime === cardMatch) {
+                        childCard.classList.remove('wrong-animation');
+                        childCard.classList.add('correct-animation');
+                        correctCount++;
+                    } else {
+                        childCard.classList.remove('correct-animation');
+                        childCard.classList.add('wrong-animation');
+                    }
+                }
+            });
+
+            // ಕಾರ್ಡ್‌ಗಳ ಪೆಟ್ಟಿಗೆಯಲ್ಲೇ ಉಳಿದುಹೋದ ಕಾರ್ಡ್‌ಗಳನ್ನು ತಪ್ಪೆಂದು ತೋರಿಸಲು
+            const leftCards = document.getElementById('cards-deck').querySelectorAll('.event-card');
+            leftCards.forEach(card => {
+                card.classList.remove('correct-animation');
+                card.classList.add('wrong-animation');
+            });
+
+            // ಸ್ಕೋರ್ ಪ್ರದರ್ಶನ
+            const scoreBoard = document.getElementById('score-board');
+            if (correctCount === totalCards) {
+                scoreBoard.innerHTML = `🎉 ಅತ್ಯದ್ಭುತ! ಸ್ಕೋರ್: ${correctCount}/${totalCards} <br>ನೀವು ಕಾಲಗಣನೆಯನ್ನು ಸರಿಯಾಗಿ ಜೋಡಿಸಿದ್ದೀರಿ!`;
+                scoreBoard.style.color = "#27ae60";
+            } else {
+                scoreBoard.innerHTML = `🤔 ಪ್ರಯತ್ನಿಸಿ! ಸ್ಕೋರ್: ${correctCount}/${totalCards} <br>ಕೆಲವು ಘಟನೆಗಳು ತಪ್ಪಾದ ಜಾಗದಲ್ಲಿವೆ, ಮತ್ತೊಮ್ಮೆ ಯೋಚಿಸಿ ಜೋಡಿಸಿ.`;
+                scoreBoard.style.color = "#c0392b";
+            }
+        }
+    </script>
+</body>
+</html>
