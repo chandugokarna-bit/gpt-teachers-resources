@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Chemistry Lab: Acids, Bases & Salts</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-color: #f8fafc;
+            --accent-blue: #38bdf8;
+            --acid-color: #ef4444;
+            --neutral-color: #22c55e;
+            --base-color: #a855f7;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            color: var(--accent-blue);
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
+        }
+
+        header p {
+            color: #94a3b8;
+            font-size: 1.1rem;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .tab-btn {
+            background: var(--card-bg);
+            color: var(--text-color);
+            border: 2px solid #334155;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn.active, .tab-btn:hover {
+            border-color: var(--accent-blue);
+            background: rgba(56, 189, 248, 0.1);
+            color: var(--accent-blue);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* TAB 1: PH LAB STYLES */
+        .lab-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            align-items: center;
+        }
+
+        @media (max-width: 768px) {
+            .lab-grid { grid-template-columns: 1fr; }
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .select-title {
+            font-weight: 600;
+            color: #94a3b8;
+            margin-bottom: 5px;
+        }
+
+        .substance-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .substance-btn {
+            background: #334155;
+            border: none;
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.2s;
+            text-align: left;
+        }
+
+        .substance-btn:hover {
+            background: #475569;
+        }
+
+        .substance-btn.selected {
+            background: var(--accent-blue);
+            color: #0f172a;
+            font-weight: bold;
+        }
+
+        .beaker-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .beaker {
+            width: 180px;
+            height: 220px;
+            border: 5px solid #e2e8f0;
+            border-top: none;
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+            position: relative;
+            overflow: hidden;
+            background: rgba(255,255,255,0.03);
+        }
+
+        .beaker::before {
+            content: '';
+            position: absolute;
+            top: 20px; left: 0; right: 0; height: 2px; background: rgba(255,255,255,0.2);
+        }
+        .beaker::after {
+            content: '';
+            position: absolute;
+            top: 120px; left: 0; right: 0; height: 2px; background: rgba(255,255,255,0.2);
+        }
+
+        .liquid {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 0%;
+            background: transparent;
+            transition: all 0.5s ease;
+        }
+
+        .ph-strip {
+            width: 24px;
+            height: 120px;
+            background: #fde047;
+            position: absolute;
+            top: -100px;
+            left: calc(50% - 12px);
+            border-radius: 4px;
+            transition: transform 0.8s ease, background-color 0.5s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            z-index: 10;
+        }
+
+        .ph-strip.dipped {
+            transform: translateY(140px);
+        }
+
+        .action-btn {
+            background: #22c55e;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-top: 20px;
+            width: 100%;
+            transition: opacity 0.2s;
+        }
+
+        .action-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .result-panel {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            background: #334155;
+            min-height: 80px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        /* TAB 2: REACTOR STYLES */
+        .reactor-layout {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .reactor-select-group {
+            display: flex;
+            width: 100%;
+            justify-content: space-around;
+            gap: 20px;
+        }
+
+        @media (max-width: 600px) {
+            .reactor-select-group { flex-direction: column; }
+        }
+
+        .reactor-box {
+            flex: 1;
+            background: #334155;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .reactor-box h3 {
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+
+        .reactor-box.acid h3 { color: #f87171; }
+        .reactor-box.base h3 { color: #c084fc; }
+
+        .dropdown {
+            width: 100%;
+            padding: 10px;
+            border-radius: 6px;
+            background: var(--bg-color);
+            color: white;
+            border: 1px solid #475569;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        .equation-display {
+            font-size: 1.5rem;
+            font-family: monospace;
+            background: #0f172a;
+            padding: 15px 30px;
+            border-radius: 8px;
+            border-left: 5px solid var(--accent-blue);
+            width: 100%;
+            text-align: center;
+            min-height: 60px;
+        }
+
+        .subscript {
+            font-size: 0.65em;
+            vertical-align: sub;
+        }
+
+        .boom-effect {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #f59e0b;
+            animation: pulse 0.5s infinite alternate;
+            display: none;
+        }
+
+        @keyframes pulse {
+            from { transform: scale(1); }
+            to { transform: scale(1.1); }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>🧪 ChemLab Interactive</h1>
+        <p>Explore Acids, Bases, and Salts without getting your hands dirty!</p>
+    </header>
+
+    <div class="nav-tabs">
+        <button class="tab-btn active" onclick="switchTab('lab-tab', this)">🌈 pH Indicator Lab</button>
+        <button class="tab-btn" onclick="switchTab('reactor-tab', this)">⚡ Neutralization Reactor</button>
+    </div>
+
+    <div class="container">
+        <div id="lab-tab" class="tab-content active">
+            <div class="lab-grid">
+                <div class="controls">
+                    <p class="select-title">Step 1: Choose a Test Substance</p>
+                    <div class="substance-grid">
+                        <button class="substance-btn" onclick="selectSubstance('lemon', 2, '#ef4444', 'Lemon Juice')">🍋 Lemon Juice</button>
+                        <button class="substance-btn" onclick="selectSubstance('coffee', 5, '#b45309', 'Coffee')">☕ Coffee</button>
+                        <button class="substance-btn" onclick="selectSubstance('water', 7, '#38bdf8', 'Pure Water')">💧 Pure Water</button>
+                        <button class="substance-btn" onclick="selectSubstance('baking', 9, '#e2e8f0', 'Baking Soda Sol.')">🍞 Baking Soda</button>
+                        <button class="substance-btn" onclick="selectSubstance('bleach', 13, '#fef08a', 'Bleach')">🧼 Bleach</button>
+                    </div>
+                    
+                    <button id="dip-btn" class="action-btn" onclick="dipStrip()" disabled>Step 2: Dip pH Paper</button>
+                    <button id="reset-btn" class="action-btn" style="background:#64748b;" onclick="resetLab()">Reset Lab</button>
+                </div>
+
+                <div class="beaker-area">
+                    <div class="ph-strip" id="phStrip"></div>
+                    <div class="beaker">
+                        <div class="liquid" id="liquidContainer"></div>
+                    </div>
+                    
+                    <div class="result-panel" id="resultPanel">
+                        <span style="color: #94a3b8;">Select a substance to begin your analysis.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="reactor-tab" class="tab-content">
+            <div class="reactor-layout">
+                <p style="text-align: center; color: #94a3b8;">Mix a strong Acid and a strong Base to trigger a neutralization reaction and produce a Salt!</p>
+                
+                <div class="reactor-select-group">
+                    <div class="reactor-box acid">
+                        <h3>Select Acid</h3>
+                        <select id="acidSelect" class="dropdown" onchange="updateReaction()">
+                            <option value="">-- Choose Acid --</option>
+                            <option value="HCl">Hydrochloric Acid (HCl)</option>
+                            <option value="HNO3">Nitric Acid (HNO₃)</option>
+                        </select>
+                    </div>
+                    
+                    <div style="font-size: 2rem; align-self: center;">+</div>
+
+                    <div class="reactor-box base">
+                        <h3>Select Base</h3>
+                        <select id="baseSelect" class="dropdown" onchange="updateReaction()">
+                            <option value="">-- Choose Base --</option>
+                            <option value="NaOH">Sodium Hydroxide (NaOH)</option>
+                            <option value="KOH">Potassium Hydroxide (KOH)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="boom-effect" id="boom">💥 REACTION SUCCESSFUL!</div>
+
+                <div class="equation-display" id="equationDisplay">
+                    Select ingredients to view equation...
+                </div>
+
+                <div class="result-panel" id="reactorResult" style="width: 100%;">
+                    <span style="color: #94a3b8;">Neutralization reactions always create a Salt and Water (H₂O).</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global State for Lab
+        let currentPh = 7;
+        let currentType = '';
+        let currentName = '';
+
+        // Tab Switcher
+        function switchTab(tabId, btnElement) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            
+            document.getElementById(tabId).classList.add('active');
+            btnElement.classList.add('active');
+        }
+
+        // Substance Selection Logic
+        function selectSubstance(id, ph, color, name) {
+            // Reset strip position safely before changing liquid
+            const strip = document.getElementById('phStrip');
+            strip.classList.remove('dipped');
+            strip.style.backgroundColor = '#fde047';
+
+            // Highlight chosen button
+            document.querySelectorAll('.substance-btn').forEach(btn => btn.classList.remove('selected'));
+            event.target.classList.add('selected');
+
+            // Fill beaker
+            const liquid = document.getElementById('liquidContainer');
+            liquid.style.height = '70%';
+            liquid.style.backgroundColor = color;
+
+            currentPh = ph;
+            currentName = name;
+            if (ph < 7) currentType = 'Acidic';
+            else if (ph > 7) currentType = 'Basic (Alkaline)';
+            else currentType = 'Neutral';
+
+            document.getElementById('dip-btn').disabled = false;
+            document.getElementById('resultPanel').innerHTML = `<b style="color:${color}">${name}</b> loaded. Ready to test pH.`;
+        }
+
+        // Dip Paper Logic
+        function dipStrip() {
+            const strip = document.getElementById('phStrip');
+            strip.classList.add('dipped');
+
+            // Map pH to vibrant litmus color matches
+            let stripColor = '#fde047';
+            if (currentPh === 2) stripColor = '#ef4444';
+            if (currentPh === 5) stripColor = '#f97316';
+            if (currentPh === 7) stripColor = '#22c55e';
+            if (currentPh === 9) stripColor = '#3b82f6';
+            if (currentPh === 13) stripColor = '#6366f1';
+
+            setTimeout(() => {
+                strip.style.backgroundColor = stripColor;
+                
+                let traits = '';
+                if(currentType.includes('Acidic')) {
+                    traits = '⚡ Features: Tastes sour, turns blue litmus paper RED, conducts electricity.';
+                } else if(currentType.includes('Basic')) {
+                    traits = '🧼 Features: Tastes bitter, feels slippery/soapy, turns red litmus paper BLUE.';
+                } else {
+                    traits = '🥤 Features: Balanced scale, safe, no structural change to litmus indicators.';
+                }
+
+                document.getElementById('resultPanel').innerHTML = `
+                    <div style="font-size: 1.1rem; margin-bottom: 5px;"><b>Substance:</b> ${currentName}</div>
+                    <div style="font-size: 1.2rem; font-weight: bold; color:${stripColor}">pH Level: ${currentPh} (${currentType})</div>
+                    <div style="font-size: 0.9rem; color: #94a3b8; margin-top:5px;">${traits}</div>
+                `;
+            }, 800);
+        }
+
+        function resetLab() {
+            const strip = document.getElementById('phStrip');
+            strip.classList.remove('dipped');
+            strip.style.backgroundColor = '#fde047';
+            document.getElementById('liquidContainer').style.height = '0%';
+            document.getElementById('dip-btn').disabled = true;
+            document.querySelectorAll('.substance-btn').forEach(btn => btn.classList.remove('selected'));
+            document.getElementById('resultPanel').innerHTML = '<span style="color: #94a3b8;">Select a substance to begin your analysis.</span>';
+        }
+
+        // Neutralization Reactor Logic
+        function updateReaction() {
+            const acid = document.getElementById('acidSelect').value;
+            const base = document.getElementById('baseSelect').value;
+            const display = document.getElementById('equationDisplay');
+            const result = document.getElementById('reactorResult');
+            const boom = document.getElementById('boom');
+
+            if (!acid || !base) {
+                display.innerHTML = "Select ingredients to view equation...";
+                result.innerHTML = '<span style="color: #94a3b8;">Neutralization reactions always create a Salt and Water (H₂O).</span>';
+                boom.style.display = 'none';
+                return;
+            }
+
+            let saltFormula = '';
+            let saltName = '';
+
+            // Map combinations
+            if (acid === 'HCl' && base === 'NaOH') { saltFormula = 'NaCl'; saltName = 'Sodium Chloride (Table Salt)'; }
+            else if (acid === 'HCl' && base === 'KOH') { saltFormula = 'KCl'; saltName = 'Potassium Chloride'; }
+            else if (acid === 'HNO3' && base === 'NaOH') { saltFormula = 'NaNO<span class="subscript">3</span>'; saltName = 'Sodium Nitrate'; }
+            else if (acid === 'HNO3' && base === 'KOH') { saltFormula = 'KNO<span class="subscript">3</span>'; saltName = 'Potassium Nitrate'; }
+
+            // Dynamic presentation adjustments for Nitric Acid display formatting
+            let acidDisplay = acid === 'HNO3' ? 'HNO<span class="subscript">3</span>' : acid;
+
+            // Trigger visual visual feedback loop
+            boom.style.display = 'block';
+            
+            display.innerHTML = `${acidDisplay} + ${base} → ${saltFormula} + H<span class="subscript">2</span>O`;
+            
+            result.innerHTML = `
+                <div style="font-size: 1.2rem; font-weight: bold; color: #22c55e; margin-bottom: 5px;">Salt Formed: ${saltName}</div>
+                <p style="font-size: 0.95rem; color: #cbd5e1;">The H⁺ ions from the acid combined with the OH⁻ ions from the base to make neutral water, leaving the remaining elements to bind perfectly into an ionic <b>Salt</b>!</p>
+            `;
+        }
+    </script>
+</body>
+</html>
