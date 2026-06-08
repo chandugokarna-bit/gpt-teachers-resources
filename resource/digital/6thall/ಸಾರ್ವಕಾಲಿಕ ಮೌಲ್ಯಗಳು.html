@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಭಾರತೀಯ ಸಾರ್ವಕಾಲಿಕ ಮೌಲ್ಯಗಳ ಸ್ಪಿನ್ನರ್ ಚಕ್ರ</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #fcf8f2;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+            user-select: none;
+        }
+        h1 {
+            color: #8e44ad;
+            margin-bottom: 5px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+        .instruction {
+            color: #555;
+            font-size: 18px;
+            margin-bottom: 30px;
+        }
+
+        /* ಮುಖ್ಯ ಚಕ್ರದ ಕಂಟೇನರ್ */
+        .wheel-box {
+            position: relative;
+            width: 420px;
+            height: 420px;
+            margin: 0 auto;
+        }
+
+        /* ಚಕ್ರದ ಮೇಲ್ಭಾಗದ ಪಾಯಿಂಟರ್ (ಬಾಣ) */
+        .wheel-pointer {
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 22px solid transparent;
+            border-right: 22px solid transparent;
+            border-top: 35px solid #8e44ad;
+            z-index: 10;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+        }
+
+        /* ಕ್ಯಾನ್ವಾಸ್ (ಚಕ್ರ) */
+        #valueWheel {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            transition: transform 4s cubic-bezier(0.1, 0.8, 0.1, 1);
+        }
+
+        /* ಸ್ಪಿನ್ ಬಟನ್ */
+        #spinBtn {
+            background: linear-gradient(135deg, #9b59b6, #8e44ad);
+            color: white;
+            border: none;
+            padding: 14px 45px;
+            font-size: 20px;
+            font-weight: bold;
+            border-radius: 30px;
+            cursor: pointer;
+            margin-top: 35px;
+            box-shadow: 0 5px 15px rgba(142, 68, 173, 0.4);
+            transition: all 0.2s ease;
+        }
+        #spinBtn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 7px 20px rgba(142, 68, 173, 0.6);
+        }
+        #spinBtn:disabled {
+            background: #bdc3c7;
+            box-shadow: none;
+            cursor: not-allowed;
+        }
+
+        /* ಮಾಹಿತಿ ಪಾಪ್-ಅಪ್ (Modal) */
+        .modal-window {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.4);
+            z-index: 20;
+            width: 85%;
+            max-width: 550px;
+            border-top: 10px solid #cf000f;
+            animation: bounceIn 0.5s ease;
+        }
+        .modal-window h2 {
+            margin-top: 0;
+            font-size: 26px;
+        }
+        .scenario-box {
+            background-color: #f9f9f9;
+            border-left: 4px solid #8e44ad;
+            padding: 15px;
+            text-align: left;
+            font-size: 16px;
+            line-height: 1.6;
+            color: #34495e;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .life-application {
+            text-align: left;
+            font-size: 15px;
+            color: #27ae60;
+            font-weight: bold;
+            background-color: #ebf7ee;
+            padding: 12px;
+            border-radius: 8px;
+        }
+        .close-btn {
+            background-color: #2c3e50;
+            color: white;
+            border: none;
+            padding: 10px 30px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 25px;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: background 0.2s;
+        }
+        .close-btn:hover { background-color: #1a252f; }
+        
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 15;
+        }
+
+        @keyframes bounceIn {
+            0% { opacity: 0; transform: translate(-50%, -65%) scale(0.8); }
+            70% { opacity: 1; transform: translate(-50%, -48%) scale(1.03); }
+            100% { transform: translate(-50%, -50%) scale(1); }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>೨ನೇ ಪಾಠ: "ಭಾರತೀಯ ಸಾರ್ವಕಾಲಿಕ ಮೌಲ್ಯಗಳ" ಸ್ಪಿನ್ನರ್ ಚಕ್ರ</h1>
+    <p class="instruction">ಚಕ್ರವನ್ನು ತಿರುಗಿಸಿ! ಬಾಣದ ಗುರುತು ನಿಲ್ಲುವ ಉದಾತ್ತ ಮೌಲ್ಯದ ಸನ್ನಿವೇಶವನ್ನು ತರಗತಿಯಲ್ಲಿ ಚರ್ಚಿಸಿ.</p>
+
+    <div class="wheel-box">
+        <div class="wheel-pointer"></div>
+        <canvas id="valueWheel" width="420" height="420"></canvas>
+    </div>
+
+    <button id="spinBtn" onclick="startSpinning()">🔄 ಚಕ್ರ ತಿರುಗಿಸಿ (Spin)</button>
+
+    <div class="modal-overlay" id="overlay"></div>
+    <div class="modal-window" id="valueModal">
+        <h2 id="modal-title">ಮೌಲ್ಯದ ಹೆಸರು</h2>
+        <div class="scenario-box" id="modal-scenario">ಸನ್ನಿವೇಶದ ವಿವರ ಇಲ್ಲಿದೆ...</div>
+        <div class="life-application" id="modal-app">ಜೀವನದಲ್ಲಿ ಅಳವಡಿಕೆ...</div>
+        <button class="close-btn" onclick="closeValueModal()">ಮುಂದೆ ಆಡಿ</button>
+    </div>
+
+    <script>
+        // ೫ ಭಾರತೀಯ ಸಾರ್ವಕಾಲಿಕ ಮೌಲ್ಯಗಳು, ಅವುಗಳ ಸನ್ನಿವೇಶ ಮತ್ತು ಅಳವಡಿಕೆ ವಿವರಗಳು
+        const valuesData = [
+            {
+                title: "✨ ಸತ್ಯ (Truth)",
+                color: "#ff9f43",
+                scenario: "<b>ಐತಿಹಾಸಿಕ ಸನ್ನಿವೇಶ:</b> ರಾಜಾ ಹರಿಶ್ಚಂದ್ರನು ತನ್ನ ಜೀವನದಲ್ಲಿ ಎಂತಹ ಕಷ್ಟದ ಪರಿಸ್ಥಿತಿಗಳು ಬಂದರೂ ಸುಳ್ಳು ಹೇಳದೆ ಸತ್ಯದ ಹಾದಿಯಲ್ಲೇ ನಡೆದನು. ಗಾಂಧೀಜಿಯವರು ಹರಿಶ್ಚಂದ್ರನ ಕಥೆಯಿಂದ ಪ್ರೇರಿತರಾಗಿ ತಮ್ಮ ಜೀವನ ಪೂರ್ತಿ 'ಸತ್ಯಾಗ್ರಹ'ವನ್ನು ಪಾಲಿಸಿದರು.",
+                app: "💡 ದೈನಂದಿನ ಜೀವನದಲ್ಲಿ ಅಳವಡಿಕೆ: ತಪ್ಪು ಮಾಡಿದಾಗ ಶಿಕ್ಷೆಯಿಂದ ಪಾರಾಗಲು ಸುಳ್ಳು ಹೇಳದೆ, ಧೈರ್ಯದಿಂದ ಸತ್ಯವನ್ನು ಒಪ್ಪಿಕೊಳ್ಳುವುದು."
+            },
+            {
+                title: "⚖️ ಧರ್ಮ (Righteousness)",
+                color: "#1dd1a1",
+                scenario: "<b>ಐತಿಹಾಸಿಕ ಸನ್ನಿವೇಶ:</b> ಸಾಮ್ರಾಟ್ ಅಶೋಕನು ಕಳಿಂಗ ಯುದ್ಧದ ನಂತರ ಯುದ್ಧದ ಹಾದಿಯನ್ನು ಬಿಟ್ಟು, ಪ್ರಜೆಗಳ ಕಲ್ಯಾಣಕ್ಕೋಸ್ಕರ 'ಧರ್ಮ'ದ (ಧಮ್ಮ) ಮಾರ್ಗವನ್ನು ಹಿಡಿದನು. ಎಲ್ಲರಿಗೂ ಒಳ್ಳೆಯದನ್ನು ಮಾಡುವುದೇ ನಿಜವಾದ ಧರ್ಮವೆಂದು ಸಾರಿದನು.",
+                app: "💡 ದೈನಂದಿನ ಜೀವನದಲ್ಲಿ ಅಳವಡಿಕೆ: ನಮ್ಮ ಕರ್ತವ್ಯಗಳನ್ನು ಪ್ರಾಮಾಣಿಕವಾಗಿ ಮಾಡುವುದು ಮತ್ತು ದುರ್ಬಲರಿಗೆ ಸಹಾಯ ಮಾಡುವುದು."
+            },
+            {
+                title: "🕊️ ಅಹಿಂಸೆ (Non-Violence)",
+                color: "#2e86de",
+                scenario: "<b>ಐತಿಹಾಸಿಕ ಸನ್ನಿವೇಶ:</b> ಭಾರತದ ಸ್ವಾತಂತ್ರ್ಯ ಸಂಗ್ರಾಮದ ಸಮಯದಲ್ಲಿ ಮಹಾತ್ಮ ಗಾಂಧೀಜಿಯವರು ಯಾವುದೇ ಆಯುಧಗಳಿಲ್ಲದೆ, ಕೇವಲ 'ಅಹಿಂಸೆ' ಮತ್ತು ಶಾಂತಿಯ ಮಾರ್ಗದ ಮೂಲಕ ಬ್ರಿಟಿಷರ ವಿರುದ್ಧ ಹೋರಾಡಿ ಜಗತ್ತಿಗೆ ಅಹಿಂಸೆಯ ತಾಕತ್ತನ್ನು ತೋರಿಸಿಕೊಟ್ಟರು.",
+                app: "💡 ದೈನಂದಿನ ಜೀವನದಲ್ಲಿ ಅಳವಡಿಕೆ: ಯಾರೊಂದಿಗೂ ಜಗಳವಾಡದೆ, ದ್ವೇಷ ಸಾಧಿಸದೆ, ಪ್ರಾಣಿ-ಪಕ್ಷಿಗಳಿಗೂ ಹಿಂಸೆ ನೀಡದೆ ಪ್ರೀತಿಯಿಂದ ಬಾಳುವುದು."
+            },
+            {
+                title: "🌍 ವಸುಧೈವ ಕುಟುಂಬಕಂ (The World is One Family)",
+                color: "#f368e0",
+                scenario: "<b>ಐತಿಹಾಸಿಕ ಸನ್ನಿವೇಶ:</b> ಭಾರತವು ಇತಿಹಾಸದ ಆರಂಭದಿಂದಲೂ ತನ್ನ ಬಳಿಗೆ ಆಶ್ರಯ ಬೇಡಿ ಬಂದ ವಿವಿಧ ದೇಶಗಳ, ಧರ್ಮಗಳ ಜನರನ್ನು ಪ್ರೀತಿಯಿಂದ ಬರಮಾಡಿಕೊಂಡಿದೆ. ಇಡೀ ಜಗತ್ತೇ ಒಂದು ದೊಡ್ಡ ಕುಟುಂಬ ಎಂಬುದು ಭಾರತೀಯರ ಮೂಲ ತತ್ವವಾಗಿದೆ.",
+                app: "💡 ದೈನಂದಿನ ಜೀವನದಲ್ಲಿ ಅಳವಡಿಕೆ: ಜಾತಿ, ಮತ, ಭಾಷೆಗಳ ಭೇದವಿಲ್ಲದೆ ತರಗತಿಯ ಮತ್ತು ಸಮಾಜದ ಎಲ್ಲ ಜನರನ್ನೂ ನಮ್ಮವರೆಂದು ಗೌರವಿಸುವುದು."
+            },
+            {
+                title: "🤲 ಸರ್ವೇ ಜನಾಃ ಸುಖಿನೋ ಭವಂತು (May Everyone be Happy)",
+                color: "#ff6b6b",
+                scenario: "<b>ಐತಿಹಾಸಿಕ ಸನ್ನಿವೇಶ:</b> ಪ್ರಾಚೀನ ಭಾರತದ ಋಷಿ-ಮುನಿಗಳು ಮತ್ತು ಶ್ರೇಷ್ಠ ರಾಜರು ಕೇವಲ ತಮ್ಮ ಸ್ವಾರ್ಥವನ್ನು ನೋಡದೆ, ಪ್ರಕೃತಿಯಲ್ಲಿರುವ ಎಲ್ಲಾ ಜೀವಿಗಳು, ಪರಿಸರ ಮತ್ತು ಸಮಸ್ತ ಮಾನವಕುಲವು ಸುಖ-ಶಾಂತಿಯಿಂದ ಇರಲಿ ಎಂದು ಪ್ರಾರ್ಥಿಸುತ್ತಿದ್ದರು.",
+                app: "💡 ದೈನಂದಿನ ಜೀವನದಲ್ಲಿ ಅಳವಡಿಕೆ: ಇತರರ ಯಶಸ್ಸು ಮತ್ತು ಸುಖವನ್ನು ಕಂಡು ಅಸೂಯೆ ಪಡದೆ, ಎಲ್ಲರಿಗೂ ಒಳ್ಳೆಯದಾಗಲಿ ಎಂದು ಬಯಸುವುದು."
+            }
+        ];
+
+        const canvas = document.getElementById("valueWheel");
+        const ctx = canvas.getContext("2d");
+        const numSegments = valuesData.length;
+        const anglePerSegment = (2 * Math.PI) / numSegments;
+        let currentRotation = 0;
+
+        // ಚಕ್ರವನ್ನು ವರ್ಣರಂಜಿತವಾಗಿ ಬಿಡಿಸುವ ಫಂಕ್ಷನ್
+        function drawValueWheel() {
+            for (let i = 0; i < numSegments; i++) {
+                const startAngle = i * anglePerSegment;
+                const endAngle = startAngle + anglePerSegment;
+
+                // ಪ್ರತಿ ಭಾಗದ ಬಣ್ಣ ತುಂಬುವುದು
+                ctx.beginPath();
+                ctx.moveTo(210, 210);
+                ctx.arc(210, 210, 210, startAngle, endAngle);
+                ctx.fillStyle = valuesData[i].color;
+                ctx.fill();
+                ctx.stroke();
+
+                // ಮೌಲ್ಯಗಳ ಹೆಸರನ್ನು ಚಕ್ರದ ಮೇಲೆ ಬರೆಯುವುದು
+                ctx.save();
+                ctx.translate(210, 210);
+                ctx.rotate(startAngle + anglePerSegment / 2);
+                ctx.textAlign = "right";
+                ctx.fillStyle = "#ffffff";
+                ctx.font = "bold 15px 'Segoe UI'";
+                
+                // ದೀರ್ಘವಿರುವ ಹೆಸರುಗಳ ಮೊದಲ ಪದ ಮಾತ್ರ ಚಕ್ರದ ಮೇಲೆ ಚಂದವಾಗಿ ಮೂಡಲು
+                const shortName = valuesData[i].title.split(" ")[1];
+                ctx.fillText(shortName, 180, 5);
+                ctx.restore();
+            }
+
+            // ಕೇಂದ್ರ ಬಿಂದು ವೃತ್ತ
+            ctx.beginPath();
+            ctx.arc(210, 210, 25, 0, 2 * Math.PI);
+            ctx.fillStyle = "#ffffff";
+            ctx.fill();
+            ctx.stroke();
+        }
+
+        // ಚಕ್ರ ತಿರುಗಿಸುವ ಫಂಕ್ಷನ್
+        function startSpinning() {
+            const spinBtn = document.getElementById("spinBtn");
+            spinBtn.disabled = true;
+
+            // ಯಾದೃಚ್ಛಿಕವಾಗಿ ಸುತ್ತಿಸುವುದು
+            const randomDegrees = Math.floor(3600 + Math.random() * 1800);
+            currentRotation += randomDegrees;
+
+            // ಟಿಕ್-ಟಿಕ್ ಧ್ವನಿ
+            playTickEffect();
+
+            const wheelElement = document.getElementById("valueWheel");
+            wheelElement.style.transform = `rotate(${currentRotation}deg)`;
+
+            // ಚಕ್ರ ನಿಂತಾಗ ರಿಸಲ್ಟ್ ಲೆಕ್ಕಾಚಾರ (4 ಸೆಕೆಂಡ್ ನಂತರ)
+            setTimeout(() => {
+                const actualDegrees = currentRotation % 360;
+                // ಬಾಣದ ಗುರುತು ಮೇಲಿರುವುದರಿಂದ (270 ಡಿಗ್ರಿ ಗೆ ಹೊಂದಾಣಿಕೆ)
+                const correctedDegrees = (360 - actualDegrees + 270) % 360;
+                const selectedIndex = Math.floor(correctedDegrees / (360 / numSegments)) % numSegments;
+
+                const selectedValue = valuesData[selectedIndex];
+
+                // ಯಶಸ್ಸಿನ ಸೌಂಡ್
+                playSuccessTone();
+
+                // ಪಾಪ್-ಅಪ್ ಡೇಟಾ ತುಂಬುವುದು
+                const modal = document.getElementById("valueModal");
+                modal.style.borderTopColor = selectedValue.color;
+                document.getElementById("modal-title").innerText = selectedValue.title;
+                document.getElementById("modal-title").style.color = selectedValue.color;
+                document.getElementById("modal-scenario").innerHTML = selectedValue.scenario;
+                document.getElementById("modal-app").innerText = selectedValue.app;
+
+                // ಪ್ರದರ್ಶನ ಮಾಡುವುದು
+                document.getElementById("overlay").style.display = "block";
+                modal.style.display = "block";
+
+                spinBtn.disabled = false;
+            }, 4000);
+        }
+
+        function closeValueModal() {
+            document.getElementById("overlay").style.display = "none";
+            document.getElementById("valueModal").style.display = "none";
+        }
+
+        // ಸುತ್ತುವಾಗ ಬರುವ ಶಬ್ದ ಸೃಷ್ಟಿ
+        function playTickEffect() {
+            let count = 0;
+            const interval = setInterval(() => {
+                if (count > 25) clearInterval(interval);
+                generateBeep(500, 0.03);
+                count++;
+            }, 130);
+        }
+
+        // ಪ್ರಶ್ನೆ/ಮೌಲ್ಯ ಬಂದಾಗ ಬರುವ ವಿನ್ನಿಂಗ್ ಮ್ಯೂಸಿಕ್
+        function playSuccessTone() {
+            generateBeep(523.25, 0.1); 
+            setTimeout(() => generateBeep(659.25, 0.1), 120); 
+            setTimeout(() => generateBeep(783.99, 0.25), 240); 
+        }
+
+        // ಆಡಿಯೋ ಜನರೇಟರ್
+        function generateBeep(freq, duration) {
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            oscillator.frequency.value = freq;
+            oscillator.start();
+            gainNode.gain.setValueAtTime(0.15, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+            oscillator.stop(audioCtx.currentTime + duration);
+        }
+
+        // ಆರಂಭಿಕ ಚಕ್ರ ರಚನೆ
+        drawValueWheel();
+    </script>
+</body>
+</html>

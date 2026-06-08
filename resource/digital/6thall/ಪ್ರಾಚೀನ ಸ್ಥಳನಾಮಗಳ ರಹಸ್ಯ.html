@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಪ್ರಾಚೀನ ಸ್ಥಳನಾಮಗಳ ರಹಸ್ಯ - ಇಂಟರಾಕ್ಟಿವ್ ನಕ್ಷೆ ಆಟ</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f6fa;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+            user-select: none;
+        }
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        p.instruction {
+            color: #555;
+            font-size: 18px;
+            margin-bottom: 25px;
+        }
+
+        /* ಮುಖ್ಯ ಆಟದ ಕಂಟೇನರ್ */
+        .game-layout {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 40px;
+            max-width: 1100px;
+            margin: 0 auto;
+            flex-wrap: wrap;
+        }
+
+        /* ಎಳೆಯಬೇಕಾದ ಕಾರ್ಡ್‌ಗಳ ಪೆಟ್ಟಿಗೆ */
+        .cards-zone {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            width: 250px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            border-top: 5px solid #e67e22;
+        }
+        .cards-zone h3 {
+            margin-top: 0;
+            color: #d35400;
+            font-size: 18px;
+        }
+        .ancient-card {
+            background: linear-gradient(135deg, #e67e22, #d35400);
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: move;
+            font-weight: bold;
+            font-size: 16px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+            transition: transform 0.2s;
+        }
+        .ancient-card:active {
+            opacity: 0.5;
+        }
+
+        /* ನಕ್ಷೆಯ ಕಂಟೇನರ್ */
+        .map-zone {
+            position: relative;
+            background: #ffffff;
+            border: 3px solid #bdc3c7;
+            border-radius: 15px;
+            padding: 15px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+
+        /* ನಕ್ಷೆಯ ಮೇಲಿರುವ ಡ್ರಾಪ್ ಬಾಕ್ಸ್‌ಗಳು */
+        .target-slot {
+            position: absolute;
+            width: 140px;
+            min-height: 45px;
+            border: 2px dashed #3498db;
+            background-color: rgba(241, 242, 246, 0.8);
+            border-radius: 6px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 4px;
+            font-size: 13px;
+            font-weight: bold;
+            color: #34495e;
+            transform: translate(-50%, -50%);
+            transition: all 0.3s ease;
+        }
+        .target-slot.drag-over {
+            background-color: #e8f4f8;
+            border-color: #2980b9;
+            transform: translate(-50%, -50%) scale(1.08);
+        }
+        .target-slot span {
+            margin-bottom: 2px;
+            color: #7f8c8d;
+        }
+
+        /* ಸರಿಯಾದ ಮತ್ತು ತಪ್ಪಾದ ಕಾರ್ಡ್ ಬಣ್ಣಗಳು */
+        .correct-placement {
+            background: linear-gradient(135deg, #2ecc71, #27ae60) !important;
+            border: none !important;
+            color: white !important;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            font-size: 15px;
+        }
+        .wrong-placement {
+            background: linear-gradient(135deg, #e74c3c, #c0392b) !important;
+            border: none !important;
+            color: white !important;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            font-size: 15px;
+        }
+
+        /* ನಿಯಂತ್ರಣ ಬಟನ್‌ಗಳು */
+        .btn-container {
+            margin-top: 30px;
+        }
+        .action-btn {
+            background-color: #2980b9;
+            color: white;
+            border: none;
+            padding: 12px 35px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 25px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(41, 128, 185, 0.3);
+            transition: background 0.2s;
+        }
+        .action-btn:hover { background-color: #1f6391; }
+        
+        #score-board {
+            font-size: 22px;
+            font-weight: bold;
+            margin-top: 20px;
+            color: #2c3e50;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>೨ನೇ ಪಾಠ: ಪ್ರಾಚೀನ ಸ್ಥಳನಾಮಗಳ ರಹಸ್ಯ</h1>
+    <p class="instruction">ಎಡಭಾಗದಲ್ಲಿರುವ 'ಪ್ರಾಚೀನ ಹೆಸರುಗಳ' ಕಾರ್ಡ್‌ಗಳನ್ನು ಎಳೆದು ನಕ್ಷೆಯಲ್ಲಿರುವ ಇಂದಿನ ಸರಿಯಾದ 'ರಾಜ್ಯ/ನಗರದ' ಪೆಟ್ಟಿಗೆಗೆ ಹಾಕಿ!</p>
+
+    <div class="game-layout">
+        
+        <div class="cards-zone" id="cards-deck">
+            <h3>📜 ಪ್ರಾಚೀನ ಹೆಸರುಗಳು:</h3>
+            <div class="ancient-card" draggable="true" id="card-magadha" data-name="magadha">ಮಗಧ</div>
+            <div class="ancient-card" draggable="true" id="card-kalinga" data-name="kalinga">ಕಳಿಂಗ</div>
+            <div class="ancient-card" draggable="true" id="card-indraprastha" data-name="indraprastha">ಇಂದ್ರಪ್ರಸ್ಥ</div>
+            <div class="ancient-card" draggable="true" id="card-kamarupa" data-name="kamarupa">ಕಾಮರೂಪ</div>
+        </div>
+
+        <div class="map-zone">
+            <svg width="450" height="500" viewBox="0 0 400 480" style="background-color: #fff; border-radius: 12px;">
+                <path d="M180,40 L230,40 L260,80 L250,120 L300,160 L340,180 L310,220 L270,210 L250,240 L240,290 L220,330 L190,440 L185,440 L140,320 L130,280 L100,260 L80,220 L120,200 L150,150 L140,100 Z" fill="#eef2f3" stroke="#bdc3c7" stroke-width="2"/>
+                <text x="50" y="450" fill="#7f8c8d" font-size="12" font-weight="bold">ಭಾರತದ ಸಾಂಕೇತಿಕ ಭೂಪಟ</text>
+            </svg>
+
+            <div class="target-slot" id="slot-delhi" style="top: 150px; left: 160px;" data-match="indraprastha">
+                <span>ಇಂದಿನ ದೆಹಲಿ</span>
+            </div>
+
+            <div class="target-slot" id="slot-bihar" style="top: 210px; left: 260px;" data-match="magadha">
+                <span>ಇಂದಿನ ಬಿಹಾರ</span>
+            </div>
+
+            <div class="target-slot" id="slot-odisha" style="top: 270px; left: 250px;" data-match="kalinga">
+                <span>ಇಂದಿನ ಒಡಿಶಾ</span>
+            </div>
+
+            <div class="target-slot" id="slot-assam" style="top: 180px; left: 340px;" data-match="kamarupa">
+                <span>ಇಂದಿನ ಅಸ್ಸಾಂ</span>
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="btn-container">
+        <button class="action-btn" onclick="checkMapAnswers()">ಉತ್ತರ ಪರಿಶೀಲಿಸಿ (Submit)</button>
+    </div>
+    <div id="score-board"></div>
+
+    <script>
+        const cards = document.querySelectorAll('.ancient-card');
+        const slots = document.querySelectorAll('.target-slot');
+
+        // ಡ್ರ್ಯಾಗ್ ಆರಂಭ ಮತ್ತು ಅಂತ್ಯ ನಿಯಂತ್ರಣ
+        cards.forEach(card => {
+            card.addEventListener('dragstart', () => {
+                card.classList.add('dragging');
+            });
+
+            card.addEventListener('dragend', () => {
+                card.classList.remove('dragging');
+            });
+        });
+
+        // ನಕ್ಷೆಯ ಸ್ಲಾಟ್‌ಗಳ ಡ್ರಾಪ್ ನಿಯಂತ್ರಣ
+        slots.forEach(slot => {
+            slot.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                slot.classList.add('drag-over');
+            });
+
+            slot.addEventListener('dragleave', () => {
+                slot.classList.remove('drag-over');
+            });
+
+            slot.addEventListener('drop', (e) => {
+                e.preventDefault();
+                slot.classList.remove('drag-over');
+                const draggingCard = document.querySelector('.dragging');
+                
+                // ಒಂದು ಸ್ಲಾಟ್‌ನಲ್ಲಿ ಕೇವಲ ಒಂದು ಕಾರ್ಡ್ ಇರಲು ಮಾತ್ರ ಅನುಮತಿ
+                if (draggingCard && slot.querySelectorAll('.ancient-card').length === 0) {
+                    slot.appendChild(draggingCard);
+                }
+            });
+        });
+
+        // ಉತ್ತರಗಳನ್ನು ಪರಿಶೀಲಿಸುವ ಮುಖ್ಯ ಫಂಕ್ಷನ್
+        function checkMapAnswers() {
+            let correctScore = 0;
+            const totalSlots = slots.length;
+
+            slots.forEach(slot => {
+                const expectedMatch = slot.getAttribute('data-match');
+                const placedCard = slot.querySelector('.ancient-card');
+
+                if (placedCard) {
+                    const cardName = placedCard.getAttribute('data-name');
+                    if (cardName === expectedMatch) {
+                        // ಸರಿಯಾಗಿದ್ದರೆ ಹಸಿರು ಬಣ್ಣಕ್ಕೆ ಬದಲಾಯಿಸುವುದು
+                        placedCard.className = 'correct-placement';
+                        correctScore++;
+                    } else {
+                        // ತಪ್ಪಾಗಿದ್ದರೆ ಕೆಂಪು ಬಣ್ಣಕ್ಕೆ ಬದಲಾಯಿಸುವುದು
+                        placedCard.className = 'wrong-placement';
+                    }
+                }
+            });
+
+            // ಕಾರ್ಡ್‌ಗಳ ಮೂಲ ಪೆಟ್ಟಿಗೆಯಲ್ಲೇ ಉಳಿದುಹೋದ ಕಾರ್ಡ್‌ಗಳನ್ನು ತಪ್ಪೆಂದು ತೋರಿಸಲು
+            const leftCards = document.getElementById('cards-deck').querySelectorAll('.ancient-card');
+            leftCards.forEach(card => {
+                card.style.background = 'linear-gradient(135deg, #e74c3c, #c0392b)';
+            });
+
+            // ಸೌಂಡ್ ಎಫೆಕ್ಟ್
+            if (correctScore === totalSlots) {
+                playAudioTone(600, 0.15);
+                setTimeout(() => playAudioTone(800, 0.2), 100);
+            } else {
+                playAudioTone(250, 0.3);
+            }
+
+            // ಫಲಿತಾಂಶ ಪ್ರದರ್ಶನ
+            const scoreBoard = document.getElementById('score-board');
+            if (correctScore === totalSlots) {
+                scoreBoard.innerHTML = `🎉 ಅದ್ಭುತ! ಸ್ಕೋರ್: ${correctScore} / ${totalSlots} <br><span style="color:#27ae60;">ನೀವು ಎಲ್ಲಾ ಪ್ರಾಚೀನ ಸ್ಥಳಗಳ ರಹಸ್ಯವನ್ನು ಸರಿಯಾಗಿ ಕಂಡುಹಿಡಿದಿದ್ದೀರಿ!</span>`;
+            } else {
+                scoreBoard.innerHTML = `🤔 ಪ್ರಯತ್ನಿಸಿ! ಸ್ಕೋರ್: ${correctScore} / ${totalSlots} <br><span style="color:#c0392b;">ಕೆಲವು ಸ್ಥಳಗಳು ತಪ್ಪಾಗಿವೆ, ಮತ್ತೊಮ್ಮೆ ಪರಿಶೀಲಿಸಿ.</span>`;
+            }
+        }
+
+        // ಕೋಡಿಂಗ್ ಮೂಲಕವೇ ಆಡಿಯೋ ಬೀಪ್ ಸೃಷ್ಟಿಸುವ ಫಂಕ್ಷನ್ (ಇಂಟರ್ನೆಟ್ ಇಲ್ಲದಿದ್ದರೂ ಸೌಂಡ್ ಬರುತ್ತದೆ)
+        function playAudioTone(freq, duration) {
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            oscillator.frequency.value = freq;
+            oscillator.start();
+            gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+            oscillator.stop(audioCtx.currentTime + duration);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಭಾರತದ ವಿಜ್ಞಾನ ಲೋಕ - ಡಿಜಿಟಲ್ ಫ್ಲಿಪ್ ಕಾರ್ಡ್ಸ್</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f7f1e3;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+            user-select: none;
+        }
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        p.instruction {
+            color: #7f8c8d;
+            font-size: 18px;
+            margin-bottom: 40px;
+        }
+
+        /* ಕಾರ್ಡ್‌ಗಳ ಪ್ರದರ್ಶನ ವಲಯ */
+        .cards-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            max-width: 1100px;
+            margin: 0 auto;
+            flex-wrap: wrap;
+            perspective: 1000px; /* 3D ಎಫೆಕ್ಟ್‌ಗಾಗಿ ಮಹತ್ವದ್ದು */
+        }
+
+        /* ಮುಖ್ಯ ಫ್ಲಿಪ್ ಕಾರ್ಡ್ ಬಾಕ್ಸ್ */
+        .flip-card {
+            background-color: transparent;
+            width: 280px;
+            height: 380px;
+            cursor: pointer;
+        }
+
+        /* ಕಾರ್ಡ್ ಒಳಗಿನ ಭಾಗ (ತಿರುಗುವಿಕೆ ನಿಯಂತ್ರಣ) */
+        .flip-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-style: preserve-3d;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-radius: 15px;
+        }
+
+        /* ಕ್ಲಿಕ್ ಮಾಡಿದಾಗ ಕಾರ್ಡ್ ತಿರುಗಲು ಈ ಕ್ಲಾಸ್ ಬಳಕೆಯಾಗುತ್ತದೆ */
+        .flip-card.flipped .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+
+        /* ಕಾರ್ಡ್‌ನ ಮುಂಭಾಗ ಮತ್ತು ಹಿಂಭಾಗದ ಸಾಮಾನ್ಯ ಶೈಲಿ */
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden; /* ಹಿಂಭಾಗ ಕಾಣಿಸದಂತೆ ತಡೆಯಲು */
+            backface-visibility: hidden;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        /* ಕಾರ್ಡ್ ಮುಂಭಾಗದ ವಿನ್ಯಾಸ */
+        .card-front {
+            background: linear-gradient(135deg, #130f40, #2c3a47);
+            color: white;
+            border: 3px solid #f1c40f;
+        }
+        .card-front .avatar {
+            font-size: 70px;
+            margin-bottom: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 50%;
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .card-front h2 {
+            margin: 10px 0;
+            font-size: 24px;
+            letter-spacing: 1px;
+        }
+        .card-front .hint {
+            font-size: 14px;
+            color: #f1c40f;
+            margin-top: 15px;
+            border: 1px dashed #f1c40f;
+            padding: 5px 12px;
+            border-radius: 20px;
+        }
+
+        /* ಕಾರ್ಡ್ ಹಿಂಭಾಗದ ವಿನ್ಯಾಸ */
+        .card-back {
+            background: linear-gradient(135deg, #ffffff, #f1f2f6);
+            color: #2c3e50;
+            transform: rotateY(180deg);
+            border: 3px solid #27ae60;
+            justify-content: flex-start;
+            padding-top: 30px;
+        }
+        .card-back h3 {
+            color: #27ae60;
+            font-size: 22px;
+            margin-top: 0;
+            border-bottom: 2px solid #27ae60;
+            padding-bottom: 5px;
+            width: 100%;
+        }
+        .card-back p {
+            font-size: 16px;
+            line-height: 1.6;
+            text-align: left;
+            font-weight: 500;
+            color: #34495e;
+            margin-top: 20px;
+        }
+        .card-back .achievement-icon {
+            font-size: 50px;
+            margin-top: auto;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>೨ನೇ ಪಾಠ: ಭಾರತದ ವಿಜ್ಞಾನ ಲೋಕ</h1>
+    <p class="instruction">ಪ್ರಾಚೀನ ಭಾರತದ ಮಹಾನ್ ವಿಜ್ಞಾನಿಗಳ ಸಾಧನೆಯನ್ನು ತಿಳಿಯಲು ಕಾರ್ಡ್‌ಗಳ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ (Flip)!</p>
+
+    <div class="cards-container">
+
+        <div class="flip-card" onclick="flipCard(this)">
+            <div class="flip-card-inner">
+                <div class="card-front">
+                    <div class="avatar">🔭</div>
+                    <h2>ಆರ್ಯಭಟ</h2>
+                    <div class="hint">ಖಗೋಳ ಮತ್ತು ಗಣಿತ ಶಾಸ್ತ್ರ</div>
+                </div>
+                <div class="card-back">
+                    <h3>🪐 ಆರ್ಯಭಟನ ಸಾಧನೆ</h3>
+                    <p>• ಭೂಮಿಯು ತನ್ನದೇ ಆದ ಅಕ್ಷದ ಮೇಲೆ ಸುತ್ತುತ್ತದೆ ಎಂದು ಜಗತ್ತಿಗೆ ಮೊದಲು ಸಾರಿದ ಮಹಾನ್ ಖಗೋಳವಿಜ್ಞಾನಿ.<br><br>
+                       • ಭೂಮಿಯು ಗುಂಡಾಗಿದೆ ಎಂದು ಪ್ರತಿಪಾದಿಸಿದರು.<br><br>
+                       • ಇವರ ಗೌರವಾರ್ಥವಾಗಿ ಭಾರತದ ಮೊದಲ ಉಪಗ್ರಹಕ್ಕೆ 'ಆರ್ಯಭಟ' ಎಂದು ಹೆಸರಿಡಲಾಗಿದೆ.</p>
+                    <div class="achievement-icon">🌍</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="flip-card" onclick="flipCard(this)">
+            <div class="flip-card-inner">
+                <div class="card-front">
+                    <div class="avatar">📐</div>
+                    <h2>ಬೋಧಾಯನ</h2>
+                    <div class="hint">ರೇಖಾಗಣಿತ ಮತ್ತು ಸೂತ್ರಗಳು</div>
+                </div>
+                <div class="card-back">
+                    <h3>📐 ಬೋಧಾಯನನ ಸಾಧನೆ</h3>
+                    <p>• ಪಾಶ್ಚಾತ್ಯ ಜಗತ್ತಿನ ಪೈಥಾಗೊರೆಸ್ ಪ್ರಮೇಯಕ್ಕೂ ನೂರಾರು ವರ್ಷಗಳ ಮುಂಚೆಯೇ ರೇಖಾಗಣಿತದ ಪ್ರಮುಖ ಸೂತ್ರಗಳನ್ನು ರಚಿಸಿದ ಶ್ರೇಷ್ಠ ಭಾರತೀಯ ಗಣಿತಜ್ಞ.<br><br>
+                       • ಇವರ 'ಬೋಧಾಯನ ಶುಲ್ಬಸೂತ್ರ'ದಲ್ಲಿ ಜ್ಯಾಮಿತಿಯ ಲೆಕ್ಕಾಚಾರಗಳ ನಿಖರ ವಿವರಣೆಗಳಿವೆ.</p>
+                    <div class="achievement-icon">📐</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="flip-card" onclick="flipCard(this)">
+            <div class="flip-card-inner">
+                <div class="card-front">
+                    <div class="avatar">⚛️</div>
+                    <h2>ಮಹರ್ಷಿ ಕಣಾದ</h2>
+                    <div class="hint">ಪರಮಾಣು ಸಿದ್ಧಾಂತ</div>
+                </div>
+                <div class="card-back">
+                    <h3>⚛️ ಕಣಾದರ ಸಾಧನೆ</h3>
+                    <p>• ಜಗತ್ತಿನ ಆಧುನಿಕ ವಿಜ್ಞಾನಿಗಳು ಪರಮಾಣು (Atom) ಸಿದ್ಧಾಂತವನ್ನು ಕಂಡುಹಿಡಿಯುವ ಮೊದಲೇ, ಸೃಷ್ಟಿಯ ಪ್ರತಿಯೊಂದು ವಸ್ತುವೂ ಅತ್ಯಂತ ಸೂಕ್ಷ್ಮವಾದ 'ಕಣ'ಗಳಿಂದ (ಅಣು) ಮಾಡಲ್ಪಟ್ಟಿದೆ ಎಂದು ಪ್ರತಿಪಾದಿಸಿದ ಜಗತ್ತಿನ ಪ್ರಥಮ ದಾರ್ಶನಿಕ.<br><br>
+                       • ಇವರನ್ನು ವೈಶೇಷಿಕ ದರ್ಶನದ ಸ್ಥಾಪಕರೆನ್ನಲಾಗುತ್ತದೆ.</p>
+                    <div class="achievement-icon">🔬</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // ಕಾರ್ಡ್ ತಿರುಗಿಸುವ ಸರಳ ಜಾವಾಸ್ಕ್ರಿಪ್ಟ್ ಫಂಕ್ಷನ್
+        function flipCard(cardElement) {
+            cardElement.classList.toggle('flipped');
+            // ಆಕರ್ಷಕ ಸಣ್ಣ ಧ್ವನಿ ಪರಿಣಾಮ (Card Swoosh effect)
+            playFlipTone();
+        }
+
+        // ಕೋಡಿಂಗ್ ಮೂಲಕವೇ ಆಡಿಯೋ ಸೃಷ್ಟಿಸುವ ಫಂಕ್ಷನ್ (ಯಾವುದೇ ಫೈಲ್ ಬೇಡ)
+        function playFlipTone() {
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            
+            oscillator.type = 'sine';
+            oscillator.frequency.setValueAtTime(300, audioCtx.currentTime); // ಕಡಿಮೆ ಪಿಚ್‌ನಿಂದ
+            oscillator.frequency.exponentialRampToValueAtTime(600, audioCtx.currentTime + 0.15); // ಹೆಚ್ಚಿನ ಪಿಚ್‌ಗೆ
+            
+            oscillator.start();
+            gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+            oscillator.stop(audioCtx.currentTime + 0.15);
+        }
+    </script>
+</body>
+</html>
