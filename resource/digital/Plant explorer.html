@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Ultimate Plant Classification Lab</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f4f0; padding: 20px; text-align: center; }
+        .card { background: white; padding: 25px; border-radius: 15px; max-width: 650px; margin: auto; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .score-board { font-size: 1.2em; font-weight: bold; color: #2e7d32; margin-bottom: 20px; }
+        .plant-icon { font-size: 60px; margin: 10px; }
+        .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
+        button { padding: 12px; cursor: pointer; border: none; border-radius: 8px; background: #2e7d32; color: white; font-weight: bold; }
+        button:hover { background: #1b5e20; }
+        .info { background: #e8f5e9; padding: 15px; border-radius: 8px; margin: 15px 0; text-align: left; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h1>🌿 Plant Explorer</h1>
+    <div class="score-board">Score: <span id="correct">0</span> / <span id="total">0</span></div>
+    
+    <div id="game-area">
+        <div id="plant-display" class="plant-icon"></div>
+        <h2 id="plant-name">Plant Name</h2>
+        <div id="info-box" class="info"></div>
+        <div id="buttons" class="btn-grid"></div>
+    </div>
+    <p id="feedback"></p>
+</div>
+
+<script>
+    const allPlants = [
+        // Herbs
+        { name: "Coriander", type: "Herb", icon: "🌿", desc: "Small, soft green stem." },
+        { name: "Mint", type: "Herb", icon: "🌱", desc: "Low growing, aromatic, soft stem." },
+        { name: "Grass", type: "Herb", icon: "🌾", desc: "Non-woody, flexible green stems." },
+        { name: "Spinach", type: "Herb", icon: "🍃", desc: "Tender leaves, short life cycle." },
+        // Shrubs
+        { name: "Rose", type: "Shrub", icon: "🌹", desc: "Woody stem, branches near base." },
+        { name: "Hibiscus", type: "Shrub", icon: "🌺", desc: "Bushy, medium-sized, woody." },
+        { name: "Lemon", type: "Shrub", icon: "🍋", desc: "Dense branches, woody texture." },
+        { name: "Tulsi", type: "Shrub", icon: "🪴", desc: "Woody, bushy, perennial shrub." },
+        // Trees
+        { name: "Banyan", type: "Tree", icon: "🌳", desc: "Large, thick woody trunk." },
+        { name: "Mango", type: "Tree", icon: "🥭", desc: "Tall, sturdy, woody trunk." },
+        { name: "Coconut", type: "Tree", icon: "🥥", desc: "Tall, unbranched woody stem." },
+        { name: "Neem", type: "Tree", icon: "🌲", desc: "Large, spreading woody branches." },
+        // Climbers
+        { name: "Money Plant", type: "Climber", icon: "🍃", desc: "Weak stem, climbs using support." },
+        { name: "Pea Plant", type: "Climber", icon: "🫛", desc: "Uses tendrils to climb." },
+        { name: "Cucumber", type: "Climber", icon: "🥒", desc: "Needs support to grow vertically." },
+        { name: "Grapevine", type: "Climber", icon: "🍇", desc: "Weak stem, climbs wall/trellis." },
+        // Creepers
+        { name: "Watermelon", type: "Creeper", icon: "🍉", desc: "Spreads horizontally on ground." },
+        { name: "Pumpkin", type: "Creeper", icon: "🎃", desc: "Very weak stem, grows along soil." },
+        { name: "Strawberry", type: "Creeper", icon: "🍓", desc: "Creeps along ground, shallow roots." },
+        { name: "Sweet Potato", type: "Creeper", icon: "🍠", desc: "Prostrate growth habit." }
+    ];
+
+    // Fisher-Yates shuffle algorithm
+    function shuffle(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+
+    const plants = shuffle([...allPlants]);
+    let current = 0;
+    let score = 0;
+
+    function loadPlant() {
+        if(current >= plants.length) {
+            document.getElementById('game-area').innerHTML = `<h2>🎉 Lab Complete!</h2><p>Final Grade: ${score}/${plants.length}</p>`;
+            return;
+        }
+        document.getElementById('plant-display').innerText = plants[current].icon;
+        document.getElementById('plant-name').innerText = plants[current].name;
+        document.getElementById('info-box').innerText = "Characteristics: " + plants[current].desc;
+        document.getElementById('total').innerText = current;
+        document.getElementById('correct').innerText = score;
+        document.getElementById('feedback').innerText = "";
+    }
+
+    ["Herb", "Shrub", "Tree", "Climber", "Creeper"].forEach(cat => {
+        const btn = document.createElement('button');
+        btn.innerText = cat;
+        btn.onclick = () => {
+            if(cat === plants[current].type) {
+                score++;
+                document.getElementById('feedback').innerText = "Correct! " + plants[current].name + " is a " + cat + ".";
+                current++;
+                setTimeout(loadPlant, 1000);
+            } else {
+                document.getElementById('feedback').innerText = "Try again!";
+            }
+        };
+        document.getElementById('buttons').appendChild(btn);
+    });
+
+    loadPlant();
+</script>
+</body>
+</html>

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <title>ಸಸ್ಯಗಳ ವರ್ಗೀಕರಣ ಕಲಿಕೆ</title>
+    <style>
+        body { font-family: 'Arial', sans-serif; background: #e8f5e9; padding: 20px; text-align: center; }
+        .card { background: white; padding: 25px; border-radius: 15px; max-width: 600px; margin: auto; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
+        button { padding: 12px; cursor: pointer; border: none; border-radius: 8px; background: #2e7d32; color: white; font-weight: bold; }
+        button:hover { background: #1b5e20; }
+        .info { background: #f1f8e9; padding: 15px; border-radius: 8px; margin: 15px 0; text-align: left; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h1>🌿 ಸಸ್ಯಗಳ ವರ್ಗೀಕರಣ</h1>
+    <div id="game-area">
+        <h2 id="plant-name">ಸಸ್ಯದ ಹೆಸರು</h2>
+        <div id="info-box" class="info">ಗುಣಲಕ್ಷಣಗಳು ಇಲ್ಲಿ ಕಾಣಿಸುತ್ತವೆ...</div>
+        <p><strong>ಈ ಸಸ್ಯವನ್ನು ವರ್ಗೀಕರಿಸಿ:</strong></p>
+        <div id="buttons" class="btn-grid"></div>
+    </div>
+    <p id="feedback"></p>
+</div>
+
+<script>
+    const plants = [
+        { name: "ಕೊತ್ತಂಬರಿ", type: "ಗಿಡಮೂಲಿಕೆ (Herb)", desc: "ಬೆಳೆಯಲು ಚಿಕ್ಕದಾದ, ಮೆದುವಾದ ಹಸಿರು ಕಾಂಡವಿರುವ ಸಸ್ಯ." },
+        { name: "ಪುದೀನ", type: "ಗಿಡಮೂಲಿಕೆ (Herb)", desc: "ಸುಗಂಧಭರಿತ, ಚಿಕ್ಕ ಮತ್ತು ಮೃದುವಾದ ಕಾಂಡದ ಸಸ್ಯ." },
+        { name: "ಪಾಲಕ್", type: "ಗಿಡಮೂಲಿಕೆ (Herb)", desc: "ಅಲ್ಪಾವಧಿಯ ಸಸ್ಯ, ಎಲೆಗಳು ತಿನ್ನಲು ಯೋಗ್ಯ." },
+        { name: "ಹುಲ್ಲು", type: "ಗಿಡಮೂಲಿಕೆ (Herb)", desc: "ತುಂಬಾ ಚಿಕ್ಕದಾದ, ಮೆದುವಾದ ಮತ್ತು ಹಸಿರು ಬಣ್ಣದ ಸಸ್ಯ." },
+        { name: "ಮೆಂತೆ", type: "ಗಿಡಮೂಲಿಕೆ (Herb)", desc: "ಚಿಕ್ಕದಾದ ಮತ್ತು ಸಾಂಬಾರ ಪದಾರ್ಥವಾಗಿ ಬಳಸುವ ಸಸ್ಯ." },
+        { name: "ದಾಸವಾಳ", type: "ಪೊದೆ (Shrub)", desc: "ಮಧ್ಯಮ ಗಾತ್ರದ, ಗಟ್ಟಿಯಾದ ಕಾಂಡವಿರುವ ಪೊದೆ ಸಸ್ಯ." },
+        { name: "ಗುಲಾಬಿ", type: "ಪೊದೆ (Shrub)", desc: "ಮುಳ್ಳುಗಳನ್ನು ಹೊಂದಿರುವ ಮತ್ತು ಗುಂಪುಗಳಾಗಿ ಬೆಳೆಯುವ ಸಸ್ಯ." },
+        { name: "ನಿಂಬೆ", type: "ಪೊದೆ (Shrub)", desc: "ದಟ್ಟವಾದ ಕೊಂಬೆಗಳು ಮತ್ತು ಗಟ್ಟಿಯಾದ ಕಾಂಡವಿರುವ ಸಸ್ಯ." },
+        { name: "ತುಳಸಿ", type: "ಪೊದೆ (Shrub)", desc: "ಪವಿತ್ರವಾದ, ಸಣ್ಣ ಮತ್ತು ಗಟ್ಟಿಯಾದ ಕಾಂಡದ ಸಸ್ಯ." },
+        { name: "ಮಲ್ಲಿಗೆ", type: "ಪೊದೆ (Shrub)", desc: "ಸಣ್ಣ ಮತ್ತು ಸುಗಂಧಭರಿತ ಹೂವುಗಳನ್ನು ಬಿಡುವ ಸಸ್ಯ." },
+        { name: "ಮಾವಿನ ಮರ", type: "ಮರ (Tree)", desc: "ಅತಿ ಎತ್ತರವಾಗಿ ಬೆಳೆಯುವ, ದಪ್ಪನೆಯ ಕಾಂಡವಿರುವ ಸಸ್ಯ." },
+        { name: "ಆಲದ ಮರ", type: "ಮರ (Tree)", desc: "ಬಹಳ ದೊಡ್ಡದಾದ ಮತ್ತು ದಪ್ಪನೆಯ ಕಾಂಡವಿರುವ ಮರ." },
+        { name: "ತೆಂಗಿನ ಮರ", type: "ಮರ (Tree)", desc: "ಎತ್ತರಕ್ಕೆ ನೇರವಾಗಿ ಬೆಳೆಯುವ, ಕೊಂಬೆಗಳಿಲ್ಲದ ಮರ." },
+        { name: "ಬೇವು", type: "ಮರ (Tree)", desc: "ಔಷಧೀಯ ಗುಣವುಳ್ಳ ದೊಡ್ಡ ಮರ." },
+        { name: "ಜಾಲಿ ಮರ", type: "ಮರ (Tree)", desc: "ಕಠಿಣವಾದ ಕಾಂಡವನ್ನು ಹೊಂದಿರುವ ಎತ್ತರದ ಮರ." },
+        { name: "ಮನಿ ಪ್ಲಾಂಟ್", type: "ಬಳ್ಳಿ (Climber)", desc: "ದುರ್ಬಲ ಕಾಂಡವಿದ್ದು, ಆಧಾರದ ಸಹಾಯದಿಂದ ಮೇಲೆ ಹಬ್ಬುತ್ತದೆ." },
+        { name: "ದ್ರಾಕ್ಷಿ", type: "ಬಳ್ಳಿ (Climber)", desc: "ಟ್ರೆಲ್ಲಿಸ್ ಅಥವಾ ಆಧಾರದ ಸಹಾಯದಿಂದ ಹಬ್ಬುವ ಬಳ್ಳಿ." },
+        { name: "ಬಟಾಣಿ", type: "ಬಳ್ಳಿ (Climber)", desc: "ತಂತುಗಳ ಸಹಾಯದಿಂದ ಆಧಾರವನ್ನು ಹಿಡಿದು ಹಬ್ಬುತ್ತದೆ." },
+        { name: "ಹಾಗಲಕಾಯಿ", type: "ಬಳ್ಳಿ (Climber)", desc: "ಆಧಾರ ಸಿಕ್ಕರೆ ವೇಗವಾಗಿ ಮೇಲೆ ಹಬ್ಬುವ ಬಳ್ಳಿ." },
+        { name: "ಬೀನ್ಸ್", type: "ಬಳ್ಳಿ (Climber)", desc: "ಸಣ್ಣ ಆಧಾರವಿದ್ದರೂ ಹಬ್ಬಿ ಬೆಳೆಯುವ ಸಸ್ಯ." },
+        { name: "ಕುಂಬಳಕಾಯಿ", type: "ನೆಲ ಬಳ್ಳಿ (Creeper)", desc: "ದುರ್ಬಲ ಕಾಂಡವಿದ್ದು, ನೆಲದ ಮೇಲೆ ಹರಡಿ ಬೆಳೆಯುತ್ತದೆ." },
+        { name: "ಕಲ್ಲಂಗಡಿ", type: "ನೆಲ ಬಳ್ಳಿ (Creeper)", desc: "ನೆಲದ ಮೇಲೆ ಹರಡಿ ದೊಡ್ಡ ಹಣ್ಣುಗಳನ್ನು ಬಿಡುತ್ತದೆ." },
+        { name: "ಸಿಹಿ ಗೆಣಸು", type: "ನೆಲ ಬಳ್ಳಿ (Creeper)", desc: "ನೆಲದ ಮೇಲೆ ಅಡ್ಡಲಾಗಿ ಬೆಳೆಯುವ ಸಸ್ಯ." },
+        { name: "ಸ್ಟ್ರಾಬೆರಿ", type: "ನೆಲ ಬಳ್ಳಿ (Creeper)", desc: "ನೆಲಕ್ಕೆ ಅಂಟಿಕೊಂಡಂತೆ ಹರಡಿ ಬೆಳೆಯುವ ಸಸ್ಯ." },
+        { name: "ಸೌತೆಕಾಯಿ", type: "ನೆಲ ಬಳ್ಳಿ (Creeper)", desc: "ನೆಲದ ಮೇಲೆ ಹರಡಿ ಬೆಳೆಯುವ ಲತಾವರ್ಗದ ಸಸ್ಯ." }
+    ];
+
+    // Shuffle function
+    function shuffle(array) {
+        return array.sort(() => Math.random() - 0.5);
+    }
+
+    const shuffledPlants = shuffle(plants);
+    let current = 0;
+
+    function loadPlant() {
+        if(current >= shuffledPlants.length) {
+            document.getElementById('game-area').innerHTML = "<h2>🎉 ಅಭಿನಂದನೆಗಳು!</h2><p>ನೀವು ಎಲ್ಲಾ 25 ಸಸ್ಯಗಳನ್ನು ಪೂರ್ಣಗೊಳಿಸಿದ್ದೀರಿ.</p>";
+            return;
+        }
+        document.getElementById('plant-name').innerText = shuffledPlants[current].name;
+        document.getElementById('info-box').innerText = "ಗುಣಲಕ್ಷಣಗಳು: " + shuffledPlants[current].desc;
+        document.getElementById('feedback').innerText = "";
+    }
+
+    const categories = ["ಗಿಡಮೂಲಿಕೆ (Herb)", "ಪೊದೆ (Shrub)", "ಮರ (Tree)", "ಬಳ್ಳಿ (Climber)", "ನೆಲ ಬಳ್ಳಿ (Creeper)"];
+    
+    categories.forEach(cat => {
+        const btn = document.createElement('button');
+        btn.innerText = cat;
+        btn.onclick = () => {
+            if(cat === shuffledPlants[current].type) {
+                document.getElementById('feedback').innerText = "ಸರಿಯಾದ ಉತ್ತರ! " + shuffledPlants[current].name + " ಎನ್ನುವುದು " + cat + " ಆಗಿದೆ.";
+                current++;
+                setTimeout(loadPlant, 1500);
+            } else {
+                document.getElementById('feedback').innerText = "ತಪ್ಪಾಗಿದೆ, ಮತ್ತೊಮ್ಮೆ ಪ್ರಯತ್ನಿಸಿ!";
+            }
+        };
+        document.getElementById('buttons').appendChild(btn);
+    });
+
+    loadPlant();
+</script>
+</body>
+</html>

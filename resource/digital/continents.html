@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>6-7ನೇ ತರಗತಿ - ಭೂಖಂಡಗಳ ಪರಿಶೋಧನೆ (3D + ನೈಜ ವರ್ಣರಂಜಿತ ನಕ್ಷೆ)</title>
+    <style>
+        body { 
+            background-color: #0b132b; 
+            color: white; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            margin: 0; 
+            padding: 15px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center;
+            user-select: none;
+            height: 100vh;
+            box-sizing: border-box;
+        }
+        h1 { color: #ffd700; text-align: center; margin: 0 0 5px 0; font-size: 24px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
+        .sub-title { color: #4ea8de; text-align: center; margin-bottom: 15px; font-size: 14px; font-weight: bold; }
+        
+        /* ಮುಖ್ಯ ಕಂಟೇನರ್ ಲೇಔಟ್ */
+        .main-container {
+            display: flex;
+            width: 100%;
+            max-width: 1200px;
+            height: 55vh;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        /* ಎಡಭಾಗದ 3D ಗ್ಲೋಬ್ ಬಾಕ್ಸ್ */
+        .globe-box {
+            flex: 1;
+            background-color: #000814;
+            border: 2px solid #334155;
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0, 170, 255, 0.15);
+        }
+        .canvas-container { width: 100%; height: 100%; }
+        .label-tag {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(15, 23, 42, 0.85);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            border: 1px solid #00aaff;
+            color: #4ea8de;
+            z-index: 5;
+        }
+
+        /* ಬಲಭಾಗದ ನೈಜ ವರ್ಣರಂಜಿತ ನಕ್ಷೆಯ ಬಾಕ್ಸ್ */
+        .map-box {
+            flex: 1.3;
+            background-color: #111a36;
+            border: 2px solid #56cfe1;
+            border-radius: 12px;
+            position: relative;
+            box-shadow: 0 0 25px rgba(86, 207, 225, 0.3);
+            padding: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+
+        /* ನಿಮ್ಮ ಎರಡನೇ ಫೋಟೋದ ತರಹವೇ ಇರುವ ಅತ್ಯಂತ ಸುಂದರ ವರ್ಣರಂಜಿತ ನಕ್ಷೆಯ ಚಿತ್ರ */
+        .world-image { 
+            width: 100%; 
+            height: 100%; 
+            object-fit: fill; 
+            border-radius: 8px;
+        }
+        
+        /* ಚಿತ್ರದ ಮೇಲಿರುವ ಅದೃಶ್ಯ ಕ್ಲಿಕ್ ಲೇಯರ್ */
+        .map-overlay {
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            width: calc(100% - 10px);
+            height: calc(100% - 10px);
+        }
+        
+        .continent-hitbox {
+            fill: transparent;
+            cursor: pointer;
+            stroke: transparent;
+            transition: all 0.2s ease;
+        }
+        
+        /* ಮೌಸ್ ತಂದಾಗ ಅಥವಾ ಕ್ಲಿಕ್ ಮಾಡಿದಾಗ ಆ ಖಂಡದ ಮೇಲೆ ತಿಳಿ ಹಳದಿ ಪ್ರಕಾಶ ಮೂಡುತ್ತದೆ */
+        .continent-hitbox:hover, .continent-hitbox.active {
+            fill: rgba(255, 215, 0, 0.2);
+            stroke: #ffd700;
+            stroke-width: 2.5;
+            filter: drop-shadow(0px 0px 8px #ffd700);
+        }
+
+        /* ಕೆಳಗಿನ ಮಾಹಿತಿ ಪ್ರದರ್ಶನ ಬಾಕ್ಸ್ */
+        #info-box { 
+            background-color: #1c2541; 
+            border: 2px solid #ffd700; 
+            border-radius: 12px; 
+            width: 100%; 
+            max-width: 1200px; 
+            padding: 15px 25px; 
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.2); 
+            box-sizing: border-box;
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+        #info-title { color: #ffd700; margin: 0 0 8px 0; font-size: 22px; border-bottom: 1px solid #3a86c8; padding-bottom: 5px; text-align: center; }
+        #info-text { font-size: 15px; line-height: 1.6; color: #e0e0e0; margin: 0; }
+        .feature-title { color: #56cfe1; font-weight: bold; display: block; margin-top: 6px; }
+
+        /* ಮೊಬೈಲ್ ಸ್ಕ್ರೀನ್ ಹೊಂದಾಣಿಕೆ */
+        @media (max-width: 768px) {
+            body { height: auto; overflow: auto; }
+            .main-container { flex-direction: column; height: auto; }
+            .globe-box { height: 280px; }
+            .map-box { height: 300px; }
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+</head>
+<body>
+
+    <h1>🗺️ ಜಗತ್ತಿನ ಭೂಖಂಡಗಳ ಪರಿಶೋಧನೆ</h1>
+    <div class="sub-title">ಎಡಭಾಗದ ಗ್ಲೋಬ್ ತಿರುಗಿಸಿ ನೋಡಿ. ಬಲಭಾಗದ ನೈಜ ವರ್ಣರಂಜಿತ ನಕ್ಷೆಯಲ್ಲಿ ಖಂಡಗಳ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ ಕಲಿಯಿರಿ!</div>
+
+    <div class="main-container">
+        <div class="globe-box">
+            <div class="label-tag">🔄 3D ಗ್ಲೋಬ್ (ತಿರುಗಿಸಿ ನೋಡಿ)</div>
+            <div id="globe-canvas" class="canvas-container"></div>
+        </div>
+
+        <div class="map-box">
+            <div class="label-tag" style="left: auto; right: 10px; color: #ffd700; border-color: #ffd700;">🎯 ಕಲರ್ ನಕ್ಷೆ (ಖಂಡಗಳ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ)</div>
+            
+            <img src="https://pub-c5e31b5cdafb419a86629d187545ad3d.r2.dev/colored-world-map.jpg" onerror="this.src='https://images.unsplash.com/photo-1524661135-423995f22d0b?q=80&w=1200&auto=format&fit=crop'" class="world-image" alt="Colorful World Map">
+            
+            <svg class="map-overlay" viewBox="0 0 1000 500" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+                <path id="north_america" class="continent-hitbox" d="M30,30 L340,30 L360,160 L280,240 L180,260 L130,220 L50,170 Z" onclick="selectContinent('north_america')"/>
+
+                <path id="south_america" class="continent-hitbox" d="M220,260 L320,270 L350,330 L290,460 L230,460 L180,330 Z" onclick="selectContinent('south_america')"/>
+
+                <path id="europe" class="continent-hitbox" d="M430,50 L580,50 L570,140 L480,170 L410,120 Z" onclick="selectContinent('europe')"/>
+
+                <path id="africa" class="continent-hitbox" d="M410,170 L550,150 L620,200 L590,370 L500,400 L420,290 Z" onclick="selectContinent('africa')"/>
+
+                <path id="asia" class="continent-hitbox" d="M580,50 L950,40 L960,210 L830,270 L720,285 L630,245 L570,150 Z" onclick="selectContinent('asia')"/>
+
+                <path id="australia" class="continent-hitbox" d="M770,300 L920,300 L950,390 L830,420 L750,370 Z" onclick="selectContinent('australia')"/>
+
+                <path id="antarctica" class="continent-hitbox" d="M20,470 L980,470 L930,498 L60,498 Z" onclick="selectContinent('antarctica')"/>
+            </svg>
+        </div>
+    </div>
+
+    <div id="info-box">
+        <h2 id="info-title">🗺️ ನಕ್ಷೆ ಪರಿಶೋಧನೆಗೆ ಸಿದ್ಧ</h2>
+        <p id="info-text" style="text-align: center;">ಬಲಬದಿಯ ವರ್ಣರಂಜಿತ ನಕ್ಷೆಯ ಚಿತ್ರದಲ್ಲಿ ಕಾಣುವ ಯಾವುದೇ ಖಂಡದ ಮೇಲೆ ನೇರವಾಗಿ ಕ್ಲಿಕ್ ಮಾಡಿ. ಆ ಖಂಡದ ಹೆಸರು ಮತ್ತು ವಿವರಣೆ ಇಲ್ಲಿ ಕೆಳಗೆ ಪ್ರದರ್ಶನಗೊಳ್ಳುತ್ತದೆ.</p>
+    </div>
+
+<script>
+    // --- ಎಡಭಾಗದ 3D ಗ್ಲೋಬ್ ಸೆಟಪ್ ---
+    const container = document.getElementById('globe-canvas');
+    const scene = new THREE.Scene();
+    
+    const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+    camera.position.set(0, 0, 9.5);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(container.clientWidth, container.clientHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    container.appendChild(renderer.domElement);
+    
+    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.05;
+
+    const ambientLight = new THREE.AmbientLight(0xffffff, 1.8);
+    scene.add(ambientLight);
+
+    const textureLoader = new THREE.TextureLoader();
+    const globeGeometry = new THREE.SphereGeometry(3.6, 64, 64);
+    const globeMaterial = new THREE.MeshBasicMaterial({
+        map: textureLoader.load('https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/planets/earth_atmos_2048.jpg')
+    });
+    const globe = new THREE.Mesh(globeGeometry, globeMaterial);
+    scene.add(globe);
+
+    function animate() {
+        requestAnimationFrame(animate);
+        if (controls.state === -1) {
+            globe.rotation.y += 0.001;
+        }
+        controls.update();
+        renderer.render(scene, camera);
+    }
+    animate();
+
+    // --- ಬಲಭಾಗದ ನಕ್ಷೆಯ ಮಾಹಿತಿ ಬ್ಯಾಂಕ್ ಮತ್ತು ಕ್ಲಿಕ್ ಲಾಜಿಕ್ ---
+    const continentData = {
+        asia: {
+            title: "🟡 ಏಷ್ಯಾ ಖಂಡ (Asia) - ಜಗತ್ತಿನ ಅತಿ ದೊಡ್ಡ ಖಂಡ",
+            text: "ಇದು ಪ್ರಪಂಚದ ಅತ್ಯಂತ ದೊಡ್ಡ ಮತ್ತು ಅತಿ ಹೆಚ್ಚು ಜನಸಂಖ್ಯೆ ಹೊಂದಿರುವ ಖಂಡವಾಗಿದೆ. ನಮ್ಮ ಹೆಮ್ಮೆಯ ಭಾರತ ದೇಶವು ಇದೇ ಖಂಡದಲ್ಲಿದೆ. <br><span class='feature-title'>⛰️ ಪ್ರಮುಖ ಭೂಸ್ವರೂಪಗಳು:</span> ಇಲ್ಲಿ ವಿಶ್ವದ ಅತಿ ಎತ್ತರವಾದ <b>ಹಿಮಾಲಯ ಪರ್ವತ ಶ್ರೇಣಿ</b> ಮತ್ತು ವಿಶ್ವದ ಅತ್ಯುನ್ನತ ಶಿಖರವಾದ <b>ಎವರೆಸ್ಟ್ ಶಿಖರ (8848.86 ಮೀ)</b> ಇವೆ. ವಿಸ್ತಾರವಾದ ಟಿಬೆಟ್ ಪ್ರಸ್ಥಭೂಮಿ ಹಾಗೂ ಪವಿತ್ರ <b>ಗಂಗಾ ನದಿ</b> ಇಲ್ಲಿದೆ."
+        },
+        africa: {
+            title: "🟢 ಆಫ್ರಿಕಾ ಖಂಡ (Africa) - ಜಗತ್ತಿನ ಎರಡನೇ ಅತಿ ದೊಡ್ಡ ಖಂಡ",
+            text: "ಇದು ಜಗತ್ತಿನ ಎರಡನೇ ಅತಿ ದೊಡ್ಡ ಖಂಡವಾಗಿದ್ದು, ನೈಜ ವಿಸ್ತೀರ್ಣದಲ್ಲಿ ಉತ್ತರ ಅಮೆರಿಕಕ್ಕಿಂತ ದೊಡ್ಡದಾಗಿದೆ. ಇದರ ಮಧ್ಯಭಾಗದಲ್ಲಿ ಸಮಭಾಜಕ ವೃತ್ತ ಹಾದುಹೋಗುತ್ತದೆ. <br><span class='feature-title'>⛰️ ಪ್ರಮುಖ ಭೂಸ್ವರೂಪಗಳು:</span> ಪ್ರಪಂಚದ ಅತ್ಯಂತ ಉದ್ದವಾದ ನದಿಯಾದ <b>ನೈಲ್ ನದಿ</b>, ವಿಶ್ವದ ಅತಿ ದೊಡ್ಡ ಬಿಸಿ ಮರುಭೂಮಿಯಾದ <b>ಸಹರಾ ಮರುಭೂಮಿ</b> ಮತ್ತು ಅತ್ಯಂತ ಎತ್ತರವಾದ <b>ಕಿಲಿಮಂಜಾರೋ ಪರ್ವತ</b> ಇಲ್ಲಿದೆ."
+        },
+        europe: {
+            title: "🟣 ಯುರೋಪ್ ಖಂಡ (Europe)",
+            text: "ಇದು ಆರ್ಥಿಕವಾಗಿ ಮತ್ತು ಕೈಗಾರಿಕಾ ಕ್ಷೇತ್ರಗಳಲ್ಲಿ ಅತ್ಯಂತ ಮುಂದುವರಿದ ಖಂಡವಾಗಿದೆ. <br><span class='feature-title'>⛰️ ಪ್ರಮುಖ ಭೂಸ್ವರೂಪಗಳು:</span> ಇಲ್ಲಿನ ಪ್ರಖ್ಯಾತ ಮಂಜಿನಿಂದ ಆವೃತವಾದ <b>ಆಲ್ಪ್ಸ್ ಪರ್ವತ ಶ್ರೇಣಿಗಳು</b> ಪ್ರಮುಖ ಭೂಸ್ವರೂಪವಾಗಿದೆ. ಅತ್ಯಂತ ಉದ್ದವಾದ <b>ವೋಲ್ಗಾ ನದಿ</b> ಇಲ್ಲಿದೆ. ಈ ಖಂಡದಲ್ಲಿ ಯಾವುದೇ ನೈಸರ್ಗಿಕ ಮರುಭೂಮಿಗಳಿಲ್ಲ."
+        },
+        north_america: {
+            title: "🟠 ಉತ್ತರ ಅಮೆರಿಕ ಖಂಡ (North America)",
+            text: "ವಿಶ್ವದ ಮೂರನೇ ಅತಿ ದೊಡ್ಡ ಖಂಡವಾಗಿದ್ದು, ಸಂಪೂರ್ಣವಾಗಿ ಉತ್ತರ ಗೋಳಾರ್ಧದಲ್ಲಿದೆ. <br><span class='feature-title'>⛰️ ಪ್ರಮುಖ ಭೂಸ್ವರೂಪಗಳು:</span> ಇದರ ಪಶ್ಚಿಮ ಭಾಗದಲ್ಲಿ ಬೃಹತ್ ಆದ <b>ರಾಕಿ ಪರ್ವತ ಶ್ರೇಣಿಗಳು</b> ಚಾಚಿಕೊಂಡಿವೆ. ವಿಶ್ವದ ಅತಿ ದೊಡ್ಡ ಸಿಹಿನೀರಿನ ಸರೋವರವಾದ <b>ಸುಪೀರಿಯರ್ ಸರೋವರ</b> ಮತ್ತು ಮಿಸಿಸಿಪ್ಪಿ ನದಿ ಇಲ್ಲಿದೆ."
+        },
+        south_america: {
+            title: "🔵 ದಕ್ಷಿಣ ಅಮೆರಿಕ ಖಂಡ (South America)",
+            text: "ದಟ್ಟವಾದ ಅರಣ್ಯಗಳು ಮತ್ತು ದೈತ್ಯ ಜೀವವೈವಿಧ್ಯತೆಗೆ ಈ ಖಂಡ ಹೆಸರುವಾಸಿ. <br><span class='feature-title'>⛰️ ಪ್ರಮುಖ ಭೂಸ್ವರೂಪಗಳು:</span> ಪ್ರಪಂಚದ ಅತ್ಯಂತ ಉದ್ದವಾದ ಪರ್ವತ ಶ್ರೇಣಿಯಾದ <b>ಆಂಡಿಸ್ ಪರ್ವತಗಳು</b> ಇಲ್ಲಿವೆ. ವಿಶ್ವದ ಅತಿ ದೊಡ್ಡ ನದಿಯಾದ ಆಕರ್ಷಕ <b>ಅಮೆಜಾನ್ ನದಿ</b> ಮತ್ತು ಅಮೆಜಾನ್ ಮಳೆಕಾಡುಗಳು ಇಲ್ಲಿದೆ."
+        },
+        australia: {
+            title: "🟠 ಆಸ್ಟ್ರೇಲಿಯಾ ಖಂಡ (Australia) - ದ್ವೀಪ ಖಂಡ",
+            text: "ಸುತ್ತಲೂ ಸಾಗರಗಳಿಂದ ಆವೃತವಾಗಿರುವುದರಿಂದ ಇದನ್ನು 'ದ್ವೀಪ ಖಂಡ' ಎನ್ನುತ್ತಾರೆ. ಇದು ವಿಶ್ವದ ಅತ್ಯಂತ ಸಣ್ಣ ಖಂಡವಾಗಿದೆ. <br><span class='feature-title'>⛰️ ಪ್ರಮುಖ ಭೂಸ್ವರೂಪಗಳು:</span> ಸಮುದ್ರದ ಒಳಗಿರುವ ಅದ್ಭುತ <b>ಗ್ರೇಟ್ ಬ್ಯಾರಿಯರ್ ರೀಫ್ (ಹವಳದ ದಂಡೆ)</b> ಇಲ್ಲಿದೆ. ವಿಶಾಲವಾದ <b>ಗ್ರೇಟ್ ವಿಕ್ಟೋರಿಯಾ ಮರುಭೂಮಿ</b> ಮತ್ತು ಮರ್ರೆ-ಡಾರ್ಲಿಂಗ್ ನದಿಗಳು ಇಲ್ಲಿವೆ."
+        },
+        antarctica: {
+            title: "⚪ ಅಂಟಾರ್ಟಿಕಾ ಖಂಡ (Antarctica) - ಶ್ವೇತ ಖಂಡ",
+            text: "ದಕ್ಷಿಣ ಧ್ರುವದಲ್ಲಿರುವ ಈ ಖಂಡವು ವರ್ಷಪೂರ್ತಿ ಸಂಪೂರ್ಣವಾಗಿ ದಪ್ಪನಾದ ಮಂಜುಗಡ್ಡೆಯಿಂದ ಮುಚ್ಚಿರುತ್ತದೆ. <br><span class='feature-title'>🔬 ವಿಶೇಷತೆ:</span> ಇಲ್ಲಿ ಕಾಯಂ ಮಾನವ ವಸತಿ ಇಲ್ಲ. ಭಾರತದ ಪ್ರಸಿದ್ಧ <b>ಮೈತ್ರಿ</b> ಮತ್ತು <b>ಭಾರತಿ</b> ಸಂ信ೋಧನಾ ಕೇಂದ್ರಗಳು ಇಲ್ಲಿ ವೈಜ್ಞಾನಿಕ ಕಾರ್ಯನಿರ್ವಹಿಸುತ್ತಿವೆ."
+        }
+    };
+
+    function selectContinent(id) {
+        // ಹಳೆಯ ಆಕ್ಟಿವ್ ಲೇಯರ್ ತೆಗೆದುಹಾಕುವುದು
+        const lands = document.querySelectorAll('.continent-hitbox');
+        lands.forEach(land => land.classList.remove('active'));
+
+        // ಕ್ಲಿಕ್ ಮಾಡಿದ ಖಂಡದ ಮೇಲೆ ಗೋಲ್ಡನ್ ಬಾರ್ಡರ್ ಹೈಲೈಟ್ ಮಾಡುವುದು
+        document.getElementById(id).classList.add('active');
+
+        // ಮಾಹಿತಿ ಪ್ರದರ್ಶಿಸುವುದು
+        document.getElementById("info-title").innerHTML = continentData[id].title;
+        document.getElementById("info-text").innerHTML = continentData[id].text;
+    }
+
+    window.addEventListener('resize', () => {
+        camera.aspect = container.clientWidth / container.clientHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(container.clientWidth, container.clientHeight);
+    });
+</script>
+
+</body>
+</html>
