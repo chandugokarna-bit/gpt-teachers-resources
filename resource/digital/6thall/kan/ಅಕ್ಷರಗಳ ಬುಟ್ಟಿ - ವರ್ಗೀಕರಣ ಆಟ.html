@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಅಕ್ಷರಗಳ ಬುಟ್ಟಿ - ವರ್ಗೀಕರಣ ಆಟ</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f7f9fa;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+        }
+
+        h2 {
+            color: #2c3e50;
+            margin-bottom: 5px;
+            text-align: center;
+        }
+
+        p.instruction {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            text-align: center;
+            max-width: 600px;
+        }
+
+        /* ಗೇಮ್ ಬೋರ್ಡ್ ವಿಸ್ತೀರ್ಣ */
+        .game-area {
+            position: relative;
+            width: 100%;
+            max-width: 700px;
+            height: 450px;
+            background-color: #ffffff;
+            border: 3px solid #cbd5e0;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow: hidden;
+        }
+
+        /* ಬೀಳುವ ಅಕ್ಷರ ಇರುವ ಜಾಗ */
+        .falling-zone {
+            position: relative;
+            width: 100%;
+            height: 250px;
+        }
+
+        /* ಬೀಳುವ ಅಕ್ಷರದ ಶೈಲಿ */
+        .falling-letter {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #ff7675;
+            color: white;
+            font-size: 2.2rem;
+            font-weight: bold;
+            padding: 10px 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            transition: all 0.5s ease-in-out;
+        }
+
+        /* ಕೆಳಗಿರುವ ಬುಟ್ಟಿಗಳ ಜಾಗ */
+        .basket-container {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            padding-bottom: 20px;
+            background: linear-gradient(to top, #f1f2f6, transparent);
+        }
+
+        /* ಪ್ರತಿ ಬುಟ್ಟಿಯ ಶೈಲಿ */
+        .basket {
+            background-color: #ffeaa7;
+            border: 2px solid #fdcb6e;
+            border-radius: 12px;
+            width: 28%;
+            padding: 15px 10px;
+            text-align: center;
+            cursor: pointer;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.05);
+            transition: transform 0.2s, background-color 0.2s;
+        }
+
+        .basket:hover {
+            transform: scale(1.05);
+            background-color: #fed330;
+        }
+
+        .basket h3 {
+            margin: 0 0 5px 0;
+            color: #d4a373;
+            font-size: 1.2rem;
+        }
+
+        .basket .count-badge {
+            background-color: #ffffff;
+            color: #2c3e50;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        /* ಸ್ಕೋರ್ ಬೋರ್ಡ್ */
+        .score-board {
+            display: flex;
+            gap: 30px;
+            margin-top: 20px;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .score { color: #2ecc71; }
+        .wrong { color: #e74c3c; }
+
+        #final-screen {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.95);
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #27ae60;
+            text-align: center;
+        }
+
+        .restart-btn {
+            margin-top: 15px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>🧺 ಚಟುವಟಿಕೆ: ಅಕ್ಷರಗಳ ಬುಟ್ಟಿ - ವರ್ಗೀಕರಣ ಆಟ</h2>
+    <p class="instruction">ಮೇಲೆ ಕಾಣಿಸುವ ಅಕ್ಷರವನ್ನು ಗಮನಿಸಿ, ಅದು ಯಾವ ಗುಂಪಿಗೆ ಸೇರುತ್ತದೆ ಎಂಬುದನ್ನು ಕೆಳಗಿನ ಸರಿಯಾದ ಬುಟ್ಟಿಯ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ ನಿರ್ಧರಿಸಿ!</p>
+
+    <div class="game-area">
+        <div class="falling-zone">
+            <div id="letter-display" class="falling-letter">ಅ</div>
+        </div>
+
+        <div class="basket-container">
+            <div class="basket" onclick="collectLetter('ಸ್ವರ')">
+                <h3>🍎 ಸ್ವರಗಳು</h3>
+                <span class="count-badge" id="svara-count">0</span>
+            </div>
+            <div class="basket" onclick="collectLetter('ವ್ಯಂಜನ')">
+                <h3>🥕 ವ್ಯಂಜನಗಳು</h3>
+                <span class="count-badge" id="vyanjana-count">0</span>
+            </div>
+            <div class="basket" onclick="collectLetter('ಯೋಗವಾಹ')">
+                <h3>🍇 ಯೋಗವಾಹಗಳು</h3>
+                <span class="count-badge" id="yogavaha-count">0</span>
+            </div>
+        </div>
+
+        <div id="final-screen">
+            <div id="final-msg">🎉 ಅದ್ಭುತ! ನೀವು ಆಟವನ್ನು ಯಶಸ್ವಿಯಾಗಿ ಮುಗಿಸಿದ್ದೀರಿ!</div>
+            <button class="restart-btn" onclick="resetGame()">ಮತ್ತೆ ಆಡಿ</button>
+        </div>
+    </div>
+
+    <div class="score-board">
+        <div>ಸರಿಯಾದ ಉತ್ತರ: <span id="correct-score" class="score">0</span></div>
+        <div>ತಪ್ಪಾದ ಉತ್ತರ: <span id="wrong-score" class="wrong">0</span></div>
+    </div>
+
+    <script>
+        // ಪಠ್ಯಪುಸ್ತಕದ ಆಧಾರದ ಮೇಲೆ ಅಕ್ಷರಗಳ ಡೇಟಾಬೇಸ್
+        const gameLetters = [
+            { text: 'ಅ', type: 'ಸ್ವರ' },
+            { text: 'ಇ', type: 'ಸ್ವರ' },
+            { text: 'ಊ', type: 'ಸ್ವರ' },
+            { text: 'ಋ', type: 'ಸ್ವರ' },
+            { text: 'ಎ', type: 'ಸ್ವರ' },
+            { text: 'ಓ', type: 'ಸ್ವರ' },
+            { text: 'ಕ್', type: 'ವ್ಯಂಜನ' },
+            { text: 'ಚ್', type: 'ವ್ಯಂಜನ' },
+            { text: 'ತ್', type: 'ವ್ಯಂಜನ' },
+            { text: 'ಪ್', type: 'ವ್ಯಂಜನ' },
+            { text: 'ಮ್', type: 'ವ್ಯಂಜನ' },
+            { text: 'ಳ್', type: 'ವ್ಯಂಜನ' },
+            { text: 'ಅಂ', type: 'ಯೋಗವಾಹ' },
+            { text: 'ಅಃ', type: 'ಯೋಗವಾಹ' }
+        ];
+
+        let shuffledLetters = [];
+        let currentIndex = 0;
+        let correctPoints = 0;
+        let wrongPoints = 0;
+        let basketCounts = { 'ಸ್ವರ': 0, 'ವ್ಯಂಜನ': 0, 'ಯೋಗವಾಹ': 0 };
+
+        const letterDisplay = document.getElementById('letter-display');
+        const finalScreen = document.getElementById('final-screen');
+
+        function startGame() {
+            // ಅಕ್ಷರಗಳನ್ನು ಅದಲು ಬದಲು (Shuffle) ಮಾಡುವುದು
+            shuffledLetters = [...gameLetters].sort(() => Math.random() - 0.5);
+            currentIndex = 0;
+            correctPoints = 0;
+            wrongPoints = 0;
+            basketCounts = { 'ಸ್ವರ': 0, 'ವ್ಯಂಜನ': 0, 'ಯೋಗವಾಹ': 0 };
+            
+            updateScoreBoard();
+            showNextLetter();
+        }
+
+        function showNextLetter() {
+            if (currentIndex < shuffledLetters.length) {
+                letterDisplay.style.top = '20px'; // ಆರಂಭಿಕ ಸ್ಥಾನಕ್ಕೆ ತರುವುದು
+                letterDisplay.style.opacity = '1';
+                letterDisplay.innerText = shuffledLetters[currentIndex].text;
+                
+                // ಇಲ್ಲಿ ಬೇಕಿದ್ದರೆ ಅಕ್ಷರ ತಾನಾಗಿಯೇ ಕೆಳಗೆ ಬೀಳುವ CSS ಅನಿಮೇಷನ್ ಲಿಂಕ್ ಮಾಡಬಹುದು
+            } else {
+                // ಆಟ ಮುಕ್ತಾಯ
+                finalScreen.style.display = 'flex';
+                document.getElementById('final-msg').innerHTML = `🎉 ಆಟ ಮುಗಿದಿದೆ!<br>ಒಟ್ಟು ಸರಿಯಾದ ಉತ್ತರಗಳು: ${correctPoints} / ${gameLetters.length} 👏👏`;
+            }
+        }
+
+        function collectLetter(selectedType) {
+            if (currentIndex >= shuffledLetters.length) return;
+
+            const currentLetter = shuffledLetters[currentIndex];
+
+            if (currentLetter.type === selectedType) {
+                correctPoints++;
+                basketCounts[selectedType]++;
+                
+                // ಬುಟ್ಟಿಯ ಕೌಂಟ್ ಅಪ್ಡೇಟ್
+                if(selectedType === 'ಸ್ವರ') document.getElementById('svara-count').innerText = basketCounts['ಸ್ವರ'];
+                if(selectedType === 'ವ್ಯಂಜನ') document.getElementById('vyanjana-count').innerText = basketCounts['ವ್ಯಂಜನ'];
+                if(selectedType === 'ಯೋಗವಾಹ') document.getElementById('yogavaha-count').innerText = basketCounts['ಯೋಗವಾಹ'];
+                
+                // ಯಶಸ್ಸಿನ ಸಣ್ಣ ಎಫೆಕ್ಟ್
+                letterDisplay.style.top = '200px';
+                letterDisplay.style.opacity = '0';
+            } else {
+                wrongPoints++;
+                // ತಪ್ಪು ಉತ್ತರದ ಅಲರ್ಟ್ ಬಣ್ಣ ಬದಲಾವಣೆ
+                letterDisplay.style.backgroundColor = '#d63031';
+                setTimeout(() => { letterDisplay.style.backgroundColor = '#ff7675'; }, 300);
+            }
+
+            updateScoreBoard();
+            currentIndex++;
+            
+            // ಸ್ವಲ್ಪ ಸಮಯದ ನಂತರ ಮುಂದಿನ ಅಕ್ಷರ ತೋರಿಸುವುದು
+            setTimeout(showNextLetter, 400);
+        }
+
+        function updateScoreBoard() {
+            document.getElementById('correct-score').innerText = correctPoints;
+            document.getElementById('wrong-score').innerText = wrongPoints;
+        }
+
+        function resetGame() {
+            finalScreen.style.display = 'none';
+            document.getElementById('svara-count').innerText = '0';
+            document.getElementById('vyanjana-count').innerText = '0';
+            document.getElementById('yogavaha-count').innerText = '0';
+            startGame();
+        }
+
+        // ಆಟವನ್ನು ಲೋಡ್ ಮಾಡುವುದು
+        startGame();
+    </script>
+</body>
+</html>

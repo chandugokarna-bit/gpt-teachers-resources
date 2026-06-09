@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಅಲ್ಪಪ್ರಾಣ - ಮಹಾಪ್ರಾಣ ಬಲೂನ್ ಪಾಪ್ ಆಟ</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f8ff;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        h2 {
+            color: #2c3e50;
+            margin-bottom: 5px;
+            text-align: center;
+        }
+
+        p.instruction {
+            color: #e67e22;
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-align: center;
+            max-width: 600px;
+        }
+
+        /* ಗೇಮ್ ಆಡುವ ಮುಖ್ಯ ಪರದೆ */
+        #game-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            height: 500px;
+            background: linear-gradient(to bottom, #87CEEB, #E0F6FF);
+            border: 4px solid #4ba3e3;
+            border-radius: 20px;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+            cursor: crosshair;
+        }
+
+        /* ಬಲೂನ್‌ಗಳ ಸಾಮಾನ್ಯ ಶೈಲಿ */
+        .balloon {
+            position: absolute;
+            width: 70px;
+            height: 85px;
+            border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.8rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: inset -8px -8px 10px rgba(0,0,0,0.15), 2px 5px 10px rgba(0,0,0,0.1);
+            animation: floatUp linear forwards;
+        }
+
+        /* ಬಲೂನ್‌ನ ಕೆಳಗಿರುವ ದಾರ */
+        .balloon::after {
+            content: "";
+            position: absolute;
+            bottom: -12px;
+            left: 32px;
+            width: 2px;
+            height: 15px;
+            background-color: rgba(0,0,0,0.2);
+        }
+
+        /* ಬಲೂನ್ ಮೇಲಕ್ಕೆ ತೇಲುವ ಅನಿಮೇಷನ್ */
+        @keyframes floatUp {
+            0% {
+                top: 520px;
+                transform: translateX(0);
+            }
+            50% {
+                transform: translateX(15px);
+            }
+            100% {
+                top: -100px;
+                transform: translateX(-15px);
+            }
+        }
+
+        /* ಸ್ಕೋರ್ ಬೋರ್ಡ್ */
+        .dashboard {
+            display: flex;
+            gap: 40px;
+            margin-top: 15px;
+            font-size: 1.3rem;
+            font-weight: bold;
+        }
+
+        .score { color: #27ae60; }
+        .lives { color: #c0392b; }
+
+        /* ಆಟ ಮುಗಿದಾಗ ಬರುವ ಸ್ಕ್ರೀನ್ */
+        #game-over-screen {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+            text-align: center;
+            z-index: 10;
+        }
+
+        .restart-btn {
+            margin-top: 20px;
+            background-color: #2ecc71;
+            color: white;
+            border: none;
+            padding: 12px 35px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(46, 204, 113, 0.4);
+        }
+
+        .restart-btn:hover {
+            background-color: #27ae60;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>🎈 ಚಟುವಟಿಕೆ: ಅಲ್ಪಪ್ರಾಣ - ಮಹಾಪ್ರಾಣ ಬಲೂನ್ ಪಾಪ್</h2>
+    <p class="instruction">🎯 ಸೂಚನೆ: ಆಕಾಶದಲ್ಲಿ ತೇಲುವ "ಮಹಾಪ್ರಾಣಾಕ್ಷರ" ಇರತಕ್ಕ ಬಲೂನ್‌ಗಳನ್ನು ಮಾತ್ರ ಒಡೆದು ಪಾಯಿಂಟ್ಸ್ ಗಳಿಸಿ!</p>
+
+    <div id="game-container">
+        <div id="game-over-screen">
+            <div id="final-msg">ಆಟ ಮುಗಿದಿದೆ!</div>
+            <button class="restart-btn" onclick="resetGame()">ಮತ್ತೆ ಆಡಿ</button>
+        </div>
+    </div>
+
+    <div class="dashboard">
+        <div>ಪಾಯಿಂಟ್ಸ್: <span id="score-display" class="score">0</span></div>
+        <div>ಉಳಿದಿರುವ ಅವಕಾಶ (Lives): <span id="lives-display" class="lives">3</span></div>
+    </div>
+
+    <script>
+        const container = document.getElementById('game-container');
+        const scoreDisplay = document.getElementById('score-display');
+        const livesDisplay = document.getElementById('lives-display');
+        const gameOverScreen = document.getElementById('game-over-screen');
+
+        // ಪಠ್ಯಪುಸ್ತಕದ ಆಧಾರದ ಮೇಲೆ ಅಕ್ಷರಗಳ ವರ್ಗೀಕರಣ
+        const mahapranaList = ['ಖ್', 'ಘ್', 'ಛ್', 'ಝ್', 'ಠ್', 'ಢ್', 'ಥ್', 'ಧ್', 'ಫ್', 'ಭ್']; // ಮಹಾಪ್ರಾಣಾಕ್ಷರಗಳು
+        const alpapranaList = ['ಕ್', 'ಗ್', 'ಚ್', 'ಜ್', 'ಟ್', 'ಡ್', 'ತ್', 'ದ್', 'ಪ್', 'ಬ್', 'ಙ್', 'ಞ್', 'ಣ್', 'ನ್', 'ಮ್']; // ಅಲ್ಪಪ್ರಾಣ ಮತ್ತು ಅನುನಾಸಿಕಗಳು
+
+        const colors = ['#ff7675', '#74b9ff', '#55efc4', '#a29bfe', '#fdcb6e', '#e84393'];
+        
+        let score = 0;
+        let lives = 3;
+        let gameInterval;
+        let isGameOver = false;
+
+        function startGame() {
+            isGameOver = false;
+            score = 0;
+            lives = 3;
+            scoreDisplay.innerText = score;
+            livesDisplay.innerText = lives;
+            gameOverScreen.style.display = 'none';
+            
+            // ಪ್ರತಿ 1.2 ಸೆಕೆಂಡಿಗೆ ಒಂದು ಹೊಸ ಬಲೂನ್ ಸೃಷ್ಟಿಸುವುದು
+            gameInterval = setInterval(createBalloon, 1200);
+        }
+
+        function createBalloon() {
+            if (isGameOver) return;
+
+            const balloon = document.createElement('div');
+            balloon.className = 'balloon';
+
+            // ಶೇಕಡಾ 50% ಮಹಾಪ್ರಾಣ ಅಥವಾ ಅಲ್ಪಪ್ರಾಣ ಬರುವ ಸಂಭವನೀಯತೆ
+            const isMahaprana = Math.random() > 0.4;
+            let letter = "";
+            if (isMahaprana) {
+                letter = mahapranaList[Math.floor(Math.random() * mahapranaList.length)];
+                balloon.setAttribute('data-type', 'mahaprana');
+            } else {
+                letter = alpapranaList[Math.floor(Math.random() * alpapranaList.length)];
+                balloon.setAttribute('data-type', 'alpaprana');
+            }
+
+            balloon.innerText = letter;
+
+            // ಯಾದೃಚ್ಛಿಕ ಬಣ್ಣ ಮತ್ತು ಎಡ-ಬಲ ಸ್ಥಾನ ನಿಗದಿ
+            const randomColor = colors[Math.floor(Math.random() * colors.length)];
+            balloon.style.backgroundColor = randomColor;
+            
+            const randomX = Math.random() * (container.clientWidth - 80);
+            balloon.style.left = randomX + 'px';
+
+            // ತೇಲುವ ವೇಗವನ್ನು ಯಾದೃಚ್ಛಿಕವಾಗಿ ನಿಗದಿಪಡಿಸುವುದು (3 ರಿಂದ 5 ಸೆಕೆಂಡ್)
+            const duration = Math.random() * 2 + 3;
+            balloon.style.animationDuration = duration + 's';
+
+            // ಬಲೂನ್ ಒಡೆಯುವ ಇವೆಂಟ್
+            balloon.addEventListener('mousedown', (e) => {
+                e.stopPropagation();
+                popBalloon(balloon);
+            });
+            
+            // ಮೊಬೈಲ್ ಟಚ್ ಇವೆಂಟ್ ಸಪೋರ್ಟ್
+            balloon.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                popBalloon(balloon);
+            });
+
+            // ಬಲೂನ್ ಒಡೆಯದೇ ಮೇಲಕ್ಕೆ ಹಾರಿ ಹೋದಾಗ ಆಗುವ ಪ್ರಕ್ರಿಯೆ
+            balloon.addEventListener('animationend', () => {
+                if (balloon.getAttribute('data-type') === 'mahaprana' && !isGameOver) {
+                    // ಮಹಾಪ್ರಾಣಾಕ್ಷರದ ಬಲೂನ್ ಒಡೆಯದೇ ಮಿಸ್ ಆದರೆ ಒಂದು ಅವಕಾಶ (Life) ನಷ್ಟವಾಗುತ್ತದೆ
+                    减lives();
+                }
+                balloon.remove();
+            });
+
+            container.appendChild(balloon);
+        }
+
+        function popBalloon(balloon) {
+            if (isGameOver) return;
+
+            const type = balloon.getAttribute('data-type');
+
+            if (type === 'mahaprana') {
+                score += 10; // ಸರಿಯಾದ ಉತ್ತರಕ್ಕೆ 10 ಪಾಯಿಂಟ್ಸ್
+                scoreDisplay.innerText = score;
+            } else {
+                score = Math.max(0, score - 5); // ತಪ್ಪು ಉತ್ತರಕ್ಕೆ 5 ಪಾಯಿಂಟ್ಸ್ ಮೈನಸ್
+                scoreDisplay.innerText = score;
+                减lives(); // ತಪ್ಪು ಬಲೂನ್ ಒಡೆದರೂ ಲೈಫ್ ಕಮ್ಮಿ ಆಗುತ್ತದೆ
+            }
+
+            // ಬಲೂನ್ ಒಡೆದಾಗ ಮಾಯವಾಗುವ ಸಣ್ಣ ಎಫೆಕ್ಟ್
+            balloon.style.transform = 'scale(1.3)';
+            balloon.style.opacity = '0';
+            setTimeout(() => balloon.remove(), 100);
+        }
+
+        function 减lives() {
+            lives--;
+            livesDisplay.innerText = lives;
+            if (lives <= 0) {
+                endGame();
+            }
+        }
+
+        function endGame() {
+            isGameOver = true;
+            clearInterval(gameInterval);
+            
+            // ಸ್ಕ್ರೀನ್ ಮೇಲಿರುವ ಎಲ್ಲಾ ಬಲೂನ್ ತೆಗೆದುಹಾಕುವುದು
+            const balloons = document.querySelectorAll('.balloon');
+            balloons.forEach(b => b.remove());
+
+            gameOverScreen.style.display = 'flex';
+            document.getElementById('final-msg').innerHTML = `🎮 ಆಟ ಮುಗಿದಿದೆ!<br>ನಿಮ್ಮ ಒಟ್ಟು ಪಾಯಿಂಟ್ಸ್: <span style="color:#2ecc71">${score}</span>`;
+        }
+
+        function resetGame() {
+            startGame();
+        }
+
+        // ವೆಬ್‌ಸೈಟ್ ಲೋಡ್ ಆದಾಗ ಆಟ ಆರಂಭವಾಗುತ್ತದೆ
+        startGame();
+    </script>
+</body>
+</html>

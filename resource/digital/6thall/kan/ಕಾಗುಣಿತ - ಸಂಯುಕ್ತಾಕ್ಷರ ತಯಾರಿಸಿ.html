@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಕಾಗುಣಿತ ಮತ್ತು ಸಂಯುಕ್ತಾಕ್ಷರ ಮೇಕರ್</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #fcf8f2;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h2 {
+            color: #2c3e50;
+            margin-bottom: 5px;
+            text-align: center;
+        }
+
+        .section-container {
+            background-color: #ffffff;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+            width: 100%;
+            max-width: 750px;
+            margin-bottom: 30px;
+            box-sizing: border-box;
+        }
+
+        h3 {
+            color: #d35400;
+            border-bottom: 2px solid #f39c12;
+            padding-bottom: 8px;
+            margin-top: 0;
+        }
+
+        /* ಭಾಗ ೧: ಕಾಗುಣಿತ ಮೇಕರ್ ಶೈಲಿ */
+        .maker-grid {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            margin-top: 15px;
+        }
+
+        .btn-panel {
+            width: 40%;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .panel-title {
+            font-weight: bold;
+            color: #34495e;
+            margin-bottom: 5px;
+        }
+
+        .char-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .char-btn {
+            background-color: #f1f2f6;
+            border: 2px solid #ced6e0;
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            min-width: 45px;
+            text-align: center;
+        }
+
+        .char-btn:hover {
+            background-color: #dfe4ea;
+        }
+
+        .char-btn.selected {
+            background-color: #eccc68;
+            border-color: #ffa502;
+            color: #2f3542;
+        }
+
+        .magic-box-container {
+            width: 20%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: #f1f2f6;
+            border-radius: 10px;
+            padding: 10px;
+        }
+
+        .formula-text {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #7f8c8d;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .result-display {
+            background-color: #2ed573;
+            color: white;
+            font-size: 3rem;
+            font-weight: bold;
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 6px 12px rgba(46, 213, 115, 0.3);
+            animation: popIn 0.3s ease;
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.5); }
+            100% { transform: scale(1); }
+        }
+
+        /* ಭಾಗ ೨: ಒತ್ತಕ್ಷರ ಕ್ವಿಜ್ ಶೈಲಿ */
+        .quiz-word {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #2c3e50;
+            text-align: center;
+            margin: 20px 0;
+            background-color: #f9f9f9;
+            padding: 10px;
+            border-radius: 8px;
+            letter-spacing: 2px;
+        }
+
+        .quiz-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .quiz-btn {
+            padding: 12px 30px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            color: white;
+            transition: opacity 0.2s;
+        }
+
+        .sajathiya { background-color: #3498db; }
+        .vijathiya { background-color: #9b59b6; }
+        .quiz-btn:hover { opacity: 0.9; }
+
+        #quiz-feedback {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            min-height: 25px;
+        }
+
+        /* ಮೊಬೈಲ್ ರೆಸ್ಪಾನ್ಸಿವ್ */
+        @media (max-width: 768px) {
+            .maker-grid { flex-direction: column; }
+            .btn-panel { width: 100%; }
+            .magic-box-container { width: 100%; padding: 20px 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <h2>🧩 ಚಟುವಟಿಕೆ: ಕಾಗುಣಿತ / ಸಂಯುಕ್ತಾಕ್ಷರ ತಯಾರಿಸಿ!</h2>
+    <p style="color: #7f8c8d; text-align: center; margin-bottom: 25px;">ಕನ್ನಡದ ಗುಣಿತಾಕ್ಷರ ಮತ್ತು ಸಂಯುಕ್ತಾಕ್ಷರಗಳ (ಒತ್ತಕ್ಷರ) ನಿಯಮಗಳನ್ನು ಆಟದ ಮೂಲಕ ಕಲಿಯಿರಿ.</p>
+
+    <div class="section-container">
+        <h3>✨ ೧. ಕಾಗುಣಿತ ಮ್ಯಾಜಿಕ್ ಟೂಲ್ (Kagunitha Maker)</h3>
+        <p style="color:#555;">ಎಡಭಾಗದಲ್ಲಿ ಒಂದು ವ್ಯಂಜನ ಮತ್ತು ಬಲಭಾಗದಲ್ಲಿ ಒಂದು ಸ್ವರವನ್ನು ಆರಿಸಿ, ಮಧ್ಯದಲ್ಲಿ ಮೂಡುವ ಮ್ಯಾಜಿಕ್ ಅಕ್ಷರವನ್ನು ಗಮನಿಸಿ!</p>
+        
+        <div class="maker-grid">
+            <div class="btn-panel">
+                <div class="panel-title">ವ್ಯಂಜನಾಕ್ಷರ ಆರಿಸಿ:</div>
+                <div class="char-buttons" id="vyanjana-box">
+                    <button class="char-btn selected" onclick="selectVyanjana('ಕ್', this)">ಕ್</button>
+                    <button class="char-btn" onclick="selectVyanjana('ಖ್', this)">ಖ್</button>
+                    <button class="char-btn" onclick="selectVyanjana('ಗ್', this)">ಗ್</button>
+                    <button class="char-btn" onclick="selectVyanjana('ಘ್', this)">ಘ್</button>
+                    <button class="char-btn" onclick="selectVyanjana('ಚ್', this)">ಚ್</button>
+                    <button class="char-btn" onclick="selectVyanjana('ಛ್', this)">ಛ್</button>
+                    <button class="char-btn" onclick="selectVyanjana('ಜ್', this)">ಜ್</button>
+                    <button class="char-btn" onclick="selectVyanjana('ಝ್', this)">ಝ್</button>
+                    <button class="char-btn" onclick="selectVyanjana('ಟ್', this)">ಟ್</button>‌
+                    <button class="char-btn" onclick="selectVyanjana('ಠ್', this)">ಠ್</button>
+                    <button class="char-btn" onclick="selectVyanjana('ಡ್', this)">ಡ್</button>
+                    <button class="char-btn" onclick="selectVyanjana('ಢ್', this)">ಢ್</button>
+                    <button class="char-btn" onclick="selectVyanjana('ಣ್', this)">ಣ್</button>
+                    <button class="char-btn" onclick="selectVyanjana('ತ್', this)">ತ್</button>
+                    <button class="char-btn" onclick="selectVyanjana('ಥ್', this)">ಥ್</button>
+                    <button class="char-btn" onclick="selectVyanjana('ದ್', this)">ದ್</button>‌
+                     <button class="char-btn" onclick="selectVyanjana('ನ್', this)">ನ್</button>
+                    <button class="char-btn" onclick="selectVyanjana('ಪ್', this)">ಪ್</button>
+                    <button class="char-btn" onclick="selectVyanjana('ಫ್', this)">ಫ್</button>
+                    <button class="char-btn" onclick="selectVyanjana('ಬ್', this)">ಬ್</button>
+                    <button class="char-btn" onclick="selectVyanjana('ಭ್', this)">ಭ್</button>
+                    <button class="char-btn" onclick="selectVyanjana('ಮ್', this)">ಮ್</button>
+                    <button class="char-btn" onclick="selectVyanjana('ಯ್', this)">ಯ್</button>
+                    <button class="char-btn" onclick="selectVyanjana('ರ್', this)">ರ್</button>‌
+                    <button class="char-btn" onclick="selectVyanjana('ಲ್', this)">ಲ್</button>
+                    <button class="char-btn" onclick="selectVyanjana('ವ್', this)">ವ್</button>
+                    <button class="char-btn" onclick="selectVyanjana('ಶ್', this)">ಶ್</button>
+                    <button class="char-btn" onclick="selectVyanjana('ಷ್', this)">ಷ್</button>
+                    <button class="char-btn" onclick="selectVyanjana('ಸ್', this)">ಸ್</button>
+                    <button class="char-btn" onclick="selectVyanjana('ಹ್', this)">ಹ್</button>
+                    <button class="char-btn" onclick="selectVyanjana('ಳ್', this)">ಳ್</button>
+
+                </div>
+            </div>
+
+            <div class="magic-box-container">
+                <div class="formula-text" id="formula-display">ಕ್ + ಅ</div>
+                <div class="result-display" id="result-char">ಕ</div>
+            </div>
+
+            <div class="btn-panel">
+                <div class="panel-title">ಸ್ವರಾಕ್ಷರ ಆರಿಸಿ:</div>
+                <div class="char-buttons" id="svara-box">
+                    <button class="char-btn selected" onclick="selectSvara('ಅ', this)">ಅ</button>
+                    <button class="char-btn" onclick="selectSvara('ಆ', this)">ಆ</button>
+                    <button class="char-btn" onclick="selectSvara('ಇ', this)">ಇ</button>
+                    <button class="char-btn" onclick="selectSvara('ಈ', this)">ಈ</button>
+                    <button class="char-btn" onclick="selectSvara('ಉ', this)">ಉ</button>
+                    <button class="char-btn" onclick="selectSvara('ಊ', this)">ಊ</button>
+                    <button class="char-btn" onclick="selectSvara('ಎ', this)">ಎ</button>
+                    <button class="char-btn" onclick="selectSvara('ಏ', this)">ಏ</button>
+                    <button class="char-btn" onclick="selectSvara('ಐ', this)">ಐ</button>
+                    <button class="char-btn" onclick="selectSvara('ಒ', this)">ಒ</button>
+                    <button class="char-btn" onclick="selectSvara('ಓ', this)">ಓ</button>
+                    <button class="char-btn" onclick="selectSvara('ಔ', this)">ಔ</button>
+                    <button class="char-btn" onclick="selectSvara('ಅಂ', this)">ಅಂ</button>
+                    <button class="char-btn" onclick="selectSvara('ಅಃ', this)">ಅಃ</button>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section-container">
+        <h3>📝 ೨. ಒತ್ತಕ್ಷರ ಕ್ವಿಜ್ (Sajathiya & Vijathiya Quiz)</h3>
+        <p style="color:#555;">ಕೆಳಗೆ ನೀಡಿರುವ ಪದದಲ್ಲಿರುವ ಸಂಯುಕ್ತಾಕ್ಷರವು <b>ಸಜಾತೀಯವೇ</b> ಅಥವಾ <b>ವಿಜಾತೀಯವೇ</b> ಎಂದು ಗುರುತಿಸಿ ಬಟನ್ ಒತ್ತಿ.</p>
+        
+        <div class="quiz-word" id="word-display">ಅಮ್ಮ</div>
+        
+        <div class="quiz-buttons">
+            <button class="quiz-btn sajathiya" onclick="answerQuiz('sajathiya')">🤝 ಸಜಾತೀಯ ಸಂಯುಕ್ತಾಕ್ಷರ</button>
+            <button class="quiz-btn vijathiya" onclick="answerQuiz('vijathiya')">⚡ ವಿಜಾತೀಯ ಸಂಯುಕ್ತಾಕ್ಷರ</button>
+        </div>
+
+        <div id="quiz-feedback"></div>
+    </div>
+
+    <script>
+        const kagunithaMap = {
+    'ಕ್': { 'ಅ': 'ಕ', 'ಆ': 'ಕಾ', 'ಇ': 'ಕಿ', 'ಈ': 'ಕೀ', 'ಉ': 'ಕು', 'ಊ': 'ಕೂ', 'ಎ': 'ಕೆ', 'ಏ': 'ಕೇ', 'ಐ': 'ಕೈ', 'ಒ': 'ಕೊ', 'ಓ': 'ಕೋ', 'ಔ': 'ಕೌ', 'ಅಂ': 'ಕಂ', 'ಅಃ': 'ಕಃ' },
+    'ಚ್': { 'ಅ': 'ಚ', 'ಆ': 'ಚಾ', 'ಇ': 'ಚಿ', 'ಈ': 'ಚೀ', 'ಉ': 'ಚು', 'ಊ': 'ಚೂ', 'ಎ': 'ಚೆ', 'ಏ': 'ಚೇ', 'ಐ': 'ಚೈ', 'ಒ': 'ಚೊ', 'ಓ': 'ಚೋ', 'ಔ': 'ಚೌ', 'ಅಂ': 'ಚಂ', 'ಅಃ': 'ಚಃ' },
+    'ತ್': { 'ಅ': 'ತ', 'ಆ': 'ತಾ', 'ಇ': 'ತಿ', 'ಈ': 'ತೀ', 'ಉ': 'ತು', 'ಊ': 'ತೂ', 'ಎ': 'ತೆ', 'ಏ': 'ತೇ', 'ಐ': 'ತೈ', 'ಒ': 'ತೊ', 'ಓ': 'ತೋ', 'ಔ': 'ತೌ', 'ಅಂ': 'ತಂ', 'ಅಃ': 'ತಃ' },
+    'ಪ್': { 'ಅ': 'ಪ', 'ಆ': 'ಪಾ', 'ಇ': 'ಪಿ', 'ಈ': 'ಪೀ', 'ಉ': 'ಪು', 'ಊ': 'ಪೂ', 'ಎ': 'ಪೆ', 'ಏ': 'ಪೇ', 'ಐ': 'ಪೈ', 'ಒ': 'ಪೊ', 'ಓ': 'ಪೋ', 'ಔ': 'ಪೌ', 'ಅಂ': 'ಪಂ', 'ಅಃ': 'ಪಃ' },
+    'ಮ್': { 'ಅ': 'ಮ', 'ಆ': 'ಮಾ', 'ಇ': 'ಮಿ', 'ಈ': 'ಮೀ', 'ಉ': 'ಮು', 'ಊ': 'ಮೂ', 'ಎ': 'ಮೆ', 'ಏ': 'ಮೇ', 'ಐ': 'ಮೈ', 'ಒ': 'ಮೊ', 'ಓ': 'ಮೋ', 'ಔ': 'ಮೌ', 'ಅಂ': 'ಮಂ', 'ಅಃ': 'ಮಃ' }
+};
+        let selectedVyanjana = 'ಕ್';
+        let selectedSvara = 'ಅ';
+
+        function selectVyanjana(val, btn) {
+            document.querySelectorAll('#vyanjana-box .char-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            selectedVyanjana = val;
+            calculateKagunitha();
+        }
+
+        function selectSvara(val, btn) {
+            document.querySelectorAll('#svara-box .char-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            selectedSvara = val;
+            calculateKagunitha();
+        }
+
+        function calculateKagunitha() {
+            const resultChar = kagunithaMap[selectedVyanjana][selectedSvara];
+            document.getElementById('formula-display').innerText = `${selectedVyanjana} + ${selectedSvara}`;
+            
+            const resultDiv = document.getElementById('result-char');
+            resultDiv.innerText = resultChar;
+            
+            // ಅನಿಮೇಷನ್ ರೀಸೆಟ್ ಮಾಡಿ ಪ್ಲೇ ಮಾಡುವುದು
+            resultDiv.style.animation = 'none';
+            resultDiv.offsetHeight; 
+            resultDiv.style.animation = 'popIn 0.3s ease';
+        }
+
+        // --- ಒತ್ತಕ್ಷರ ಕ್ವಿಜ್ ಲಾಜಿಕ್ ---
+        const quizWords = [
+            { word: 'ಅಮ್ಮ', type: 'sajathiya' },
+            { word: 'ಪುಸ್ತಕ', type: 'vijathiya' },
+            { word: 'ಅಕ್ಕ', type: 'sajathiya' },
+            { word: 'ಶಸ್ತ್ರ', type: 'vijathiya' },
+            { word: 'ಅಜ್ಜ', type: 'sajathiya' },
+            { word: 'ಅಕ್ಷರ', type: 'vijathiya' },
+            { word: 'ಅಪ್ಪ', type: 'sajathiya' },
+            { word: 'ಶಕ್ತಿ', type: 'vijathiya' }
+        ];
+
+        let currentQuizIndex = 0;
+
+        function answerQuiz(selectedType) {
+            const currentQuiz = quizWords[currentQuizIndex];
+            const feedback = document.getElementById('quiz-feedback');
+
+            if (selectedType === currentQuiz.type) {
+                feedback.innerText = "✅ ಶಭಾಷ್! ಸರಿಯಾದ ಉತ್ತರ. 👏";
+                feedback.style.color = "#28a745";
+            } else {
+                feedback.innerText = "❌ ತಪ್ಪು ಉತ್ತರ! ಮತ್ತೊಮ್ಮೆ ಯೋಚಿಸಿ ಪಠ್ಯಪುಸ್ತಕದ ಉದಾಹರಣೆ ಗಮನಿಸಿ.";
+                feedback.style.color = "#dc3545";
+            }
+
+            // 1.5 ಸೆಕೆಂಡ್ ನಂತರ ಮುಂದಿನ ಪದಕ್ಕೆ ಹೋಗುವುದು
+            setTimeout(() => {
+                feedback.innerText = "";
+                currentQuizIndex = (currentQuizIndex + 1) % quizWords.length;
+                document.getElementById('word-display').innerText = quizWords[currentQuizIndex].word;
+            }, 1500);
+        }
+    </script>
+</body>
+</html>
