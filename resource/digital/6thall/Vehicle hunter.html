@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ವೆಹಿಕಲ್ ಹಂಟರ್ - ಸ್ಕೋರ್ ಬೋರ್ಡ್ ಆಕ್ಟಿವಿಟಿ</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f9f4;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            user-select: none;
+            touch-action: none; /* ಮೊಬೈಲ್‌ನಲ್ಲಿ ಸ್ಕ್ರಾಲ್ ಆಗದಂತೆ ತಡೆಯಲು */
+        }
+
+        h2 {
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        /* ಸ್ಕೋರ್ ಬೋರ್ಡ್ ಸ್ಟೈಲ್ */
+        .score-container {
+            background-color: #2ecc71;
+            color: white;
+            padding: 10px 25px;
+            font-size: 22px;
+            font-weight: bold;
+            border-radius: 50px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .container {
+            display: flex;
+            gap: 40px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        /* ವರ್ಡ್ ಗ್ರಿಡ್ ಸ್ಟೈಲ್ */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(12, 40px);
+            grid-template-rows: repeat(6, 40px);
+            gap: 4px;
+            background-color: #34495e;
+            padding: 12px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .cell {
+            width: 40px;
+            height: 40px;
+            background-color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 18px;
+            color: #2c3e50;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        /* ಸೆಲೆಕ್ಟ್ ಆಗುತ್ತಿರುವಾಗ ಆರೆಂಜ್ ಬಣ್ಣ */
+        .cell.selecting {
+            background-color: #ffaa44;
+            color: white;
+        }
+
+        /* ಸರಿಯಾದ ಪದ ಸಿಕ್ಕಾಗ ಹಸಿರು ಬಣ್ಣ */
+        .cell.found {
+            background-color: #2ecc71;
+            color: white;
+        }
+
+        /* ವಾಹನಗಳ ಪಟ್ಟಿ */
+        .word-list-box {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+            min-width: 220px;
+            border: 2px solid #e0e0e0;
+        }
+
+        .word-list-box h3 {
+            margin-top: 0;
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 5px;
+        }
+
+        .word-item {
+            font-size: 18px;
+            margin: 12px 0;
+            color: #2c3e50;
+            font-weight: bold;
+            padding: 6px 10px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+            transition: all 0.4s ease;
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        /* ಪದ ಸರಿಯಾಗಿ ಸಿಕ್ಕಾಗ ಲಿಸ್ಟ್‌ನಿಂದ ಮಾಯವಾಗುವ ಸ್ಟೈಲ್ */
+        .word-item.hidden-fade {
+            opacity: 0;
+            transform: scale(0.7);
+            margin: 0;
+            padding: 0;
+            height: 0;
+            overflow: hidden;
+            border: none;
+        }
+
+        .success-animation {
+            color: #2ecc71;
+            font-weight: bold;
+            font-size: 18px;
+            margin-top: 10px;
+            min-height: 25px;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>🧩 Activity 1: Vehicle Hunter</h2>
+    <p>ಅಕ್ಷರಗಳ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ ಎಳೆಯಿರಿ (Click & Drag). ಸರಿಯಾದ ಪದ ಸಿಕ್ಕರೆ ಪಟ್ಟಿಯಿಂದ ಮಾಯವಾಗಿ 2 ಅಂಕ ಸಿಗುತ್ತದೆ!</p>
+
+    <div class="score-container">
+        <span>🏆 ಒಟ್ಟು ಅಂಕಗಳು:</span>
+        <span id="scoreDisplay">0</span>
+    </div>
+
+    <div class="container">
+        <div class="grid" id="wordGrid"></div>
+
+        <div class="word-list-box">
+            <h3>ಹುಡುಕಬೇಕಾದ ಪಟ್ಟಿ:</h3>
+            <div id="wordList"></div>
+            <div class="success-animation" id="statusMessage"></div>
+        </div>
+    </div>
+
+    <script>
+        const wordsToFind = ["TRAIN", "BUS", "CAR", "TRACTOR", "SHIP"]; // 
+        
+        const gridData = [
+            ['B','F','T','R','A','I','N','K','J','I','D','B'],
+            ['U','S','M','A','S','C','T','J','O','U','C','A'],
+            ['R','A','C','T','O','R','U','E','C','O','O','U'],
+            ['C','R','T','R','T','J','K','V','I','E','L','B'],
+            ['R','P','B','C','R','N','V','L','D','K','M','C'],
+            ['W','A','O','S','I','E','P','N','S','H','I','P']
+        ];
+
+        const numRows = 6;
+        const numCols = 12;
+        const gridElement = document.getElementById('wordGrid');
+        const listElement = document.getElementById('wordList');
+        const scoreDisplay = document.getElementById('scoreDisplay');
+        const statusMessage = document.getElementById('statusMessage');
+
+        let isDrawing = false;
+        let selectedCells = [];
+        let foundWords = [];
+        let totalScore = 0;
+
+        // ಲಿಸ್ಟ್ ಸೃಷ್ಟಿಸುವುದು
+        function createWordList() {
+            wordsToFind.forEach(word => {
+                const div = document.createElement('div');
+                div.className = 'word-item';
+                div.id = `word-${word}`;
+                div.innerText = `🚘 ${word}`;
+                listElement.appendChild(div);
+            });
+        }
+
+        // ಗ್ರಿಡ್ ಸೃಷ್ಟಿಸುವುದು
+        function createGrid() {
+            for (let r = 0; r < numRows; r++) {
+                for (let c = 0; c < numCols; c++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'cell';
+                    cell.innerText = gridData[r][c];
+                    cell.setAttribute('data-row', r);
+                    cell.setAttribute('data-col', c);
+
+                    // ಕಂಪ್ಯೂಟರ್ ಮೌಸ್ ಇವೆಂಟ್‌ಗಳು
+                    cell.addEventListener('mousedown', () => startSelection(cell));
+                    cell.addEventListener('mouseenter', () => continueSelection(cell));
+                    
+                    gridElement.appendChild(cell);
+                }
+            }
+
+            // ಮೊಬೈಲ್ ಟಚ್ ಸ್ಕ್ರೀನ್ ರೆಸ್ಪಾನ್ಸ್‌ಗಾಗಿ ಗ್ಲೋಬಲ್ ಟಚ್ ಇವೆಂಟ್‌ಗಳು
+            gridElement.addEventListener('touchstart', handleTouchStart, {passive: false});
+            gridElement.addEventListener('touchmove', handleTouchMove, {passive: false});
+            gridElement.addEventListener('touchend', endSelection);
+
+            window.addEventListener('mouseup', endSelection);
+        }
+
+        // ಕಂಪ್ಯೂಟರ್ ಮೌಸ್ ಸೆಲೆಕ್ಷನ್ ಆರಂಭ
+        function startSelection(cell) {
+            if (cell.classList.contains('found')) return;
+            isDrawing = true;
+            selectedCells = [cell];
+            cell.classList.add('selecting');
+        }
+
+        function continueSelection(cell) {
+            if (!isDrawing || cell.classList.contains('found')) return;
+            if (!selectedCells.includes(cell)) {
+                selectedCells.push(cell);
+                cell.classList.add('selecting');
+            }
+        }
+
+        // ಮೊಬೈಲ್ ಟಚ್ ಸೆಲೆಕ್ಷನ್ ನಿರ್ವಹಣೆ
+        function handleTouchStart(e) {
+            const touch = e.touches[0];
+            const element = document.elementFromPoint(touch.clientX, touch.clientY);
+            if (element && element.classList.contains('cell')) {
+                e.preventDefault();
+                startSelection(element);
+            }
+        }
+
+        function handleTouchMove(e) {
+            if (!isDrawing) return;
+            e.preventDefault();
+            const touch = e.touches[0];
+            const element = document.elementFromPoint(touch.clientX, touch.clientY);
+            if (element && element.classList.contains('cell')) {
+                continueSelection(element);
+            }
+        }
+
+        // ಸೆಲೆಕ್ಷನ್ ಮುಗಿದಾಗ (Mouse Up / Touch End)
+        function endSelection() {
+            if (!isDrawing) return;
+            isDrawing = false;
+
+            const selectedWord = selectedCells.map(cell => cell.innerText).join('');
+            const reversedWord = selectedWord.split('').reverse().join('');
+
+            let matchedWord = "";
+            if (wordsToFind.includes(selectedWord)) matchedWord = selectedWord;
+            else if (wordsToFind.includes(reversedWord)) matchedWord = reversedWord;
+
+            if (matchedWord && !foundWords.includes(matchedWord)) {
+                // 1. ಗ್ರಿಡ್‌ನಲ್ಲಿ ಹಸಿರು ಬಣ್ಣ ಮಾಡುವುದು
+                selectedCells.forEach(cell => {
+                    cell.classList.remove('selecting');
+                    cell.classList.add('found');
+                });
+                foundWords.push(matchedWord);
+                
+                // 2. ಅಂಕಗಳನ್ನು ಹೆಚ್ಚಿಸುವುದು (+2 ಪಾಯಿಂಟ್ಸ್)
+                totalScore += 2;
+                scoreDisplay.innerText = totalScore;
+                statusMessage.innerText = `🌟 ಸಿಕ್ಕಿತು: ${matchedWord} (+2 Points!)`;
+
+                // 3. ಪಟ್ಟಿಯಿಂದ ಆ ಪದವನ್ನು ಮಾಯ (ಕಣ್ಮರೆ) ಮಾಡುವುದು
+                const listItem = document.getElementById(`word-${matchedWord}`);
+                listItem.classList.add('hidden-fade'); // ಸ್ಮೂತ್ ಆಗಿ ಮಾಯವಾಗಲು ಅನಿಮೇಷನ್ ಕ್ಲಾಸ್
+
+                // ಎಲ್ಲ ಪದಗಳು ಸಿಕ್ಕಾಗ ಫೈನಲ್ ಅಲರ್ಟ್
+                if (foundWords.length === wordsToFind.length) {
+                    setTimeout(() => {
+                        statusMessage.innerText = "🎉 ಗೇಮ್ ಕಂಪ್ಲೀಟ್ ಆಗಿದೆ!";
+                        alert(`🏆 ಅಭಿನಂದನೆಗಳು! ನೀವು ಎಲ್ಲಾ ವಾಹನಗಳನ್ನು ಪತ್ತೆಹಚ್ಚಿ ಒಟ್ಟು ${totalScore} ಅಂಕಗಳನ್ನು ಗಳಿಸಿದ್ದೀರಿ!`);
+                    }, 500);
+                }
+            } else {
+                // ತಪ್ಪು ಪದವಾಗಿದ್ದರೆ ಸೆಲೆಕ್ಷನ್ ರದ್ದಾಗುತ್ತದೆ
+                selectedCells.forEach(cell => cell.classList.remove('selecting'));
+            }
+            selectedCells = [];
+        }
+
+        // ಪ್ರಾರಂಭಿಸಿ
+        createWordList();
+        createGrid();
+    </script>
+</body>
+</html>

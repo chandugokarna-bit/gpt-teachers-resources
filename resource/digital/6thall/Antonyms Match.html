@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Antonyms Match Game</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f0f9;
+            color: #2c3e50;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            user-select: none;
+        }
+
+        .game-container {
+            background-color: #ffffff;
+            max-width: 700px;
+            width: 100%;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 8px 24px rgba(142, 68, 173, 0.1);
+            border-top: 6px solid #8e44ad;
+            text-align: center;
+        }
+
+        h2 {
+            color: #8e44ad;
+            margin-top: 0;
+        }
+
+        .columns-container {
+            display: flex;
+            justify-content: space-between;
+            gap: 40px;
+            margin-top: 30px;
+        }
+
+        .column {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .column h3 {
+            margin-bottom: 10px;
+            font-size: 18px;
+            color: #34495e;
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 5px;
+        }
+
+        /* ಕಾರ್ಡ್‌ಗಳ ಬೇಸ್ ಸ್ಟೈಲ್ */
+        .card {
+            padding: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            border: 2px solid transparent;
+        }
+
+        /* ಎಡಭಾಗದ ಪದಗಳ ಕಾರ್ಡ್ (ನೀಲಿ ಶೇಡ್) */
+        .left-card {
+            background-color: #eaf2f8;
+            color: #2980b9;
+        }
+        .left-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(41, 128, 185, 0.15);
+            background-color: #d4e6f1;
+        }
+
+        /* ಬಲಭಾಗದ ಪದಗಳ ಕಾರ್ಡ್ (ನೇರಳೆ ಶೇಡ್) */
+        .right-card {
+            background-color: #f5eef8;
+            color: #8e44ad;
+        }
+        .right-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(142, 68, 173, 0.15);
+            background-color: #ebdef0;
+        }
+
+        /* ಸೆಲೆಕ್ಟ್ ಆದಾಗ ಸ್ಟೈಲ್ */
+        .card.selected {
+            border-color: #f1c40f;
+            background-color: #fef9e7;
+            color: #f39c12;
+            transform: scale(1.03);
+        }
+
+        /* ಸರಿಯಾದ ಜೋಡಿಯಾದಾಗ (ಹಸಿರು) */
+        .card.matched {
+            background-color: #d5f5e3;
+            color: #27ae60;
+            border-color: #2ecc71;
+            transform: scale(0.95);
+            opacity: 0.4;
+            cursor: default;
+            pointer-events: none;
+        }
+
+        /* ತಪ್ಪಾದ ಜೋಡಿಯಾದಾಗ (ಕೆಂಪು) */
+        .card.wrong {
+            background-color: #fadbd8;
+            color: #c0392b;
+            border-color: #e74c3c;
+            animation: shake 0.4s;
+        }
+
+        .score-board {
+            margin-top: 25px;
+            font-size: 20px;
+            font-weight: bold;
+            color: #27ae60;
+            min-height: 30px;
+        }
+
+        /* ಕಾರ್ಡ್ ತಪ್ಪು ಜೋಡಿಯಾದಾಗ ನಡುಗುವ ಅನಿಮೇಷನ್ */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-6px); }
+            40%, 80% { transform: translateX(6px); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="game-container">
+        <h2>🔄 Activity 3: Antonyms Match (ವಿರುದ್ಧ ಪದಗಳ ಜೋಡಿ)</h2>
+        <p style="color: #7f8c8d; margin-bottom: 5px;">ಮೊದಲು Column A ನಿಂದ ಒಂದು ಪದವನ್ನು ಆರಿಸಿ, ನಂತರ Column B ನಿಂದ ಅದರ ಸರಿಯಾದ ವಿರುದ್ಧ ಪದವನ್ನು ಕ್ಲಿಕ್ ಮಾಡಿ ಜೋಡಿಸಿ!</p>
+        
+        <div class="columns-container">
+            <div class="column" id="leftColumn">
+                <h3>Column A (Words)</h3>
+            </div>
+            
+            <div class="column" id="rightColumn">
+                <h3>Column B (Antonyms)</h3>
+            </div>
+        </div>
+
+        <div class="score-board" id="msgBox"></div>
+    </div>
+
+    <script>
+        // ಪಠ್ಯಪುಸ್ತಕದ ಪುಟ 16ರಲ್ಲಿರುವ ನಿಖರವಾದ ವಿರುದ್ಧ ಪದಗಳ ಡೇಟಾ
+        const antonymsMap = {
+            "dangerous": "safe",
+            "short": "long",
+            "far": "near",
+            "low": "high",
+            "old": "new",
+            "stop": "start"
+        };
+
+        const leftWords = Object.keys(antonymsMap);
+        // ಬಲಭಾಗದ ಪದಗಳನ್ನು ಮಕ್ಕಳಿಗೆ ಸುಲಭ ಸಿಗದಿರಲು shuffle (ಅದಲು-ಬದಲು) ಮಾಡಲಾಗುತ್ತದೆ
+        const rightWords = Object.values(antonymsMap).sort(() => Math.random() - 0.5);
+
+        const leftColumn = document.getElementById('leftColumn');
+        const rightColumn = document.getElementById('rightColumn');
+        const msgBox = document.getElementById('msgBox');
+
+        let selectedLeft = null;
+        let selectedRight = null;
+        let matchCount = 0;
+
+        // ಎಡಭಾಗದ ಕಾರ್ಡ್‌ಗಳನ್ನು ಸೃಷ್ಟಿಸುವುದು
+        function initGame() {
+            leftWords.forEach(word => {
+                const card = document.createElement('div');
+                card.className = 'card left-card';
+                card.innerText = word;
+                card.dataset.word = word;
+                card.addEventListener('click', () => handleLeftClick(card));
+                leftColumn.appendChild(card);
+            });
+
+            // ಬಲಭಾಗದ ಕಾರ್ಡ್‌ಗಳನ್ನು ಸೃಷ್ಟಿಸುವುದು
+            rightWords.forEach(word => {
+                const card = document.createElement('div');
+                card.className = 'card right-card';
+                card.innerText = word;
+                card.dataset.word = word;
+                card.addEventListener('click', () => handleRightClick(card));
+                rightColumn.appendChild(card);
+            });
+        }
+
+        function handleLeftClick(card) {
+            if (card.classList.contains('matched')) return;
+            
+            // ಹಿಂದಿನ ಸೆಲೆಕ್ಷನ್ ರಿಸೆಟ್ ಮಾಡುವುದು
+            if (selectedLeft) selectedLeft.classList.remove('selected');
+            
+            selectedLeft = card;
+            card.classList.add('selected');
+            checkMatch();
+        }
+
+        function handleRightClick(card) {
+            if (card.classList.contains('matched')) return;
+            
+            // ಹಿಂದಿನ ಸೆಲೆಕ್ಷನ್ ರಿಸೆಟ್ ಮಾಡುವುದು
+            if (selectedRight) selectedRight.classList.remove('selected');
+            
+            selectedRight = card;
+            card.classList.add('selected');
+            checkMatch();
+        }
+
+        function checkMatch() {
+            // ಎರಡು ಕಡೆ ಕಾರ್ಡ್ ಸೆಲೆಕ್ಟ್ ಆಗಿದ್ದಾಗ ಮಾತ್ರ ಪರಿಶೀಲಿಸುವುದು
+            if (selectedLeft && selectedRight) {
+                const leftVal = selectedLeft.dataset.word;
+                const rightVal = selectedRight.dataset.word;
+
+                if (antonymsMap[leftVal] === rightVal) {
+                    // ಜೋಡಿ ಸರಿಯಾಗಿದ್ದರೆ (MATCHED)
+                    const tempLeft = selectedLeft;
+                    const tempRight = selectedRight;
+                    
+                    tempLeft.className = 'card left-card matched';
+                    tempRight.className = 'card right-card matched';
+                    
+                    matchCount++;
+                    resetSelections();
+
+                    if (matchCount === leftWords.length) {
+                        msgBox.innerHTML = "🎉 ಸೂಪರ್! ನೀವು ಎಲ್ಲಾ ವಿರುದ್ಧ ಪದಗಳನ್ನು ಸರಿಯಾಗಿ ಜೋಡಿಸಿದ್ದೀರಿ!";
+                    }
+                } else {
+                    // ಜೋಡಿ ತಪ್ಪಾಗಿದ್ದರೆ (WRONG)
+                    const tempLeft = selectedLeft;
+                    const tempRight = selectedRight;
+
+                    tempLeft.classList.add('wrong');
+                    tempRight.classList.add('wrong');
+
+                    // 0.4 ಸೆಕೆಂಡ್ ನಂತರ ಕೆಂಪು ಬಣ್ಣವನ್ನು ತೆಗೆದು ಮೊದಲಿನ ಸ್ಥಿತಿಗೆ ತರುವುದು
+                    setTimeout(() => {
+                        tempLeft.classList.remove('selected', 'wrong');
+                        tempRight.classList.remove('selected', 'wrong');
+                    }, 400);
+
+                    resetSelections();
+                }
+            }
+        }
+
+        function resetSelections() {
+            selectedLeft = null;
+            selectedRight = null;
+        }
+
+        // ಆಟವನ್ನು ಶುರು ಮಾಡುವುದು
+        initGame();
+    </script>
+</body>
+</html>

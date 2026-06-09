@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loud vs Soft Sounds Classifier</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #fcfcfc;
+            color: #2c3e50;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            user-select: none;
+        }
+
+        .game-container {
+            background-color: #ffffff;
+            max-width: 800px;
+            width: 100%;
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            border-top: 6px solid #e67e22;
+        }
+
+        h2 {
+            color: #e67e22;
+            text-align: center;
+            margin-top: 0;
+        }
+
+        /* ಶಬ್ದದ ಕಾರ್ಡ್‌ಗಳಿರುವ ಜಾಗ */
+        .sounds-pool {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
+            margin: 25px 0;
+            min-height: 80px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            border: 2px dashed #e0e0e0;
+        }
+
+        /* ಶಬ್ದದ ಕಾರ್ಡ್ ಸ್ಟೈಲ್ */
+        .sound-card {
+            background-color: #ffffff;
+            border: 2px solid #34495e;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: grab;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: bold;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .sound-card:active {
+            cursor: grabbing;
+            transform: scale(1.05);
+        }
+
+        /* ಆಡಿಯೋ ಬಟನ್ ಸ್ಟೈಲ್ */
+        .audio-btn {
+            background-color: #34495e;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            transition: background-color 0.2s;
+        }
+
+        .audio-btn:hover {
+            background-color: #e67e22;
+        }
+
+        /* ಡ್ರಾಪ್ ಮಾಡುವ ಬಾಕ್ಸ್‌ಗಳು */
+        .drop-zones-container {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .drop-zone {
+            flex: 1;
+            min-height: 200px;
+            padding: 15px;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            transition: background-color 0.3s, border-color 0.3s;
+            border: 3px dashed transparent;
+        }
+
+        /* Loud Sound Box (ಕೆಂಪು/ಆರೆಂಜ್ ಶೇಡ್) */
+        #loudZone {
+            background-color: #fdf2e9;
+            border-color: #f5cba7;
+        }
+        #loudZone.hovered {
+            background-color: #fadbd8;
+            border-color: #e74c3c;
+        }
+        #loudZone h3 {
+            color: #d35400;
+            margin-top: 0;
+            text-align: center;
+            border-bottom: 2px solid #f5cba7;
+            padding-bottom: 5px;
+        }
+
+        /* Soft Sound Box (ಹಸಿರು ಶೇಡ್) */
+        #softZone {
+            background-color: #e8f8f5;
+            border-color: #a3e4d7;
+        }
+        #softZone.hovered {
+            background-color: #d4efdf;
+            border-color: #2ecc71;
+        }
+        #softZone h3 {
+            color: #16a085;
+            margin-top: 0;
+            text-align: center;
+            border-bottom: 2px solid #a3e4d7;
+            padding-bottom: 5px;
+        }
+
+        /* ಬಾಕ್ಸ್ ಒಳಗೆ ಡ್ರಾಪ್ ಆದಾಗ ಕಾರ್ಡ್‌ನ ಸ್ಟೈಲ್ ಬದಲಾವಣೆ */
+        .drop-zone .sound-card {
+            cursor: default;
+            border-color: transparent;
+            box-shadow: none;
+            background-color: rgba(255, 255, 255, 0.7);
+        }
+
+        .message-box {
+            margin-top: 25px;
+            font-size: 20px;
+            font-weight: bold;
+            text-align: center;
+            color: #2ecc71;
+            min-height: 30px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="game-container">
+        <h2>🔊 Activity 4: Loud vs Soft Sounds Classifier</h2>
+        <p style="text-align: center; color: #7f8c8d; margin-bottom: 0;">🔊 ಬಟನ್ ಒತ್ತಿ ಶಬ್ದವನ್ನು ಕೇಳಿಸಿಕೊಳ್ಳಿ, ನಂತರ ಕಾರ್ಡ್ ಅನ್ನು ಎಳೆದು (Drag & Drop) ಸರಿಯಾದ ಬಾಕ್ಸ್‌ಗೆ ಹಾಕಿ!</p>
+        
+        <div class="sounds-pool" id="soundsPool"></div>
+
+        <div class="drop-zones-container">
+            <div class="drop-zone" id="loudZone" data-type="loud">
+                <h3>📢 Loud Sounds (ದೊಡ್ಡ ಶಬ್ದಗಳು)</h3>
+            </div>
+
+            <div class="drop-zone" id="softZone" data-type="soft">
+                <h3>🍃 Soft Sounds (ಮೆದುವಾದ ಶಬ್ದಗಳು)</h3>
+            </div>
+        </div>
+
+        <div class="message-box" id="msgBox"></div>
+    </div>
+
+    <script>
+        // ಪಠ್ಯಪುಸ್ತಕದ ಪುಟ 18ರಲ್ಲಿರುವ ನಿಖರವಾದ ಶಬ್ದಗಳ ಡೇಟಾ ಮತ್ತು ವರ್ಗೀಕರಣ
+        const soundsData = [
+            { id: "s1", text: "Clapping hands", type: "soft", speakText: "Clapping hands" },
+            { id: "s2", text: "Stamping feet", type: "loud", speakText: "Stamping feet" },
+            { id: "s3", text: "A horn blowing", type: "loud", speakText: "A horn blowing" },
+            { id: "s4", text: "A feather dropping", type: "soft", speakText: "A feather dropping" },
+            { id: "s5", text: "A bee buzzing", type: "soft", speakText: "A bee buzzing" },
+            { id: "s6", text: "A car moving", type: "loud", speakText: "A car moving" },
+            { id: "s7", text: "The wind blowing", type: "soft", speakText: "The wind blowing" },
+            { id: "s8", text: "Rustling leaves", type: "soft", speakText: "Rustling leaves" }
+        ];
+
+        const soundsPool = document.getElementById('soundsPool');
+        const loudZone = document.getElementById('loudZone');
+        const softZone = document.getElementById('softZone');
+        const msgBox = document.getElementById('msgBox');
+
+        let draggedElement = null;
+        let totalItems = soundsData.length;
+        let correctCount = 0;
+
+        // ಆಕ್ಟಿವಿಟಿ ಪ್ರಾರಂಭಿಸುವುದು (ಕಾರ್ಡ್‌ಗಳನ್ನು ಅದಲು ಬದಲು ಮಾಡಿ ಜೋಡಿಸುವುದು)
+        function initGame() {
+            const shuffledSounds = [...soundsData].sort(() => Math.random() - 0.5);
+
+            shuffledSounds.forEach(sound => {
+                const card = document.createElement('div');
+                card.className = 'sound-card';
+                card.id = sound.id;
+                card.draggable = true;
+                card.dataset.type = sound.type;
+
+                // ಸ್ಪೀಕರ್ ಬಟನ್
+                const audioBtn = document.createElement('button');
+                audioBtn.className = 'audio-btn';
+                audioBtn.innerHTML = '🔊';
+                audioBtn.addEventListener('click', (e) => {
+                    e.stopPropagation(); // ಡ್ರಾಗ್ ಇವೆಂಟ್ ಅಡ್ಡಿಪಡಿಸದಂತೆ ತಡೆಯಲು
+                    playSound(sound.speakText);
+                });
+
+                const textSpan = document.createElement('span');
+                textSpan.innerText = sound.text;
+
+                card.appendChild(audioBtn);
+                card.appendChild(textSpan);
+
+                // ಡ್ರಾಗ್ ಇವೆಂಟ್‌ಗಳು
+                card.addEventListener('dragstart', () => {
+                    draggedElement = card;
+                });
+
+                soundsPool.appendChild(card);
+            });
+
+            setupDropZones([loudZone, softZone]);
+        }
+
+        // ವೆಬ್ ಬ್ರೌಸರ್ ಮೂಲಕ ಶಬ್ದವನ್ನು ಉಚ್ಚರಿಸುವ ಫಂಕ್ಷನ್ (Text to Speech)
+        function playSound(text) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel(); // ಹಿಂದಿನ ಶಬ್ದವನ್ನು ನಿಲ್ಲಿಸಲು
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'en-US';
+                utterance.rate = 0.85; // ಮಕ್ಕಳಿಗೆ ಸ್ಪಷ್ಟವಾಗಿ ಕೇಳಲು ಸ್ವಲ್ಪ ನಿಧಾನ ಗತಿ
+                window.speechSynthesis.speak(utterance);
+            } else {
+                alert("ನಿಮ್ಮ ಬ್ರೌಸರ್ ಆಡಿಯೋ ಸಪೋರ್ಟ್ ಮಾಡುತ್ತಿಲ್ಲ.");
+            }
+        }
+
+        // ಡ್ರಾಗ್ ಮಾಡಿ ಹಾಕುವ ಬಾಕ್ಸ್‌ಗಳ ಇವೆಂಟ್ ಸೆಟಪ್
+        function setupDropZones(zones) {
+            zones.forEach(zone => {
+                zone.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    zone.classList.add('hovered');
+                });
+
+                zone.addEventListener('dragleave', () => {
+                    zone.classList.remove('hovered');
+                });
+
+                zone.addEventListener('drop', () => {
+                    zone.classList.remove('hovered');
+                    if (!draggedElement) return;
+
+                    const cardType = draggedElement.dataset.type;
+                    const zoneType = zone.dataset.type;
+
+                    // ಸರಿಯಾದ ಬಾಕ್ಸ್‌ಗೆ ಹಾಕಲಾಗಿದೆಯೇ ಎಂದು ಪರಿಶೀಲನೆ
+                    if (cardType === zoneType) {
+                        draggedElement.draggable = false; // ಮತ್ತೊಮ್ಮೆ ಎಳೆಯದಂತೆ ಲಾಕ್ ಮಾಡುವುದು
+                        zone.appendChild(draggedElement);
+                        correctCount++;
+                        msgBox.innerText = "⭐ ಸರಿ ಉತ್ತರ!";
+                        msgBox.style.color = "#2ecc71";
+
+                        // ಎಲ್ಲಾ ಶಬ್ದಗಳು ಮುಗಿದಾಗ ಅಭಿನಂದನೆ
+                        if (correctCount === totalItems) {
+                            msgBox.innerHTML = "🎉 ಅದ್ಭುತ! ನೀವು ಎಲ್ಲಾ ಶಬ್ದಗಳನ್ನು ಸರಿಯಾಗಿ ವರ್ಗೀಕರಿಸಿದ್ದೀರಿ! 👏👏";
+                        }
+                    } else {
+                        // ತಪ್ಪಾದ ಬಾಕ್ಸ್‌ಗೆ ಹಾಕಿದರೆ ಎಚ್ಚರಿಕೆ ಸಂದೇಶ
+                        msgBox.innerText = "❌ ತಪ್ಪು ಬಾಕ್ಸ್! ಇನ್ನೊಮ್ಮೆ ಪ್ರಯತ್ನಿಸಿ.";
+                        msgBox.style.color = "#e74c3c";
+                    }
+                    draggedElement = null;
+                });
+            });
+        }
+
+        // ಆಟವನ್ನು ಶುರು ಮಾಡುವುದು
+        initGame();
+    </script>
+</body>
+</html>

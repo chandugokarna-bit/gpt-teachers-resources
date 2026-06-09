@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VIBGYOR Premium Rainbow Builder (Fixed)</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f7fc;
+            color: #2c3e50;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            user-select: none;
+            touch-action: none; /* ಮೊಬೈಲ್‌ನಲ್ಲಿ ಸ್ಕ್ರಾಲ್ ಆಗದಂತೆ ತಡೆಯಲು */
+        }
+
+        .game-container {
+            background-color: #ffffff;
+            max-width: 850px;
+            width: 100%;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            border-top: 6px solid #3498db;
+            text-align: center;
+        }
+
+        h2 {
+            background: linear-gradient(to right, #e74c3c, #e67e22, #f1c40f, #2ecc71, #3498db, #2e4053, #8e44ad);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-top: 0;
+            font-size: 28px;
+        }
+
+        .content-box {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        /* ಬಣ್ಣಗಳ ಬಕೆಟ್ ಪೂಲ್ */
+        .color-palette {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            min-width: 220px;
+        }
+
+        /* ಕಲರ್ ಕಾರ್ಡ್ಸ್ */
+        .color-card {
+            padding: 12px 20px;
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: grab;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+
+        .color-card:active {
+            cursor: grabbing;
+        }
+
+        .color-card.hidden {
+            visibility: hidden;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* SVG ಮಳೆಬಿಲ್ಲಿನ ಕಂಟೇನರ್ ಸ್ಟೈಲ್ */
+        .rainbow-svg-container {
+            background-color: #faffff;
+            border: 2px dashed #d1f2eb;
+            border-radius: 15px;
+            padding: 10px;
+        }
+
+        /* ಮಳೆಬಿಲ್ಲಿನ ಪಥಗಳು (Paths) */
+        .rainbow-path {
+            fill: none;
+            stroke: #e5e8e8; /* ಆರಂಭಿಕ ಬೂದು ಬಣ್ಣ */
+            stroke-width: 16; /* ಬಿಲ್ಲುಗಳ ದಪ್ಪ */
+            stroke-linecap: round;
+            cursor: pointer;
+            transition: stroke 0.5s ease;
+        }
+
+        /* ಡ್ರಾಗ್ ಮಾಡಿದಾಗ ಹೈಲೈಟ್ ಆಗಲು */
+        .rainbow-path.drag-over {
+            stroke: #bdc3c7;
+        }
+
+        .message-box {
+            margin-top: 25px;
+            font-size: 22px;
+            font-weight: bold;
+            min-height: 35px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="game-container">
+        <h2>🎨 Activity 5: VIBGYOR Rainbow Builder</h2>
+        <p style="color: #7f8c8d;">ಮಳೆಬಿಲ್ಲಿನ ಬಣ್ಣಗಳ ಹೆಸರನ್ನು ಎಳೆದು (Drag & Drop) ಮಳೆಬಿಲ್ಲಿನ ಸರಿಯಾದ ಪಟ್ಟಿಗೆ ಹಾಕಿ ಬಣ್ಣ ತುಂಬಿಸಿ!</p>
+        
+        <div class="content-box">
+            <div class="color-palette" id="colorPalette"></div>
+
+            <div class="rainbow-svg-container">
+                <svg width="420" height="230" viewBox="0 0 420 230" id="rainbowSvg">
+                    <path class="rainbow-path" id="path-RED" data-color="RED" d="M 30,210 A 180,180 0 0,1 390,210" />
+                    <path class="rainbow-path" id="path-ORANGE" data-color="ORANGE" d="M 52,210 A 158,158 0 0,1 368,210" />
+                    <path class="rainbow-path" id="path-YELLOW" data-color="YELLOW" d="M 74,210 A 136,136 0 0,1 346,210" />
+                    <path class="rainbow-path" id="path-GREEN" data-color="GREEN" d="M 96,210 A 114,114 0 0,1 324,210" />
+                    <path class="rainbow-path" id="path-BLUE" data-color="BLUE" d="M 118,210 A 92,92 0 0,1 302,210" />
+                    <path class="rainbow-path" id="path-INDIGO" data-color="INDIGO" d="M 140,210 A 70,70 0 0,1 280,210" />
+                    <path class="rainbow-path" id="path-VIOLET" data-color="VIOLET" d="M 162,210 A 48,48 0 0,1 258,210" />
+                </svg>
+            </div>
+        </div>
+
+        <div class="message-box" id="msgBox"></div>
+    </div>
+
+    <script>
+        const colorsConfig = [
+            { id: "VIOLET", name: "Violet (ನೇರಳೆ)", hex: "#8e44ad" },
+            { id: "INDIGO", name: "Indigo (ಗಾಢ ನೀಲಿ)", hex: "#2e4053" },
+            { id: "BLUE", name: "Blue (ನೀಲಿ)", hex: "#3498db" },
+            { id: "GREEN", name: "Green (ಹಸಿರು)", hex: "#2ecc71" },
+            { id: "YELLOW", name: "Yellow (ಹಳದಿ)", hex: "#f1c40f" },
+            { id: "ORANGE", name: "Orange (ಕಿತ್ತಳೆ)", hex: "#e67e22" },
+            { id: "RED", name: "Red (ಕೆಂಪು)", hex: "#e74c3c" }
+        ];
+
+        const palette = document.getElementById('colorPalette');
+        const msgBox = document.getElementById('msgBox');
+        let draggedColorId = null;
+        let completedCount = 0;
+
+        function initGame() {
+            // ಕಾರ್ಡ್‌ಗಳ ಶಫಲ್ (Shuffle)
+            const shuffledColors = [...colorsConfig].sort(() => Math.random() - 0.5);
+
+            shuffledColors.forEach(color => {
+                const card = document.createElement('div');
+                card.className = 'color-card';
+                card.innerText = color.name;
+                card.id = `card-${color.id}`;
+                card.draggable = true;
+                card.style.backgroundColor = color.hex;
+
+                // ಡೆಸ್ಕ್‌ಟಾಪ್ ಡ್ರಾಗ್ ಇವೆಂಟ್ಸ್
+                card.addEventListener('dragstart', () => { draggedColorId = color.id; });
+                
+                palette.appendChild(card);
+            });
+
+            // ಮೊಬೈಲ್ ಟಚ್ ಸಪೋರ್ಟ್‌ಗಾಗಿ ಗ್ಲೋಬಲ್ ಇವೆಂಟ್ಸ್
+            window.addEventListener('touchstart', handleTouchStart, {passive: false});
+            window.addEventListener('touchmove', handleTouchMove, {passive: false});
+            window.addEventListener('touchend', handleTouchEnd);
+
+            // SVG ಪಥಗಳ (Paths) ಡ್ರಾಗ್ ಓವರ್ ಇವೆಂಟ್ಸ್ (ಡೆಸ್ಕ್‌ಟಾಪ್‌ಗಾಗಿ)
+            const paths = document.querySelectorAll('.rainbow-path');
+            paths.forEach(path => {
+                path.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    if(!path.classList.contains('colored')) path.classList.add('drag-over');
+                });
+
+                path.addEventListener('dragleave', () => { path.classList.remove('drag-over'); });
+                path.addEventListener('drop', () => { handleDropAction(path); });
+            });
+        }
+
+        // ಡ್ರಾಪ್ ಆದಾಗ ಬಣ್ಣ ತುಂಬುವ ಪ್ರಮುಖ ಲಾಜಿಕ್
+        function handleDropAction(pathElement) {
+            if (pathElement.classList.contains('colored')) return;
+            
+            const targetColor = pathElement.dataset.color;
+
+            if (draggedColorId === targetColor) {
+                const matchedColorObj = colorsConfig.find(c => c.id === targetColor);
+                pathElement.style.stroke = matchedColorObj.hex; // ಬಣ್ಣ ತುಂಬುವುದು
+                pathElement.classList.add('colored');
+                
+                document.getElementById(`card-${targetColor}`).classList.add('hidden');
+                
+                completedCount++;
+                msgBox.innerText = "🌟 ಅದ್ಭುತ! ಸರಿಯಾದ ಬಣ್ಣ.";
+                msgBox.style.color = matchedColorObj.hex;
+
+                if (completedCount === 7) {
+                    msgBox.innerHTML = "🌈 ವಾಹ್! ಸುಂದರವಾದ ಮಳೆಬಿಲ್ಲು ಸಿದ್ಧವಾಯಿತು! 👏👏";
+                    msgBox.style.color = "#27ae60";
+                }
+            } else {
+                msgBox.innerText = "❌ ತಪ್ಪು ಜಾಗ! ಇನ್ನೊಮ್ಮೆ ಪ್ರಯತ್ನಿಸಿ.";
+                msgBox.style.color = "#c0392b";
+            }
+        }
+
+        // --- ಮೊಬೈಲ್ ಟಚ್ ಲಾಜಿಕ್ ---
+        let touchActiveCard = null;
+
+        function handleTouchStart(e) {
+            const touch = e.touches[0];
+            const target = document.elementFromPoint(touch.clientX, touch.clientY);
+            if (target && target.classList.contains('color-card') && !target.classList.contains('hidden')) {
+                touchActiveCard = target;
+                draggedColorId = target.id.replace('card-', '');
+            }
+        }
+
+        function handleTouchMove(e) {
+            if (!touchActiveCard) return;
+            e.preventDefault(); // ಸ್ಕ್ರೀನ್ ಸ್ಕ್ರಾಲ್ ಆಗದಂತೆ ತಡೆಯಲು
+            
+            const touch = e.touches[0];
+            const target = document.elementFromPoint(touch.clientX, touch.clientY);
+            
+            // ಹೈಲೈಟ್ ಎಫೆಕ್ಟ್
+            document.querySelectorAll('.rainbow-path').forEach(p => p.classList.remove('drag-over'));
+            if (target && target.classList.contains('rainbow-path') && !target.classList.contains('colored')) {
+                target.classList.add('drag-over');
+            }
+        }
+
+        function handleTouchEnd(e) {
+            if (!touchActiveCard) return;
+            
+            const touch = e.changedTouches[0];
+            const target = document.elementFromPoint(touch.clientX, touch.clientY);
+            
+            document.querySelectorAll('.rainbow-path').forEach(p => p.classList.remove('drag-over'));
+
+            if (target && target.classList.contains('rainbow-path')) {
+                handleDropAction(target);
+            }
+            
+            touchActiveCard = null;
+            draggedColorId = null;
+        }
+
+        initGame();
+    </script>
+</body>
+</html>
