@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಚಲನೆಯ ವಿಜ್ಞಾನ ಪಾರ್ಕ್ - Motion Science Park</title>
+    <style>
+        :root {
+            --slate-900: #0f172a;
+            --slate-800: #1e293b;
+            --emerald: #10b981;
+            --cyan: #06b6d4;
+            --amber: #f59e0b;
+            --rose: #f43f5e;
+            --text: #f8fafc;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+
+        body {
+            background-color: var(--slate-900);
+            color: var(--text);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 25px;
+            max-width: 800px;
+        }
+
+        header h1 {
+            font-size: 2.4rem;
+            color: var(--cyan);
+            margin-bottom: 10px;
+            text-shadow: 0 0 15px rgba(6, 182, 212, 0.4);
+        }
+
+        header p {
+            color: #94a3b8;
+            font-size: 1.1rem;
+        }
+
+        .main-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            width: 100%;
+            max-width: 950px;
+        }
+
+        @media (max-width: 768px) {
+            .main-layout { grid-template-columns: 1fr; }
+        }
+
+        .card {
+            background: var(--slate-800);
+            border-radius: 16px;
+            padding: 25px;
+            border: 1px solid #334155;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.4);
+        }
+
+        /* Simulation Window */
+        .sim-window {
+            background: #090d16;
+            border: 2px inset #334155;
+            border-radius: 12px;
+            height: 320px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .sim-title {
+            position: absolute;
+            top: 10px;
+            left: 15px;
+            font-size: 0.9rem;
+            color: var(--cyan);
+            font-weight: bold;
+            background: rgba(6, 182, 212, 0.1);
+            padding: 4px 10px;
+            border-radius: 20px;
+        }
+
+        /* Animated Objects */
+        .motion-object {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #a855f7, #6366f1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 0 0 20px rgba(168, 85, 247, 0.6);
+            position: absolute;
+        }
+
+        /* CSS Live Animations */
+        /* 1. Rectilinear */
+        .anim-rectilinear {
+            animation: moveLine 2s linear infinite alternate;
+            top: 50%;
+            left: 10%;
+        }
+        @keyframes moveLine {
+            0% { left: 10%; }
+            100% { left: 80%; }
+        }
+
+        /* 2. Circular */
+        .orbit-track {
+            width: 160px;
+            height: 160px;
+            border: 2px dashed #334155;
+            border-radius: 50%;
+            position: absolute;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        .anim-circular {
+            position: relative;
+            animation: moveCircle 4s linear infinite;
+        }
+        @keyframes moveCircle {
+            0% { transform: rotate(0deg) translate(80px) rotate(0deg); }
+            100% { transform: rotate(360deg) translate(80px) rotate(-360deg); }
+        }
+
+        /* 3. Rotational */
+        .anim-rotational {
+            position: absolute;
+            top: 45%;
+            left: 45%;
+            border-radius: 8px; /* Square/Top shape */
+            animation: spinInPlace 1.5s linear infinite;
+        }
+        @keyframes spinInPlace {
+            100% { transform: rotate(360deg); }
+        }
+
+        /* 4. Periodic */
+        .pivot-point {
+            position: absolute;
+            top: 20px;
+            width: 10px;
+            height: 10px;
+            background: white;
+            border-radius: 50%;
+            display: none;
+        }
+        .anim-periodic {
+            position: absolute;
+            top: 150px;
+            transform-origin: center -130px;
+            animation: swingSwing 2s ease-in-out infinite alternate;
+        }
+        @keyframes swingSwing {
+            0% { transform: rotate(-45deg); }
+            100% { transform: rotate(45deg); }
+        }
+
+        /* Quest / Controls Side */
+        .quest-box {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100%;
+        }
+
+        .riddle-tag {
+            color: var(--amber);
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .riddle-text {
+            font-size: 1.25rem;
+            line-height: 1.6;
+            color: #e2e8f0;
+            background: #0f172a;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid var(--amber);
+            margin-bottom: 20px;
+        }
+
+        .options-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .opt-btn {
+            background: #1e293b;
+            color: white;
+            border: 2px solid #475569;
+            padding: 14px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-align: left;
+            transition: all 0.2s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .opt-btn:hover {
+            border-color: var(--cyan);
+            background: #273549;
+        }
+
+        .feedback {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: bold;
+            text-align: center;
+            font-size: 1.1rem;
+            display: none;
+        }
+        .success { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid var(--emerald); }
+        .error { background: rgba(244, 63, 94, 0.2); color: #fb7185; border: 1px solid var(--rose); }
+
+        .next-btn {
+            background: var(--cyan);
+            color: var(--slate-900);
+            font-weight: bold;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 15px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 1.1rem;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>🚀 ಇಂಟರಾಕ್ಟಿವ್ ಚಲನೆಯ ವಿಜ್ಞಾನ ಪಾರ್ಕ್ 🎡</h1>
+        <p>ವಿಜ್ಞಾನ ಪಾರ್ಕ್‌ನ ರೈಡ್‌ಗಳು ಆಫ್ ಆಗಿವೆ! ಒಗಟನ್ನು ಓದಿ, ಅದು ಯಾವ ಚಲನೆ ಎಂದು ಸರಿಯಾಗಿ ಪತ್ತೆಹಚ್ಚಿ ರೈಡ್‌ಗಳನ್ನು ಲೈವ್ ಆಗಿ ಚಲಿಸುವಂತೆ ಮಾಡಿ.</p>
+    </header>
+
+    <div class="main-layout">
+        
+        <div class="card">
+            <div class="sim-window" id="simWindow">
+                <div class="sim-title" id="simTitle">ವಸ್ತು ನಿಶ್ಚಲವಾಗಿದೆ (Stopped)</div>
+                
+                <div class="orbit-track" id="orbitTrack"></div>
+                
+                <div class="pivot-point" id="pivotPoint"></div>
+
+                <div class="motion-object" id="motionObj">⚫</div>
+            </div>
+            
+            <div style="margin-top:15px; font-size:0.9rem; color:#94a3b8; text-align:center;">
+                💡 <b>ಶಿಕ್ಷಕರಿಗೆ ಸುಳಿವು:</b> ಉತ್ತರ ಸರಿಹೋದಾಗ ಮೇಲಿನ ಬಾಕ್ಸ್‌ನಲ್ಲಿ ವಸ್ತುವು ಆಯಾ ನಿಯಮದಂತೆ ಲೈವ್ ಆಗಿ ಚಲಿಸಲು ಆರಂಭಿಸುತ್ತದೆ!
+            </div>
+        </div>
+
+        <div class="card quest-box">
+            <div>
+                <div class="riddle-tag">⚡ ಪವರ್ ರೀ-ಕನೆಕ್ಟ್ ಸವಾಲು (<span id="levelText">1 / 4</span>)</div>
+                <div class="riddle-text" id="riddleDisplay">ಲೋಡ್ ಆಗುತ್ತಿದೆ...</div>
+                
+                <div class="options-stack" id="optionsStack">
+                    </div>
+            </div>
+
+            <div>
+                <div class="feedback" id="feedbackBox"></div>
+                <button class="next-btn" id="nextBtn" onclick="nextQuestion()">ಮುಂದಿನ ರೈಡ್ ಆನ್ ಮಾಡಿ ➔</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // ಸವಾಲುಗಳ ಡೇಟಾಬೇಸ್
+        const motionQuests = [
+            {
+                riddle: "ರೈಡ್ 1: ನಮ್ಮ ಮೆಟ್ರೋ ರೈಲು ಸಿಗ್ನಲ್ ದಾಟಿದ ನಂತರ ಸಂಪೂರ್ಣವಾಗಿ 'ನೇರವಾದ ಹಳಿ'ಯ ಮೇಲೆ ವೇಗವಾಗಿ ಮುನ್ನಡೆಯುತ್ತಿದೆ. ಇದು ಯಾವ ರೀತಿಯ ಚಲನೆ?",
+                options: ["ನೇರ ರೇಖೀಯ ಚಲನೆ", "ವೃತ್ತೀಯ ಚಲನೆ", "ಆವರ್ತಕ ಚಲನೆ", "ಭ್ರಮಣ ಚಲನೆ"],
+                correct: "ನೇರ ರೇಖೀಯ ಚಲನೆ",
+                animClass: "anim-rectilinear",
+                emoji: "🚇",
+                titleText: "ನೇರ ರೇಖೀಯ ಚಲನೆ (Rectilinear Motion) ಚಾಲ್ತಿಯಲ್ಲಿದೆ"
+            },
+            {
+                riddle: "ರೈಡ್ 2: ಮಕ್ಕಳು ಆಟ ಆಡುವ ಜೋಕಾಲಿ (Swing) ಒಂದು ನಿರ್ದಿಷ್ಟ ಸಮಯದ ಅಂತರದಲ್ಲಿ ನಿಯಮಿತವಾಗಿ ಮುಂದೆ ಮತ್ತು ಹಿಂದೆ ಚಲಿಸುತ್ತಿದೆ. ಇದು ಯಾವ ಚಲನೆ?",
+                options: ["ನೇರ ರೇಖೀಯ ಚಲನೆ", "ಆವರ್ತಕ ಚಲನೆ", "ಭ್ರಮಣ ಚಲನೆ", "ವೃತ್ತೀಯ ಚಲನೆ"],
+                correct: "ಆವರ್ತಕ ಚಲನೆ",
+                animClass: "anim-periodic",
+                emoji: "➿",
+                titleText: "ಆವರ್ತಕ ಚಲನೆ (Periodic Motion) ಚಾಲ್ತಿಯಲ್ಲಿದೆ"
+            },
+            {
+                riddle: "ರೈಡ್ 3: ದೀಪಾವಳಿ ಹಬ್ಬದಲ್ಲಿ ನೆಲದ ಮೇಲೆ ಇಟ್ಟು ಹಚ್ಚಿದಾಗ ತನ್ನದೇ ಒಂದು ಕಡ್ಡಿಗೆ ಅಥವಾ ಕೇಂದ್ರಕ್ಕೆ ಅಂಟಿಕೊಂಡು ಗಿರಗಿರನೆ ತಿರುಗುವ ನೆಲಚಕ್ರ ಅಥವಾ ಬುಗುರಿ (Top) ಯಾವ ಚಲನೆ ಹೊಂದಿದೆ?",
+                options: ["ವೃತ್ತೀಯ ಚಲನೆ", "ಸರಳ ರೇಖೀಯ ಚಲನೆ", "ಭ್ರಮಣ ಚಲನೆ", "ಆವರ್ತಕ ಚಲನೆ"],
+                correct: "ಭ್ರಮಣ ಚಲನೆ",
+                animClass: "anim-rotational",
+                emoji: "🌀",
+                titleText: "ಭ್ರಮಣ ಚಲನೆ (Rotational Motion) ಚಾಲ್ತಿಯಲ್ಲಿದೆ"
+            },
+            {
+                riddle: "ರೈಡ್ 4: ಸೂರ್ಯನನ್ನು ಕೇಂದ್ರವಾಗಿಟ್ಟುಕೊಂಡು ಅದರ ಸುತ್ತಲೂ ನಿಗದಿತ ಕಕ್ಷೆಯ ಹಾದಿಯಲ್ಲಿ (Orbit) ಸುತ್ತುತ್ತಿರುವ ನಮ್ಮ ಭೂಮಿಯ ಚಲನೆಗೆ ಏನನ್ನುತ್ತಾರೆ?",
+                options: ["ವೃತ್ತೀಯ ಚಲನೆ", "ಭ್ರಮಣ ಚಲನೆ", "ನೇರ ರೇಖೀಯ ಚಲನೆ", "ಆವರ್ತಕ ಚಲನೆ"],
+                correct: "ವೃತ್ತೀಯ ಚಲನೆ",
+                animClass: "anim-circular",
+                emoji: "🌍",
+                titleText: "ವೃತ್ತೀಯ ಚಲನೆ (Circular Motion) ಚಾಲ್ತಿಯಲ್ಲಿದೆ"
+            }
+        ];
+
+        let currentLevel = 0;
+
+        function loadLevel() {
+            const quest = motionQuests[currentLevel];
+            
+            // ಯುಐ ಅಪ್ಡೇಟ್
+            document.getElementById('levelText').innerText = `${currentLevel + 1} / ${motionQuests.length}`;
+            document.getElementById('riddleDisplay').innerText = quest.riddle;
+            document.getElementById('feedbackBox').style.display = 'none';
+            document.getElementById('nextBtn').style.display = 'none';
+            
+            // ಸಿಮ್ಯುಲೇಶನ್ ರಿಸ್ಟಾರ್ಟ್ (ವಸ್ತುವನ್ನು ನಿಲ್ಲಿಸುವುದು)
+            const obj = document.getElementById('motionObj');
+            obj.className = "motion-object";
+            obj.style.top = "45%";
+            obj.style.left = "45%";
+            obj.innerText = "❌";
+            document.getElementById('simTitle').innerText = "ರೈಡ್ ಆಫ್ ಆಗಿದೆ (Power Off)";
+            document.getElementById('orbitTrack').style.display = 'none';
+            document.getElementById('pivotPoint').style.display = 'none';
+
+            // ಆಪ್ಷನ್ ಬಟನ್ಸ್‌ಗಳನ್ನು ಜನರೇಟ್ ಮಾಡುವುದು
+            const stack = document.getElementById('optionsStack');
+            stack.innerHTML = '';
+            
+            quest.options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'opt-btn';
+                btn.innerHTML = `<span>${opt}</span> 🔘`;
+                btn.onclick = () => checkAnswer(opt, btn);
+                stack.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(selectedOpt, btnElement) {
+            const quest = motionQuests[currentLevel];
+            const feedback = document.getElementById('feedbackBox');
+            feedback.style.display = 'block';
+
+            if (selectedOpt === quest.correct) {
+                // ಸರಿ ಉತ್ತರ!
+                feedback.className = "feedback success";
+                feedback.innerHTML = "🎯 ಸರಿಯಾದ ಉತ್ತರ! ಪವರ್ ಆನ್ ಆಯಿತು. ಲೈವ್ ಸಿಮ್ಯುಲೇಶನ್ ಗಮನಿಸಿ.";
+                document.getElementById('nextBtn').style.display = 'block';
+                
+                // ಎಲ್ಲಾ ಆಪ್ಷನ್ ಬಟನ್‌ಗಳನ್ನು ಲಾಕ್ ಮಾಡುವುದು
+                document.querySelectorAll('.opt-btn').forEach(b => b.disabled = true);
+                btnElement.style.borderColor = "var(--emerald)";
+                btnElement.innerHTML = `<span>${selectedOpt}</span> ✅`;
+
+                // ಅನಿಮೇಷನ್ ಸ್ಟಾರ್ಟ್ ಮಾಡುವುದು!
+                triggerAnimation(quest);
+            } else {
+                // ತಪ್ಪು ಉತ್ತರ
+                feedback.className = "feedback error";
+                feedback.innerHTML = "❌ ತಪ್ಪು ಆಯ್ಕೆ! ವಿವರಣೆಯನ್ನು ಮತ್ತೊಮ್ಮೆ ಓದಿ ಚಲನೆಯ ಹಾದಿಯನ್ನು ಕಲ್ಪಿಸಿಕೊಳ್ಳಿ.";
+                btnElement.style.borderColor = "var(--rose)";
+                btnElement.innerHTML = `<span>${selectedOpt}</span> ❌`;
+            }
+        }
+
+        function triggerAnimation(quest) {
+            const obj = document.getElementById('motionObj');
+            obj.innerText = quest.emoji;
+            
+            // ಕ್ಲಾಸ್ ಅಪ್ಲೈ ಮಾಡುವ ಮೂಲಕ ಸಿಎಸ್‌ಎಸ್ ಅನಿಮೇಷನ್ ಪ್ರದರ್ಶಿಸುವುದು
+            obj.className = `motion-object ${quest.animClass}`;
+            document.getElementById('simTitle').innerText = quest.titleText;
+
+            // ಹೆಚ್ಚುವರಿ ಗೈಡ್ ಲೈನ್‌ಗಳನ್ನು ಆನ್ ಮಾಡುವುದು
+            if (quest.animClass === 'anim-circular') {
+                document.getElementById('orbitTrack').style.display = 'flex';
+            }
+            if (quest.animClass === 'anim-periodic') {
+                const pivot = document.getElementById('pivotPoint');
+                pivot.style.display = 'block';
+                pivot.style.left = '50%';
+            }
+        }
+
+        function nextQuestion() {
+            currentLevel++;
+            if (currentLevel < motionQuests.length) {
+                loadLevel();
+            } else {
+                // ಆಟ ಮುಕ್ತಾಯ
+                document.getElementById('riddleDisplay').innerHTML = "🎉 <b>ಅಭಿನಂದನೆಗಳು!</b> ನೀವು ವಿಜ್ಞಾನ ಪಾರ್ಕ್‌ನ ಎಲ್ಲಾ ರೈಡ್‌ಗಳನ್ನು ಯಶಸ್ವಿಯಾಗಿ ಆನ್ ಮಾಡಿದ್ದೀರಿ ಮತ್ತು ಎಲ್ಲಾ ಚಲನೆಗಳನ್ನು ನಿಖರವಾಗಿ ಕಲಿತಿದ್ದೀರಿ!";
+                document.getElementById('optionsStack').innerHTML = '';
+                document.getElementById('feedbackBox').style.display = 'none';
+                
+                const nextBtn = document.getElementById('nextBtn');
+                nextBtn.innerText = "ಮೊದಲಿನಿಂದ ಪ್ರಾರಂಭಿಸಿ 🔄";
+                nextBtn.onclick = () => {
+                    currentLevel = 0;
+                    loadLevel();
+                    nextBtn.onclick = nextQuestion;
+                };
+            }
+        }
+
+        window.onload = loadLevel;
+    </script>
+</body>
+</html>

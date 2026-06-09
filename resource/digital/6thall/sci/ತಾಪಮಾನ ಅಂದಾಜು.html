@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ತಾಪಮಾನ ಅಂದಾಜು ಮಹಾ ಸವಾಲು!</title>
+    <style>
+        :root {
+            --bg-color: #0b1329;
+            --card-bg: #1c2541;
+            --cyan: #00b4d8;
+            --blue-light: #90e0ef;
+            --amber: #ffb703;
+            --emerald: #06d6a0;
+            --rose: #ef476f;
+            --text: #f8fafc;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 25px;
+            max-width: 800px;
+        }
+
+        header h1 {
+            font-size: 2.3rem;
+            color: var(--cyan);
+            margin-bottom: 8px;
+            text-shadow: 0 0 15px rgba(0, 180, 216, 0.4);
+        }
+
+        header p {
+            color: #94a3b8;
+            font-size: 1.1rem;
+        }
+
+        .main-container {
+            width: 100%;
+            max-width: 950px;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .grid-two-col {
+            display: grid;
+            grid-template-columns: 1fr 1.3fr;
+            gap: 25px;
+        }
+
+        @media (max-width: 768px) {
+            .grid-two-col { grid-template-columns: 1fr; }
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 25px;
+            border: 1px solid #334155;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--blue-light);
+            border-bottom: 2px solid #334155;
+            padding-bottom: 8px;
+        }
+
+        /* Forms Styling */
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 0.95rem;
+            color: #cbd5e1;
+        }
+
+        input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 2px solid #475569;
+            background: #0b1329;
+            color: white;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input:focus {
+            border-color: var(--cyan);
+        }
+
+        .btn {
+            background: var(--cyan);
+            color: var(--bg-color);
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 1.05rem;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .btn-amber { background: var(--amber); color: #000; }
+        .btn-rose { background: var(--rose); color: white; }
+
+        /* Bowls Visual */
+        .bowls-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .bowl-visual {
+            padding: 15px 5px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        .bowl-cold { background: rgba(0, 180, 216, 0.15); border: 2px solid var(--cyan); color: #64dfdf; }
+        .bowl-normal { background: rgba(6, 214, 160, 0.15); border: 2px solid var(--emerald); color: #72efdd; }
+        .bowl-warm { background: rgba(239, 71, 111, 0.15); border: 2px solid var(--rose); color: #ff99c8; }
+
+        /* Leaderboard Table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid #334155;
+            font-size: 0.95rem;
+        }
+
+        th {
+            background: #0f172a;
+            color: var(--blue-light);
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background: rgba(255,255,255,0.03);
+        }
+
+        .rank-badge {
+            display: inline-block;
+            width: 26px;
+            height: 26px;
+            line-height: 26px;
+            border-radius: 50%;
+            font-weight: bold;
+            background: #475569;
+        }
+
+        tr:nth-child(1) .rank-badge { background: var(--amber); color: black; }
+        tr:nth-child(2) .rank-badge { background: #e2e8f0; color: black; }
+        tr:nth-child(3) .rank-badge { background: #cd7f32; color: white; }
+
+        .hidden-section {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>🌡️ ತಾಪಮಾನ ಅಂದಾಜು ಮತ್ತು ಮಾಪನ ಸವಾಲು! 🧪</h1>
+        <p>ಸ್ಪರ್ಶ ಜ್ಞಾನದ ಮೂಲಕ ತಾಪಮಾನ ಊಹಿಸಿ! ನಂತರ ಲ್ಯಾಬೋರೇಟರಿ ಥರ್ಮಾಮೀಟರ್‌ನ ನಿಖರ ಮಾಪನದೊಂದಿಗೆ ಹೋಲಿಸಿ ವಿಜೇತರನ್ನು ಪತ್ತೆಹಚ್ಚಿ.</p>
+    </header>
+
+    <div class="main-container">
+        
+        <div class="grid-two-col">
+            
+            <div style="display: flex; flex-direction: column; gap: 25px;">
+                
+                <div class="card" id="teacherCard">
+                    <div class="card-title">🧑‍🏫 1. ಶಿಕ್ಷಕರ ಫಲಕ (ಥರ್ಮಾಮೀಟರ್ ರೀಡಿಂಗ್ಸ್)</div>
+                    <p style="font-size:0.85rem; color:#94a3b8; margin-bottom:15px;">ಲ್ಯಾಬ್ ಥರ್ಮಾಮೀಟರ್‌ನಿಂದ ಅಳೆದ ನಿಖರ ತಾಪಮಾನವನ್ನು (°C ನಲ್ಲಿ) ಇಲ್ಲಿ ದಾಖಲಿಸಿ ಲಾಕ್ ಮಾಡಿ:</p>
+                    
+                    <div class="form-group">
+                        <label>ಪಾತ್ರೆ ಎ (ತಣ್ಣನೆಯ ನೀರು) °C:</label>
+                        <input type="number" id="actualCold" value="15" placeholder="ಉದಾ: 15">
+                    </div>
+                    <div class="form-group">
+                        <label>ಪಾತ್ರೆ ಬಿ (ಸಾಮಾನ್ಯ ನೀರು) °C:</label>
+                        <input type="number" id="actualNormal" value="27" placeholder="ಉದಾ: 27">
+                    </div>
+                    <div class="form-group">
+                        <label>ಪಾತ್ರೆ ಸಿ (ಉಗುರುಬೆಚ್ಚಗಿನ ನೀರು) °C:</label>
+                        <input type="number" id="actualWarm" value="42" placeholder="ಉದಾ: 42">
+                    </div>
+                    <button class="btn btn-amber" onclick="lockActualValues()">🔒 ನಿಖರ ತಾಪಮಾನ ಲಾಕ್ ಮಾಡಿ</button>
+                </div>
+
+                <div class="card hidden-section" id="studentCard">
+                    <div class="card-title">✍️ 2. ವಿದ್ಯಾರ್ಥಿಯ ಅಂದಾಜು ದಾಖಲಿಸಿ</div>
+                    
+                    <div class="form-group">
+                        <label>ವಿದ್ಯಾರ್ಥಿಯ ಹೆಸರು:</label>
+                        <input type="text" id="studentName" placeholder="ವಿದ್ಯಾರ್ಥಿಯ ಹೆಸರು ಬರೆಯಿರಿ">
+                    </div>
+
+                    <div class="bowls-container">
+                        <div class="bowl-visual bowl-cold">🥣 ಪಾತ್ರೆ A<br>(ತಣ್ಣನೆ)</div>
+                        <div class="bowl-visual bowl-normal">🥣 ಪಾತ್ರೆ B<br>(ಸಾಮಾನ್ಯ)</div>
+                        <div class="bowl-visual bowl-warm">🥣 ಪಾತ್ರೆ C<br>(ಬೆಚ್ಚಗೆ)</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>ಪಾತ್ರೆ A ಊಹೆ (°C):</label>
+                        <input type="number" id="guessCold" placeholder="ನಿಮ್ಮ ಊಹೆ">
+                    </div>
+                    <div class="form-group">
+                        <label>ಪಾತ್ರೆ B ಊಹೆ (°C):</label>
+                        <input type="number" id="guessNormal" placeholder="ನಿಮ್ಮ ಊಹೆ">
+                    </div>
+                    <div class="form-group">
+                        <label>ಪಾತ್ರೆ C ಊಹೆ (°C):</label>
+                        <input type="number" id="guessWarm" placeholder="ನಿಮ್ಮ ಊಹೆ">
+                    </div>
+                    
+                    <button class="btn" onclick="submitStudentGuess()">🚀 ಅಂದಾಜು ಸಲ್ಲಿಸು (Submit)</button>
+                    <button class="btn btn-rose" onclick="unlockActualValues()" style="margin-top: 10px; padding: 6px; font-size: 0.85rem;">🔄 ರೀಡಿಂಗ್ಸ್ ಬದಲಾಯಿಸಿ</button>
+                </div>
+
+            </div>
+
+            <div class="card">
+                <div class="card-title">🏆 ತಾಪಮಾನ ಲೀಡರ್‌ಬೋರ್ಡ್ (Leaderboard)</div>
+                <p id="noDataText" style="text-align:center; color:#64748b; padding:40px 0;">ಇನ್ನೂ ಯಾವುದೇ ವಿದ್ಯಾರ್ಥಿಯ ಡೇಟಾ ನಮೂದಾಗಿಲ್ಲ. ಮೊದಲು ಶಿಕ್ಷಕರ ಫಲಕದಲ್ಲಿ ತಾಪಮಾನ ಲಾಕ್ ಮಾಡಿ ಆಟ ಆರಂಭಿಸಿ!</p>
+                
+                <div id="leaderboardSection" class="hidden-section">
+                    <div style="background: #0f172a; padding: 10px; border-radius: 8px; font-size: 0.9rem; margin-bottom: 15px; border-left: 4px solid var(--cyan);">
+                        🎯 <b>ನಿಖರ ರೀಡಿಂಗ್ಸ್:</b> ಪಾತ್ರೆ A: <span id="lblA" style="color:var(--cyan)"></span>°C | ಪಾತ್ರೆ B: <span id="lblB" style="color:var(--emerald)"></span>°C | ಪಾತ್ರೆ C: <span id="lblC" style="color:var(--rose)"></span>°C
+                    </div>
+                    
+                    <div style="overflow-x: auto;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ಸ್ಥಾನ</th>
+                                    <th>ಹೆಸರು</th>
+                                    <th>ಊಹೆ (A / B / C)</th>
+                                    <th>ಒಟ್ಟು ವ್ಯತ್ಯಾಸ 📉</th>
+                                </tr>
+                            </thead>
+                            <tbody id="leaderboardBody">
+                                </tbody>
+                        </table>
+                    </div>
+                    <p style="font-size:0.8rem; color:#64748b; margin-top:15px;">* ಸೂಚನೆ: ಒಟ್ಟು ವ್ಯತ್ಯಾಸ (ದೋಷ) ಎಷ್ಟು <b>ಕಡಿಮೆ</b> ಇರುತ್ತದೆಯೋ, ಆ ವಿದ್ಯಾರ್ಥಿಯ ಅಂದಾಜು ಅಷ್ಟು ನಿಖರವಾಗಿರುತ್ತದೆ ಮತ್ತು ಅವರು ಅಗ್ರಸ್ಥಾನ ಪಡೆಯುತ್ತಾರೆ!</p>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <script>
+        // ವಿದ್ಯಾರ್ಥಿಗಳ ಡೇಟಾ ಶೇಖರಣೆ
+        let studentsData = [];
+        let actuals = { cold: 0, normal: 0, warm: 0 };
+
+        // 1. ಶಿಕ್ಷಕರು ನಿಖರ ತಾಪಮಾನ ಲಾಕ್ ಮಾಡುವ ಪ್ರಕ್ರಿಯೆ
+        function lockActualValues() {
+            actuals.cold = parseFloat(document.getElementById('actualCold').value);
+            actuals.normal = parseFloat(document.getElementById('actualNormal').value);
+            actuals.warm = parseFloat(document.getElementById('actualWarm').value);
+
+            if (isNaN(actuals.cold) || !actuals.normal || isNaN(actuals.warm)) {
+                alert("ದಯವಿಟ್ಟು ಮೂರೂ ಪಾತ್ರೆಗಳ ನಿಖರ ತಾಪಮಾನವನ್ನು ನಮೂದಿಸಿ!");
+                return;
+            }
+
+            // ಯುಐ ಬದಲಾವಣೆ
+            document.getElementById('teacherCard').classList.add('hidden-section');
+            document.getElementById('studentCard').classList.remove('hidden-section');
+            document.getElementById('noDataText').classList.add('hidden-section');
+            document.getElementById('leaderboardSection').classList.remove('hidden-section');
+
+            // ಲೇಬಲ್ ಅಪ್ಡೇಟ್
+            document.getElementById('lblA').innerText = actuals.cold;
+            document.getElementById('lblB').innerText = actuals.normal;
+            document.getElementById('lblC').innerText = actuals.warm;
+
+            // ಲೀಡರ್‌ಬೋರ್ಡ್ ಪುನಃ ಲೆಕ್ಕ ಹಾಕುವುದು (ಒಂದೊಮ್ಮೆ ರೀಡಿಂಗ್ ಬದಲಾಯಿಸಿದರೆ)
+            recalculateScores();
+        }
+
+        // 2. ರೀಡಿಂಗ್ ಅನ್‌ಲಾಕ್ ಮಾಡುವುದು
+        function unlockActualValues() {
+            document.getElementById('teacherCard').classList.remove('hidden-section');
+            document.getElementById('studentCard').classList.add('hidden-section');
+        }
+
+        // 3. ವಿದ್ಯಾರ್ಥಿಯ ಊಹೆಯನ್ನು ಸಲ್ಲಿಸುವುದು
+        function submitStudentGuess() {
+            const name = document.getElementById('studentName').value.trim();
+            const guessC = parseFloat(document.getElementById('guessCold').value);
+            const guessN = parseFloat(document.getElementById('guessNormal').value);
+            const guessW = parseFloat(document.getElementById('guessWarm').value);
+
+            if (!name || isNaN(guessC) || isNaN(guessN) || isNaN(guessW)) {
+                alert("ದಯವಿಟ್ಟು ವಿದ್ಯಾರ್ಥಿಯ ಹೆಸರು ಮತ್ತು ಮೂರೂ ಪಾತ್ರೆಗಳ ತಾಪಮಾನದ ಊಹೆಯನ್ನು ನಮೂದಿಸಿ!");
+                return;
+            }
+
+            // ಹೊಸ ವಿದ್ಯಾರ್ಥಿಯ ಆಬ್ಜೆಕ್ಟ್ ಸೃಷ್ಟಿ
+            const student = {
+                name: name,
+                cold: guessC,
+                normal: guessN,
+                warm: guessW,
+                totalError: 0
+            };
+
+            studentsData.push(student);
+            recalculateScores();
+
+            // ಇನ್‌ಪುಟ್ ಫೀಲ್ಡ್‌ಗಳನ್ನು ಖಾಲಿ ಮಾಡುವುದು ಮುಂದಿನ ವಿದ್ಯಾರ್ಥಿಗಾಗಿ
+            document.getElementById('studentName').value = '';
+            document.getElementById('guessCold').value = '';
+            document.getElementById('guessNormal').value = '';
+            document.getElementById('guessWarm').value = '';
+            document.getElementById('studentName').focus();
+        }
+
+        // 4. ಸ್ಕೋರ್ ಮತ್ತು ವ್ಯತ್ಯಾಸಗಳ ಲೆಕ್ಕಾಚಾರ
+        function recalculateScores() {
+            studentsData.forEach(student => {
+                // ಪ್ರತಿಯೊಂದು ಪಾತ್ರೆಯ ವ್ಯತ್ಯಾಸಗಳ ಪರಮ ಮೌಲ್ಯ (Absolute Difference) ಲೆಕ್ಕ ಹಾಕುವುದು
+                let diffA = Math.abs(actuals.cold - student.cold);
+                let diffB = Math.abs(actuals.normal - student.normal);
+                let diffC = Math.abs(actuals.warm - student.warm);
+                
+                // ಒಟ್ಟು ದೋಷ (Total Error)
+                student.totalError = parseFloat((diffA + diffB + diffC).toFixed(1));
+            });
+
+            // ಕಡಿಮೆ ದೋಷವಿರುವ ವಿದ್ಯಾರ್ಥಿ ಮೊದಲ ಸ್ಥಾನಕ್ಕೆ ಬರುವಂತೆ ಸಾರ್ಟ್ (Sort) ಮಾಡುವುದು
+            studentsData.sort((a, b) => a.totalError - b.totalError);
+
+            // ಲೀಡರ್‌ಬೋರ್ಡ್ ಕೋಷ್ಟಕವನ್ನು ಮರುರಚಿಸುವುದು
+            renderLeaderboard();
+        }
+
+        // 5. ಲೀಡರ್‌ಬೋರ್ಡ್ ಯುಐ ಪ್ರದರ್ಶನ
+        function renderLeaderboard() {
+            const tbody = document.getElementById('leaderboardBody');
+            tbody.innerHTML = '';
+
+            if (studentsData.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" style="color:#64748b;">ಇನ್ನೂ ಯಾವುದೇ ವಿದ್ಯಾರ್ಥಿಯ ಅಂದಾಜು ದಾಖಲಾಗಿಲ್ಲ!</td></tr>`;
+                return;
+            }
+
+            studentsData.forEach((student, index) => {
+                const tr = document.createElement('tr');
+                
+                // ಮೊದಲ ಸ್ಥಾನ ಪಡೆದವನಿಗೆ ವಿಶೇಷ ಚಿಹ್ನೆ
+                let rankDisplay = `<span class="rank-badge">${index + 1}</span>`;
+                if(index === 0) rankDisplay = `🥇 <span class="rank-badge">1</span>`;
+                if(index === 1) rankDisplay = `🥈 <span class="rank-badge">2</span>`;
+                if(index === 2) rankDisplay = `🥉 <span class="rank-badge">3</span>`;
+
+                tr.innerHTML = `
+                    <td>${rankDisplay}</td>
+                    <td style="font-weight:bold; color:#fff;">${student.name}</td>
+                    <td>${student.cold}° / ${student.normal}° / ${student.warm}°</td>
+                    <td style="font-weight:bold; color:${student.totalError === 0 ? 'var(--emerald)' : 'var(--amber)'}">
+                        ${student.totalError} °C
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+    </script>
+</body>
+</html>

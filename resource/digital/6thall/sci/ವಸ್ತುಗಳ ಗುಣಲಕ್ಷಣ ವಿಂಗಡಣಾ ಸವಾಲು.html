@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ವಸ್ತುಗಳ ಗುಣಲಕ್ಷಣ ವಿಂಗಡಣಾ ಮಹಾ ಸವಾಲು!</title>
+    <style>
+        :root {
+            --slate-900: #0f172a;
+            --slate-800: #1e293b;
+            --indigo: #6366f1;
+            --emerald: #10b981;
+            --rose: #f43f5e;
+            --amber: #f59e0b;
+            --cyan: #06b6d4;
+            --text-light: #f8fafc;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+
+        body {
+            background-color: var(--slate-900);
+            color: var(--text-light);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 25px;
+            max-width: 800px;
+        }
+
+        header h1 {
+            font-size: 2.3rem;
+            color: var(--indigo);
+            margin-bottom: 8px;
+            text-shadow: 0 0 15px rgba(99, 102, 241, 0.3);
+        }
+
+        header p {
+            color: #94a3b8;
+            font-size: 1.1rem;
+        }
+
+        .game-container {
+            width: 100%;
+            max-width: 1000px;
+            background: var(--slate-800);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid #334155;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+        }
+
+        /* Teacher's Voice Announcement Display */
+        .announcement-box {
+            background: linear-gradient(135deg, #1e1b4b, #311042);
+            border: 2px solid var(--amber);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+            box-shadow: 0 0 20px rgba(245, 158, 11, 0.2);
+        }
+
+        .announcement-box h3 {
+            font-size: 1rem;
+            color: var(--amber);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+
+        .current-property {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #ffffff;
+            animation: pulse 1.5s infinite alternate;
+        }
+
+        /* Items Table Playground */
+        .table-title {
+            font-size: 1.1rem;
+            color: #94a3b8;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .items-table {
+            background: #0f172a;
+            border: 3px dashed #334155;
+            border-radius: 12px;
+            padding: 25px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 15px;
+            min-height: 250px;
+            margin-bottom: 30px;
+        }
+
+        .item-card {
+            background: var(--slate-800);
+            border: 2px solid #475569;
+            border-radius: 10px;
+            padding: 15px 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+
+        .item-card:hover {
+            border-color: var(--indigo);
+            transform: translateY(-2px);
+        }
+
+        .item-emoji {
+            font-size: 2.5rem;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .item-name {
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+
+        /* Sorting Destination Box */
+        .sorting-box-container {
+            background: rgba(16, 185, 129, 0.1);
+            border: 2px solid var(--emerald);
+            border-radius: 12px;
+            padding: 20px;
+            min-height: 140px;
+        }
+
+        .box-title {
+            color: var(--emerald);
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .box-contents {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        /* Dynamic Classes for Actions */
+        .wrong-shake {
+            animation: shake 0.4s ease;
+            border-color: var(--rose) !important;
+            background: rgba(244, 63, 94, 0.1);
+        }
+
+        .correct-fade {
+            opacity: 0.3;
+            cursor: not-allowed;
+            pointer-events: none;
+            border-color: var(--emerald) !important;
+        }
+
+        /* Next Button Control */
+        .control-panel {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 25px;
+        }
+
+        .score-board {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .next-btn {
+            background: var(--cyan);
+            color: var(--slate-900);
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            display: none;
+            transition: all 0.2s;
+        }
+
+        .next-btn:hover {
+            background: #0891b2;
+        }
+
+        /* Animations */
+        @keyframes pulse {
+            from { transform: scale(0.98); text-shadow: 0 0 10px rgba(255,255,255,0.2); }
+            to { transform: scale(1.02); text-shadow: 0 0 20px rgba(255,255,255,0.5); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-8px); }
+            40%, 80% { transform: translateX(8px); }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>🧪 ವಸ್ತುಗಳ ಗುಣಲಕ್ಷಣ ವಿಂಗಡಣಾ ಮಹಾ ಸವಾಲು! 📦</h1>
+        <p>6ನೇ ತರಗತಿ ವಿಜ್ಞಾನ: ಶಿಕ್ಷಕರ ಧ್ವನಿಯನ್ನು ಆಲಿಸಿ, ಕೆಳಗಿರುವ ೧೮ ವಿವಿಧ ವಸ್ತುಗಳಿಂದ ಸೂಕ್ತವಾದ ಎಲ್ಲ ವಸ್ತುಗಳನ್ನು ಆರಿಸಿ ಬಾಕ್ಸ್‌ಗೆ ವಿಂಗಡಿಸಿ!</p>
+    </header>
+
+    <div class="game-container">
+        
+        <div class="announcement-box">
+            <h3>📢 ಶಿಕ್ಷಕರ ಧ್ವನಿ (Teacher's Callout):</h3>
+            <div class="current-property" id="propertyCallout">ಲೋಡ್ ಆಗುತ್ತಿದೆ...</div>
+        </div>
+
+        <div>
+            <div class="table-title">🫳 ಮೇಜಿನ ಮೇಲಿರುವ ವಿವಿಧ ವಸ್ತುಗಳು (18 Objects on the Table):</div>
+            <div class="items-table" id="objectsTable">
+                </div>
+        </div>
+
+        <div class="sorting-box-container">
+            <div class="box-title">📥 ವಿಂಗಡಣಾ ಗುಂಪು ಬಾಕ್ಸ್ (<span id="boxTargetName">ಗುಂಪು</span>)</div>
+            <div class="box-contents" id="dropBox">
+                </div>
+        </div>
+
+        <div class="control-panel">
+            <div class="score-board">✨ ಗಳಿಸಿದ ಒಟ್ಟು ಅಂಕಗಳು: <span id="scoreVal" style="color:var(--cyan)">0</span></div>
+            <button class="next-btn" id="nextChallengeBtn" onclick="setupNextChallenge()">ಮುಂದಿನ ಗುಣಲಕ್ಷಣ ➔</button>
+        </div>
+
+    </div>
+
+    <script>
+        // ವಿಸ್ತರಿಸಲಾದ ವಸ್ತುಗಳ ಮಾಸ್ಟರ್ ಡೇಟಾಬೇಸ್ (ಒಟ್ಟು 18 ಪ್ರಮುಖ ಉದಾಹರಣೆಗಳು)
+        const scienceObjects = [
+            { id: "stone", name: "ಕಲ್ಲು (Stone)", emoji: "🪨", props: ["ಮುಳುಗುವ ವಸ್ತುಗಳು", "ಅಪಾರದರ್ಶಕ ವಸ್ತುಗಳು", "ನೀರಿನಲ್ಲಿ ಕರಗದ ವಸ್ತುಗಳು"] },
+            { id: "spoon", name: "ಸ್ಟೀಲ್ ಚಮಚ (Steel Spoon)", emoji: "🥄", props: ["ಮುಳುಗುವ ವಸ್ತುಗಳು", "ಅಪಾರದರ್ಶಕ ವಸ್ತುಗಳು", "ನೀರಿನಲ್ಲಿ ಕರಗದ ವಸ್ತುಗಳು"] },
+            { id: "glass_cup", name: "ಗಾಜಿನ ಲೋಟ (Glass)", emoji: "🥛", props: ["ಮುಳುಗುವ ವಸ್ತುಗಳು", "ಪಾರದರ್ಶಕ ವಸ್ತುಗಳು", "ನೀರಿನಲ್ಲಿ ಕರಗದ ವಸ್ತುಗಳು"] },
+            { id: "sponge", name: "ಸ್ಪಾಂಜ್ (Sponge)", emoji: "🧽", props: ["ತೇಲುವ ವಸ್ತುಗಳು", "ಅಪಾರದರ್ಶಕ ವಸ್ತುಗಳು", "ನೀರಿನಲ್ಲಿ ಕರಗದ ವಸ್ತುಗಳು"] },
+            { id: "coconut_oil", name: "ಕೊಬ್ಬರಿ ಎಣ್ಣೆ (Oil)", emoji: "🫗", props: ["ತೇಲುವ ವಸ್ತುಗಳು", "ಅರೆಪಾರದರ್ಶಕ ವಸ್ತುಗಳು", "ನೀರಿನಲ್ಲಿ ಕರಗದ ವಸ್ತುಗಳು"] },
+            { id: "sugar", name: "ಸಕ್ಕರೆ (Sugar)", emoji: "🧂", props: ["ಮುಳುಗುವ ವಸ್ತುಗಳು", "ಅಪಾರದರ್ಶಕ ವಸ್ತುಗಳು", "ನೀರಿನಲ್ಲಿ ಕರಗುವ ವಸ್ತುಗಳು"] },
+            { id: "salt", name: "ಅಡಿಗೆ ಉಪ್ಪು (Salt)", emoji: "🍚", props: ["ಮುಳುಗುವ ವಸ್ತುಗಳು", "ಅಪಾರದರ್ಶಕ ವಸ್ತುಗಳು", "ನೀರಿನಲ್ಲಿ ಕರಗುವ ವಸ್ತುಗಳು"] },
+            { id: "wood_block", name: "ಮರದ ತುಂಡು (Wood)", emoji: "🪵", props: ["ತೇಲುವ ವಸ್ತುಗಳು", "ಅಪಾರದರ್ಶಕ ವಸ್ತುಗಳು", "ನೀರಿನಲ್ಲಿ ಕರಗದ ವಸ್ತುಗಳು"] },
+            { id: "iron_nail", name: "ಕಬ್ಬಿಣದ ಮೊಳೆ (Iron Nail)", emoji: "📌", props: ["ಮುಳುಗುವ ವಸ್ತುಗಳು", "ಅಪಾರದರ್ಶಕ ವಸ್ತುಗಳು", "ನೀರಿನಲ್ಲಿ ಕರಗದ ವಸ್ತುಗಳು"] },
+            { id: "dry_leaf", name: "ಒಣಗಿದ ಎಲೆ (Dry Leaf)", emoji: "🍂", props: ["ತೇಲುವ ವಸ್ತುಗಳು", "ಅಪಾರದರ್ಶಕ ವಸ್ತುಗಳು", "ನೀರಿನಲ್ಲಿ ಕರಗದ ವಸ್ತುಗಳು"] },
+            { id: "coin", name: "ನಾಣ್ಯ (Coin)", emoji: "🪙", props: ["ಮುಳುಗುವ ವಸ್ತುಗಳು", "ಅಪಾರದರ್ಶಕ ವಸ್ತುಗಳು", "ನೀರಿನಲ್ಲಿ ಕರಗದ ವಸ್ತುಗಳು"] },
+            { id: "sand", name: "ಮರಳು (Sand)", emoji: "⏳", props: ["ಮುಳುಗುವ ವಸ್ತುಗಳು", "ಅಪಾರದರ್ಶಕ ವಸ್ತುಗಳು", "ನೀರಿನಲ್ಲಿ ಕರಗದ ವಸ್ತುಗಳು"] },
+            { id: "oily_paper", name: "ಎಣ್ಣೆ ಕಾಗದ (Oily Paper)", emoji: "📄", props: ["ತೇಲುವ ವಸ್ತುಗಳು", "ಅರೆಪಾರದರ್ಶಕ ವಸ್ತುಗಳು", "ನೀರಿನಲ್ಲಿ ಕರಗದ ವಸ್ತುಗಳು"] },
+            { id: "plastic_bottle", name: "ಪ್ಲಾಸ್ಟಿಕ್ ಬಾಟಲಿ", emoji: "🍾", props: ["ತೇಲುವ ವಸ್ತುಗಳು", "ಪಾರದರ್ಶಕ ವಸ್ತುಗಳು", "ನೀರಿನಲ್ಲಿ ಕರಗದ ವಸ್ತುಗಳು"] },
+            { id: "honey", name: "ಜೇನುತುಪ್ಪ (Honey)", emoji: "🍯", props: ["ಮುಳುಗುವ ವಸ್ತುಗಳು", "ಅರೆಪಾರದರ್ಶಕ ವಸ್ತುಗಳು", "ನೀರಿನಲ್ಲಿ ಕರಗುವ ವಸ್ತುಗಳು"] },
+            { id: "feather", name: "ಹಕ್ಕಿಯ ಗರಿ (Feather)", emoji: "🪶", props: ["ತೇಲುವ ವಸ್ತುಗಳು", "ಅಪಾರದರ್ಶಕ ವಸ್ತುಗಳು", "ನೀರಿನಲ್ಲಿ ಕರಗದ ವಸ್ತುಗಳು"] },
+            { id: "chalk", name: "ಸೀಮೆಸುಣ್ಣ (Chalk)", emoji: "🖍️", props: ["ಮುಳುಗುವ ವಸ್ತುಗಳು", "ಅಪಾರದರ್ಶಕ ವಸ್ತುಗಳು", "ನೀರಿನಲ್ಲಿ ಕರಗದ ವಸ್ತುಗಳು"] },
+            { id: "butter_paper", name: "ಬಟರ್ ಪೇಪರ್", emoji: "📜", props: ["ತೇಲುವ ವಸ್ತುಗಳು", "ಅರೆಪಾರದರ್ಶಕ ವಸ್ತುಗಳು", "ನೀರಿನಲ್ಲಿ ಕರಗದ ವಸ್ತುಗಳು"] }
+        ];
+
+        // ಶಿಕ್ಷಕರು ಕರೆಯಬಹುದಾದ ವಿಸ್ತೃತ ಸವಾಲುಗಳು (7 ನಿಯಮಗಳು)
+        const challenges = [
+            { text: "ನೀರಿನಲ್ಲಿ ತೇಲುವ ವಸ್ತುಗಳು! 💧🛶", matchKey: "ತೇಲುವ ವಸ್ತುಗಳು" },
+            { text: "ನೀರಿನಲ್ಲಿ ಮುಳುಗುವ ವಸ್ತುಗಳು! ⚓", matchKey: "ಮುಳುಗುವ ವಸ್ತುಗಳು" },
+            { text: "ಪಾರದರ್ಶಕ ವಸ್ತುಗಳು! (Transparent) 🔎", matchKey: "ಪಾರದರ್ಶಕ ವಸ್ತುಗಳು" },
+            { text: "ಅಪಾರದರ್ಶಕ ವಸ್ತುಗಳು! (Opaque) 🧱", matchKey: "ಅಪಾರದರ್ಶಕ ವಸ್ತುಗಳು" },
+            { text: "ಅರೆಪಾರದರ್ಶಕ ವಸ್ತುಗಳು! (Translucent) 🌤️", matchKey: "ಅರೆಪಾರದರ್ಶಕ ವಸ್ತುಗಳು" },
+            { text: "ನೀರಿನಲ್ಲಿ ಕರಗುವ (ವಿಲೀನವಾಗುವ) ವಸ್ತುಗಳು! 🌪️", matchKey: "ನೀರಿನಲ್ಲಿ ಕರಗುವ ವಸ್ತುಗಳು" },
+            { text: "ನೀರಿನಲ್ಲಿ ಕರಗದ (ಅವಿಲೀನ) ವಸ್ತುಗಳು! ❌", matchKey: "ನೀರಿನಲ್ಲಿ ಕರಗದ ವಸ್ತುಗಳು" }
+        ];
+
+        let currentChallengeIndex = 0;
+        let score = 0;
+        let remainingMatchesCount = 0;
+
+        // ಆಟವನ್ನು ಪ್ರಾರಂಭಿಸುವ ಕಾರ್ಯವಿಧಾನ
+        function initGame() {
+            shuffleArray(challenges); // ಸವಾಲುಗಳನ್ನು ಯಾದೃಚ್ಛಿಕಗೊಳಿಸುವುದು
+            loadChallenge();
+        }
+
+        // ಪ್ರಸ್ತುತ ಸವಾಲನ್ನು ಲೋಡ್ ಮಾಡುವುದು
+        function loadChallenge() {
+            const currentChallenge = challenges[currentChallengeIndex];
+            
+            // ಯುಐ ಅಪ್ಡೇಟ್
+            document.getElementById('propertyCallout').innerText = currentChallenge.text;
+            document.getElementById('boxTargetName').innerText = currentChallenge.matchKey;
+            document.getElementById('dropBox').innerHTML = '';
+            document.getElementById('nextChallengeBtn').style.display = 'none';
+
+            // ಈ ಸವಾಲಿಗೆ ಎಷ್ಟು ವಸ್ತುಗಳು ಮ್ಯಾಚ್ ಆಗುತ್ತವೆ ಎಂದು ಲೆಕ್ಕ ಹಾಕುವುದು
+            remainingMatchesCount = scienceObjects.filter(obj => obj.props.includes(currentChallenge.matchKey)).length;
+
+            // ಮೇಜಿನ ಮೇಲಿರುವ ವಸ್ತುಗಳ ಗ್ರಿಡ್ ಮರುಜೋಡಣೆ
+            const table = document.getElementById('objectsTable');
+            table.innerHTML = '';
+            
+            scienceObjects.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'item-card';
+                card.id = `item-${item.id}`;
+                card.innerHTML = `<span class="item-emoji">${item.emoji}</span><span class="item-name">${item.name}</span>`;
+                
+                // ಕ್ಲಿಕ್ ಮಾಡಿದಾಗ ಪರಿಶೀಲಿಸುವ ಲಾಜಿಕ್
+                card.onclick = () => verifyItemSelection(item, card, currentChallenge.matchKey);
+                table.appendChild(card);
+            });
+        }
+
+        // ವಿದ್ಯಾರ್ಥಿ ವಸ್ತುವನ್ನು ಆರಿಸಿದಾಗ ನಡೆಯುವ ಪರಿಶೀಲನೆ
+        function verifyItemSelection(item, cardElement, matchKey) {
+            // ವಸ್ತುವು ಪ್ರಸ್ತುತ ಗುಣಲಕ್ಷಣಕ್ಕೆ ಹೊಂದಾಣಿಕೆಯಾಗುತ್ತದೆಯೇ?
+            if (item.props.includes(matchKey)) {
+                // ಸರಿ ಉತ್ತರ!
+                score += 10;
+                document.getElementById('scoreVal').innerText = score;
+                remainingMatchesCount--;
+
+                // ವಸ್ತುವನ್ನು ಮೇಜಿನಿಂದ ಮರೆಮಾಚಿ ಬಾಕ್ಸ್‌ಗೆ ಸೇರಿಸುವುದು
+                cardElement.classList.add('correct-fade');
+                
+                const box = document.getElementById('dropBox');
+                const boxItem = document.createElement('div');
+                boxItem.className = 'item-card';
+                boxItem.style.background = '#065f46';
+                boxItem.style.borderColor = 'var(--emerald)';
+                boxItem.innerHTML = `<span class="item-emoji">${item.emoji}</span><span class="item-name">${item.name}</span>`;
+                box.appendChild(boxItem);
+
+                // ಆ ಗುಣದ ಎಲ್ಲಾ ವಸ್ತುಗಳನ್ನು ಪತ್ತೆಹಚ್ಚಿದಾಗ
+                if (remainingMatchesCount === 0) {
+                    document.getElementById('propertyCallout').innerText = "🎉 ಅದ್ಭುತ! ಈ ಗುಂಪಿನ ಎಲ್ಲಾ ವಸ್ತುಗಳನ್ನು ಯಶಸ್ವಿಯಾಗಿ ವಿಂಗಡಿಸಿದ್ದೀರಿ.";
+                    document.getElementById('nextChallengeBtn').style.display = 'block';
+                }
+            } else {
+                // ತಪ್ಪು ಉತ್ತರ - ಕಾರ್ಡ್ ನಡುಗುವ ಅನಿಮೇಷನ್
+                cardElement.classList.add('wrong-shake');
+                // ಅನಿಮೇಷನ್ ಮುಗಿದ ನಂತರ ಕ್ಲಾಸ್ ತೆಗೆಯುವುದು
+                setTimeout(() => {
+                    cardElement.classList.remove('wrong-shake');
+                }, 400);
+            }
+        }
+
+        // ಮುಂದಿನ ಸವಾಲಿಗೆ ಹೋಗುವುದು
+        function setupNextChallenge() {
+            currentChallengeIndex++;
+            if (currentChallengeIndex < challenges.length) {
+                loadChallenge();
+            } else {
+                // ಎಲ್ಲಾ ಸುತ್ತುಗಳು ಮುಗಿದಾಗ
+                document.getElementById('propertyCallout').innerText = "🏆 ಅಭಿನಂದನೆಗಳು! ನೀವು ಮಹಾ ವರ್ಗೀಕರಣ ಸವಾಲನ್ನು ಸಂಪೂರ್ಣವಾಗಿ ಜಯಿಸಿದ್ದೀರಿ!";
+                document.getElementById('objectsTable').innerHTML = '<div style="grid-column: 1/-1; text-align:center; font-size:1.3rem; color:var(--emerald); font-weight:bold;">ನಿಮಗೆ ವಸ್ತುಗಳ ಭೌತಿಕ ಗುಣಲಕ್ಷಣಗಳ ಬಗ್ಗೆ ಅತ್ಯುತ್ತಮವಾದ ಪ್ರಾಯೋಗಿಕ ಜ್ಞಾನವಿದೆ! 🌟</div>';
+                document.getElementById('nextChallengeBtn').style.display = 'none';
+            }
+        }
+
+        // ಅರೇಗಳನ್ನು ಯಾದೃಚ್ಛಿಕಗೊಳಿಸಲು ಸಹಾಯ ಮಾಡುವ ಫಂಕ್ಷನ್
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        window.onload = initGame;
+    </script>
+</body>
+</html>

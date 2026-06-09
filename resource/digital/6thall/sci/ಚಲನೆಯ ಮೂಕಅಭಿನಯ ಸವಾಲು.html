@@ -1,0 +1,360 @@
+
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಚಲನೆಯ ಮೂಕಅಭಿನಯ ಸವಾಲು! (Motion Charades)</title>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --secondary: #06b6d4;
+            --dark-bg: #0f172a;
+            --card-bg: #1e293b;
+            --text-light: #f8fafc;
+            --accent-pink: #ec4899;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: var(--text-light);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 25px;
+            max-width: 700px;
+        }
+
+        header h1 {
+            font-size: 2.3rem;
+            color: var(--secondary);
+            margin-bottom: 10px;
+            text-shadow: 0 0 15px rgba(6, 182, 212, 0.3);
+        }
+
+        header p {
+            color: #94a3b8;
+            font-size: 1.1rem;
+            line-height: 1.5;
+        }
+
+        .main-container {
+            width: 100%;
+            max-width: 800px;
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+            border: 1px solid #334155;
+        }
+
+        /* Scoreboard & Timer Grid */
+        .game-status {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .status-box {
+            background: #0f172a;
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid #334155;
+        }
+
+        .status-val {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--secondary);
+            margin-top: 5px;
+        }
+
+        #timerVal {
+            color: var(--accent-pink);
+        }
+
+        /* Chit Area */
+        .chit-zone {
+            background: linear-gradient(135deg, #1e1b4b, #2e1042);
+            border: 2px dashed var(--secondary);
+            border-radius: 16px;
+            padding: 35px;
+            text-align: center;
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .chit-title {
+            font-size: 1.1rem;
+            color: #94a3b8;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .secret-content {
+            background: #0f172a;
+            padding: 20px;
+            border-radius: 8px;
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin: 20px 0;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #475569;
+            filter: blur(8px);
+            transition: filter 0.3s ease;
+        }
+
+        .secret-content.revealed {
+            filter: blur(0);
+            color: #fef08a;
+            border-color: #eab308;
+        }
+
+        .hint-text {
+            font-size: 1.05rem;
+            color: #a7f3d0;
+            background: rgba(16, 185, 129, 0.15);
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 15px;
+            display: none;
+        }
+
+        /* Buttons Control */
+        .btn-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: white;
+        }
+
+        .btn-primary { background: var(--primary); }
+        .btn-secondary { background: #475569; }
+        .btn-success { background: #10b981; }
+        .btn-pink { background: var(--accent-pink); }
+        .btn:hover { opacity: 0.9; transform: translateY(-1px); }
+        .btn:disabled { opacity: 0.3; cursor: not-allowed; transform: none; }
+
+        /* Score Controllers */
+        .score-controls {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 25px;
+            background: #0f172a;
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        .team-btn-group {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>🎭 ಚಲನೆಗಳ ಮೂಕಅಭಿನಯ ಸವಾಲು 🏃‍♂️</h1>
+        <p>ಮಾತನಾಡದೆ, ಕೇವಲ ದೈಹಿಕ ಅಭಿನಯದ ಮೂಲಕ ಚಲನೆಯ ವಿಧವನ್ನು ಸಹಪಾಠಿಗಳಿಗೆ ತಿಳಿಸಿ! ಉಳಿದವರು ಅದನ್ನು ಯೋಚಿಸಿ ನಿಖರವಾಗಿ ಪತ್ತೆಹಚ್ಚಬೇಕು.</p>
+    </header>
+
+    <div class="main-container">
+        
+        <div class="game-status">
+            <div class="status-box">
+                <div>👥 ತಂಡ 'A' ಅಂಕಗಳು</div>
+                <div class="status-val" id="scoreA">0</div>
+            </div>
+            <div class="status-box" style="border-color: var(--accent-pink);">
+                <div>⏱️ ಬಾಕಿ ಇರುವ ಸಮಯ</div>
+                <div class="status-val" id="timerVal">60 ಸೆ</div>
+            </div>
+            <div class="status-box">
+                <div>👥 ತಂಡ 'B' ಅಂಕಗಳು</div>
+                <div class="status-val" id="scoreB">0</div>
+            </div>
+        </div>
+
+        <div class="chit-zone">
+            <div class="chit-title">📦 ರಹಸ್ಯ ಚೀಟಿ ಪೆಟ್ಟಿಗೆ (Digital Chit Box)</div>
+            <p style="color: #cbd5e1;">ಅಭಿನಯಿಸುವ ವಿದ್ಯಾರ್ಥಿ ಮಾತ್ರ ಕೆಳಗಿನ ಬಟನ್ ಒತ್ತಿ ಚೀಟಿ ನೋಡಿ!</p>
+            
+            <div class="secret-content" id="chitDisplay">ನಿಮ್ಮ ಚೀಟಿ ಇಲ್ಲಿದೆ</div>
+            
+            <div class="hint-text" id="hintDisplay">💡 ಅಭಿನಯದ ಸುಳಿವು: ಲೋಡ್ ಆಗುತ್ತಿದೆ...</div>
+
+            <div class="btn-grid">
+                <button class="btn btn-primary" onclick="drawNewChit()">🎲 ಹೊಸ ಚೀಟಿ ಎತ್ತಿ</button>
+                <button class="btn btn-secondary" id="toggleBtn" onclick="toggleReveal()" disabled>👁️ ಚೀಟಿ ತೋರಿಸು/ಮರೆಮಾಡು</button>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-bottom: 25px;">
+            <button class="btn btn-pink" id="startTimerBtn" onclick="startTimer()" style="width: 50%;" disabled>⏱️ ಸಮಯವನ್ನು ಪ್ರಾರಂಭಿಸಿ (Start Timer)</button>
+        </div>
+
+        <div class="score-controls">
+            <div class="team-btn-group">
+                <span style="font-weight: bold;">ತಂಡ A:</span>
+                <button class="btn btn-success" style="padding: 5px 12px; font-size:0.9rem;" onclick="updateScore('A', 10)">+10 ಅಂಕ</button>
+            </div>
+            <div class="team-btn-group">
+                <span style="font-weight: bold;">ತಂಡ B:</span>
+                <button class="btn btn-success" style="padding: 5px 12px; font-size:0.9rem;" onclick="updateScore('B', 10)">+10 ಅಂಕ</button>
+            </div>
+            <button class="btn btn-secondary" style="padding: 5px 12px; font-size:0.9rem; background:#cbd5e1; color:#0f172a;" onclick="resetScores()">🔄 ಸ್ಕೋರ್ ರೀಸೆಟ್</button>
+        </div>
+
+    </div>
+
+    <script>
+        // ಚಲನೆಗಳ ಡೇಟಾಬೇಸ್ (ಚಲನೆಯ ಹೆಸರು ಮತ್ತು ಅಭಿನಯಿಸುವ ವಿಧಾನದ ಐಡಿಯಾ)
+        const motionChits = [
+            {
+                name: "ಸರಳ ರೇಖೀಯ ಚಲನೆ (Rectilinear Motion)",
+                hint: "ಒಂದೇ ಸರಳ ರೇಖೆಯಲ್ಲಿ (Straight Line) ಸೈನಿಕರಂತೆ ಮಾರ್ಚ್ ಫಾಸ್ಟ್ ಮಾಡಿ ಅಥವಾ ನೇರವಾಗಿ ನಡೆದು ತೋರಿಸಿ."
+            },
+            {
+                name: "ವೃತ್ತೀಯ ಚಲನೆ (Circular Motion)",
+                hint: "ನಿಮ್ಮ ಕೈಯನ್ನು ಗಡಿಯಾರದ ಮುಳ್ಳಿನಂತೆ ಅಥವಾ ಫ್ಯಾನಿನಂತೆ ದುಂಡಗೆ ತಿರುಗಿಸಿ, ಅಥವಾ ಒಂದು ಜಾಗದ ಸುತ್ತಲೂ ವೃತ್ತಾಕಾರವಾಗಿ ನಡೆದು ತೋರಿಸಿ."
+            },
+            {
+                name: "ಆವರ್ತಕ ಚಲನೆ (Periodic Motion)",
+                hint: "ಜೋಕಾಲಿ ಆಡುವಂತೆ ಅಥವಾ ಗಡಿಯಾರದ ಲೋಲಕದಂತೆ (To and fro) ನಿಯಮಿತ ಅವಧಿಯಲ್ಲಿ ದೇಹವನ್ನು ಮುಂದೆ-ಹಿಂದೆ ತೂಗಾಡಿಸಿ."
+            },
+            {
+                name: "ಭ್ರಮಣ ಚಲನೆ (Rotational Motion)",
+                hint: "ಬುಗುರಿಯಂತೆ (Top) ಅಥವಾ ಭೂಮಿಯಂತೆ ನಿಮ್ಮ ಸ್ವಂತ ಅಕ್ಷದ ಮೇಲೆ ನೀವೇ ಒಂದೇ ಜಾಗದಲ್ಲಿ ಸುತ್ತಿ ತೋರಿಸಿ."
+            },
+            {
+                name: "ಆಂದೋಲನ ಚಲನೆ (Oscillatory Motion)",
+                hint: "ಒಂದು ತಂತಿಯನ್ನು ಎಳೆದು ಬಿಟ್ಟಾಗ ಕಂಪಿಸುವಂತೆ (Vibration) ನಿಮ್ಮ ಕೈ ಅಥವಾ ದೇಹವನ್ನು ವೇಗವಾಗಿ ಕಂಪಿಸಿ ತೋರಿಸಿ."
+            },
+            {
+                name: "ವಕ್ರರೇಖೀಯ ಚಲನೆ (Curvilinear Motion)",
+                hint: "ಹಾವು ಚಲಿಸುವಂತೆ ಅಥವಾ ರಸ್ತೆಯ ತಿರುವುಗಳಲ್ಲಿ ಗಾಡಿ ಓಡಿಸುವಂತೆ ಅಂಕುಡೊಂಕಾಗಿ ಚಲಿಸಿ ತೋರಿಸಿ."
+            }
+        ];
+
+        let scoreA = 0;
+        let scoreB = 0;
+        let timeLeft = 60;
+        let timerInterval = null;
+        let isRevealed = false;
+
+        // 1. ಹೊಸ ಚೀಟಿ ಎತ್ತುವ ಪ್ರಕ್ರಿಯೆ
+        function drawNewChit() {
+            // ಯಾದೃಚ್ಛಿಕವಾಗಿ ಒಂದು ಚಲನೆಯನ್ನು ಆರಿಸುವುದು
+            const randomIndex = Math.floor(Math.random() * motionChits.length);
+            const selectedChit = motionChits[randomIndex];
+
+            // ಡೇಟಾ ಸೆಟ್ ಮಾಡುವುದು
+            const display = document.getElementById('chitDisplay');
+            const hint = document.getElementById('hintDisplay');
+            
+            display.innerText = selectedChit.name;
+            hint.innerText = `💡 ಅಭಿನಯದ ಸುಳಿವು: ${selectedChit.hint}`;
+            
+            // ಸುರಕ್ಷತೆಗಾಗಿ ಮೊದಲು ಬ್ಲರ್ ಮಾಡುವುದು ಮತ್ತು ಸುಳಿವನ್ನು ಮರೆಮಾಡುವುದು
+            display.classList.remove('revealed');
+            hint.style.display = 'none';
+            isRevealed = false;
+
+            // ನಿಯಂತ್ರಣ ಬಟನ್‌ಗಳನ್ನು ಸಕ್ರಿಯಗೊಳಿಸುವುದು
+            document.getElementById('toggleBtn').disabled = false;
+            document.getElementById('startTimerBtn').disabled = false;
+            
+            // ಟೈಮರ್ ರೀಸೆಟ್ ಮಾಡುವುದು (ಆದರೆ ಸ್ಟಾರ್ಟ್ ಮಾಡುವುದಿಲ್ಲ)
+            clearInterval(timerInterval);
+            timeLeft = 60;
+            document.getElementById('timerVal').innerText = `${timeLeft} ಸೆ`;
+        }
+
+        // 2. ಚೀಟಿಯ ಹೆಸರನ್ನು ಪ್ರದರ್ಶಿಸುವ/ಮರೆಮಾಡುವ ಲಾಜಿಕ್
+        function toggleReveal() {
+            const display = document.getElementById('chitDisplay');
+            const hint = document.getElementById('hintDisplay');
+            
+            if (!isRevealed) {
+                display.classList.add('revealed');
+                hint.style.display = 'block';
+                isRevealed = true;
+            } else {
+                display.classList.remove('revealed');
+                hint.style.display = 'none';
+                isRevealed = false;
+            }
+        }
+
+        // 3. ಟೈಮರ್ ಆರಂಭಿಸುವಿಕೆ
+        function startTimer() {
+            clearInterval(timerInterval);
+            timeLeft = 60;
+            document.getElementById('startTimerBtn').disabled = true;
+
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                document.getElementById('timerVal').innerText = `${timeLeft} ಸೆ`;
+
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    document.getElementById('timerVal').innerText = "ಸಮಯ ಮುಗಿಯಿತು! 🔔";
+                    // ಸಮಯ ಮುಗಿದಾಗ ಉತ್ತರವನ್ನು ಎಲ್ಲರಿಗೂ ಕಾಣುವಂತೆ ಮಾಡುವುದು
+                    document.getElementById('chitDisplay').classList.add('revealed');
+                }
+            }, 1000);
+        }
+
+        // 4. ಸ್ಕೋರ್ ಅಪ್ಡೇಟ್ ಮಾಡುವುದು
+        function updateScore(team, points) {
+            if (team === 'A') {
+                scoreA += points;
+                document.getElementById('scoreA').innerText = scoreA;
+            } else if (team === 'B') {
+                scoreB += points;
+                document.getElementById('scoreB').innerText = scoreB;
+            }
+            // ಸ್ಕೋರ್ ಕೊಟ್ಟ ತಕ್ಷಣ ಟೈಮರ್ ನಿಲ್ಲಿಸುವುದು
+            clearInterval(timerInterval);
+        }
+
+        function resetScores() {
+            scoreA = 0;
+            scoreB = 0;
+            document.getElementById('scoreA').innerText = 0;
+            document.getElementById('scoreB').innerText = 0;
+        }
+    </script>
+</body>
+</html>

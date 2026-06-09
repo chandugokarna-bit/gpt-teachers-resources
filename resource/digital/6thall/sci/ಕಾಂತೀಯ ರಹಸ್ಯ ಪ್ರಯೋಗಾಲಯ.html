@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಕಾಂತೀಯ ರಹಸ್ಯ ಪ್ರಯೋಗಾಲಯ - Magnetic Lab</title>
+    <style>
+        :root {
+            --bg-dark: #0b132b;
+            --panel-bg: #1c2541;
+            --neon-blue: #4cc9f0;
+            --neon-pink: #f72585;
+            --north-red: #ef4444;
+            --south-blue: #3b82f6;
+            --text-light: #f8fafc;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+            max-width: 800px;
+        }
+
+        header h1 {
+            font-size: 2.3rem;
+            color: var(--neon-blue);
+            margin-bottom: 8px;
+            text-shadow: 0 0 10px rgba(76, 201, 240, 0.4);
+        }
+
+        header p {
+            color: #94a3b8;
+            font-size: 1.1rem;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background: var(--panel-bg);
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 20px 30px rgba(0,0,0,0.5);
+            border: 1px solid #3a506b;
+        }
+
+        /* Nav Tabs */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #3a506b;
+            padding-bottom: 10px;
+        }
+
+        .tab-btn {
+            background: #111827;
+            color: #94a3b8;
+            border: 1px solid #3a506b;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+
+        .tab-btn.active {
+            background: var(--neon-blue);
+            color: #0b132b;
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 10px rgba(76, 201, 240, 0.4);
+        }
+
+        .game-section {
+            display: none;
+        }
+
+        .game-section.active {
+            display: block;
+        }
+
+        /* LEVEL 1: POLE FINDER STYLES */
+        .lab-bench {
+            background: #0b132b;
+            border: 2px inset #3a506b;
+            border-radius: 12px;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            min-height: 220px;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        /* Unmarked Magnet */
+        .secret-magnet {
+            display: flex;
+            width: 260px;
+            height: 60px;
+            border-radius: 6px;
+            overflow: hidden;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.4);
+            font-weight: bold;
+            font-size: 1.3rem;
+            transition: transform 0.3s ease;
+        }
+
+        .pole-a {
+            flex: 1;
+            background: #64748b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-right: 2px solid #475569;
+            color: white;
+        }
+
+        .pole-b {
+            flex: 1;
+            background: #475569;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        /* Test Tool Magnet */
+        .test-tool {
+            width: 130px;
+            height: 45px;
+            background: var(--north-red);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            border-radius: 4px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            font-size: 1rem;
+        }
+
+        .control-panel {
+            margin-top: 25px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 600px) {
+            .control-panel { grid-template-columns: 1fr; }
+        }
+
+        .sub-panel {
+            background: #111827;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #3a506b;
+        }
+
+        .panel-title {
+            font-size: 1rem;
+            color: var(--neon-blue);
+            font-weight: bold;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+        }
+
+        .btn {
+            background: #374151;
+            color: white;
+            border: 1px solid #4b5563;
+            padding: 10px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            width: 100%;
+            margin-bottom: 8px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            background: #4b5563;
+            border-color: #6b7280;
+        }
+
+        .dropdown {
+            width: 100%;
+            padding: 10px;
+            background: var(--panel-bg);
+            color: white;
+            border: 1px solid #4b5563;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            outline: none;
+        }
+
+        .submit-btn {
+            background: var(--neon-pink);
+            color: white;
+            border: none;
+            font-weight: bold;
+        }
+        .submit-btn:hover { background: #e01e75; }
+
+        .reaction-text {
+            font-size: 1.4rem;
+            font-weight: bold;
+            min-height: 35px;
+            color: #e2e8f0;
+            text-align: center;
+        }
+
+        /* LEVEL 2: TYPES OF MAGNET STYLES */
+        .quiz-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        @media (max-width: 768px) {
+            .quiz-grid { grid-template-columns: 1fr; }
+        }
+
+        .riddle-card {
+            background: #111827;
+            padding: 20px;
+            border-radius: 12px;
+            border-left: 5px solid var(--neon-pink);
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        .magnet-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 12px;
+        }
+
+        .magnet-opt {
+            background: #1e293b;
+            border: 2px solid #475569;
+            border-radius: 10px;
+            padding: 15px 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .magnet-opt:hover {
+            border-color: var(--neon-blue);
+            transform: translateY(-2px);
+        }
+
+        .magnet-emoji {
+            font-size: 2.5rem;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .feedback-box {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            min-height: 50px;
+        }
+        .success { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid #10b981; }
+        .error { background: rgba(244, 63, 94, 0.2); color: #fb7185; border: 1px solid #f43f5e; }
+
+        /* Magnet Visual States for Level 1 */
+        .attract-anim { transform: translateX(-30px); }
+        .repel-anim { transform: translateX(30px); }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>🧲 ಕಾಂತೀಯ ರಹಸ್ಯ ಪ್ರಯೋಗಾಲಯ 🔬</h1>
+        <p>ವಿಜ್ಞಾನದ ನಿಯಮಗಳನ್ನು ಬಳಸಿ! ಧ್ರುವಗಳ ರಹಸ್ಯವನ್ನು ಭೇದಿಸಿ ಮತ್ತು ಕಾಂತಗಳ ವಿವಿಧ ಆಕಾರಗಳನ್ನು ಗುರುತಿಸಿ.</p>
+    </header>
+
+    <div class="container">
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('tab1', this)">ಹಂತ 1: ಧ್ರುವಗಳ ಪತ್ತೆ (Find Poles)</button>
+            <button class="tab-btn" onclick="switchTab('tab2', this)">ಹಂತ 2: ಕಾಂತಗಳ ವಿಧಗಳು (Types)</button>
+        </div>
+
+        <div id="tab1" class="game-section active">
+            <div class="lab-bench">
+                <div class="test-tool">🔍 ಪರೀಕ್ಷಕ: ಉತ್ತರ ಧ್ರುವ (N)</div>
+                <div class="secret-magnet" id="secretMagnet">
+                    <div class="pole-a" id="visualA">ತುದಿ A</div>
+                    <div class="pole-b" id="visualB">ತುದಿ B</div>
+                </div>
+                <div class="reaction-text" id="reactionDisplay">ಪರೀಕ್ಷಿಸಲು ಕೆಳಗಿನ ಬಟನ್ ಒತ್ತಿ...</div>
+            </div>
+
+            <div class="control-panel">
+                <div class="sub-panel">
+                    <div class="panel-title">🛠️ ಪ್ರಯೋಗ ನಡೆಸಿ (Perform Experiment)</div>
+                    <button class="btn" onclick="testPole('A')">👉 ಪರೀಕ್ಷಕ (N) ಅನ್ನು 'ತುದಿ A' ಹತ್ತಿರ ತನ್ನಿ</button>
+                    <button class="btn" onclick="testPole('B')">👉 ಪರೀಕ್ಷಕ (N) ಅನ್ನು 'ತುದಿ B' ಹತ್ತಿರ ತನ್ನಿ</button>
+                    <button class="btn" style="background:#059669" onclick="resetLevel1()">🔄 ಹೊಸ ರಹಸ್ಯ ಕಾಂತವನ್ನು ಪಡೆಯಿರಿ</button>
+                </div>
+                
+                <div class="sub-panel" style="border-color: var(--neon-pink);">
+                    <div class="panel-title">🧠 ನಿಮ್ಮ ವೈಜ್ಞಾನಿಕ ತೀರ್ಮಾನ (Conclusion)</div>
+                    <label style="font-size:0.9rem; color:#94a3b8;">ತುದಿ A ಯಾವ ಧ್ರುವ?</label>
+                    <select id="guessA" class="dropdown">
+                        <option value="">-- ಆರಿಸಿ --</option>
+                        <option value="N">ಉತ್ತರ ಧ್ರುವ (North Pole)</option>
+                        <option value="S">ದಕ್ಷಿಣ ಧ್ರುವ (South Pole)</option>
+                    </select>
+                    
+                    <button class="btn submit-btn" onclick="verifyPoles()">✔️ ಧ್ರುವಗಳನ್ನು ಖಚಿತಪಡಿಸಿ!</button>
+                    <div id="level1Feedback" style="margin-top:10px; font-weight:bold; text-align:center;"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab2" class="game-section">
+            <div class="quiz-grid">
+                <div class="riddle-card">
+                    <div class="panel-title" style="color:var(--neon-pink);">🧩 ಕಾಂತದ ಒಗಟು (Riddle)</div>
+                    <p id="riddleText">ಲೋಡ್ ಆಗುತ್ತಿದೆ...</p>
+                </div>
+
+                <div>
+                    <div class="panel-title">📐 ಸರಿಯಾದ ಆಕಾರದ ಕಾಂತವನ್ನು ಆರಿಸಿ:</div>
+                    <div class="magnet-options">
+                        <div class="magnet-opt" onclick="checkTypeGuess('ದಂಡಕಾಂತ')">
+                            <span class="magnet-emoji">➖</span>
+                            <span>ದಂಡಕಾಂತ<br>(Bar Magnet)</span>
+                        </div>
+                        <div class="magnet-opt" onclick="checkTypeGuess('ಕುದುರೆ ಲಾಳಾಕಾರದ ಕಾಂತ')">
+                            <span class="magnet-emoji">🧲</span>
+                            <span>ಲಾಳಾಕಾರದ ಕಾಂತ<br>(Horseshoe)</span>
+                        </div>
+                        <div class="magnet-opt" onclick="checkTypeGuess('ಉಂಗುರಾಕಾರದ ಕಾಂತ')">
+                            <span class="magnet-emoji">⭕</span>
+                            <span>ಉಂಗುರಾಕಾರದ ಕಾಂತ<br>(Ring Magnet)</span>
+                        </div>
+                        <div class="magnet-opt" onclick="checkTypeGuess('ನળાಕಾರದ ಕಾಂತ')">
+                            <span class="magnet-emoji">🧪</span>
+                            <span>ನળાಕಾರದ ಕಾಂತ<br>(Cylindrical)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="feedback-box" id="level2Feedback" style="display:none;"></div>
+            <button class="btn" id="nextRiddleBtn" style="margin-top:15px; display:none; background:var(--neon-blue); color:#0b132b; font-weight:bold;" onclick="loadNextRiddle()">ಮುಂದಿನ ಒಗಟು ➔</button>
+        </div>
+
+    </div>
+
+    <script>
+        // --- ಹಂತ 1 ರ ಜಾವಾಸ್ಕ್ರಿಪ್ಟ್ ಲಾಜಿಕ್ (POLE FINDER) ---
+        let realA = 'N'; // ಹಿನ್ನೆಲೆಯಲ್ಲಿ ಕಂಪ್ಯೂಟರ್ ನಿರ್ಧರಿಸುವ ಧ್ರುವ
+        let realB = 'S';
+
+        function resetLevel1() {
+            // ಯಾದೃಚ್ಛಿಕವಾಗಿ ಧ್ರುವಗಳನ್ನು ಬದಲಾಯಿಸುವುದು (Randomize)
+            if (Math.random() > 0.5) {
+                realA = 'N'; realB = 'S';
+            } else {
+                realA = 'S'; realB = 'N';
+            }
+            // ರೀಸೆಟ್ ಯುಐ
+            document.getElementById('reactionDisplay').innerText = "ಹೊಸ ಕಾಂತ ಸಿದ್ಧವಾಗಿದೆ! ಪರೀಕ್ಷಿಸಿ...";
+            document.getElementById('level1Feedback').innerText = "";
+            document.getElementById('guessA').value = "";
+            
+            const mag = document.getElementById('secretMagnet');
+            mag.className = "secret-magnet";
+            document.getElementById('visualA').style.background = "#64748b";
+            document.getElementById('visualA').innerText = "ತುದಿ A";
+            document.getElementById('visualB').style.background = "#475569";
+            document.getElementById('visualB').innerText = "ತುದಿ B";
+        }
+
+        function testPole(side) {
+            const display = document.getElementById('reactionDisplay');
+            const mag = document.getElementById('secretMagnet');
+            
+            // ಅನಿಮೇಷನ್ ಕ್ಲಿಯರ್ ಮಾಡಲು
+            mag.className = "secret-magnet";
+            
+            // ಸಜಾತೀಯ ಧ್ರುವಗಳು ವಿಕರ್ಷಿಸುತ್ತವೆ, ವಿಜಾತೀಯ ಆಕರ್ಷಿಸುತ್ತವೆ
+            let currentPoleOfSide = (side === 'A') ? realA : realB;
+
+            setTimeout(() => {
+                if (currentPoleOfSide === 'N') {
+                    // N ಮತ್ತು N -> ವಿಕರ್ಷಣೆ (Repulsion - ದೂರ ತಳ್ಳುತ್ತದೆ)
+                    display.innerHTML = `💥 <b>ವಿಕರ್ಷಣೆ! (Repulsion)</b><br><span style="color:var(--neon-pink)">ತುದಿ ${side}</span> ಪರೀಕ್ಷಕ ಉತ್ತರ ಧ್ರುವವನ್ನು ದೂರ ತಳ್ಳುತ್ತಿದೆ!`;
+                    mag.classList.add('repel-anim');
+                } else {
+                    // N ಮತ್ತು S -> ಆಕರ್ಷಣೆ (Attraction - ಹತ್ತಿರ ಎಳೆಯುತ್ತದೆ)
+                    display.innerHTML = `🧲 <b>ಆಕರ್ಷಣೆ! (Attraction)</b><br><span style="color:var(--neon-blue)">ತುದಿ ${side}</span> ಪರೀಕ್ಷಕ ಉತ್ತರ ಧ್ರುವಕ್ಕೆ ಅಂಟಿಕೊಳ್ಳುತ್ತಿದೆ!`;
+                    mag.classList.add('attract-anim');
+                }
+            }, 50);
+        }
+
+        function verifyPoles() {
+            const guessA = document.getElementById('guessA').value;
+            const feedback = document.getElementById('level1Feedback');
+
+            if (!guessA) {
+                alert("ದಯವಿಟ್ಟು ತುದಿ A ನ ಧ್ರುವವನ್ನು ಆಯ್ಕೆಮಾಡಿ!");
+                return;
+            }
+
+            if (guessA === realA) {
+                feedback.innerHTML = "🎉 ಅತ್ಯದ್ಭುತ ತಾರ್ಕಿಕ ಚಿಂತನೆ! ನಿಮ್ಮ ಊಹೆ ಸಂಪೂರ್ಣ ಸರಿ.";
+                feedback.style.color = "#34d399";
+                
+                // ನಿಜವಾದ ಬಣ್ಣಗಳನ್ನು ಪ್ರದರ್ಶಿಸುವುದು (ಉತ್ತರ ಧ್ರುವಕ್ಕೆ ಕೆಂಪು, ದಕ್ಷಿಣಕ್ಕೆ ನೀಲಿ)
+                document.getElementById('visualA').style.background = (realA === 'N') ? "var(--north-red)" : "var(--south-blue)";
+                document.getElementById('visualA').innerText = realA + " (North)";
+                document.getElementById('visualB').style.background = (realB === 'N') ? "var(--north-red)" : "var(--south-blue)";
+                document.getElementById('visualB').innerText = realB + " (South)";
+            } else {
+                feedback.innerHTML = "❌ ತಪ್ಪು ತೀರ್ಮಾನ! 'ಸಜಾತೀಯ ಧ್ರುವಗಳು ವಿಕರ್ಷಿಸುತ್ತವೆ, ವಿಜಾತೀಯ ಧ್ರುವಗಳು ಆಕರ್ಷಿಸುತ್ತವೆ' ಎಂಬ ನಿಯಮ ನೆನಪಿಸಿಕೊಳ್ಳಿ.";
+                feedback.style.color = "#fb7185";
+            }
+        }
+
+
+        // --- ಹಂತ 2 ರ ಜಾವಾಸ್ಕ್ರಿಪ್ಟ್ ಲಾಜಿಕ್ (TYPES OF MAGNETS) ---
+        const riddles = [
+            { text: "ನಾನು ಆಯತಾಕಾರದ ಪಟ್ಟಿಯಂತಿದ್ದೇನೆ. ಶಾಲೆಯ ವಿಜ್ಞಾನ ಪ್ರಯೋಗಾಲಯದಲ್ಲಿ ಪ್ರಯೋಗಗಳನ್ನು ಮಾಡಲು ನನ್ನನ್ನು ಅತಿ ಹೆಚ್ಚಾಗಿ ಬಳಸಲಾಗುತ್ತದೆ. ನಾನು ಯಾರು?", answer: "ದಂಡಕಾಂತ" },
+            { text: "ನನ್ನ ಆಕಾರ ಇಂಗ್ಲಿಷ್ ಅಕ್ಷರ 'U' ನಂತೆ ಇರುತ್ತದೆ. ನನ್ನ ಎರಡು ಧ್ರುವಗಳು ತುಂಬಾ ಹತ್ತಿರ ಇರುವುದರಿಂದ ನಾನು ಹೆಚ್ಚು ಶಕ್ತಿಶಾಲಿಯಾಗಿರುತ್ತೇನೆ. ನಾನು ಯಾರು?", answer: "ಕುದುರೆ ಲಾಳಾಕಾರದ ಕಾಂತ" },
+            { text: "ನನ್ನ ಮಧ್ಯಭಾಗದಲ್ಲಿ ರಂಧ್ರವಿರುತ್ತದೆ, ನಾನು ದುಂಡಗಿದ್ದೇನೆ. ರೇಡಿಯೋ, ಟಿವಿ ಹಾಗೂ ಸೌಂಡ್ ಸ್ಪೀಕರ್‌ಗಳ ಹಿಂಭಾಗದಲ್ಲಿ ನನ್ನನ್ನು ನೀವು ನೋಡಬಹುದು. ನಾನು ಯಾರು?", answer: "ಉಂಗುರಾಕಾರದ ಕಾಂತ" },
+            { text: "ನಾನು ಉದ್ದನೆಯ ಚಾಕ್‌ಪೀಸ್ ಅಥವಾ ಪೈಪ್‌ನ ಆಕಾರವನ್ನು ಹೊಂದಿದ್ದೇನೆ. ನನ್ನನ್ನು ನಯವಾದ ಮೇಲ್ಮೈಗಳ ಮೇಲೆ ಉರುಳಿಸಬಹುದು. ನಾನು ಯಾರು?", answer: "ಸ್ತಂಭಕೃತಿ  ಕಾಂತ" }
+        ];
+
+        let currentRiddleIndex = 0;
+
+        function loadRiddle() {
+            document.getElementById('level2Feedback').style.display = 'none';
+            document.getElementById('nextRiddleBtn').style.display = 'none';
+            document.getElementById('riddleText').innerText = riddles[currentRiddleIndex].text;
+        }
+
+        function checkTypeGuess(selectedType) {
+            const currentRiddle = riddles[currentRiddleIndex];
+            const feedback = document.getElementById('level2Feedback');
+            feedback.style.display = 'block';
+
+            if (selectedType === currentRiddle.answer) {
+                feedback.className = "feedback-box success";
+                feedback.innerText = `🎯 ಸರಿಯಾದ ಉತ್ತರ! ಅದುವೇ "${selectedType}".`;
+                document.getElementById('nextRiddleBtn').style.display = 'block';
+            } else {
+                feedback.className = "feedback-box error";
+                feedback.innerText = `❌ ತಪ್ಪು ಉತ್ತರ! ವಿವರಣೆಯನ್ನು ಮತ್ತೊಮ್ಮೆ ಓದಿ ಆಕಾರವನ್ನು ಕಲ್ಪಿಸಿಕೊಳ್ಳಿ.`;
+            }
+        }
+
+        function loadNextRiddle() {
+            currentRiddleIndex = (currentRiddleIndex + 1) % riddles.length;
+            loadRiddle();
+        }
+
+
+        // --- ಟ್ಯಾಬ್ ಸ್ವಿಚಿಂಗ್ ಲಾಜಿಕ್ ---
+        function switchTab(tabId, btnElement) {
+            document.querySelectorAll('.game-section').forEach(sec => sec.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            
+            document.getElementById(tabId).classList.add('active');
+            btnElement.classList.add('active');
+        }
+
+        // ಪುಟ ಲೋಡ್ ಆದಾಗ ಆರಂಭವಾಗುವ ಪ್ರಕ್ರಿಯೆಗಳು
+        window.onload = () => {
+            resetLevel1();
+            loadRiddle();
+        };
+    </script>
+</body>
+</html>
