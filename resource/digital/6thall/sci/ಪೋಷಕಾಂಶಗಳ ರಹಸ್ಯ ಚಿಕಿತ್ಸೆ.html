@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಡಾ. ನ್ಯೂಟ್ರಿಷನ್: ಪೋಷಕಾಂಶಗಳ ರಹಸ್ಯ ಚಿಕಿತ್ಸೆ</title>
+    <style>
+        :root {
+            --bg-clinic: #f0fdfa;
+            --primary-teal: #0f766e;
+            --accent-cyan: #06b6d4;
+            --card-white: #ffffff;
+            --text-main: #0f172a;
+            --success: #16a34a;
+            --danger: #dc2626;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-clinic);
+            color: var(--text-main);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+            max-width: 700px;
+        }
+
+        header h1 {
+            font-size: 2.2rem;
+            color: var(--primary-teal);
+            margin-bottom: 8px;
+        }
+
+        header p {
+            color: #475569;
+            font-size: 1.1rem;
+        }
+
+        .game-container {
+            width: 100%;
+            max-width: 850px;
+            background: var(--card-white);
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(15, 118, 110, 0.1);
+            border: 2px solid #ccfbf1;
+        }
+
+        /* Dashboard */
+        .clinic-dash {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #e0f2fe;
+            padding: 12px 20px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            font-weight: bold;
+            color: #0369a1;
+        }
+
+        /* Patient Section */
+        .patient-zone {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .patient-avatar {
+            font-size: 4.5rem;
+            background: #f1f5f9;
+            padding: 10px;
+            border-radius: 50%;
+            border: 3px solid #cbd5e1;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .dialogue-box {
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            padding: 15px;
+            border-radius: 12px;
+            position: relative;
+            flex: 1;
+        }
+
+        .dialogue-box::before {
+            content: '';
+            position: absolute;
+            left: -10px;
+            top: 50%;
+            transform: translateY(-50%) rotate(45deg);
+            width: 15px;
+            height: 15px;
+            background: white;
+            border-left: 1px solid #cbd5e1;
+            border-bottom: 1px solid #cbd5e1;
+        }
+
+        .patient-speech {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #334155;
+            line-height: 1.5;
+        }
+
+        /* Interactive Steps */
+        .step-panel {
+            display: none;
+            animation: fadeIn 0.4s ease forwards;
+        }
+
+        .step-panel.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .step-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: var(--primary-teal);
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Option Grids */
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+        }
+
+        .opt-btn {
+            background: #ffffff;
+            border: 2px solid #cbd5e1;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: bold;
+            color: #475569;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+
+        .opt-btn:hover:not(:disabled) {
+            border-color: var(--accent-cyan);
+            background: #ecfeff;
+            color: var(--primary-teal);
+            transform: translateY(-2px);
+        }
+
+        .opt-btn .emoji-icon {
+            font-size: 1.8rem;
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        /* Status classes */
+        .opt-btn.correct { background: var(--success) !important; color: white !important; border-color: #15803d !important; }
+        .opt-btn.wrong { background: var(--danger) !important; color: white !important; border-color: #991b1b !important; }
+
+        /* Feedback Display */
+        .feedback-box {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            text-align: center;
+            min-height: 50px;
+            font-size: 1.1rem;
+        }
+
+        .next-btn {
+            display: none;
+            background: var(--primary-teal);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 20px auto 0 auto;
+            transition: background 0.2s;
+        }
+
+        .next-btn:hover { background: #115e59; }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>🩺 ಡಾ. ನ್ಯೂಟ್ರಿಷನ್: ಪೋಷಕಾಂಶಗಳ ರಹಸ್ಯ ಚಿಕಿತ್ಸೆ! 🍎</h1>
+        <p>ನೀವೇ ಇಲ್ಲಿ ಮುಖ್ಯ ವೈದ್ಯರು! ರೋಗಿಗಳ ಮಾತುಗಳನ್ನು (ರೋಗಲಕ್ಷಣ) ಎಚ್ಚರಿಕೆಯಿಂದ ಆಲಿಸಿ, ಕೊರತೆಯಿರುವ ಪೋಷಕಾಂಶ ಮತ್ತು ಸರಿಯಾದ ಆಹಾರವನ್ನು ಪತ್ತೆಹಚ್ಚಿ ಗುಣಪಡಿಸಿ.</p>
+    </header>
+
+    <div class="game-container">
+        
+        <div class="clinic-dash">
+            <div id="caseCount">🏥 ರೋಗಿಗಳ ಸಂಖ್ಯೆ: 1 / 5</div>
+            <div id="scoreDisplay">🏆 ವೈದ್ಯಕೀಯ ರೇಟಿಂಗ್: 0 ಅಂಕಗಳು</div>
+        </div>
+
+        <div class="patient-zone">
+            <div class="patient-avatar" id="patientAvatar">👦</div>
+            <div class="dialogue-box">
+                <div class="patient-speech" id="symptomText">ಲೋಡ್ ಆಗುತ್ತಿದೆ...</div>
+            </div>
+        </div>
+
+        <div id="stepDiagnosis" class="step-panel active">
+            <div class="step-title">ಹಂತ 1: ರೋಗಿಗೆ ಯಾವ ಪೋಷಕಾಂಶದ (Nutrient) ಕೊರತೆಯಿದೆ ಎಂದು ಪತ್ತೆಹಚ್ಚಿ:</div>
+            <div class="options-grid" id="nutrientGrid">
+                </div>
+        </div>
+
+        <div id="stepFood" class="step-panel">
+            <div class="step-title">ಹಂತ 2: ಈ ಕೊರತೆಯನ್ನು ನೀಗಿಸಲು ಔಷಧಿಯ ರೂಪದಲ್ಲಿ ಯಾವ ಆಹಾರವನ್ನು ನೀಡುತ್ತೀರಿ?:</div>
+            <div class="options-grid" id="foodGrid">
+                </div>
+        </div>
+
+        <div class="feedback-box" id="feedbackBox"></div>
+        <button class="next-btn" id="nextBtn" onclick="nextPatient()">ಮುಂದಿನ ರೋಗಿಯನ್ನು ಪರೀಕ್ಷಿಸಿ ➡️</button>
+
+    </div>
+
+    <script>
+        // ಬ್ರೇನ್ ಸ್ಟಾರ್ಮಿಂಗ್ ರೋಗಿಗಳ ಡೇಟಾಬೇಸ್
+        const patientsData = [
+            {
+                avatar: "👁️‍🗨️👨",
+                symptom: "ಡಾಕ್ಟರೇ, ಹಗಲೆಲ್ಲಾ ಚೆನ್ನಾಗಿಯೇ ಇರುತ್ತೇನೆ. ಆದರೆ ಸೂರ್ಯ ಮುಳುಗಿ ಕತ್ತಲಾಗುತ್ತಿದ್ದಂತೆ ನನಗೆ ಕಣ್ಣುಗಳು ಮಂಜಾಗುತ್ತವೆ, ದಾರಿ ಸರಿಯಾಗಿ ಕಾಣಿಸುವುದೇ ಇಲ್ಲ!",
+                correctNutrient: "ವಿಟಮಿನ್ ಎ (Vitamin A)",
+                correctFood: "🥕 ಕ್ಯಾರೆಟ್ / ಪಪ್ಪಾಯಿ",
+                reason: "ಇದು ಇರುಳುಗಣ್ಣು (Night Blindness) ರೋಗ. ಇದಕ್ಕೆ ವಿಟಮಿನ್ ಎ ಕೊರತೆ ಕಾರಣ."
+            },
+            {
+                avatar: "🦷👧",
+                symptom: "ಅಯ್ಯೋ ಡಾಕ್ಟರೇ, ಹಲ್ಲುಜ್ಜುವಾಗಲೆಲ್ಲಾ ನನ್ನ ಒಸಡುಗಳಿಂದ ರಕ್ತ ಬರುತ್ತಿದೆ! ಜೊತೆಗೆ ಕೈಗೆ ಆದ ಸಣ್ಣ ಗಾಯವೂ ಎಷ್ಟೇ ದಿನವಾದರೂ ಒಣಗುತ್ತಲೇ ಇಲ್ಲ.",
+                correctNutrient: "ವಿಟಮಿನ್ ಸಿ (Vitamin C)",
+                correctFood: "🍋 ನೆಲ್ಲಿಕಾಯಿ / ಕಿತ್ತಳೆ",
+                reason: "ಇದು ಸ್ಕರ್ವಿ (Scurvy) ರೋಗದ ಲಕ್ಷಣ. ಒಸಡುಗಳ ಆರೋಗ್ಯಕ್ಕೆ ವಿಟಮಿನ್ ಸಿ ಅತ್ಯಗತ್ಯ."
+            },
+            {
+                avatar: "🦴🏃‍♂️",
+                symptom: "ನನಗೆ ಜೋರಾಗಿ ಓಡಲು ಆಗ್ತಿಲ್ಲ ಡಾಕ್ಟರೇ. ನನ್ನ ಕಾಲುಗಳು ಬಾಗಿದಂತೆ ಕಾಣಿಸುತ್ತವೆ ಮತ್ತು ಮೂಳೆಗಳು ಸಣ್ಣ ಮುಟ್ಟಿಗೆ ನೋವಾಗುತ್ತವೆ, ತುಂಬಾ ದುರ್ಬಲವಾಗಿವೆ.",
+                correctNutrient: "ಕ್ಯಾಲ್ಸಿಯಂ / ವಿಟಮಿನ್ ಡಿ",
+                correctFood: "🥛 ಹಾಲು / ಮೊಟ್ಟೆ",
+                reason: "ಮೂಳೆಗಳು ಮೃದುವಾಗುವ ಈ ಸ್ಥಿತಿಗೆ ರಿಕೆಟ್ಸ್ ಎನ್ನಬಹುದು. ಬಲವಾದ ಮೂಳೆಗೆ ಕ್ಯಾಲ್ಸಿಯಂ ಮತ್ತು ವಿಟಮಿನ್ ಡಿ ಬೇಕು."
+            },
+            {
+                avatar: "😴🧓",
+                symptom: "ನನಗೆ ಸ್ವಲ್ಪ ದೂರ ನಡೆದರೂ ಸಾಕು ಉಸಿರು ಕಟ್ಟಿದಂತಾಗುತ್ತದೆ. ದೇಹದಲ್ಲಿ ಶಕ್ತಿಯೇ ಇಲ್ಲ, ಆಟವಾಡಲು ಹೋದರೆ ತಕ್ಷಣ ತಲೆಸುತ್ತು ಬಂದಂತಾಗಿ ಸುಸ್ತಾಗುತ್ತೇನೆ.",
+                correctNutrient: "ಕಾರ್ಬೋಹೈಡ್ರೇಟ್ (ಶಕ್ತಿ)",
+                correctFood: "🍚 ಅನ್ನ / ಚಪಾತಿ",
+                reason: "ದೇಹಕ್ಕೆ ತಕ್ಷಣದ ಕೆಲಸಗಳಿಗೆ ಶಕ್ತಿ ನೀಡಲು ಕಾರ್ಬೋಹೈಡ್ರೇಟ್‌ಗಳು (Carbohydrates) ಮುಖ್ಯ ಇಂಧನ."
+            },
+            {
+                avatar: "🧒🩹",
+                symptom: "ನನ್ನ ಮಗನ ವಯಸ್ಸಿಗೆ ತಕ್ಕಂತೆ ಅವನ ದೇಹ ಬೆಳವಣಿಗೆ ಆಗುತ್ತಿಲ್ಲ ಡಾಕ್ಟರೇ. ಕೈಕಾಲುಗಳು ತುಂಬಾ ತೆಳ್ಳಗಾಗಿವೆ, ಸ್ನಾಯುಗಳು ಬೆಳೆಯುತ್ತಲೇ ಇಲ್ಲ.",
+                correctNutrient: "ಪ್ರೋಟೀನ್ (ಬೆಳವಣಿಗೆ)",
+                correctFood: "🍲 ತೊಗರಿ ಬೇಳೆ / ಮೀನು",
+                reason: "ದೇಹದ ಕೋಶಗಳ ಮತ್ತು ಸ್ನಾಯುಗಳ ಬೆಳವಣಿಗೆಗೆ ಪ್ರೋಟೀನ್‌ಗಳು (Proteins) ದೇಹ ನಿರ್ಮಾಣ ಘಟಕಗಳಾಗಿವೆ."
+            }
+        ];
+
+        // ಆಪ್ಷನ್ ಪಟ್ಟಿಗಳು (ಗೊಂದಲ ಮೂಡಿಸಲು ಎಲ್ಲಾ ಆಟದಲ್ಲೂ ಇರುತ್ತವೆ)
+        const allNutrients = ["ಕಾರ್ಬೋಹೈಡ್ರೇಟ್ (ಶಕ್ತಿ)", "ಪ್ರೋಟೀನ್ (ಬೆಳವಣಿಗೆ)", "ವಿಟಮಿನ್ ಎ (Vitamin A)", "ವಿಟಮಿನ್ ಸಿ (Vitamin C)", "ಕ್ಯಾಲ್ಸಿಯಂ / ವಿಟಮಿನ್ ಡಿ"];
+        const allFoods = ["🍚 ಅನ್ನ / ಚಪಾತಿ", "🍲 ತೊಗರಿ ಬೇಳೆ / ಮೀನು", "🥕 ಕ್ಯಾರೆಟ್ / ಪಪ್ಪಾಯಿ", "🍋 ನೆಲ್ಲಿಕಾಯಿ / ಕಿತ್ತಳೆ", "🥛 ಹಾಲು / ಮೊಟ್ಟೆ", "🍿 ಕುರ್ಕುರೆ / ಚಿಪ್ಸ್"];
+
+        let currentCaseIndex = 0;
+        let score = 0;
+        let stage = "diagnosis"; // diagnosis ಅಥವಾ food
+        let currentPatient = {};
+
+        function startGame() {
+            currentCaseIndex = 0;
+            score = 0;
+            loadPatient();
+        }
+
+        function loadPatient() {
+            stage = "diagnosis";
+            currentPatient = patientsData[currentCaseIndex];
+            
+            // UI ಅಪ್ಡೇಟ್
+            document.getElementById('caseCount').innerText = `🏥 ರೋಗಿಗಳ ಸಂಖ್ಯೆ: ${currentCaseIndex + 1} / ${patientsData.length}`;
+            document.getElementById('scoreDisplay').innerText = `🏆 ವೈದ್ಯಕೀಯ ರೇಟಿಂಗ್: ${score} ಅಂಕಗಳು`;
+            document.getElementById('patientAvatar').innerText = currentPatient.avatar;
+            document.getElementById('symptomText').innerText = currentPatient.symptom;
+            
+            // ಪ್ಯಾನಲ್ ಸ್ಥಿತಿ
+            document.getElementById('stepDiagnosis').classList.add('active');
+            document.getElementById('stepFood').classList.remove('active');
+            
+            // ಫೀಡ್‌ಬ್ಯಾಕ್ ಮತ್ತು ನೆಕ್ಸ್ಟ್ ಬಟನ್ ರಿಸೆಟ್
+            const fb = document.getElementById('feedbackBox');
+            fb.innerText = "ರೋಗಿಯ ಸಮಸ್ಯೆಯನ್ನು ಓದಿ ರೋಗನಿರ್ಣಯ ಮಾಡಿ...";
+            fb.style.backgroundColor = "#fafaf9";
+            fb.style.color = "#57534e";
+            document.getElementById('nextBtn').style.display = "none";
+
+            renderNutrientOptions();
+        }
+
+        // ಹಂತ 1 ರ ಬಟನ್‌ಗಳ ಸೃಷ್ಟಿ
+        function renderNutrientOptions() {
+            const grid = document.getElementById('nutrientGrid');
+            grid.innerHTML = '';
+            allNutrients.forEach(nut => {
+                const btn = document.createElement('button');
+                btn.className = 'opt-btn';
+                btn.innerText = nut;
+                btn.onclick = () => checkDiagnosis(nut, btn);
+                grid.appendChild(btn);
+            });
+        }
+
+        // ಹಂತ 1 ರ ಪರಿಶೀಲನೆ
+        function checkDiagnosis(selectedNutrient, btnElement) {
+            const fb = document.getElementById('feedbackBox');
+            const allBtns = document.querySelectorAll('#nutrientGrid .opt-btn');
+            
+            // ಬಟನ್ ಲಾಕ್ ಮಾಡುವುದು
+            allBtns.forEach(b => b.disabled = true);
+
+            if (selectedNutrient === currentPatient.correctNutrient) {
+                score += 10;
+                btnElement.classList.add('correct');
+                fb.innerText = `🎯 ಅತ್ಯುತ್ತಮ ರೋಗನಿರ್ಣಯ! ನೀವು ಸರಿಯಾದ ಕೊರತೆಯನ್ನು ಕಂಡುಹಿಡಿದಿದ್ದೀರಿ. ಈಗ ಹಂತ-2 ಕ್ಕೆ ಹೋಗಿ ಆಹಾರ ನೀಡಿ.`;
+                fb.style.backgroundColor = "#dcfce7";
+                fb.style.color = "var(--success)";
+                
+                // 1.5 ಸೆಕೆಂಡಿನ ನಂತರ ಹಂತ 2 ಕ್ಕೆ ಬದಲಾಯಿಸುವುದು
+                setTimeout(() => {
+                    goToFoodStage();
+                }, 1500);
+            } else {
+                score = Math.max(0, score - 5); // ತಪ್ಪು ಉತ್ತರಕ್ಕೆ ನೆಗೆಟಿವ್ ಮಾರ್ಕಿಂಗ್
+                btnElement.classList.add('wrong');
+                fb.innerText = `❌ ತಪ್ಪು ರೋಗನಿರ್ಣಯ! ರೋಗಿಯ ಲಕ್ಷಣಗಳನ್ನು ಮತ್ತೊಮ್ಮೆ ಸೂಕ್ಷ್ಮವಾಗಿ ಗಮನಿಸಿ ಯೋಚಿಸಿ. (5 ಅಂಕಗಳ ಕಡಿತ)`;
+                fb.style.backgroundColor = "#fee2e2";
+                fb.style.color = "var(--danger)";
+                
+                // ತಪ್ಪು ಮಾಡಿದರೆ ಮರುಪ್ರಯತ್ನಿಸಲು ಅವಕಾಶ ಬಿಡುವುದು
+                setTimeout(() => {
+                    allBtns.forEach(b => { if(!b.classList.contains('wrong')) b.disabled = false; });
+                }, 1500);
+            }
+            document.getElementById('scoreDisplay').innerText = `🏆 ವೈದ್ಯಕೀಯ ರೇಟಿಂಗ್: ${score} ಅಂಕಗಳು`;
+        }
+
+        // ಹಂತ 2 ಕ್ಕೆ ಪ್ರವೇಶಿಸುವುದು
+        function goToFoodStage() {
+            stage = "food";
+            document.getElementById('stepDiagnosis').classList.remove('active');
+            document.getElementById('stepFood').classList.add('active');
+            
+            const fb = document.getElementById('feedbackBox');
+            fb.innerText = "ಈಗ ಈ ಪೋಷಕಾಂಶ ಹೆಚ್ಚಿರುವ ನೈಸರ್ಗಿಕ ಆಹಾರ ಪದಾರ್ಥವನ್ನು ಸೂಚಿಸಿ...";
+            fb.style.backgroundColor = "#f0fdfa";
+            fb.style.color = "var(--primary-teal)";
+
+            renderFoodOptions();
+        }
+
+        // ಹಂತ 2 ರ ಬಟನ್‌ಗಳ ಸೃಷ್ಟಿ
+        function renderFoodOptions() {
+            const grid = document.getElementById('foodGrid');
+            grid.innerHTML = '';
+            allFoods.forEach(food => {
+                const btn = document.createElement('button');
+                btn.className = 'opt-btn';
+                btn.innerText = food;
+                btn.onclick = () => checkFoodSelection(food, btn);
+                grid.appendChild(btn);
+            });
+        }
+
+        // ಹಂತ 2 ರ ಪರಿಶೀಲನೆ
+        function checkFoodSelection(selectedFood, btnElement) {
+            const fb = document.getElementById('feedbackBox');
+            const allBtns = document.querySelectorAll('#foodGrid .opt-btn');
+            allBtns.forEach(b => b.disabled = true);
+
+            if (selectedFood === "🍿 ಕುರ್ಕುರೆ / ಚಿಪ್ಸ್") {
+                score = Math.max(0, score - 10);
+                btnElement.classList.add('wrong');
+                fb.innerText = `⚠️ ಅಯ್ಯೋ ವೈದ್ಯರೇ! ರೋಗಿಗೆ ಜಂಕ್ ಫುಡ್ ನೀಡಬಾರದು! ಇದರಿಂದ ಕಾಯಿಲೆ ಹೆಚ್ಚಾಗುತ್ತದೆ. (10 ಅಂಕಗಳ ಭಾರಿ ಕಡಿತ)`;
+                fb.style.backgroundColor = "#fef2f2";
+                fb.style.color = "var(--danger)";
+                setTimeout(() => {
+                    allBtns.forEach(b => { if(!b.classList.contains('wrong')) b.disabled = false; });
+                }, 2000);
+            } else if (selectedFood === currentPatient.correctFood) {
+                score += 15;
+                btnElement.classList.add('correct');
+                fb.innerHTML = `🎉 ಅದ್ಭುತ ಚಿಕಿತ್ಸೆ! ರೋಗಿ ಗುಣಮುಖರಾಗಿದ್ದಾರೆ.<br><small><b>ವಿವರಣೆ:</b> ${currentPatient.reason}</small>`;
+                fb.style.backgroundColor = "#dcfce7";
+                fb.style.color = "var(--success)";
+                
+                // ಮುಂದಿನ ರೋಗಿಯ ಬಟನ್ ತೋರಿಸುವುದು
+                document.getElementById('nextBtn').style.display = "block";
+            } else {
+                score = Math.max(0, score - 5);
+                btnElement.classList.add('wrong');
+                fb.innerText = `❌ ಈ ಆಹಾರದಲ್ಲಿ ಆ ಪೋಷಕಾಂಶವಿಲ್ಲ! ಬೇರೆ ಸರಿಯಾದ ನೈಸರ್ಗಿಕ ಆಹಾರವನ್ನು ಆರಿಸಿ.`;
+                fb.style.backgroundColor = "#fee2e2";
+                fb.style.color = "var(--danger)";
+                setTimeout(() => {
+                    allBtns.forEach(b => { if(!b.classList.contains('wrong')) b.disabled = false; });
+                }, 1500);
+            }
+            document.getElementById('scoreDisplay').innerText = `🏆 ವೈದ್ಯಕೀಯ ರೇಟಿಂಗ್: ${score} ಅಂಕಗಳು`;
+        }
+
+        // ಮುಂದಿನ ರೋಗಿಗೆ ಹೋಗುವ ಲಾಜಿಕ್
+        function nextPatient() {
+            currentCaseIndex++;
+            if (currentCaseIndex < patientsData.length) {
+                loadPatient();
+            } else {
+                // ಆಟ ಮುಕ್ತಾಯ
+                document.getElementById('stepFood').classList.remove('active');
+                document.getElementById('patientAvatar').innerText = "🎓🏆";
+                document.getElementById('symptomText').innerHTML = `<b>ಅಭಿನಂದನೆಗಳು ಮಹಾ ವೈದ್ಯರೇ!</b><br>ನೀವು ಎಲ್ಲಾ ರೋಗಿಗಳನ್ನು ಯಶಸ್ವಿಯಾಗಿ ಗುಣಪಡಿಸಿದ್ದೀರಿ. ನಿಮ್ಮ ಒಟ್ಟು ವೈದ್ಯಕೀಯ ಸ್ಕೋರ್: <b>${score} ಅಂಕಗಳು!</b>`;
+                document.getElementById('feedbackBox').innerText = "ನೀವು ಪೋಷಕಾಂಶಗಳ ರಹಸ್ಯ ಜಗತ್ತನ್ನು ಸಂಪೂರ್ಣವಾಗಿ ಗೆದ್ದಿದ್ದೀರಿ!";
+                document.getElementById('feedbackBox').style.backgroundColor = "#e0f2fe";
+                document.getElementById('feedbackBox').style.color = "#0369a1";
+                document.getElementById('nextBtn').innerText = "🔄 ಮೊದಲಿನಿಂದ ಆಟವಾಡಿ";
+                document.getElementById('nextBtn').style.display = "block";
+                document.getElementById('nextBtn').onclick = () => { location.reload(); };
+            }
+        }
+
+        window.onload = startGame;
+    </script>
+</body>
+</html>

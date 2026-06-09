@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಜೀವ ವೈವಿಧ್ಯ ಬಿಂಗೊ (Biodiversity Bingo)</title>
+    <style>
+        :root {
+            --bg-color: #f0fdf4;
+            --primary-green: #166534;
+            --accent-green: #22c55e;
+            --card-bg: #ffffff;
+            --text-dark: #1e293b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-dark);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        header h1 {
+            font-size: 2.2rem;
+            color: var(--primary-green);
+            margin-bottom: 8px;
+        }
+
+        header p {
+            color: #475569;
+            font-size: 1.1rem;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Score & Info Dashboard */
+        .dashboard {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            padding: 15px 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            border-left: 5px solid var(--accent-green);
+        }
+
+        .score-box {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--primary-green);
+        }
+
+        /* Clue Box Area */
+        .clue-box {
+            background: #dcfce7;
+            border: 2px solid #bbf7d0;
+            padding: 25px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        .clue-title {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--primary-green);
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .clue-text {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #0f172a;
+            line-height: 1.5;
+        }
+
+        /* Bingo Cards Grid */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            user-select: none;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-green);
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+        }
+
+        .card .emoji {
+            font-size: 3.5rem;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .card .name {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #334155;
+        }
+
+        /* Status & Animation Classes */
+        .card.correct {
+            background: #22c55e !important;
+            border-color: #16a34a !important;
+            color: white !important;
+        }
+        .card.correct .name { color: white; }
+
+        .card.wrong {
+            background: #ef4444 !important;
+            border-color: #dc2626 !important;
+            color: white !important;
+            animation: shake 0.4s ease;
+        }
+        .card.wrong .name { color: white; }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
+        }
+
+        .feedback-message {
+            text-align: center;
+            font-size: 1.3rem;
+            font-weight: bold;
+            min-height: 30px;
+        }
+
+        .btn-reset {
+            background: var(--primary-green);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-reset:hover {
+            background: #15803d;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>🌿 ಜೀವ ವೈವಿಧ್ಯ ಬಿಂಗೊ 🐾</h1>
+        <p>ಸುಳಿವನ್ನು ಎಚ್ಚರಿಕೆಯಿಂದ ಓದಿ, ಸರಿಯಾದ ಜೈವಿಕ ಲಕ್ಷಣವಿರುವ ಕಾರ್ಡ್ ಅನ್ನು ಗುರುತಿಸಿ!</p>
+    </header>
+
+    <div class="container">
+        
+        <!-- ಡ್ಯಾಶ್‌ಬೋರ್ಡ್ -->
+        <div class="dashboard">
+            <div class="score-box" id="scoreDisplay">🏆 ಅಂಕಗಳು: 0 / 0</div>
+            <button class="btn-reset" onclick="resetGame()">ಮರುಪ್ರಾರಂಭಿಸಿ</button>
+        </div>
+
+        <!-- ಸುಳಿವಿನ ಪೆಟ್ಟಿಗೆ -->
+        <div class="clue-box">
+            <div class="clue-title">💡 ಶಿಕ್ಷಕರ ಸುಳಿವು (Clue)</div>
+            <div class="clue-text" id="clueDisplay">ಸುಳಿವು ಲೋಡ್ ಆಗುತ್ತಿದೆ...</div>
+        </div>
+
+        <!-- ಫೀಡ್‌ಬ್ಯಾಕ್ ಸಂದೇಶ -->
+        <div class="feedback-message" id="feedbackDisplay"></div>
+
+        <!-- ಬಿಂಗೊ ಕಾರ್ಡ್‌ಗಳ ಗ್ರಿಡ್ -->
+        <div class="cards-grid" id="cardsGrid">
+            <!-- ಜಾವಾಸ್ಕ್ರಿಪ್ಟ್ ಮೂಲಕ ಕಾರ್ಡ್‌ಗಳು ಇಲ್ಲಿ ಮೂಡುತ್ತವೆ -->
+        </div>
+
+    </div>
+
+    <script>
+        // ಜೀವ ವೈವಿಧ್ಯದ ಡೇಟಾಬೇಸ್ (ಹೆಸರು, ಎಮೋಜಿ ಮತ್ತು ಸುಳಿವುಗಳು)
+        const biodiversityData = [
+            { id: 1, name: "ತುಳಸಿ", emoji: "🌿", clue: "ನಾನು ಹಸಿರು ಮತ್ತು ಎಳೆಯ ಕಾಂಡವನ್ನು ಹೊಂದಿರುವ ಸಣ್ಣ ಸಸ್ಯ - ಅಂದರೆ 'ಮೂಲಿಕೆ' (Herb)." },
+            { id: 2, name: "ಮೀನು", emoji: "🐟", clue: "ನಾನು ನೀರಿನಲ್ಲಿ ವಾಸಿಸುವ 'ಜಲಚರ ಪ್ರಾಣಿ', ಉಸಿರಾಡಲು ಕಿವಿರುಗಳನ್ನು (Gills) ಬಳಸುತ್ತೇನೆ." },
+            { id: 3, name: "ಆಲದ ಮರ", emoji: "🌳", clue: "ನಾನು ಗಟ್ಟಿಯಾದ ದಪ್ಪ ಕಾಂಡ ಹೊಂದಿರುವ ದೊಡ್ಡ ಸಸ್ಯ (ಮರ) ಮತ್ತು ನನ್ನಲ್ಲಿ 'ಬಿಳಲುಗಳು' (Aerial Roots) ಇವೆ." },
+            { id: 4, name: "ಕಪ್ಪೆ", emoji: "🐸", clue: "ನಾನು ನೆಲ ಮತ್ತು ನೀರು ಎರಡರಲ್ಲೂ ವಾಸಿಸಬಲ್ಲ ಒಂದು 'ಉಭಯವಾಸಿ' (Amphibian) ಪ್ರಾಣಿ." },
+            { id: 5, name: "ಗುಲಾಬಿ", emoji: "🌹", clue: "ನಾನು ಗಟ್ಟಿಯಾದ ಆದರೆ ಅಷ್ಟೊಂದು ದಪ್ಪವಿಲ್ಲದ ಕಾಂಡ ಹಾಗೂ ಮುಳ್ಳುಗಳನ್ನು ಹೊಂದಿರುವ 'ಪೊದೆ ಸಸ್ಯ' (Shrub)." },
+            { id: 6, name: "ಸಿಂಹ", emoji: "🦁", clue: "ನಾನು ಕಾಡಿನ ರಾಜ, ಇತರ ಪ್ರಾಣಿಗಳ ಮಾಂಸವನ್ನು ಮಾತ್ರ ತಿನ್ನುವ 'ಮಾಂಸಾಹಾರಿ' (Carnivore) ಪ್ರಾಣಿ." },
+            { id: 7, name: "ಬಾತುಕೋಳಿ", emoji: "🦆", clue: "ನಾನು ನೀರಿನಲ್ಲಿ ಈಜಲು ಪಾದಗಳಲ್ಲಿ 'ಜಾಲಪಾದ' (Webbed Feet) ಹೊಂದಿರುವ ಪಕ್ಷಿ." },
+            { id: 8, name: "ಕಳ್ಳಿ ಗಿಡ", emoji: "🌵", clue: "ನಾನು ಮರುಭೂಮಿಯಲ್ಲಿ ಬೆಳೆಯುವ ಸಸ್ಯ, ನೀರನ್ನು ಉಳಿಸಲು ನನ್ನ ಎಲೆಗಳು 'ಮುಳ್ಳುಗಳಾಗಿ' ಮಾರ್ಪಟ್ಟಿವೆ." }
+        ];
+
+        let currentItem = null;
+        let score = 0;
+        let totalAttempts = 0;
+        let canClick = true;
+
+        // ಆಟವನ್ನು ಪ್ರಾರಂಭಿಸುವ ಫಂಕ್ಷನ್
+        function initGame() {
+            canClick = true;
+            document.getElementById('feedbackDisplay').innerText = "";
+            document.getElementById('feedbackDisplay').style.color = "initial";
+            
+            // ಯಾದೃಚ್ಛಿಕವಾಗಿ ಒಂದು ಸುಳಿವನ್ನು ಆರಿಸುವುದು
+            const randomIndex = Math.floor(Math.random() * biodiversityData.length);
+            currentItem = biodiversityData[randomIndex];
+            document.getElementById('clueDisplay').innerText = currentItem.clue;
+
+            // ಕಾರ್ಡ್‌ಗಳನ್ನು ಪರದೆಯ ಮೇಲೆ ಪ್ರದರ್ಶಿಸುವುದು (ಯಾವಾಗಲೂ ಒಂದೇ ಕ್ರಮದಲ್ಲಿದ್ದರೆ ಸುಲಭವಾಗುತ್ತದೆ, ಬೇಕಿದ್ದರೆ ಷಫಲ್ ಮಾಡಬಹುದು)
+            renderCards();
+        }
+
+        // ಕಾರ್ಡ್‌ಗಳನ್ನು ಗ್ರಿಡ್‌ನಲ್ಲಿ ಮೂಡಿಸುವುದು
+        function renderCards() {
+            const grid = document.getElementById('cardsGrid');
+            grid.innerHTML = '';
+
+            biodiversityData.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <span class="emoji">${item.emoji}</span>
+                    <span class="name">${item.name}</span>
+                `;
+                // ಕಾರ್ಡ್ ಕ್ಲಿಕ್ ಮಾಡಿದಾಗ ಪರಿಶೀಲಿಸುವ ಲಾಜಿಕ್
+                card.onclick = () => checkAnswer(item, card);
+                grid.appendChild(card);
+            });
+        }
+
+        // ಉತ್ತರದ ಪರಿಶೀಲನೆ
+        function checkAnswer(selectedItem, cardElement) {
+            if (!canClick) return;
+
+            totalAttempts++;
+            canClick = false; // ಉತ್ತರ ನೀಡಿದ ಮೇಲೆ ಮುಂದಿನ ಸುಳಿವು ಬರುವವರೆಗೆ ಕ್ಲಿಕ್ ಲಾಕ್ ಮಾಡುವುದು
+
+            const feedback = document.getElementById('feedbackDisplay');
+
+            if (selectedItem.id === currentItem.id) {
+                // ಸರಿಯಾದ ಉತ್ತರ
+                score++;
+                cardElement.classList.add('correct');
+                feedback.innerText = `🎉 ಸರಿ ಉತ್ತರ! ಅದುವೇ "${selectedItem.name}".`;
+                feedback.style.color = "var(--primary-green)";
+            } else {
+                // ತಪ್ಪು ಉತ್ತರ
+                cardElement.classList.add('wrong');
+                feedback.innerText = `❌ ತಪ್ಪು ಉತ್ತರ! ಸರಿಯಾದ ಉತ್ತರ "${currentItem.name}" ಆಗಿತ್ತು.`;
+                feedback.style.color = "#ef4444";
+                
+                // ಸರಿಯಾದ ಕಾರ್ಡ್ ಅನ್ನು ಹೈಲೈಟ್ ಮಾಡುವುದು
+                highlightCorrectCard();
+            }
+
+            // ಸ್ಕೋರ್ ಅಪ್ಡೇಟ್
+            document.getElementById('scoreDisplay').innerText = `🏆 ಅಂಕಗಳು: ${score} / ${totalAttempts}`;
+
+            // 2.5 ಸೆಕೆಂಡುಗಳ ನಂತರ ಮುಂದಿನ ಪ್ರಶ್ನೆಗೆ ಹೋಗುವುದು
+            setTimeout(() => {
+                initGame();
+            }, 2500);
+        }
+
+        // ತಪ್ಪು ಉತ್ತರ ನೀಡಿದಾಗ ಸರಿಯಾದ ಕಾರ್ಡ್ ಯಾವುದು ಎಂದು ತೋರಿಸಲು
+        function highlightCorrectCard() {
+            const cards = document.querySelectorAll('.card');
+            cards.forEach(card => {
+                const nameSpan = card.querySelector('.name').innerText;
+                if (nameSpan === currentItem.name) {
+                    card.classList.add('correct');
+                }
+            });
+        }
+
+        // ಆಟ ರೀಸೆಟ್ ಮಾಡಲು
+        function resetGame() {
+            score = 0;
+            totalAttempts = 0;
+            document.getElementById('scoreDisplay').innerText = `🏆 ಅಂಕಗಳು: 0 / 0`;
+            initGame();
+        }
+
+        // ಪೇಜ್ ಲೋಡ್ ಆದಾಗ ಆಟ ಶುರು
+        window.onload = initGame;
+    </script>
+</body>
+</html>

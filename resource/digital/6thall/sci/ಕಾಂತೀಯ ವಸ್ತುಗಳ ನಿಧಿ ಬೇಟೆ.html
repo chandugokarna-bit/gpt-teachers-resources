@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಕಾಂತೀಯ ವಸ್ತುಗಳ ನಿಧಿ ಬೇಟೆ! (Magnetic Hunt)</title>
+    <style>
+        :root {
+            --ground-color: #65a30d; /* ಮೈದಾನದ ಹಸಿರು ಬಣ್ಣ */
+            --sky-blue: #0284c7;
+            --danger-red: #dc2626;
+            --text-dark: #1e293b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f0fdf4;
+            color: var(--text-dark);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+            max-width: 700px;
+        }
+
+        header h1 {
+            font-size: 2.2rem;
+            color: #15803d;
+            margin-bottom: 8px;
+        }
+
+        header p {
+            color: #475569;
+            font-size: 1.1rem;
+        }
+
+        .game-container {
+            width: 100%;
+            max-width: 800px;
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        /* Stats Bar */
+        .stats-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #e2e8f0;
+            padding: 12px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        #timer {
+            color: var(--danger-red);
+        }
+
+        #score {
+            color: var(--sky-blue);
+        }
+
+        /* Playground / Grid */
+        .playground {
+            background: var(--ground-color);
+            background-image: radial-gradient(#4d7c0f 20%, transparent 20%),
+                              radial-gradient(#4d7c0f 20%, transparent 20%);
+            background-size: 20px 20px;
+            background-position: 0 0, 10px 10px;
+            border-radius: 12px;
+            min-height: 350px;
+            position: relative;
+            border: 4px solid #3f6212;
+            overflow: hidden;
+            box-shadow: inset 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        /* Items Styles */
+        .item {
+            position: absolute;
+            font-size: 2.5rem;
+            cursor: pointer;
+            user-select: none;
+            transition: transform 0.2s ease, opacity 0.3s ease;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .item:hover {
+            transform: scale(1.2);
+            background: rgba(255, 255, 255, 0.4);
+        }
+
+        /* Attracted animation (Flying towards magnet) */
+        .item.attracted {
+            transform: scale(0) rotate(360deg);
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* Feedback Screen */
+        .feedback-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            z-index: 10;
+        }
+
+        .feedback-overlay h2 {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: #f59e0b;
+        }
+
+        .btn {
+            background: #22c55e;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            transition: background 0.2s;
+        }
+
+        .btn:hover { background: #16a34a; }
+
+        .floating-message {
+            position: absolute;
+            color: white;
+            font-weight: bold;
+            font-size: 1.1rem;
+            padding: 5px 10px;
+            border-radius: 4px;
+            pointer-events: none;
+            animation: floatUp 1s ease forwards;
+            z-index: 5;
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(0); opacity: 1; }
+            100% { transform: translateY(-40px); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>🧲 ಕಾಂತೀಯ ವಸ್ತುಗಳ ನಿಧಿ ಬೇಟೆ! 🔍</h1>
+        <p>ಮೈದಾನದಲ್ಲಿ ವಿವಿಧ ವಸ್ತುಗಳನ್ನು ಮರೆಮಾಡಲಾಗಿದೆ. ನಿಮ್ಮ 🧲 ಕಾಂತದ ಸಹಾಯದಿಂದ ಕೇವಲ <b>ಕಾಂತೀಯ ವಸ್ತುಗಳನ್ನು (Magnetic Items)</b> ಮಾತ್ರ ಹುಡುಕಿ ಕ್ಲಿಕ್ ಮಾಡಿ! ತಪ್ಪು ವಸ್ತು ಮುಟ್ಟಿದರೆ ಸಮಯ ಕಡಿತವಾಗುತ್ತದೆ!</p>
+    </header>
+
+    <div class="game-container">
+        <div class="stats-bar">
+            <div id="score">💰 ಗಳಿಸಿದ ಅಂಕಗಳು: 0</div>
+            <div id="timer">⏱️ ಸಮಯ: 30 ಸೆ</div>
+        </div>
+
+        <div class="playground" id="playground">
+            <div class="feedback-overlay" id="overlay">
+                <h2 id="overlayTitle">ಬೇಟೆಗೆ ಸಿದ್ಧರಾಗಿ!</h2>
+                <p id="overlayText">ನಿಮಗೆ 30 ಸೆಕೆಂಡುಗಳ ಕಾಲಾವಕಾಶವಿರುತ್ತದೆ.</p>
+                <button class="btn" id="startBtn" onclick="startGame()">ಆಟವನ್ನು ಪ್ರಾರಂಭಿಸಿ ➔</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ಮೈದಾನದಲ್ಲಿ ಹರಡುವ ವಸ್ತುಗಳ ಡೇಟಾಬೇಸ್
+        const itemsData = [
+            // ಕಾಂತೀಯ ವಸ್ತುಗಳು (Magnetic Materials)
+            { name: "ಕಬೀಣದ ಮೊಳೆ", emoji: "🔩", isMagnetic: true },
+            { name: "ಕಬ್ಬಿಣದ ಕೀಲಿ", emoji: "🔑", isMagnetic: true },
+            { name: "ಸ್ಟೀಲ್ ನಾಣ್ಯ", emoji: "🪙", isMagnetic: true },
+            { name: "ಸುರಕ್ಷತಾ ಸೂಜಿ", emoji: "🧡", isMagnetic: true },
+            { name: "ಕಬ್ಬಿಣದ ಕ್ಲಿಪ್", emoji: "📎", isMagnetic: true },
+            // ಕಾಂತೀಯವಲ್ಲದ ವಸ್ತುಗಳು (Non-Magnetic Materials)
+            { name: "ಪ್ಲಾಸ್ಟಿಕ್ ಬಟನ್", emoji: "🧸", isMagnetic: false },
+            { name: "ಕಾಗದದ ತುಂಡು", emoji: "📄", isMagnetic: false },
+            { name: "ರಬ್ಬರ್ ಎರೇಸರ್", emoji: "✏️", isMagnetic: false },
+            { name: "ಮರದ ತುಂಡು", emoji: "🪵", isMagnetic: false },
+            { name: "ಗಾಜಿನ ಗೋಲಿ", emoji: "🔮", isMagnetic: false },
+            { name: "ಪ್ಲಾಸ್ಟಿಕ್ ಚಮಚ", emoji: "🥄", isMagnetic: false },
+            { name: "ಎಲೆ", emoji: "🍃", isMagnetic: false }
+        ];
+
+        let score = 0;
+        let timeLeft = 30;
+        let gameInterval = null;
+        let gameActive = false;
+        let totalMagneticItems = 0;
+
+        // ಆಟವನ್ನು ಪ್ರಾರಂಭಿಸುವ ಫಂಕ್ಷನ್
+        function startGame() {
+            score = 0;
+            timeLeft = 30;
+            gameActive = true;
+            document.getElementById('score').innerText = `💰 ಗಳಿಸಿದ ಅಂಕಗಳು: ${score}`;
+            document.getElementById('timer').innerText = `⏱️ ಸಮಯ: ${timeLeft} ಸೆ`;
+            document.getElementById('overlay').style.display = 'none';
+
+            // ಹಳೆಯ ವಸ್ತುಗಳನ್ನು ತೆಗೆದು ಹೊಸದಾಗಿ ಹರಡುವುದು
+            generateItems();
+
+            // ಟೈಮರ್ ಆರಂಭ
+            clearInterval(gameInterval);
+            gameInterval = setInterval(() => {
+                timeLeft--;
+                document.getElementById('timer').innerText = `⏱️ ಸಮಯ: ${timeLeft} ಸೆ`;
+                
+                if (timeLeft <= 0) {
+                    endGame();
+                }
+            }, 1000);
+        }
+
+        // ಮೈದಾನದಲ್ಲಿ ವಸ್ತುಗಳನ್ನು ಯಾದೃಚ್ಛಿಕವಾಗಿ (Random) ಹರಡುವುದು
+        function generateItems() {
+            const playground = document.getElementById('playground');
+            
+            // ಹಳೆಯ ಐಟಂಗಳನ್ನು ಕ್ಲಿಯರ್ ಮಾಡುವುದು
+            const oldItems = playground.querySelectorAll('.item');
+            oldItems.forEach(el => el.remove());
+
+            totalMagneticItems = 0;
+
+            // ಐಟಂಗಳನ್ನು ಲೂಪ್ ಮಾಡಿ ಮೈದಾನದ ಬೇರೆ ಬೇರೆ ಕಡೆ ಹಾಕುವುದು
+            // ಗೇಮ್ ಸ್ವಲ್ಪ ಕಷ್ಟವಾಗಲು ಐಟಂಗಳ ಪಟ್ಟಿಯನ್ನು 2 ಬಾರಿ ಬಳಸೋಣ
+            const doubleItems = [...itemsData, ...itemsData];
+
+            doubleItems.forEach(item => {
+                if (item.isMagnetic) totalMagneticItems++;
+
+                const el = document.createElement('div');
+                el.className = 'item';
+                el.innerText = item.emoji;
+                el.setAttribute('title', item.name);
+
+                // ಯಾದೃಚ್ಛಿಕ ಸ್ಥಾನಗಳು (X, Y ಅಕ್ಷಗಳು)
+                const posX = Math.floor(Math.random() * (playground.clientWidth - 70));
+                const posY = Math.floor(Math.random() * (playground.clientHeight - 70));
+
+                el.style.left = posX + 'px';
+                el.style.top = posY + 'px';
+
+                // ಕ್ಲಿಕ್ ಮಾಡಿದಾಗ ಪರಿಶೀಲಿಸುವ ಲಾಜಿಕ್
+                el.onclick = (e) => handleItemClick(item, el, e);
+
+                playground.appendChild(el);
+            });
+        }
+
+        // ವಸ್ತುವನ್ನು ಕ್ಲಿಕ್ ಮಾಡಿದಾಗ ಕಾಂತದ ಆಕರ್ಷಣೆ ಪರಿಶೀಲನೆ
+        function handleItemClick(item, element, event) {
+            if (!gameActive) return;
+
+            const playground = document.getElementById('playground');
+
+            if (item.isMagnetic) {
+                // ಯಶಸ್ಸು: ಕಾಂತೀಯ ವಸ್ತು ಆಕರ್ಷಿತವಾಯಿತು!
+                score += 10;
+                totalMagneticItems--;
+                document.getElementById('score').innerText = `💰 ಗಳಿಸಿದ ಅಂಕಗಳು: ${score}`;
+                
+                // ಆಕರ್ಷಣೆಯ ಅನಿಮೇಷನ್ ಎಫೆಕ್ಟ್
+                element.classList.add('attracted');
+                showFloatingMessage("+10 ಆಕರ್ಷಿತವಾಯಿತು! 🧲", event.clientX, event.clientY, "#22c55e");
+
+                // ಎಲ್ಲಾ ಕಾಂತೀಯ ವಸ್ತುಗಳು ಖಾಲಿಯಾದರೆ ಆಟ ಮುಕ್ತಾಯ
+                if (totalMagneticItems === 0) {
+                    endGame(true);
+                }
+            } else {
+                // ತಪ್ಪು: ಕಾಂತೀಯವಲ್ಲದ ವಸ್ತು (ಕಾಂತಕ್ಕೆ ಅಂಟಿಕೊಳ್ಳುವುದಿಲ್ಲ)
+                timeLeft = Math.max(0, timeLeft - 4); // 4 ಸೆಕೆಂಡ್ ಶಿಕ್ಷೆ!
+                document.getElementById('timer').innerText = `⏱️ ಸಮಯ: ${timeLeft} ಸೆ`;
+                
+                showFloatingMessage("❌ ಅಂಟಿಕೊಳ್ಳುವುದಿಲ್ಲ! (ಸಮಯ -4ಸೆ)", event.clientX, event.clientY, "#ef4444");
+            }
+        }
+
+        // ತೇಲುವ ಸಂದೇಶಗಳು (+10 ಅಥವಾ ತಪ್ಪು ಎಂದು ತೋರಿಸಲು)
+        function showFloatingMessage(text, clientX, clientY, color) {
+            const msg = document.createElement('div');
+            msg.className = 'floating-message';
+            msg.innerText = text;
+            msg.style.backgroundColor = color;
+            
+            // ಮೌಸ್ ಕ್ಲಿಕ್ ಮಾಡಿದ ಜಾಗಕ್ಕೆ ಸಂದೇಶವನ್ನು ಹೊಂದಿಸುವುದು
+            const playground = document.getElementById('playground');
+            const rect = playground.getBoundingClientRect();
+            msg.style.left = (clientX - rect.left) + 'px';
+            msg.style.top = (clientY - rect.top) + 'px';
+
+            playground.appendChild(msg);
+            setTimeout(() => msg.remove(), 1000);
+        }
+
+        // ಆಟದ ಮುಕ್ತಾಯ
+        function endGame(allCollected = false) {
+            gameActive = false;
+            clearInterval(gameInterval);
+
+            const overlay = document.getElementById('overlay');
+            const title = document.getElementById('overlayTitle');
+            const text = document.getElementById('overlayText');
+            const btn = document.getElementById('startBtn');
+
+            overlay.style.display = 'flex';
+            btn.innerText = "ಮತ್ತೆ ಆಡಿ 🔄";
+
+            if (allCollected) {
+                title.innerText = "🎉 ಅದ್ಭುತ ಜಯ! 🎉";
+                text.innerHTML = `ನೀವು ಮೈದಾನದಲ್ಲಿದ್ದ ಎಲ್ಲಾ ಕಾಂತೀಯ ವಸ್ತುಗಳನ್ನು ಯಶಸ್ವಿಯಾಗಿ ಆಕರ್ಷಿಸಿದ್ದೀರಿ!<br><b>ಒಟ್ಟು ಅಂಕಗಳು: ${score}</b>`;
+            } else {
+                title.innerText = "⏱️ ಸಮಯ ಮುಕ್ತಾಯವಾಯಿತು!";
+                text.innerHTML = `ಆಟದ ಸಮಯ ಮುಗಿದಿದೆ. ನೀವು ಸಂಗ್ರಹಿಸಿದ ಒಟ್ಟು ನಿಧಿ:<br><b>ಒಟ್ಟು ಅಂಕಗಳು: ${score}</b>`;
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ರಹಸ್ಯ ಪೆಟ್ಟಿಗೆಯ ಪತ್ತೇದಾರಿ (Mystery Box Detective)</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-color: #f8fafc;
+            --accent-blue: #38bdf8;
+            --success-green: #22c55e;
+            --fail-red: #ef4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        header h1 {
+            font-size: 2.2rem;
+            color: var(--accent-blue);
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
+        }
+
+        header p {
+            color: #94a3b8;
+            font-size: 1.1rem;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+
+        .game-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            align-items: start;
+        }
+
+        @media (max-width: 768px) {
+            .game-layout { grid-template-columns: 1fr; }
+        }
+
+        /* Box Animation Area */
+        .box-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #0f172a;
+            padding: 20px;
+            border-radius: 12px;
+            border: 2px dashed #334155;
+            min-height: 250px;
+        }
+
+        .mystery-box-emoji {
+            font-size: 6rem;
+            transition: transform 0.5s ease;
+            cursor: pointer;
+        }
+
+        .mystery-box-emoji.shake {
+            animation: shake 0.5s ease;
+        }
+
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            20% { transform: translateX(-10px) rotate(-5deg); }
+            40% { transform: translateX(10px) rotate(5deg); }
+            60% { transform: translateX(-10px) rotate(-5deg); }
+            80% { transform: translateX(10px) rotate(5deg); }
+            100% { transform: translateX(0); }
+        }
+
+        .secret-reveal {
+            font-size: 4rem;
+            display: none;
+            animation: pop 0.5s ease forward;
+        }
+
+        @keyframes pop {
+            0% { transform: scale(0); }
+            100% { transform: scale(1); }
+        }
+
+        /* Controls & Questions */
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .section-title {
+            font-weight: 600;
+            color: #94a3b8;
+            font-size: 1rem;
+            margin-bottom: 5px;
+        }
+
+        .question-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .question-btn {
+            background: #334155;
+            border: 1px solid #475569;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: left;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+        }
+
+        .question-btn:hover:not(:disabled) {
+            background: #475569;
+            border-color: var(--accent-blue);
+        }
+
+        .question-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        /* Guess Section */
+        .guess-area {
+            margin-top: 15px;
+            background: #0f172a;
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        .dropdown {
+            width: 100%;
+            padding: 10px;
+            border-radius: 6px;
+            background: var(--card-bg);
+            color: white;
+            border: 1px solid #475569;
+            font-size: 1rem;
+            margin-bottom: 10px;
+            outline: none;
+        }
+
+        .action-btn {
+            background: var(--accent-blue);
+            color: #0f172a;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+            font-size: 1rem;
+            transition: background 0.2s;
+        }
+
+        .action-btn:hover {
+            background: #7dd3fc;
+        }
+
+        /* Clue Log */
+        .log-panel {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            background: #334155;
+            min-height: 100px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .log-item {
+            font-size: 0.9rem;
+            margin-bottom: 6px;
+            padding-bottom: 4px;
+            border-bottom: 1px solid #475569;
+        }
+
+        .badge {
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 0.8rem;
+            margin-right: 5px;
+        }
+
+        .badge.yes { background: var(--success-green); color: white; }
+        .badge.no { background: var(--fail-red); color: white; }
+
+        .game-status {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-top: 10px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>🔍 ರಹಸ್ಯ ಪೆಟ್ಟಿಗೆಯ ಪತ್ತೇದಾರಿ 📦</h1>
+        <p>ಪೆಟ್ಟಿಗೆಯನ್ನು ತೆರೆಯದೆಯೇ ವೈಜ್ಞಾನಿಕ ಪ್ರಶ್ನೆಗಳನ್ನು ಕೇಳಿ ಒಳಗಿರುವ ವಸ್ತುವನ್ನು ಪತ್ತೆಹಚ್ಚಿ!</p>
+    </header>
+
+    <div class="container">
+        <div class="game-layout">
+            
+            <div>
+                <div class="box-area">
+                    <div id="mysteryBox" class="mystery-box-emoji" onclick="shakeBox()">📦</div>
+                    <div id="secretReveal" class="secret-reveal"></div>
+                    <div id="gameStatus" class="game-status" style="color: #94a3b8;">ಪೆಟ್ಟಿಗೆಯೊಳಗೆ ಒಂದು ರಹಸ್ಯ ವಸ್ತುವಿದೆ!</div>
+                </div>
+
+                <p class="section-title" style="margin-top: 15px;">ದೊರೆತ ಸುಳಿವುಗಳು (Clue Log):</p>
+                <div class="log-panel" id="clueLog">
+                    <span style="color: #94a3b8; font-size: 0.9rem;">ಇನ್ನೂ ಯಾವುದೇ ಪ್ರಶ್ನೆಗಳನ್ನು ಕೇಳಲಾಗಿಲ್ಲ...</span>
+                </div>
+            </div>
+
+            <div class="controls">
+                <p class="section-title">ಹಂತ 1: ವೈಜ್ಞಾನಿಕ ಪ್ರಶ್ನೆಗಳನ್ನು ಕೇಳಿ (ಯಾವುದಾದರೂ ಆರಿಸಿ):</p>
+                <div class="question-list">
+                    <button class="question-btn" onclick="askQuestion(0, this)">🌱 ಇದು ಪ್ರಕೃತಿಯಲ್ಲಿ ಸಿಗುವ ನೈಸರ್ಗಿಕ ವಸ್ತುವೇ?</button>
+                    <button class="question-btn" onclick="askQuestion(1, this)">🧸 ಇದರ ಮೇಲ್ಮೈ ಮುಟ್ಟಲು ಮೃದುವಾಗಿದೆಯೇ?</button>
+                    <button class="question-btn" onclick="askQuestion(2, this)">🪵 ಇದು ಸಸ್ಯ ಅಥವಾ ಜೀವಿಯಿಂದ ಪಡೆದ ವಸ್ತುವೇ?</button>
+                    <button class="question-btn" onclick="askQuestion(3, this)">💎 ಇದು ತುಂಬಾ ಗಟ್ಟಿಯಾಗಿದೆಯೇ?</button>
+                    <button class="question-btn" onclick="askQuestion(4, this)">✍️ ಇದನ್ನು ಬರೆಯಲು ಅಥವಾ ಕಲಿಯಲು ಬಳಸುತ್ತಾರೆಯೇ?</button>
+                </div>
+
+                <div class="guess-area">
+                    <p class="section-title">ಹಂತ 2: ನಿಮ್ಮ ಅಂತಿಮ ಊಹೆಯನ್ನು ಆಯ್ಕೆಮಾಡಿ:</p>
+                    <select id="guessSelect" class="dropdown">
+                        <option value="">-- ವಸ್ತುವನ್ನು ಆರಿಸಿ --</option>
+                        <option value="ಎಲೆ">🍃 ಎಲೆ (Leaf)</option>
+                        <option value="ಕಲ್ಲು">🪨 ಕಲ್ಲು (Stone)</option>
+                        <option value="ಪೆನ್">🖊️ ಪೆನ್ (Pen)</option>
+                        <option value="ಸೇಬು ಹಣ್ಣು">🍎 ಸೇಬು ಹಣ್ಣು (Apple)</option>
+                    </select>
+                    <button class="action-btn" onclick="checkGuess()">ಊಹೆಯನ್ನು ಪರಿಶೀಲಿಸಿ!</button>
+                    <button class="action-btn" style="background:#64748b; margin-top: 8px; color:white;" onclick="resetGame()">ಹೊಸ ಆಟ ಪ್ರಾರಂಭಿಸಿ</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // ರಹಸ್ಯ ವಸ್ತುಗಳ ಡೇಟಾಬೇಸ್ (ವೈಜ್ಞಾನಿಕ ಲಕ್ಷಣಗಳೊಂದಿಗೆ)
+        const items = [
+            { name: "ಎಲೆ", emoji: "🍃", answers: [true, true, true, false, false] },
+            { name: "ಕಲ್ಲು", emoji: "🪨", answers: [true, false, false, true, false] },
+            { name: "ಪೆನ್", emoji: "🖊️", answers: [false, false, false, true, true] },
+            { name: "ಸೇಬು ಹಣ್ಣು", emoji: "🍎", answers: [true, true, true, false, false] } 
+            // ಗಮನಿಸಿ: ಎಲೆ ಮತ್ತು ಸೇಬು ಹಣ್ಣಿಗೆ ಕೆಲವು ಲಕ್ಷಣಗಳು ಸೇಮ್ ಇದ್ದರೂ ಬರೆಯುವಾಗ/ಊಹಿಸುವಾಗ ಮಗು ಯೋಚಿಸಬೇಕು.
+        ];
+
+        let currentItem = {};
+        let firstQuestionAsked = false;
+
+        // ಆಟದ ಆರಂಭ
+        function initGame() {
+            // ಯಾದೃಚ್ಛಿಕವಾಗಿ (Random) ಒಂದು ವಸ್ತುವನ್ನು ಆಯ್ಕೆ ಮಾಡುವುದು
+            const randomIndex = Math.floor(Math.random() * items.length);
+            currentItem = items[randomIndex];
+            
+            // ರೀಸೆಟ್ ಯುಐ
+            document.getElementById('mysteryBox').style.display = 'block';
+            document.getElementById('secretReveal').style.display = 'none';
+            document.getElementById('clueLog').innerHTML = '<span style="color: #94a3b8; font-size: 0.9rem;">ಇನ್ನೂ ಯಾವುದೇ ಪ್ರಶ್ನೆಗಳನ್ನು ಕೇಳಲಾಗಿಲ್ಲ...</span>';
+            document.getElementById('gameStatus').innerHTML = 'ಪೆಟ್ಟಿಗೆಯೊಳಗೆ ಒಂದು ರಹಸ್ಯ ವಸ್ತುವಿದೆ!';
+            document.getElementById('gameStatus').style.color = '#94a3b8';
+            document.getElementById('guessSelect').value = "";
+            
+            // ಪ್ರಶ್ನೆ ಬಟನ್‌ಗಳನ್ನು ಮರುಸಕ್ರಿಯಗೊಳಿಸುವುದು
+            document.querySelectorAll('.question-btn').forEach(btn => {
+                btn.disabled = false;
+            });
+            firstQuestionAsked = false;
+        }
+
+        // ಪೆಟ್ಟಿಗೆಯನ್ನು ಅಲ್ಲಾಡಿಸುವ ಅನಿಮೇಷನ್
+        function shakeBox() {
+            const box = document.getElementById('mysteryBox');
+            box.classList.add('shake');
+            setTimeout(() => box.classList.remove('shake'), 500);
+        }
+
+        // ಪ್ರಶ್ನೆ ಕೇಳುವ ಲಾಜಿಕ್
+        function askQuestion(qIndex, btnElement) {
+            if (!firstQuestionAsked) {
+                document.getElementById('clueLog').innerHTML = ''; // ಹಳೆಯ ಮೆಸೇಜ್ ಕ್ಲಿಯರ್ ಮಾಡಲು
+                firstQuestionAsked = true;
+            }
+
+            shakeBox();
+            btnElement.disabled = true; // ಒಂದು ಬಾರಿ ಕೇಳಿದ ಪ್ರಶ್ನೆಯನ್ನು ಲಾಕ್ ಮಾಡುವುದು
+
+            const isYes = currentItem.answers[qIndex];
+            const answerText = isYes ? "ಹೌದು" : "ಅಲ್ಲ";
+            const badgeClass = isYes ? "yes" : "no";
+            const questionText = btnElement.innerText;
+
+            // ಲಾಗ್‌ಗೆ ಸೇರಿಸುವುದು
+            const logPanel = document.getElementById('clueLog');
+            const logItem = document.createElement('div');
+            logItem.className = 'log-item';
+            logItem.innerHTML = `<span class="badge ${badgeClass}">${answerText}</span> ${questionText}`;
+            logPanel.appendChild(logItem);
+            logPanel.scrollTop = logPanel.scrollHeight; // ಸ್ಕ್ರಾಲ್ ಕೆಳಗೆ ಮಾಡಲು
+        }
+
+        // ಊಹೆ ಸರಿಯಾಗಿದೆಯೇ ಎಂದು ಪರಿಶೀಲಿಸುವುದು
+        function checkGuess() {
+            const userGuess = document.getElementById('guessSelect').value;
+            const statusText = document.getElementById('gameStatus');
+            
+            if (!userGuess) {
+                alert("ದಯವಿಟ್ಟು ಪಟ್ಟಿಯಿಂದ ಒಂದು ವಸ್ತುವನ್ನು ಆಯ್ಕೆಮಾಡಿ!");
+                return;
+            }
+
+            if (userGuess === currentItem.name) {
+                // ಗೆಲುವು! ಪೆಟ್ಟಿಗೆ ಓಪನ್ ಆಗುತ್ತದೆ
+                document.getElementById('mysteryBox').style.display = 'none';
+                const reveal = document.getElementById('secretReveal');
+                reveal.style.display = 'block';
+                reveal.innerText = currentItem.emoji;
+                
+                statusText.innerHTML = `🎉 ಅದ್ಭುತ! ನೀವು ಸರಿಯಾಗಿ ಪತ್ತೆಹಚ್ಚಿದ್ದೀರಿ: <b>${currentItem.name}</b>`;
+                statusText.style.color = "var(--success-green)";
+                
+                // ಎಲ್ಲಾ ಪ್ರಶ್ನೆಗಳನ್ನು ಲಾಕ್ ಮಾಡುವುದು
+                document.querySelectorAll('.question-btn').forEach(btn => btn.disabled = true);
+            } else {
+                // ತಪ್ಪು ಊಹೆ
+                shakeBox();
+                statusText.innerText = "❌ ತಪ್ಪು ಊಹೆ! ಸುಳಿವುಗಳನ್ನು ಮತ್ತೊಮ್ಮೆ ಗಮನಿಸಿ ಪ್ರಯತ್ನಿಸಿ.";
+                statusText.style.color = "var(--fail-red)";
+            }
+        }
+
+        function resetGame() {
+            initGame();
+        }
+
+        // ಪುಟ ಲೋಡ್ ಆದಾಗ ಆಟ ಶುರುವಾಗಲಿ
+        window.onload = initGame;
+    </script>
+</body>
+</html>
