@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಸಂಖ್ಯಾರೇಖೆಯ ಮೇಲೆ ಪೂರ್ಣಾಂಕಗಳು</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #e3f2fd;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+            text-align: center;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            border-top: 8px solid #1976D2;
+        }
+        h1 {
+            color: #1565C0;
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        p.desc {
+            font-size: 18px;
+            color: #555;
+            margin-bottom: 20px;
+        }
+        .score-board {
+            font-size: 22px;
+            font-weight: bold;
+            color: #d32f2f;
+            background-color: #ffebee;
+            padding: 10px 20px;
+            border-radius: 8px;
+            display: inline-block;
+            margin-bottom: 20px;
+            border: 2px dashed #f44336;
+        }
+        .target-box {
+            font-size: 26px;
+            font-weight: bold;
+            color: #ffffff;
+            background-color: #00838F;
+            padding: 15px 30px;
+            border-radius: 10px;
+            display: inline-block;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        .target-number {
+            font-size: 40px;
+            color: #FFEB3B;
+            display: block;
+            margin-top: 5px;
+        }
+        .canvas-wrapper {
+            overflow-x: auto; /* For smaller screens */
+            padding: 10px 0;
+        }
+        canvas {
+            background-color: #fafafa;
+            border: 2px solid #ccc;
+            border-radius: 10px;
+            cursor: pointer;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
+        }
+        #feedback {
+            font-size: 24px;
+            font-weight: bold;
+            margin-top: 25px;
+            min-height: 35px;
+        }
+        .btn-next {
+            background-color: #4CAF50;
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 20px;
+            display: none;
+            transition: 0.3s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        }
+        .btn-next:hover {
+            background-color: #388E3C;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>➖ ಸಂಖ್ಯಾರೇಖೆಯ ಮೇಲೆ ಪೂರ್ಣಾಂಕಗಳು ➕</h1>
+        <p class="desc">ಸಂಖ್ಯಾರೇಖೆಯ (Number Line) ಮೇಲೆ ಸರಿಯಾದ ಪೂರ್ಣಾಂಕವನ್ನು ಗುರುತಿಸಿ ಕ್ಲಿಕ್ ಮಾಡಿ.</p>
+
+        <div class="score-board">
+            ಅಂಕಗಳು: <span id="score">0</span>
+        </div>
+
+        <div>
+            <div class="target-box">
+                ಈ ಪೂರ್ಣಾಂಕವನ್ನು ಹುಡುಕಿ:
+                <span class="target-number" id="targetDisplay">0</span>
+            </div>
+        </div>
+
+        <div class="canvas-wrapper">
+            <canvas id="numberLineCanvas" width="800" height="150"></canvas>
+        </div>
+
+        <div id="feedback"></div>
+        <button class="btn-next" id="nextBtn" onclick="generateNewTarget()">ಮುಂದಿನ ಪ್ರಶ್ನೆ ➡️</button>
+    </div>
+
+    <script>
+        const canvas = document.getElementById("numberLineCanvas");
+        const ctx = canvas.getContext("2d");
+
+        // Canvas configuration
+        const padding = 50;
+        const lineY = 75;
+        const minVal = -10;
+        const maxVal = 10;
+        const range = maxVal - minVal;
+        const intervalWidth = (canvas.width - 2 * padding) / range;
+
+        let targetInteger = 0;
+        let score = 0;
+        let isWaitingForNext = false;
+
+        // Initialize game
+        window.onload = function() {
+            generateNewTarget();
+        };
+
+        function drawNumberLine(highlightVal = null, isCorrect = false) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw Main Line
+            ctx.beginPath();
+            ctx.moveTo(padding - 20, lineY);
+            ctx.lineTo(canvas.width - padding + 20, lineY);
+            ctx.lineWidth = 4;
+            ctx.strokeStyle = "#333";
+            ctx.stroke();
+
+            // Draw Arrows at ends
+            drawArrow(padding - 20, lineY, "left");
+            drawArrow(canvas.width - padding + 20, lineY, "right");
+
+            // Draw Ticks and Numbers
+            for (let i = minVal; i <= maxVal; i++) {
+                let x = padding + (i - minVal) * intervalWidth;
+                
+                // Tick line
+                ctx.beginPath();
+                ctx.moveTo(x, lineY - 10);
+                ctx.lineTo(x, lineY + 10);
+                
+                // Highlight zero and clicked value
+                if (i === highlightVal) {
+                    ctx.strokeStyle = isCorrect ? "#4CAF50" : "#F44336"; // Green if correct, Red if wrong
+                    ctx.lineWidth = 6;
+                } else if (i === 0) {
+                    ctx.strokeStyle = "#1976D2"; // Blue for Zero
+                    ctx.lineWidth = 4;
+                } else {
+                    ctx.strokeStyle = "#555";
+                    ctx.lineWidth = 2;
+                }
+                ctx.stroke();
+
+                // Numbers
+                ctx.fillStyle = (i === highlightVal) ? (isCorrect ? "#2E7D32" : "#D32F2F") : (i === 0 ? "#1976D2" : "#333");
+                ctx.font = (i === highlightVal || i === 0) ? "bold 18px Arial" : "16px Arial";
+                ctx.textAlign = "center";
+                ctx.fillText(i, x, lineY + 35);
+                
+                // Highlight Circle
+                if (i === highlightVal) {
+                    ctx.beginPath();
+                    ctx.arc(x, lineY, 12, 0, Math.PI * 2);
+                    ctx.fillStyle = isCorrect ? "rgba(76, 175, 80, 0.3)" : "rgba(244, 67, 54, 0.3)";
+                    ctx.fill();
+                    ctx.strokeStyle = isCorrect ? "#4CAF50" : "#F44336";
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                }
+            }
+        }
+
+        function drawArrow(x, y, direction) {
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+            if (direction === "left") {
+                ctx.lineTo(x + 15, y - 8);
+                ctx.lineTo(x + 15, y + 8);
+            } else {
+                ctx.lineTo(x - 15, y - 8);
+                ctx.lineTo(x - 15, y + 8);
+            }
+            ctx.fillStyle = "#333";
+            ctx.fill();
+        }
+
+        function generateNewTarget() {
+            // Generate a random integer between -10 and 10
+            targetInteger = Math.floor(Math.random() * (range + 1)) + minVal;
+            document.getElementById("targetDisplay").innerText = targetInteger;
+            
+            // Reset UI
+            document.getElementById("feedback").innerText = "";
+            document.getElementById("nextBtn").style.display = "none";
+            isWaitingForNext = false;
+
+            drawNumberLine();
+        }
+
+        // Handle Canvas Clicks
+        canvas.addEventListener("click", function(event) {
+            if (isWaitingForNext) return; // Prevent clicking after answering
+
+            let rect = canvas.getBoundingClientRect();
+            // Adjust for canvas scaling in some displays
+            let scaleX = canvas.width / rect.width; 
+            let clickX = (event.clientX - rect.left) * scaleX;
+
+            // Calculate which integer is closest to the click
+            let clickedFloat = ((clickX - padding) / intervalWidth) + minVal;
+            let clickedInt = Math.round(clickedFloat);
+
+            // Check if click was reasonably close to the integer mark (Tolerance)
+            let distance = Math.abs(clickedFloat - clickedInt);
+            
+            let feedback = document.getElementById("feedback");
+
+            if (clickedInt >= minVal && clickedInt <= maxVal && distance < 0.4) {
+                if (clickedInt === targetInteger) {
+                    // Correct Answer
+                    drawNumberLine(clickedInt, true);
+                    feedback.innerText = `✅ ಅದ್ಭುತ! ನೀವು ಸರಿಯಾಗಿ ${targetInteger} ನ್ನು ಗುರುತಿಸಿದ್ದೀರಿ.`;
+                    feedback.style.color = "#2E7D32";
+                    score += 10;
+                    document.getElementById("score").innerText = score;
+                    
+                    document.getElementById("nextBtn").style.display = "inline-block";
+                    isWaitingForNext = true;
+                } else {
+                    // Wrong Answer
+                    drawNumberLine(clickedInt, false);
+                    feedback.innerText = `❌ ತಪ್ಪಾಗಿದೆ. ನೀವು ಕ್ಲಿಕ್ ಮಾಡಿದ್ದು ${clickedInt} ರ ಮೇಲೆ. ಮತ್ತೊಮ್ಮೆ ಪ್ರಯತ್ನಿಸಿ!`;
+                    feedback.style.color = "#D32F2F";
+                }
+            }
+        });
+    </script>
+</body>
+</html>

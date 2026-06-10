@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಪೂರ್ಣಾಂಕಗಳ ವ್ಯವಕಲನ ಆಟ</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #e0f2f1;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+            text-align: center;
+        }
+        .container {
+            max-width: 850px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            border-top: 8px solid #00897b;
+        }
+        h1 {
+            color: #00695c;
+            font-size: 32px;
+            margin-bottom: 5px;
+        }
+        .rules {
+            background-color: #f5f5f5;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 16px;
+            border: 2px dashed #00897b;
+            text-align: left;
+            display: inline-block;
+        }
+        .level-indicator {
+            font-size: 20px;
+            font-weight: bold;
+            color: #d84315;
+            margin-bottom: 10px;
+        }
+        .problem-box {
+            font-size: 36px;
+            font-weight: bold;
+            color: #fff;
+            background-color: #00acc1;
+            padding: 20px;
+            border-radius: 10px;
+            display: inline-block;
+            margin-bottom: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        }
+        .instruction-box {
+            font-size: 18px;
+            color: #e65100;
+            background-color: #ffe0b2;
+            padding: 10px 20px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        
+        /* Workspace */
+        .workspace-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #424242;
+            margin-bottom: 10px;
+        }
+        .workspace {
+            background-color: #fafafa;
+            border: 3px solid #b0bec5;
+            border-radius: 15px;
+            min-height: 200px;
+            padding: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            align-content: flex-start;
+            gap: 15px;
+            justify-content: center;
+        }
+        .coin {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            font-weight: bold;
+            color: white;
+            box-shadow: inset -3px -3px 6px rgba(0,0,0,0.3), 2px 2px 5px rgba(0,0,0,0.2);
+            cursor: pointer;
+            animation: popIn 0.3s ease-out;
+            transition: transform 0.2s;
+        }
+        .coin:hover { transform: scale(1.1); }
+        .coin.pos { background: radial-gradient(circle at 30% 30%, #66bb6a, #2e7d32); }
+        .coin.neg { background: radial-gradient(circle at 30% 30%, #ef5350, #c62828); }
+        .coin.fading { transform: scale(0); opacity: 0; transition: 0.3s; }
+        
+        /* Controls & Actions */
+        .btn-zero {
+            background-color: #9c27b0;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            margin-bottom: 20px;
+        }
+        .btn-zero:hover { background-color: #7b1fa2; transform: translateY(-2px); }
+
+        .action-area {
+            background-color: #e0f7fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 10px;
+            border: 2px solid #80deea;
+        }
+        input[type="number"] {
+            font-size: 24px;
+            padding: 10px;
+            width: 100px;
+            text-align: center;
+            border: 2px solid #0097a7;
+            border-radius: 8px;
+            margin-right: 10px;
+        }
+        .btn-submit {
+            background-color: #4CAF50;
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        }
+        .btn-submit:hover { background-color: #388E3C; }
+
+        .btn-hint {
+            background-color: #2196F3;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-left: 10px;
+            transition: 0.3s;
+        }
+        .btn-hint:hover { background-color: #1976D2; }
+        
+        .hint-box {
+            display: none;
+            background-color: #fff9c4;
+            color: #f57f17;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            border-left: 5px solid #fbc02d;
+            text-align: left;
+        }
+        
+        #feedback {
+            font-size: 22px;
+            font-weight: bold;
+            margin-top: 15px;
+            min-height: 30px;
+        }
+        .btn-next {
+            background-color: #ff9800;
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            display: none;
+            margin: 20px auto 0 auto;
+        }
+        .btn-next:hover { background-color: #f57c00; }
+        
+        #victoryScreen { display: none; margin-top: 30px; }
+
+        @keyframes popIn { 0% { transform: scale(0); } 80% { transform: scale(1.2); } 100% { transform: scale(1); } }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>🎮 ಪೂರ್ಣಾಂಕಗಳ ವ್ಯವಕಲನ ಆಟ</h1>
+        <div class="rules">
+            <b>ನಿಯಮಗಳು:</b><br>
+            1. ವ್ಯವಕಲನ (ಕಳೆಯುವುದು) ಎಂದರೆ <b>"ತೆಗೆಯುವುದು"</b>.<br>
+            2. ತೆಗೆಯಲು ಸಾಕಷ್ಟು ನಾಣ್ಯಗಳಿಲ್ಲದಿದ್ದರೆ, <b>"ಶೂನ್ಯ ಜೋಡಿ (1 ಹಸಿರು + 1 ಕೆಂಪು)"</b> ಯನ್ನು ಸೇರಿಸಿ.<br>
+            3. ನಾಣ್ಯವನ್ನು ತೆಗೆಯಲು <b>ಅದರ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ</b>.
+        </div>
+
+        <div id="gameplayArea">
+            <div class="level-indicator" id="levelDisplay">ಹಂತ: 1 / 15</div>
+            
+            <div class="problem-box" id="problemDisplay"></div>
+            <br>
+            <div class="instruction-box" id="taskInstruction"></div>
+
+            <div class="workspace-title">ನಿಮ್ಮ ಬೋರ್ಡ್ (ಇಲ್ಲಿಂದ ನಾಣ್ಯಗಳನ್ನು ತೆಗೆಯಿರಿ):</div>
+            <button class="btn-zero" onclick="addZeroPair()">➕ ಶೂನ್ಯ ಜೋಡಿ ಸೇರಿಸಿ (Add Zero Pair)</button>
+
+            <div class="workspace" id="workspace"></div>
+
+            <div class="action-area" id="actionArea">
+                <label style="font-size:20px; font-weight:bold;">ಅಂತಿಮ ಉತ್ತರ: </label>
+                <input type="number" id="finalAnswer" placeholder="ಉತ್ತರ">
+                <button class="btn-submit" onclick="checkAnswer()">ಪರಿಶೀಲಿಸಿ</button>
+                <button class="btn-hint" onclick="showHint()">💡 ಸುಳಿವು (Hint)</button>
+                
+                <div class="hint-box" id="hintBox"></div>
+            </div>
+
+            <div id="feedback"></div>
+            <button class="btn-next" id="nextBtn" onclick="nextLevel()">ಮುಂದಿನ ಹಂತ ➡️</button>
+        </div>
+
+        <div id="victoryScreen">
+            <h2 style="color: #4CAF50; font-size: 36px;">🎉 ಅದ್ಭುತ! ನೀವು ವ್ಯವಕಲನವನ್ನು ಗೆದ್ದಿದ್ದೀರಿ! 🎉</h2>
+            <p style="font-size: 22px;">ಶೂನ್ಯ ಜೋಡಿಗಳನ್ನು ಬಳಸಿ ಕಳೆಯುವ ತಂತ್ರವನ್ನು ನೀವು ಕರಗತ ಮಾಡಿಕೊಂಡಿದ್ದೀರಿ.</p>
+            <div style="font-size: 80px; margin: 20px 0;">🏅🧠🚀</div>
+            <button class="btn-submit" style="background-color: #ff9800;" onclick="location.reload()">ಮತ್ತೆ ಆಡಿ</button>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            { n1: 5, n2: 2 }, { n1: -4, n2: -1 }, { n1: 3, n2: 5 }, { n1: 4, n2: -2 },
+            { n1: -3, n2: 2 }, { n1: -2, n2: -6 }, { n1: 0, n2: 4 }, { n1: 0, n2: -3 },
+            { n1: 5, n2: -5 }, { n1: -4, n2: 4 }, { n1: 6, n2: 6 }, { n1: -7, n2: -7 },
+            { n1: 2, n2: 8 }, { n1: -1, n2: -8 }, { n1: -5, n2: 5 }
+        ];
+
+        let currentLevelIndex = 0;
+        let coinsArray = []; 
+
+        window.onload = function() { loadLevel(); };
+
+        function loadLevel() {
+            if (currentLevelIndex >= questions.length) {
+                document.getElementById("gameplayArea").style.display = "none";
+                document.getElementById("victoryScreen").style.display = "block";
+                return;
+            }
+
+            let q = questions[currentLevelIndex];
+            document.getElementById("levelDisplay").innerText = `ಹಂತ: ${currentLevelIndex + 1} / 15`;
+            let displayNum2 = q.n2 < 0 ? `(${q.n2})` : q.n2;
+            document.getElementById("problemDisplay").innerText = `${q.n1} - ${displayNum2} = ?`;
+
+            let colorToTake = q.n2 > 0 ? "ಹಸಿರು (Green)" : "ಕೆಂಪು (Red)";
+            let amountToTake = Math.abs(q.n2);
+            document.getElementById("taskInstruction").innerHTML = `ಗುರಿ: ಬೋರ್ಡ್‌ನಿಂದ <b>${amountToTake} ${colorToTake}</b> ನಾಣ್ಯಗಳನ್ನು ಕ್ಲಿಕ್ ಮಾಡಿ ತೆಗೆಯಿರಿ!`;
+
+            coinsArray = [];
+            let type = q.n1 > 0 ? 'pos' : 'neg';
+            let count = Math.abs(q.n1);
+            for(let i=0; i<count; i++) coinsArray.push(type);
+
+            renderCoins();
+
+            // Reset UI
+            document.getElementById("finalAnswer").value = "";
+            document.getElementById("feedback").innerText = "";
+            document.getElementById("hintBox").style.display = "none";
+            document.getElementById("nextBtn").style.display = "none";
+            document.querySelector('.btn-zero').disabled = false;
+        }
+
+        function renderCoins() {
+            let workspace = document.getElementById("workspace");
+            workspace.innerHTML = "";
+            
+            coinsArray.forEach((type, index) => {
+                let coin = document.createElement("div");
+                coin.className = `coin ${type}`;
+                coin.innerText = type === 'pos' ? "+" : "-";
+                
+                coin.onclick = function() {
+                    coin.classList.add('fading');
+                    setTimeout(() => {
+                        coinsArray.splice(index, 1);
+                        document.getElementById("hintBox").style.display = "none"; // Hide hint if they take action
+                        renderCoins();
+                    }, 200);
+                };
+                workspace.appendChild(coin);
+            });
+        }
+
+        function addZeroPair() {
+            coinsArray.push('pos');
+            coinsArray.push('neg');
+            document.getElementById("hintBox").style.display = "none";
+            renderCoins();
+        }
+
+        function showHint() {
+            let q = questions[currentLevelIndex];
+            let amountToTake = Math.abs(q.n2);
+            let colorToTake = q.n2 > 0 ? 'pos' : 'neg';
+            let colorNameK = q.n2 > 0 ? 'ಹಸಿರು' : 'ಕೆಂಪು';
+
+            let currentPosCount = coinsArray.filter(c => c === 'pos').length;
+            let currentNegCount = coinsArray.filter(c => c === 'neg').length;
+            let currentCount = colorToTake === 'pos' ? currentPosCount : currentNegCount;
+
+            let hintBox = document.getElementById("hintBox");
+            
+            if (currentCount < amountToTake) {
+                let needed = amountToTake - currentCount;
+                hintBox.innerHTML = `💡 <b>ಸುಳಿವು:</b> ನಿಮಗೆ ತೆಗೆಯಲು ಒಟ್ಟು ${amountToTake} ${colorNameK} ನಾಣ್ಯಗಳು ಬೇಕು. ಆದರೆ ಬೋರ್ಡ್‌ನಲ್ಲಿ ಸಾಕಷ್ಟು ನಾಣ್ಯಗಳಿಲ್ಲ. ಆದ್ದರಿಂದ ಇನ್ನೂ <b>${needed} ಬಾರಿ "➕ ಶೂನ್ಯ ಜೋಡಿ ಸೇರಿಸಿ"</b> ಗುಂಡಿಯನ್ನು ಒತ್ತಿ!`;
+            } else if (currentCount >= amountToTake) {
+                // They have enough coins, check if they already took them away
+                let initialCoins = colorToTake === 'pos' ? (q.n1 > 0 ? q.n1 : 0) : (q.n1 < 0 ? Math.abs(q.n1) : 0);
+                
+                // Have they taken the correct amount?
+                let targetCountAfterSub = initialCoins - amountToTake; // This is a simplification, but helps.
+                
+                hintBox.innerHTML = `💡 <b>ಸುಳಿವು:</b> ನಿಮ್ಮ ಬಳಿ ಸಾಕಷ್ಟು ${colorNameK} ನಾಣ್ಯಗಳಿವೆ! ಈಗ ಬೋರ್ಡ್‌ನಿಂದ <b>ಸರಿಯಾಗಿ ${amountToTake} ${colorNameK} ನಾಣ್ಯಗಳ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ ತೆಗೆಯಿರಿ</b>. ಆಮೇಲೆ ಉಳಿದ ನಾಣ್ಯಗಳನ್ನು ಎಣಿಸಿ ಉತ್ತರ ಬರೆಯಿರಿ.`;
+            }
+            
+            hintBox.style.display = "block";
+        }
+
+        function checkAnswer() {
+            let userAnswer = parseInt(document.getElementById("finalAnswer").value);
+            let q = questions[currentLevelIndex];
+            let correctAnswer = q.n1 - q.n2;
+            let feedback = document.getElementById("feedback");
+
+            if (isNaN(userAnswer)) {
+                feedback.innerHTML = "⚠️ ದಯವಿಟ್ಟು ಉತ್ತರವನ್ನು ನಮೂದಿಸಿ!";
+                feedback.style.color = "#F57C00";
+                return;
+            }
+
+            let currentPosCount = coinsArray.filter(c => c === 'pos').length;
+            let currentNegCount = coinsArray.filter(c => c === 'neg').length;
+            let boardValue = currentPosCount - currentNegCount;
+            let hasZeroPairs = Math.min(currentPosCount, currentNegCount) > 0;
+
+            if (userAnswer === correctAnswer) {
+                if (boardValue === correctAnswer && !hasZeroPairs) {
+                    feedback.innerHTML = "🎉 <b>ಅದ್ಭುತ! ನೀವು ಸರಿಯಾಗಿ ಕಳೆದು ಉತ್ತರವನ್ನು ಕಂಡುಹಿಡಿದಿದ್ದೀರಿ!</b> 🏆";
+                    feedback.style.color = "#2E7D32";
+                    document.getElementById("nextBtn").style.display = "inline-block";
+                    document.querySelector('.btn-zero').disabled = true; 
+                    
+                    let allCoins = document.querySelectorAll('.coin');
+                    allCoins.forEach(c => c.onclick = null);
+                } else if (hasZeroPairs) {
+                    feedback.innerHTML = "⚠️ ಉತ್ತರ ಸರಿ. ಆದರೆ ಬೋರ್ಡ್ ಮೇಲೆ ಹೆಚ್ಚುವರಿ 'ಶೂನ್ಯ ಜೋಡಿಗಳು' ಉಳಿದಿವೆ. ಅವನ್ನು ತೆಗೆಯಿರಿ!";
+                    feedback.style.color = "#d84315";
+                } else {
+                    feedback.innerHTML = "⚠️ ಉತ್ತರ ಸರಿ, ಆದರೆ ಬೋರ್ಡ್‌ನಲ್ಲಿರುವ ನಾಣ್ಯಗಳು ನಿಮ್ಮ ಉತ್ತರಕ್ಕೆ ಹೊಂದಿಕೆಯಾಗುತ್ತಿಲ್ಲ. ಸರಿಯಾಗಿ ಕಳೆಯಿರಿ!";
+                    feedback.style.color = "#d84315";
+                }
+            } else {
+                feedback.innerHTML = "❌ <b>ಉತ್ತರ ತಪ್ಪಾಗಿದೆ.</b> 'ಸುಳಿವು' ಬಟನ್ ಬಳಸಿ ಮತ್ತು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.";
+                feedback.style.color = "#C62828";
+            }
+        }
+
+        function nextLevel() {
+            currentLevelIndex++;
+            loadLevel();
+        }
+    </script>
+</body>
+</html>
