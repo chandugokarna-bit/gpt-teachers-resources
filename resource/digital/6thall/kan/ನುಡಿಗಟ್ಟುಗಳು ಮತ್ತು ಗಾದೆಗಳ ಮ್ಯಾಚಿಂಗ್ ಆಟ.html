@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ನುಡಿಗಟ್ಟುಗಳು ಮತ್ತು ಗಾದೆಗಳ ಮ್ಯಾಚಿಂಗ್ ಆಟ</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f9f4;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            user-select: none;
+        }
+
+        h2 {
+            color: #27ae60;
+            margin-bottom: 5px;
+            text-align: center;
+        }
+
+        p.instruction {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+            text-align: center;
+            max-width: 600px;
+        }
+
+        /* ಮುಖ್ಯ ಗೇಮ್ ಏರಿಯಾ */
+        .match-container {
+            position: relative;
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 800px;
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            gap: 100px; /* ಗೆರೆ ಎಳೆಯಲು ಮಧ್ಯದಲ್ಲಿ ಜಾಗ */
+            box-sizing: border-box;
+        }
+
+        /* ಕಾಲಂ ಶೈಲಿ */
+        .column {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 45%;
+            z-index: 2;
+        }
+
+        .column h3 {
+            text-align: center;
+            color: #2c3e50;
+            margin-top: 0;
+            border-bottom: 2px solid #2ecc71;
+            padding-bottom: 8px;
+        }
+
+        /* ಆಪ್ಷನ್ ಬಟನ್ ಶೈಲಿ */
+        .match-btn {
+            background-color: #f8f9fa;
+            border: 2px solid #dcdde1;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 1.05rem;
+            font-weight: bold;
+            color: #2c3e50;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: left;
+            line-height: 1.5;
+        }
+
+        .match-btn:hover:not(.matched) {
+            background-color: #f1f2f6;
+            border-color: #718093;
+        }
+
+        /* ಕ್ಲಿಕ್ ಮಾಡಿದಾಗ ಆಗುವ ಬಣ್ಣ ಬದಲಾವಣೆ */
+        .match-btn.selected {
+            background-color: #e1f5fe;
+            border-color: #3498db;
+            color: #2980b9;
+        }
+
+        /* ಸರಿಯಾಗಿ ಮ್ಯಾಚ್ ಆದಾಗ */
+        .match-btn.matched {
+            background-color: #d4edda;
+            border-color: #2ecc71;
+            color: #155724;
+            cursor: default;
+        }
+
+        /* ಗೆರೆ ಎಳೆಯುವ ತಂತ್ರಜ್ಞಾನದ SVG ಕ್ಯಾನ್ವಾಸ್ */
+        svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        line {
+            stroke: #2ecc71;
+            stroke-width: 4;
+            stroke-dasharray: 5;
+            animation: dash 1s linear infinite;
+        }
+
+        @keyframes dash {
+            to { stroke-dashoffset: -20; }
+        }
+
+        #result-msg {
+            margin-top: 25px;
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #27ae60;
+            min-height: 35px;
+            text-align: center;
+        }
+
+        .restart-btn {
+            margin-top: 15px;
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            display: none;
+        }
+
+        /* ಮೊಬೈಲ್ ಹೊಂದಾಣಿಕೆ */
+        @media (max-width: 768px) {
+            .match-container { gap: 40px; padding: 15px; }
+            .match-btn { font-size: 0.95rem; padding: 10px; }
+        }
+    </style>
+</head>
+<body>
+
+    <h2>🗣️ ಚಟುವಟಿಕೆ: ನುಡಿಗಟ್ಟುಗಳು ಮತ್ತು ಗಾದೆಗಳ ಮ್ಯಾಚಿಂಗ್</h2>
+    <p class="instruction">ಎಡಭಾಗದ ನುಡಿಗಟ್ಟು/ಗಾದೆಯನ್ನು ಕ್ಲಿಕ್ ಮಾಡಿ, ನಂತರ ಬಲಭಾಗದಲ್ಲಿರುವ ಅದರ ಸರಿಯಾದ ಅರ್ಥವನ್ನು ಕ್ಲಿಕ್ ಮಾಡಿ ಗೆರೆ ಎಳೆದು ಜೋಡಿಸಿ!</p>
+
+    <div class="match-container" id="game-box">
+        <svg id="svg-canvas"></svg>
+
+        <div class="column" id="left-col">
+            <h3>ನುಡಿಗಟ್ಟು / ಗಾದೆ</h3>
+            </div>
+
+        <div class="column" id="right-col">
+            <h3>ನಿಜವಾದ ಅರ್ಥ</h3>
+            </div>
+    </div>
+
+    <div id="result-msg"></div>
+    <button class="restart-btn" id="reload-btn" onclick="initGame()">ಮತ್ತೆ ಆಡಿ</button>
+
+    <script>
+        // ಗಂಟೆಗಟ್ಟಲೆ ಆಡಲು ವಿಸ್ತರಿಸಲಾದ ೫ ಮುಖ್ಯ ಜೋಡಿಗಳು
+        const matchData = [
+            { id: 1, phrase: "ಕಾಲಿಗೆ ಬುದ್ಧಿ ಹೇಳು", meaning: "ಭಯದಿಂದ ಅಥವಾ ಉಪಾಯದಿಂದ ಓಡಿ ಹೋಗು / ಪಲಾಯನ ಮಾಡು" },
+            { id: 2, phrase: "ಒಂದು ಕುರಿ ಹಳ್ಳಕ್ಕೆ ಬಿದ್ದರೆ ಎಲ್ಲಾ ಬಿದ್ದವು", meaning: "ಒಬ್ಬರ ಮೂರ್ಖತನವನ್ನು ಉಳಿದವರೆಲ್ಲರೂ ಕುರುಡಾಗಿ ಅನುಸರಿಸುವುದು" },
+            { id: 3, phrase: "ಕೇಳಿದ ಕಿವಿ ಊರಿಗೆ ಮಾರಿ ತಂದಿತು", meaning: "ಯಾವುದೇ ವಿಷಯದ ಸತ್ಯಾಸತ್ಯತೆ ತಿಳಿಯದೆ ನಂಬಿದರೆ ಆಪತ್ತು ಕಾಯಂ" },
+            { id: 4, phrase: "ಬಾಯಿ ಬಡಿದುಕೊಳ್ಳು", meaning: "ಅತೀವವಾದ ದುಃಖದಿಂದ ಜೋರಾಗಿ ಗೋಳಾಡುವುದು" },
+            { id: 5, phrase: "ಪಕ್ಕೆಲುಬು ನೋಯುವಂತೆ ನಗು", meaning: "ತುಂಬಾ ತಡೆಯಲಾರದಷ್ಟು ವಿಪರೀತವಾಗಿ ಹಾಸ್ಯ ಉಕ್ಕಿ ನಗುವುದು" }
+        ];
+
+        let selectedLeft = null;
+        let matchedCount = 0;
+
+        const leftCol = document.getElementById('left-col');
+        const rightCol = document.getElementById('right-col');
+        const svg = document.getElementById('svg-canvas');
+
+        function initGame() {
+            // ರೀಸೆಟ್ ಪ್ರಕ್ರಿಯೆ
+            leftCol.innerHTML = '<h3>ನುಡಿಗಟ್ಟು / ಗಾದೆ</h3>';
+            rightCol.innerHTML = '<h3>ನಿಜವಾದ ಅರ್ಥ</h3>';
+            svg.innerHTML = '';
+            matchedCount = 0;
+            selectedLeft = null;
+            document.getElementById('result-msg').innerText = '';
+            document.getElementById('reload-btn').style.display = 'none';
+
+            // ಎಡಭಾಗವನ್ನು ಶಫಲ್ ಮಾಡುವುದು
+            const leftData = [...matchData].sort(() => Math.random() - 0.5);
+            // ಬಲಭಾಗವನ್ನು ಪ್ರತ್ಯೇಕವಾಗಿ ಶಫಲ್ ಮಾಡುವುದು
+            const rightData = [...matchData].sort(() => Math.random() - 0.5);
+
+            // ಬಟನ್‌ಗಳ ಸೃಷ್ಟಿ
+            leftData.forEach(item => {
+                const btn = document.createElement('button');
+                btn.className = 'match-btn';
+                btn.innerText = item.phrase;
+                btn.dataset.id = item.id;
+                btn.onclick = () => selectLeftButton(btn);
+                leftCol.appendChild(btn);
+            });
+
+            rightData.forEach(item => {
+                const btn = document.createElement('button');
+                btn.className = 'match-btn';
+                btn.innerText = item.meaning;
+                btn.dataset.id = item.id;
+                btn.onclick = () => selectRightButton(btn);
+                rightCol.appendChild(btn);
+            });
+        }
+
+        function selectLeftButton(btn) {
+            if (btn.classList.contains('matched')) return;
+            
+            // ಮೊದಲೇ ಸೆಲೆಕ್ಟ್ ಆಗಿದ್ದನ್ನು ರದ್ದು ಮಾಡುವುದು
+            document.querySelectorAll('#left-col .match-btn').forEach(b => b.classList.remove('selected'));
+            
+            btn.classList.add('selected');
+            selectedLeft = btn;
+        }
+
+        function selectRightButton(btn) {
+            if (!selectedLeft || btn.classList.contains('matched')) return;
+
+            if (selectedLeft.dataset.id === btn.dataset.id) {
+                // ಸರಿಯಾದ ಜೋಡಿ!
+                selectedLeft.classList.remove('selected');
+                selectedLeft.classList.add('matched');
+                btn.classList.add('matched');
+
+                // ಎರಡು ಬಟನ್‌ಗಳ ನಡುವೆ ಗೆರೆ ಎಳೆಯುವುದು
+                drawConnectLine(selectedLeft, btn);
+
+                selectedLeft = null;
+                matchedCount++;
+
+                if (matchedCount === matchData.length) {
+                    document.getElementById('result-msg').innerHTML = "🎉 ಅದ್ಭುತ ಜಾಣ್ಮೆ! ಎಲ್ಲಾ ಗಾದೆ ಮತ್ತು ನುಡಿಗಟ್ಟುಗಳನ್ನು ಸರಿಯಾಗಿ ಜೋಡಿಸಿದ್ದೀರಿ! 👏👏";
+                    document.getElementById('reload-btn').style.display = 'block';
+                }
+            } else {
+                // ತಪ್ಪು ಜೋಡಿಯಾದರೆ ಸೆಲೆಕ್ಷನ್ ರದ್ದಾಗುತ್ತದೆ
+                selectedLeft.classList.remove('selected');
+                selectedLeft = null;
+                btn.style.borderColor = '#e74c3c';
+                setTimeout(() => btn.style.borderColor = '#dcdde1', 500);
+            }
+        }
+
+        // ಬಟನ್‌ಗಳ ಮಧ್ಯೆ ಲೈವ್ ಆಗಿ ಗೆರೆ ಬಿಡಿಸುವ ಮ್ಯಾಜಿಕ್ ಫಂಕ್ಷನ್
+        function drawConnectLine(el1, el2) {
+            const containerRect = document.getElementById('game-box').getBoundingClientRect();
+            const rect1 = el1.getBoundingClientRect();
+            const rect2 = el2.getBoundingClientRect();
+
+            // ಎಡ ಬಟನ್‌ನ ಬಲ ಮೂಲೆ ಮತ್ತು ಬಲ ಬಟನ್‌ನ ಎಡ ಮೂಲೆ ಲೆಕ್ಕಾಚಾರ
+            const x1 = rect1.right - containerRect.left;
+            const y1 = rect1.top + rect1.height / 2 - containerRect.top;
+            const x2 = rect2.left - containerRect.left;
+            const y2 = rect2.top + rect2.height / 2 - containerRect.top;
+
+            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            line.setAttribute('x1', x1);
+            line.setAttribute('y1', y1);
+            line.setAttribute('x2', x2);
+            line.setAttribute('y2', y2);
+
+            svg.appendChild(line);
+        }
+
+        // ವಿಂಡೋ ರಿಸೈಜ್ ಆದಾಗ ಗೆರೆಗಳು ಸರಿಯಾಗಿ ಕೂರಲು
+        window.addEventListener('resize', () => {
+            if (matchedCount > 0) initGame(); // ರಿಸೈಜ್ ಆದಾಗ ಆಟವನ್ನು ಮೊದಲಿನಿಂದ ತರುತ್ತದೆ
+        });
+
+        // ಆಟವನ್ನು ಪ್ರಥಮ ಬಾರಿಗೆ ಲೋಡ್ ಮಾಡುವುದು
+        initGame();
+    </script>
+</body>
+</html>

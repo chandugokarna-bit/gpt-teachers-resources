@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಒಗಟುಗಳ ಸವಾಲ್-ಜವಾಬ್ - Flip Card Game</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f3f0fa;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            user-select: none;
+        }
+
+        h2 {
+            color: #6c5ce7;
+            margin-bottom: 5px;
+            text-align: center;
+        }
+
+        p.instruction {
+            color: #57606f;
+            font-size: 1.1rem;
+            margin-bottom: 40px;
+            text-align: center;
+            max-width: 600px;
+        }
+
+        /* ಕಾರ್ಡ್‌ಗಳ ಗ್ರಿಡ್ ಲೇಔಟ್ */
+        .riddle-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            width: 100%;
+            max-width: 950px;
+            perspective: 1000px; /* 3D ಇಫೆಕ್ಟ್‌ಗಾಗಿ */
+        }
+
+        /* ಫ್ಲಿಪ್ ಕಾರ್ಡ್ ಕಂಟೈನರ್ */
+        .flip-card {
+            background-color: transparent;
+            width: 100%;
+            height: 220px;
+            cursor: pointer;
+        }
+
+        /* ಒಳಗಿನ ನಿಜವಾದ ತಿರುಗುವ ಬಾಕ್ಸ್ */
+        .flip-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-radius: 15px;
+        }
+
+        /* ಕ್ಲಿಕ್ ಮಾಡಿದಾಗ ಕಾರ್ಡ್ ಫ್ಲಿಪ್ ಆಗುವ ಕ್ಲಾಸ್ */
+        .flip-card.flipped .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+
+        /* ಮುಂಭಾಗ ಮತ್ತು ಹಿಂಭಾಗದ ಸಾಮಾನ್ಯ ಶೈಲಿ */
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden; /* ಹಿಂಭಾಗ ಕಾಣದಂತೆ ತಡೆಯಲು */
+            backface-visibility: hidden;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        /* ಮುಂಭಾಗದ ಶೈಲಿ (ಒಗಟು) */
+        .card-front {
+            background: linear-gradient(135deg, #a8a5ff 0%, #6c5ce7 100%);
+            color: white;
+            border: 2px solid #5f27cd;
+        }
+
+        .card-front h3 {
+            margin: 0 0 10px 0;
+            font-size: 1.3rem;
+            background-color: rgba(255,255,255,0.2);
+            padding: 4px 15px;
+            border-radius: 20px;
+        }
+
+        .card-front p {
+            font-size: 1.15rem;
+            font-weight: bold;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        /* ಹಿಂಭಾಗದ ಶೈಲಿ (ಉತ್ತರ) */
+        .card-back {
+            background-color: #2ed573;
+            color: white;
+            transform: rotateY(180deg);
+            border: 2px solid #10ac84;
+        }
+
+        .answer-emoji {
+            font-size: 3.5rem;
+            margin-bottom: 5px;
+            animation: pop 0.4s ease-in-out;
+        }
+
+        .answer-text {
+            font-size: 1.6rem;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        @keyframes pop {
+            0% { transform: scale(0.5); }
+            100% { transform: scale(1); }
+        }
+
+        /* ಮೊಬೈಲ್ ಸ್ಕ್ರೀನ್ ಹೊಂದಾಣಿಕೆ */
+        @media (max-width: 600px) {
+            .riddle-grid { grid-template-columns: 1fr; }
+            .flip-card { height: 200px; }
+        }
+    </style>
+</head>
+<body>
+
+    <h2>🎭 ಚಟುವಟಿಕೆ: ಒಗಟುಗಳ ಸವಾಲ್-ಜವಾಬ್ (Flip Card Quiz)</h2>
+    <p class="instruction">ಕೆಳಗಿನ ಮ್ಯಾಜಿಕ್ ಕಾರ್ಡ್‌ಗಳ ಮೇಲಿರುವ ಒಗಟುಗಳನ್ನು ಓದಿರಿ. ಉತ್ತರವನ್ನು ತಿಳಿಯಲು ಕಾರ್ಡ್ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ (Flip ಮಾಡಿ)!</p>
+
+    <div class="riddle-grid" id="riddle-container">
+        </div>
+
+    <script>
+        // ಕನ್ನಡದ ಪ್ರಸಿದ್ಧ ಹಾಗೂ ಪಠ್ಯಪುಸ್ತಕದ ಆಶಯಕ್ಕೆ ತಕ್ಕ ಒಗಟುಗಳ ಡೇಟಾ
+        const riddlesData = [
+            {
+                num: "೧",
+                riddle: "ಕೂಗಿದರೆ ರಾವಣ, ಹಾರಿದರೆ ಹನುಮಂತ, ಕೂತರೆ ಮುನಿ. ನಾನು ಯಾರು?",
+                answer: "ಕಪ್ಪೆ",
+                emoji: "🐸"
+            },
+            {
+                num: "೨",
+                riddle: "ಅಂಗಿ ಬಿಚ್ಚಿದರೆ ನೂರಾರು ಪದರ, ಹೆಚ್ಚುತ್ತ ಹೋದರೆ ಕಣ್ಣೀರ ಸಾಗರ. ನಾನು ಯಾರು?",
+                answer: "ಈರುಳ್ಳಿ (ಉಳ್ಳಾಗಡ್ಡಿ)",
+                emoji: "🧅"
+            },
+            {
+                num: "೩",
+                riddle: "ಮುಚ್ಚಿದರೆ ಕತ್ತಲೆ, ತೆಗೆದರೆ ಬೆಳಕು. ಜಗದ ರಂಗ ನೋಡುವ ಪುಟ್ಟ ಕಿಟಕಿಗಳು. ನಾವು ಯಾರು?",
+                answer: "ಕಣ್ಣುಗಳು",
+                emoji: "👀"
+            },
+            {
+                num: "೪",
+                riddle: "ಹುಟ್ಟುತ್ತಾ ಜುಟ್ಟು, ಬೆಳೆಯುತ್ತಾ ಜ್ಞಾನದ ನೀರು, ಮೂರು ಕಣ್ಣಿನ ರಾಜ. ನಾನು ಯಾರು?",
+                answer: "ತೆಂಗಿನಕಾಯಿ",
+                emoji: "🥥"
+            },
+            {
+                num: "೫",
+                riddle: "ಬಾಲ ಹಿಡಿದರೆ ಓಡುತ್ತೆ, ಬಟ್ಟೆಯನ್ನೆಲ್ಲಾ ಜೋಡಿಸುತ್ತೆ. ನಾನು ಯಾರು?",
+                answer: "ಸೂಜಿ - ದಾರ",
+                emoji: "🪡"
+            }
+        ];
+
+        function createRiddleCards() {
+            const container = document.getElementById('riddle-container');
+            
+            // ಪ್ರತಿ ಬಾರಿ ಹೊಸದಾಗಿ ಬರುವಾಗ ಒಗಟುಗಳನ್ನು ಅದಲು ಬದಲು (Shuffle) ಮಾಡುವುದು
+            const shuffledRiddles = [...riddlesData].sort(() => Math.random() - 0.5);
+
+            shuffledRiddles.forEach(data => {
+                // ಮುಖ್ಯ ಕಾರ್ಡ್ ಕಂಟೈನರ್
+                const card = document.createElement('div');
+                card.className = 'flip-card';
+                
+                // ಕ್ಲಿಕ್ ಇವೆಂಟ್ - ಫ್ಲಿಪ್ ಮಾಡಲು ಟಾಗಲ್ ಕ್ಲಾಸ್ ಬಳಸುವುದು
+                card.onclick = () => {
+                    card.classList.toggle('flipped');
+                };
+
+                // ಒಳಗಿನ 3D ಬಾಕ್ಸ್
+                const inner = document.createElement('div');
+                inner.className = 'flip-card-inner';
+
+                // ಮುಂಭಾಗ (ಒಗಟು)
+                const front = document.createElement('div');
+                front.className = 'card-front';
+                front.innerHTML = `<h3>ಒಗಟು ${data.num}</h3><p>${data.riddle}</p>`;
+
+                // ಹಿಂಭಾಗ (ಉತ್ತರ)
+                const back = document.createElement('div');
+                back.className = 'card-back';
+                back.innerHTML = `<div class="answer-emoji">${data.emoji}</div><div class="answer-text">ಉತ್ತರ: ${data.answer}</div>`;
+
+                // ಜೋಡಣೆ ಮಾಡುವುದು
+                inner.appendChild(front);
+                inner.appendChild(back);
+                card.appendChild(inner);
+                container.appendChild(card);
+            });
+        }
+
+        // ವೆಬ್‌ಸೈಟ್ ಪೇಜ್ ಲೋಡ್ ಆದ ತಕ್ಷಣ ಕಾರ್ಡ್‌ಗಳನ್ನು ಸೃಷ್ಟಿಸುವುದು
+        createRiddleCards();
+    </script>
+</body>
+</html>

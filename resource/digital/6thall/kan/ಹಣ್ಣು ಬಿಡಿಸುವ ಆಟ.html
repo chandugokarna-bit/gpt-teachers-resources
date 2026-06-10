@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ವಚನ ಬದಲಿಸಿ ಬರೆಯುವ ಹಣ್ಣು ಬಿಡಿಸುವ ಆಟ</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f7fcf0;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            user-select: none;
+        }
+
+        h2 {
+            color: #2e7d32;
+            margin-bottom: 5px;
+            text-align: center;
+        }
+
+        p.instruction {
+            color: #558b2f;
+            font-size: 1.1rem;
+            margin-bottom: 25px;
+            text-align: center;
+            max-width: 600px;
+        }
+
+        /* ಮುಖ್ಯ ಆಟದ ಮರ ಮತ್ತು ಬುಟ್ಟಿಯ ಜಾಗ */
+        .orchard-container {
+            background: linear-gradient(to bottom, #a1c4fd 0%, #c2e9fb 100%);
+            border: 4px solid #2e7d32;
+            border-radius: 20px;
+            padding: 20px;
+            width: 100%;
+            max-width: 800px;
+            height: 480px;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+
+        /* ಮರದ ಹಸಿರು ಭಾಗ */
+        .tree-top {
+            width: 90%;
+            height: 220px;
+            background-color: #4caf50;
+            border-radius: 100px;
+            margin: 0 auto;
+            position: relative;
+            box-shadow: inset 0 -15px 30px rgba(0,0,0,0.15);
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        /* ಹಣ್ಣುಗಳ (ಸೇಬು) ಶೈಲಿ */
+        .apple {
+            background-color: #e53935;
+            color: white;
+            padding: 8px 15px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 20px;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            transition: transform 0.2s, top 0.5s ease-in;
+            position: relative;
+            z-index: 2;
+        }
+
+        .apple:hover {
+            transform: scale(1.1);
+            background-color: #d32f2f;
+        }
+
+        .apple.selected {
+            background-color: #ffb300;
+            color: #2c3e50;
+            border: 2px solid #ff6f00;
+            animation: wobble 0.5s infinite alternate;
+        }
+
+        @keyframes wobble {
+            from { transform: rotate(-5deg); }
+            to { transform: rotate(5deg); }
+        }
+
+        /* ಹಣ್ಣು ಕೆಳಗೆ ಬೀಳುವ ಅನಿಮೇಷನ್ ಕ್ಲಾಸ್ */
+        .apple.fall {
+            transform: translateY(220px) scale(0.8);
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* ಬುಟ್ಟಿಗಳ ಜಾಗ */
+        .baskets-zone {
+            position: absolute;
+            bottom: 20px;
+            width: 95%;
+            left: 2.5%;
+            display: flex;
+            justify-content: space-around;
+            gap: 15px;
+        }
+
+        /* ಪ್ರತಿ ಬುಟ್ಟಿಯ ಶೈಲಿ */
+        .basket {
+            background-color: #d7ccc8;
+            border: 3px solid #8d6e63;
+            border-radius: 12px 12px 25px 25px;
+            width: 30%;
+            padding: 15px 10px;
+            text-align: center;
+            cursor: pointer;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+            transition: background-color 0.2s;
+            box-sizing: border-box;
+        }
+
+        .basket:hover {
+            background-color: #bcaaa4;
+        }
+
+        .basket h4 {
+            margin: 0;
+            font-size: 1.3rem;
+            color: #4e342e;
+        }
+
+        /* ಸ್ಕೋರ್ ಮತ್ತು ವಿಕ್ಟರಿ ಸ್ಕ್ರೀನ್ */
+        .score-board {
+            margin-top: 20px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #2e7d32;
+        }
+
+        #victory-overlay {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.95);
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            z-index: 10;
+        }
+
+        .restart-btn {
+            background-color: #2e7d32;
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>🍎 ಚಟುವಟಿಕೆ: ವಚನ ಬದಲಿಸಿ ಬರೆಯುವ ಹಣ್ಣು ಬಿಡಿಸುವ ಆಟ</h2>
+    <p class="instruction">ಮರದ ಮೇಲಿರುವ ಕೆಂಪು ಸೇಬು ಹಣ್ಣನ್ನು (ಏಕವಚನ) ಕ್ಲಿಕ್ ಮಾಡಿ, ನಂತರ ಕೆಳಗಿರುವ ಅದರ ಸರಿಯಾದ ಬಹುವಚನ ರೂಪದ ಬುಟ್ಟಿಯನ್ನು ಕ್ಲಿಕ್ ಮಾಡಿ ಹಣ್ಣನ್ನು ಬುಟ್ಟಿಗೆ ಬೀಳಿಸಿ!</p>
+
+    <div class="orchard-container">
+        <div class="tree-top" id="tree-pool">
+            </div>
+
+        <div class="baskets-zone">
+            <div class="basket" onclick="checkPlural('ಗಳು')">
+                <h4>🧺 ....ಗಳು</h4>
+            </div>
+            <div class="basket" onclick="checkPlural('ಗಳು-ಬದಲಾವಣೆ')">
+                <h4>🧺 ಮಕ್ಕಳು / ಜನ</h4>
+            </div>
+            <div class="basket" onclick="checkPlural('ಂದಿರು')">
+                <h4>🧺 ....ಂದಿರು</h4>
+            </div>
+        </div>
+
+        <div id="victory-overlay">
+            <h3 style="color:#2e7d32; font-size: 2rem; margin: 0 0 10px 0;">🍏 ಅದ್ಭುತ ಪ್ರದರ್ಶನ!</h3>
+            <p style="font-size: 1.2rem; color: #555;" id="final-msg"></p>
+            <button class="restart-btn" onclick="initGame()">ಮತ್ತೆ ತೋಟಕ್ಕೆ ಹೋಗಿ</button>
+        </div>
+    </div>
+
+    <div class="score-board">
+        ಉಳಿದಿರುವ ಹಣ್ಣುಗಳು: <span id="apples-left">0</span>
+    </div>
+
+    <script>
+        // "ಗಂಧರ್ವಸೇನ!" ಪಾಠದ ವಿವಿಧ ವಚನ ಪ್ರತ್ಯಯಗಳ ಡೇಟಾಬೇಸ್
+        const wordPool = [
+            { singular: "ಗಿಡ", type: "ಗಳು", plural: "ಗಿಡಗಳು" },
+            { singular: "ಪತ್ರ", type: "ಗಳು", plural: "ಪತ್ರಗಳು" },
+            { singular: "ಕತ್ತೆ", type: "ಗಳು", plural: "ಕತ್ತೆಗಳು" },
+            { singular: "ಕುರಿ", type: "ಗಳು", plural: "ಕುರಿಗಳು" },
+            { singular: "ದೇಶ", type: "ಗಳು", plural: "ದೇಶಗಳು" },
+            { singular: "ಮಗು", type: "ಗಳು-ಬದಲಾವಣೆ", plural: "ಮಕ್ಕಳು" },
+            { singular: "ಒಬ್ಬನು", type: "ಗಳು-ಬದಲಾವಣೆ", plural: "ಜನರು / ಹಲವರು" },
+            { singular: "ರಾಜ", type: "ಂದಿರು", plural: "ರಾಜಂದಿರು" },
+            { singular: "ಮಂತ್ರಿ", type: "ಂದಿರು", plural: "ಮಂತ್ರಿಗಳು / ಮಂತ್ರಿವರ್ಗ" },
+            { singular: "ಹೆಂಡತಿ", type: "ಂದಿರು", plural: "ಹೆಂಡತಿಯಂದಿರು" }
+        ];
+
+        let selectedAppleElement = null;
+        let selectedAppleData = null;
+        let remainingApples = 0;
+        let wrongAttempts = 0;
+
+        function initGame() {
+            const tree = document.getElementById('tree-pool');
+            tree.innerHTML = '';
+            document.getElementById('victory-overlay').style.display = 'none';
+            selectedAppleElement = null;
+            selectedAppleData = null;
+            wrongAttempts = 0;
+
+            // ಹಣ್ಣುಗಳನ್ನು ಶಫಲ್ ಮಾಡುವುದು
+            const shuffled = [...wordPool].sort(() => Math.random() - 0.5);
+            remainingApples = shuffled.length;
+            document.getElementById('apples-left').innerText = remainingApples;
+
+            // ಮರದ ಮೇಲೆ ಹಣ್ಣುಗಳನ್ನು ನೇತುಹಾಕುವುದು
+            shuffled.forEach(item => {
+                const apple = document.createElement('div');
+                apple.className = 'apple';
+                apple.innerText = item.singular;
+                
+                apple.onclick = (e) => {
+                    e.stopPropagation();
+                    selectApple(apple, item);
+                };
+
+                tree.appendChild(apple);
+            });
+        }
+
+        function selectApple(element, data) {
+            document.querySelectorAll('.apple').forEach(a => a.classList.remove('selected'));
+            element.classList.add('selected');
+            selectedAppleElement = element;
+            selectedAppleData = data;
+        }
+
+        function checkPlural(basketType) {
+            if (!selectedAppleElement || !selectedAppleData) return;
+
+            // ಸರಿಯಾದ ಬುಟ್ಟಿಯೇ ಎಂದು ಪರಿಶೀಲಿಸುವುದು
+            if (selectedAppleData.type === basketType) {
+                // ಹಣ್ಣು ಕೆಳಗೆ ಬೀಳುವ ಎಫೆಕ್ಟ್
+                selectedAppleElement.className = 'apple fall';
+                
+                remainingApples--;
+                document.getElementById('apples-left').innerText = remainingApples;
+
+                // ಕ್ಲಿಯರ್ ಮಾಡುವುದು
+                selectedAppleElement = null;
+                selectedAppleData = null;
+
+                // ಆಟ ಮುಗಿದಿದೆಯೇ ಎಂದು ನೋಡುವುದು
+                if (remainingApples === 0) {
+                    setTimeout(endGame, 600);
+                }
+            } else {
+                // ತಪ್ಪು ಬುಟ್ಟಿಯಾದರೆ ಹಣ್ಣು ಕೆಂಪು ಬಣ್ಣಕ್ಕೆ ಮರಳಿ ನಡುಗುತ್ತದೆ
+                wrongAttempts++;
+                const el = selectedAppleElement;
+                el.classList.remove('selected');
+                el.style.backgroundColor = '#d32f2f';
+                
+                selectedAppleElement = null;
+                selectedAppleData = null;
+            }
+        }
+
+        function endGame() {
+            document.getElementById('victory-overlay').style.display = 'flex';
+            document.getElementById('final-msg').innerHTML = `ಮರದಲ್ಲಿದ್ದ ಎಲ್ಲಾ <b>${wordPool.length}</b> ಹಣ್ಣುಗಳನ್ನು ಸರಿಯಾದ ವಚನದ ಬುಟ್ಟಿಗೆ ಬಿಡಿಸಿದ್ದೀರಿ!<br>ತಪ್ಪಾದ ಪ್ರಯತ್ನಗಳು: <b>${wrongAttempts}</b>`;
+        }
+
+        // ಪ್ರಥಮ ಬಾರಿ ಗೇಮ್ ಲೋಡ್ ಮಾಡುವುದು
+        initGame();
+    </script>
+</body>
+</html>

@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಲಿಂಗಗಳ ವಿಂಗಡಣೆ - ೩ ಬುಟ್ಟಿಗಳ ಆಟ</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f3f4;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            user-select: none;
+        }
+
+        h2 {
+            color: #2c3e50;
+            margin-bottom: 5px;
+            text-align: center;
+        }
+
+        p.instruction {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+            margin-bottom: 25px;
+            text-align: center;
+            max-width: 600px;
+        }
+
+        /* ಮುಖ್ಯ ಗೇಮ್ ಕಂಟೈನರ್ */
+        .game-board {
+            background-color: #ffffff;
+            border-radius: 20px;
+            padding: 30px;
+            width: 100%;
+            max-width: 800px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            box-sizing: border-box;
+        }
+
+        /* ಪದಗಳು ಮೂಡುವ ಜಾಗ */
+        .word-display-area {
+            background-color: #fdf6e2;
+            border: 2px dashed #e67e22;
+            border-radius: 12px;
+            padding: 20px;
+            width: 100%;
+            min-height: 120px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 40px;
+            box-sizing: border-box;
+        }
+
+        /* ಪದಗಳ ಕಾರ್ಡ್ ಶೈಲಿ */
+        .word-card {
+            background-color: #ffffff;
+            border: 2px solid #cbd5e0;
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #2d3748;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            transition: all 0.2s ease;
+        }
+
+        .word-card:hover {
+            transform: scale(1.05);
+            border-color: #e67e22;
+        }
+
+        .word-card.selected {
+            background-color: #feebc8;
+            border-color: #dd6b20;
+            color: #dd6b20;
+            animation: pulse 1s infinite alternate;
+        }
+
+        @keyframes pulse {
+            from { transform: scale(1); }
+            to { transform: scale(1.05); }
+        }
+
+        /* ಬುಟ್ಟಿಗಳ ಕಂಟೈನರ್ */
+        .baskets-container {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            gap: 15px;
+        }
+
+        /* ಪ್ರತಿ ಬುಟ್ಟಿಯ ಶೈಲಿ */
+        .basket {
+            background: linear-gradient(to bottom, #fff, #f7fafc);
+            border: 3px solid #cbd5e0;
+            border-radius: 15px;
+            width: 31%;
+            min-height: 180px;
+            padding: 15px 10px;
+            text-align: center;
+            cursor: pointer;
+            box-sizing: border-box;
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* ವಿಭಿನ್ನ ಲಿಂಗದ ಬುಟ್ಟಿಗಳಿಗೆ ವಿಭಿನ್ನ ಬಣ್ಣ */
+        .basket[data-gender="pullinga"] { border-color: #3182ce; }
+        .basket[data-gender="streelinga"] { border-color: #ed64a6; }
+        .basket[data-gender="napumsaka"] { border-color: #48bb78; }
+
+        .basket:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+
+        .basket h3 {
+            margin: 0 0 10px 0;
+            font-size: 1.2rem;
+        }
+        .basket[data-gender="pullinga"] h3 { color: #3182ce; }
+        .basket[data-gender="streelinga"] h3 { color: #ed64a6; }
+        .basket[data-gender="napumsaka"] h3 { color: #48bb78; }
+
+        .basket-emoji {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        /* ಬುಟ್ಟಿಯ ಒಳಗಡೆ ಸಂಗ್ರಹವಾದ ಪದಗಳ ಪಟ್ಟಿ */
+        .collected-words {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            width: 100%;
+            font-size: 0.95rem;
+            color: #4a5568;
+            font-weight: 500;
+        }
+
+        .collected-item {
+            background-color: #edf2f7;
+            padding: 4px 8px;
+            border-radius: 4px;
+            text-align: center;
+        }
+
+        /* ಸ್ಕೋರ್ ಬೋರ್ಡ್ */
+        .score-board {
+            margin-top: 25px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            display: flex;
+            gap: 30px;
+        }
+        .correct { color: #38a169; }
+        .wrong { color: #e53e3e; }
+
+        /* ಆಟ ಮುಗಿದಾಗ ಬರುವ ಪರದೆ */
+        #victory-screen {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.96);
+            border-radius: 16px;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            z-index: 10;
+        }
+
+        .restart-btn {
+            background-color: #3182ce;
+            color: white;
+            border: none;
+            padding: 12px 35px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        /* ಮೊಬೈಲ್ ಹೊಂದಾಣಿಕೆ */
+        @media (max-width: 768px) {
+            .baskets-container { flex-direction: column; gap: 20px; }
+            .basket { width: 100%; min-height: 120px; }
+        }
+    </style>
+</head>
+<body>
+
+    <h2>🧺 ಚಟುವಟಿಕೆ: ಲಿಂಗಗಳ ವಿಂಗಡಣೆ - ೩ ಬುಟ್ಟಿಗಳ ಆಟ</h2>
+    <p class="instruction">ಮೇಲಿನ ಬಾಕ್ಸ್‌ನಲ್ಲಿರುವ ಪದದ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ, ನಂತರ ಅದನ್ನು ಕೆಳಗಿನ ಸರಿಯಾದ ಲಿಂಗದ (ಪುಲ್ಲಿಂಗ, ಸ್ತ್ರೀಲಿಂಗ ಅಥವಾ ನಪುಂಸಕಲಿಂಗ) ಬುಟ್ಟಿಗೆ ಹಾಕಿರಿ!</p>
+
+    <div class="game-board">
+        <div class="word-display-area" id="words-pool"></div>
+
+        <div class="baskets-container">
+            <div class="basket" data-gender="pullinga" onclick="dropIntoBasket('pullinga')">
+                <span class="basket-emoji">🧑‍ಅಪ್ಪ</span>
+                <h3>೧. ಪುಲ್ಲಿಂಗ</h3>
+                <div class="collected-words" id="list-pullinga"></div>
+            </div>
+
+            <div class="basket" data-gender="streelinga" onclick="dropIntoBasket('streelinga')">
+                <span class="basket-emoji">👩‍ಅಮ್ಮ</span>
+                <h3>೨. ಸ್ತ್ರೀಲಿಂಗ</h3>
+                <div class="collected-words" id="list-streelinga"></div>
+            </div>
+
+            <div class="basket" data-gender="napumsaka" onclick="dropIntoBasket('napumsaka')">
+                <span class="basket-emoji">🌳ವಸ್ತು/ಪ್ರಾಣಿ</span>
+                <h3>೩. ನಪುಂಸಕಲಿಂಗ</h3>
+                <div class="collected-words" id="list-napumsaka"></div>
+            </div>
+        </div>
+
+        <div id="victory-screen">
+            <h3 style="color:#2b6cb0; font-size: 2rem; margin-bottom: 10px;">🎉 ಅದ್ಭುತ ಜಾಣ್ಮೆ!</h3>
+            <p style="font-size: 1.3rem; color: #4a5568;" id="final-score-text"></p>
+            <button class="restart-btn" onclick="initGame()">ಮತ್ತೆ ಆಡಿ</button>
+        </div>
+    </div>
+
+    <div class="score-board">
+        <div class="correct">ಸರಿ: <span id="correct-count">0</span></div>
+        <div class="wrong">ತಪ್ಪು: <span id="wrong-count">0</span></div>
+    </div>
+
+    <script>
+        // "ಗಂಧರ್ವಸೇನ!" ಪಾಠದ ಆಧಾರಿತ ಅಧಿಕೃತ ಪದಗಳ ಪಟ್ಟಿ
+        const wordsData = [
+            { word: "ಮಹಾರಾಜ", gender: "pullinga" },
+            { word: "ಮಂತ್ರಿ", gender: "pullinga" },
+            { word: "ಪಡೆಯ ಮುಖ್ಯಸ್ಥ", gender: "pullinga" },
+            { word: "ಧೋಬಿ (ಮಡಿವಾಳ)", gender: "pullinga" },
+            { word: "ಮಹಾರಾಣಿ", gender: "streelinga" },
+            { word: "ಹೆಂಡತಿ", gender: "streelinga" },
+            { word: "ಮಡಿವಾಳಿ", gender: "streelinga" },
+            { word: "ಸೇವಕಿ", gender: "streelinga" },
+            { word: "ಕತ್ತೆ", gender: "napumsaka" },
+            { word: "ಅರಮನೆ", gender: "napumsaka" },
+            { word: "ಕೆರೆ", gender: "napumsaka" },
+            { word: "ಕುರಿ", gender: "napumsaka" },
+            { word: "ದೇಶ", gender: "napumsaka" }
+        ];
+
+        let selectedWordElement = null;
+        let selectedWordData = null;
+        let correctScore = 0;
+        let wrongScore = 0;
+        let totalWordsCount = wordsData.length;
+
+        function initGame() {
+            // ರೀಸೆಟ್ ಪ್ರಕ್ರಿಯೆ
+            document.getElementById('words-pool').innerHTML = '';
+            document.getElementById('list-pullinga').innerHTML = '';
+            document.getElementById('list-streelinga').innerHTML = '';
+            document.getElementById('list-napumsaka').innerHTML = '';
+            document.getElementById('victory-screen').style.display = 'none';
+            
+            correctScore = 0;
+            wrongScore = 0;
+            selectedWordElement = null;
+            selectedWordData = null;
+            updateScoreDisplay();
+
+            // ಪದಗಳನ್ನು ಅದಲು ಬದಲು (Shuffle) ಮಾಡುವುದು
+            const shuffledWords = [...wordsData].sort(() => Math.random() - 0.5);
+
+            // ಪದಗಳ ಕಾರ್ಡ್ ಸೃಷ್ಟಿಸುವುದು
+            shuffledWords.forEach((item, index) => {
+                const card = document.createElement('div');
+                card.className = 'word-card';
+                card.innerText = item.word;
+                card.dataset.index = index;
+                
+                card.onclick = (e) => {
+                    e.stopPropagation();
+                    selectWord(card, item);
+                };
+                
+                document.getElementById('words-pool').appendChild(card);
+            });
+        }
+
+        function selectWord(cardElement, itemData) {
+            // ಮೊದಲೇ ಸೆಲೆಕ್ಟ್ ಆಗಿದ್ದ ಕಾರ್ಡ್‌ನ ಹೈಲೈಟ್ ತೆಗೆಯುವುದು
+            document.querySelectorAll('.word-card').forEach(c => c.classList.remove('selected'));
+            
+            cardElement.classList.add('selected');
+            selectedWordElement = cardElement;
+            selectedWordData = itemData;
+        }
+
+        function dropIntoBasket(basketGender) {
+            if (!selectedWordElement || !selectedWordData) return;
+
+            if (selectedWordData.gender === basketGender) {
+                // ಸರಿಯಾದ ಉತ್ತರ!
+                correctScore++;
+                
+                // ಬುಟ್ಟಿಯ ಒಳಗಡೆ ಪದವನ್ನು ಸೇರಿಸುವುದು
+                const list = document.getElementById(`list-${basketGender}`);
+                const item = document.createElement('div');
+                item.className = 'collected-item';
+                item.innerText = selectedWordData.word;
+                list.appendChild(item);
+
+                // ಪೂಲ್‌ನಿಂದ ಪದವನ್ನು ತೆಗೆದುಹಾಕುವುದು
+                selectedWordElement.remove();
+                
+                selectedWordElement = null;
+                selectedWordData = null;
+                
+                // ಆಟ ಮುಗಿದಿದೆಯೇ ಎಂದು ಪರಿಶೀಲಿಸುವುದು
+                checkGameStatus();
+            } else {
+                // ತಪ್ಪು ಉತ್ತರ!
+                wrongScore++;
+                
+                // ತಪ್ಪು ಎಂದು ತೋರಿಸಲು ಸಣ್ಣ ಎಫೆಕ್ಟ್
+                const currentCard = selectedWordElement;
+                currentCard.style.backgroundColor = '#fed7d7';
+                currentCard.style.borderColor = '#e53e3e';
+                setTimeout(() => {
+                    currentCard.style.backgroundColor = '#ffffff';
+                    currentCard.style.borderColor = '#cbd5e0';
+                    currentCard.classList.remove('selected');
+                }, 500);
+
+                selectedWordElement = null;
+                selectedWordData = null;
+            }
+
+            updateScoreDisplay();
+        }
+
+        function updateScoreDisplay() {
+            document.getElementById('correct-count').innerText = correctScore;
+            document.getElementById('wrong-count').innerText = wrongScore;
+        }
+
+        function checkGameStatus() {
+            const remainingCards = document.querySelectorAll('.word-card');
+            if (remainingCards.length === 0) {
+                const victoryScreen = document.getElementById('victory-screen');
+                const scoreText = document.getElementById('final-score-text');
+                
+                victoryScreen.style.display = 'flex';
+                scoreText.innerHTML = `ನೀವು ಎಲ್ಲಾ <b>${totalWordsCount}</b> ಪದಗಳನ್ನು ಸರಿಯಾದ ಬುಟ್ಟಿಗೆ ಸೇರಿಸಿದ್ದೀರಿ!<br>ತೆಗೆದುಕೊಂಡ ಒಟ್ಟು ತಪ್ಪು ಪ್ರಯತ್ನಗಳು: <b>${wrongScore}</b>`;
+            }
+        }
+
+        // ವೆಬ್‌ಸೈಟ್ ಲೋಡ್ ಆದಾಗ ಆಟವನ್ನು ಆರಂಭಿಸುವುದು
+        initGame();
+    </script>
+</body>
+</html>
