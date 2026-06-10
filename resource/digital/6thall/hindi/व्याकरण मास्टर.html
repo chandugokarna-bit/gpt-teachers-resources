@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>व्याकरण मास्टर - Class 3 Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Mukta:wght@400;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Poppins', 'Mukta', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .game-container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+            position: relative;
+        }
+
+        h1 {
+            color: #764ba2;
+            font-size: 28px;
+            margin-bottom: 5px;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: #747d8c;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 25px;
+            font-size: 18px;
+            font-weight: 600;
+            color: #57606f;
+            background: #f1f2f6;
+            padding: 10px 20px;
+            border-radius: 10px;
+        }
+
+        .word-display {
+            font-size: 45px;
+            font-weight: 700;
+            color: #2f3542;
+            margin: 20px 0;
+            padding: 30px 20px;
+            background: #ffffff;
+            border: 3px dashed #ced6e0;
+            border-radius: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        button {
+            background: #fff;
+            border: 2px solid #667eea;
+            color: #667eea;
+            font-size: 18px;
+            font-weight: 700;
+            padding: 15px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: 'Mukta', sans-serif;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        button:hover {
+            background: #667eea;
+            color: #fff;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .feedback {
+            margin-top: 20px;
+            font-size: 20px;
+            font-weight: bold;
+            height: 30px;
+        }
+
+        /* Animations */
+        @keyframes correct {
+            0% { transform: scale(1); border-color: #2ed573; background: #e8f8f5; }
+            50% { transform: scale(1.1); border-color: #2ed573; background: #2ed573; color: white; }
+            100% { transform: scale(1); border-color: #ced6e0; background: #ffffff; }
+        }
+
+        @keyframes wrong {
+            0% { transform: translateX(0); border-color: #ff4757; }
+            25% { transform: translateX(-10px); background: #ff4757; color: white; }
+            50% { transform: translateX(10px); }
+            75% { transform: translateX(-10px); }
+            100% { transform: translateX(0); border-color: #ced6e0; background: #ffffff; }
+        }
+
+        .anim-correct { animation: correct 0.6s ease; }
+        .anim-wrong { animation: wrong 0.5s ease; }
+
+        .streak-fire {
+            color: #ffa502;
+            display: none;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="game-container">
+        <h1>व्याकरण मास्टर</h1>
+        <span class="subtitle">Class 3 Edition 🎵</span>
+        
+        <div class="stats">
+            <div>स्कोर (Score): <span id="score" style="color:#2ed573; font-size:22px;">0</span></div>
+            <div>लगातार (Streak): <span id="streak" style="color:#ffa502; font-size:22px;">0</span> <span class="streak-fire" id="fire">🔥</span></div>
+        </div>
+
+        <div class="word-display" id="wordBox">
+            तैयार?
+        </div>
+
+        <div class="options-grid">
+            <button onclick="checkAnswer('संज्ञा')">संज्ञा (Noun)</button>
+            <button onclick="checkAnswer('सर्वनाम')">सर्वनाम (Pronoun)</button>
+            <button onclick="checkAnswer('विशेषण')">विशेषण (Adjective)</button>
+            <button onclick="checkAnswer('क्रिया')">क्रिया (Verb)</button>
+        </div>
+
+        <div class="feedback" id="feedbackText"></div>
+    </div>
+
+    <script>
+        // Web Audio API setup for generating sounds directly in the browser
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playSound(isCorrect) {
+            // Browsers suspend audio until user interacts, so we resume it on click
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+
+            if (isCorrect) {
+                // Happy high-pitched ascending chime
+                oscillator.type = 'sine';
+                oscillator.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5 note
+                oscillator.frequency.exponentialRampToValueAtTime(1046.50, audioCtx.currentTime + 0.1); // Up to C6
+                gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                oscillator.start();
+                oscillator.stop(audioCtx.currentTime + 0.3);
+            } else {
+                // Sad low-pitched buzzer
+                oscillator.type = 'sawtooth';
+                oscillator.frequency.setValueAtTime(300, audioCtx.currentTime);
+                oscillator.frequency.exponentialRampToValueAtTime(150, audioCtx.currentTime + 0.2); // Pitch drops
+                gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                oscillator.start();
+                oscillator.stop(audioCtx.currentTime + 0.3);
+            }
+        }
+
+        // 32 Simple Words for Class 3
+        const words = [
+            // संज्ञा (Noun) - 8 words
+            { word: "पेड़", type: "संज्ञा" },
+            { word: "गाय", type: "संज्ञा" },
+            { word: "घर", type: "संज्ञा" },
+            { word: "किताब", type: "संज्ञा" },
+            { word: "सूरज", type: "संज्ञा" },
+            { word: "लड़का", type: "संज्ञा" },
+            { word: "पानी", type: "संज्ञा" },
+            { word: "शेर", type: "संज्ञा" },
+            
+            // सर्वनाम (Pronoun) - 8 words
+            { word: "मैं", type: "सर्वनाम" },
+            { word: "तुम", type: "सर्वनाम" },
+            { word: "वह", type: "सर्वनाम" },
+            { word: "हम", type: "सर्वनाम" },
+            { word: "उसका", type: "सर्वनाम" },
+            { word: "कौन", type: "सर्वनाम" },
+            { word: "मेरा", type: "सर्वनाम" },
+            { word: "यह", type: "सर्वनाम" },
+            
+            // विशेषण (Adjective) - 8 words
+            { word: "लाल", type: "विशेषण" },
+            { word: "बड़ा", type: "विशेषण" },
+            { word: "अच्छा", type: "विशेषण" },
+            { word: "मीठा", type: "विशेषण" },
+            { word: "नया", type: "विशेषण" },
+            { word: "सुंदर", type: "विशेषण" },
+            { word: "छोटा", type: "विशेषण" },
+            { word: "गरम", type: "विशेषण" },
+            
+            // क्रिया (Verb) - 8 words
+            { word: "खाना", type: "क्रिया" },
+            { word: "रोना", type: "क्रिया" },
+            { word: "सोना", type: "क्रिया" },
+            { word: "खेलना", type: "क्रिया" },
+            { word: "दौड़ना", type: "क्रिया" },
+            { word: "पढ़ना", type: "क्रिया" },
+            { word: "हंसना", type: "क्रिया" },
+            { word: "जाना", type: "क्रिया" }
+        ];
+
+        let currentWord = {};
+        let score = 0;
+        let streak = 0;
+
+        const wordBox = document.getElementById("wordBox");
+        const scoreBox = document.getElementById("score");
+        const streakBox = document.getElementById("streak");
+        const fireIcon = document.getElementById("fire");
+        const feedbackText = document.getElementById("feedbackText");
+
+        function loadNewWord() {
+            const randomIndex = Math.floor(Math.random() * words.length);
+            currentWord = words[randomIndex];
+            wordBox.innerText = currentWord.word;
+            wordBox.classList.remove("anim-correct", "anim-wrong");
+        }
+
+        function checkAnswer(selectedType) {
+            if (selectedType === currentWord.type) {
+                // CORRECT
+                playSound(true);
+                score += 10 + (streak * 5);
+                streak++;
+                
+                feedbackText.style.color = "#2ed573";
+                feedbackText.innerText = "बिल्कुल सही! (Spot on!)";
+                
+                wordBox.classList.remove("anim-wrong");
+                void wordBox.offsetWidth;
+                wordBox.classList.add("anim-correct");
+
+            } else {
+                // WRONG
+                playSound(false);
+                streak = 0;
+                feedbackText.style.color = "#ff4757";
+                feedbackText.innerText = `ऊप्स! यह ${currentWord.type} है।`;
+                
+                wordBox.classList.remove("anim-correct");
+                void wordBox.offsetWidth;
+                wordBox.classList.add("anim-wrong");
+            }
+
+            updateStats();
+            
+            setTimeout(() => {
+                feedbackText.innerText = "";
+                loadNewWord();
+            }, 1200);
+        }
+
+        function updateStats() {
+            scoreBox.innerText = score;
+            streakBox.innerText = streak;
+            
+            if (streak >= 3) {
+                fireIcon.style.display = "inline";
+                fireIcon.style.transform = "scale(1.2)";
+                setTimeout(() => fireIcon.style.transform = "scale(1)", 200);
+            } else {
+                fireIcon.style.display = "none";
+            }
+        }
+
+        window.onload = loadNewWord;
+
+    </script>
+</body>
+</html>

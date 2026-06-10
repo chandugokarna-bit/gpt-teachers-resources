@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>स्वर और व्यंजन - Hindi Alphabet Game</title>
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            /* Using Baloo 2 which looks great for Hindi scripts */
+            font-family: 'Baloo 2', 'Poppins', cursive;
+            background: linear-gradient(135deg, #00c6ff 0%, #0072ff 100%);
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .game-board {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px 30px;
+            border-radius: 25px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            text-align: center;
+            max-width: 450px;
+            width: 90%;
+            position: relative;
+        }
+
+        h1 {
+            color: #0072ff;
+            font-size: 32px;
+            line-height: 1.2;
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            font-size: 16px;
+            color: #7f8fa6;
+            margin-bottom: 25px;
+            display: block;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .scoreboard {
+            display: flex;
+            justify-content: space-around;
+            background: #f1f2f6;
+            padding: 12px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .score-val { color: #00a8ff; font-size: 24px; }
+        .streak-val { color: #e1b12c; font-size: 24px; }
+
+        /* The animated letter bubble */
+        .letter-bubble {
+            width: 150px;
+            height: 150px;
+            background: #ffffff;
+            border: 5px solid #00a8ff;
+            border-radius: 50%;
+            margin: 0 auto 30px auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 70px;
+            font-weight: 700;
+            color: #2f3542;
+            box-shadow: inset 0 -8px 0 rgba(0, 168, 255, 0.2), 0 10px 20px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+        }
+
+        .btn-container {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        button {
+            flex: 1;
+            padding: 15px 10px;
+            font-size: 22px;
+            font-family: 'Baloo 2', cursive;
+            font-weight: 700;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            color: white;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn-swar {
+            background: #9c88ff;
+            box-shadow: 0 6px 0 #8c7ae6;
+        }
+        .btn-swar:active { transform: translateY(6px); box-shadow: none; }
+
+        .btn-vyanjan {
+            background: #e84118;
+            box-shadow: 0 6px 0 #c23616;
+        }
+        .btn-vyanjan:active { transform: translateY(6px); box-shadow: none; }
+
+        .feedback {
+            margin-top: 20px;
+            font-size: 22px;
+            font-weight: bold;
+            height: 30px;
+        }
+
+        /* Animations */
+        @keyframes popIn {
+            0% { transform: scale(0); opacity: 0; }
+            80% { transform: scale(1.1); opacity: 1; }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes successPop {
+            0% { transform: scale(1); border-color: #4cd137; background: #e8f8f5; }
+            50% { transform: scale(1.2); border-color: #4cd137; background: #4cd137; color: white; }
+            100% { transform: scale(1); border-color: #00a8ff; background: #ffffff; }
+        }
+
+        @keyframes errorShake {
+            0% { transform: translateX(0); border-color: #e84118; background: #fcebeb;}
+            25% { transform: translateX(-15px) rotate(-5deg); }
+            50% { transform: translateX(15px) rotate(5deg); }
+            75% { transform: translateX(-15px) rotate(-5deg); }
+            100% { transform: translateX(0); border-color: #00a8ff; background: #ffffff;}
+        }
+
+        .anim-pop { animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .anim-correct { animation: successPop 0.6s ease; }
+        .anim-wrong { animation: errorShake 0.5s ease; }
+
+    </style>
+</head>
+<body>
+
+    <div class="game-board">
+        <h1>स्वर और व्यंजन</h1>
+        <span class="subtitle">Swar & Vyanjan Sorter</span>
+        
+        <div class="scoreboard">
+            <div>स्कोर: <span class="score-val" id="score">0</span></div>
+            <div>स्ट्रीक: <span class="streak-val" id="streak">0</span> <span id="fire" style="display:none;">🔥</span></div>
+        </div>
+
+        <!-- The bubble where the letter appears -->
+        <div class="letter-bubble anim-pop" id="letterBox">
+            अ
+        </div>
+
+        <div class="btn-container">
+            <button class="btn-swar" onclick="checkAnswer('स्वर')">स्वर (Vowels)</button>
+            <button class="btn-vyanjan" onclick="checkAnswer('व्यंजन')">व्यंजन (Consonants)</button>
+        </div>
+
+        <div class="feedback" id="feedbackText"></div>
+    </div>
+
+    <script>
+        // Audio Setup
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playSound(isCorrect) {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+
+            if (isCorrect) {
+                // Happy pop sound
+                oscillator.type = 'sine';
+                oscillator.frequency.setValueAtTime(600, audioCtx.currentTime); 
+                oscillator.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.1); 
+                gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+                oscillator.start();
+                oscillator.stop(audioCtx.currentTime + 0.2);
+            } else {
+                // Sad buzzer sound
+                oscillator.type = 'triangle';
+                oscillator.frequency.setValueAtTime(200, audioCtx.currentTime);
+                oscillator.frequency.exponentialRampToValueAtTime(50, audioCtx.currentTime + 0.3); 
+                gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                oscillator.start();
+                oscillator.stop(audioCtx.currentTime + 0.3);
+            }
+        }
+
+        // Swar and Vyanjan Arrays
+        const swarList = ['अ', 'आ', 'इ', 'ई', 'उ', 'ऊ', 'ऋ', 'ए', 'ऐ', 'ओ', 'औ', 'अं', 'अः'];
+        const vyanjanList = ['क', 'ख', 'ग', 'घ', 'च', 'छ', 'ज', 'झ', 'ट', 'ठ', 'ड', 'ढ', 'त', 'थ', 'द', 'ध', 'न', 'प', 'फ', 'ब', 'भ', 'म', 'य', 'र', 'ल', 'व', 'श', 'ष', 'स', 'ह'];
+
+        // Combine them into a searchable pool
+        let alphabetPool = [];
+        swarList.forEach(letter => alphabetPool.push({ letter: letter, type: 'स्वर' }));
+        vyanjanList.forEach(letter => alphabetPool.push({ letter: letter, type: 'व्यंजन' }));
+
+        let currentData = {};
+        let score = 0;
+        let streak = 0;
+
+        const letterBox = document.getElementById("letterBox");
+        const scoreBox = document.getElementById("score");
+        const streakBox = document.getElementById("streak");
+        const fireIcon = document.getElementById("fire");
+        const feedbackText = document.getElementById("feedbackText");
+
+        function loadNewLetter() {
+            // Pick a random letter from the pool
+            const randomIndex = Math.floor(Math.random() * alphabetPool.length);
+            currentData = alphabetPool[randomIndex];
+            
+            letterBox.innerText = currentData.letter;
+            
+            // Re-trigger the pop-in animation
+            letterBox.className = "letter-bubble anim-pop";
+            feedbackText.innerText = "";
+        }
+
+        function checkAnswer(selectedType) {
+            // Remove previous classes so we can restart animations
+            letterBox.className = "letter-bubble";
+            void letterBox.offsetWidth; // Force DOM reflow
+
+            if (selectedType === currentData.type) {
+                // Correct
+                playSound(true);
+                streak++;
+                score += (10 * streak); // Multiplier logic
+                
+                feedbackText.style.color = "#4cd137";
+                feedbackText.innerText = "शाबाश!";
+                letterBox.classList.add("anim-correct");
+
+            } else {
+                // Wrong
+                playSound(false);
+                streak = 0;
+                
+                feedbackText.style.color = "#e84118";
+                feedbackText.innerText = `गलत! '${currentData.letter}' एक ${currentData.type} है।`;
+                letterBox.classList.add("anim-wrong");
+            }
+
+            updateStats();
+            
+            // Load next letter after delay
+            setTimeout(loadNewLetter, 1200);
+        }
+
+        function updateStats() {
+            scoreBox.innerText = score;
+            streakBox.innerText = streak;
+            
+            if (streak >= 3) {
+                fireIcon.style.display = "inline";
+                fireIcon.style.transform = "scale(1.3)";
+                setTimeout(() => fireIcon.style.transform = "scale(1)", 200);
+            } else {
+                fireIcon.style.display = "none";
+            }
+        }
+
+        // Initialize the game
+        window.onload = loadNewLetter;
+
+    </script>
+</body>
+</html>
