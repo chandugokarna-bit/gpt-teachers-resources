@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ವರ್ಚುವಲ್ ತಾಪಮಾನ ಪ್ರಯೋಗಾಲಯ ಸಿಮ್ಯುಲೇಟರ್</title>
+    <style>
+        :root {
+            --slate-950: #020617;
+            --slate-900: #0f172a;
+            --slate-800: #1e293b;
+            --cyan: #06b6d4;
+            --emerald: #10b981;
+            --rose: #f43f5e;
+            --amber: #f59e0b;
+            --text: #f1f5f9;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+
+        body {
+            background-color: var(--slate-950);
+            color: var(--text);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            max-width: 800px;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            color: var(--cyan);
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(6, 182, 212, 0.3);
+        }
+
+        header p {
+            color: #94a3b8;
+            font-size: 1.1rem;
+        }
+
+        .lab-station {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 30px;
+            width: 100%;
+            max-width: 1000px;
+        }
+
+        @media (max-width: 768px) {
+            .lab-station { grid-template-columns: 1fr; }
+        }
+
+        .card {
+            background: var(--slate-900);
+            border-radius: 20px;
+            padding: 25px;
+            border: 1px solid #334155;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+        }
+
+        /* 3 Bowls UI */
+        .bowls-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .bowl-card {
+            background: var(--slate-800);
+            border: 2px solid #475569;
+            border-radius: 15px;
+            padding: 20px 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bowl-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--cyan);
+        }
+
+        .bowl-card.active {
+            border-color: var(--amber) !important;
+            box-shadow: 0 0 20px rgba(245, 158, 11, 0.3);
+            background: #1e293b;
+        }
+
+        .bowl-emoji {
+            font-size: 3.5rem;
+            display: block;
+            margin-bottom: 10px;
+            transition: transform 0.2s;
+        }
+
+        .bowl-card:active .bowl-emoji {
+            transform: scale(0.9);
+        }
+
+        /* Liquid color overlays */
+        .bowl-cold { border-bottom: 6px solid var(--cyan); }
+        .bowl-normal { border-bottom: 6px solid var(--emerald); }
+        .bowl-warm { border-bottom: 6px solid var(--rose); }
+
+        /* Interactive Sensation Message Box */
+        .sensation-display {
+            background: #020617;
+            border-left: 4px solid var(--amber);
+            padding: 15px;
+            border-radius: 8px;
+            min-height: 70px;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            font-size: 1.1rem;
+            color: #cbd5e1;
+        }
+
+        /* Input Slider Section */
+        .guess-control-box {
+            background: #0f172a;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #334155;
+        }
+
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .therm-slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 5px;
+            outline: none;
+            accent-color: var(--cyan);
+            cursor: pointer;
+        }
+
+        .btn-submit {
+            background: var(--amber);
+            color: black;
+            font-weight: bold;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            width: 100%;
+            margin-top: 15px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: opacity 0.2s;
+        }
+
+        .btn-submit:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        /* Thermometer Animation Graphic */
+        .thermometer-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #020617;
+            border-radius: 15px;
+            padding: 30px 10px;
+            height: 100%;
+            min-height: 400px;
+            position: relative;
+        }
+
+        .thermometer-tube {
+            width: 24px;
+            height: 280px;
+            background: #334155;
+            border-radius: 12px;
+            position: relative;
+            border: 3px solid #64748b;
+            display: flex;
+            align-items: flex-end;
+        }
+
+        .thermometer-mercury {
+            width: 100%;
+            height: 0%; /* Dynamic height handled by JS */
+            background: linear-gradient(to top, var(--rose), #ff4d6d);
+            border-radius: 8px;
+            transition: height 2s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        .thermometer-bulb {
+            width: 44px;
+            height: 44px;
+            background: var(--rose);
+            border-radius: 50%;
+            margin-top: -10px;
+            border: 3px solid #64748b;
+            box-shadow: 0 0 15px rgba(244, 63, 94, 0.5);
+        }
+
+        .temperature-badge {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-top: 20px;
+            color: var(--text);
+        }
+
+        /* Score & Analysis Screen */
+        .analysis-text {
+            margin-top: 15px;
+            font-size: 1rem;
+            line-height: 1.5;
+            text-align: center;
+            color: #94a3b8;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>🧪 ವರ್ಚುವಲ್ ತಾಪಮಾನ ಪ್ರಯೋಗಾಲಯ ಸಿಮ್ಯುಲೇಟರ್ 🌡️</h1>
+        <p>ಆರನೇ ತರಗತಿ ವಿಜ್ಞಾನ: ನಮ್ಮ ಸ್ಪರ್ಶ ಜ್ಞಾನ (ತ್ವಚೆ) ಮತ್ತು ವೈಜ್ಞಾನಿಕ ಲ್ಯಾಬೋರೇಟರಿ ಥರ್ಮಾಮೀಟರ್ ನಡುವಿನ ವ್ಯತ್ಯಾಸವನ್ನು ಈ ಲೈವ್ ಪ್ರಯೋಗದ ಮೂಲಕ ಅನ್ವೇಷಿಸಿ!</p>
+    </header>
+
+    <div class="lab-station">
+        
+        <div class="card">
+            <h3 style="margin-bottom: 15px; color: var(--cyan);">👇 ಹಂತ 1: ಪಾತ್ರೆಯ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ ನೀರನ್ನು ಸ್ಪರ್ಶಿಸಿ</h3>
+            
+            <div class="bowls-grid">
+                <div class="bowl-card bowl-cold" id="bowl_A" onclick="selectBowl('A')">
+                    <span class="bowl-emoji">🥣</span>
+                    <strong>ಪಾತ್ರೆ A</strong>
+                    <div style="font-size: 0.8rem; margin-top:5px; color:#a1a1aa;" id="status_A">ಮುಟ್ಟಿಲ್ಲ ❌</div>
+                </div>
+                <div class="bowl-card bowl-normal" id="bowl_B" onclick="selectBowl('B')">
+                    <span class="bowl-emoji">🥣</span>
+                    <strong>ಪಾತ್ರೆ B</strong>
+                    <div style="font-size: 0.8rem; margin-top:5px; color:#a1a1aa;" id="status_B">ಮುಟ್ಟಿಲ್ಲ ❌</div>
+                </div>
+                <div class="bowl-card bowl-warm" id="bowl_C" onclick="selectBowl('C')">
+                    <span class="bowl-emoji">🥣</span>
+                    <strong>ಪಾತ್ರೆ C</strong>
+                    <div style="font-size: 0.8rem; margin-top:5px; color:#a1a1aa;" id="status_C">ಮುಟ್ಟಿಲ್ಲ ❌</div>
+                </div>
+            </div>
+
+            <div class="sensation-display" id="sensationText">
+                💡 ಪಾತ್ರೆಯನ್ನು ಆರಿಸಿದಾಗ ನಿಮ್ಮ ಬೆರಳಿಗೆ ಆಗುವ ಉಷ್ಣತೆಯ ಅನುಭವದ ವಿವರಣೆ ಇಲ್ಲಿ ಮೂಡುತ್ತದೆ...
+            </div>
+
+            <div class="guess-control-box">
+                <div class="slider-label">
+                    <span>🤔 ನಿಮ್ಮ ತಾಪಮಾನದ ಊಹೆ:</span>
+                    <span style="color:var(--amber); font-size:1.3rem;"><span id="sliderValDisplay">25</span>°C</span>
+                </div>
+                <input type="range" min="0" max="60" value="25" class="therm-slider" id="tempSlider" oninput="updateSliderDisplay(this.value)">
+                
+                <button class="btn-submit" id="submitGuessBtn" onclick="recordGuess()" disabled>🎯 ಈ ಊಹೆಯನ್ನು ಲಾಕ್ ಮಾಡಿ</button>
+            </div>
+            
+            <button class="btn-submit" id="restartBtn" onclick="resetLab()" style="background:#475569; color:white; display:none; margin-top:20px;">🔄 ಹೊಸ ಪ್ರಯೋಗವನ್ನು ಆರಂಭಿಸಿ</button>
+        </div>
+
+        <div class="card thermometer-container">
+            <h3 style="position: absolute; top: 15px; color:#94a3b8; font-size:0.9rem;">LABORATORY THERMOMETER SIMULATION</h3>
+            
+            <div class="thermometer-tube">
+                <div class="thermometer-mercury" id="mercuryBar"></div>
+            </div>
+            <div class="thermometer-bulb"></div>
+
+            <div class="temperature-badge" id="thermReadout">-- °C</div>
+            <div style="font-size:0.9rem; color: #64748b;" id="thermLabel">ಥರ್ಮಾಮೀಟರ್ ಅನ್ನು ನೀರಿನಲ್ಲಿ ಇಟ್ಟಿಲ್ಲ</div>
+
+            <div class="analysis-text" id="analysisOutput"></div>
+        </div>
+
+    </div>
+
+    <script>
+        // ಪ್ರತಿ ಬಾರಿಯೂ ವಿಭಿನ್ನ ರಹಸ್ಯ ತಾಪಮಾನಗಳನ್ನು ಕಂಪ್ಯೂಟರ್ ಸೃಷ್ಟಿಸುತ್ತದೆ
+        let actualTemperatures = {};
+        let studentGuesses = {};
+        let selectedBowlId = null;
+
+        function initLab() {
+            // ಯಾದೃಚ್ಛಿಕವಾಗಿ ತಾಪಮಾನ ನಿಗದಿಪಡಿಸುವುದು (Random Temperatures)
+            actualTemperatures['A'] = Math.floor(Math.random() * (15 - 5 + 1)) + 5;    // Cold: 5 to 15
+            actualTemperatures['B'] = Math.floor(Math.random() * (28 - 22 + 1)) + 22;  // Normal: 22 to 28
+            actualTemperatures['C'] = Math.floor(Math.random() * (48 - 37 + 1)) + 37;  // Warm: 37 to 48
+
+            studentGuesses = {};
+            selectedBowlId = null;
+            
+            document.getElementById('submitGuessBtn').disabled = true;
+        }
+
+        function selectBowl(bowlId) {
+            if (studentGuesses[bowlId] !== undefined) {
+                alert("ಈ ಪಾತ್ರೆಯ ತಾಪಮಾನವನ್ನು ನೀವು ಈಗಾಗಲೇ ಅಂದಾಜು ಮಾಡಿದ್ದೀರಿ!");
+                return;
+            }
+
+            selectedBowlId = bowlId;
+            
+            // ಸಕ್ರಿಯ ಬಟನ್ ಹೈಲೈಟ್ ಮಾಡುವುದು
+            document.querySelectorAll('.bowl-card').forEach(card => card.classList.remove('active'));
+            document.getElementById(`bowl_${bowlId}`).classList.add('active');
+
+            // ತ್ವಚೆಯ ವರ್ಚುವಲ್ ಸ್ಪರ್ಶದ ಅನುಭವವನ್ನು ಸುಳಿವಿನ ರೂಪದಲ್ಲಿ ನೀಡುವುದು
+            let text = "";
+            if (bowlId === 'A') text = "🧊 <b>ಸ್ಪರ್ಶ ಸುಳಿವು:</b> ನಿಮ್ಮ ಬೆರಳನ್ನು ಮುಳುಗಿಸಿದಾಗ ನೀರು ತುಂಬಾ ತಣ್ಣಗಾಗಿ, ಐಸ್ ಮುಟ್ಟಿದಂತಹ ಅನುಭವ ನೀಡುತ್ತಿದೆ!";
+            if (bowlId === 'B') text = "💧 <b>ಸ್ಪರ್ಶ ಸುಳಿವು:</b> ಈ ನೀರನ್ನು ಮುಟ್ಟಿದಾಗ ಬಿಸಿಯೂ ಅಲ್ಲದ, ತಣ್ಣಗೂ ಅಲ್ಲದ ಸಾಮಾನ್ಯ ಸ್ಥಿತಿಯ ಅನುಭವವಾಗುತ್ತಿದೆ.";
+            if (bowlId === 'C') text = "🔥 <b>ಸ್ಪರ್ಶ ಸುಳಿವು:</b> ಅಬ್ಬಾ! ಈ ನೀರು ಬೆರಳಿಗೆ ಸಾಕಷ್ಟು ಬಿಸಿ ತಾಗುತ್ತಿದೆ (ಸುರಕ್ಷಿತ ಮಿತಿಯಲ್ಲಿದೆ).";
+
+            document.getElementById('sensationText').innerHTML = text;
+            document.getElementById('submitGuessBtn').disabled = false;
+            
+            // ಥರ್ಮಾಮೀಟರ್ ರಿಸ್ಟಾರ್ಟ್ ಮಾಡಿ ಶೂನ್ಯಕ್ಕೆ ತರುವುದು
+            animateMercury(0);
+            document.getElementById('thermReadout').innerText = "-- °C";
+            document.getElementById('thermLabel').innerText = `ಪಾತ್ರೆ ${bowlId} ಗೆ ಥರ್ಮಾಮೀಟರ್ ಇಡಲು ಸಿದ್ಧವಾಗಿದೆ.`;
+        }
+
+        function updateSliderDisplay(val) {
+            document.getElementById('sliderValDisplay').innerText = val;
+        }
+
+        function recordGuess() {
+            const guessVal = parseInt(document.getElementById('tempSlider').value);
+            studentGuesses[selectedBowlId] = guessVal;
+
+            // ಸ್ಟೇಟಸ್ ಅಪ್ಡೇಟ್
+            document.getElementById(`status_${selectedBowlId}`).innerText = `ಊಹೆ: ${guessVal}°C ✅`;
+            document.getElementById(`status_${selectedBowlId}`).style.color = "var(--amber)";
+
+            // ಥರ್ಮಾಮೀಟರ್ ಅನಿಮೇಷನ್ ಮತ್ತು ನಿಖರ ತಾಪಮಾನ ಪ್ರದರ್ಶನ ಆನ್ ಆಗುತ್ತದೆ!
+            const actualVal = actualTemperatures[selectedBowlId];
+            document.getElementById('thermLabel').innerText = `ಪಾತ್ರೆ ${selectedBowlId} ನ ನಿಖರ ಮಾಪನ ಚಾಲ್ತಿಯಲ್ಲಿದೆ...`;
+            
+            // ಪಾದರಸದ ಲೈವ್ ಚಲನೆ
+            animateMercury(actualVal);
+
+            setTimeout(() => {
+                document.getElementById('thermReadout').innerText = `${actualVal} °C`;
+                
+                // ಫಲಿತಾಂಶದ ತುಲನಾತ್ಮಕ ವಿಶ್ಲೇಷಣೆ
+                let error = Math.abs(actualVal - guessVal);
+                let analysisText = "";
+                if (error <= 3) {
+                    analysisText = `🎯 <b>ಅದ್ಭುತ ಊಹೆ!</b> ನಿಮ್ಮ ತ್ವಚೆಯ ಅಂದಾಜು ವಿಜ್ಞಾನದ ಥರ್ಮಾಮೀಟರ್‌ಗೆ ಅತ್ಯಂತ ಹತ್ತಿರವಿದೆ (ವ್ಯತ್ಯಾಸ ಕೇವಲ ${error}°C).`;
+                    document.getElementById('analysisOutput').style.color = "var(--emerald)";
+                } else {
+                    analysisText = `⚠️ <b>ಗಮನಿಸಿ:</b> ನಿಮ್ಮ ಊಹೆಗೂ ಥರ್ಮಾಮೀಟರ್ ತೋರಿಸಿದ ನಿಜವಾದ ರೀಡಿಂಗ್‌ಗೂ <b>${error}°C</b> ನಷ್ಟು ವ್ಯತ್ಯಾಸವಿದೆ! ನಮ್ಮ ಚರ್ಮವು ಯಾವಾಗಲೂ ನಿಖರ ತಾಪಮಾನ ಹೇಳಲಾರದು ಎಂಬುದಕ್ಕೆ ಇದು ಸಾಕ್ಷಿ.`;
+                    document.getElementById('analysisOutput').style.color = "var(--amber)";
+                }
+                document.getElementById('analysisOutput').innerHTML = analysisText;
+
+                checkGameCompletion();
+            }, 2000); // 2 ಸೆಕೆಂಡುಗಳ ಕಾಲ ಥರ್ಮಾಮೀಟರ್ ಏರುವ ಅನಿಮೇಷನ್ ನಡೆಯುತ್ತದೆ
+        }
+
+        function animateMercury(temp) {
+            // 60 ಡಿಗ್ರಿಯನ್ನು 100% ಎತ್ತರಕ್ಕೆ ಮ್ಯಾಪ್ ಮಾಡುವುದು
+            let percentage = (temp / 60) * 100;
+            document.getElementById('mercuryBar').style.height = `${percentage}%`;
+        }
+
+        function checkGameCompletion() {
+            if (Object.keys(studentGuesses).length === 3) {
+                document.getElementById('sensationText').innerHTML = "🏆 <b>ಪ್ರಯೋಗ ಪೂರ್ಣಗೊಂಡಿದೆ!</b> ಮೂರೂ ಪಾತ್ರೆಗಳ ಪ್ರಾಯೋಗಿಕ ಡೇಟಾವನ್ನು ಹೋಲಿಕೆ ಮಾಡಿ ನೋಡಿದ್ದೀರಿ. ನಮ್ಮ ತೀರ್ಮಾನ: ತಾಪಮಾನದ ನಿಖರತೆಗೆ ಉಪಕರಣಗಳೇ ಬೇಕು!";
+                document.getElementById('submitGuessBtn').disabled = true;
+                document.getElementById('restartBtn').style.display = "block";
+                document.querySelectorAll('.bowl-card').forEach(card => card.classList.remove('active'));
+            }
+        }
+
+        function resetLab() {
+            document.getElementById('restartBtn').style.display = "none";
+            document.getElementById('status_A').innerText = "ಮುಟ್ಟಿಲ್ಲ ❌"; document.getElementById('status_A').style.color = "#a1a1aa";
+            document.getElementById('status_B').innerText = "ಮುಟ್ಟಿಲ್ಲ ❌"; document.getElementById('status_B').style.color = "#a1a1aa";
+            document.getElementById('status_C').innerText = "ಮುಟ್ಟಿಲ್ಲ ❌"; document.getElementById('status_C').style.color = "#a1a1aa";
+            document.getElementById('sensationText').innerHTML = "💡 ಪಾತ್ರೆಯನ್ನು ಆರಿಸಿದಾಗ ನಿಮ್ಮ ಬೆರಳಿಗೆ ಆಗುವ ಉಷ್ಣತೆಯ ಅನುಭವದ ವಿವರಣೆ ಇಲ್ಲಿ ಮೂಡುತ್ತದೆ...";
+            document.getElementById('analysisOutput').innerText = "";
+            document.getElementById('thermReadout').innerText = "-- °C";
+            document.getElementById('thermLabel').innerText = "ಥರ್ಮಾಮೀಟರ್ ಅನ್ನು ನೀರಿನಲ್ಲಿ ಇಟ್ಟಿಲ್ಲ";
+            animateMercury(0);
+            initLab();
+        }
+
+        window.onload = initLab;
+    </script>
+</body>
+</html>
