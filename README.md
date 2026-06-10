@@ -6,11 +6,13 @@
 ವಿದ್ಯಾರ್ಥಿಗಳಿಗೆ ಎಲ್ಲಾ ವಿಷಯಗಳ resources ಒಂದೇ ಸ್ಥಳದಲ್ಲಿ ಒದಗಿಸುವುದು.
 
 ## 📂 ಲಭ್ಯವಿರುವ ಸಂಪನ್ಮೂಲಗಳು
-- 🎥 Video Lessons
+- 🎥 Video Lessons(AI)
+- 🖥️ Digital Classroom
 - 📄 PDF Notes
 - 📊 PPT Materials
-- 🧠 Activities (Drag & Drop)
+- 🧠 Activities (E-Reasources)
 - 📢 Educational Orders
+- 📄 School Documents
 
 ## 🌐 Website Link
 👉 https://chandugokarna-bit.github.io/gpt-teachers-resources/
