@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ದತ್ತಾಂಶ ಬೇಟೆ ಮತ್ತು ಸ್ತಂಭ ನಕ್ಷೆ (Bar Graph)</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #e8f5e9;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 30px;
+            border-top: 8px solid #2196F3;
+        }
+        h1 {
+            color: #1565C0;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        p.desc {
+            font-size: 16px;
+            color: #555;
+            margin-bottom: 25px;
+        }
+        .timer-box {
+            font-size: 36px;
+            font-weight: bold;
+            color: #d32f2f;
+            background-color: #ffcdd2;
+            padding: 15px;
+            border-radius: 10px;
+            display: inline-block;
+            margin-bottom: 20px;
+            border: 2px dashed #b71c1c;
+        }
+        .data-row {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 10px;
+            gap: 15px;
+        }
+        input[type="text"], input[type="number"] {
+            font-size: 18px;
+            padding: 10px;
+            width: 200px;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+            outline: none;
+        }
+        input[type="text"]:focus, input[type="number"]:focus {
+            border-color: #2196F3;
+        }
+        .btn {
+            font-size: 18px;
+            padding: 12px 25px;
+            margin: 15px 5px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            color: white;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+        .btn-start { background-color: #4CAF50; }
+        .btn-start:hover { background-color: #388E3C; }
+        .btn-submit { background-color: #ff9800; display: none; margin: 20px auto; }
+        .btn-submit:hover { background-color: #f57c00; }
+        .btn-restart { background-color: #9c27b0; margin-top: 30px; }
+        .btn-restart:hover { background-color: #7b1fa2; }
+        
+        /* Table Styles */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            font-size: 18px;
+        }
+        th, td {
+            border: 2px solid #ddd;
+            padding: 12px;
+            text-align: center;
+        }
+        th {
+            background-color: #2196F3;
+            color: white;
+        }
+        tr:nth-child(even) { background-color: #f2f2f2; }
+        
+        /* Bar Graph Styles */
+        .chart-container {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            height: 300px;
+            margin-top: 40px;
+            padding: 20px 10px 0 10px;
+            border-bottom: 3px solid #333;
+            border-left: 3px solid #333;
+            background-color: #fafafa;
+            position: relative;
+        }
+        .chart-title {
+            font-size: 22px;
+            color: #d84315;
+            margin-top: 30px;
+            margin-bottom: -10px;
+        }
+        .bar-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 15%;
+            height: 100%;
+            justify-content: flex-end;
+        }
+        .bar {
+            width: 100%;
+            border-radius: 5px 5px 0 0;
+            text-align: center;
+            transition: height 1s ease-out;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+        }
+        .bar-value {
+            display: block;
+            margin-top: -25px;
+            font-weight: bold;
+            color: #333;
+            font-size: 18px;
+        }
+        .bar-label {
+            margin-top: 10px;
+            font-weight: bold;
+            color: #555;
+            word-wrap: break-word;
+        }
+        
+        #gameplay, #result { display: none; }
+        .success-msg { color: #2E7D32; font-size: 20px; font-weight: bold; margin-top: 15px; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>🏃‍♂️ ದತ್ತಾಂಶ ಬೇಟೆ ಮತ್ತು ಸ್ತಂಭ ನಕ್ಷೆ 📊</h1>
+        <p class="desc">ಸಮಯ ಪ್ರಾರಂಭವಾದ ತಕ್ಷಣ ತರಗತಿಯಲ್ಲಿ ಓಡಾಡಿ ನಿಮ್ಮ 5 ಸ್ನೇಹಿತರ ಹೆಸರು ಮತ್ತು ಅವರ "ತೂಕ" ಅಥವಾ "ಅಂಕಗಳನ್ನು" (ಸಂಖ್ಯೆಯಲ್ಲಿ) ಬರೆದುಕೊಳ್ಳಿ.</p>
+
+        <div id="setup">
+            <button class="btn btn-start" onclick="startGame()">⏱️ ಆಟ ಪ್ರಾರಂಭಿಸಿ (Start Timer)</button>
+        </div>
+
+        <div id="gameplay">
+            <div class="timer-box" id="timerDisplay">05:00</div>
+            
+            <div id="inputFields">
+                <div class="data-row">
+                    <input type="text" id="name1" placeholder="ಸ್ನೇಹಿತನ ಹೆಸರು 1">
+                    <input type="number" id="data1" placeholder="ಸಂಖ್ಯೆ (ಉದಾ: ತೂಕ)" min="0">
+                </div>
+                <div class="data-row">
+                    <input type="text" id="name2" placeholder="ಸ್ನೇಹಿತನ ಹೆಸರು 2">
+                    <input type="number" id="data2" placeholder="ಸಂಖ್ಯೆ (ಉದಾ: ತೂಕ)" min="0">
+                </div>
+                <div class="data-row">
+                    <input type="text" id="name3" placeholder="ಸ್ನೇಹಿತನ ಹೆಸರು 3">
+                    <input type="number" id="data3" placeholder="ಸಂಖ್ಯೆ (ಉದಾ: ತೂಕ)" min="0">
+                </div>
+                <div class="data-row">
+                    <input type="text" id="name4" placeholder="ಸ್ನೇಹಿತನ ಹೆಸರು 4">
+                    <input type="number" id="data4" placeholder="ಸಂಖ್ಯೆ (ಉದಾ: ತೂಕ)" min="0">
+                </div>
+                <div class="data-row">
+                    <input type="text" id="name5" placeholder="ಸ್ನೇಹಿತನ ಹೆಸರು 5">
+                    <input type="number" id="data5" placeholder="ಸಂಖ್ಯೆ (ಉದಾ: ತೂಕ)" min="0">
+                </div>
+            </div>
+
+            <button class="btn btn-submit" id="submitBtn" onclick="generateReport()">ನಕ್ಷೆಯನ್ನು ತಯಾರಿಸಿ (Generate Graph)</button>
+        </div>
+
+        <div id="result">
+            <div class="success-msg" id="timeTakenMsg"></div>
+            
+            <table id="dataTable">
+                <thead>
+                    <tr>
+                        <th>ಕ್ರಮ ಸಂಖ್ಯೆ</th>
+                        <th>ಸ್ನೇಹಿತನ ಹೆಸರು</th>
+                        <th>ಸಂಗ್ರಹಿಸಿದ ಸಂಖ್ಯೆ</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    </tbody>
+            </table>
+
+            <h2 class="chart-title">📈 ನಿಮ್ಮ ದತ್ತಾಂಶದ ಸ್ತಂಭ ನಕ್ಷೆ (Bar Graph) 📈</h2>
+            
+            <div class="chart-container" id="chartBox">
+                </div>
+
+            <button class="btn btn-restart" onclick="location.reload()">ಮತ್ತೊಮ್ಮೆ ಆಡಿ (Play Again)</button>
+        </div>
+
+    </div>
+
+    <script>
+        let timerInterval;
+        let totalSeconds = 300; // 5 minutes
+        let timeElapsed = 0;
+
+        function startGame() {
+            document.getElementById("setup").style.display = "none";
+            document.getElementById("gameplay").style.display = "block";
+            document.getElementById("submitBtn").style.display = "block";
+            
+            timerInterval = setInterval(updateTimer, 1000);
+        }
+
+        function updateTimer() {
+            if (totalSeconds <= 0) {
+                clearInterval(timerInterval);
+                alert("⏰ ಸಮಯ ಮುಗಿಯಿತು! ಈಗಲೇ ನಕ್ಷೆಯನ್ನು ಸಲ್ಲಿಸಿ.");
+                generateReport();
+                return;
+            }
+            
+            totalSeconds--;
+            timeElapsed++;
+            
+            let minutes = Math.floor(totalSeconds / 60);
+            let seconds = totalSeconds % 60;
+            
+            minutes = minutes < 10 ? "0" + minutes : minutes;
+            seconds = seconds < 10 ? "0" + seconds : seconds;
+            
+            document.getElementById("timerDisplay").innerText = `${minutes}:${seconds}`;
+        }
+
+        function generateReport() {
+            clearInterval(timerInterval);
+
+            let tbody = document.getElementById("tableBody");
+            tbody.innerHTML = ""; 
+            
+            let dataArray = [];
+            let maxVal = 0;
+
+            // 1. Collect Data and Build Table
+            for (let i = 1; i <= 5; i++) {
+                let name = document.getElementById(`name${i}`).value.trim();
+                let dataValue = parseFloat(document.getElementById(`data${i}`).value);
+                
+                // Set default values if empty
+                if(!name) name = `ವ್ಯಕ್ತಿ ${i}`;
+                if(isNaN(dataValue)) dataValue = 0;
+
+                // Find maximum value to adjust graph height properly
+                if(dataValue > maxVal) {
+                    maxVal = dataValue;
+                }
+
+                dataArray.push({ name: name, value: dataValue });
+
+                let row = `<tr>
+                    <td>${i}</td>
+                    <td>${name}</td>
+                    <td>${dataValue}</td>
+                </tr>`;
+                tbody.innerHTML += row;
+            }
+
+            // 2. Build Bar Graph
+            let chartBox = document.getElementById("chartBox");
+            chartBox.innerHTML = "";
+            let colors = ["#E91E63", "#9C27B0", "#3F51B5", "#00BCD4", "#FF9800"]; // Colors for bars
+
+            // Prevent dividing by zero if all inputs are 0
+            let scaleMax = maxVal === 0 ? 1 : maxVal; 
+
+            dataArray.forEach((item, index) => {
+                // Calculate height percentage relative to the highest number (Max 90% height)
+                let heightPercentage = (item.value / scaleMax) * 90;
+
+                let barHTML = `
+                <div class="bar-wrapper">
+                    <div class="bar" style="height: ${heightPercentage}%; background-color: ${colors[index]};">
+                        <span class="bar-value">${item.value}</span>
+                    </div>
+                    <div class="bar-label">${item.name}</div>
+                </div>`;
+                
+                chartBox.innerHTML += barHTML;
+            });
+
+            // 3. Show Result
+            document.getElementById("gameplay").style.display = "none";
+            document.getElementById("result").style.display = "block";
+
+            let minsTaken = Math.floor(timeElapsed / 60);
+            let secsTaken = timeElapsed % 60;
+            document.getElementById("timeTakenMsg").innerText = `🎉 ನೀವು ತೆಗೆದುಕೊಂಡ ಸಮಯ: ${minsTaken} ನಿಮಿಷ ${secsTaken} ಸೆಕೆಂಡುಗಳು!`;
+        }
+    </script>
+</body>
+</html>

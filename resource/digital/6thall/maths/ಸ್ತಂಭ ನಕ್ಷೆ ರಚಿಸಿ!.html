@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ನೀವೇ ಸ್ತಂಭ ನಕ್ಷೆ ರಚಿಸಿ</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f3e5f5;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 850px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            border-top: 8px solid #9c27b0;
+        }
+        h1 {
+            text-align: center;
+            color: #6a1b9a;
+            font-size: 30px;
+            margin-bottom: 5px;
+        }
+        p.desc {
+            text-align: center;
+            font-size: 18px;
+            color: #555;
+            margin-bottom: 25px;
+        }
+        
+        /* Data Table */
+        .data-table-container {
+            background-color: #f3e5f5;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            border: 2px dashed #ce93d8;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: center;
+            font-size: 18px;
+            background-color: white;
+        }
+        th, td {
+            border: 2px solid #e1bee7;
+            padding: 10px;
+        }
+        th {
+            background-color: #9c27b0;
+            color: white;
+        }
+
+        /* Graph Construction Area */
+        .graph-workspace {
+            display: flex;
+            height: 350px;
+            margin-top: 20px;
+            padding: 10px 0;
+            position: relative;
+        }
+        .y-axis {
+            display: flex;
+            flex-direction: column-reverse;
+            justify-content: space-between;
+            align-items: flex-end;
+            padding-right: 15px;
+            border-right: 4px solid #333;
+            width: 40px;
+            font-weight: bold;
+            color: #555;
+        }
+        .graph-area {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            flex-grow: 1;
+            border-bottom: 4px solid #333;
+            background-color: #fafafa;
+            position: relative;
+            padding: 0 10px;
+        }
+
+        /* Grid Lines */
+        .grid-line {
+            position: absolute;
+            left: 0;
+            right: 0;
+            border-top: 1px dashed #bdbdbd;
+            z-index: 0;
+        }
+
+        /* Interactive Bars */
+        .bar-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+            height: 100%;
+            z-index: 1;
+            width: 18%;
+        }
+        .bar {
+            width: 80%;
+            background-color: #2196F3;
+            border-radius: 5px 5px 0 0;
+            text-align: center;
+            transition: height 0.3s ease;
+            box-shadow: inset 0 -3px 5px rgba(0,0,0,0.2);
+            position: relative;
+            height: 0%; /* Default 0 */
+        }
+        .bar-label {
+            margin-top: 10px;
+            font-weight: bold;
+            color: #333;
+            font-size: 16px;
+        }
+        
+        /* Bar Controls */
+        .controls-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+        .ctrl-btn {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            width: 35px;
+            height: 35px;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        .ctrl-btn.minus { background-color: #f44336; }
+        .ctrl-btn:hover { filter: brightness(1.1); transform: scale(1.05); }
+        .ctrl-btn:active { transform: scale(0.95); }
+        .current-val {
+            font-weight: bold;
+            font-size: 16px;
+            color: #000;
+            background: white;
+            border: 1px solid #ccc;
+            padding: 2px 5px;
+            border-radius: 3px;
+            margin-bottom: 5px;
+            z-index: 2;
+        }
+
+        /* Submit Button */
+        .submit-section {
+            text-align: center;
+            margin-top: 40px;
+        }
+        .btn-check {
+            background-color: #ff9800;
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        }
+        .btn-check:hover { background-color: #f57c00; transform: translateY(-2px); }
+        
+        #feedback {
+            font-size: 24px;
+            font-weight: bold;
+            margin-top: 20px;
+            min-height: 35px;
+        }
+        .btn-new {
+            background-color: #008CBA;
+            color: white;
+            font-size: 18px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            margin-top: 15px;
+            cursor: pointer;
+            display: none;
+        }
+        .btn-new:hover { background-color: #007399; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>📊 ನೀವೇ ಸ್ತಂಭ ನಕ್ಷೆ ರಚಿಸಿ! 📐</h1>
+        <p class="desc">ಮೇಲಿರುವ ದತ್ತಾಂಶವನ್ನು (Data) ನೋಡಿ, <b>'+'</b> ಮತ್ತು <b>'-'</b> ಗುಂಡಿಗಳನ್ನು ಬಳಸಿ ಸ್ತಂಭಗಳನ್ನು ಸರಿಯಾದ ಎತ್ತರಕ್ಕೆ ಬೆಳೆಸಿ.</p>
+
+        <div class="data-table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ವರ್ಗ (Category)</th>
+                        <th>ಸೇಬು 🍎</th>
+                        <th>ಬಾಳೆಹಣ್ಣು 🍌</th>
+                        <th>ದ್ರಾಕ್ಷಿ 🍇</th>
+                        <th>ಕಿತ್ತಳೆ 🍊</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><b>ಮಾರಾಟವಾದ ಪ್ರಮಾಣ</b></td>
+                        <td id="target0">0</td>
+                        <td id="target1">0</td>
+                        <td id="target2">0</td>
+                        <td id="target3">0</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="graph-workspace">
+            <div class="y-axis">
+                <div>0</div>
+                <div>20</div>
+                <div>40</div>
+                <div>60</div>
+                <div>80</div>
+                <div>100</div>
+            </div>
+
+            <div class="graph-area" id="graphArea">
+                <div class="grid-line" style="bottom: 20%;"></div>
+                <div class="grid-line" style="bottom: 40%;"></div>
+                <div class="grid-line" style="bottom: 60%;"></div>
+                <div class="grid-line" style="bottom: 80%;"></div>
+                <div class="grid-line" style="bottom: 100%;"></div>
+
+                </div>
+        </div>
+
+        <div class="submit-section">
+            <button class="btn-check" id="checkBtn" onclick="checkGraph()">ನನ್ನ ನಕ್ಷೆಯನ್ನು ಪರಿಶೀಲಿಸಿ (Check)</button>
+            <div id="feedback"></div>
+            <button class="btn-new" id="newBtn" onclick="generateNewGame()">ಹೊಸ ಆಟ ಶುರುಮಾಡಿ (New Game)</button>
+        </div>
+    </div>
+
+    <script>
+        const categories = ["ಸೇಬು 🍎", "ಬಾಳೆಹಣ್ಣು 🍌", "ದ್ರಾಕ್ಷಿ 🍇", "ಕಿತ್ತಳೆ 🍊"];
+        const barColors = ["#E91E63", "#FFEB3B", "#9C27B0", "#FF9800"];
+        let targetData = [];
+        let currentData = [0, 0, 0, 0];
+
+        window.onload = function() {
+            generateNewGame();
+        };
+
+        function generateNewGame() {
+            // Reset Arrays and UI
+            targetData = [];
+            currentData = [0, 0, 0, 0];
+            document.getElementById("feedback").innerText = "";
+            document.getElementById("checkBtn").style.display = "inline-block";
+            document.getElementById("newBtn").style.display = "none";
+            
+            let graphArea = document.getElementById("graphArea");
+            
+            // Keep grid lines, remove old bars
+            let gridLines = Array.from(graphArea.getElementsByClassName('grid-line'));
+            graphArea.innerHTML = '';
+            gridLines.forEach(gl => graphArea.appendChild(gl));
+
+            // Generate Random Targets (Multiples of 10, max 100)
+            for (let i = 0; i < 4; i++) {
+                let randomVal = Math.floor(Math.random() * 10 + 1) * 10; 
+                targetData.push(randomVal);
+                document.getElementById(`target${i}`).innerText = randomVal;
+
+                // Create Bar Element
+                let barHTML = `
+                    <div class="bar-wrapper">
+                        <div class="controls-group">
+                            <button class="ctrl-btn" onclick="adjustHeight(${i}, 10)">+</button>
+                            <button class="ctrl-btn minus" onclick="adjustHeight(${i}, -10)">-</button>
+                        </div>
+                        <div class="current-val" id="valDisplay${i}">0</div>
+                        <div class="bar" id="bar${i}" style="background-color: ${barColors[i]}; height: 0%;"></div>
+                        <div class="bar-label">${categories[i]}</div>
+                    </div>
+                `;
+                graphArea.insertAdjacentHTML('beforeend', barHTML);
+            }
+        }
+
+        function adjustHeight(index, amount) {
+            let newVal = currentData[index] + amount;
+            
+            // Limit between 0 and 100
+            if (newVal >= 0 && newVal <= 100) {
+                currentData[index] = newVal;
+                document.getElementById(`bar${index}`).style.height = newVal + "%";
+                document.getElementById(`valDisplay${index}`).innerText = newVal;
+            }
+        }
+
+        function checkGraph() {
+            let isCorrect = true;
+            let feedback = document.getElementById("feedback");
+
+            for (let i = 0; i < 4; i++) {
+                if (currentData[i] !== targetData[i]) {
+                    isCorrect = false;
+                    break;
+                }
+            }
+
+            if (isCorrect) {
+                feedback.innerText = "🎉 ಅದ್ಭುತ! ನೀವು ದತ್ತಾಂಶಕ್ಕೆ ಸರಿಯಾಗಿ ನಕ್ಷೆಯನ್ನು ರಚಿಸಿದ್ದೀರಿ! 🏆";
+                feedback.style.color = "#2E7D32";
+                document.getElementById("checkBtn").style.display = "none";
+                document.getElementById("newBtn").style.display = "inline-block";
+                
+                // Disable buttons
+                let btns = document.querySelectorAll('.ctrl-btn');
+                btns.forEach(btn => btn.disabled = true);
+            } else {
+                feedback.innerText = "❌ ತಪ್ಪಾಗಿದೆ! ಕೋಷ್ಟಕದಲ್ಲಿರುವ ಸಂಖ್ಯೆಗಳನ್ನು ಮತ್ತೊಮ್ಮೆ ಪರಿಶೀಲಿಸಿ ಸರಿಪಡಿಸಿ.";
+                feedback.style.color = "#c62828";
+            }
+        }
+    </script>
+</body>
+</html>

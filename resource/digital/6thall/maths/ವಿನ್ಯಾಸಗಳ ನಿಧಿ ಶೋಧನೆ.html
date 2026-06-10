@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ವಿನ್ಯಾಸಗಳ ನಿಧಿ ಶೋಧನೆ (Pattern Treasure Hunt)</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1a1a2e;
+            color: #ffffff;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            background-color: #16213e;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 30px;
+            border: 4px solid #f2a365;
+        }
+        h1 {
+            color: #f2a365;
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        p.desc {
+            font-size: 18px;
+            color: #e94560;
+            margin-bottom: 25px;
+        }
+        /* Updated progress-bar to handle many locks smoothly */
+        .progress-bar {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 30px;
+            flex-wrap: wrap; 
+        }
+        .lock {
+            font-size: 24px;
+            opacity: 0.4;
+            transition: 0.3s;
+        }
+        .lock.unlocked {
+            opacity: 1;
+            transform: scale(1.2);
+            text-shadow: 0 0 10px #ffeb3b;
+        }
+        .question-box {
+            background-color: #0f3460;
+            font-size: 28px;
+            font-weight: bold;
+            padding: 30px;
+            border-radius: 10px;
+            margin: 20px 0;
+            letter-spacing: 2px;
+            border: 2px dashed #e94560;
+        }
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .option-btn {
+            background-color: #e94560;
+            color: white;
+            font-size: 22px;
+            font-weight: bold;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+        .option-btn:hover {
+            background-color: #d8315b;
+            transform: translateY(-3px);
+        }
+        .explanation {
+            font-size: 18px;
+            color: #4CAF50;
+            margin-top: 20px;
+            font-weight: bold;
+            display: none;
+            background-color: #e8f5e9;
+            color: #2e7d32;
+            padding: 15px;
+            border-radius: 8px;
+        }
+        .btn-next {
+            background-color: #f2a365;
+            color: #1a1a2e;
+            font-size: 20px;
+            font-weight: bold;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 20px;
+            display: none;
+            transition: 0.3s;
+        }
+        .btn-next:hover {
+            background-color: #e69255;
+        }
+        #treasure {
+            display: none;
+        }
+        .treasure-icon {
+            font-size: 100px;
+            margin: 20px 0;
+            animation: bounce 2s infinite;
+        }
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+            40% {transform: translateY(-30px);}
+            60% {transform: translateY(-15px);}
+        }
+        .level-text {
+            font-size: 20px;
+            font-weight: bold;
+            color: #fff;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>🗺️ ವಿನ್ಯಾಸಗಳ ನಿಧಿ ಶೋಧನೆ 💎</h1>
+        <p class="desc">ಸರಿಯಾದ ವಿನ್ಯಾಸವನ್ನು ಗುರುತಿಸಿ ಬೀಗಗಳನ್ನು ತೆರೆಯಿರಿ ಮತ್ತು ನಿಧಿಯನ್ನು ಗೆಲ್ಲಿರಿ!</p>
+        
+        <div class="level-text" id="levelIndicator">ಹಂತ: 1</div>
+
+        <div class="progress-bar" id="locksContainer"></div>
+
+        <div id="gameplay">
+            <div class="question-box" id="patternDisplay">
+                </div>
+
+            <div class="options-grid" id="optionsContainer">
+                </div>
+
+            <div class="explanation" id="explanationBox"></div>
+            <button class="btn-next" id="nextBtn" onclick="nextQuestion()">ಮುಂದಿನ ಹಂತ ➡️</button>
+        </div>
+
+        <div id="treasure">
+            <h2>🎉 ಅದ್ಭುತ ಸಾಧನೆ! ನೀವು ಎಲ್ಲಾ 26 ವಿನ್ಯಾಸಗಳನ್ನು ಭೇದಿಸಿದ್ದೀರಿ! 🎉</h2>
+            <div class="treasure-icon">💎🏆👑</div>
+            <p style="font-size: 20px; color: #f2a365;">ಗಣಿತದ ವಿನ್ಯಾಸಗಳಲ್ಲಿ ನೀವೀಗ ಅಪ್ರತಿಮ ಮಾಂತ್ರಿಕರು!</p>
+            <button class="btn-next" style="display: inline-block; margin-top: 20px;" onclick="location.reload()">ಮತ್ತೆ ಆಡಿ (Play Again)</button>
+        </div>
+
+    </div>
+
+    <script>
+        // Patterns Database (Original 6 + New 20)
+        const patterns = [
+            // ಹಳೆಯ 6 ಪ್ರಶ್ನೆಗಳು
+            { sequence: "3, 6, 9, 12, ___?", options: ["14", "15", "16", "18"], answer: 1, explanation: "ವಿವರಣೆ: ಪ್ರತೀ ಸಂಖ್ಯೆಗೆ 3 ನ್ನು ಕೂಡಿಸಲಾಗಿದೆ (+3). ಆದ್ದರಿಂದ 12 + 3 = 15." },
+            { sequence: "1, 4, 9, 16, ___?", options: ["20", "24", "25", "30"], answer: 2, explanation: "ವಿವರಣೆ: ಇವು ವರ್ಗ ಸಂಖ್ಯೆಗಳು (Square Numbers: 1², 2², 3², 4²). ಮುಂದಿನದ್ದು 5² = 25." },
+            { sequence: "🌞, 🌙, ⭐, 🌞, 🌙, ___?", options: ["🌞", "🌙", "⭐", "☁️"], answer: 2, explanation: "ವಿವರಣೆ: ಸೂರ್ಯ, ಚಂದ್ರ, ನಕ್ಷತ್ರ - ಈ ಮೂರು ಆಕೃತಿಗಳು ಪುನರಾವರ್ತನೆಯಾಗುತ್ತಿವೆ." },
+            { sequence: "1, 1, 2, 3, 5, 8, ___?", options: ["10", "11", "12", "13"], answer: 3, explanation: "ವಿವರಣೆ: ಇದು ಫಿಬೊನಾಚಿ ವಿನ್ಯಾಸ! ಹಿಂದಿನ ಎರಡು ಸಂಖ್ಯೆಗಳನ್ನು ಕೂಡಿಸಿದರೆ ಮುಂದಿನ ಸಂಖ್ಯೆ ಸಿಗುತ್ತದೆ (5 + 8 = 13)." },
+            { sequence: "50, 45, 40, 35, ___?", options: ["30", "25", "20", "32"], answer: 0, explanation: "ವಿವರಣೆ: ಪ್ರತೀ ಸಂಖ್ಯೆಯಿಂದ 5 ನ್ನು ಕಳೆಯಲಾಗಿದೆ (-5). ಆದ್ದರಿಂದ 35 - 5 = 30." },
+            { sequence: "2, 4, 8, 16, ___?", options: ["20", "24", "32", "64"], answer: 2, explanation: "ವಿವರಣೆ: ಪ್ರತೀ ಸಂಖ್ಯೆಯನ್ನು 2 ರಿಂದ ಗುಣಿಸಲಾಗಿದೆ (×2). ಆದ್ದರಿಂದ 16 × 2 = 32." },
+
+            // ಹೊಸ 20 ಪ್ರಶ್ನೆಗಳು
+            { sequence: "1, 8, 27, 64, ___?", options: ["81", "100", "125", "144"], answer: 2, explanation: "ವಿವರಣೆ: ಇವು ಘನ ಸಂಖ್ಯೆಗಳು (Cube Numbers: 1³, 2³, 3³, 4³). ಮುಂದಿನದ್ದು 5³ = 125." },
+            { sequence: "2, 3, 5, 7, 11, 13, ___?", options: ["14", "15", "17", "19"], answer: 2, explanation: "ವಿವರಣೆ: ಇವು ಅವಿಭಾಜ್ಯ ಸಂಖ್ಯೆಗಳು (Prime Numbers). 13 ರ ನಂತರ ಬರುವ ಅವಿಭಾಜ್ಯ ಸಂಖ್ಯೆ 17." },
+            { sequence: "2, 5, 11, 23, ___?", options: ["45", "46", "47", "48"], answer: 2, explanation: "ವಿವರಣೆ: ಹಿಂದಿನ ಸಂಖ್ಯೆಯನ್ನು 2 ರಿಂದ ಗುಣಿಸಿ 1 ಸೇರಿಸಲಾಗಿದೆ (×2 +1). ಆದ್ದರಿಂದ 23 × 2 + 1 = 47." },
+            { sequence: "10, 12, 11, 13, 12, ___?", options: ["11", "13", "14", "15"], answer: 2, explanation: "ವಿವರಣೆ: ಮೊದಲು 2 ನ್ನು ಕೂಡಿಸಲಾಗಿದೆ (+2), ನಂತರ 1 ನ್ನು ಕಳೆಯಲಾಗಿದೆ (-1). ಆದ್ದರಿಂದ 12 + 2 = 14." },
+            { sequence: "3, 9, 27, 81, ___?", options: ["162", "243", "300", "324"], answer: 1, explanation: "ವಿವರಣೆ: ಪ್ರತೀ ಸಂಖ್ಯೆಯನ್ನು 3 ರಿಂದ ಗುಣಿಸಲಾಗಿದೆ (×3). 81 × 3 = 243." },
+            { sequence: "1/2, 1/4, 1/8, 1/16, ___?", options: ["1/18", "1/20", "1/24", "1/32"], answer: 3, explanation: "ವಿವರಣೆ: ಛೇದವನ್ನು (Denominator) 2 ರಿಂದ ಗುಣಿಸುತ್ತಾ ಹೋಗಲಾಗಿದೆ. 16 × 2 = 32, ಆದ್ದರಿಂದ 1/32." },
+            { sequence: "7, 14, 21, 28, 35, ___?", options: ["40", "42", "45", "49"], answer: 1, explanation: "ವಿವರಣೆ: ಇದು 7 ರ ಮಗ್ಗಿ ಅಥವಾ 7 ರ ಗುಣಕಗಳು. 35 ರ ನಂತರ 42 ಬರುತ್ತದೆ." },
+            { sequence: "100, 99, 95, 86, 70, ___?", options: ["45", "50", "54", "60"], answer: 0, explanation: "ವಿವರಣೆ: ಕ್ರಮವಾಗಿ 1, 4, 9, 16 (ವರ್ಗ ಸಂಖ್ಯೆಗಳು) ನ್ನು ಕಳೆಯಲಾಗಿದೆ. 70 ರಿಂದ 25 ನ್ನು ಕಳೆದರೆ 45 ಬರುತ್ತದೆ." },
+            { sequence: "A, C, E, G, ___?", options: ["H", "I", "J", "K"], answer: 1, explanation: "ವಿವರಣೆ: ಇಂಗ್ಲಿಷ್ ವರ್ಣಮಾಲೆಯಲ್ಲಿ ಒಂದೊಂದು ಅಕ್ಷರ ಬಿಟ್ಟು ಮುಂದಿನ ಅಕ್ಷರ ಬರೆಯಲಾಗಿದೆ. G ನಂತರ H ಬಿಟ್ಟು I ಬರುತ್ತದೆ." },
+            { sequence: "1, 2, 4, 7, 11, ___?", options: ["14", "15", "16", "17"], answer: 2, explanation: "ವಿವರಣೆ: ಕ್ರಮವಾಗಿ +1, +2, +3, +4 ಸೇರಿಸಲಾಗಿದೆ. 11 ಕ್ಕೆ 5 ಸೇರಿಸಿದರೆ 16." },
+            { sequence: "1, 2, 2, 4, 8, ___?", options: ["12", "16", "24", "32"], answer: 3, explanation: "ವಿವರಣೆ: ಹಿಂದಿನ ಎರಡು ಸಂಖ್ಯೆಗಳನ್ನು ಗುಣಿಸಿ ಮುಂದಿನ ಸಂಖ್ಯೆ ಪಡೆಯಲಾಗಿದೆ (2 × 4 = 8, 4 × 8 = 32)." },
+            { sequence: "1, 10, 2, 20, 3, 30, 4, ___?", options: ["4", "40", "50", "60"], answer: 1, explanation: "ವಿವರಣೆ: ಇಲ್ಲಿ ಎರಡು ವಿನ್ಯಾಸಗಳು ಬೆರೆತಿವೆ. (1,2,3,4) ಮತ್ತು (10,20,30...). 4 ರ ನಂತರ 40 ಬರಬೇಕು." },
+            { sequence: "123, 234, 345, 456, ___?", options: ["566", "567", "578", "678"], answer: 1, explanation: "ವಿವರಣೆ: ಪ್ರತಿಯೊಂದು ಅಂಕೆಯೂ 1 ರಷ್ಟು ಹೆಚ್ಚಾಗುತ್ತಿದೆ. 456 ನಂತರ 567 ಬರುತ್ತದೆ." },
+            { sequence: "🍎, 🍌, 🍉, 🍎, 🍌, 🍉, ___?", options: ["🍎", "🍌", "🍉", "🍇"], answer: 0, explanation: "ವಿವರಣೆ: ಸೇಬು, ಬಾಳೆಹಣ್ಣು, ಕಲ್ಲಂಗಡಿ ಎಂಬ ಮೂರು ಹಣ್ಣುಗಳು ಪುನರಾವರ್ತನೆಯಾಗುತ್ತಿವೆ. 🍉 ನಂತರ ಮತ್ತೆ 🍎 ಬರುತ್ತದೆ." },
+            { sequence: "0, 7, 26, 63, ___?", options: ["80", "99", "124", "125"], answer: 2, explanation: "ವಿವರಣೆ: ಇವು ಘನ ಸಂಖ್ಯೆಗಳಿಗಿಂತ 1 ಕಡಿಮೆ ಇರುವ ಸಂಖ್ಯೆಗಳು (1³-1, 2³-1..). ಮುಂದಿನದ್ದು 5³ - 1 = 124." },
+            { sequence: "2, 5, 14, 41, ___?", options: ["120", "122", "124", "125"], answer: 1, explanation: "ವಿವರಣೆ: ಹಿಂದಿನ ಸಂಖ್ಯೆಯನ್ನು 3 ರಿಂದ ಗುಣಿಸಿ 1 ಕಳೆಯಲಾಗಿದೆ (×3 -1). 41 × 3 - 1 = 122." },
+            { sequence: "5, 15, 35, 65, 105, ___?", options: ["125", "145", "150", "155"], answer: 3, explanation: "ವಿವರಣೆ: ಕ್ರಮವಾಗಿ 10, 20, 30, 40 ನ್ನು ಕೂಡಿಸಲಾಗಿದೆ. 105 ಕ್ಕೆ 50 ನ್ನು ಕೂಡಿಸಿದರೆ 155 ಬರುತ್ತದೆ." },
+            { sequence: "128, 64, 32, 16, ___?", options: ["4", "6", "8", "10"], answer: 2, explanation: "ವಿವರಣೆ: ಪ್ರತೀ ಸಂಖ್ಯೆಯನ್ನು 2 ರಿಂದ ಭಾಗಿಸಲಾಗಿದೆ (ಅರ್ಧ ಮಾಡಲಾಗಿದೆ). 16 ರ ಅರ್ಧ 8." },
+            { sequence: "⬆️, ➡️, ⬇️, ⬅️, ___?", options: ["⬆️", "➡️", "⬇️", "⬅️"], answer: 0, explanation: "ವಿವರಣೆ: ಬಾಣದ ಗುರುತು ಪ್ರದಕ್ಷಿಣಾಕಾರವಾಗಿ (Clockwise) ತಿರುಗುತ್ತಿದೆ. ಎಡಕ್ಕೆ (⬅️) ತಿರುಗಿದ ನಂತರ ಮತ್ತೆ ಮೇಲಕ್ಕೆ (⬆️) ಬರುತ್ತದೆ." },
+            { sequence: "1, 4, 9, 16, 25, 36, ___?", options: ["42", "45", "49", "50"], answer: 2, explanation: "ವಿವರಣೆ: ಇವು ಸತತ ವರ್ಗ ಸಂಖ್ಯೆಗಳು (1², 2², 3², 4², 5², 6²). ಮುಂದಿನದ್ದು 7² = 49." }
+        ];
+
+        let currentIndex = 0;
+
+        window.onload = function() {
+            createLocks();
+            loadQuestion();
+        };
+
+        // Dynamically create locks based on the number of questions
+        function createLocks() {
+            let locksContainer = document.getElementById("locksContainer");
+            locksContainer.innerHTML = ""; // Clear existing
+            patterns.forEach((_, index) => {
+                let lock = document.createElement("span");
+                lock.className = "lock";
+                lock.id = `lock${index}`;
+                lock.innerText = "🔒";
+                locksContainer.appendChild(lock);
+            });
+        }
+
+        function loadQuestion() {
+            let currentData = patterns[currentIndex];
+            
+            // Update Level Indicator
+            document.getElementById("levelIndicator").innerText = `ಹಂತ: ${currentIndex + 1} / ${patterns.length}`;
+            
+            // Reset UI
+            document.getElementById("patternDisplay").innerText = currentData.sequence;
+            document.getElementById("explanationBox").style.display = "none";
+            document.getElementById("nextBtn").style.display = "none";
+            
+            let optionsContainer = document.getElementById("optionsContainer");
+            optionsContainer.innerHTML = "";
+            optionsContainer.style.pointerEvents = "auto"; // Enable clicking
+
+            // Create option buttons dynamically
+            currentData.options.forEach((opt, index) => {
+                let btn = document.createElement("button");
+                btn.className = "option-btn";
+                btn.innerText = opt;
+                btn.onclick = () => checkAnswer(index, btn);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(selectedIndex, btnElement) {
+            let currentData = patterns[currentIndex];
+            let optionsContainer = document.getElementById("optionsContainer");
+            
+            // Disable further clicks
+            optionsContainer.style.pointerEvents = "none";
+
+            if (selectedIndex === currentData.answer) {
+                // Correct Answer
+                btnElement.style.backgroundColor = "#4CAF50"; // Green
+                
+                // Unlock the corresponding lock
+                let currentLock = document.getElementById(`lock${currentIndex}`);
+                currentLock.innerText = "🔓";
+                currentLock.classList.add("unlocked");
+
+                // Show Explanation
+                let explanationBox = document.getElementById("explanationBox");
+                explanationBox.innerText = "✅ ಸರಿಯಾದ ಉತ್ತರ! " + currentData.explanation;
+                explanationBox.style.display = "block";
+                
+                document.getElementById("nextBtn").style.display = "inline-block";
+            } else {
+                // Wrong Answer
+                btnElement.style.backgroundColor = "#d32f2f"; // Red
+                
+                // Allow clicking again after a short delay
+                setTimeout(() => {
+                    btnElement.style.backgroundColor = "#e94560"; // Reset color
+                    optionsContainer.style.pointerEvents = "auto";
+                }, 1000);
+            }
+        }
+
+        function nextQuestion() {
+            currentIndex++;
+            
+            if (currentIndex >= patterns.length) {
+                // Game Finished! Show Treasure
+                document.getElementById("gameplay").style.display = "none";
+                document.getElementById("treasure").style.display = "block";
+                document.getElementById("levelIndicator").style.display = "none";
+            } else {
+                // Load Next Question
+                loadQuestion();
+            }
+        }
+    </script>
+</body>
+</html>

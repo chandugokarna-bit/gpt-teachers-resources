@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಮೆದುಳಿಗೆ ಕಸರತ್ತು: ಸಂಖ್ಯಾ ಒಗಟುಗಳು</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f3e5f5;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+            max-width: 650px;
+            margin: 0 auto;
+            padding: 30px;
+            border-top: 8px solid #9c27b0;
+        }
+        h1 {
+            color: #6a1b9a;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        p.desc {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 25px;
+        }
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            font-size: 18px;
+            font-weight: bold;
+            background-color: #e1bee7;
+            padding: 10px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            color: #4a148c;
+        }
+        .question-box {
+            background-color: #fff3e0;
+            font-size: 22px;
+            font-weight: bold;
+            padding: 25px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border: 2px dashed #ff9800;
+            line-height: 1.5;
+            color: #d84315;
+        }
+        .input-area {
+            margin: 20px 0;
+        }
+        input[type="number"] {
+            font-size: 20px;
+            padding: 12px;
+            width: 150px;
+            text-align: center;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+            outline: none;
+        }
+        input[type="number"]:focus {
+            border-color: #9c27b0;
+        }
+        .btn-group {
+            margin-top: 20px;
+        }
+        .btn {
+            font-size: 18px;
+            padding: 12px 25px;
+            margin: 5px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            color: white;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+        .btn-check { background-color: #4caf50; }
+        .btn-check:hover { background-color: #388e3c; }
+        .btn-hint { background-color: #2196f3; }
+        .btn-hint:hover { background-color: #1976d2; }
+        .btn-next { background-color: #ff9800; display: none; margin: 0 auto;}
+        .btn-next:hover { background-color: #f57c00; }
+        
+        #feedback {
+            font-size: 20px;
+            font-weight: bold;
+            margin: 20px 0;
+            min-height: 30px;
+        }
+        #hintDisplay {
+            font-size: 16px;
+            color: #0277bd;
+            background-color: #e1f5fe;
+            padding: 10px;
+            border-radius: 5px;
+            display: none;
+            margin-top: 15px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>🧠 ಮೆದುಳಿಗೆ ಕಸರತ್ತು: ಸಂಖ್ಯಾ ಒಗಟುಗಳು 💡</h1>
+        <p class="desc">ಪ್ರಶ್ನೆಯನ್ನು ಓದಿ, ತರ್ಕಬದ್ಧವಾಗಿ ಯೋಚಿಸಿ ಸರಿಯಾದ ಸಂಖ್ಯೆಯನ್ನು ಊಹಿಸಿ!</p>
+
+        <div class="stats">
+            <div>ಪ್ರಶ್ನೆ: <span id="qNumber">1</span> / <span id="totalQs">10</span></div>
+            <div>ಅಂಕಗಳು: <span id="score">0</span></div>
+        </div>
+
+        <div class="question-box" id="questionText">
+            </div>
+
+        <div class="input-area">
+            <input type="number" id="answerInput" placeholder="ಉತ್ತರ (ಸಂಖ್ಯೆ)">
+            
+            <div class="btn-group">
+                <button class="btn btn-check" id="checkBtn" onclick="checkAnswer()">ಉತ್ತರ ಪರಿಶೀಲಿಸಿ</button>
+                <button class="btn btn-hint" id="hintBtn" onclick="showHint()">ಸುಳಿವು (Hint)</button>
+            </div>
+            
+            <div id="hintDisplay"></div>
+        </div>
+
+        <div id="feedback"></div>
+        <button class="btn btn-next" id="nextBtn" onclick="loadNextQuestion()">ಮುಂದಿನ ಪ್ರಶ್ನೆ ➡️</button>
+    </div>
+
+    <script>
+        // ರಸಪ್ರಶ್ನೆಗಳ ಸಂಗ್ರಹ (10 Brain teasers)
+        const questions = [
+            {
+                q: "ನಾನು 2-ಅಂಕಿಯ ಸಂಖ್ಯೆ. ನನ್ನ ಅಂಕೆಗಳನ್ನು ಕೂಡಿಸಿದರೆ 8 ಬರುತ್ತದೆ. ನಾನು 20 ಮತ್ತು 30 ರ ನಡುವೆ ಇದ್ದೇನೆ. ನಾನು ಯಾರು?",
+                a: 26,
+                hint: "20 ಮತ್ತು 30 ರ ನಡುವಿನ ಸಂಖ್ಯೆಯ ಮೊದಲ ಅಂಕೆ '2' ಆಗಿರಲೇಬೇಕು. ಹಾಗಾದರೆ 2 ಕ್ಕೆ ಎಷ್ಟನ್ನು ಸೇರಿಸಿದರೆ 8 ಬರುತ್ತದೆ?"
+            },
+            {
+                q: "ಒಂದು ಕೊಳದಲ್ಲಿರುವ ತಾವರೆ ಹೂವುಗಳು ಪ್ರತಿದಿನ ಎರಡರಷ್ಟು (double) ಆಗುತ್ತವೆ. ಕೊಳವು ಸಂಪೂರ್ಣವಾಗಿ ತುಂಬಲು 20 ದಿನಗಳು ಬೇಕು. ಹಾಗಾದರೆ, ಕೊಳವು ಅರ್ಧದಷ್ಟು ತುಂಬಲು ಎಷ್ಟು ದಿನಗಳು ಬೇಕು?",
+                a: 19,
+                hint: "ಹೂವುಗಳು ಪ್ರತಿದಿನ ಎರಡರಷ್ಟಾಗುತ್ತವೆ, ಅಂದರೆ 20ನೇ ದಿನ ಪೂರ್ಣ ತುಂಬಿದ್ದರೆ, ಹಿಂದಿನ ದಿನ (19ನೇ ದಿನ) ಅದು ಅರ್ಧದಷ್ಟಿರುತ್ತದೆ!"
+            },
+            {
+                q: "10 ಮೀಟರ್ ಎತ್ತರದ ಕಂಬವನ್ನು ಹತ್ತಲು ಒಂದು ಕೋತಿ ಪ್ರಯತ್ನಿಸುತ್ತಿದೆ. ಅದು ಪ್ರತಿದಿನ 3 ಮೀಟರ್ ಹತ್ತುತ್ತದೆ ಮತ್ತು 2 ಮೀಟರ್ ಕೆಳಗೆ ಜಾರುತ್ತದೆ. ಕಂಬದ ತುದಿಯನ್ನು ತಲುಪಲು ಕೋತಿಗೆ ಎಷ್ಟು ದಿನಗಳು ಬೇಕು?",
+                a: 8,
+                hint: "ಕೋತಿ ಪ್ರತಿದಿನ 1 ಮೀಟರ್ ಮಾತ್ರ ಮೇಲೇರುತ್ತದೆ (3-2=1). ಆದರೆ 7ನೇ ದಿನದ ನಂತರ (7 ಮೀಟರ್), 8ನೇ ದಿನ 3 ಮೀಟರ್ ಹತ್ತಿದಾಗ ಅದು ತುದಿಯನ್ನು ತಲುಪುತ್ತದೆ ಮತ್ತು ಜಾರುವುದಿಲ್ಲ!"
+            },
+            {
+                q: "ಒಂದು ಕೋಣೆಯಲ್ಲಿ 5 ಜನ ಇದ್ದಾರೆ. ಎಲ್ಲರೂ ಪರಸ್ಪರ ಒಬ್ಬರಿಗೊಬ್ಬರು ಒಮ್ಮೆ ಮಾತ್ರ ಕೈಕುಲುಕಿದರೆ (Handshake), ಒಟ್ಟು ಎಷ್ಟು ಬಾರಿ ಕೈಕುಲುಕಲಾಗುತ್ತದೆ?",
+                a: 10,
+                hint: "ಮೊದಲನೆಯ ವ್ಯಕ್ತಿ 4 ಜನರೊಂದಿಗೆ ಕೈಕುಲುಕುತ್ತಾನೆ. ಎರಡನೇ ವ್ಯಕ್ತಿ ಉಳಿದ 3 ಜನರೊಂದಿಗೆ... ಹೀಗೆ 4 + 3 + 2 + 1 ಲೆಕ್ಕ ಹಾಕಿ."
+            },
+            {
+                q: "3 ಬೆಕ್ಕುಗಳು 3 ಇಲಿಗಳನ್ನು ಹಿಡಿಯಲು 3 ನಿಮಿಷ ತೆಗೆದುಕೊಳ್ಳುತ್ತವೆ. ಹಾಗಾದರೆ 100 ಬೆಕ್ಕುಗಳು 100 ಇಲಿಗಳನ್ನು ಹಿಡಿಯಲು ಎಷ್ಟು ನಿಮಿಷ ತೆಗೆದುಕೊಳ್ಳುತ್ತವೆ?",
+                a: 3,
+                hint: "ಪ್ರತಿಯೊಂದು ಬೆಕ್ಕು ಒಂದು ಇಲಿಯನ್ನು ಹಿಡಿಯಲು 3 ನಿಮಿಷ ತೆಗೆದುಕೊಳ್ಳುತ್ತದೆ. ಎಲ್ಲ ಬೆಕ್ಕುಗಳು ಒಟ್ಟಿಗೆ ಕೆಲಸ ಮಾಡುತ್ತಿವೆ!"
+            },
+            {
+                q: "ನನ್ನ ಬಳಿ 6 ಸೇಬುಗಳಿವೆ. ನೀವು ಅದರಿಂದ 4 ಸೇಬುಗಳನ್ನು ತೆಗೆದುಕೊಂಡರೆ, ನಿಮ್ಮ ಬಳಿ ಎಷ್ಟು ಸೇಬುಗಳಿರುತ್ತವೆ?",
+                a: 4,
+                hint: "ಪ್ರಶ್ನೆಯನ್ನು ಸರಿಯಾಗಿ ಓದಿ! 'ನೀವು' ತೆಗೆದುಕೊಂಡದ್ದು ಎಷ್ಟು ಸೇಬುಗಳನ್ನು?"
+            },
+            {
+                q: "ತಂದೆಯ ವಯಸ್ಸು ಮಗನಿಗಿಂತ 30 ವರ್ಷ ಹೆಚ್ಚು. 5 ವರ್ಷಗಳ ನಂತರ ತಂದೆಯ ವಯಸ್ಸು ಮಗನ ವಯಸ್ಸಿನ ಎರಡರಷ್ಟಾಗುತ್ತದೆ. ಹಾಗಾದರೆ ಮಗನ ಈಗಿನ ವಯಸ್ಸು ಎಷ್ಟು?",
+                a: 25,
+                hint: "ಮಗನ ವಯಸ್ಸನ್ನು 'x' ಎಂದುಕೊಳ್ಳಿ. ಸಮೀಕರಣ: (x + 5) * 2 = (x + 30) + 5"
+            },
+            {
+                q: "ಮೂರು ಸತತ (ಸಾಲಾಗಿ ಬರುವ) ಸಂಖ್ಯೆಗಳನ್ನು ಕೂಡಿಸಿದರೆ 15 ಬರುತ್ತದೆ. ಆ ಮೂರು ಸಂಖ್ಯೆಗಳನ್ನು ಗುಣಿಸಿದರೆ (Product) ಎಷ್ಟು ಬರುತ್ತದೆ?",
+                a: 120,
+                hint: "ಆ ಮೂರು ಸತತ ಸಂಖ್ಯೆಗಳು 4, 5, ಮತ್ತು 6. ಈಗ ಅವುಗಳನ್ನು ಗುಣಿಸಿ (4 × 5 × 6)."
+            },
+            {
+                q: "ಒಂದು ಸಂಖ್ಯೆಯನ್ನು 2 ರಿಂದ ಗುಣಿಸಿ, ಅದಕ್ಕೆ 10 ಸೇರಿಸಿ, ಬಂದ ಮೊತ್ತವನ್ನು 2 ರಿಂದ ಭಾಗಿಸಿದಾಗ 15 ಬರುತ್ತದೆ. ಆ ಆರಂಭಿಕ ಸಂಖ್ಯೆ ಯಾವುದು?",
+                a: 10,
+                hint: "ಹಿಂದಿನಿಂದ ಲೆಕ್ಕಾಚಾರ (Reverse calculation) ಮಾಡಿ: 15 ನ್ನು 2 ರಿಂದ ಗುಣಿಸಿ, 10 ನ್ನು ಕಳೆಯಿರಿ, ಆಮೇಲೆ 2 ರಿಂದ ಭಾಗಿಸಿ."
+            },
+            {
+                q: "1 ರಿಂದ 100 ರವರೆಗಿನ ಸಂಖ್ಯೆಗಳನ್ನು ಬರೆಯುವಾಗ '9' ಎಂಬ ಅಂಕೆ (Digit 9) ಒಟ್ಟು ಎಷ್ಟು ಬಾರಿ ಬರುತ್ತದೆ?",
+                a: 20,
+                hint: "9, 19, 29... ಬಿಡಿ ಸ್ಥಾನದಲ್ಲಿ 10 ಬಾರಿ ಮತ್ತು 90, 91, 92... ಹತ್ತರ ಸ್ಥಾನದಲ್ಲಿ 10 ಬಾರಿ. '99' ರಲ್ಲಿ 9 ಎರಡು ಬಾರಿ ಇದೆ ಎಂಬುದನ್ನು ಮರೆಯದಿರಿ!"
+            }
+        ];
+
+        let currentQIndex = 0;
+        let score = 0;
+
+        window.onload = function() {
+            document.getElementById("totalQs").innerText = questions.length;
+            loadQuestion();
+        };
+
+        function loadQuestion() {
+            if (currentQIndex >= questions.length) {
+                document.querySelector(".container").innerHTML = `
+                    <h1>🎉 ಆಟ ಮುಕ್ತಾಯ! 🎉</h1>
+                    <h2>ನಿಮ್ಮ ಒಟ್ಟು ಅಂಕಗಳು: ${score} / ${questions.length * 10}</h2>
+                    <p style="font-size: 18px; color: #4CAF50; font-weight:bold;">ಅದ್ಭುತ! ನಿಮ್ಮ ಮೆದುಳಿನ ತರ್ಕಬದ್ಧ ಯೋಚನಾ ಶಕ್ತಿ ಬೆರಗುಗೊಳಿಸುವಂತಿದೆ!</p>
+                    <button class="btn btn-hint" onclick="location.reload()">ಮತ್ತೆ ಆಡಿ (Play Again)</button>
+                `;
+                return;
+            }
+
+            // Reset UI
+            document.getElementById("qNumber").innerText = currentQIndex + 1;
+            document.getElementById("questionText").innerText = questions[currentQIndex].q;
+            document.getElementById("answerInput").value = "";
+            document.getElementById("answerInput").disabled = false;
+            document.getElementById("feedback").innerText = "";
+            document.getElementById("hintDisplay").style.display = "none";
+            document.getElementById("hintDisplay").innerText = questions[currentQIndex].hint;
+            
+            document.getElementById("checkBtn").style.display = "inline-block";
+            document.getElementById("hintBtn").style.display = "inline-block";
+            document.getElementById("nextBtn").style.display = "none";
+            
+            // Focus input box automatically
+            document.getElementById("answerInput").focus();
+        }
+
+        function checkAnswer() {
+            let userAnswer = document.getElementById("answerInput").value;
+            let feedback = document.getElementById("feedbackMessage");
+
+            if (userAnswer === "") {
+                alert("ದಯವಿಟ್ಟು ನಿಮ್ಮ ಉತ್ತರವನ್ನು ಟೈಪ್ ಮಾಡಿ.");
+                return;
+            }
+
+            let correctAnswer = questions[currentQIndex].a;
+            let feedbackEl = document.getElementById("feedback");
+
+            if (parseInt(userAnswer) === correctAnswer) {
+                feedbackEl.innerHTML = "✅ <b>ಸರಿಯಾದ ಉತ್ತರ! ಅದ್ಭುತ ಯೋಚನೆ!</b>";
+                feedbackEl.style.color = "green";
+                score += 10;
+                document.getElementById("score").innerText = score;
+                
+                document.getElementById("answerInput").disabled = true;
+                document.getElementById("checkBtn").style.display = "none";
+                document.getElementById("hintBtn").style.display = "none";
+                document.getElementById("nextBtn").style.display = "block";
+                document.getElementById("hintDisplay").style.display = "none";
+            } else {
+                feedbackEl.innerHTML = "❌ <b>ತಪ್ಪಾಗಿದೆ. ಮತ್ತೆ ಯೋಚಿಸಿ ಅಥವಾ ಸುಳಿವು ಬಳಸಿ!</b>";
+                feedbackEl.style.color = "red";
+            }
+        }
+
+        function showHint() {
+            document.getElementById("hintDisplay").style.display = "block";
+        }
+
+        function loadNextQuestion() {
+            currentQIndex++;
+            loadQuestion();
+        }
+        
+        // Allow pressing "Enter" key to submit answer
+        document.getElementById("answerInput").addEventListener("keypress", function(event) {
+            if (event.key === "Enter" && document.getElementById("checkBtn").style.display !== "none") {
+                event.preventDefault();
+                checkAnswer();
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ವಿನ್ಯಾಸದ ಪತ್ತೇದಾರಿ (Pattern Detective)</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f8ff;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 30px;
+            border: 4px solid #4CAF50;
+        }
+        h1 {
+            color: #2e8b57;
+            font-size: 28px;
+        }
+        .pattern-box {
+            background-color: #e6e6fa;
+            font-size: 32px;
+            font-weight: bold;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            letter-spacing: 2px;
+            color: #333;
+        }
+        .input-area input {
+            font-size: 20px;
+            padding: 10px;
+            width: 150px;
+            text-align: center;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+        }
+        .btn {
+            font-size: 18px;
+            padding: 10px 20px;
+            margin: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            color: white;
+            transition: 0.3s;
+        }
+        .btn-check {
+            background-color: #008CBA;
+        }
+        .btn-check:hover {
+            background-color: #007399;
+        }
+        .btn-next {
+            background-color: #ff9800;
+            display: none;
+        }
+        .btn-next:hover {
+            background-color: #e68a00;
+        }
+        .feedback {
+            font-size: 20px;
+            font-weight: bold;
+            margin: 20px 0;
+            height: 30px;
+        }
+        .score-board {
+            font-size: 22px;
+            font-weight: bold;
+            color: #d32f2f;
+            margin-top: 20px;
+        }
+        .hint {
+            font-size: 14px;
+            color: #666;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>🕵️‍♂️ ವಿನ್ಯಾಸದ ಪತ್ತೇದಾರಿ 🕵️‍♀️</h1>
+        <p>ಮುಂದಿನ ಸಂಖ್ಯೆ ಅಥವಾ ಆಕೃತಿಯನ್ನು ಕಂಡುಹಿಡಿಯಿರಿ!</p>
+
+        <div class="score-board">
+            ಗುಂಪಿನ ಅಂಕಗಳು: <span id="score">0</span>
+        </div>
+
+        <div class="pattern-box" id="patternDisplay">
+            </div>
+
+        <div class="hint" id="patternHint"></div>
+
+        <div class="input-area">
+            <input type="text" id="answerInput" placeholder="ಉತ್ತರ ಟೈಪ್ ಮಾಡಿ" autocomplete="off">
+            <br>
+            <button class="btn btn-check" id="checkBtn" onclick="checkAnswer()">ಪರಿಶೀಲಿಸಿ (Check)</button>
+            <button class="btn btn-next" id="nextBtn" onclick="loadNextPattern()">ಮುಂದಿನ ಪ್ರಶ್ನೆ (Next)</button>
+        </div>
+
+        <div class="feedback" id="feedbackMessage"></div>
+    </div>
+
+    <script>
+        // ಪ್ರಶ್ನೆಗಳ ಪಟ್ಟಿ (Patterns Database)
+        const patterns = [
+            { sequence: "1, 3, 5, 7, ___?", answer: "9", hint: "(ಸುಳಿವು: ಬೆಸ ಸಂಖ್ಯೆಗಳು)" },
+            { sequence: "2, 4, 6, 8, ___?", answer: "10", hint: "(ಸುಳಿವು: ಸಮ ಸಂಖ್ಯೆಗಳು)" },
+            { sequence: "1, 4, 9, 16, ___?", answer: "25", hint: "(ಸುಳಿವು: ವರ್ಗ ಸಂಖ್ಯೆಗಳು - 1², 2², 3²...)" },
+            { sequence: "1, 3, 6, 10, ___?", answer: "15", hint: "(ಸುಳಿವು: ತ್ರಿಕೋನೀಯ ಸಂಖ್ಯೆಗಳು - +2, +3, +4...)" },
+            { sequence: "10, 20, 30, 40, ___?", answer: "50", hint: "(ಸುಳಿವು: 10ರ ಗುಣಕಗಳು)" },
+            { sequence: "🔺(3 ಬದಿ), ⬛(4 ಬದಿ), ⬟(5 ಬದಿ), __?", answer: "6", hint: "(ಸುಳಿವು: ಮುಂದಿನ ಬಹುಭುಜಾಕೃತಿಯ ಬದಿಗಳ ಸಂಖ್ಯೆ ಎಷ್ಟು?)" },
+            { sequence: "100, 90, 80, 70, ___?", answer: "60", hint: "(ಸುಳಿವು: 10 ರಷ್ಟು ಕಡಿಮೆಯಾಗುತ್ತಿದೆ)" }
+        ];
+
+        let currentPatternIndex = 0;
+        let score = 0;
+
+        // ಪುಟ ಲೋಡ್ ಆದಾಗ ಮೊದಲ ಪ್ರಶ್ನೆ ತೋರಿಸಲು
+        window.onload = function() {
+            loadNextPattern();
+        };
+
+        function loadNextPattern() {
+            // ಎಚ್ಚರಿಕೆ ಸಂದೇಶ ಮತ್ತು ಇನ್ಪುಟ್ ಖಾಲಿ ಮಾಡುವುದು
+            document.getElementById("feedbackMessage").innerText = "";
+            document.getElementById("answerInput").value = "";
+            document.getElementById("answerInput").disabled = false;
+            
+            // ಬಟನ್ ಗಳ ಬದಲಾವಣೆ
+            document.getElementById("checkBtn").style.display = "inline-block";
+            document.getElementById("nextBtn").style.display = "none";
+
+            // ಪ್ರಶ್ನೆ ಮುಗಿದಿದ್ದರೆ ಮತ್ತೆ ಮೊದಲಿನಿಂದ ಶುರು ಮಾಡು
+            if(currentPatternIndex >= patterns.length) {
+                alert("ಅದ್ಭುತ! ನೀವು ಎಲ್ಲಾ ವಿನ್ಯಾಸಗಳನ್ನು ಪತ್ತೆಹಚ್ಚಿದ್ದೀರಿ. ಆಟ ಮತ್ತೆ ಶುರುವಾಗಲಿದೆ!");
+                currentPatternIndex = 0;
+                score = 0;
+                document.getElementById("score").innerText = score;
+            }
+
+            // ಪ್ರಶ್ನೆಯನ್ನು ಪ್ರದರ್ಶಿಸುವುದು
+            let currentPattern = patterns[currentPatternIndex];
+            document.getElementById("patternDisplay").innerText = currentPattern.sequence;
+            document.getElementById("patternHint").innerText = currentPattern.hint;
+        }
+
+        function checkAnswer() {
+            let userAnswer = document.getElementById("answerInput").value.trim();
+            let correctAnswer = patterns[currentPatternIndex].answer;
+            let feedback = document.getElementById("feedbackMessage");
+
+            if(userAnswer === correctAnswer) {
+                feedback.innerText = "✅ ಸರಿಯಾದ ಉತ್ತರ! ಅದ್ಭುತ!";
+                feedback.style.color = "green";
+                score += 10; // ಸರಿ ಉತ್ತರಕ್ಕೆ 10 ಅಂಕಗಳು
+                document.getElementById("score").innerText = score;
+                
+                // ಸರಿ ಉತ್ತರ ನೀಡಿದಾಗ ಇನ್ಪುಟ್ ಬ್ಲಾಕ್ ಮಾಡಿ
+                document.getElementById("answerInput").disabled = true;
+                document.getElementById("checkBtn").style.display = "none";
+                document.getElementById("nextBtn").style.display = "inline-block";
+                
+                currentPatternIndex++;
+            } else if (userAnswer === "") {
+                feedback.innerText = "⚠️ ದಯವಿಟ್ಟು ಉತ್ತರವನ್ನು ನಮೂದಿಸಿ.";
+                feedback.style.color = "orange";
+            } else {
+                feedback.innerText = "❌ ತಪ್ಪಾಗಿದೆ, ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ!";
+                feedback.style.color = "red";
+                // ತಪ್ಪು ಉತ್ತರಕ್ಕೆ ಅಂಕ ಕಳೆಯಬೇಕಿದ್ದರೆ ಇಲ್ಲಿ ಕೋಡ್ ಸೇರಿಸಬಹುದು
+            }
+        }
+    </script>
+</body>
+</html>

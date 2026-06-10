@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಕೋನಗಳ ಅನ್ವೇಷಣೆ (Angle Explorer)</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f8ff;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 30px;
+            border-top: 8px solid #00BCD4;
+        }
+        h1 {
+            color: #0097A7;
+            font-size: 30px;
+            margin-bottom: 10px;
+        }
+        p.desc {
+            font-size: 18px;
+            color: #555;
+            margin-bottom: 30px;
+        }
+        
+        /* Canvas Styling */
+        .canvas-container {
+            position: relative;
+            margin: 0 auto;
+            width: 400px;
+            height: 300px;
+            background-color: #fafafa;
+            border: 2px dashed #ccc;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+        canvas {
+            display: block;
+        }
+
+        /* Slider Controls */
+        .controls {
+            margin: 30px 0;
+            background-color: #e0f7fa;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        input[type="range"] {
+            width: 80%;
+            cursor: pointer;
+            height: 10px;
+            border-radius: 5px;
+            outline: none;
+            background: #b2ebf2;
+        }
+        .angle-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #D32F2F;
+            margin-top: 15px;
+        }
+
+        /* Angle Info Display */
+        .info-box {
+            background-color: #FFF9C4;
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 20px;
+            border-left: 6px solid #FBC02D;
+            transition: all 0.3s ease;
+        }
+        .angle-name {
+            font-size: 26px;
+            font-weight: bold;
+            color: #F57F17;
+            margin-bottom: 10px;
+        }
+        .angle-example {
+            font-size: 18px;
+            color: #424242;
+        }
+        .emoji {
+            font-size: 40px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>📐 ಕೋನಗಳ ಅನ್ವೇಷಣೆ (Angle Explorer) 🔍</h1>
+        <p class="desc">ಕೆಳಗಿನ ಬಟನ್ ಅನ್ನು ಎಳೆಯಿರಿ (Drag) ಮತ್ತು ಕೋನಗಳು ಹೇಗೆ ಬದಲಾಗುತ್ತವೆ ಎಂಬುದನ್ನು ನೋಡಿ!</p>
+
+        <div class="canvas-container">
+            <canvas id="angleCanvas" width="400" height="300"></canvas>
+        </div>
+
+        <div class="controls">
+            <input type="range" id="angleSlider" min="0" max="360" value="45" oninput="updateAngle()">
+            <div class="angle-value">ಕೋನ: <span id="degreeDisplay">45</span>°</div>
+        </div>
+
+        <div class="info-box" id="infoBox">
+            <div class="angle-name" id="angleName">ಲಘು ಕೋನ (Acute Angle)</div>
+            <div class="emoji" id="angleEmoji">🍕</div>
+            <div class="angle-example" id="angleExample">ಉದಾಹರಣೆ: ಪಿಜ್ಜಾದ ತುಂಡು ಅಥವಾ ಕತ್ತರಿ</div>
+        </div>
+    </div>
+
+    <script>
+        // Get Elements
+        const canvas = document.getElementById("angleCanvas");
+        const ctx = canvas.getContext("2d");
+        const slider = document.getElementById("angleSlider");
+        const degreeDisplay = document.getElementById("degreeDisplay");
+        
+        const angleName = document.getElementById("angleName");
+        const angleEmoji = document.getElementById("angleEmoji");
+        const angleExample = document.getElementById("angleExample");
+        const infoBox = document.getElementById("infoBox");
+
+        // Fixed point for the angle vertex
+        const centerX = 200;
+        const centerY = 200;
+        const radius = 130;
+
+        // Angle Types Data (Kannada & English)
+        const angleData = [
+            { max: 0,   name: "ಶೂನ್ಯ ಕೋನ (Zero Angle)", emoji: "➖", example: "ಉದಾ: ಮುಚ್ಚಿದ ಪುಸ್ತಕ", color: "#9E9E9E", bgColor: "#F5F5F5" },
+            { max: 89,  name: "ಲಘು ಕೋನ (Acute Angle)", emoji: "🍕", example: "ಉದಾ: ಪಿಜ್ಜಾದ ತುಂಡು ಅಥವಾ ಕತ್ತರಿ", color: "#4CAF50", bgColor: "#E8F5E9" },
+            { max: 90,  name: "ಲಂಬ ಕೋನ (Right Angle)", emoji: "📘", example: "ಉದಾ: ಪುಸ್ತಕದ ಮೂಲೆ ಅಥವಾ 'L' ಅಕ್ಷರ", color: "#2196F3", bgColor: "#E3F2FD" },
+            { max: 179, name: "ವಿಶಾಲ ಕೋನ (Obtuse Angle)", emoji: "💻", example: "ಉದಾ: ಅಗಲವಾಗಿ ತೆರೆದ ಲ್ಯಾಪ್‌ಟಾಪ್", color: "#9C27B0", bgColor: "#F3E5F5" },
+            { max: 180, name: "ಸರಳ ಕೋನ (Straight Angle)", emoji: "📏", example: "ಉದಾ: ನೇರವಾದ ರಸ್ತೆ ಅಥವಾ ಸ್ಕೇಲ್", color: "#FF9800", bgColor: "#FFF3E0" },
+            { max: 359, name: "ಸರಳಾಧಿಕ ಕೋನ (Reflex Angle)", emoji: "🏃‍♂️", example: "ಉದಾ: ಹಿಂದಕ್ಕೆ ಬಾಗಿದ ವ್ಯಾಯಾಮ ಭಂಗಿ", color: "#E91E63", bgColor: "#FCE4EC" },
+            { max: 360, name: "ಪೂರ್ಣ ಕೋನ (Complete Angle)", emoji: "🎡", example: "ಉದಾ: ಸೈಕಲ್ ಚಕ್ರದ ಒಂದು ಪೂರ್ಣ ಸುತ್ತು", color: "#00BCD4", bgColor: "#E0F7FA" }
+        ];
+
+        function getAngleInfo(degree) {
+            if (degree === 0) return angleData[0];
+            if (degree > 0 && degree < 90) return angleData[1];
+            if (degree === 90) return angleData[2];
+            if (degree > 90 && degree < 180) return angleData[3];
+            if (degree === 180) return angleData[4];
+            if (degree > 180 && degree < 360) return angleData[5];
+            if (degree === 360) return angleData[6];
+        }
+
+        function drawAngle(degree, color) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            let rad = (degree * Math.PI) / 180;
+
+            // Draw Arc showing the angle measured
+            ctx.beginPath();
+            ctx.moveTo(centerX, centerY);
+            ctx.arc(centerX, centerY, 60, 0, -rad, true); // true for drawing counter-clockwise upwards
+            ctx.fillStyle = color + "40"; // Adding transparency to color
+            ctx.fill();
+            ctx.closePath();
+
+            // Draw Arc Outline
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, 60, 0, -rad, true);
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 3;
+            ctx.stroke();
+
+            // Draw Base Line (0 degree)
+            ctx.beginPath();
+            ctx.moveTo(centerX, centerY);
+            ctx.lineTo(centerX + radius, centerY);
+            ctx.lineWidth = 5;
+            ctx.lineCap = "round";
+            ctx.strokeStyle = "#333";
+            ctx.stroke();
+
+            // Draw Moving Line
+            ctx.beginPath();
+            ctx.moveTo(centerX, centerY);
+            let x = centerX + radius * Math.cos(-rad);
+            let y = centerY + radius * Math.sin(-rad);
+            ctx.lineTo(x, y);
+            ctx.lineWidth = 5;
+            ctx.lineCap = "round";
+            ctx.strokeStyle = "#333";
+            ctx.stroke();
+
+            // Draw Center Dot
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, 8, 0, 2 * Math.PI);
+            ctx.fillStyle = "#FF5722";
+            ctx.fill();
+        }
+
+        function updateAngle() {
+            let currentDegree = parseInt(slider.value);
+            degreeDisplay.innerText = currentDegree;
+
+            let info = getAngleInfo(currentDegree);
+
+            // Update Text and UI
+            angleName.innerText = info.name;
+            angleName.style.color = info.color;
+            angleEmoji.innerText = info.emoji;
+            angleExample.innerText = info.example;
+            
+            infoBox.style.borderLeftColor = info.color;
+            infoBox.style.backgroundColor = info.bgColor;
+
+            // Redraw Canvas
+            drawAngle(currentDegree, info.color);
+        }
+
+        // Initialize on load
+        window.onload = function() {
+            updateAngle();
+        };
+    </script>
+</body>
+</html>
