@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fun Verb Game for Class 1</title>
+    <style>
+        :root {
+            --bg-color: #f0f3f4;
+            --card-color: #ffffff;
+            --accent-color: #ff7675;
+            --button-color: #0984e3;
+            --text-color: #2d3436;
+            --correct-color: #2ecc71;
+            --wrong-color: #e74c3c;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 15px;
+            box-sizing: border-box;
+        }
+
+        #game-box {
+            background-color: var(--card-color);
+            padding: 30px;
+            border-radius: 25px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+            border: 4px solid #74b9ff;
+        }
+
+        h1 {
+            color: #0984e3;
+            margin-top: 0;
+            font-size: 2.2rem;
+        }
+
+        .stats-bar {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+            background: #dfe6e9;
+            padding: 10px 20px;
+            border-radius: 15px;
+            font-weight: bold;
+        }
+
+        #sentence-display {
+            font-size: 1.8rem;
+            margin: 25px 0;
+            padding: 20px;
+            background: #fff9db;
+            border-radius: 15px;
+            border: 2px dashed #f1c40f;
+            line-height: 1.6;
+        }
+
+        .blank {
+            color: #d63031;
+            font-weight: bold;
+            border-bottom: 4px solid #d63031;
+            padding: 0 10px;
+        }
+
+        .verb-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-top: 25px;
+        }
+
+        /* Center the last button 'have' across the bottom row */
+        .verb-grid button:last-child {
+            grid-column: span 3;
+        }
+
+        .verb-btn {
+            background-color: var(--button-color);
+            color: white;
+            border: none;
+            padding: 15px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            border-radius: 15px;
+            cursor: pointer;
+            box-shadow: 0 5px #006266;
+            transition: all 0.1s ease;
+        }
+
+        .verb-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 1px #006266;
+        }
+
+        #feedback {
+            margin-top: 25px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            height: 40px;
+        }
+
+        .correct-anim { color: var(--correct-color); }
+        .wrong-anim { color: var(--wrong-color); }
+
+        #results-screen { display: none; }
+
+        .btn-restart {
+            background-color: #2ecc71;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.5rem;
+            border-radius: 15px;
+            cursor: pointer;
+            margin-top: 20px;
+            font-weight: bold;
+            box-shadow: 0 5px #27ae60;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="game-box">
+        <!-- Play Screen -->
+        <div id="play-screen">
+            <h1>✏️ Fill in the Blanks</h1>
+            
+            <div class="stats-bar">
+                <div>Stars: ⭐ <span id="score-val">0</span></div>
+                <div>Question: <span id="count-val">1</span> / 10</div>
+            </div>
+
+            <div id="sentence-display">
+                Loading...
+            </div>
+
+            <div class="verb-grid">
+                <button class="verb-btn" onclick="submitAnswer('is')">is</button>
+                <button class="verb-btn" onclick="submitAnswer('am')">am</button>
+                <button class="verb-btn" onclick="submitAnswer('are')">are</button>
+                <button class="verb-btn" onclick="submitAnswer('was')">was</button>
+                <button class="verb-btn" onclick="submitAnswer('were')">were</button>
+                <button class="verb-btn" onclick="submitAnswer('has')">has</button>
+                <button class="verb-btn" onclick="submitAnswer('have')">have</button>
+            </div>
+
+            <div id="feedback"></div>
+        </div>
+
+        <!-- End Screen -->
+        <div id="results-screen">
+            <h1>🎉 Game Over! 🎉</h1>
+            <h2 style="font-size: 2.5rem; color: #0984e3;">Total Stars: ⭐ <span id="final-score">0</span></h2>
+            <p id="rank-text" style="font-size: 1.5rem; font-weight: bold; color: #6c5ce7;"></p>
+            <button class="btn-restart" onclick="resetGame()">Play Again</button>
+        </div>
+    </div>
+
+    <script>
+        // Very simple sentences for Class 1 / Beginner levels
+        const simpleSentences = [
+            { sentence: "I <span class='blank'>?</span> a good child.", answer: "am" },
+            { sentence: "This <span class='blank'>?</span> a big ball.", answer: "is" },
+            { sentence: "They <span class='blank'>?</span> playing with toys.", answer: "are" },
+            { sentence: "She <span class='blank'>?</span> a red apple.", answer: "has" },
+            { sentence: "I <span class='blank'>?</span> two small eyes.", answer: "have" },
+            { sentence: "Yesterday, it <span class='blank'>?</span> raining.", answer: "was" },
+            { sentence: "Yesterday, they <span class='blank'>?</span> sad.", answer: "were" },
+            { sentence: "The cat <span class='blank'>?</span> on the mat.", answer: "is" },
+            { sentence: "He <span class='blank'>?</span> a toy car.", answer: "has" },
+            { sentence: "We <span class='blank'>?</span> many books.", answer: "have" }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let blockInput = false;
+
+        function loadQuestion() {
+            if (currentQuestion < simpleSentences.length) {
+                document.getElementById("count-val").innerText = currentQuestion + 1;
+                document.getElementById("score-val").innerText = score;
+                document.getElementById("sentence-display").innerHTML = simpleSentences[currentQuestion].sentence;
+                document.getElementById("feedback").innerText = "";
+                blockInput = false;
+            } else {
+                endGame();
+            }
+        }
+
+        function submitAnswer(chosenVerb) {
+            if (blockInput) return;
+            blockInput = true;
+
+            const correctAnswer = simpleSentences[currentQuestion].answer;
+            const feedbackBox = document.getElementById("feedback");
+
+            if (chosenVerb === correctAnswer) {
+                score += 1;
+                document.getElementById("score-val").innerText = score;
+                
+                let completedSentence = simpleSentences[currentQuestion].sentence.replace("?", chosenVerb);
+                document.getElementById("sentence-display").innerHTML = completedSentence;
+                
+                feedbackBox.innerHTML = "<span class='correct-anim'>🟢 Right! Good job! </span>";
+            } else {
+                feedbackBox.innerHTML = `<span class='wrong-anim'>🔴 No, the right word is "${correctAnswer}".</span>`;
+            }
+
+            setTimeout(() => {
+                currentQuestion++;
+                loadQuestion();
+            }, 2500); 
+        }
+
+        function endGame() {
+            document.getElementById("play-screen").style.display = "none";
+            document.getElementById("results-screen").style.display = "block";
+            document.getElementById("final-score").innerText = score;
+
+            let rank = "";
+            if (score === 10) rank = "🏆 Superb! You got all correct!";
+            else if (score >= 6) rank = "👍 Very Good! Keep it up!";
+            else rank = "📚 Try again to get more stars!";
+            
+            document.getElementById("rank-text").innerText = rank;
+        }
+
+        function resetGame() {
+            currentQuestion = 0;
+            score = 0;
+            document.getElementById("play-screen").style.display = "block";
+            document.getElementById("results-screen").style.display = "none";
+            loadQuestion();
+        }
+
+        // Start game
+        loadQuestion();
+    </script>
+</body>
+</html>

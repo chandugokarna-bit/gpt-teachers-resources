@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Look and Frame - Sentence Game</title>
+    <style>
+        :root {
+            --sky-blue: #bae6fd;
+            --grass-green: #22c55e;
+            --wood-brown: #78350f;
+            --btn-blue: #0284c7;
+            --btn-hover: #0369a1;
+            --dark-gray: #334155;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background-color: #f0fdf4;
+            color: var(--dark-gray);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        #main-container {
+            background-color: white;
+            border: 6px solid var(--btn-blue);
+            border-radius: 24px;
+            padding: 20px;
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: var(--btn-blue);
+            margin-top: 0;
+            font-size: 1.8rem;
+        }
+
+        .status-header {
+            display: flex;
+            justify-content: space-between;
+            background-color: #f0f9ff;
+            padding: 10px 15px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            border: 2px dashed var(--btn-blue);
+        }
+
+        /* The Visual Picture Box container */
+        .picture-box {
+            background: linear-gradient(to bottom, var(--sky-blue) 60%, #bbf7d0 60%);
+            border: 4px solid var(--dark-gray);
+            border-radius: 16px;
+            height: 160px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 5rem;
+            letter-spacing: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 6px 0 #cbd5e1;
+            user-select: none;
+        }
+
+        .audio-helper-btn {
+            background-color: #eab308;
+            color: black;
+            border: none;
+            padding: 8px 20px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 20px;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #ca8a04;
+            margin-bottom: 15px;
+            font-family: inherit;
+        }
+
+        .audio-helper-btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 1px 0 #ca8a04;
+        }
+
+        /* Box where selected words appear */
+        .sentence-input-area {
+            background-color: #f8fafc;
+            border: 3px dashed #94a3b8;
+            border-radius: 12px;
+            min-height: 50px;
+            padding: 10px;
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #0369a1;
+            margin-bottom: 15px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .word-tag {
+            background-color: #e0f2fe;
+            border: 2px solid #7dd3fc;
+            padding: 4px 12px;
+            border-radius: 8px;
+        }
+
+        /* Scrambled word selection bank */
+        .word-bank {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            min-height: 50px;
+        }
+
+        .word-block {
+            background-color: white;
+            color: var(--dark-gray);
+            border: 3px solid var(--dark-gray);
+            padding: 10px 18px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 12px;
+            cursor: pointer;
+            box-shadow: 0 4px 0 var(--dark-gray);
+            font-family: inherit;
+            transition: all 0.05s;
+        }
+
+        .word-block:active {
+            transform: translateY(3px);
+            box-shadow: 0 1px 0 var(--dark-gray);
+        }
+
+        .word-block.used {
+            opacity: 0.2;
+            pointer-events: none;
+        }
+
+        .action-row {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .action-btn {
+            padding: 12px 25px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-family: inherit;
+            color: white;
+        }
+
+        .btn-clear { background-color: #ef4444; box-shadow: 0 4px 0 #991b1b; }
+        .btn-check { background-color: #22c55e; box-shadow: 0 4px 0 #16a34a; }
+
+        .action-btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 1px 0 grey;
+        }
+
+        #feedback-terminal {
+            margin-top: 15px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            height: 35px;
+        }
+
+        .text-correct { color: #16a34a; }
+        .text-wrong { color: #dc2626; }
+
+        #win-deck { display: none; }
+
+        .btn-restart {
+            background-color: var(--btn-blue);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            font-family: inherit;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="main-container">
+        <!-- Main Game Interactive Block -->
+        <div id="game-deck">
+            <h1>🖼️ Look and Frame Sentences</h1>
+            
+            <div class="status-header">
+                <div>Stars: ⭐ <span id="score-val">0</span></div>
+                <div>Picture: 🗺️ <span id="count-val">1/10</span></div>
+            </div>
+
+            <!-- Natively simulated canvas illustration scene -->
+            <div class="picture-box" id="pic-canvas">☀️🌳👦⚽</div>
+
+            <button class="audio-helper-btn" onclick="speakClue()">🔊 Speak Picture Clue</button>
+
+            <div style="text-align: left; font-size: 0.9rem; font-weight: bold; color:#64748b; margin-bottom: 5px;">Your Sentence:</div>
+            <div class="sentence-input-area" id="sentence-preview">
+                <span style="color:#cbd5e1; font-weight: normal; font-size:1.1rem;">Tap words below to build sentence...</span>
+            </div>
+
+            <div class="word-bank" id="words-container">
+                <!-- Javascript fills scrambled button components here dynamically -->
+            </div>
+
+            <div class="action-row">
+                <button class="action-btn btn-clear" onclick="clearSentence()">🔄 Clear All</button>
+                <button class="action-btn btn-check" onclick="checkSentence()">✅ Check Answer</button>
+            </div>
+
+            <div id="feedback-terminal"></div>
+        </div>
+
+        <!-- End Game Screen Module -->
+        <div id="win-deck">
+            <h1 style="color: #16a34a;">🎉 Superb Learning! 🎉</h1>
+            <div style="font-size: 5rem; margin: 15px 0;">🏫⭐🏆</div>
+            <h2>Total Stars Won: ⭐ <span id="final-score">0</span></h2>
+            <p style="font-size: 1.2rem; color: #475569;">You can look at pictures and frame English sentences correctly!</p>
+            <button class="btn-restart" onclick="restartGame()">Play Again</button>
+        </div>
+    </div>
+
+    <script>
+        // 10 super simple picture levels matching Class 3 elementary standard frameworks
+        const levelsData = [
+            { 
+                visuals: "☀️🌳👦⚽", 
+                audioClue: "A boy is playing with a ball near the tree.",
+                correctArray: ["The", "boy", "is", "playing", "with", "a", "ball"],
+                scrambled: ["playing", "is", "ball", "The", "with", "boy", "a"]
+            },
+            { 
+                visuals: "🐱🥛🍽️", 
+                audioClue: "The cat is drinking white milk.",
+                correctArray: ["The", "cat", "is", "drinking", "milk"],
+                scrambled: ["is", "drinking", "cat", "milk", "The"]
+            },
+            { 
+                visuals: "🐟💧🌊", 
+                audioClue: "Fish swim inside the clean water.",
+                correctArray: ["Fish", "swim", "in", "the", "water"],
+                scrambled: ["swim", "the", "water", "Fish", "in"]
+            },
+            { 
+                visuals: "🐒🍌🌳", 
+                audioClue: "A happy monkey eats a yellow banana.",
+                correctArray: ["The", "monkey", "is", "eating", "a", "banana"],
+                scrambled: ["eating", "The", "banana", "monkey", "a", "is"]
+            },
+            { 
+                visuals: "📕👧✍️", 
+                audioClue: "A clever girl writes in her book.",
+                correctArray: ["The", "girl", "is", "writing", "in", "the", "book"],
+                scrambled: ["girl", "book", "is", "in", "The", "the", "writing"]
+            },
+            { 
+                visuals: "🐮🌱🌾", 
+                audioClue: "The big cow eats green grass.",
+                correctArray: ["The", "cow", "eats", "green", "grass"],
+                scrambled: ["grass", "cow", "green", "The", "eats"]
+            },
+            { 
+                visuals: "👦🚲🛣️", 
+                audioClue: "The little boy rides a small bike.",
+                correctArray: ["The", "boy", "rides", "a", "bike"],
+                scrambled: ["rides", "bike", "boy", "a", "The"]
+            },
+            { 
+                visuals: "🐕🦴🏡", 
+                audioClue: "The brown dog has a white bone.",
+                correctArray: ["The", "dog", "has", "a", "bone"],
+                scrambled: ["bone", "has", "dog", "The", "a"]
+            },
+            { 
+                visuals: "👩🍳🍲🔥", 
+                audioClue: "Mother is cooking hot food for us.",
+                correctArray: ["Mother", "is", "cooking", "food"],
+                scrambled: ["cooking", "food", "Mother", "is"]
+            },
+            { 
+                visuals: "🐦🌳 nest", 
+                audioClue: "The little bird sits on a tree.",
+                correctArray: ["The", "bird", "sits", "on", "a", "tree"],
+                scrambled: ["on", "bird", "tree", "The", "a", "sits"]
+            }
+        ];
+
+        let activeLevel = 0;
+        let runningScore = 0;
+        let selectedWordsList = [];
+        let executionLock = false;
+
+        // Offline Native Speech Translation Hint Generator
+        function speakClue() {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                let narration = new SpeechSynthesisUtterance(levelsData[activeLevel].audioClue);
+                narration.lang = 'en-IN'; // Set voice accent to standard Indian-English context profile
+                narration.rate = 0.8;    // Deliver guidance deliberately slow for level 3 comprehension bounds
+                window.speechSynthesis.speak(narration);
+            }
+        }
+
+        // Native hardware audio sound effect engine pipeline
+        function emitBeep(isSuccess) {
+            try {
+                let context = new (window.AudioContext || window.webkitAudioContext)();
+                let oscillator = context.createOscillator();
+                let amplifier = context.createGain();
+                oscillator.connect(amplifier);
+                amplifier.connect(context.destination);
+                
+                oscillator.frequency.setValueAtTime(isSuccess ? 800 : 220, context.currentTime);
+                if(isSuccess) oscillator.frequency.setValueAtTime(1100, context.currentTime + 0.1);
+                
+                amplifier.gain.setValueAtTime(0.1, context.currentTime);
+                amplifier.gain.exponentialRampToValueAtTime(0.01, context.currentTime + 0.25);
+                
+                oscillator.start();
+                oscillator.stop(context.currentTime + 0.25);
+            } catch (e) {}
+        }
+
+        function loadSessionRound() {
+            if (activeLevel < levelsData.length) {
+                document.getElementById("count-val").innerText = (activeLevel + 1) + " / " + levelsData.length;
+                document.getElementById("score-val").innerText = runningScore;
+                document.getElementById("feedback-terminal").innerText = "";
+                
+                // Load assets into DOM fields safely
+                document.getElementById("pic-canvas").innerText = levelsData[activeLevel].visuals;
+                
+                selectedWordsList = [];
+                renderPreviewBar();
+                renderWordBankBlocks();
+                executionLock = false;
+
+                // Fire initial spoken prompt guide automatically 
+                setTimeout(speakClue, 400);
+            } else {
+                displayVictorySummary();
+            }
+        }
+
+        function renderPreviewBar() {
+            const bar = document.getElementById("sentence-preview");
+            if (selectedWordsList.length === 0) {
+                bar.innerHTML = `<span style="color:#cbd5e1; font-weight: normal; font-size:1.1rem;">Tap words below to build sentence...</span>`;
+                return;
+            }
+            bar.innerHTML = "";
+            selectedWordsList.forEach(word => {
+                const node = document.createElement("span");
+                node.className = "word-tag";
+                node.innerText = word;
+                bar.appendChild(node);
+            });
+        }
+
+        function renderWordBankBlocks() {
+            const container = document.getElementById("words-container");
+            container.innerHTML = "";
+            
+            const currentScramblePool = levelsData[activeLevel].scrambled;
+            currentScramblePool.forEach((word, index) => {
+                const block = document.createElement("button");
+                block.className = "word-block";
+                block.id = "block-id-" + index;
+                block.innerText = word;
+                block.onclick = () => tapWordBlock(word, "block-id-" + index);
+                container.appendChild(block);
+            });
+        }
+
+        function tapWordBlock(wordString, elementId) {
+            if (executionLock) return;
+            
+            const targetBlock = document.getElementById(elementId);
+            if (!targetBlock.classList.contains("used")) {
+                targetBlock.classList.add("used");
+                selectedWordsList.push(wordString);
+                renderPreviewBar();
+            }
+        }
+
+        function clearSentence() {
+            if (executionLock) return;
+            selectedWordsList = [];
+            renderPreviewBar();
+            
+            // Undo visual usage filter parameters on word block children
+            const activeBlocks = document.querySelectorAll(".word-block");
+            activeBlocks.forEach(btn => btn.classList.remove("used"));
+            document.getElementById("feedback-terminal").innerText = "";
+        }
+
+        function checkSentence() {
+            if (executionLock || selectedWordsList.length === 0) return;
+            executionLock = true;
+
+            const referenceTargetArray = levelsData[activeLevel].correctArray;
+            const terminal = document.getElementById("feedback-terminal");
+            
+            // Validate sequence structural arrays length matches perfectly
+            let matchIsCorrect = true;
+            if (selectedWordsList.length !== referenceTargetArray.length) {
+                matchIsCorrect = false;
+            } else {
+                for (let i = 0; i < referenceTargetArray.length; i++) {
+                    if (selectedWordsList[i] !== referenceTargetArray[i]) {
+                        matchIsCorrect = false;
+                        break;
+                    }
+                }
+            }
+
+            if (matchIsCorrect) {
+                runningScore += 20;
+                document.getElementById("score-val").innerText = runningScore;
+                terminal.innerHTML = "<span class='text-correct'>⭐ Excellent! Excellent Sentence! ⭐</span>";
+                emitBeep(true);
+
+                setTimeout(() => {
+                    activeLevel++;
+                    loadSessionRound();
+                }, 2200);
+            } else {
+                terminal.innerHTML = "<span class='text-wrong'>❌ Not quite right! Try clearing and re-ordering!</span>";
+                emitBeep(false);
+                setTimeout(() => {
+                    terminal.innerText = "";
+                    executionLock = false;
+                }, 2000);
+            }
+        }
+
+        function displayVictorySummary() {
+            document.getElementById("game-deck").style.display = "none";
+            document.getElementById("win-deck").style.display = "block";
+            document.getElementById("final-score").innerText = runningScore;
+        }
+
+        function restartGame() {
+            activeLevel = 0;
+            runningScore = 0;
+            document.getElementById("game-deck").style.display = "block";
+            document.getElementById("win-deck").style.display = "none";
+            loadSessionRound();
+        }
+
+        // Initialize runtime sequence launch
+        loadSessionRound();
+    </script>
+</body>
+</html>

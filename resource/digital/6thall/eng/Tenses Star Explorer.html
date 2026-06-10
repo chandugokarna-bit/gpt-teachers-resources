@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>12 Tenses Star Explorer</title>
+    <style>
+        :root {
+            --bg-color: #e0f7fa;
+            --card-color: #ffffff;
+            --primary: #0097e6;
+            --secondary: #8c7ae6;
+            --text-dark: #2f3640;
+            --correct: #44bd32;
+            --wrong: #e84118;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-dark);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 15px;
+            box-sizing: border-box;
+        }
+
+        #game-container {
+            background-color: var(--card-color);
+            padding: 30px;
+            border-radius: 25px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+            width: 100%;
+            max-width: 700px;
+            text-align: center;
+            border: 5px solid var(--primary);
+        }
+
+        h1 {
+            color: var(--primary);
+            margin-top: 0;
+            font-size: 2.2rem;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            font-size: 1.4rem;
+            background: #f5f6fa;
+            padding: 10px 20px;
+            border-radius: 15px;
+            font-weight: bold;
+            border: 2px dashed var(--secondary);
+        }
+
+        #sentence-box {
+            font-size: 2rem;
+            margin: 30px 0;
+            padding: 30px 10px;
+            background: #fff9c4;
+            border-radius: 20px;
+            border: 3px solid #fbc531;
+            line-height: 1.5;
+            color: #d35400;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .btn {
+            background-color: var(--secondary);
+            color: white;
+            border: none;
+            padding: 15px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: transform 0.1s;
+            box-shadow: 0 5px #7158e2;
+        }
+
+        .btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 1px #7158e2;
+        }
+
+        #feedback-box {
+            margin-top: 25px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            height: 40px;
+        }
+
+        .correct-text { color: var(--correct); }
+        .wrong-text { color: var(--wrong); }
+
+        #end-screen { display: none; }
+
+        .btn-restart {
+            background-color: var(--correct);
+            box-shadow: 0 5px #4cd137;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="game-container">
+        <!-- Play Screen -->
+        <div id="play-screen">
+            <h1>⭐ Tense Star Explorer ⭐</h1>
+            <p style="font-size: 1.2rem; color: #7f8fa6;">Read the sentence and find its tense!</p>
+            
+            <div class="stats">
+                <div>Stars: ⭐ <span id="score">0</span></div>
+                <div>Level: <span id="current">1</span> / 12</div>
+            </div>
+
+            <div id="sentence-box">Loading...</div>
+
+            <div class="options-grid" id="options-area">
+                <!-- Buttons will be generated here by JavaScript -->
+            </div>
+
+            <div id="feedback-box"></div>
+        </div>
+
+        <!-- End Screen -->
+        <div id="end-screen">
+            <h1>🎉 All 12 Tenses Complete! 🎉</h1>
+            <h2 style="font-size: 2.5rem; margin: 20px 0;">Total Stars: ⭐ <span id="final-score">0</span></h2>
+            <p id="badge" style="font-size: 1.8rem; font-weight: bold; color: var(--primary);"></p>
+            <button class="btn btn-restart" onclick="restartGame()">Play Again</button>
+        </div>
+    </div>
+
+    <script>
+        // 12 Tenses with very simple vocabulary for Class 3
+        const questions = [
+            { 
+                tense: "Simple Present", 
+                sentence: "I play cricket.", 
+                options: ["Simple Present", "Simple Past", "Simple Future"] 
+            },
+            { 
+                tense: "Present Continuous", 
+                sentence: "I am playing cricket.", 
+                options: ["Present Continuous", "Past Continuous", "Simple Present"] 
+            },
+            { 
+                tense: "Present Perfect", 
+                sentence: "I have played cricket.", 
+                options: ["Simple Past", "Present Perfect", "Future Perfect"] 
+            },
+            { 
+                tense: "Present Perfect Continuous", 
+                sentence: "I have been playing cricket.", 
+                options: ["Present Perfect Continuous", "Past Perfect Continuous", "Present Continuous"] 
+            },
+            { 
+                tense: "Simple Past", 
+                sentence: "She ate an apple.", 
+                options: ["Simple Future", "Simple Present", "Simple Past"] 
+            },
+            { 
+                tense: "Past Continuous", 
+                sentence: "She was eating an apple.", 
+                options: ["Past Continuous", "Present Continuous", "Future Continuous"] 
+            },
+            { 
+                tense: "Past Perfect", 
+                sentence: "She had eaten an apple.", 
+                options: ["Present Perfect", "Past Perfect", "Simple Past"] 
+            },
+            { 
+                tense: "Past Perfect Continuous", 
+                sentence: "She had been eating an apple.", 
+                options: ["Past Perfect Continuous", "Present Perfect Continuous", "Past Continuous"] 
+            },
+            { 
+                tense: "Simple Future", 
+                sentence: "He will sleep.", 
+                options: ["Simple Past", "Simple Present", "Simple Future"] 
+            },
+            { 
+                tense: "Future Continuous", 
+                sentence: "He will be sleeping.", 
+                options: ["Future Continuous", "Present Continuous", "Past Continuous"] 
+            },
+            { 
+                tense: "Future Perfect", 
+                sentence: "He will have slept.", 
+                options: ["Past Perfect", "Future Perfect", "Present Perfect"] 
+            },
+            { 
+                tense: "Future Perfect Continuous", 
+                sentence: "He will have been sleeping.", 
+                options: ["Future Continuous", "Future Perfect Continuous", "Past Perfect Continuous"] 
+            }
+        ];
+
+        let currentIndex = 0;
+        let score = 0;
+        let waiting = false;
+
+        function loadQuestion() {
+            if (currentIndex < questions.length) {
+                document.getElementById("current").innerText = currentIndex + 1;
+                document.getElementById("score").innerText = score;
+                document.getElementById("sentence-box").innerText = questions[currentIndex].sentence;
+                document.getElementById("feedback-box").innerText = "";
+                
+                const optionsArea = document.getElementById("options-area");
+                optionsArea.innerHTML = ""; // Clear old buttons
+                
+                // Create buttons for current question
+                questions[currentIndex].options.forEach(option => {
+                    const btn = document.createElement("button");
+                    btn.className = "btn";
+                    btn.innerText = option;
+                    btn.onclick = () => checkAnswer(option);
+                    optionsArea.appendChild(btn);
+                });
+
+                waiting = false;
+            } else {
+                showResults();
+            }
+        }
+
+        function checkAnswer(selectedOption) {
+            if (waiting) return;
+            waiting = true;
+
+            const correctTense = questions[currentIndex].tense;
+            const feedback = document.getElementById("feedback-box");
+
+            if (selectedOption === correctTense) {
+                score++;
+                document.getElementById("score").innerText = score;
+                feedback.innerHTML = "<span class='correct-text'>🟢 Correct! Star Collected! ⭐</span>";
+            } else {
+                feedback.innerHTML = `<span class='wrong-text'>🔴 Oops! It is ${correctTense}.</span>`;
+            }
+
+            // Wait 2.5 seconds before next question
+            setTimeout(() => {
+                currentIndex++;
+                loadQuestion();
+            }, 2500);
+        }
+
+        function showResults() {
+            document.getElementById("play-screen").style.display = "none";
+            document.getElementById("end-screen").style.display = "block";
+            document.getElementById("final-score").innerText = score;
+
+            let badgeText = "";
+            if (score === 12) badgeText = "🏆 Grammar Master!";
+            else if (score >= 8) badgeText = "🌟 Great Job!";
+            else badgeText = "📚 Keep Learning!";
+            
+            document.getElementById("badge").innerText = badgeText;
+        }
+
+        function restartGame() {
+            currentIndex = 0;
+            score = 0;
+            document.getElementById("play-screen").style.display = "block";
+            document.getElementById("end-screen").style.display = "none";
+            loadQuestion();
+        }
+
+        // Start game
+        loadQuestion();
+    </script>
+</body>
+</html>

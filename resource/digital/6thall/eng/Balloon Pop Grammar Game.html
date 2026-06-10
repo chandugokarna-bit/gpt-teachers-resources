@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Balloon Pop: Grammar Game</title>
+    <style>
+        :root {
+            --sky-top: #74b9ff;
+            --sky-bottom: #dfe6e9;
+            --text-dark: #2d3436;
+        }
+
+        body {
+            margin: 0;
+            overflow: hidden; /* Stops scrollbars when balloons fly */
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background: linear-gradient(to bottom, var(--sky-top), var(--sky-bottom));
+            height: 100vh;
+            user-select: none; /* Stops accidental text highlighting while clicking */
+        }
+
+        /* Heads Up Display (HUD) */
+        #hud {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 15px 30px;
+            box-sizing: border-box;
+            display: flex;
+            justify-content: space-between;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #fff;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.4);
+            z-index: 10;
+        }
+
+        .hud-box {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px 20px;
+            border-radius: 15px;
+            border: 2px solid white;
+        }
+
+        /* Screens */
+        #start-screen, #game-over-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.85);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 20;
+            text-align: center;
+        }
+
+        h1 {
+            color: #d63031;
+            font-size: 3.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px white;
+        }
+
+        p.instruction {
+            font-size: 1.8rem;
+            color: #0984e3;
+            font-weight: bold;
+            margin-bottom: 30px;
+            max-width: 80%;
+        }
+
+        .btn {
+            background-color: #00b894;
+            color: white;
+            font-size: 2rem;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 8px #00ebbd, 0 15px 20px rgba(0,0,0,0.2);
+            transition: all 0.1s;
+            font-weight: bold;
+            font-family: inherit;
+        }
+
+        .btn:active {
+            transform: translateY(8px);
+            box-shadow: 0 0px #00ebbd, 0 5px 10px rgba(0,0,0,0.2);
+        }
+
+        /* Balloon Styling */
+        .balloon {
+            position: absolute;
+            bottom: -150px;
+            width: 90px;
+            height: 110px;
+            border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.4rem;
+            cursor: pointer;
+            box-shadow: inset -10px -10px 15px rgba(0,0,0,0.2), 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.1s;
+            /* Animation added via JS */
+        }
+
+        /* The balloon string */
+        .balloon::after {
+            content: '';
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            width: 2px;
+            height: 25px;
+            background: rgba(0,0,0,0.3);
+        }
+
+        /* Popping Animations */
+        .popped-correct {
+            animation: popCorrect 0.3s forwards !important;
+            pointer-events: none;
+        }
+
+        .popped-wrong {
+            animation: popWrong 0.3s forwards !important;
+            pointer-events: none;
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(0) rotate(-5deg); }
+            50% { transform: translateY(-60vh) rotate(5deg); }
+            100% { transform: translateY(-120vh) rotate(-5deg); }
+        }
+
+        @keyframes popCorrect {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.5); opacity: 0.8; filter: brightness(200%); }
+            100% { transform: scale(0); opacity: 0; }
+        }
+
+        @keyframes popWrong {
+            0% { transform: scale(1) rotate(0deg); opacity: 1; }
+            20% { transform: scale(1) rotate(-20deg); }
+            40% { transform: scale(1) rotate(20deg); }
+            100% { transform: translateY(50vh); opacity: 0; } /* Falls down */
+        }
+
+        #game-over-screen { display: none; }
+    </style>
+</head>
+<body>
+
+    <!-- Start Screen -->
+    <div id="start-screen">
+        <h1>🎈 Balloon Pop! 🎈</h1>
+        <p class="instruction">MISSION: Pop ONLY the balloons that have <u>Action Words (Verbs)</u>!<br><br>Don't pop the naming words (Nouns)!</p>
+        <button class="btn" onclick="startGame()">Start Popping!</button>
+    </div>
+
+    <!-- HUD (Score and Timer) -->
+    <div id="hud" style="display: none;">
+        <div class="hud-box">Score: ⭐ <span id="score">0</span></div>
+        <div class="hud-box">Time: ⏳ <span id="time">30</span>s</div>
+    </div>
+
+    <!-- Game Area -->
+    <div id="game-area"></div>
+
+    <!-- Game Over Screen -->
+    <div id="game-over-screen">
+        <h1>Time's Up! ⏰</h1>
+        <p class="instruction">You scored <span id="final-score" style="color:#d63031; font-size: 2.5rem;">0</span> points!</p>
+        <button class="btn" onclick="resetGame()">Play Again</button>
+    </div>
+
+    <script>
+        // Word Lists for Class 1-3
+        const verbs = ["run", "jump", "play", "eat", "sleep", "cry", "sing", "fly", "read", "sit", "walk", "draw"];
+        const nouns = ["cat", "dog", "apple", "sun", "ball", "boy", "girl", "tree", "book", "car", "bird", "hat"];
+        const balloonColors = ["#ff7675", "#74b9ff", "#55efc4", "#ffeaa7", "#a29bfe", "#fd79a8", "#fab1a0"];
+
+        let score = 0;
+        let timeLeft = 30;
+        let gameTimer;
+        let spawnTimer;
+        let isPlaying = false;
+
+        const gameArea = document.getElementById("game-area");
+
+        function startGame() {
+            document.getElementById("start-screen").style.display = "none";
+            document.getElementById("hud").style.display = "flex";
+            score = 0;
+            timeLeft = 30;
+            updateHUD();
+            isPlaying = true;
+
+            // Start countdown
+            gameTimer = setInterval(() => {
+                timeLeft--;
+                updateHUD();
+                if (timeLeft <= 0) endGame();
+            }, 1000);
+
+            // Spawn balloons constantly
+            spawnTimer = setInterval(spawnBalloon, 800); // 1 balloon every 0.8 seconds
+        }
+
+        function spawnBalloon() {
+            if (!isPlaying) return;
+
+            const balloon = document.createElement("div");
+            balloon.classList.add("balloon");
+
+            // 60% chance it's a verb (correct target), 40% chance it's a noun (wrong target)
+            const isVerb = Math.random() < 0.6;
+            const wordList = isVerb ? verbs : nouns;
+            const randomWord = wordList[Math.floor(Math.random() * wordList.length)];
+            
+            // Assign word, color, and behavior
+            balloon.innerText = randomWord;
+            balloon.dataset.isVerb = isVerb;
+            balloon.style.backgroundColor = balloonColors[Math.floor(Math.random() * balloonColors.length)];
+
+            // Random horizontal position (10% to 90% of screen width)
+            balloon.style.left = Math.floor(Math.random() * 80) + 10 + "vw";
+            
+            // Random floating speed (between 4s and 7s)
+            const speed = Math.random() * 3 + 4;
+            balloon.style.animation = `floatUp ${speed}s linear forwards`;
+
+            // Click / Tap Event
+            balloon.addEventListener("mousedown", () => popBalloon(balloon));
+            balloon.addEventListener("touchstart", (e) => {
+                e.preventDefault(); // prevents double firing on touch devices
+                popBalloon(balloon);
+            });
+
+            // Remove balloon from memory after it floats away
+            balloon.addEventListener("animationend", () => {
+                if (balloon.parentNode === gameArea) gameArea.removeChild(balloon);
+            });
+
+            gameArea.appendChild(balloon);
+        }
+
+        function popBalloon(balloon) {
+            if (!isPlaying) return;
+
+            const isVerb = balloon.dataset.isVerb === "true";
+
+            if (isVerb) {
+                // Correct!
+                score += 10;
+                balloon.innerText = "+10";
+                balloon.classList.add("popped-correct");
+            } else {
+                // Wrong!
+                score -= 5;
+                balloon.innerText = "Oops!";
+                balloon.classList.add("popped-wrong");
+            }
+
+            updateHUD();
+
+            // Remove balloon completely after popping animation finishes
+            setTimeout(() => {
+                if (balloon.parentNode === gameArea) gameArea.removeChild(balloon);
+            }, 300);
+        }
+
+        function updateHUD() {
+            document.getElementById("score").innerText = score;
+            document.getElementById("time").innerText = timeLeft;
+        }
+
+        function endGame() {
+            isPlaying = false;
+            clearInterval(gameTimer);
+            clearInterval(spawnTimer);
+            
+            // Clear all remaining balloons
+            gameArea.innerHTML = "";
+
+            document.getElementById("hud").style.display = "none";
+            document.getElementById("game-over-screen").style.display = "flex";
+            document.getElementById("final-score").innerText = score;
+        }
+
+        function resetGame() {
+            document.getElementById("game-over-screen").style.display = "none";
+            startGame();
+        }
+    </script>
+</body>
+</html>

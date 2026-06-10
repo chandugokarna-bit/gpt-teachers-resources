@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Magic Sentence Robot - Class 3</title>
+    <style>
+        :root {
+            --bg-color: #eef2f3;
+            --robot-blue: #0284c7;
+            --assertive-color: #f59e0b;
+            --imperative-color: #06b6d4;
+            --interrogative-color: #8b5cf6;
+            --exclamatory-color: #ec4899;
+            --dark-text: #1e293b;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--dark-text);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        #game-box {
+            background-color: white;
+            border: 6px solid var(--robot-blue);
+            border-radius: 25px;
+            padding: 25px;
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: var(--robot-blue);
+            font-size: 2rem;
+            margin-top: 0;
+        }
+
+        .score-board {
+            display: flex;
+            justify-content: space-between;
+            background-color: #e0f2fe;
+            padding: 10px 20px;
+            border-radius: 15px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            border: 2px dashed var(--robot-blue);
+        }
+
+        /* Large display box for the sentence */
+        .robot-screen {
+            background-color: #1e293b;
+            color: #38bdf8;
+            padding: 25px 15px;
+            border-radius: 20px;
+            font-size: 1.6rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.5);
+            min-height: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Large Audio Button for Primary Students */
+        .audio-btn {
+            background-color: #22c55e;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 5px 0 #16a34a;
+            margin-bottom: 25px;
+            font-family: inherit;
+        }
+
+        .audio-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 1px 0 #16a34a;
+        }
+
+        .button-label {
+            font-size: 1rem;
+            color: #64748b;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        /* Easy-to-tap 4 Button Grid */
+        .buttons-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        @media (min-width: 450px) {
+            .buttons-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .game-btn {
+            color: white;
+            border: none;
+            border-radius: 15px;
+            padding: 15px 10px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            font-family: inherit;
+            transition: transform 0.1s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .game-btn span {
+            font-size: 0.85rem;
+            opacity: 0.9;
+            font-weight: normal;
+        }
+
+        .game-btn:active { transform: scale(0.95); }
+
+        .btn-assertive { background-color: var(--assertive-color); box-shadow: 0 4px 0 #b45309; }
+        .btn-imperative { background-color: var(--imperative-color); box-shadow: 0 4px 0 #0e7490; }
+        .btn-interrogative { background-color: var(--interrogative-color); box-shadow: 0 4px 0 #6d28d9; }
+        .btn-exclamatory { background-color: var(--exclamatory-color); box-shadow: 0 4px 0 #be185d; }
+
+        #alert-box {
+            margin-top: 20px;
+            font-size: 1.4rem;
+            font-weight: bold;
+            height: 40px;
+        }
+
+        .correct-text { color: #16a34a; }
+        .wrong-text { color: #dc2626; }
+
+        #win-screen { display: none; }
+
+        .restart-btn {
+            background-color: var(--robot-blue);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            border-radius: 25px;
+            cursor: pointer;
+            margin-top: 20px;
+            font-family: inherit;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="game-box">
+        <!-- Main Game View -->
+        <div id="play-screen">
+            <h1>🤖 The Magic Sentence Robot</h1>
+            
+            <div class="score-board">
+                <div>Stars: ⭐ <span id="score-val">0</span></div>
+                <div>Sentence: 📝 <span id="count-val">1/12</span></div>
+            </div>
+
+            <div class="robot-screen">
+                <div id="sentence-display">Loading...</div>
+            </div>
+
+            <!-- Speak Button -->
+            <button class="audio-btn" onclick="speakSentence()">🔊 Listen to Robot Voice</button>
+
+            <div class="button-label">Touch the correct robot room:</div>
+            
+            <!-- Easy Input Grid -->
+            <div class="buttons-grid">
+                <button class="game-btn btn-assertive" onclick="checkAnswer('Assertive')">
+                    Assertive
+                    <span>(✏️ Simple Telling)</span>
+                </button>
+                <button class="game-btn btn-imperative" onclick="checkAnswer('Imperative')">
+                    Imperative
+                    <span>(✋ Order / Request)</span>
+                </button>
+                <button class="game-btn btn-interrogative" onclick="checkAnswer('Interrogative')">
+                    Interrogative
+                    <span>(❓ Ask a Question)</span>
+                </button>
+                <button class="game-btn btn-exclamatory" onclick="checkAnswer('Exclamatory')">
+                    Exclamatory
+                    <span>(😮 Happy / Shocked!)</span>
+                </button>
+            </div>
+
+            <div id="alert-box"></div>
+        </div>
+
+        <!-- Win View -->
+        <div id="win-screen">
+            <h1 style="color: #16a34a;">🎉 Brilliant Job! 🎉</h1>
+            <div style="font-size: 5rem; margin: 15px 0;">🤖🏆⭐</div>
+            <h2>You won all Stars: ⭐ <span id="final-score">0</span></h2>
+            <p style="font-size: 1.2rem; color: #475569;">You are a master of English sentences!</p>
+            <button class="restart-btn" onclick="resetGame()">Play Again</button>
+        </div>
+    </div>
+
+    <script>
+        // 12 Super Simple Sentences for Class 3 Govt School kids (Without ending punctuation)
+        const schoolLevelData = [
+            { text: "The cat is sleeping on the mat", fullAudio: "The cat is sleeping on the mat.", type: "Assertive" },
+            { text: "Open your English book now", fullAudio: "Open your English book now.", type: "Imperative" },
+            { text: "Where is your school bag", fullAudio: "Where is your school bag?", type: "Interrogative" },
+            { text: "Wow, what a beautiful bird", fullAudio: "Wow! what a beautiful bird!", type: "Exclamatory" },
+            { text: "Please give me your pencil", fullAudio: "Please give me your pencil.", type: "Imperative" },
+            { text: "The sun rises in the east", fullAudio: "The sun rises in the east.", type: "Assertive" },
+            { text: "Do you want to play with me", fullAudio: "Do you want to play with me?", type: "Interrogative" },
+            { text: "Oh no, the glass is broken", fullAudio: "Oh no! the glass is broken!", type: "Exclamatory" },
+            { text: "Come here and sit down", fullAudio: "Come here and sit down.", type: "Imperative" },
+            { text: "What is the color of an apple", fullAudio: "What is the color of an apple?", type: "Interrogative" },
+            { text: "I have two small puppy dogs", fullAudio: "I have two small puppy dogs.", type: "Assertive" },
+            { text: "Yay, today is a holiday", fullAudio: "Yay! today is a holiday!", type: "Exclamatory" }
+        ];
+
+        let currentIndex = 0;
+        let starPoints = 0;
+        let clickLock = false;
+
+        // Simple Speech Engine
+        function speakSentence() {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                let sayThis = new SpeechSynthesisUtterance(schoolLevelData[currentIndex].fullAudio);
+                sayThis.lang = 'en-IN'; // Uses Indian English voice profile if available on device
+                sayThis.rate = 0.85; // Slightly slower speed for primary children
+                window.speechSynthesis.speak(sayThis);
+            }
+        }
+
+        // Native audio ding for immediate classroom gratification
+        function playChime() {
+            try {
+                let ctx = new (window.AudioContext || window.webkitAudioContext)();
+                let osc = ctx.createOscillator();
+                let gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.frequency.setValueAtTime(600, ctx.currentTime);
+                osc.frequency.setValueAtTime(900, ctx.currentTime + 0.1);
+                gain.gain.setValueAtTime(0.1, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.3);
+            } catch (e) {}
+        }
+
+        function setupRound() {
+            if (currentIndex < schoolLevelData.length) {
+                document.getElementById("count-val").innerText = (currentIndex + 1) + " / " + schoolLevelData.length;
+                document.getElementById("score-val").innerText = starPoints;
+                document.getElementById("alert-box").innerText = "";
+                document.getElementById("sentence-display").innerText = schoolLevelData[currentIndex].text;
+                clickLock = false;
+                
+                // Speak the new sentence automatically when round opens
+                setTimeout(speakSentence, 300);
+            } else {
+                showEndScreen();
+            }
+        }
+
+        function checkAnswer(playerChoice) {
+            if (clickLock) return;
+            clickLock = true;
+
+            const correctType = schoolLevelData[currentIndex].type;
+            const messageBox = document.getElementById("alert-box");
+
+            if (playerChoice === correctType) {
+                starPoints += 10;
+                document.getElementById("score-val").innerText = starPoints;
+                messageBox.innerHTML = "<span class='correct-text'>👍 Yes! Right Answer! ⭐</span>";
+                playChime();
+
+                setTimeout(() => {
+                    currentIndex++;
+                    setupRound();
+                }, 1800);
+            } else {
+                messageBox.innerHTML = "<span class='wrong-text'>❌ Not quite! Listen again and try!</span>";
+                setTimeout(() => {
+                    messageBox.innerText = "";
+                    clickLock = false;
+                }, 1500);
+            }
+        }
+
+        function showEndScreen() {
+            document.getElementById("play-screen").style.display = "none";
+            document.getElementById("win-screen").style.display = "block";
+            document.getElementById("final-score").innerText = starPoints;
+        }
+
+        function resetGame() {
+            currentIndex = 0;
+            starPoints = 0;
+            schoolLevelData.sort(() => 0.5 - Math.random());
+            document.getElementById("play-screen").style.display = "block";
+            document.getElementById("win-screen").style.display = "none";
+            setupRound();
+        }
+
+        // Run game instantly on start
+        schoolLevelData.sort(() => 0.5 - Math.random());
+        setupRound();
+    </script>
+</body>
+</html>

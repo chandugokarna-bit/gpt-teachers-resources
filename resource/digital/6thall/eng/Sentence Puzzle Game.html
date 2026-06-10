@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Easy Sentence Puzzle Game</title>
+    <style>
+        :root {
+            --primary-blue: #0984e3;
+            --mint-green: #2ecc71;
+            --orange-sun: #e67e22;
+            --bg-light: #f5f6fa;
+            --card-bg: #ffffff;
+            --text-main: #2c3e50;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 15px;
+            box-sizing: border-box;
+        }
+
+        #game-container {
+            background-color: var(--card-bg);
+            padding: 30px;
+            border-radius: 25px;
+            box-shadow: 0 12px 24px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 650px;
+            text-align: center;
+            border: 5px solid var(--primary-blue);
+        }
+
+        h1 {
+            color: var(--primary-blue);
+            margin-top: 0;
+            font-size: 2.2rem;
+        }
+
+        .instruction {
+            font-size: 1.3rem;
+            color: #7f8c8d;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 25px;
+            font-size: 1.4rem;
+            background: #edf2f7;
+            padding: 12px 20px;
+            border-radius: 15px;
+            font-weight: bold;
+        }
+
+        /* Where the words land */
+        .sentence-slots-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            min-height: 60px;
+            padding: 20px;
+            background: #fffdef;
+            border: 3px dashed var(--orange-sun);
+            border-radius: 20px;
+            margin-bottom: 30px;
+        }
+
+        /* Scrambled word pool */
+        .word-pool {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            min-height: 60px;
+            padding: 20px;
+            background: #f1f2f6;
+            border-radius: 20px;
+            margin-bottom: 25px;
+        }
+
+        /* Individual word blocks */
+        .word-block {
+            background-color: var(--primary-blue);
+            color: white;
+            padding: 12px 22px;
+            font-size: 1.6rem;
+            font-weight: bold;
+            border-radius: 15px;
+            cursor: pointer;
+            box-shadow: 0 6px #0652dd;
+            user-select: none;
+            transition: transform 0.1s ease;
+        }
+
+        .word-block:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px #0652dd;
+        }
+
+        .word-block.placed {
+            background-color: var(--orange-sun);
+            box-shadow: 0 6px #d35400;
+        }
+
+        /* Action Buttons */
+        .action-zone {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .btn {
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.4rem;
+            font-weight: bold;
+            border-radius: 15px;
+            cursor: pointer;
+            box-shadow: 0 5px rgba(0,0,0,0.2);
+        }
+
+        .btn-check {
+            background-color: var(--mint-green);
+            box-shadow: 0 6px #218c74;
+        }
+
+        .btn-clear {
+            background-color: #e74c3c;
+            box-shadow: 0 6px #c0392b;
+        }
+
+        #feedback-box {
+            margin-top: 25px;
+            font-size: 1.6rem;
+            font-weight: bold;
+            height: 45px;
+        }
+
+        .text-correct { color: var(--mint-green); }
+        .text-wrong { color: #e74c3c; }
+
+        #end-screen { display: none; }
+
+        .btn-replay {
+            background-color: var(--primary-blue);
+            box-shadow: 0 6px #0652dd;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="game-container">
+        <!-- Play Screen -->
+        <div id="play-screen">
+            <h1>🧩 Word Puzzle Game</h1>
+            <p class="instruction">Click the words to make a correct sentence!</p>
+            
+            <div class="status-bar">
+                <div>Stars: ⭐ <span id="score-val">0</span></div>
+                <div>Sentence: <span id="count-val">1</span> / 10</div>
+            </div>
+
+            <!-- Answer Placement Zone -->
+            <div class="sentence-slots-container" id="target-zone"></div>
+
+            <!-- Mixed Words Pool -->
+            <div class="word-pool" id="source-zone"></div>
+
+            <!-- Controls -->
+            <div class="action-zone">
+                <button class="btn btn-clear" onclick="clearSentence()">Clear 🔁</button>
+                <button class="btn btn-check" onclick="checkSentence()">Check Answer ✔️</button>
+            </div>
+
+            <div id="feedback-box"></div>
+        </div>
+
+        <!-- End Screen -->
+        <div id="end-screen">
+            <h1>🎉 Superb Job! 🎉</h1>
+            <h2 style="font-size: 2.5rem; margin: 20px 0;">Total Stars: ⭐ <span id="final-score">0</span></h2>
+            <p style="font-size: 1.6rem; color: var(--orange-sun); font-weight: bold;">You are a Star Reader!</p>
+            <button class="btn btn-replay" onclick="restartGame()">Play Again</button>
+        </div>
+    </div>
+
+    <script>
+        // 10 Very Simple Sentences for Class 3 Students
+        const dataset = [
+            { correct: ["The", "cat", "is", "small."], scrambled: ["is", "cat", "The", "small."] },
+            { correct: ["I", "love", "my", "mother."], scrambled: ["mother.", "my", "I", "love"] },
+            { correct: ["The", "apple", "is", "red."], scrambled: ["is", "The", "red.", "apple"] },
+            { correct: ["This", "is", "a", "book."], scrambled: ["book.", "is", "a", "This"] },
+            { correct: ["Cow", "gives", "us", "milk."], scrambled: ["milk.", "us", "gives", "Cow"] },
+            { correct: ["Birds", "fly", "in", "sky."], scrambled: ["sky.", "in", "fly", "Birds"] },
+            { correct: ["The", "sun", "is", "hot."], scrambled: ["hot.", "is", "The", "sun"] },
+            { correct: ["I", "play", "with", "ball."], scrambled: ["ball.", "with", "I", "play"] },
+            { correct: ["Fish", "swim", "in", "water."], scrambled: ["water.", "swim", "in", "Fish"] },
+            { correct: ["My", "school", "is", "big."], scrambled: ["big.", "is", "school", "My"] }
+        ];
+
+        let currentRound = 0;
+        let totalScore = 0;
+        let chosenWords = [];
+
+        // Function to play a cheerful chime sound using Web Audio API (No files needed)
+        function playCorrectSound() {
+            try {
+                let ctx = new (window.AudioContext || window.webkitAudioContext)();
+                
+                // Sound Note 1
+                let osc1 = ctx.createOscillator();
+                let gain1 = ctx.createGain();
+                osc1.connect(gain1);
+                gain1.connect(ctx.destination);
+                osc1.frequency.setValueAtTime(523.25, ctx.currentTime); // C5 Note
+                gain1.gain.setValueAtTime(0.2, ctx.currentTime);
+                osc1.start();
+                gain1.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+                osc1.stop(ctx.currentTime + 0.3);
+
+                // Sound Note 2 (slightly later for a happy chime effect)
+                setTimeout(() => {
+                    let osc2 = ctx.createOscillator();
+                    let gain2 = ctx.createGain();
+                    osc2.connect(gain2);
+                    gain2.connect(ctx.destination);
+                    osc2.frequency.setValueAtTime(659.25, ctx.currentTime); // E5 Note
+                    gain2.gain.setValueAtTime(0.2, ctx.currentTime);
+                    osc2.start();
+                    gain2.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4);
+                    osc2.stop(ctx.currentTime + 0.4);
+                }, 100);
+
+            } catch (e) {
+                console.log("Audio not supported or waiting for user interaction.");
+            }
+        }
+
+        function initRound() {
+            if (currentRound < dataset.length) {
+                document.getElementById("count-val").innerText = currentRound + 1;
+                document.getElementById("score-val").innerText = totalScore;
+                document.getElementById("feedback-box").innerText = "";
+                
+                chosenWords = [];
+                renderPools();
+            } else {
+                showVictory();
+            }
+        }
+
+        function renderPools() {
+            const sourceZone = document.getElementById("source-zone");
+            const targetZone = document.getElementById("target-zone");
+            
+            sourceZone.innerHTML = "";
+            targetZone.innerHTML = "";
+
+            // Render selected words in upper box
+            chosenWords.forEach((word, idx) => {
+                const wordEl = document.createElement("div");
+                wordEl.className = "word-block placed";
+                wordEl.innerText = word;
+                wordEl.onclick = () => removeWord(idx);
+                targetZone.appendChild(wordEl);
+            });
+
+            // Render leftover words in lower scrambled pool
+            dataset[currentRound].scrambled.forEach((word) => {
+                const countInChosen = chosenWords.filter(w => w === word).length;
+                const countInScrambled = dataset[currentRound].scrambled.filter(w => w === word).length;
+
+                if (countInChosen < countInScrambled) {
+                    const wordEl = document.createElement("div");
+                    wordEl.className = "word-block";
+                    wordEl.innerText = word;
+                    wordEl.onclick = () => pickWord(word);
+                    sourceZone.appendChild(wordEl);
+                }
+            });
+        }
+
+        function pickWord(word) {
+            chosenWords.push(word);
+            renderPools();
+        }
+
+        function removeWord(index) {
+            chosenWords.splice(index, 1);
+            renderPools();
+        }
+
+        function clearSentence() {
+            chosenWords = [];
+            renderPools();
+            document.getElementById("feedback-box").innerText = "";
+        }
+
+        function checkSentence() {
+            const currentCorrect = dataset[currentRound].correct;
+            const feedbackField = document.getElementById("feedback-box");
+
+            if (chosenWords.length < currentCorrect.length) {
+                feedbackField.innerHTML = "<span class='text-wrong'>⚠️ Use all the words first!</span>";
+                return;
+            }
+
+            let isPerfect = true;
+            for (let i = 0; i < currentCorrect.length; i++) {
+                if (chosenWords[i] !== currentCorrect[i]) {
+                    isPerfect = false;
+                    break;
+                }
+            }
+
+            if (isPerfect) {
+                totalScore += 1;
+                document.getElementById("score-val").innerText = totalScore;
+                feedbackField.innerHTML = "<span class='text-correct'>🟢 Correct! Good job! 🎉</span>";
+                
+                // Ring the victory chime!
+                playCorrectSound();
+                
+                setTimeout(() => {
+                    currentRound++;
+                    initRound();
+                }, 2200);
+            } else {
+                feedbackField.innerHTML = "<span class='text-wrong'>🔴 Incorrect. Try a different order!</span>";
+            }
+        }
+
+        function showVictory() {
+            document.getElementById("play-screen").style.display = "none";
+            document.getElementById("end-screen").style.display = "block";
+            document.getElementById("final-score").innerText = totalScore;
+        }
+
+        function restartGame() {
+            currentRound = 0;
+            totalScore = 0;
+            document.getElementById("play-screen").style.display = "block";
+            document.getElementById("end-screen").style.display = "none";
+            initRound();
+        }
+
+        initRound();
+    </script>
+</body>
+</html>

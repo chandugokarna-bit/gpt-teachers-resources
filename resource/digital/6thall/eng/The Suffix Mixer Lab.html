@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Suffix Mixer Lab Game</title>
+    <style>
+        :root {
+            --lab-purple: #4a148c;
+            --neon-green: #00e676;
+            --potion-cyan: #00e5ff;
+            --amber-orange: #ff9100;
+            --bg-dark: #2c3e50;
+            --card-light: #ffffff;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background-color: #f1f2f6;
+            color: var(--bg-dark);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 15px;
+            box-sizing: border-box;
+        }
+
+        #game-container {
+            background-color: var(--card-light);
+            padding: 30px;
+            border-radius: 30px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+            width: 100%;
+            max-width: 650px;
+            text-align: center;
+            border: 6px solid var(--lab-purple);
+        }
+
+        h1 {
+            color: var(--lab-purple);
+            margin-top: 0;
+            font-size: 2.3rem;
+            letter-spacing: 1px;
+        }
+
+        .instruction {
+            font-size: 1.2rem;
+            color: #57606f;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 25px;
+            font-size: 1.3rem;
+            background: #f3e5f5;
+            padding: 12px 20px;
+            border-radius: 15px;
+            font-weight: bold;
+            border: 2px dashed var(--lab-purple);
+        }
+
+        /* Lab Brainstorming Clue Card */
+        .clue-card {
+            background: #e0f7fa;
+            border: 3px solid var(--potion-cyan);
+            padding: 20px;
+            border-radius: 20px;
+            font-size: 1.4rem;
+            font-weight: bold;
+            margin-bottom: 25px;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
+        }
+
+        /* The Lab Beaker Visual Setup */
+        .lab-workspace {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .beaker-container {
+            background: #fff;
+            border: 5px solid #747d8c;
+            border-top: none;
+            border-radius: 0 0 40px 40px;
+            padding: 25px 40px;
+            display: inline-flex;
+            gap: 5px;
+            font-size: 2.2rem;
+            font-weight: bold;
+            position: relative;
+            box-shadow: 0 8px 0 #ced6e0;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .base-word-text {
+            color: var(--bg-dark);
+        }
+
+        .suffix-slot {
+            color: var(--amber-orange);
+            border-bottom: 4px dashed var(--amber-orange);
+            min-width: 90px;
+            text-align: left;
+            transition: all 0.2s ease;
+        }
+
+        .suffix-slot.filled {
+            border-bottom: none;
+            animation: pulse 0.4s ease;
+        }
+
+        /* Suffix Potion Grid */
+        .potion-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        @media (min-width: 480px) {
+            .potion-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        .potion-btn {
+            background-color: #f1f2f6;
+            color: var(--lab-purple);
+            border: 3px solid var(--lab-purple);
+            padding: 15px 5px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            border-radius: 20px;
+            cursor: pointer;
+            box-shadow: 0 6px #7442c8;
+            transition: all 0.1s ease;
+        }
+
+        .potion-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px #7442c8;
+        }
+
+        #feedback-box {
+            margin-top: 20px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            height: 45px;
+        }
+
+        .text-correct { color: var(--neon-green); text-shadow: 1px 1px 1px rgba(0,0,0,0.1); }
+        .text-wrong { color: #ff4757; }
+
+        #end-screen { display: none; }
+        
+        .btn-replay {
+            background-color: var(--lab-purple);
+            color: white;
+            border: none;
+            padding: 15px 35px;
+            font-size: 1.4rem;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 6px #310d61;
+            margin-top: 20px;
+        }
+
+        /* Keyframe Animations */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="game-container">
+        <!-- Play Screen -->
+        <div id="play-screen">
+            <h1>🧪 The Suffix Mixer Lab</h1>
+            <p class="instruction">Drop a Suffix Potion into the beaker to form the target word!</p>
+            
+            <div class="status-bar">
+                <div>Score: ⭐ <span id="score-val">0</span></div>
+                <div>Experiment: 🔬 <span id="count-val">1</span> / 10</div>
+            </div>
+
+            <!-- Target Meaning Clue Card -->
+            <div class="clue-card" id="clue-text">Loading formula...</div>
+
+            <!-- The Interactive Beaker Visual -->
+            <div class="lab-workspace">
+                <div class="beaker-container">
+                    <span class="base-word-text" id="base-display">word</span>
+                    <span class="suffix-slot" id="suffix-display">____</span>
+                </div>
+            </div>
+
+            <!-- Suffix Formula Options -->
+            <div class="potion-grid">
+                <button class="potion-btn" onclick="mixSuffix('-ful')">-ful</button>
+                <button class="potion-btn" onclick="mixSuffix('-less')">-less</button>
+                <button class="potion-btn" onclick="mixSuffix('-er')">-er</button>
+                <button class="potion-btn" onclick="mixSuffix('-ly')">-ly</button>
+            </div>
+
+            <div id="feedback-box"></div>
+        </div>
+
+        <!-- End Screen -->
+        <div id="end-screen">
+            <h1>⚗️ Lab Master Scientist! ⚗️</h1>
+            <div style="font-size: 5rem; margin: 15px 0;">🌟🧪✨</div>
+            <h2 style="font-size: 2.3rem; margin: 15px 0;">Total Stars: ⭐ <span id="final-score">0</span></h2>
+            <p style="font-size: 1.5rem; color: var(--lab-purple); font-weight: bold;">You mastered all the word changes!</p>
+            <button class="btn-replay" onclick="restartGame()">Run New Test</button>
+        </div>
+    </div>
+
+    <script>
+        // Brainstorming challenge set tailored cleanly for intermediate primary levels
+        const dataset = [
+            { base: "help", clue: "Goal: Full of help / Ready to do chores 🤝", correct: "-ful" },
+            { base: "fear", clue: "Goal: Without fear / Very brave like a lion 🦁", correct: "-less" },
+            { base: "teach", clue: "Goal: A person whose job is to teach 👩‍🏫", correct: "-er" },
+            { base: "quick", clue: "Goal: Running or working in a fast way 🏃‍♂️", correct: "-ly" },
+            { base: "care", clue: "Goal: Without care / Making silly mistakes ⚠️", correct: "-less" },
+            { base: "play", clue: "Goal: Full of play / Energetic and happy puppy 🐶", correct: "-ful" },
+            { base: "sing", clue: "Goal: A person who sings sweet songs 🎤", correct: "-er" },
+            { base: "slow", clue: "Goal: Moving or walking in a slow way 🐢", correct: "-ly" },
+            { base: "use", clue: "Goal: Having no use / Broken trash box 🗑️", correct: "-less" },
+            { base: "cheer", clue: "Goal: Full of cheer / Super happy and bright 🎉", correct: "-ful" }
+        ];
+
+        let currentRound = 0;
+        let totalScore = 0;
+        let blockClicks = false;
+
+        // Custom synth chime utilizing native browser code engine offline
+        function playCorrectSound() {
+            try {
+                let ctx = new (window.AudioContext || window.webkitAudioContext)();
+                
+                // Sound Element 1
+                let osc1 = ctx.createOscillator();
+                let gain1 = ctx.createGain();
+                osc1.connect(gain1);
+                gain1.connect(ctx.destination);
+                osc1.frequency.setValueAtTime(587.33, ctx.currentTime); // D5 Note
+                gain1.gain.setValueAtTime(0.15, ctx.currentTime);
+                osc1.start();
+                gain1.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.2);
+                osc1.stop(ctx.currentTime + 0.2);
+
+                // Sound Element 2 (harmonized second note step up)
+                setTimeout(() => {
+                    let osc2 = ctx.createOscillator();
+                    let gain2 = ctx.createGain();
+                    osc2.connect(gain2);
+                    gain2.connect(ctx.destination);
+                    osc2.frequency.setValueAtTime(880.00, ctx.currentTime); // A5 Note
+                    gain2.gain.setValueAtTime(0.15, ctx.currentTime);
+                    osc2.start();
+                    gain2.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.35);
+                    osc2.stop(ctx.currentTime + 0.35);
+                }, 80);
+            } catch (e) {
+                console.log("Audio pipeline configuration bypass.");
+            }
+        }
+
+        function initRound() {
+            if (currentRound < dataset.length) {
+                document.getElementById("count-val").innerText = currentRound + 1;
+                document.getElementById("score-val").innerText = totalScore;
+                document.getElementById("feedback-box").innerText = "";
+                
+                // Reset beaker state
+                const suffixSlot = document.getElementById("suffix-display");
+                suffixSlot.innerText = "____";
+                suffixSlot.className = "suffix-slot";
+
+                // Map standard properties
+                document.getElementById("clue-text").innerText = dataset[currentRound].clue;
+                document.getElementById("base-display").innerText = dataset[currentRound].base;
+                
+                blockClicks = false;
+            } else {
+                showVictory();
+            }
+        }
+
+        function mixSuffix(chosenSuffix) {
+            if (blockClicks) return;
+            blockClicks = true;
+
+            const correctSuffix = dataset[currentRound].correct;
+            const feedbackField = document.getElementById("feedback-box");
+            const suffixSlot = document.getElementById("suffix-display");
+
+            // Visually place the suffix inside the beaker container instantly
+            suffixSlot.innerText = chosenSuffix;
+            suffixSlot.className = "suffix-slot filled";
+
+            if (chosenSuffix === correctSuffix) {
+                totalScore += 10;
+                document.getElementById("score-val").innerText = totalScore;
+                feedbackField.innerHTML = `<span class='text-correct'>💥 Success! Result: ${dataset[currentRound].base}${chosenSuffix}</span>`;
+                
+                playCorrectSound();
+
+                setTimeout(() => {
+                    currentRound++;
+                    initRound();
+                }, 2200);
+            } else {
+                feedbackField.innerHTML = "<span class='text-wrong'>❌ Potion failed! The meaning does not match. Try again!</span>";
+                
+                setTimeout(() => {
+                    suffixSlot.innerText = "____";
+                    suffixSlot.className = "suffix-slot";
+                    feedbackField.innerText = "";
+                    blockClicks = false;
+                }, 1800);
+            }
+        }
+
+        function showVictory() {
+            document.getElementById("play-screen").style.display = "none";
+            document.getElementById("end-screen").style.display = "block";
+            document.getElementById("final-score").innerText = totalScore;
+        }
+
+        function restartGame() {
+            currentRound = 0;
+            totalScore = 0;
+            document.getElementById("play-screen").style.display = "block";
+            document.getElementById("end-screen").style.display = "none";
+            initRound();
+        }
+
+        // Initialize runtime round engine
+        initRound();
+    </script>
+</body>
+</html>

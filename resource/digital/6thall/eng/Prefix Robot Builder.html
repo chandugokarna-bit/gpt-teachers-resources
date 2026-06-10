@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prefix Robot Game</title>
+    <style>
+        :root {
+            --purple-robot: #8e44ad;
+            --bright-blue: #3498db;
+            --success-green: #2ecc71;
+            --coral-red: #e74c3c;
+            --bg-cream: #f9f9f9;
+            --dark-blue: #2c3e50;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background-color: #f0f3f4;
+            color: var(--dark-blue);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 15px;
+            box-sizing: border-box;
+        }
+
+        #game-container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 25px;
+            box-shadow: 0 12px 24px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+            border: 6px solid var(--purple-robot);
+        }
+
+        h1 {
+            color: var(--purple-robot);
+            margin-top: 0;
+            font-size: 2.2rem;
+        }
+
+        .instruction {
+            font-size: 1.2rem;
+            color: #7f8c8d;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 25px;
+            font-size: 1.3rem;
+            background: #f4ecf7;
+            padding: 12px 20px;
+            border-radius: 15px;
+            font-weight: bold;
+            border: 2px solid #e8daef;
+        }
+
+        /* Clue Box card style */
+        .clue-card {
+            background: #fcf3cf;
+            border: 3px dashed #f39c12;
+            padding: 20px;
+            border-radius: 20px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 25px;
+        }
+
+        /* Interactive Word Equation Area */
+        .word-builder-box {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 30px;
+            font-size: 2rem;
+            font-weight: bold;
+        }
+
+        .prefix-slot {
+            background-color: #edf2f7;
+            border: 3px dashed var(--bright-blue);
+            color: var(--bright-blue);
+            padding: 10px 20px;
+            border-radius: 12px;
+            min-width: 80px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .prefix-slot.filled {
+            background-color: var(--purple-robot);
+            color: white;
+            border-style: solid;
+            border-color: var(--purple-robot);
+        }
+
+        .base-word-box {
+            background-color: #e5e8e8;
+            padding: 13px 25px;
+            border-radius: 12px;
+            border: 3px solid #bdc3c7;
+        }
+
+        /* Choice Buttons grid */
+        .prefix-options {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .opt-btn {
+            background-color: var(--bright-blue);
+            color: white;
+            border: none;
+            padding: 15px 5px;
+            font-size: 1.6rem;
+            font-weight: bold;
+            border-radius: 15px;
+            cursor: pointer;
+            box-shadow: 0 6px #2980b9;
+            transition: transform 0.1s;
+        }
+
+        .opt-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px #2980b9;
+        }
+
+        #feedback-box {
+            margin-top: 20px;
+            font-size: 1.6rem;
+            font-weight: bold;
+            height: 45px;
+        }
+
+        .text-correct { color: var(--success-green); }
+        .text-wrong { color: var(--coral-red); }
+
+        #end-screen { display: none; }
+        
+        .btn-replay {
+            background-color: var(--purple-robot);
+            color: white;
+            border: none;
+            padding: 15px 35px;
+            font-size: 1.4rem;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 6px #6c3483;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="game-container">
+        <!-- Play Screen -->
+        <div id="play-screen">
+            <h1>🤖 Prefix Robot Builder</h1>
+            <p class="instruction">Choose the right prefix to make a new word!</p>
+            
+            <div class="status-bar">
+                <div>Stars: ⭐ <span id="score-val">0</span></div>
+                <div>Word: <span id="count-val">1</span> / 10</div>
+            </div>
+
+            <!-- Meaning Clue Box -->
+            <div class="clue-card" id="clue-text">Clue goes here</div>
+
+            <!-- Visual Equation Box -->
+            <div class="word-builder-box">
+                <div class="prefix-slot" id="prefix-display">???</div>
+                <div>+</div>
+                <div class="base-word-box" id="base-display">word</div>
+            </div>
+
+            <!-- Prefix Choice Buttons -->
+            <div class="prefix-options">
+                <button class="opt-btn" onclick="selectPrefix('un-')">un-</button>
+                <button class="opt-btn" onclick="selectPrefix('re-')">re-</button>
+                <button class="opt-btn" onclick="selectPrefix('dis-')">dis-</button>
+            </div>
+
+            <div id="feedback-box"></div>
+        </div>
+
+        <!-- End Screen -->
+        <div id="end-screen">
+            <h1>🏆 Robot Fixed! 🏆</h1>
+            <div style="font-size: 5rem; margin: 15px 0;">🤖✨</div>
+            <h2 style="font-size: 2.3rem; margin: 15px 0;">Total Stars: ⭐ <span id="final-score">0</span></h2>
+            <p style="font-size: 1.5rem; color: var(--purple-robot); font-weight: bold;">You are a Prefix Expert!</p>
+            <button class="btn-replay" onclick="restartGame()">Play Again</button>
+        </div>
+    </div>
+
+    <script>
+        // 10 Level Bank focused on easy un-, re-, dis- prefixes
+        const dataset = [
+            { base: "happy", clue: "Meaning: Not happy 😢", correct: "un-" },
+            { base: "write", clue: "Meaning: To write something again 📝", correct: "re-" },
+            { base: "like", clue: "Meaning: To not like something 👎", correct: "dis-" },
+            { base: "kind", clue: "Meaning: Not nice or not kind 💔", correct: "un-" },
+            { base: "play", clue: "Meaning: To play a video again ▶️", correct: "re-" },
+            { base: "appear", clue: "Meaning: To vanish or stop being seen 🪄", correct: "dis-" },
+            { base: "lock", clue: "Meaning: To open a locked door 🔑", correct: "un-" },
+            { base: "tell", clue: "Meaning: To tell a story again 🗣️", correct: "re-" },
+            { base: "honest", clue: "Meaning: Not telling the truth / lying 🤥", correct: "dis-" },
+            { base: "clean", clue: "Meaning: Not clean / dirty 🧼", correct: "un-" }
+        ];
+
+        let currentRound = 0;
+        let totalScore = 0;
+        let blockClicks = false;
+
+        // Offline Web Audio chime generator
+        function playCorrectSound() {
+            try {
+                let ctx = new (window.AudioContext || window.webkitAudioContext)();
+                
+                let osc1 = ctx.createOscillator();
+                let gain1 = ctx.createGain();
+                osc1.connect(gain1);
+                gain1.connect(ctx.destination);
+                osc1.frequency.setValueAtTime(523.25, ctx.currentTime); // C5 Note
+                gain1.gain.setValueAtTime(0.15, ctx.currentTime);
+                osc1.start();
+                gain1.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.25);
+                osc1.stop(ctx.currentTime + 0.25);
+
+                setTimeout(() => {
+                    let osc2 = ctx.createOscillator();
+                    let gain2 = ctx.createGain();
+                    osc2.connect(gain2);
+                    gain2.connect(ctx.destination);
+                    osc2.frequency.setValueAtTime(659.25, ctx.currentTime); // E5 Note
+                    gain2.gain.setValueAtTime(0.15, ctx.currentTime);
+                    osc2.start();
+                    gain2.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.35);
+                    osc2.stop(ctx.currentTime + 0.35);
+                }, 100);
+            } catch (e) {
+                console.log("Audio contextual trigger error bypass.");
+            }
+        }
+
+        function initRound() {
+            if (currentRound < dataset.length) {
+                document.getElementById("count-val").innerText = currentRound + 1;
+                document.getElementById("score-val").innerText = totalScore;
+                document.getElementById("feedback-box").innerText = "";
+                
+                // Reset slots
+                const prefixSlot = document.getElementById("prefix-display");
+                prefixSlot.innerText = "???";
+                prefixSlot.className = "prefix-slot";
+
+                // Set content
+                document.getElementById("clue-text").innerText = dataset[currentRound].clue;
+                document.getElementById("base-display").innerText = dataset[currentRound].base;
+                
+                blockClicks = false;
+            } else {
+                showVictory();
+            }
+        }
+
+        function selectPrefix(selected) {
+            if (blockClicks) return;
+            blockClicks = true;
+
+            const correctPrefix = dataset[currentRound].correct;
+            const feedbackField = document.getElementById("feedback-box");
+            const prefixSlot = document.getElementById("prefix-display");
+
+            // Visually insert selected answer into slot container
+            prefixSlot.innerText = selected;
+            prefixSlot.className = "prefix-slot filled";
+
+            if (selected === correctPrefix) {
+                totalScore += 1;
+                document.getElementById("score-val").innerText = totalScore;
+                feedbackField.innerHTML = `<span class='text-correct'>🟢 Great Job! ${selected}${dataset[currentRound].base} is right!</span>`;
+                
+                playCorrectSound();
+
+                setTimeout(() => {
+                    currentRound++;
+                    initRound();
+                }, 2200);
+            } else {
+                feedbackField.innerHTML = "<span class='text-wrong'>🔴 Oops! That doesn't match the meaning. Try again!</span>";
+                
+                // Allow them to click again after a small pause to view error
+                setTimeout(() => {
+                    prefixSlot.innerText = "???";
+                    prefixSlot.className = "prefix-slot";
+                    feedbackField.innerText = "";
+                    blockClicks = false;
+                }, 1800);
+            }
+        }
+
+        function showVictory() {
+            document.getElementById("play-screen").style.display = "none";
+            document.getElementById("end-screen").style.display = "block";
+            document.getElementById("final-score").innerText = totalScore;
+        }
+
+        function restartGame() {
+            currentRound = 0;
+            totalScore = 0;
+            document.getElementById("play-screen").style.display = "block";
+            document.getElementById("end-screen").style.display = "none";
+            initRound();
+        }
+
+        // Boot system round
+        initRound();
+    </script>
+</body>
+</html>

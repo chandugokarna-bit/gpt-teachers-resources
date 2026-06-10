@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jungle Grammar Treasure Hunt - 10 Levels</title>
+    <style>
+        :root {
+            --jungle-green: #1e824c;
+            --dirt-brown: #8d6e63;
+            --gold: #f1c40f;
+            --sky-blue: #e8f4f8;
+            --text-color: #2c3e50;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background-color: var(--sky-blue);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 15px;
+            box-sizing: border-box;
+        }
+
+        #hunt-container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 25px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+            width: 100%;
+            max-width: 650px;
+            text-align: center;
+            border: 6px solid var(--jungle-green);
+            position: relative;
+        }
+
+        h1 {
+            color: var(--jungle-green);
+            margin-top: 0;
+            font-size: 2.2rem;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .map-bar {
+            display: flex;
+            justify-content: space-between;
+            background: #fff3cd;
+            padding: 12px 20px;
+            border-radius: 15px;
+            border: 2px dashed var(--dirt-brown);
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin-bottom: 25px;
+        }
+
+        #riddle-box {
+            background: #fdfefe;
+            padding: 25px;
+            border-radius: 20px;
+            border: 3px solid var(--dirt-brown);
+            font-size: 1.5rem;
+            line-height: 1.6;
+            margin-bottom: 25px;
+            min-height: 90px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
+        }
+
+        .clue-hint {
+            font-size: 1rem;
+            color: #7f8c8d;
+            margin-top: 10px;
+            font-style: italic;
+        }
+
+        .options-layout {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+
+        @media (min-width: 450px) {
+            .options-layout {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        .choice-btn {
+            background-color: var(--jungle-green);
+            color: white;
+            border: none;
+            padding: 15px 10px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            border-radius: 15px;
+            cursor: pointer;
+            box-shadow: 0 6px #145a32;
+            transition: transform 0.1s;
+        }
+
+        .choice-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px #145a32;
+        }
+
+        #feedback-message {
+            margin-top: 25px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            height: 40px;
+        }
+
+        .correct-style { color: #27ae60; }
+        .wrong-style { color: #c0392b; }
+
+        #start-screen, #victory-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #game-screen { display: none; }
+        #victory-screen { display: none; }
+
+        .big-icon {
+            font-size: 5rem;
+            margin: 20px 0;
+            animation: bounce 2s infinite;
+        }
+
+        .action-btn {
+            background-color: var(--gold);
+            color: #2c3e50;
+            border: none;
+            padding: 15px 35px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 6px #d4ac0d;
+            margin-top: 20px;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="hunt-container">
+        
+        <!-- START SCREEN -->
+        <div id="start-screen">
+            <h1>🧭 Jungle Treasure Hunt</h1>
+            <div class="big-icon">🗺️</div>
+            <p style="font-size: 1.3rem; margin: 0 10px 20px 10px;">
+                Welcome, Young Explorer! Deep inside the jungle lies a chest of gold. Solve the 10 grammar riddles to collect all the missing keys!
+            </p>
+            <button class="action-btn" onclick="startHunt()">Enter the Jungle</button>
+        </div>
+
+        <!-- PLAY SCREEN -->
+        <div id="game-screen">
+            <h1>🎒 Solving Clues...</h1>
+            
+            <div class="map-bar">
+                <div>Keys: 🔑 <span id="key-count">0</span> / 10</div>
+                <div>Map Stop: 📍 <span id="stop-count">1</span> / 10</div>
+            </div>
+
+            <div id="riddle-box">
+                <div id="sentence-text">Loading riddle...</div>
+                <div id="hint-text" class="clue-hint">Hint goes here</div>
+            </div>
+
+            <div class="options-layout" id="choices-area">
+                <!-- Buttons will be generated here -->
+            </div>
+
+            <div id="feedback-message"></div>
+        </div>
+
+        <!-- VICTORY SCREEN -->
+        <div id="victory-screen">
+            <h1>👑 Treasure Unlocked!</h1>
+            <div class="big-icon">🔓💰✨</div>
+            <h2 style="font-size: 2rem; color: var(--jungle-green); margin: 10px 0;">Excellent Work!</h2>
+            <p style="font-size: 1.3rem; margin-bottom: 25px;">
+                You used all 10 grammar keys perfectly to unlock the box. You are now a certified Grand Grammar Explorer!
+            </p>
+            <button class="action-btn" onclick="restartHunt()">Hunt Again</button>
+        </div>
+
+    </div>
+
+    <script>
+        // Expanded to 10 distinct grammatical questions tailored for Class 5
+        const cluesBank = [
+            {
+                sentence: "Ramu is a good boy. ____ goes to school every day.",
+                hint: "Find the correct Pronoun to replace Ramu's name.",
+                choices: ["He", "She", "It"],
+                answer: "He"
+            },
+            {
+                sentence: "The hungry fox saw a ____ mango high up in the tree.",
+                hint: "Find the Adjective (describing word) that fits best.",
+                choices: ["sweet", "sweetly", "run"],
+                answer: "sweet"
+            },
+            {
+                sentence: "The little monkey is sitting ____ the branch of the tree.",
+                hint: "Find the Preposition that shows where the monkey sits.",
+                choices: ["under", "on", "between"],
+                answer: "on"
+            },
+            {
+                sentence: "I wanted to play cricket, ____ it started raining.",
+                hint: "Find the Joining Word (Conjunction) to link these ideas.",
+                choices: ["and", "because", "but"],
+                answer: "but"
+            },
+            {
+                sentence: "Many beautiful birds ____ flying in the sky right now.",
+                hint: "Find the matching Helping Verb for more than one bird.",
+                choices: ["is", "are", "am"],
+                answer: "are"
+            },
+            {
+                sentence: "Anil ate ____ orange after lunch yesterday.",
+                hint: "Choose the correct Article ('a' or 'an') for the word 'orange'.",
+                choices: ["a", "an", "the"],
+                answer: "an"
+            },
+            {
+                sentence: "The brave tiger walked ____ through the tall green grass.",
+                hint: "Find the Adverb that tells *how* the tiger walked.",
+                choices: ["slowly", "slow", "slowness"],
+                answer: "slowly"
+            },
+            {
+                sentence: "Last week, our entire class ____ to see the city museum.",
+                hint: "Pick the correct Past Tense action word.",
+                choices: ["go", "went", "going"],
+                answer: "went"
+            },
+            {
+                sentence: "The two happy puppies ____ loudly when they see a ball.",
+                hint: "Pick the right matching action for plural (more than one) naming words.",
+                choices: ["bark", "barks", "barking"],
+                answer: "bark"
+            },
+            {
+                sentence: "Today the weather is very ____, so we should drink cold water.",
+                hint: "Find the correct describing word (Adjective) based on the clue sentence.",
+                choices: ["hot", "cold", "rainy"],
+                answer: "hot"
+            }
+        ];
+
+        let currentStop = 0;
+        let keysCollected = 0;
+        let blockClicks = false;
+
+        function startHunt() {
+            document.getElementById("start-screen").style.display = "none";
+            document.getElementById("game-screen").style.display = "block";
+            loadClue();
+        }
+
+        function loadClue() {
+            if (currentStop < cluesBank.length) {
+                document.getElementById("stop-count").innerText = currentStop + 1;
+                document.getElementById("key-count").innerText = keysCollected;
+                document.getElementById("sentence-text").innerText = cluesBank[currentStop].sentence;
+                document.getElementById("hint-text").innerText = cluesBank[currentStop].hint;
+                document.getElementById("feedback-message").innerText = "";
+                
+                const choicesArea = document.getElementById("choices-area");
+                choicesArea.innerHTML = ""; 
+                
+                cluesBank[currentStop].choices.forEach(option => {
+                    const btn = document.createElement("button");
+                    btn.className = "choice-btn";
+                    btn.innerText = option;
+                    btn.onclick = () => submitChoice(option);
+                    choicesArea.appendChild(btn);
+                });
+
+                blockClicks = false;
+            } else {
+                showTreasure();
+            }
+        }
+
+        function submitChoice(userSelect) {
+            if (blockClicks) return;
+            blockClicks = true;
+
+            const correctOption = cluesBank[currentStop].answer;
+            const feedbackField = document.getElementById("feedback-message");
+
+            if (userSelect === correctOption) {
+                keysCollected++;
+                document.getElementById("key-count").innerText = keysCollected;
+                
+                const filledText = cluesBank[currentStop].sentence.replace("____", `[${correctOption}]`);
+                document.getElementById("sentence-text").innerText = filledText;
+                
+                feedbackField.innerHTML = "<span class='correct-style'>🔑 Click! You found a matching key!</span>";
+            } else {
+                feedbackField.innerHTML = `<span class='wrong-style'>🦁 Oh no! A wild animal blocked you. Try again!</span>`;
+                
+                setTimeout(() => {
+                    blockClicks = false;
+                    loadClue();
+                }, 2000);
+                return;
+            }
+
+            setTimeout(() => {
+                currentStop++;
+                loadClue();
+            }, 2500);
+        }
+
+        function showTreasure() {
+            document.getElementById("game-screen").style.display = "none";
+            document.getElementById("victory-screen").style.display = "flex";
+        }
+
+        function restartHunt() {
+            currentStop = 0;
+            keysCollected = 0;
+            document.getElementById("victory-screen").style.display = "none";
+            document.getElementById("game-screen").style.display = "block";
+            loadClue();
+        }
+    </script>
+</body>
+</html>

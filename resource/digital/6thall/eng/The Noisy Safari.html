@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Noisy Safari - 15 Animal Sounds</title>
+    <style>
+        :root {
+            --safari-sky: #dff9fb;
+            --safari-grass: #2ccabc;
+            --safari-sun: #ffbe76;
+            --wood-brown: #834c24;
+            --dark-text: #2c3e50;
+            --card-white: #ffffff;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background-color: var(--safari-sky);
+            color: var(--dark-text);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 15px;
+            box-sizing: border-box;
+        }
+
+        #game-container {
+            background-color: var(--card-white);
+            padding: 30px;
+            border-radius: 30px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.12);
+            width: 100%;
+            max-width: 650px;
+            text-align: center;
+            border: 6px solid var(--safari-grass);
+        }
+
+        h1 {
+            color: var(--wood-brown);
+            margin-top: 0;
+            font-size: 2.3rem;
+            text-shadow: 1px 1px 0px rgba(0,0,0,0.05);
+        }
+
+        .instruction {
+            font-size: 1.3rem;
+            color: #57606f;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 25px;
+            font-size: 1.3rem;
+            background: #e0f7fa;
+            padding: 12px 20px;
+            border-radius: 15px;
+            font-weight: bold;
+            border: 2px solid var(--safari-grass);
+        }
+
+        /* Speech Bubble Animation */
+        .sound-bubble {
+            background: #fff9db;
+            border: 3px solid var(--safari-sun);
+            padding: 25px;
+            border-radius: 25px;
+            font-size: 2.2rem;
+            font-weight: bold;
+            color: #d35400;
+            margin-bottom: 30px;
+            position: relative;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.02);
+            animation: bounce 2s infinite;
+        }
+
+        /* Choice Layout Grid */
+        .animal-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        @media (min-width: 450px) {
+            .animal-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        .animal-card {
+            background-color: #f8f9fa;
+            border: 3px solid #ced4da;
+            border-radius: 20px;
+            padding: 15px 5px;
+            cursor: pointer;
+            box-shadow: 0 6px 0 #adb5bd;
+            transition: all 0.1s ease;
+        }
+
+        .animal-card:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #adb5bd;
+        }
+
+        .animal-emoji {
+            font-size: 3rem;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .animal-name {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--dark-text);
+        }
+
+        #feedback-box {
+            margin-top: 20px;
+            font-size: 1.6rem;
+            font-weight: bold;
+            height: 45px;
+        }
+
+        .text-correct { color: #2ed573; }
+        .text-wrong { color: #ff4757; }
+
+        #end-screen { display: none; }
+        
+        .btn-replay {
+            background-color: var(--safari-sun);
+            color: #5d4037;
+            border: none;
+            padding: 15px 35px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 6px #e67e22;
+            margin-top: 20px;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="game-container">
+        <!-- Play Screen -->
+        <div id="play-screen">
+            <h1>🦁 The Noisy Safari</h1>
+            <p class="instruction">Which animal makes this sound?</p>
+            
+            <div class="status-bar">
+                <div>Badges: 🏅 <span id="score-val">0</span></div>
+                <div>Animal: 🗺️ <span id="count-val">1</span> / 15</div>
+            </div>
+
+            <!-- Sound Clue Display -->
+            <div class="sound-bubble" id="sound-clue">"Moo! Moo!"</div>
+
+            <!-- Choice Grid Area -->
+            <div class="animal-grid" id="choices-box">
+                <!-- Filled dynamically by JavaScript -->
+            </div>
+
+            <div id="feedback-box"></div>
+        </div>
+
+        <!-- End Screen -->
+        <div id="end-screen">
+            <h1>👑 Ultimate Safari Expert! 👑</h1>
+            <div style="font-size: 5.5rem; margin: 20px 0;">🤠🐆🦜🐘</div>
+            <h2 style="font-size: 2.3rem; margin: 15px 0;">Total Badges: 🏅 <span id="final-score">0</span></h2>
+            <p style="font-size: 1.5rem; color: var(--wood-brown); font-weight: bold;">Incredible! You correctly identified all 15 animal sounds!</p>
+            <button class="btn-replay" onclick="restartGame()">Explore Again</button>
+        </div>
+    </div>
+
+    <script>
+        // Expanded Dataset containing 15 distinct levels
+        const dataset = [
+            { sound: '"Moo! Moo!"', correct: "Cow", emoji: "🐮" },
+            { sound: '"Bark! Bark!"', correct: "Dog", emoji: "🐶" },
+            { sound: '"Meow! Meow!"', correct: "Cat", emoji: "🐱" },
+            { sound: '"Quack! Quack!"', correct: "Duck", emoji: "🦆" },
+            { sound: '"Roar! Roar!"', correct: "Lion", emoji: "🦁" },
+            { sound: '"Ribbit! Ribbit!"', correct: "Frog", emoji: "🐸" },
+            { sound: '"Baa! Baa!"', correct: "Sheep", emoji: "🐑" },
+            { sound: '"Buzz! Buzz!"', correct: "Bee", emoji: "🐝" },
+            { sound: '"Hiss! Hiss!"', correct: "Snake", emoji: "🐍" },
+            { sound: '"Cluck! Cluck!"', correct: "Hen", emoji: "🐔" },
+            { sound: '"Trumpet! Trumpet!"', correct: "Elephant", emoji: "🐘" },
+            { sound: '"Chatter! Chatter!"', correct: "Monkey", emoji: "🐵" },
+            { sound: '"Hoot! Hoot!"', correct: "Owl", emoji: "🦉" },
+            { sound: '"Squeak! Squeak!"', correct: "Mouse", emoji: "🐭" },
+            { sound: '"Neigh! Neigh!"', correct: "Horse", emoji: "🐴" }
+        ];
+
+        // Global pool used to generate random wrong options
+        const allAnimals = [
+            { name: "Cow", emoji: "🐮" },
+            { name: "Dog", emoji: "🐶" },
+            { name: "Cat", emoji: "🐱" },
+            { name: "Duck", emoji: "🦆" },
+            { name: "Lion", emoji: "🦁" },
+            { name: "Frog", emoji: "🐸" },
+            { name: "Sheep", emoji: "🐑" },
+            { name: "Bee", emoji: "🐝" },
+            { name: "Snake", emoji: "🐍" },
+            { name: "Hen", emoji: "🐔" },
+            { name: "Elephant", emoji: "🐘" },
+            { name: "Monkey", emoji: "🐵" },
+            { name: "Owl", emoji: "🦉" },
+            { name: "Mouse", emoji: "🐭" },
+            { name: "Horse", emoji: "🐴" },
+            { name: "Rabbit", emoji: "🐰" },
+            { name: "Bird", emoji: "🐦" }
+        ];
+
+        let currentRound = 0;
+        let totalScore = 0;
+        let blockClicks = false;
+
+        // Custom synthesizer engine to emit high-quality audio completely offline
+        function playSuccessChime() {
+            try {
+                let audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                let osc = audioCtx.createOscillator();
+                let gainNode = audioCtx.createGain();
+                
+                osc.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+                
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(587.33, audioCtx.currentTime); // Note D5
+                osc.frequency.setValueAtTime(880.00, audioCtx.currentTime + 0.1); // Note A5
+                
+                gainNode.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.35);
+                
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.35);
+            } catch (err) {
+                console.log("Audio API connection bypassed.");
+            }
+        }
+
+        function initRound() {
+            if (currentRound < dataset.length) {
+                document.getElementById("count-val").innerText = currentRound + 1;
+                document.getElementById("score-val").innerText = totalScore;
+                document.getElementById("feedback-box").innerText = "";
+                document.getElementById("sound-clue").innerText = dataset[currentRound].sound;
+                
+                generateChoices();
+                blockClicks = false;
+            } else {
+                showVictory();
+            }
+        }
+
+        function generateChoices() {
+            const choicesBox = document.getElementById("choices-box");
+            choicesBox.innerHTML = ""; 
+
+            const correctName = dataset[currentRound].correct;
+            const correctEmoji = dataset[currentRound].emoji;
+
+            // Seed the grid options array with the right answer
+            let roundOptions = [{ name: correctName, emoji: correctEmoji }];
+
+            // Select 3 unique wrong answers from general pool
+            let filteredList = allAnimals.filter(item => item.name !== correctName);
+            filteredList.sort(() => 0.5 - Math.random());
+            
+            for(let i=0; i<3; i++) {
+                roundOptions.push(filteredList[i]);
+            }
+
+            // Shuffle the cards so the correct option lands in a unique spot
+            roundOptions.sort(() => 0.5 - Math.random());
+
+            // Build dynamic UI layout blocks
+            roundOptions.forEach(item => {
+                const card = document.createElement("div");
+                card.className = "animal-card";
+                card.onclick = () => verifyAnswer(item.name);
+
+                const emojiSpan = document.createElement("span");
+                emojiSpan.className = "animal-emoji";
+                emojiSpan.innerText = item.emoji;
+
+                const nameSpan = document.createElement("span");
+                nameSpan.className = "animal-name";
+                nameSpan.innerText = item.name;
+
+                card.appendChild(emojiSpan);
+                card.appendChild(nameSpan);
+                choicesBox.appendChild(card);
+            });
+        }
+
+        function verifyAnswer(selectedName) {
+            if (blockClicks) return;
+            blockClicks = true;
+
+            const targetAnswer = dataset[currentRound].correct;
+            const feedbackField = document.getElementById("feedback-box");
+
+            if (selectedName === targetAnswer) {
+                totalScore += 1;
+                document.getElementById("score-val").innerText = totalScore;
+                feedbackField.innerHTML = `<span class='text-correct'>🎉 Splendid! That is correct! 🏅</span>`;
+                
+                playSuccessChime();
+
+                setTimeout(() => {
+                    currentRound++;
+                    initRound();
+                }, 2000);
+            } else {
+                feedbackField.innerHTML = `<span class='text-wrong'>❌ Incorrect sound. Try another animal!</span>`;
+                
+                setTimeout(() => {
+                    feedbackField.innerText = "";
+                    blockClicks = false;
+                }, 1500);
+            }
+        }
+
+        function showVictory() {
+            document.getElementById("play-screen").style.display = "none";
+            document.getElementById("end-screen").style.display = "block";
+            document.getElementById("final-score").innerText = totalScore;
+        }
+
+        function restartGame() {
+            currentRound = 0;
+            totalScore = 0;
+            document.getElementById("play-screen").style.display = "block";
+            document.getElementById("end-screen").style.display = "none";
+            initRound();
+        }
+
+        // Start initialization process
+        initRound();
+    </script>
+</body>
+</html>
