@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಒತ್ತಕ್ಷರ ಜೋಡಿ ಹಕ್ಕಿ - ಚಿತ್ರ ಸಹಿತ</title>
+    <style>
+        :root {
+            --bg: #f0f2f5;
+            --primary: #ff7675;
+            --secondary: #6c5ce7;
+            --success: #2ed573;
+            --dark: #2d3436;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            user-select: none;
+        }
+
+        header {
+            text-align: center;
+            background: linear-gradient(135deg, #20bf6b, #05c46b);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 20px;
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            width: 90%;
+            max-width: 800px;
+        }
+
+        header h1 { margin: 0; font-size: 2.2rem; }
+        header p { margin: 5px 0 0 0; font-size: 1.1rem; opacity: 0.9; }
+
+        .game-box {
+            background: white;
+            padding: 30px;
+            border-radius: 25px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+            width: 90%;
+            max-width: 800px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 25px;
+        }
+
+        /* Image Display Box */
+        .clue-image-container {
+            font-size: 5.5rem;
+            background: #f1f2f6;
+            padding: 20px 40px;
+            border-radius: 20px;
+            box-shadow: inset 0 4px 8px rgba(0,0,0,0.05);
+            line-height: 1;
+        }
+
+        /* Word Puzzle Area */
+        .word-arena {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            min-height: 80px;
+        }
+
+        .letter-fixed {
+            font-size: 4rem;
+            font-weight: bold;
+            color: var(--dark);
+        }
+
+        .letter-blank {
+            font-size: 4rem;
+            font-weight: bold;
+            color: #ff4757;
+            border-bottom: 5px solid #ff4757;
+            min-width: 90px;
+            text-align: center;
+        }
+
+        .letter-blank.solved {
+            border-bottom: none;
+            color: var(--success);
+            animation: popIn 0.4s ease;
+        }
+
+        /* Balloons Floating Area */
+        .balloons-area {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+            width: 100%;
+        }
+
+        .balloon {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: white;
+            background: #3498db;
+            width: 100px;
+            height: 120px;
+            border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+            position: relative;
+            transition: all 0.3s ease;
+            animation: float 3s ease-in-out infinite alternate;
+        }
+
+        .balloon:nth-child(1) { background: #3498db; animation-delay: 0s; }
+        .balloon:nth-child(2) { background: #e67e22; animation-delay: 0.4s; }
+        .balloon:nth-child(3) { background: #9b59b6; animation-delay: 0.8s; }
+        .balloon:nth-child(4) { background: #1abc9c; animation-delay: 1.2s; }
+
+        .balloon::after {
+            content: "";
+            position: absolute;
+            bottom: -10px;
+            width: 2px;
+            height: 15px;
+            background: #7f8c8d;
+        }
+
+        .balloon.wrong {
+            background: #95a5a6 !important;
+            transform: scale(0.9);
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Audio feedback section */
+        .success-panel {
+            display: none;
+            align-items: center;
+            gap: 20px;
+            background: #e8f5e9;
+            padding: 15px 30px;
+            border-radius: 15px;
+            border: 2px solid var(--success);
+            animation: popIn 0.3s ease;
+        }
+
+        .speaker-btn {
+            font-size: 1.8rem;
+            background: var(--success);
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(46, 213, 115, 0.4);
+        }
+
+        .next-btn {
+            background: var(--secondary);
+            color: white;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 12px;
+            cursor: pointer;
+        }
+
+        .status-message {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #ff4757;
+            height: 30px;
+        }
+
+        .level-indicator {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: var(--secondary);
+            background: #eee7fe;
+            padding: 5px 15px;
+            border-radius: 20px;
+        }
+
+        /* Animations */
+        @keyframes float {
+            0% { transform: translateY(0px) rotate(-2deg); }
+            100% { transform: translateY(-15px) rotate(2deg); }
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.7); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>ಚಿತ್ರ ನೋಡಿ ಒತ್ತಕ್ಷರ ಜೋಡಿಸಿ 🎈 ✨</h1>
+        <p>ಚಿತ್ರವನ್ನು ಗುರುತಿಸಿ, ಸರಿಯಾದ ಒತ್ತಕ್ಷರ ಬಲೂನನ್ನು ಕ್ಲಿಕ್ ಮಾಡಿ ಪದ ಪೂರ್ಣಗೊಳಿಸಿ!</p>
+    </header>
+
+    <div class="game-box">
+        <div class="level-indicator" id="level-counter">ಹಂತ: 1/10</div>
+
+        <div class="clue-image-container" id="clue-image">👩‍👦</div>
+
+        <div class="status-message" id="status-text"></div>
+
+        <div class="word-arena">
+            <span class="letter-fixed" id="prefix-letter">ಅ</span>
+            <span class="letter-blank" id="blank-letter">?</span>
+        </div>
+
+        <div style="font-size: 1.2rem; color: #57606f; font-weight: bold;">ಸರಿಯಾದ ಬಲೂನ್ ಆರಿಸಿ:</div>
+
+        <div class="balloons-area" id="balloons-container"></div>
+
+        <div class="success-panel" id="success-panel">
+            <span style="font-size: 1.3rem; font-weight: bold; color: #2f3542;">ಪದ ಪೂರ್ಣಗೊಂಡಿದೆ:</span>
+            <button class="speaker-btn" onclick="playOthaksharaWordAudio()">🔊 ಕೇಳಿ</button>
+            <button class="next-btn" onclick="nextLevel()">ಮುಂದಿನ ಪದ ➡️</button>
+        </div>
+    </div>
+
+    <script>
+        // 10 Interactive Levels Data with Word, Clue and Balloons Choices
+        const levels = [
+            { prefix: 'ಅ', correctOthakshara: 'ಮ್ಮ', displayFull: 'ಅಮ್ಮ', clue: '👩‍👦', options: ['ಮ್ಮ', 'ಪ್ಪ', 'ಕ್ಕ', 'ಜ್ಜ'] },
+            { prefix: 'ಅ', correctOthakshara: 'ಪ್ಪ', displayFull: 'ಅಪ್ಪ', clue: '👨‍👦', options: ['ಟ್ಟ', 'ವ್v', 'ಪ್ಪ', 'ಲ್ಲ'] },
+            { prefix: 'ಅ', correctOthakshara: 'ಕ್ಕ', displayFull: 'ಅಕ್ಕ', clue: '👩', options: ['ಕ್ಕ', 'ಣ್ಣ', 'ತ್ತ', 'ದ್ದ'] },
+            { prefix: 'ಅ', correctOthakshara: 'ಣ್ಣ', displayFull: 'ಅಣ್ಣ', clue: '👦', options: ['ಮ್ಮ', 'ಣ್ಣ', 'ಳ್ಳ', 'ಜ್ಜ'] },
+            { prefix: 'ಹ', correctOthakshara: 'ಕ್ಕಿ', displayFull: 'ಹಕ್ಕಿ', clue: '🐦', options: ['ಗ್ಗಿ', 'ಲ್ಲಿ', 'ಕ್ಕಿ', 'ಟ್ಟಿ'] },
+            { prefix: 'ಕ', correctOthakshara: 'ಪ್ಪೆ', displayFull: 'ಕಪ್ಪೆ', clue: '🐸', options: ['ಟ್ಟೆ', 'ಪ್ಪೆ', 'ಲ್ಲೆ', 'ಣ್ಣೆ'] },
+            { prefix: 'ಬೆ', correctOthakshara: 'ಕ್ಕು', displayFull: 'ಬೆಕ್ಕು', clue: '🐱', options: ['ಟ್ಟು', 'ಲ್ಲು', 'ನ್ನು', 'ಕ್ಕು'] },
+            { prefix: 'ಬಾ', correctOthakshara: 'ಲ', displayFull: 'ಬಾಲ', clue: '🐕', options: ['ಲ', 'ಳ', 'ನ', 'ಕ'] }, // ನಾಯಿ ಬಾಲ/ನಾಯಿ
+            { prefix: 'ಚಂ', correctOthakshara: 'ದ್ರ', displayFull: 'ಚಂದ್ರ', clue: '🌙', options: ['ಗ್ರ', 'ದ್ರ', 'ಪ್ರ', 'ಕ್ರ'] },
+            { prefix: 'ಸೂ', correctOthakshara: 'ರ್ಯ', displayFull: 'ಸೂರ್ಯ', clue: '☀️', options: ['ಮ್ಯ', 'ರ್ಯ', 'ಣ್ಯ', 'ವ್ಯ'] }
+        ];
+
+        let currentLevelIndex = 0;
+        let isSolved = false;
+
+        const levelCounter = document.getElementById('level-counter');
+        const clueImage = document.getElementById('clue-image');
+        const prefixLetter = document.getElementById('prefix-letter');
+        const blankLetter = document.getElementById('blank-letter');
+        const balloonsContainer = document.getElementById('balloons-container');
+        const successPanel = document.getElementById('success-panel');
+        const statusText = document.getElementById('status-text');
+
+        function loadLevel() {
+            const currentLevel = levels[currentLevelIndex];
+            isSolved = false;
+            
+            // Set dynamic contents
+            levelCounter.innerText = `ಹಂತ: ${currentLevelIndex + 1}/10`;
+            clueImage.innerText = currentLevel.clue;
+            prefixLetter.innerText = currentLevel.prefix;
+            blankLetter.innerText = '?';
+            blankLetter.classList.remove('solved');
+            
+            statusText.innerText = '';
+            successPanel.style.display = 'none';
+
+            // Generate Balloons and Shuffle Options
+            balloonsContainer.innerHTML = '';
+            currentLevel.options.forEach(option => {
+                const balloon = document.createElement('div');
+                balloon.classList.add('balloon');
+                balloon.innerText = option;
+                balloon.onclick = () => handleBalloonClick(option, balloon);
+                balloonsContainer.appendChild(balloon);
+            });
+        }
+
+        function handleBalloonClick(selectedOption, balloonElement) {
+            if (isSolved) return;
+
+            const currentLevel = levels[currentLevelIndex];
+
+            if (selectedOption === currentLevel.correctOthakshara) {
+                isSolved = true;
+                blankLetter.innerText = currentLevel.correctOthakshara;
+                blankLetter.classList.add('solved');
+                statusText.innerText = '🎉 ಶಹಬಾಷ್! ಸರಿಯಾದ ಉತ್ತರ.';
+                successPanel.style.display = 'flex';
+                
+                // Block remaining balloons
+                document.querySelectorAll('.balloon').forEach(b => b.style.cursor = 'not-allowed');
+            } else {
+                statusText.innerText = '❌ ತಪ್ಪು ಉತ್ತರ! ಮತ್ತೊಮ್ಮೆ ಯೋಚಿಸಿ.';
+                balloonElement.classList.add('wrong');
+            }
+        }
+
+        function playOthaksharaWordAudio() {
+            const fullWord = levels[currentLevelIndex].displayFull;
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(fullWord);
+                utterance.lang = 'kn-IN';
+                utterance.rate = 0.7; // Slow speed for clarity
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        function nextLevel() {
+            currentLevelIndex++;
+            if (currentLevelIndex < levels.length) {
+                loadLevel();
+            } else {
+                currentLevelIndex = 0;
+                alert('👑 ಅದ್ಭುತ ಸಾಧನೆ! ನೀವು ಎಲ್ಲಾ 10 ಒತ್ತಕ್ಷರ ಹಂತಗಳನ್ನು ಯಶಸ್ವಿಯಾಗಿ ಪೂರ್ಣಗೊಳಿಸಿದ್ದೀರಿ! ಆಟವನ್ನು ಮೊದಲಿನಿಂದ ಆರಂಭಿಸಲಾಗುತ್ತಿದೆ.');
+                loadLevel();
+            }
+        }
+
+        // Run on load
+        loadLevel();
+    </script>
+</body>
+</html>

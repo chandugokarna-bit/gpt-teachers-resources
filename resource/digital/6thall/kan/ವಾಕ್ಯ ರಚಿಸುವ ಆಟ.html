@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಕನ್ನಡ ವಾಕ್ಯ ಜೋಡಣೆ - ರೈಲ್ವೆ ಟ್ರ್ಯಾಕ್ ಆಟ</title>
+    <style>
+        :root {
+            --bg: #f1f9f6;
+            --primary: #38ef7d;
+            --secondary: #11998e;
+            --track-color: #747d8c;
+            --word-bg: #ffffff;
+            --word-text: #2f3542;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            user-select: none;
+        }
+
+        header {
+            text-align: center;
+            background: linear-gradient(135deg, #11998e, #38ef7d);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 20px;
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            width: 90%;
+            max-width: 850px;
+        }
+
+        header h1 { margin: 0; font-size: 2.2rem; }
+        header p { margin: 5px 0 0 0; font-size: 1.1rem; opacity: 0.9; }
+
+        .game-box {
+            background: white;
+            padding: 30px;
+            border-radius: 25px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+            width: 90%;
+            max-width: 850px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 25px;
+        }
+
+        .level-indicator {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: var(--secondary);
+            background: #e1f7f5;
+            padding: 5px 15px;
+            border-radius: 20px;
+        }
+
+        /* Large Image Clue Box */
+        .clue-box {
+            font-size: 5.5rem;
+            background: #f8f9fa;
+            padding: 15px 45px;
+            border-radius: 20px;
+            box-shadow: inset 0 4px 8px rgba(0,0,0,0.05);
+            line-height: 1;
+        }
+
+        /* Completed Sentence Track Display */
+        .sentence-track {
+            width: 100%;
+            min-height: 100px;
+            background: #f1f2f6;
+            border-top: 6px double var(--track-color);
+            border-bottom: 6px double var(--track-color);
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        .track-block {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: white;
+            background: linear-gradient(135deg, #4b7bec, #3867d6);
+            padding: 12px 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 10px rgba(0,0,0,0.15);
+            animation: buildTrack 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .track-placeholder {
+            font-size: 1.5rem;
+            color: #a4b0be;
+            font-style: italic;
+        }
+
+        /* Words Pool Selection */
+        .words-pool-title {
+            font-size: 1.2rem;
+            color: #57606f;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .words-pool {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            width: 100%;
+        }
+
+        .word-card {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--word-text);
+            background: var(--word-bg);
+            border: 3px solid #ced6e0;
+            padding: 12px 30px;
+            border-radius: 15px;
+            cursor: pointer;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.05);
+            transition: all 0.2s ease;
+        }
+
+        .word-card:hover {
+            transform: translateY(-3px);
+            border-color: #4b7bec;
+        }
+
+        .word-card:active { transform: scale(0.95); }
+
+        .word-card.selected {
+            background: #ced6e0;
+            color: #a4b0be;
+            border-color: #a4b0be;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Control Panel / Reset / Audio */
+        .success-panel {
+            display: none;
+            align-items: center;
+            gap: 20px;
+            background: #e8f5e9;
+            padding: 15px 30px;
+            border-radius: 15px;
+            border: 2px solid #2ed573;
+            animation: popIn 0.3s ease;
+        }
+
+        .speaker-btn {
+            font-size: 1.8rem;
+            background: #2ed573;
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(46, 213, 115, 0.4);
+        }
+
+        .next-btn {
+            background: #4b7bec;
+            color: white;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 12px;
+            cursor: pointer;
+        }
+
+        .reset-btn {
+            background: #ff4757;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .status-message {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #ff4757;
+            height: 30px;
+        }
+
+        /* Animations */
+        @keyframes buildTrack {
+            0% { transform: scale(0.6) translateY(20px); opacity: 0; }
+            100% { transform: scale(1) translateY(0); opacity: 1; }
+        }
+        @keyframes popIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>ವಾಕ್ಯ ಜೋಡಣೆ - ರೈಲ್ವೆ ಟ್ರ್ಯಾಕ್ ಲಿಂಕ್ 🚂 ✨</h1>
+        <p>ಚಿತ್ರಕ್ಕೆ ಹೊಂದಾಣಿಕೆಯಾಗುವಂತೆ ಶಬ್ದಗಳನ್ನು ಸರಿಯಾದ ಕ್ರಮದಲ್ಲಿ ಜೋಡಿಸಿ ವಾಕ್ಯ ರಚಿಸಿ!</p>
+    </header>
+
+    <div class="game-box">
+        <div class="level-indicator" id="level-counter">ವಾಕ್ಯ: 1/5</div>
+
+        <!-- Visual Clue Box -->
+        <div class="clue-box" id="clue-image">🍎</div>
+
+        <div class="status-message" id="status-text"></div>
+
+        <!-- Railway Track for Sentence Construction -->
+        <div class="sentence-track" id="track-container">
+            <span class="track-placeholder">ಇಲ್ಲಿ ಶಬ್ದಗಳು ಬಂದು ಹಳಿ ಜೋಡಣೆಯಾಗುತ್ತವೆ...</span>
+        </div>
+
+        <div class="words-pool-title">ಶಬ್ದಗಳನ್ನು ಸರಿಯಾದ ಕ್ರಮದಲ್ಲಿ ಕ್ಲಿಕ್ ಮಾಡಿ:</div>
+        
+        <!-- Mixed Choice Buttons -->
+        <div class="words-pool" id="words-container"></div>
+
+        <div>
+            <button class="reset-btn" onclick="resetCurrentLevel()">ದಾರಿ ತಪ್ಪಿದರೆ ಇಲ್ಲಿ ಮರುಹೊಂದಿಸಿ (Reset) 🔄</button>
+        </div>
+
+        <!-- Success Panel with Permanent Speaker -->
+        <div class="success-panel" id="success-panel">
+            <span style="font-size: 1.3rem; font-weight: bold; color: #2f3542;">ಪೂರ್ಣ ವಾಕ್ಯ ಕೇಳಿ:</span>
+            <button class="speaker-btn" onclick="playSentenceAudio()">🔊 ವಾಕ್ಯ ಕೇಳಿ</button>
+            <button class="next-btn" onclick="nextLevel()">ಮುಂದಿನ ವಾಕ್ಯ ➡️</button>
+        </div>
+    </div>
+
+    <script>
+        // 5 Interactive Sentences Levels with Shuffled Options
+        const levels = [
+            { correctSequence: ['ರಾಜು', 'ಹಣ್ಣು', 'ತಿನ್ನುತ್ತಾನೆ'], clue: '🍎', pool: ['ತಿನ್ನುತ್ತಾನೆ', 'ರಾಜು', 'ಹಣ್ಣು'] },
+            { correctSequence: ['ಹಕ್ಕಿ', 'ಆಕಾಶದಲ್ಲಿ', 'ಹಾರುತ್ತದೆ'], clue: '🐦', pool: ['ಹಾರುತ್ತದೆ', 'ಹಕ್ಕಿ', 'ಆಕಾಶದಲ್ಲಿ'] },
+            { correctSequence: ['ಗುರುಗಳು', 'ಪಾಠ', 'ಮಾಡುತ್ತಾರೆ'], clue: '👨‍🏫', pool: ['ಪಾಠ', 'ಮಾಡುತ್ತಾರೆ', 'ಗುರುಗಳು'] },
+            { correctSequence: ['ನಾಯಿ', 'ಮನೆಯನ್ನು', 'ಕಾಯುತ್ತದೆ'], clue: '🐕', pool: ['ಮನೆಯನ್ನು', 'ನಾಯಿ', 'ಕಾಯುತ್ತದೆ'] },
+            { correctSequence: ['ಮಗು', 'ಹಾಲನ್ನು', 'ಕುಡಿಯುತ್ತದೆ'], clue: '🍼', pool: ['ಹಾಲನ್ನು', 'ಕುಡಿಯುತ್ತದೆ', 'ಮಗು'] }
+        ];
+
+        let currentLevelIndex = 0;
+        let constructedSentence = [];
+
+        const levelCounter = document.getElementById('level-counter');
+        const clueImage = document.getElementById('clue-image');
+        const trackContainer = document.getElementById('track-container');
+        const wordsContainer = document.getElementById('words-container');
+        const successPanel = document.getElementById('success-panel');
+        const statusText = document.getElementById('status-text');
+
+        function loadLevel() {
+            const currentLevel = levels[currentLevelIndex];
+            constructedSentence = [];
+            
+            levelCounter.innerText = `ವಾಕ್ಯ: ${currentLevelIndex + 1}/5`;
+            clueImage.innerText = currentLevel.clue;
+            statusText.innerText = '';
+            successPanel.style.display = 'none';
+            
+            // Set track placeholder text text initial state
+            trackContainer.innerHTML = '<span class="track-placeholder">ಶಬ್ದಗಳನ್ನು ಕ್ಲಿಕ್ ಮಾಡಿ ಹಳಿ ಜೋಡಿಸಿ...</span>';
+
+            // Load Shuffle Word Blocks
+            wordsContainer.innerHTML = '';
+            currentLevel.pool.forEach(word => {
+                const card = document.createElement('div');
+                card.classList.add('word-card');
+                card.innerText = word;
+                card.onclick = () => handleWordClick(word, card);
+                wordsContainer.appendChild(card);
+            });
+        }
+
+        function handleWordClick(word, cardElement) {
+            const currentLevel = levels[currentLevelIndex];
+            const nextExpectedIndex = constructedSentence.length;
+
+            // Check if the clicked word is at the right grammar place index
+            if (currentLevel.correctSequence[nextExpectedIndex] === word) {
+                // Remove placeholder text on first valid click
+                if (constructedSentence.length === 0) {
+                    trackContainer.innerHTML = '';
+                }
+
+                constructedSentence.push(word);
+                cardElement.classList.add('selected');
+                statusText.innerText = ''; // Clear error message
+
+                // Add to visible Railway track block item
+                const block = document.createElement('div');
+                block.classList.add('track-block');
+                block.innerText = word;
+                trackContainer.appendChild(block);
+
+                // Check if sentence is entirely complete
+                if (constructedSentence.length === currentLevel.correctSequence.length) {
+                    statusText.innerText = '🎉 ಶಹಬಾಷ್! ಸಂಪೂರ್ಣ ಟ್ರ್ಯಾಕ್ ಜೋಡಿಸಲಾಗಿದೆ.';
+                    successPanel.style.display = 'flex';
+                }
+            } else {
+                statusText.innerText = '❌ ತಪ್ಪು ಕ್ರಮ! ಕನ್ನಡ ವಾಕ್ಯದ ಸರಿಯಾದ ಕ್ರಮ ಯೋಚಿಸಿ (ಯಾರು? ಏನು? ಮಾಡುತ್ತಾರೆ?).';
+                // Shake effect on error
+                cardElement.style.transform = 'translateX(6px)';
+                setTimeout(() => cardElement.style.transform = 'none', 100);
+            }
+        }
+
+        function resetCurrentLevel() {
+            loadLevel();
+        }
+
+        function playSentenceAudio() {
+            const fullSentenceString = levels[currentLevelIndex].correctSequence.join(' ');
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(fullSentenceString);
+                utterance.lang = 'kn-IN';
+                utterance.rate = 0.8; // Pleasant listening speed for classroom environment
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        function nextLevel() {
+            currentLevelIndex++;
+            if (currentLevelIndex < levels.length) {
+                loadLevel();
+            } else {
+                currentLevelIndex = 0;
+                alert('👑 ಸೌರ ಸಾಮ್ರಾಜ್ಯದ ವಿಜೇತರು! ನೀವು ಎಲ್ಲಾ 5 ವಾಕ್ಯಗಳನ್ನು ಯಶಸ್ವಿಯಾಗಿ ಜೋಡಿಸಿದ್ದೀರಿ! ಆಟವನ್ನು ಪುನರಾರಂಭಿಸಲಾಗುತ್ತಿದೆ.');
+                loadLevel();
+            }
+        }
+
+        // Initialize Level
+        loadLevel();
+    </script>
+</body>
+</html>
