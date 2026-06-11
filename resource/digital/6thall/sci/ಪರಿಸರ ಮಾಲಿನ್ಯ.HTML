@@ -1,0 +1,319 @@
+
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ಪರಿಸರ ಮಾಲಿನ್ಯ: ಕಸ ವಿಂಗಡಣೆ ಆಟ</title>
+<style>
+  body {
+    font-family: 'Tunga', 'Kedage', sans-serif;
+    background: linear-gradient(135deg, #e0f2f1 0%, #b2dfdb 100%);
+    color: #333;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    padding: 20px;
+    box-sizing: border-box;
+  }
+  .header {
+    text-align: center;
+    margin-bottom: 20px;
+    background: white;
+    padding: 15px 30px;
+    border-radius: 40px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    border: 4px dashed #00897b;
+  }
+  h1 {
+    color: #00695c;
+    font-size: 34px;
+    margin: 0 0 5px 0;
+  }
+  p.subtitle {
+    color: #00897b;
+    font-size: 18px;
+    margin: 0;
+    font-weight: bold;
+  }
+  
+  /* Flip Cards Section */
+  .learn-section {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 40px;
+    max-width: 900px;
+  }
+  .flip-card {
+    background-color: transparent;
+    width: 200px;
+    height: 250px;
+    perspective: 1000px;
+    cursor: pointer;
+  }
+  .flip-card-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    transition: transform 0.6s;
+    transform-style: preserve-3d;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+    border-radius: 15px;
+  }
+  .flip-card:hover .flip-card-inner, .flip-card.flipped .flip-card-inner {
+    transform: rotateY(180deg);
+  }
+  .flip-card-front, .flip-card-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    border-radius: 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 15px;
+    box-sizing: border-box;
+  }
+  .flip-card-front { color: white; font-size: 22px; font-weight: bold; }
+  .flip-card-back { background-color: #fff; transform: rotateY(180deg); font-size: 15px; font-weight: bold; border: 3px solid; }
+  .icon { font-size: 50px; margin-bottom: 10px; }
+
+  #meaning .flip-card-front { background: #ffb74d; border: 3px solid #f57c00; }
+  #meaning .flip-card-back { border-color: #f57c00; color: #e65100; }
+  #causes .flip-card-front { background: #e57373; border: 3px solid #d32f2f; }
+  #causes .flip-card-back { border-color: #d32f2f; color: #b71c1c; }
+  #effects .flip-card-front { background: #ba68c8; border: 3px solid #7b1fa2; }
+  #effects .flip-card-back { border-color: #7b1fa2; color: #4a148c; }
+  #prevention .flip-card-front { background: #4db6ac; border: 3px solid #00796b; }
+  #prevention .flip-card-back { border-color: #00796b; color: #004d40; }
+
+  /* New Game Section - Waste Segregation */
+  .game-container {
+    background: white;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    text-align: center;
+    max-width: 700px;
+    width: 100%;
+    border: 5px solid #00acc1;
+  }
+  .game-title {
+    color: #00838f;
+    font-size: 28px;
+    margin-top: 0;
+    margin-bottom: 10px;
+  }
+  .score-board {
+    font-size: 22px;
+    font-weight: bold;
+    color: #d84315;
+    background: #fbe9e7;
+    padding: 10px;
+    border-radius: 10px;
+    display: inline-block;
+    margin-bottom: 20px;
+  }
+  
+  .item-display {
+    background: #fff8e1;
+    border: 3px dashed #ffc107;
+    border-radius: 20px;
+    padding: 30px;
+    margin-bottom: 25px;
+    min-height: 120px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  .waste-emoji {
+    font-size: 60px;
+    margin-bottom: 10px;
+    animation: float 2s infinite;
+  }
+  .waste-name {
+    font-size: 24px;
+    font-weight: bold;
+    color: #5d4037;
+  }
+
+  @keyframes float {
+    0%, 100% {transform: translateY(0);}
+    50% {transform: translateY(-10px);}
+  }
+
+  .bins-container {
+    display: flex;
+    justify-content: space-around;
+    gap: 15px;
+    flex-wrap: wrap;
+  }
+  .bin-btn {
+    flex: 1;
+    min-width: 150px;
+    padding: 20px;
+    border: none;
+    border-radius: 15px;
+    font-size: 22px;
+    font-weight: bold;
+    color: white;
+    cursor: pointer;
+    font-family: 'Tunga', sans-serif;
+    transition: transform 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .bin-btn:active { transform: scale(0.95); }
+  
+  .bin-green { background: #43a047; box-shadow: 0 6px 0 #1b5e20; }
+  .bin-blue { background: #1e88e5; box-shadow: 0 6px 0 #0d47a1; }
+  .bin-icon { font-size: 40px; margin-bottom: 5px; }
+
+  .feedback-msg {
+    margin-top: 20px;
+    font-size: 20px;
+    font-weight: bold;
+    min-height: 30px;
+  }
+  .correct { color: #2e7d32; }
+  .wrong { color: #c62828; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🌍 ಪರಿಸರ ಸಂರಕ್ಷಣೆ 🌿</h1>
+  <p class="subtitle">ಸ್ವಚ್ಛ ಶಾಲೆ - ಹಸಿರು ಶಾಲೆ!</p>
+</div>
+
+<div class="learn-section">
+  <div class="flip-card" id="meaning" onclick="this.classList.toggle('flipped')">
+    <div class="flip-card-inner">
+      <div class="flip-card-front"><div class="icon">🤔</div>ಅರ್ಥ</div>
+      <div class="flip-card-back">ಗಾಳಿ, ನೀರು, ಮಣ್ಣಿಗೆ ಹಾನಿಕಾರಕ ವಸ್ತುಗಳು ಸೇರಿ ಪರಿಸರ ಹಾಳಾಗುವುದೇ ಪರಿಸರ ಮಾಲಿನ್ಯ.</div>
+    </div>
+  </div>
+  <div class="flip-card" id="causes" onclick="this.classList.toggle('flipped')">
+    <div class="flip-card-inner">
+      <div class="flip-card-front"><div class="icon">🏭</div>ಕಾರಣಗಳು</div>
+      <div class="flip-card-back">ಮರಗಳನ್ನು ಕಡಿಯುವುದು, ಪ್ಲಾಸ್ಟಿಕ್ ಬಳಕೆ, ಮತ್ತು ಕಾರ್ಖಾನೆಗಳ ರಾಸಾಯನಿಕ ತ್ಯಾಜ್ಯ.</div>
+    </div>
+  </div>
+  <div class="flip-card" id="effects" onclick="this.classList.toggle('flipped')">
+    <div class="flip-card-inner">
+      <div class="flip-card-front"><div class="icon">🤒</div>ಪರಿಣಾಮಗಳು</div>
+      <div class="flip-card-back">ತಾಪಮಾನ ಏರಿಕೆ, ಹೊಸ ಕಾಯಿಲೆಗಳು ಮತ್ತು ಪ್ರಾಣಿ-ಪಕ್ಷಿಗಳಿಗೆ ತೊಂದರೆ.</div>
+    </div>
+  </div>
+  <div class="flip-card" id="prevention" onclick="this.classList.toggle('flipped')">
+    <div class="flip-card-inner">
+      <div class="flip-card-front"><div class="icon">🌱</div>ತಡೆಗಟ್ಟುವಿಕೆ</div>
+      <div class="flip-card-back">ಹಸಿ ಕಸ-ಒಣ ಕಸ ವಿಂಗಡಣೆ, ಪ್ಲಾಸ್ಟಿಕ್ ನಿಷೇಧ, ಮತ್ತು ಸಸ್ಯಗಳನ್ನು ಬೆಳೆಸುವುದು.</div>
+    </div>
+  </div>
+</div>
+
+<div class="game-container">
+  <h2 class="game-title">🗑️ ಕಸ ವಿಂಗಡಣೆ ಆಟ ♻️</h2>
+  <div class="score-board">ಅಂಕಗಳು: <span id="score">0</span></div>
+  
+  <p style="font-size:17px; color:#555; margin-top:0;">ಈ ವಸ್ತುಗಳನ್ನು ಸರಿಯಾದ ಕಸದ ಬುಟ್ಟಿಗೆ ಹಾಕಿ!</p>
+  
+  <div class="item-display">
+    <div class="waste-emoji" id="wasteEmoji">🍌</div>
+    <div class="waste-name" id="wasteName">ಬಾಳೆಹಣ್ಣಿನ ಸಿಪ್ಪೆ</div>
+  </div>
+
+  <div class="bins-container" id="binContainer">
+    <button class="bin-btn bin-green" onclick="checkSort('wet')">
+      <span class="bin-icon">🟢</span>
+      ಹಸಿ ಕಸ
+    </button>
+    <button class="bin-btn bin-blue" onclick="checkSort('dry')">
+      <span class="bin-icon">🔵</span>
+      ಒಣ ಕಸ
+    </button>
+  </div>
+
+  <div class="feedback-msg" id="feedback"></div>
+</div>
+
+<script>
+  // Game Logic: Wet vs Dry Waste
+  const wasteItems = [
+    { emoji: "🍌", name: "ಹಣ್ಣಿನ ಸಿಪ್ಪೆ", type: "wet" },
+    { emoji: "🥤", name: "ಪ್ಲಾಸ್ಟಿಕ್ ಲೋಟ", type: "dry" },
+    { emoji: "🍂", name: "ಶಾಲಾ ತೋಟದ ಒಣಗಿದ ಎಲೆಗಳು", type: "wet" },
+    { emoji: "🍬", name: "ಚಾಕಲೇಟ್ ಕವರ್", type: "dry" },
+    { emoji: "🗞️", name: "ಹಳೆಯ ಪೇಪರ್", type: "dry" },
+    { emoji: "🍎", name: "ಉಳಿದ ಆಹಾರ (ಅನ್ನ, ತರಕಾರಿ)", type: "wet" },
+    { emoji: "🧴", name: "ಖಾಲಿ ಶಾಂಪೂ ಬಾಟಲಿ", type: "dry" },
+    { emoji: "🥀", name: "ಬಾಡಿದ ಹೂವುಗಳು", type: "wet" }
+  ];
+
+  let currentWasteIndex = 0;
+  let score = 0;
+
+  // Shuffle waste items
+  wasteItems.sort(() => Math.random() - 0.5);
+
+  function loadNextWaste() {
+    if (currentWasteIndex < wasteItems.length) {
+      document.getElementById("wasteEmoji").innerText = wasteItems[currentWasteIndex].emoji;
+      document.getElementById("wasteName").innerText = wasteItems[currentWasteIndex].name;
+      document.getElementById("feedback").innerText = "";
+    } else {
+      // Game Over State
+      document.querySelector(".item-display").innerHTML = `
+        <div style="font-size: 60px;">🏆</div>
+        <div style="font-size: 24px; color: #00838f; font-weight:bold;">ಅಭಿನಂದನೆಗಳು!</div>
+        <div style="font-size: 18px; color: #555; margin-top:10px;">ನೀವು ಶಾಲೆಯನ್ನು ಸ್ವಚ್ಛವಾಗಿಡುವ ಉತ್ತಮ ಪರಿಸರ ರಕ್ಷಕರು.</div>
+      `;
+      document.getElementById("binContainer").style.display = "none";
+      document.getElementById("feedback").style.display = "none";
+    }
+  }
+
+  function checkSort(userChoice) {
+    let actualType = wasteItems[currentWasteIndex].type;
+    let feedbackEl = document.getElementById("feedback");
+
+    if (userChoice === actualType) {
+      score += 10;
+      document.getElementById("score").innerText = score;
+      feedbackEl.innerText = "ಸರಿಯಾದ ಬುಟ್ಟಿ! 🎉 ಕಸ ವಿಂಗಡಣೆ ಯಶಸ್ವಿಯಾಗಿದೆ.";
+      feedbackEl.className = "feedback-msg correct";
+    } else {
+      let correctBinName = actualType === 'wet' ? "ಹಸಿರು ಬುಟ್ಟಿ (ಹಸಿ ಕಸ)" : "ನೀಲಿ ಬುಟ್ಟಿ (ಒಣ ಕಸ)";
+      feedbackEl.innerText = `ತಪ್ಪಾಗಿದೆ! ❌ ಇದನ್ನು ${correctBinName}ಗೆ ಹಾಕಬೇಕು.`;
+      feedbackEl.className = "feedback-msg wrong";
+    }
+
+    currentWasteIndex++;
+    
+    // Disable buttons briefly to prevent double clicks
+    let buttons = document.querySelectorAll(".bin-btn");
+    buttons.forEach(b => b.disabled = true);
+
+    setTimeout(() => {
+      loadNextWaste();
+      buttons.forEach(b => b.disabled = false);
+    }, 2000);
+  }
+
+  // Start the game
+  loadNextWaste();
+</script>
+
+</body>
+</html>

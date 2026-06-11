@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ಜಲ ಮಾಲಿನ್ಯ: ಕಲಿಯಿರಿ ಮತ್ತು ರಕ್ಷಿಸಿ</title>
+<style>
+  body {
+    font-family: 'Tunga', 'Kedage', sans-serif;
+    background: linear-gradient(to bottom, #e0f7fa, #b2ebf2);
+    color: #333;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    padding: 20px;
+    box-sizing: border-box;
+  }
+  .header {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  h1 {
+    color: #01579b;
+    font-size: 38px;
+    margin-bottom: 5px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+  }
+  p.subtitle {
+    color: #00838f;
+    font-size: 20px;
+    margin-top: 0;
+    font-weight: bold;
+  }
+  
+  /* Flip Cards Section */
+  .learn-section {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 40px;
+    max-width: 900px;
+  }
+  .flip-card {
+    background-color: transparent;
+    width: 210px;
+    height: 260px;
+    perspective: 1000px;
+    cursor: pointer;
+  }
+  .flip-card-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    transition: transform 0.6s;
+    transform-style: preserve-3d;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+    border-radius: 15px;
+  }
+  .flip-card:hover .flip-card-inner, .flip-card.flipped .flip-card-inner {
+    transform: rotateY(180deg);
+  }
+  .flip-card-front, .flip-card-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    border-radius: 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 15px;
+    box-sizing: border-box;
+  }
+  .flip-card-front {
+    color: white;
+    font-size: 24px;
+    font-weight: bold;
+  }
+  .flip-card-back {
+    background-color: white;
+    transform: rotateY(180deg);
+    font-size: 16px;
+    font-weight: bold;
+    border: 3px solid;
+  }
+  .icon { font-size: 55px; margin-bottom: 10px; filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.2)); }
+
+  /* Specific Card Colors */
+  #meaning .flip-card-front { background: linear-gradient(135deg, #4FC3F7, #0288D1); border: 3px solid #0288D1; }
+  #meaning .flip-card-back { border-color: #0288D1; color: #01579b; }
+  
+  #causes .flip-card-front { background: linear-gradient(135deg, #e57373, #d32f2f); border: 3px solid #d32f2f; }
+  #causes .flip-card-back { border-color: #d32f2f; color: #c62828; }
+  
+  #effects .flip-card-front { background: linear-gradient(135deg, #ba68c8, #7b1fa2); border: 3px solid #7b1fa2; }
+  #effects .flip-card-back { border-color: #7b1fa2; color: #4a148c; }
+  
+  #prevention .flip-card-front { background: linear-gradient(135deg, #81c784, #388e3c); border: 3px solid #388e3c; }
+  #prevention .flip-card-back { border-color: #388e3c; color: #1b5e20; }
+
+  /* Interactive River Game */
+  .game-container {
+    background: white;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    text-align: center;
+    max-width: 800px;
+    width: 100%;
+    border: 5px solid #0288d1;
+  }
+  .game-title {
+    color: #006064;
+    font-size: 28px;
+    margin-top: 0;
+    margin-bottom: 15px;
+  }
+  
+  .river {
+    width: 100%;
+    height: 200px;
+    background-color: #558b2f; /* Dirty green color */
+    border-radius: 15px;
+    position: relative;
+    overflow: hidden;
+    transition: background-color 1.5s ease;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    margin-bottom: 20px;
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.3);
+  }
+  .river.clean {
+    background-color: #29b6f6; /* Clean blue color */
+    box-shadow: inset 0 0 20px rgba(255,255,255,0.5);
+  }
+
+  .trash {
+    font-size: 50px;
+    cursor: pointer;
+    transition: all 0.3s;
+    animation: float 3s ease-in-out infinite;
+  }
+  .trash:hover { transform: scale(1.2); }
+  .trash.hidden { display: none; }
+
+  .fish {
+    font-size: 50px;
+    display: none;
+    animation: swim 4s linear infinite;
+  }
+  .river.clean .fish { display: block; }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-15px); }
+  }
+  @keyframes swim {
+    0% { transform: translateX(-150px); }
+    100% { transform: translateX(150px); }
+  }
+
+  .action-buttons {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+  .btn {
+    padding: 12px 20px;
+    font-size: 18px;
+    font-weight: bold;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    color: white;
+    font-family: 'Tunga', sans-serif;
+    transition: transform 0.2s, opacity 0.3s;
+  }
+  .btn:active { transform: translateY(3px); }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .btn-plastic { background: #d32f2f; box-shadow: 0 4px 0 #b71c1c; }
+  .btn-chemical { background: #f57c00; box-shadow: 0 4px 0 #e65100; }
+  .btn-garbage { background: #7b1fa2; box-shadow: 0 4px 0 #4a148c; }
+
+  .success-message {
+    font-size: 26px;
+    font-weight: bold;
+    color: #2e7d32;
+    margin-top: 20px;
+    display: none;
+    animation: pop 0.5s ease;
+  }
+
+  @keyframes pop {
+    0% { transform: scale(0.5); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>💧 ಜಲ ಮಾಲಿನ್ಯ (Water Pollution) 🌊</h1>
+  <p class="subtitle">ಕಾರ್ಡ್‌ಗಳ ಮೇಲೆ ಟಚ್ ಮಾಡಿ ಕಲಿಯಿರಿ, ಕೆಳಗೆ ಕೆರೆಯನ್ನು ಸ್ವಚ್ಛಗೊಳಿಸಿ!</p>
+</div>
+
+<div class="learn-section">
+  <div class="flip-card" id="meaning" onclick="this.classList.toggle('flipped')">
+    <div class="flip-card-inner">
+      <div class="flip-card-front">
+        <div class="icon">🤔</div>
+        ಅರ್ಥ (Meaning)
+      </div>
+      <div class="flip-card-back">
+        ನದಿ, ಕೆರೆ ಮತ್ತು ಸಮುದ್ರದ ನೀರಿಗೆ ಕಸ, ಕೊಳಕು ಮತ್ತು ರಾಸಾಯನಿಕಗಳು ಸೇರಿ ನೀರು ಮಲಿನವಾಗುವುದೇ ಜಲ ಮಾಲಿನ್ಯ.
+      </div>
+    </div>
+  </div>
+
+  <div class="flip-card" id="causes" onclick="this.classList.toggle('flipped')">
+    <div class="flip-card-inner">
+      <div class="flip-card-front">
+        <div class="icon">🏭</div>
+        ಕಾರಣಗಳು (Causes)
+      </div>
+      <div class="flip-card-back">
+        ಕಾರ್ಖಾನೆಗಳ ತ್ಯಾಜ್ಯ, ಪ್ಲಾಸ್ಟಿಕ್ ಎಸೆಯುವುದು, ಬಟ್ಟೆ ತೊಳೆಯುವುದು ಮತ್ತು ಚರಂಡಿ ನೀರನ್ನು ನದಿಗೆ ಬಿಡುವುದು.
+      </div>
+    </div>
+  </div>
+
+  <div class="flip-card" id="effects" onclick="this.classList.toggle('flipped')">
+    <div class="flip-card-inner">
+      <div class="flip-card-front">
+        <div class="icon">🐟</div>
+        ಪರಿಣಾಮಗಳು (Effects)
+      </div>
+      <div class="flip-card-back">
+        ಮೀನುಗಳ ಸಾವು, ಶುದ್ಧ ಕುಡಿಯುವ ನೀರಿನ ಕೊರತೆ, ಮತ್ತು ಕಾಲರಾ, ಟೈಫಾಯ್ಡ್ ನಂತಹ ಕಾಯಿಲೆಗಳು.
+      </div>
+    </div>
+  </div>
+
+  <div class="flip-card" id="prevention" onclick="this.classList.toggle('flipped')">
+    <div class="flip-card-inner">
+      <div class="flip-card-front">
+        <div class="icon">🌱</div>
+        ತಡೆಗಟ್ಟುವಿಕೆ (Prevention)
+      </div>
+      <div class="flip-card-back">
+                 ಕಸವನ್ನು ಕಸದ ಬುಟ್ಟಿಗೆ ಹಾಕುವುದು, ಕೆರೆಗಳನ್ನು ಶುಚಿಯಾಗಿಟ್ಟುಕೊಳ್ಳುವುದು,
+                 ಕಾರ್ಖಾನೆ  ನೀರನ್ನು ಶುದ್ಧೀಕರಿಸಿದ ನಂತರವೇ ನದಿಗೆ ಬಿಡುವುದು, 
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="game-container">
+  <h2 class="game-title">✨ ಆಟ: ಕೆರೆಯನ್ನು ಸ್ವಚ್ಛಗೊಳಿಸಿ! ✨</h2>
+  <p style="font-size:18px; color:#555;">ಕೆಳಗಿನ ಗುಂಡಿಗಳನ್ನು ಒತ್ತಿ ನೀರನ್ನು ಸ್ವಚ್ಛ ಮಾಡಿರಿ.</p>
+  
+  <div class="river" id="riverDisplay">
+    <div class="trash" id="t-plastic" title="ಪ್ಲಾಸ್ಟಿಕ್ ಬಾಟಲಿ">🥤</div>
+    <div class="trash" id="t-chemical" title="ರಾಸಾಯನಿಕ">🛢️</div>
+    <div class="trash" id="t-garbage" title="ಕಸದ ಚೀಲ">🛍️</div>
+    
+    <div class="fish">🐟</div>
+    <div class="fish" style="animation-delay: 1s;">🐬</div>
+    <div class="fish" style="animation-delay: 2.5s;">🐠</div>
+  </div>
+
+  <div class="action-buttons">
+    <button class="btn btn-plastic" id="btnPlastic" onclick="removeTrash('plastic')">ಪ್ಲಾಸ್ಟಿಕ್ ತೆಗೆಯಿರಿ</button>
+    <button class="btn btn-chemical" id="btnChemical" onclick="removeTrash('chemical')">ರಾಸಾಯನಿಕ ನಿಲ್ಲಿಸಿ</button>
+    <button class="btn btn-garbage" id="btnGarbage" onclick="removeTrash('garbage')">ಕಸ ಹೊರತೆಗೆಯಿರಿ</button>
+  </div>
+
+  <div class="success-message" id="successMsg">
+    🎉 ಅದ್ಭುತ! ನೀವು ಕೆರೆಯನ್ನು ಸ್ವಚ್ಛಗೊಳಿಸಿದಿರಿ. ಮೀನುಗಳು ಈಗ ಸಂತೋಷವಾಗಿವೆ! 💙
+  </div>
+</div>
+
+<script>
+  let removedCount = 0;
+
+  function removeTrash(type) {
+    // Hide the corresponding trash emoji
+    document.getElementById(`t-${type}`).classList.add('hidden');
+    
+    // Disable the button so it can't be clicked again
+    let btn;
+    if(type === 'plastic') btn = document.getElementById('btnPlastic');
+    if(type === 'chemical') btn = document.getElementById('btnChemical');
+    if(type === 'garbage') btn = document.getElementById('btnGarbage');
+    
+    btn.disabled = true;
+    btn.innerText = "ಸ್ವಚ್ಛವಾಗಿದೆ ✔️";
+    btn.style.backgroundColor = "#4caf50";
+    btn.style.boxShadow = "0 4px 0 #2e7d32";
+
+    removedCount++;
+
+    // Check if all 3 trashes are removed
+    if (removedCount === 3) {
+      makeRiverClean();
+    }
+  }
+
+  function makeRiverClean() {
+    let river = document.getElementById('riverDisplay');
+    river.classList.add('clean'); // Changes color to clean blue and shows fish
+    document.getElementById('successMsg').style.display = 'block';
+  }
+</script>
+
+</body>
+</html>
