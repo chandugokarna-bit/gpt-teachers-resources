@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ವೇದಕಾಲದ ಜ್ಞಾನ - ಇಂಟರಾಕ್ಟಿವ್ ಸ್ಪಿನ್ನರ್</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #fcedf2;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+            user-select: none;
+        }
+        h1 {
+            color: #c0392b;
+            margin-bottom: 5px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+        .instruction {
+            color: #7f8c8d;
+            font-size: 18px;
+            margin-bottom: 30px;
+        }
+
+        /* ಚಕ್ರದ ಮುಖ್ಯ ಪೆಟ್ಟಿಗೆ */
+        .wheel-wrapper {
+            position: relative;
+            width: 420px;
+            height: 420px;
+            margin: 0 auto;
+        }
+
+        /* ಚಕ್ರದ ಮೇಲ್ಭಾಗದ ಸೂಚಕ ಬಾಣ (Pointer) */
+        .wheel-arrow {
+            position: absolute;
+            top: -22px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 20px solid transparent;
+            border-right: 20px solid transparent;
+            border-top: 35px solid #c0392b;
+            z-index: 10;
+            filter: drop-shadow(0 3px 5px rgba(0,0,0,0.2));
+        }
+
+        /* ಕ್ಯಾನ್ವಾಸ್ ಸ್ಪಿನ್ನರ್ */
+        #revisionWheel {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            box-shadow: 0 12px 28px rgba(0,0,0,0.15);
+            transition: transform 4s cubic-bezier(0.1, 0.8, 0.1, 1);
+        }
+
+        /* ಸ್ಪಿನ್ ಬಟನ್ ವಿನ್ಯಾಸ */
+        #spinButton {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            border: none;
+            padding: 14px 45px;
+            font-size: 20px;
+            font-weight: bold;
+            border-radius: 30px;
+            cursor: pointer;
+            margin-top: 35px;
+            box-shadow: 0 5px 15px rgba(192, 57, 43, 0.4);
+            transition: all 0.2s ease;
+        }
+        #spinButton:hover {
+            transform: scale(1.05);
+            box-shadow: 0 7px 20px rgba(192, 57, 43, 0.6);
+        }
+        #spinButton:disabled {
+            background: #bdc3c7;
+            box-shadow: none;
+            cursor: not-allowed;
+        }
+
+        /* ಪ್ರಶ್ನೆ ಮೂಡುವ ಪಾಪ್-ಅಪ್ ವಿಂಡೋ (Modal) */
+        .question-modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.4);
+            z-index: 20;
+            width: 85%;
+            max-width: 550px;
+            animation: bounceInEffect 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border-top: 10px solid #c0392b;
+        }
+        .question-modal h2 {
+            margin-top: 0;
+            font-size: 24px;
+            color: #2c3e50;
+        }
+        .q-avatar {
+            font-size: 55px;
+            margin: 15px 0;
+            background-color: #fdeadc;
+            display: inline-block;
+            padding: 15px;
+            border-radius: 50%;
+            width: 80px;
+            height: 80px;
+            line-height: 80px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+        .q-text-display {
+            background-color: #fdfefe;
+            border: 2px dashed #e74c3c;
+            padding: 20px;
+            font-size: 22px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin: 20px 0;
+            border-radius: 8px;
+            line-height: 1.5;
+        }
+        .modal-close-btn {
+            background-color: #c0392b;
+            color: white;
+            border: none;
+            padding: 10px 35px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 25px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background 0.2s;
+        }
+        .modal-close-btn:hover { background-color: #7b241c; }
+        
+        .modal-background-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 15;
+        }
+
+        @keyframes bounceInEffect {
+            0% { opacity: 0; transform: translate(-50%, -65%) scale(0.8); }
+            70% { opacity: 1; transform: translate(-50%, -48%) scale(1.03); }
+            100% { transform: translate(-50%, -50%) scale(1); }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>೪ನೇ ಪಾಠ: "ವೇದಕಾಲದ ಜ್ಞಾನ" ಪುನರಾವರ್ತನೆ ಸ್ಪಿನ್ನರ್</h1>
+    <p class="instruction">ಚಕ್ರವನ್ನು ತಿರುಗಿಸಿ! ಬಾಣದ ಗುರುತು ನಿಲ್ಲುವ ಅದೃಷ್ಟದ ಪ್ರಶ್ನೆಗೆ ವಿದ್ಯಾರ್ಥಿಗಳು ಉತ್ತರಿಸಬೇಕು.</p>
+
+    <div class="wheel-wrapper">
+        <div class="wheel-arrow"></div>
+        <canvas id="revisionWheel" width="420" height="420"></canvas>
+    </div>
+
+    <button id="spinButton" onclick="spinRevisionWheel()">🔄 ಚಕ್ರ ತಿರುಗಿಸಿ (Spin)</button>
+
+    <div class="modal-background-overlay" id="modalOverlay"></div>
+    <div class="question-modal" id="qModal">
+        <h2>❓ ಅದೃಷ್ಟದ ಪ್ರಶ್ನೆ:</h2>
+        <div class="q-avatar">📖</div>
+        <div class="q-text-display" id="questionDisplay">ಪ್ರಶ್ನೆ ಲೋಡ್ ಆಗುತ್ತಿದೆ...</div>
+        <button class="modal-close-btn" onclick="closeQModal()">ಮುಂದಿನ ಪ್ರಶ್ನೆ</button>
+    </div>
+
+    <script>
+        // ೬ ಪ್ರಮುಖ ಪುನರಾವರ್ತನೆ ಪ್ರಶ್ನೆಗಳ ಡೇಟಾಬೇಸ್
+        const questionsList = [
+            "ವೇದ ಎಂದರೆ ಏನು? ಅದರ ಅರ್ಥವೇನು?",
+            "ಅತ್ಯಂತ ಪ್ರಾಚೀನವಾದ ವೇದ ಯಾವುದು?",
+            "ಪೂರ್ವ ವೇದಕಾಲದ ಇಬ್ಬರು ಮಹಿಳಾ ವಿದ್ವನ್ಮಣಿಗಳ ಹೆಸರನ್ನು ತಿಳಿಸಿ.",
+            "ಪೂರ್ವ ವೇದಕಾಲದಲ್ಲಿದ್ದ ಪ್ರಜಾಸತ್ತಾತ್ಮಕ ರಾಜಕೀಯ ಸಂಸ್ಥೆಗಳು ಯಾವುವು?",
+            "ಉತ್ತರ ವೇದಕಾಲದಲ್ಲಿ ಜಾರಿಗೆ ಬಂದ ನಾಲ್ಕು ವರ್ಣಗಳು ಯಾವುವು?",
+            "ಭಾರತದ ಎರಡು ಪ್ರಮುಖ ಮಹಾಕಾವ್ಯಗಳು ಮತ್ತು ಅವುಗಳ ಕರ್ತೃಗಳ ಹೆಸರನ್ನು ಹೇಳಿ."
+        ];
+
+        // ವರ್ಣರಂಜಿತ ಬಣ್ಣಗಳ ಪಟ್ಟಿ
+        const segmentColors = ["#1abc9c", "#3498db", "#9b59b6", "#f1c40f", "#e67e22", "#e74c3c"];
+        
+        const canvas = document.getElementById("revisionWheel");
+        const ctx = canvas.getContext("2d");
+        const numSegments = questionsList.length;
+        const anglePerSegment = (2 * Math.PI) / numSegments;
+        let currentRotationAngle = 0;
+
+        // ಚಕ್ರವನ್ನು ಆಕರ್ಷಕವಾಗಿ ರಚಿಸುವ ಫಂಕ್ಷನ್
+        function drawRevisionWheel() {
+            for (let i = 0; i < numSegments; i++) {
+                const startAngle = i * anglePerSegment;
+                const endAngle = startAngle + anglePerSegment;
+
+                // ಚಕ್ರದ ತ್ರಿಕೋನ ಭಾಗಗಳು
+                ctx.beginPath();
+                ctx.moveTo(210, 210);
+                ctx.arc(210, 210, 210, startAngle, endAngle);
+                ctx.fillStyle = segmentColors[i];
+                ctx.fill();
+                ctx.stroke();
+
+                // ಪ್ರಶ್ನೆಗಳ ಸಂಖ್ಯೆಯನ್ನು ಚಕ್ರದ ಒಳಗೆ ಬರೆಯುವುದು (ಪ್ರಶ್ನೆ ೧, ಪ್ರಶ್ನೆ ೨...)
+                ctx.save();
+                ctx.translate(210, 210);
+                ctx.rotate(startAngle + anglePerSegment / 2);
+                ctx.textAlign = "right";
+                ctx.fillStyle = "#ffffff";
+                ctx.font = "bold 16px 'Segoe UI'";
+                ctx.fillText(`ಪ್ರಶ್ನೆ  ${i + 1}`, 180, 5);
+                ctx.restore();
+            }
+
+            // ಚಕ್ರದ ಕೇಂದ್ರದ ಸಣ್ಣ ಬಿಳಿ ವೃತ್ತ
+            ctx.beginPath();
+            ctx.arc(210, 210, 25, 0, 2 * Math.PI);
+            ctx.fillStyle = "#ffffff";
+            ctx.fill();
+            ctx.stroke();
+        }
+
+        // ಚಕ್ರ ತಿರುಗಿಸುವ ಫಂಕ್ಷನ್
+        function spinRevisionWheel() {
+            const spinBtn = document.getElementById("spinButton");
+            spinBtn.disabled = true;
+
+            // ಯಾದೃಚ್ಛಿಕವಾಗಿ ಹೆಚ್ಚು ಸುತ್ತುಗಳನ್ನು ಸುತ್ತಿಸಲು ಡಿಗ್ರಿ ಲೆಕ್ಕಾಚಾರ
+            const randomRotation = Math.floor(3600 + Math.random() * 1800);
+            currentRotationAngle += randomRotation;
+
+            // ಸುತ್ತುವಾಗ ಬರುವ ಡಿಜಿಟಲ್ ಟಿಕ್-ಟಿಕ್ ಧ್ವನಿ ಎಫೆಕ್ಟ್
+            playWheelTickSound();
+
+            const wheelElement = document.getElementById("revisionWheel");
+            wheelElement.style.transform = `rotate(${currentRotationAngle}deg)`;
+
+            // ಚಕ್ರ ನಿಂತಾಗ ರಿಸಲ್ಟ್ ಲೋಡ್ ಮಾಡುವುದು (೪ ಸೆಕೆಂಡ್ ನಂತರ)
+            setTimeout(() => {
+                const actualDegrees = currentRotationAngle % 360;
+                // ಬಾಣದ ಗುರುತು ಮೇಲ್ಭಾಗದಲ್ಲಿ ಇರುವುದರಿಂದ ಅದಕ್ಕೆ ತಕ್ಕಂತೆ ಲೆಕ್ಕಾಚಾರ ಮರುಹೊಂದಾಣಿಕೆ
+                const correctedDegrees = (360 - actualDegrees + 270) % 360;
+                const selectedIndex = Math.floor(correctedDegrees / (360 / numSegments)) % numSegments;
+
+                // ಯಶಸ್ಸಿನ ಸೌಂಡ್ ಎಫೆಕ್ಟ್
+                playWinTune();
+
+                // ಪಾಪ್-ಅಪ್ ವಿಂಡೋದಲ್ಲಿ ಪ್ರಶ್ನೆಯನ್ನು ತುಂಬುವುದು
+                document.getElementById("questionDisplay").innerText = questionsList[selectedIndex];
+
+                // ಪ್ರದರ್ಶಿಸುವುದು
+                document.getElementById("modalOverlay").style.display = "block";
+                document.getElementById("qModal").style.display = "block";
+
+                spinBtn.disabled = false;
+            }, 4000);
+        }
+
+        function closeQModal() {
+            document.getElementById("modalOverlay").style.display = "none";
+            document.getElementById("qModal").style.display = "none";
+        }
+
+        // ಚಕ್ರ ಸುತ್ತುವಾಗ ಬರುವ ಶಬ್ದ ಜನರೇಟರ್
+        function playWheelTickSound() {
+            let ticks = 0;
+            const interval = setInterval(() => {
+                if (ticks > 26) clearInterval(interval);
+                createAudioBeep(450, 0.03);
+                ticks++;
+            }, 125);
+        }
+
+        // ಪ್ರಶ್ನೆ ಬಂದಾಗ ಬರುವ ವಿನ್ನಿಂಗ್ ಮ್ಯೂಸಿಕ್ ಟೋನ್
+        function playWinTune() {
+            createAudioBeep(523.25, 0.1); // C5
+            setTimeout(() => createAudioBeep(659.25, 0.1), 120); // E5
+            setTimeout(() => createAudioBeep(783.99, 0.25), 240); // G5
+        }
+
+        // ಯಾವುದೇ ಬಾಹ್ಯ ಫೈಲ್ ಇಲ್ಲದೆ ಬ್ರೌಸರ್ ಮೂಲಕವೇ ನೈಜ ಆಡಿಯೋ ಸೃಷ್ಟಿಸುವ ತಂತ್ರಜ್ಞಾನ
+        function createAudioBeep(freq, duration) {
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            oscillator.frequency.value = freq;
+            oscillator.start();
+            gainNode.gain.setValueAtTime(0.15, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+            oscillator.stop(audioCtx.currentTime + duration);
+        }
+
+        // ಆರಂಭಿಕ ಚಕ್ರ ರಚನೆ
+        drawRevisionWheel();
+    </script>
+</body>
+</html>

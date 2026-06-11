@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಕನ್ನಡದ ಜ್ಞಾನಪೀಠ ಪ್ರಶಸ್ತಿ ವಿಜೇತರ ಡಿಜಿಟಲ್ ಗ್ಯಾಲರಿ</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1e0854; /* ರಾಯಲ್ ಪರ್ಪಲ್ ಥೀಮ್ */
+            color: #ffffff;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+            user-select: none;
+            overflow-x: hidden;
+        }
+        
+        h1 {
+            color: #f1c40f; /* ಗೋಲ್ಡನ್ ಬಣ್ಣ */
+            font-size: 32px;
+            margin-bottom: 5px;
+            text-shadow: 0 0 12px rgba(241, 196, 15, 0.4);
+        }
+        
+        .sub-title {
+            color: #d7bde2;
+            font-size: 18px;
+            margin-bottom: 40px;
+        }
+
+        /* ಕಾರ್ಡ್‌ಗಳ ಗ್ರಿಡ್ ಲೇಔಟ್ */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 10px;
+            perspective: 1200px; /* 3D ಡೆಪ್ತ್ ಎಫೆಕ್ಟ್ */
+        }
+
+        /* ಕಾರ್ಡ್ ಬಾಕ್ಸ್ */
+        .poet-card {
+            background-color: transparent;
+            height: 380px;
+            cursor: pointer;
+        }
+
+        /* ತಿರುಗುವ ಕಂಟೈನರ್ */
+        .card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-style: preserve-3d;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+            border-radius: 20px;
+        }
+
+        /* ಕ್ಲಿಕ್ ಮಾಡಿದಾಗ ಕಾರ್ಡ್ ತಿರುಗಲು */
+        .poet-card.flipped .card-inner {
+            transform: rotateY(180deg);
+        }
+
+        /* ಮುಂಭಾಗ ಮತ್ತು ಹಿಂಭಾಗದ ಸಾಮಾನ್ಯ ವಿನ್ಯಾಸ */
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+            border: 2px solid #f1c40f;
+        }
+
+        /* ಮುಂಭಾಗದ ಆಕರ್ಷಕ ಶೈಲಿ */
+        .card-front {
+            background: linear-gradient(135deg, #4a148c, #311b92);
+            color: white;
+            box-shadow: inset 0 0 20px rgba(241, 196, 15, 0.2);
+        }
+        
+        .card-front .avatar-icon {
+            font-size: 60px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 50%;
+            margin-bottom: 15px;
+            border: 2px solid rgba(241, 196, 15, 0.3);
+        }
+
+        .card-front h2 {
+            margin: 10px 0 5px 0;
+            font-size: 24px;
+            color: #f1c40f;
+        }
+
+        .card-front .medal-tag {
+            font-size: 13px;
+            background-color: #f39c12;
+            color: white;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin-top: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .card-front .hint {
+            font-size: 12px;
+            color: #b2babb;
+            margin-top: auto;
+            padding-top: 10px;
+            border-top: 1px dashed rgba(255,255,255,0.1);
+            width: 100%;
+        }
+
+        /* ಹಿಂಭಾಗದ ಸುಂದರ ವಿವರಗಳ ಶೈಲಿ */
+        .card-back {
+            background: linear-gradient(135deg, #ffffff, #f4f6f7);
+            color: #2c3e50;
+            transform: rotateY(180deg);
+            justify-content: flex-start;
+            padding-top: 25px;
+            border-color: #2980b9;
+        }
+
+        .card-back h3 {
+            color: #4a148c;
+            font-size: 20px;
+            margin-top: 0;
+            border-bottom: 2px solid #4a148c;
+            padding-bottom: 6px;
+            width: 100%;
+        }
+
+        .card-back ul {
+            font-size: 15px;
+            line-height: 1.6;
+            text-align: left;
+            font-weight: 600;
+            color: #34495e;
+            margin: 15px 0;
+            padding-left: 10px;
+            list-style-type: none;
+        }
+
+        .card-back li {
+            margin-bottom: 12px;
+        }
+
+        /* ಲೈವ್ ಕ್ಲಾಸ್ ರೂಮ್ ರೇಟಿಂಗ್ ಸಿಸ್ಟಮ್ */
+        .rating-zone {
+            margin-top: auto;
+            background: #eaecee;
+            padding: 8px 15px;
+            border-radius: 30px;
+            display: flex;
+            gap: 5px;
+        }
+        .star {
+            color: #bdc3c7;
+            font-size: 22px;
+            transition: color 0.2s;
+        }
+        .star.active-star {
+            color: #f1c40f;
+            text-shadow: 0 0 5px rgba(241,196,15,0.5);
+        }
+    </style>
+</head>
+<body>
+
+    <h1>🏆 ಕರ್ನಾಟಕದ ಅಷ್ಟ ಜ್ಞಾನಪೀಠ ಪ್ರಶಸ್ತಿ ವಿಜೇತರ ಗ್ಯಾಲರಿ</h1>
+    <p class="sub-title">ಕನ್ನಡ ಸಾಹಿತ್ಯದ ಸಾಧಕರ ಕೃತಿಗಳು ಮತ್ತು ವಿವರಗಳನ್ನು ತಿಳಿಯಲು ಕಾರ್ಡ್‌ಗಳ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ (Flip)!</p>
+
+    <div class="gallery-grid" id="galleryContainer">
+        </div>
+
+    <script>
+        // ಕರ್ನಾಟಕದ ಎಲ್ಲಾ ೮ ಜ್ಞಾನಪೀಠ ಪ್ರಶಸ್ತಿ ಪುರಸ್ಕೃತರ ಅಧಿಕೃತ ಪಟ್ಟಿ
+        const jnanpithPoets = [
+            {
+                name: "ಕುವೆಂಪು",
+                year: "೧೯೬೭",
+                book: "ಶ್ರೀ ರಾಮಾಯಣ ದರ್ಶನಂ",
+                title: "ರಾಷ್ಟ್ರಕವಿ, ವಿಶ್ವಮಾನವ",
+                icon: "✍️",
+                details: [
+                    "• ಕನ್ನಡಕ್ಕೆ <b>ಮೊದಲ ಜ್ಞಾನಪೀಠ</b> ತಂದುಕೊಟ್ಟ ಮಹಾನ್ ಕವಿ.",
+                    "• ನಮ್ಮ ಹೆಮ್ಮೆಯ ನಾಡಗೀತೆ 'ಜಯ ಭಾರತ ಜನನಿಯ ತನುಜಾತೆ' ರಚಿಸಿದವರು.",
+                    "• ಇವರ ಕಾವ್ಯನಾಮ 'ಕುವೆಂಪು' (ಕುಪ್ಪಳಿ ವೆಂಕಟಪ್ಪ ಪುಟ್ಟಪ್ಪ)."
+                ]
+            },
+            {
+                name: "ದ.ರಾ. ಬೇಂದ್ರೆ",
+                year: "೧೯೭೩",
+                book: "ನಾಕುತಂತಿ",
+                title: "ವರಕವಿ",
+                icon: "吟",
+                details: [
+                    "• ಇವರನ್ನು ಕನ್ನಡದ <b>'ಭಾವಗೀತೆಗಳ ಚಕ್ರವರ್ತಿ'</b> ಎನ್ನಲಾಗುತ್ತದೆ.",
+                    "• ಇವರ ಕಾವ್ಯನಾಮ 'ಅಂಬಿಕಾತನಯದತ್ತ'.",
+                    "• ಸಾಹಿತ್ಯದಲ್ಲಿ ಅದ್ಭುತ ಶಬ್ದಗಾರಿಕೆ ಮತ್ತು ಗಮಕ ಶೈಲಿಗೆ ಹೆಸರಾದವರು."
+                ]
+            },
+            {
+                name: "ಕೆ. ಶಿವರಾಮ ಕಾರಂತ",
+                year: "೧೯೭೭",
+                book: "ಮೂಕಜ್ಜಿಯ ಕನಸುಗಳು",
+                title: "ಕಡಲತೀರದ ಭಾರ್ಗವ",
+                icon: "📚",
+                details: [
+                    "• ಇವರನ್ನು ಕನ್ನಡದ <b>'ನಡೆದಾಡುವ ವಿಶ್ವಕೋಶ'</b> ಎನ್ನಲಾಗುತ್ತದೆ.",
+                    "• ಕಾದಂಬರಿ, ಯಕ್ಷಗಾನ, ಪರಿಸರ ಹೀಗೆ ಸಾಹಿತ್ಯದ ಎಲ್ಲಾ ಪ್ರಕಾರಗಳಲ್ಲಿ ಕೃಷಿ ಮಾಡಿದ್ದಾರೆ.",
+                    "• 'ಚೋಮನ ದುಡಿ' ಮತ್ತು 'ಮರಳಿ ಮಣ್ಣಿಗೆ' ಇವರ ಪ್ರಸಿದ್ಧ ಕಾದಂಬರಿಗಳು."
+                ]
+            },
+            {
+                name: "ಮಾಸ್ತಿ ವೆಂಕಟೇಶ ಅಯ್ಯಂಗಾರ್",
+                year: "೧೯೮೩",
+                book: "ಚೆನ್ನಬಸವನಾಯಕ",
+                title: "ಮಾಸ್ತಿ ಕನ್ನಡದ ಆಸ್ತಿ",
+                icon: "✒️",
+                details: [
+                    "• ಇವರನ್ನು ಕನ್ನಡದ <b>'ಸಣ್ಣ ಕಥೆಗಳ ಜನಕ'</b> ಎಂದು ಗೌರವಿಸಲಾಗುತ್ತದೆ.",
+                    "• ಇವರ ಕಾವ್ಯನಾಮ 'ಶ್ರೀನಿವಾಸ'.",
+                    "• ಇವರ ಕಥೆಗಳು ಕರಾರುವಾಕ್ಕಾದ ಬದುಕಿನ ಸರಳತೆಯನ್ನು ಸಾರುತ್ತವೆ."
+                ]
+            },
+            {
+                name: "ವಿ.ಕೃ. ಗೋಕಾಕ್",
+                year: "೧೯೯೦",
+                book: "ಭಾರತ ಸಿಂಧು ರಶ್ಮಿ",
+                title: "ವಿನಾಯಕ",
+                icon: "📝",
+                details: [
+                    "• ಇವರು ಇಂಗ್ಲಿಷ್ ಮತ್ತು ಕನ್ನಡ ಭಾಷೆಗಳೆರಡರಲ್ಲೂ ದೈತ್ಯ ಪ್ರತಿಭೆಯಾಗಿದ್ದರು.",
+                    "• ಇವರ ಕಾವ್ಯನಾಮ <b>'ವಿನಾಯಕ'</b>.",
+                    "• ಪ್ರಸಿದ್ಧ 'ಗೋಕಾಕ್ ಚಳವಳಿ'ಯ ನೇತೃತ್ವ ವಹಿಸಿ ಕನ್ನಡ ಭಾಷಾ ರಕ್ಷಣೆಗೆ ಹೋರಾಡಿದವರು."
+                ]
+            },
+            {
+                name: "ಯು.ಆರ್. ಅನಂತಮೂರ್ತಿ",
+                year: "೧೯೯೪",
+                book: "ಸಮಗ್ರ ಸಾಹಿತ್ಯ ಕೊಡುಗೆ",
+                title: "ನವ್ಯ ಸಾಹಿತ್ಯದ ಹರಿಕಾರ",
+                icon: "📖",
+                details: [
+                    "• ಕನ್ನಡ ನವ್ಯ ಸಾಹಿತ್ಯ ಚಳವಳಿಯ ಪ್ರಮುಖ ಪ್ರೇರಕ ಶಕ್ತಿ.",
+                    "• ಇವರ ಪ್ರಸಿದ್ಧ ಕಾದಂಬರಿಗಳು <b>'ಸಂಸ್ಕಾರ'</b> ಮತ್ತು 'ಭಾರತೀಪುರ'.",
+                    "• ಜಾಗತಿಕ ಮಟ್ಟದ ವಿಶ್ವವಿದ್ಯಾಲಯಗಳಲ್ಲಿ ಪ್ರಾಧ್ಯಾಪಕರಾಗಿ ಸೇವೆ ಸಲ್ಲಿಸಿದ್ದರು."
+                ]
+            },
+            {
+                name: "ಗಿರೀಶ್ ಕಾರ್ನಾಡ್",
+                year: "೧೯೯೮",
+                book: "ಸಮಗ್ರ ನಾಟಕ ಕೊಡುಗೆ",
+                title: "ವಿಶ್ವಪ್ರಸಿದ್ಧ ನಾಟಕಕಾರ",
+                icon: "🎭",
+                details: [
+                    "• ಇವರು ಅಂತರರಾಷ್ಟ್ರೀಯ ಮಟ್ಟದ ಖ್ಯಾತಿ ಪಡೆದ ನಾಟಕಕಾರ ಮತ್ತು ನಟರಾಗಿದ್ದರು.",
+                    "• ಇವರ ಪ್ರಸಿದ್ಧ ನಾಟಕಗಳು <b>'ಯಯಾತಿ', 'ತುಘಲಕ್'</b> ಮತ್ತು 'ಹಯವದನ'.",
+                    "• ಇತಿಹಾಸ ಮತ್ತು ಪುರಾಣಗಳನ್ನು ತಳಹದಿಯಾಗಿಟ್ಟುಕೊಂಡು ಆಧುನಿಕ ನಾಟಕಗಳನ್ನು ಸೃಷ್ಟಿಸಿದರು."
+                ]
+            },
+            {
+                name: "ಚಂದ್ರಶೇಖರ ಕಂಬಾರ",
+                year: "೨೦೧೦",
+                book: "ಸಮಗ್ರ ಸಾಹಿತ್ಯ ಕೊಡುಗೆ",
+                title: "ಜಾನಪದ ತಜ್ಞ",
+                icon: "🌾",
+                details: [
+                    "• ಕನ್ನಡ ಸಾಹಿತ್ಯಕ್ಕೆ <b>೮ನೇ ಜ್ಞಾನಪೀಠ</b> ಪ್ರಶಸ್ತಿ ತಂದುಕೊಟ್ಟ ಹೆಮ್ಮೆಯ ಕವಿ.",
+                    "• ಇವರ ಕೃತಿಗಳು ಸಂಪೂರ್ಣವಾಗಿ ಉತ್ತರ ಕರ್ನಾಟಕದ ಗ್ರಾಮೀಣ ಜಾನಪದ ಸೊಗಡಿನಿಂದ ಕೂಡಿವೆ.",
+                    "• 'ಜೋಕುಮಾರಸ್ವಾಮಿ' ಮತ್ತು 'ಶಿಖರ ಸೂರ್ಯ' ಇವರ ಪ್ರಸಿದ್ಧ ಕೃತಿಗಳು."
+                ]
+            }
+        ];
+
+        // ಕಾರ್ಡ್‌ಗಳನ್ನು ಡೈನಾಮಿಕ್ ಆಗಿ ರಚಿಸುವ ಫಂಕ್ಷನ್
+        function buildGallery() {
+            const container = document.getElementById("galleryContainer");
+            container.innerHTML = "";
+
+            jnanpithPoets.forEach((poet, pIdx) => {
+                const cardHTML = `
+                    <div class="poet-card" onclick="flipCard(this, event)">
+                        <div class="card-inner">
+                            <div class="card-front">
+                                <div class="avatar-icon">${poet.icon}</div>
+                                <h2>${poet.name}</h2>
+                                <div class="medal-tag">🏅 ವರ್ಷ: ${poet.year}</div>
+                                <div class="hint">ಸಾಧನೆ ತಿಳಿಯಲು ಕ್ಲಿಕ್ ಮಾಡಿ 🔄</div>
+                            </div>
+                            <div class="card-back">
+                                <h3>${poet.name} (${poet.title})</h3>
+                                <ul>
+                                    <li><b>🏆 ಪ್ರಶಸ್ತಿ ಕೃತಿ:</b> ${poet.book}</li>
+                                    ${poet.details.map(detail => `<li>${detail}</li>`).join('')}
+                                </ul>
+                                <div class="rating-zone" onclick="event.stopPropagation();">
+                                    <span class="star" onclick="ratePoet(${pIdx}, 1)">★</span>
+                                    <span class="star" onclick="ratePoet(${pIdx}, 2)">★</span>
+                                    <span class="star" onclick="ratePoet(${pIdx}, 3)">★</span>
+                                    <span class="star" onclick="ratePoet(${pIdx}, 4)">★</span>
+                                    <span class="star" onclick="ratePoet(${pIdx}, 5)">★</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += cardHTML;
+            });
+        }
+
+        // ಕಾರ್ಡ್ ಫ್ಲಿಪ್ ಆಕ್ಷನ್
+        function flipCard(cardElement, event) {
+            cardElement.classList.toggle('flipped');
+            playSwooshAudio();
+        }
+
+        // ರೇಟಿಂಗ್ ನೀಡುವ ಫಂಕ್ಷನ್
+        function ratePoet(poetIdx, starCount) {
+            const cardBacks = document.querySelectorAll('.card-back');
+            const stars = cardBacks[poetIdx].querySelectorAll('.star');
+            
+            stars.forEach((star, sIdx) => {
+                if (sIdx < starCount) {
+                    star.classList.add('active-star');
+                } else {
+                    star.classList.remove('active-star');
+                }
+            });
+            playChimeAudio();
+        }
+
+        // ಕಾರ್ಡ್ ತಿರುಗುವಾಗ ಬರುವ ಧ್ವನಿ (Swoosh effect)
+        function playSwooshAudio() {
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            oscillator.type = 'triangle';
+            oscillator.frequency.setValueAtTime(150, audioCtx.currentTime);
+            oscillator.frequency.exponentialRampToValueAtTime(450, audioCtx.currentTime + 0.15);
+            oscillator.start();
+            gainNode.gain.setValueAtTime(0.06, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+            oscillator.stop(audioCtx.currentTime + 0.15);
+        }
+
+        // ರೇಟಿಂಗ್ ಕೊಟ್ಟಾಗ ಬರುವ ಮ್ಯೂಸಿಕಲ್ ಧ್ವನಿ
+        function playChimeAudio() {
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            oscillator.frequency.value = 880; // ಹೈ ಪಿಚ್
+            oscillator.start();
+            gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.12);
+            oscillator.stop(audioCtx.currentTime + 0.12);
+        }
+
+        // ಆರಂಭಿಕ ಲೋಡ್
+        buildGallery();
+    </script>
+</body>
+</html>

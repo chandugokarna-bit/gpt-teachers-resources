@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಕರ್ನಾಟಕ ದರ್ಶನ - ೨೪ ಮಹಾ ಪ್ರವಾಸಿ ತಾಣಗಳ ಗ್ಯಾಲರಿ</title>
+    <style>
+        /* ನಿಯಾನ್ ಗೋಲ್ಡ್ ಪ್ರೀಮಿಯಂ ಗೇಮಿಂಗ್ ಥೀಮ್ */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: radial-gradient(circle, #150d2a 0%, #070311 100%);
+            color: #ffffff;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+            user-select: none;
+            overflow-x: hidden;
+        }
+
+        h1 {
+            color: #f1c40f;
+            font-size: 32px;
+            margin-bottom: 5px;
+            text-shadow: 0 0 15px rgba(241, 196, 15, 0.6);
+            font-weight: 800;
+        }
+
+        .sub-title {
+            color: #bfa3dc;
+            font-size: 16px;
+            margin-bottom: 30px;
+        }
+
+        /* ೨೪ ಕಾರ್ಡ್‌ಗಳ ಬೃಹತ್ ಗ್ರಿಡ್ */
+        .spots-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 10px;
+        }
+
+        /* 3D ನಿಯಾನ್ ಕಾರ್ಡ್ ಶೈಲಿ */
+        .spot-card {
+            background: linear-gradient(135deg, rgba(49, 27, 146, 0.35), rgba(103, 58, 183, 0.15));
+            border: 2px solid #f1c40f;
+            border-radius: 18px;
+            padding: 20px 15px;
+            cursor: pointer;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+            transition: all 0.25s ease;
+            position: relative;
+        }
+
+        .spot-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 12px 25px rgba(241, 196, 15, 0.25), 0 0 15px rgba(139, 92, 246, 0.3);
+            background: rgba(74, 20, 140, 0.4);
+        }
+
+        .spot-icon {
+            font-size: 45px;
+            margin-bottom: 10px;
+            filter: drop-shadow(0 0 8px rgba(241, 196, 15, 0.4));
+        }
+
+        .spot-card h2 {
+            margin: 8px 0;
+            font-size: 20px;
+            color: #ffffff;
+        }
+
+        .spot-location {
+            font-size: 12px;
+            color: #f1c40f;
+            background: rgba(241, 196, 15, 0.08);
+            padding: 3px 12px;
+            border-radius: 15px;
+            display: inline-block;
+            font-weight: bold;
+            border: 1px solid rgba(241, 196, 15, 0.2);
+        }
+
+        /* ಮಾಹಿತಿ ಪಾಪ್-ಅಪ್ (Modal) */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(7, 3, 17, 0.88);
+            backdrop-filter: blur(6px);
+            z-index: 100;
+        }
+
+        .info-modal {
+            display: none;
+            position: fixed;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%) scale(0.8);
+            width: 90%;
+            max-width: 600px;
+            background: linear-gradient(135deg, #1d1136, #0e061b);
+            border: 3px solid #f1c40f;
+            border-radius: 25px;
+            padding: 25px;
+            box-shadow: 0 20px 50px rgba(241, 196, 15, 0.3);
+            z-index: 101;
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-align: left;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+
+        .info-modal.active {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border-bottom: 2px dashed rgba(241, 196, 15, 0.2);
+            padding-bottom: 12px;
+            margin-bottom: 18px;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            font-size: 26px;
+            color: #f1c40f;
+        }
+
+        .modal-body p {
+            font-size: 15px;
+            line-height: 1.6;
+            color: #dfd5f5;
+            margin-bottom: 10px;
+        }
+
+        .map-badge {
+            background: #27ae60;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 12px;
+            font-size: 13px;
+        }
+
+        /* ಕ್ವಿಜ್ ಬಾಕ್ಸ್ */
+        .quiz-box {
+            background: rgba(255, 255, 255, 0.04);
+            border-left: 4px solid #3498db;
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 15px;
+        }
+        .quiz-title {
+            font-weight: bold;
+            color: #3498db;
+            margin-bottom: 6px;
+            font-size: 14px;
+        }
+        .quiz-ans {
+            display: none;
+            color: #2ecc71;
+            font-weight: bold;
+            margin-top: 6px;
+            border-top: 1px dashed rgba(255,255,255,0.1);
+            padding-top: 4px;
+            font-size: 14px;
+        }
+
+        .show-ans-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 4px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .close-modal-btn {
+            background: linear-gradient(135deg, #f1c40f, #d4ac0d);
+            color: #110722;
+            border: none;
+            padding: 10px 25px;
+            font-size: 15px;
+            font-weight: bold;
+            border-radius: 20px;
+            cursor: pointer;
+            display: block;
+            margin: 20px auto 0 auto;
+        }
+
+        .info-modal::-webkit-scrollbar { width: 6px; }
+        .info-modal::-webkit-scrollbar-thumb { background: #f1c40f; border-radius: 10px; }
+    </style>
+</head>
+<body>
+
+    <div class="modal-overlay" id="overlay" onclick="closeSpotModal()"></div>
+    
+    <!-- ಮಾಹಿತಿ ಪಾಪ್-ಅಪ್ ವಿಂಡೋ -->
+    <div class="info-modal" id="spotModal">
+        <div class="modal-header">
+            <div id="modalIcon" style="font-size: 35px;">🏰</div>
+            <div id="modalTitle">ತಾಣದ ಹೆಸರು</div>
+        </div>
+        <div class="modal-body">
+            <div class="map-badge" id="modalMap">📍 ನಕ್ಷೆ ಸ್ಥಳ: ಜಿಲ್ಲೆ</div>
+            <p id="modalDesc1">ವಿವರಣೆ ೧</p>
+            <p id="modalDesc2">ವಿವರಣೆ ೨</p>
+            
+            <div class="quiz-box">
+                <div class="quiz-title">💡 ತರಗತಿ ಸವಾಲು (ರಹಸ್ಯ ಪ್ರಶ್ನೆ):</div>
+                <p id="modalQuiz">ಪ್ರಶ್ನೆ...</p>
+                <button class="show-ans-btn" onclick="toggleQuizAnswer()">ಉತ್ತರ ತಿಳಿಯಿರಿ 👁️</button>
+                <div class="quiz-ans" id="modalAnswer">ಉತ್ತರ...</div>
+            </div>
+        </div>
+        <button class="close-modal-btn" onclick="closeSpotModal()">❌ ಮುಚ್ಚಿ</button>
+    </div>
+
+    <h1>🏰 "ಕರ್ನಾಟಕ ದರ್ಶನ" ೨೪ ಮಹಾ ಪ್ರವಾಸಿ ತಾಣಗಳ ಗ್ಯಾಲರಿ</h1>
+    <p class="sub-title">ನಮ್ಮ ರಾಜ್ಯದ ಇತಿಹಾಸ, ನಿಸರ್ಗ ಮತ್ತು ಧಾರ್ಮಿಕ ವೈಭವ ಸಾರುವ ತಾಣಗಳ ರಹಸ್ಯ ತಿಳಿಯಲು ಕಾರ್ಡ್ ಕ್ಲಿಕ್ ಮಾಡಿ!</p>
+
+    <!-- ೨೪ ತಾಣಗಳ ಬೃಹತ್ ಗ್ರಿಡ್ -->
+    <div class="spots-grid" id="gridContainer"></div>
+
+    <script>
+        // ಕರ್ನಾಟಕದ ಒಟ್ಟು ೨೪ ವೈವಿಧ್ಯಮಯ ಪ್ರವಾಸಿ ತಾಣಗಳ ಬೃಹತ್ ಡೇಟಾಬೇಸ್
+        const megaTourismData = [
+            { name: "ಹಂಪಿ", icon: "🏛️", location: "ವಿಜಯನಗರ ಜಿಲ್ಲೆ", desc1: "<b>ಇತಿಹಾಸ:</b> ಜಗತ್ಪ್ರಸಿದ್ಧ ವಿಜಯನಗರ ಸಾಮ್ರಾಜ್ಯದ ರಾಜಧಾನಿಯಾಗಿದ್ದು, ಯುನೆಸ್ಕೋ ಪಾರಂಪರಿಕ ತಾಣವಾಗಿದೆ.", desc2: "<b>ವಿಶೇಷತೆ:</b> ಇಲ್ಲಿನ ಕಲ್ಲಿನ ರಥ, ವಿರೂಪಾಕ್ಷ ದೇವಸ್ಥಾನ ಮತ್ತು ಸಂಗೀತ ಹೊರಹೊಮ್ಮಿಸುವ ಸಾಂಸ್ಕೃತಿಕ ಕಂಬಗಳು ಪ್ರಸಿದ್ಧವಾಗಿವೆ.", quiz: "ಹಂಪಿಯ ಕಲ್ಲಿನ ರಥದ ಚಿತ್ರವು ಭಾರತದ ಎಷ್ಟು ರೂಪಾಯಿಯ ಹೊಸ ನೋಟಿನ ಮೇಲಿದೆ?", answer: "👉 ಸರಿಯಾದ ಉತ್ತರ: ೫೦ ರೂಪಾಯಿ ನೋಟಿನ ಮೇಲೆ!" },
+            { name: "ಬಾದಾಮಿ", icon: "🧗", location: "ಬಾಗಲಕೋಟೆ ಜಿಲ್ಲೆ", desc1: "<b>ಇತಿಹಾಸ:</b> ಚಾಲುಕ್ಯ ರಾಜವಂಶದ ವೈಭವದ ರಾಜಧಾನಿಯಾಗಿತ್ತು (ವಾತಾಪಿ).", desc2: "<b>ವಿಶೇಷತೆ:</b> ಕೆಂಪು ಮರಳುಗಲ್ಲಿನ ಬೆಟ್ಟಗಳನ್ನು ಕೊರೆದು ನಿರ್ಮಿಸಿದ ಅದ್ಭುತ ೪ ಗುಹಾಂತರ ದೇವಾಲಯಗಳು ಇಲ್ಲಿವೆ.", quiz: "ಬಾದಾಮಿಯ ಹಳೆಯ ಹೆಸರೇನು?", answer: "👉 ಸರಿಯಾದ ಉತ್ತರ: ವಾತಾಪಿ!" },
+            { name: "ಗೋಲಗುಂಬಜ್", icon: "🕌", location: "ವಿಜಯಪುರ ಜಿಲ್ಲೆ", desc1: "<b>ಇತಿಹಾಸ:</b> ಮೊಹಮ್ಮದ್ ಆದಿಲ್ ಶಾ ನಿರ್ಮಿಸಿದ ಭವ್ಯ ಸ್ಮಾರಕ ಮಂದಿರ.", desc2: "<b>ವಿಶೇಷತೆ:</b> ಕಂಬಗಳ ಆಧಾರವಿಲ್ಲದ ವಿಶ್ವದ ೨ನೇ ಅತಿ ದೊಡ್ಡ ಗುಮ್ಮಟ ಮತ್ತು ಶಬ್ದವನ್ನು ೭-೯ ಬಾರಿ ಪ್ರತಿಧ್ವನಿಸುವ ಪಿಸುಮಾತಿನ ಗ್ಯಾಲರಿ ಇಲ್ಲಿದೆ.", quiz: "ಇಲ್ಲಿರುವ ಪ್ರಸಿದ್ಧ ಗ್ಯಾಲರಿಯ ಹೆಸರೇನು?", answer: "👉 ಸರಿಯಾದ ಉತ್ತರ: ಪಿಸುಮಾತಿನ ಗ್ಯಾಲರಿ (Whispering Gallery)!" },
+            { name: "ಮೈಸೂರು ಅರಮನೆ", icon: "🏰", location: "ಮೈಸೂರು ಜಿಲ್ಲೆ", desc1: "<b>ಇತಿಹಾಸ:</b> ಒಡೆಯರ್ ರಾಜವಂಶದ ವೈಭವದ ಅಂಬಾವಿಲಾಸ ಅರಮನೆಯಾಗಿದ್ದು, ಇಂಡೋ-ಸಾರ್ಸೆನಿಕ್ ಶೈಲಿಯಲ್ಲಿದೆ.", desc2: "<b>ವಿಶೇಷತೆ:</b> ದಸರಾ ಸಮಯದಲ್ಲಿ ಒಂದು ಲಕ್ಷಕ್ಕೂ ಹೆಚ್ಚು ದೀಪಗಳಿಂದ ಇದು ಕಂಗೊಳಿಸುತ್ತದೆ.", quiz: "ದಸರಾ ಜಂಬೂಸವಾರಿಯಲ್ಲಿ ಚಿನ್ನದ ಅಂಬಾರಿಯನ್ನು ಯಾರು ಹೊರುತ್ತಾರೆ?", answer: "👉 ಸರಿಯಾದ ಉತ್ತರ: ಗಜರಾಜ (ಆನೆ)!" },
+            
+            // ಹೊಸ ೨೦ ತಾಣಗಳ ಸೇರ್ಪಡೆ
+            { name: "ಬೇಲೂರು", icon: "📐", location: "ಹಾಸನ ಜಿಲ್ಲೆ", desc1: "<b>ಇತಿಹಾಸ:</b> ಹೊಯ್ಸಳ ರಾಜ ವಿಷ್ಣುವರ್ಧನ ನಿರ್ಮಿಸಿದ ಶಿಲ್ಪಕಲೆಯ ತವರೂರು.", desc2: "<b>ವಿಶೇಷತೆ:</b> ಇಲ್ಲಿನ ಚೆನ್ನಕೇಶವ ಸ್ವಾಮಿ ದೇವಾಲಯದ ನಕ್ಷತ್ರಾಕಾರದ ತಳಹದಿ ಮತ್ತು ಮದನಿಕೆಯರ ಕೆತ್ತನೆಗಳು ಜಗತ್ಪ್ರಸಿದ್ಧವಾಗಿವೆ.", quiz: "ಬೇಲೂರು ದೇವಾಲಯವನ್ನು ನಿರ್ಮಿಸಿದ ಹೊಯ್ಸಳ ರಾಜ ಯಾರು?", answer: "👉 ಸರಿಯಾದ ಉತ್ತರ: ವಿಷ್ಣುವರ್ಧನ!" },
+            { name: "ಹಳೇಬೀಡು", icon: "🛕", location: "ಹಾಸನ ಜಿಲ್ಲೆ", desc1: "<b>ಇತಿಹಾಸ:</b> ಹೊಯ್ಸಳ ಸಾಮ್ರಾಜ್ಯದ ಮತ್ತೊಂದು ಭವ್ಯ ರಾಜಧಾನಿ (ದ್ವಾರಸಮುದ್ರ).", desc2: "<b>ವಿಶೇಷತೆ:</b> ಹೊಯ್ಸಳೇಶ್ವರ ದೇವಾಲಯದಲ್ಲಿರುವ ನಯವಾಗಿ ಕತ್ತರಿಸಿದ ಬೃಹತ್ ಬಳಪದ ಕಲ್ಲಿನ ಕೆತ್ತನೆಗಳು ಮತ್ತು ಭವ್ಯ ನಂದಿ ವಿಗ್ರಹಗಳು ವಿಶಿಷ್ಟವಾಗಿವೆ.", quiz: "ಹಳೇಬೀಡಿನ ಹಳೆಯ ಹೆಸರೇನು?", answer: "👉 ಸರಿಯಾದ ಉತ್ತರ: ದ್ವಾರಸಮುದ್ರ!" },
+            { name: "ಶ್ರವಣಬೆಳಗೊಳ", icon: "🧘", location: "ಹಾಸನ ಜಿಲ್ಲೆ", desc1: "<b>ಇತಿಹಾಸ:</b> ಜೈನ ಧರ್ಮದ ಪ್ರಸಿದ್ಧ ದಕ್ಷಿಣದ ಕಾಶಿ.", desc2: "<b>ವಿಶೇಷತೆ:</b> ವಿಂಧ್ಯಗಿರಿ ಬೆಟ್ಟದ ಮೇಲಿರುವ ಏಕಶಿಲೆಯಲ್ಲಿ ಕೆತ್ತಲಾದ ೫೭ ಅಡಿ ಎತ್ತರದ ಭಗವಾನ್ <b>ಗೊಮ್ಮಟೇಶ್ವರ (ಬಾಹುಬಲಿ)</b> ಬೃಹತ್ ಮೂರ್ತಿ ಇಲ್ಲಿದೆ.", quiz: "ಗೊಮ್ಮಟೇಶ್ವರ ಮೂರ್ತಿಗೆ ಎಷ್ಟು ವರ್ಷಕ್ಕೊಮ್ಮೆ ಮಹಾಮಸ್ತಾಕಾಭಿಷೇಕ ನಡೆಯುತ್ತದೆ?", answer: "👉 ಸರಿಯಾದ ಉತ್ತರ: ಪ್ರತಿ ೧೨ ವರ್ಷಗಳಿಗೊಮ್ಮೆ!" },
+            { name: "ಜೋಗ್ ಜಲಪಾತ", icon: "🌊", location: "ಶಿವಮೊಗ್ಗ ಜಿಲ್ಲೆ", desc1: "<b>ನಿಸರ್ಗ:</b> ಶರಾವತಿ ನದಿಯಿಂದ ಸೃಷ್ಟಿಯಾಗುವ ಭಾರತದ ಅತ್ಯಂತ ಎತ್ತರದ ನೇರ ಜಲಪಾತಗಳಲ್ಲೊಂದು.", desc2: "<b>ವಿಶೇಷತೆ:</b> ರಾಜ, ರಾಣಿ, ರೋರರ್ ಮತ್ತು ರಾಕೆಟ್ ಎಂಬ ನಾಲ್ಕು ವಿಭಾಗಗಳಾಗಿ ಧುಮುಕುವ ದೃಶ್ಯ ಅದ್ಭುತವಾಗಿರುತ್ತದೆ.", quiz: "ಜೋಗ್ ಜಲಪಾತವನ್ನು ಸೃಷ್ಟಿಸುವ ನದಿ ಯಾವುದು?", answer: "👉 ಸರಿಯಾದ ಉತ್ತರ: ಶರಾವತಿ ನದಿ!" },
+            { name: "ಚಿತ್ರದುರ್ಗದ ಕೋಟೆ", icon: "🧱", location: "ಚಿತ್ರದುರ್ಗ ಜಿಲ್ಲೆ", desc1: "<b>ಇತಿಹಾಸ:</b> ಕಲ್ಲುಬೆಟ್ಟಗಳ ಮಧ್ಯೆ ಪಾಳೇಗಾರರು ನಿರ್ಮಿಸಿದ ಭೇದಿಸಲಾಗದ ರಕ್ಷಣಾ ಕೋಟೆ.", desc2: "<b>ವಿಶೇಷತೆ:</b> ಇದು <b>'ಏಳುಸುತ್ತಿನ ಕೋಟೆ'</b> ಎಂದು ಪ್ರಸಿದ್ಧವಾಗಿದೆ. ವೀರವನಿತೆ ಓಬವ್ವ ಕದನ ನುಗ್ಗಿದ ಕಿಂಡಿ (ಓಬವ್ವನ ಕಿಂಡಿ) ಇಲ್ಲಿದೆ.", quiz: "ಚಿತ್ರದುರ್ಗದ ಕೋಟೆಯನ್ನು ಎಷ್ಟು ಸುತ್ತಿನ ಕೋಟೆ ಎನ್ನಲಾಗುತ್ತದೆ?", answer: "👉 ಸರಿಯಾದ ಉತ್ತರ: ಏಳು ಸುತ್ತಿನ ಕೋಟೆ!" },
+            { name: "ಗೋಕರ್ಣ", icon: "🏖️", location: "ಉತ್ತರ ಕನ್ನಡ ಜಿಲ್ಲೆ", desc1: "<b>ಧಾರ್ಮಿಕ/ನಿಸರ್ಗ:</b> ಪವಿತ್ರ ಮಹಾಬಲೇಶ್ವರ (ಆತ್ಮಲಿಂಗ) ದೇವಸ್ಥಾನವಿರುವ ಕರಾವಳಿ ತಾಣ.", desc2: "<b>ವಿಶೇಷತೆ:</b> ಇಲ್ಲಿನ 'ಓಂ ಬೀಚ್' (Om Beach) ನೈಸರ್ಗಿಕವಾಗಿಯೇ ಹಿಂದೂ ಧರ್ಮದ 'ಓಂ' ಆಕಾರವನ್ನು ಹೋಲುತ್ತದೆ.", quiz: "ಗೋಕರ್ಣದಲ್ಲಿ ರಾವಣನಿಂದ ಸ್ಥಾಪಿಸಲ್ಪಟ್ಟ ಪವಿತ್ರ ಲಿಂಗದ ಹೆಸರೇನು?", answer: "👉 ಸರಿಯಾದ ಉತ್ತರ: ಆತ್ಮಲಿಂಗ!" },
+            { name: "ಮುರುಡೇಶ್ವರ", icon: "🔱", location: "ಉತ್ತರ ಕನ್ನಡ ಜಿಲ್ಲೆ", desc1: "<b>ಧಾರ್ಮಿಕ:</b> ಅರಬ್ಬಿ ಸಮುದ್ರದ ದಂಡೆಯ ಮೇಲಿರುವ ಭವ್ಯ ಶಿವನ ತಾಣ.", desc2: "<b>ವಿಶೇಷತೆ:</b> ವಿಶ್ವದ ೨ನೇ ಅತಿ ಎತ್ತರದ (೧೨೩ ಅಡಿ) ಭವ್ಯ ಶಿವನ ವಿಗ್ರಹ ಮತ್ತು ಇಪ್ಪತ್ತು ಅಂತಸ್ತುಗಳ ಬೃಹತ್ ರಾಜಗೋಪೂರ ಇಲ್ಲಿದೆ.", quiz: "ಮುರುಡೇಶ್ವರ ಶಿವನ ವಿಗ್ರಹದ ಪಕ್ಕದಲ್ಲಿರುವ ಸಮುದ್ರ ಯಾವುದು?", answer: "👉 ಸರಿಯಾದ ಉತ್ತರ: ಅರಬ್ಬಿ ಸಮುದ್ರ!" },
+            { name: "ಶೃಂಗೇರಿ", icon: "🙏", location: "ಚಿಕ್ಕಮಗಳೂರು ಜಿಲ್ಲೆ", desc1: "<b>ಇತಿಹಾಸ:</b> ಆದಿ ಶಂಕರಾಚಾರ್ಯರು ಸ್ಥಾಪಿಸಿದ ಭಾರತದ ಪ್ರಥಮ ಶಾರದಾ ಪೀಠ.", desc2: "<b>ವಿಶೇಷತೆ:</b> ಇಲ್ಲಿನ ವಿದ್ಯಾಶಂಕರ ದೇವಾಲಯದಲ್ಲಿರುವ ೧೨ ರಾಶಿ ಸ್ತಂಭಗಳ ಮೇಲೆ ಸೂರ್ಯನ ಕಿರಣಗಳು ಆಯಾ ತಿಂಗಳ ರಾಶಿಗೆ ತಕ್ಕಂತೆ ಬೀಳುತ್ತವೆ!", quiz: "ಶೃಂಗೇರಿ ಮಠವನ್ನು ಸ್ಥಾಪಿಸಿದ ಜಗದ್ಗುರುಗಳು ಯಾರು?", answer: "👉 ಸರಿಯಾದ ಉತ್ತರ: ಆದಿ ಶಂಕರಾಚಾರ್ಯರು!" },
+            { name: "ಕೆಮ್ಮಣ್ಣುಗುಂಡಿ", icon: "⛰️", location: "ಚಿಕ್ಕಮಗಳೂರು ಜಿಲ್ಲೆ", desc1: "<b>ನಿಸರ್ಗ:</b> ಬಾಬಾಬುಡನ್ ಗಿರಿ ಬೆಟ್ಟ ಸಾಲುಗಳಲ್ಲಿರುವ ಸುಂದರ ಗಿರಿಧಾಮ.", desc2: "<b>ವಿಶೇಷತೆ:</b> ಇದನ್ನು ಮೈಸೂರು ಅರಸರಾದ ನಾಲ್ವಡಿ ಕೃಷ್ಣರಾಜ ಒಡೆಯರ್ ಅವರ ಬೇಸಿಗೆಯ ತಂಗುದಾಣವಾಗಿ ಬಳಸುತ್ತಿದ್ದರು (KR ಹಿಲ್ಸ್).", quiz: "ಕೆಮ್ಮಣ್ಣುಗುಂಡಿ ಗಿರಿಧಾಮಕ್ಕೆ ಇರುವ ಮತ್ತೊಂದು ಹೆಸರೇನು?", answer: "👉 ಸರಿಯಾದ ಉತ್ತರ: ಕೆ.ಆರ್. ಹಿಲ್ಸ್ (KR Hills)!" },
+            { name: "ಧರ್ಮಸ್ಥಳ", icon: "☸️", location: "ದಕ್ಷಿಣ ಕನ್ನಡ ಜಿಲ್ಲೆ", desc1: "<b>ಧಾರ್ಮಿಕ:</b> ನೇತ್ರಾವತಿ ನದಿಯ ದಂಡೆಯ ಮೇಲಿರುವ ಸುಪ್ರಸಿದ್ಧ ಮಂಜುನಾಥ ಸ್ವಾಮಿ ಕ್ಷೇತ್ರ.", desc2: "<b>ವಿಶೇಷತೆ:</b> ಇಲ್ಲಿ ನಿರಂತರವಾಗಿ ಅನ್ನದಾನ, ಜ್ಞಾನದಾನ, ಔಷಧದಾನ ನಡೆಯುವ ಅಪ್ರತಿಮ ದಾನ ಕ್ಷೇತ್ರವಾಗಿದೆ ಹಾಗೂ ಬಾಹುಬಲಿಯ ಏಕಶಿಲಾ ಮೂರ್ತಿ ಇದೆ.", quiz: "ಧರ್ಮಸ್ಥಳದ ಪಕ್ಕದಲ್ಲಿ ಹರಿಯುವ ಪವಿತ್ರ ನದಿ ಯಾವುದು?", answer: "👉 ಸರಿಯಾದ ಉತ್ತರ: ನೇತ್ರಾವತಿ ನದಿ!" },
+            { name: "ಉಡುಪಿ ಶ್ರೀಕೃಷ್ಣ", icon: "🐄", location: "ಉಡುಪಿ ಜಿಲ್ಲೆ", desc1: "<b>ಧಾರ್ಮಿಕ:</b> ಮಾಧ್ವ ಸಿದ್ಧಾಂತದ ಪ್ರತಿಪಾದಕರಾದ ಶ್ರೀ ಮಧ್ವಾಚಾರ್ಯರು ಸ್ಥಾಪಿಸಿದ ಕೃಷ್ಣನ ದೇವಸ್ಥಾನ.", desc2: "<b>ವಿಶೇಷತೆ:</b> ಇಲ್ಲಿ ದೇವನನ್ನು ನೇರವಾಗಿ ನೋಡುವಂತಿಲ್ಲ, ಬದಲಾಗಿ ಒಂಬತ್ತು ರಂಧ್ರಗಳಿರುವ ಪ್ರಸಿದ್ಧ <b>'ಕನಕನ ಕಿಂಡಿ'</b> ಮೂಲಕವೇ ನೋಡಬೇಕು.", quiz: "ಉಡುಪಿಯಲ್ಲಿ ಶ್ರೀಕೃಷ್ಣನ ದರ್ಶನವನ್ನು ಯಾವ ಕಿಂಡಿಯ ಮೂಲಕ ಪಡೆಯಲಾಗುತ್ತದೆ?", answer: "👉 ಸರಿಯಾದ ಉತ್ತರ: ಕನಕನ ಕಿಂಡಿ!" },
+            { name: "ಕುಕ್ಕೆ ಸುಬ್ರಹ್ಮಣ್ಯ", icon: "🐍", location: "ದಕ್ಷಿಣ ಕನ್ನಡ ಜಿಲ್ಲೆ", desc1: "<b>ಧಾರ್ಮಿಕ:</b> ಪಶ್ಚಿಮ ಘಟ್ಟಗಳ ಕುಮಾರಪರ್ವತ ಬೆಟ್ಟದ ತಪ್ಪಲಿನಲ್ಲಿರುವ ನಾಗಾರಾಧನೆಯ ಪರಮ ಪವಿತ್ರ ಕ್ಷೇತ್ರ.", desc2: "<b>ವಿಶೇಷತೆ:</b> ಸರ್ಪದೋಷ ನಿವಾರಣಾ ಪೂಜೆಗಳಿಗೆ ಭಾರತದಲ್ಲೇ ಅತ್ಯಂತ ಪ್ರಸಿದ್ಧಿ ಪಡೆದ ದೇವಸ್ಥಾನವಾಗಿದೆ.", quiz: "ಕುಕ್ಕೆ ಸುಬ್ರಹ್ಮಣ್ಯ ಕ್ಷೇತ್ರವು ಯಾವ ಪರ್ವತದ ತಪ್ಪಲಿನಲ್ಲಿದೆ?", answer: "👉 ಸರಿಯಾದ ಉತ್ತರ: ಕುಮಾರಪರ್ವತ!" },
+            { name: "ಐಹೊಳೆ", icon: "🎨", location: "ಬಾಗಲಕೋಟೆ ಜಿಲ್ಲೆ", desc1: "<b>ಇತಿಹಾಸ:</b> ಚಾಲುಕ್ಯರ ಕಾಲದ ಅದ್ಭುತ ಶಿಲ್ಪಕಲಾ ಪ್ರಯೋಗ ಶಾಲೆ.", desc2: "<b>ವಿಶೇಷತೆ:</b> ಇದನ್ನು <b>'ಭಾರತೀಯ ದೇವಾಲಯ ವಾಸ್ತುಶಿಲ್ಪದ ತೊಟ್ಟಿಲು'</b> ಎನ್ನಲಾಗುತ್ತದೆ. ಇಲ್ಲಿನ ದುರ್ಗಾ ದೇವಸ್ಥಾನದ ಆಕಾರ ವಿಶಿಷ್ಟವಾಗಿದೆ.", quiz: "ಯಾವ ಸ್ಥಳವನ್ನು 'ಭಾರತೀಯ ದೇವಾಲಯ ವಾಸ್ತುಶಿಲ್ಪದ ತೊಟ್ಟಿಲು' ಎನ್ನಲಾಗುತ್ತದೆ?", answer: "👉 ಸರಿಯಾದ ಉತ್ತರ: ಐಹೊಳೆ!" },
+            { name: "ಪಟ್ಟದಕಲ್ಲು", icon: "👑", location: "ಬಾಗಲಕೋಟೆ ಜಿಲ್ಲೆ", desc1: "<b>ಇತಿಹಾಸ:</b> ಚಾಲುಕ್ಯ ಅರಸರಿಗೆ ಪಟ್ಟಾಭಿಷೇಕ ಮಾಡುತ್ತಿದ್ದ ಪವಿತ್ರ ಯುನೆಸ್ಕೋ ತಾಣ.", desc2: "<b>ವಿಶೇಷತೆ:</b> ಇಲ್ಲಿ ದ್ರಾವಿಡ ಮತ್ತು ನಗರ ಶೈಲಿಗಳೆರಡರ ಮಿಶ್ರಣವಿರುವ ಭವ್ಯ ವಿರೂಪಾಕ್ಷ ಮತ್ತು ಮಲ್ಲಿಕಾರ್ಜುನ ದೇವಾಲಯಗಳಿವೆ.", quiz: "ಪಟ್ಟದಕಲ್ಲು ಯಾವ ರಾಜವಂಶದ ಪಟ್ಟಾಭಿಷೇಕದ ಸ್ಥಳವಾಗಿತ್ತು?", answer: "👉 ಸರಿಯಾದ ಉತ್ತರ: ಚಾಲುಕ್ಯ ರಾಜವಂಶ!" },
+            { name: "ಮಡಿಕೇರಿ (ಕೊಡಗು)", icon: "☕", location: "ಕೊಡಗು ಜಿಲ್ಲೆ", desc1: "<b>ನಿಸರ್ಗ:</b> ದಟ್ಟವಾದ ಕಾಫಿ ತೋಟಗಳು ಮತ್ತು ತಂಪಾದ ಹವಾಮಾನದಿಂದ ಕೂಡಿದ ಗಿರಿಧಾಮ.", desc2: "<b>ವಿಶೇಷತೆ:</b> ಇದನ್ನು <b>'ಭಾರತದ ಸ್ಕಾಟ್‌ಲ್ಯಾಂಡ್'</b> ಎಂದು ಕರೆಯಲಾಗುತ್ತದೆ. ಇಲ್ಲಿನ ಅಬ್ಬಿ ಜಲಪಾತ ಮತ್ತು ರಾಜಾಸೀಟ್ ಪ್ರಸಿದ್ಧವಾಗಿವೆ.", quiz: "ಕರ್ನಾಟಕದ ಯಾವ ಜಿಲ್ಲೆಯನ್ನು 'ಭಾರತದ ಸ್ಕಾಟ್‌ಲ್ಯಾಂಡ್' ಎನ್ನಲಾಗುತ್ತದೆ?", answer: "👉 ಸರಿಯಾದ ಉತ್ತರ: ಕೊಡಗು (ಮಡಿಕೇರಿ)!" },
+            { name: "ನಂದಿ ಬೆಟ್ಟ", icon: "☁️", location: "ಚಿಕ್ಕಬಳ್ಳಾಪುರ ಜಿಲ್ಲೆ", desc1: "<b>ನಿಸರ್ಗ:</b> ಬೆಂಗಳೂರಿನ ಸಮೀಪವಿರುವ ಅದ್ಭುತ ಸೂರ್ಯೋದಯ ಮತ್ತು ಮಂಜಿನ ನಗರಿ.", desc2: "<b>ವಿಶೇಷತೆ:</b> ಇಲ್ಲಿ ಟಿಪ್ಪು ಸುಲ್ತಾನ್ ನಿರ್ಮಿಸಿದ ಬೇಸಿಗೆ ಅರಮನೆ ಹಾಗೂ ಕೈದಿಗಳನ್ನು ದೂಡುತ್ತಿದ್ದ 'ಟಿಪ್ಪು ಡ್ರಾಪ್' (Tippu Drop) ಪ್ರಸಿದ್ಧಿಯಾಗಿದೆ.", quiz: "ನಂದಿ ಬೆಟ್ಟದಲ್ಲಿರುವ ಪ್ರಸಿದ್ಧ ಕಡಿದಾದ ಬಂಡೆಯ ಹೆಸರೇನು?", answer: "👉 ಸರಿಯಾದ ಉತ್ತರ: ಟಿಪ್ಪು ಡ್ರಾಪ್ (Tippu Drop)!" },
+            { name: "ಬಂಡೀಪುರ", icon: "🐅", location: "ಚಾಮರಾಜನಗರ ಜಿಲ್ಲೆ", desc1: "<b>ನಿಸರ್ಗ:</b> ಪಶ್ಚಿಮ ಘಟ್ಟಗಳ ತಪ್ಪಲಿನಲ್ಲಿರುವ ಕರ್ನಾಟಕದ ಅತಿ ದೊಡ್ಡ ಹುಲಿ ಸಂರಕ್ಷಿತ ರಾಷ್ಟ್ರೀಯ ಉದ್ಯಾನವನ.", desc2: "<b>ವಿಶೇಷತೆ:</b> ಇಲ್ಲಿ ನೀಲಗಿರಿ ಜೀವಗೋಳವಿದ್ದು ಆನೆ, ಚಿರತೆ, ಗೌರ್ ಮತ್ತು ನೂರಾರು ವನ್ಯಜೀವಿಗಳನ್ನು ನೈಜ ಸಫಾರಿಯಲ್ಲಿ ನೋಡಬಹುದು.", quiz: "ಬಂಡೀಪುರ ಉದ್ಯಾನವನವು ಪ್ರಮುಖವಾಗಿ ಯಾವ ಪ್ರಾಣಿಯ ಸಂರಕ್ಷಣೆಗೆ ಹೆಸರಾಗಿದೆ?", answer: "👉 ಸರಿಯಾದ ಉತ್ತರ: ರಾಷ್ಟ್ರೀಯ ಪ್ರಾಣಿ ಹುಲಿ (Tiger)!" },
+            { name: "ನಾಗರಹೊಳೆ", icon: "🐘", location: "ಕೊಡಗು/ಮೈಸೂರು ಜಿಲ್ಲೆ", desc1: "<b>ನಿಸರ್ಗ:</b> ರಾಜೀವ್ ಗಾಂಧಿ ರಾಷ್ಟ್ರೀಯ ಉದ್ಯಾನವನ ಎಂದು ಕರೆಯಲ್ಪಡುವ ದಟ್ಟ ಅರಣ್ಯ ತಾಣ.", desc2: "<b>ವಿಶೇಷತೆ:</b> ಇಲ್ಲಿ ಏಷ್ಯಾದಲ್ಲೇ ಅತಿ ಹೆಚ್ಚು ಆನೆಗಳ ಹಿಂಡು ಮತ್ತು ವಿಶಿಷ್ಟ ಕೃಷ್ಣಮೃಗಗಳು ಮುಕ್ತವಾಗಿ ವಾಸಿಸುತ್ತವೆ.", quiz: "ನಾಗರಹೊಳೆ ಉದ್ಯಾನವನಕ್ಕೆ ಇರುವ ಮತ್ತೊಂದು ಹೆಸರೇನು?", answer: "👉 ಸರಿಯಾದ ಉತ್ತರ: ರಾಜೀವ್ ಗಾಂಧಿ ರಾಷ್ಟ್ರೀಯ ಉದ್ಯಾನವನ!" },
+            { name: "ಬನ್ನೇರುಘಟ್ಟ", icon: "🦁", location: "ಬೆಂಗಳೂರು ನಗರ ಜಿಲ್ಲೆ", desc1: "<b>ನಿಸರ್ಗ:</b> ರಾಜಧಾನಿಯ ಮಡಿಲಲ್ಲಿರುವ ಏಷ್ಯಾದ ಪ್ರಥಮ ರಾಷ್ಟ್ರೀಯ ಜೈವಿಕ ಉದ್ಯಾನವನ.", desc2: "<b>ವಿಶೇಷತೆ:</b> ಇಲ್ಲಿ ಭಾರತದ ಮೊದಲ ಭವ್ಯ <b>'ಚಿಟ್ಟೆ ಪಾರ್ಕ್' (Butterfly Park)</b> ಹಾಗೂ ಹುಲಿ-ಸಿಂಹಗಳ ಮುಕ್ತ ಸಫಾರಿ ಇದೆ.", quiz: "ಭಾರತದ ಮೊದಲ 'ಚಿಟ್ಟೆ ಪಾರ್ಕ್' ಎಲ್ಲಿದೆ?", answer: "👉 ಸರಿಯಾದ ಉತ್ತರ: ಬನ್ನೇರುಘಟ್ಟ ಜೈವಿಕ ಉದ್ಯಾನವನದಲ್ಲಿ!" },
+            { name: "ಮೇಲುಕೋಟೆ", icon: "💎", location: "ಮಂಡ್ಯ ಜಿಲ್ಲೆ", desc1: "<b>ಧಾರ್ಮಿಕ/ಇತಿಹಾಸ:</b> ಬೆಟ್ಟದ ಮೇಲಿರುವ ಐತಿಹಾಸಿಕ ಚೆಲುವನಾರಾಯಣ ಸ್ವಾಮಿ ಮತ್ತು ಯೋಗಾನರಸಿಂಹ ಸ್ವಾಮಿ ಕ್ಷೇತ್ರ.", desc2: "<b>ವಿಶೇಷತೆ:</b> ಇಲ್ಲಿ ವರ್ಷಕ್ಕೊಮ್ಮೆ ನಡೆಯುವ ಪ್ರಸಿದ್ಧ <b>'ವೈರಮುಡಿ ಉತ್ಸವ'</b>ಕ್ಕೆ ಲಕ್ಷಾಂತರ ಭಕ್ತರು ಆಗಮಿಸುತ್ತಾರೆ. ಕಲ್ಯಾಣಿ ಹೊಂಡ ಸುಂದರವಾಗಿದೆ.", quiz: "ಮೇಲುಕೋಟೆಯಲ್ಲಿ ನಡೆಯುವ ಪ್ರಸಿದ್ಧ ರಾತ್ರಿ ಉತ್ಸವ ಯಾವುದು?", answer: "👉 ಸರಿಯಾದ ಉತ್ತರ: ವೈರಮುಡಿ ಉತ್ಸವ!" }
+        ];
+
+        // ಗ್ಯಾಲರಿಯನ್ನು ನಿರ್ಮಿಸುವ ಫಂಕ್ಷನ್
+        function buildMegaGallery() {
+            const container = document.getElementById("gridContainer");
+            container.innerHTML = "";
+
+            megaTourismData.forEach((spot, idx) => {
+                container.innerHTML += `
+                    <div class="spot-card" onclick="openSpotModal(${idx})">
+                        <div class="spot-icon">${spot.icon}</div>
+                        <h2>${spot.name}</h2>
+                        <div class="spot-location">📍 ${spot.location}</div>
+                    </div>
+                `;
+            });
+        }
+
+        // ಪಾಪ್-ಅಪ್ ಓಪನ್ ಮಾಡುವ ಫಂಕ್ಷನ್
+        function openSpotModal(index) {
+            const spot = megaTourismData[index];
+            
+            document.getElementById("modalIcon").innerText = spot.icon;
+            document.getElementById("modalTitle").innerText = spot.name;
+            document.getElementById("modalMap").innerText = "📍 ನಕ್ಷೆ ಸ್ಥಳ: " + spot.location;
+            document.getElementById("modalDesc1").innerHTML = spot.desc1;
+            document.getElementById("modalDesc2").innerHTML = spot.desc2;
+            document.getElementById("modalQuiz").innerText = spot.quiz;
+            document.getElementById("modalAnswer").innerText = spot.answer;
+            
+            document.getElementById("modalAnswer").style.display = "none";
+            document.getElementById("overlay").style.display = "block";
+            
+            const modal = document.getElementById("spotModal");
+            modal.style.display = "block";
+            setTimeout(() => { modal.classList.add("active"); }, 50);
+
+            playNeonAudio(240, 640, 0.2);
+        }
+
+        function closeSpotModal() {
+            const modal = document.getElementById("spotModal");
+            modal.classList.remove("active");
+            setTimeout(() => {
+                modal.style.display = "none";
+                document.getElementById("overlay").style.display = "none";
+            }, 250);
+        }
+
+        function toggleQuizAnswer() {
+            const ans = document.getElementById("modalAnswer");
+            if (ans.style.display === "none") {
+                ans.style.display = "block";
+                playNeonAudio(880, 880, 0.12);
+            } else {
+                ans.style.display = "none";
+            }
+        }
+
+        // ಆಫ್‌ಲೈನ್ ಡಿಜಿಟಲ್ ಧ್ವನಿ ಪರಿಣಾಮ
+        function playNeonAudio(startFreq, endFreq, duration) {
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            oscillator.frequency.setValueAtTime(startFreq, audioCtx.currentTime);
+            oscillator.frequency.exponentialRampToValueAtTime(endFreq, audioCtx.currentTime + duration);
+            oscillator.start();
+            gainNode.gain.setValueAtTime(0.08, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+            oscillator.stop(audioCtx.currentTime + duration);
+        }
+
+        // ಆಟದ ಆರಂಭ
+        buildMegaGallery();
+    </script>
+</body>
+</html>

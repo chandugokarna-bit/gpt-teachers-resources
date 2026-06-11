@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಮಹಾಕಾವ್ಯಗಳ ರಹಸ್ಯ ಪತ್ತೆ - ಇಂಟರಾಕ್ಟಿವ್ ಆಟ</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #fdfefe;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+            user-select: none;
+        }
+        h1 {
+            color: #d35400;
+            margin-bottom: 5px;
+        }
+        .instruction {
+            color: #555;
+            font-size: 18px;
+            margin-bottom: 35px;
+        }
+
+        .game-container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        /* ಎರಡು ಮಹಾಕಾವ್ಯಗಳ ಮುಖ್ಯ ಪೆಟ್ಟಿಗೆಗಳ ಲೇಔಟ್ */
+        .epics-grid {
+            display: flex;
+            justify-content: space-around;
+            gap: 30px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+
+        /* ಪ್ರತಿ ಮಹಾಕಾವ್ಯದ ಬಾಕ್ಸ್ ಶೈಲಿ */
+        .epic-box {
+            background-color: #ffffff;
+            border: 3px dashed #bdc3c7;
+            border-radius: 15px;
+            width: 45%;
+            min-width: 280px;
+            min-height: 280px;
+            padding: 20px;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .epic-box h2 {
+            margin-top: 0;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f2f4f4;
+            font-size: 22px;
+        }
+        
+        /* ಮಹಾಕಾವ್ಯಗಳ ಪ್ರತ್ಯೇಕ ಥೀಮ್ ಬಣ್ಣಗಳು */
+        #ramayana-box h2 { color: #e67e22; }
+        #mahabharata-box h2 { color: #2980b9; }
+
+        /* ಡ್ರ್ಯಾಗ್ ಮಾಡುವಾಗ ಬಾಕ್ಸ್ ಹೈಲೈಟ್ ಆಗಲು */
+        .epic-box.drag-over {
+            background-color: #fdf2e9;
+            border-color: #e67e22;
+            transform: scale(1.02);
+        }
+        #mahabharata-box.drag-over {
+            background-color: #ebf5fb;
+            border-color: #2980b9;
+        }
+
+        /* ಕಾರ್ಡ್ಸ್ ಇರುವ ಕೆಳಗಿನ ಪೆಟ್ಟಿಗೆ */
+        .cards-pool {
+            background-color: #ffffff;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            border-top: 6px solid #d35400;
+            margin-bottom: 25px;
+        }
+
+        /* ಪ್ರತ್ಯೇಕ ಕಾರ್ಡ್ ಶೈಲಿ */
+        .epic-card {
+            background: linear-gradient(135deg, #34495e, #2c3e50);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: move;
+            font-weight: bold;
+            font-size: 16px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+            transition: transform 0.2s, opacity 0.2s;
+        }
+        .epic-card:active {
+            cursor: grabbing;
+        }
+
+        /* ಪೆಟ್ಟಿಗೆಯ ಒಳಗೆ ಸೇರಿದ ಕಾರ್ಡ್‌ಗಳ ಸಣ್ಣ ಟ್ಯಾಗ್ಸ್ ಶೈಲಿ */
+        .correct-placement {
+            background: linear-gradient(135deg, #2ecc71, #27ae60) !important;
+            box-shadow: 0 0 8px #2ecc71;
+        }
+        .wrong-placement {
+            background: linear-gradient(135deg, #e74c3c, #c0392b) !important;
+            box-shadow: 0 0 8px #e74c3c;
+        }
+
+        /* ಸಬ್ಮಿಟ್ ಬಟನ್ */
+        .submit-action-btn {
+            background: linear-gradient(135deg, #e67e22, #d35400);
+            color: white;
+            border: none;
+            padding: 12px 50px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 25px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(211, 84, 0, 0.3);
+            transition: background 0.2s;
+        }
+        .submit-action-btn:hover { background: #ba4a00; }
+        
+        #result-display-panel {
+            font-size: 22px;
+            font-weight: bold;
+            margin-top: 25px;
+            color: #2c3e50;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>೪ನೇ ಪಾಠ: "ಮಹಾಕಾವ್ಯಗಳ ರಹಸ್ಯ ಪತ್ತೆ" ಡಿಜಿಟಲ್ ಪಜಲ್</h1>
+    <p class="instruction">ಕೆಳಗಿರುವ ಪಾತ್ರಗಳು ಮತ್ತು ಘಟನೆಗಳ ಕಾರ್ಡ್‌ಗಳನ್ನು ಎಳೆದು ಅವು ಸೇರಬೇಕಾದ ಸರಿಯಾದ ಮಹಾಕಾವ್ಯದ ಪೆಟ್ಟಿಗೆಗೆ ಹಾಕಿ!</p>
+
+    <div class="game-container">
+        
+        <div class="epics-grid">
+            <div class="epic-box" id="ramayana-box" data-epic="ramayana">
+                <h2>🏹 ರಾಮಾಯಣ</h2>
+            </div>
+            <div class="epic-box" id="mahabharata-box" data-epic="mahabharata">
+                <h2>📜 ಮಹಾಭಾರತ</h2>
+            </div>
+        </div>
+
+        <div class="cards-pool" id="cards-container">
+            <div class="epic-card" draggable="true" id="card1" data-match="ramayana">ಮಹರ್ಷಿ ವಾಲ್ಮೀಕಿ (ಕರ್ತೃ)</div>
+            <div class="epic-card" draggable="true" id="card2" data-match="mahabharata">ವೇದವ್ಯಾಸರು (ಕರ್ತೃ)</div>
+            <div class="epic-card" draggable="true" id="card3" data-match="ramayana">ಶ್ರೀರಾಮನ ಪಿತೃವಾಕ್ಯ ಪರಿಪಾಲನೆ</div>
+            <div class="epic-card" draggable="true" id="card4" data-match="mahabharata">ಕೌರವರು ಮತ್ತು ಪಾಂಡವರ ಯುದ್ಧ</div>
+            <div class="epic-card" draggable="true" id="card5" data-match="ramayana">ಸೀತಾ ಹರಣ ಮತ್ತು ರಾವಣ ವಧೆ</div>
+            <div class="epic-card" draggable="true" id="card6" data-match="mahabharata">ಭಗವದ್ಗೀತೆಯ ಉಪದೇಶ</div>
+            <div class="epic-card" draggable="true" id="card7" data-match="ramayana">ಲಕ್ಷ್ಮಣ ಮತ್ತು ಹನುಮಂತನ ಭಕ್ತಿ</div>
+            <div class="epic-card" draggable="true" id="card8" data-match="mahabharata">ಕುರುಕ್ಷೇತ್ರ ಮಹಾಯುದ್ಧ</div>
+        </div>
+
+    </div>
+
+    <button class="submit-action-btn" onclick="verifyEpicsAnswers()">ಉತ್ತರ ಪರಿಶೀಲಿಸಿ (Submit)</button>
+    <div id="result-display-panel"></div>
+
+    <script>
+        const dragCards = document.querySelectorAll('.epic-card');
+        const epicBoxes = document.querySelectorAll('.epic-box');
+
+        // ಡ್ರ್ಯಾಗ್ ಈವೆಂಟ್ ನಿಯಂತ್ರಣ ವ್ಯವಸ್ಥೆ
+        dragCards.forEach(card => {
+            card.addEventListener('dragstart', () => {
+                card.classList.add('dragging-now');
+            });
+
+            card.addEventListener('dragend', () => {
+                card.classList.remove('dragging-now');
+            });
+        });
+
+        // ಡ್ರಾಪ್ ಜೋನ್‌ಗಳ ನಿಯಂತ್ರಣ ವ್ಯವಸ್ಥೆ
+        epicBoxes.forEach(box => {
+            box.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                box.classList.add('drag-over');
+            });
+
+            box.addEventListener('dragleave', () => {
+                box.classList.remove('drag-over');
+            });
+
+            box.addEventListener('drop', (e) => {
+                e.preventDefault();
+                box.classList.remove('drag-over');
+                const currentDragging = document.querySelector('.dragging-now');
+                if (currentDragging) {
+                    box.appendChild(currentDragging);
+                }
+            });
+        });
+
+        // ಉತ್ತರಗಳನ್ನು ಪರಿಶೀಲಿಸುವ ಮುಖ್ಯ ಫಂಕ್ಷನ್
+        function verifyEpicsAnswers() {
+            let correctCount = 0;
+            const totalCards = dragCards.length;
+
+            epicBoxes.forEach(box => {
+                const boxEpicName = box.getAttribute('data-epic');
+                const innerCards = box.querySelectorAll('.epic-card');
+
+                innerCards.forEach(card => {
+                    const cardMatchName = card.getAttribute('data-match');
+                    
+                    // ಸರಿಯಾದ ಪೆಟ್ಟಿಗೆಗೆ ಹಾಕಿದ್ದರೆ ಹಸಿರು ಬಣ್ಣ, ಇಲ್ಲದಿದ್ದರೆ ಕೆಂಪು ಬಣ್ಣ ಮೂಡುತ್ತದೆ
+                    if (boxEpicName === cardMatchName) {
+                        card.classList.remove('wrong-placement');
+                        card.classList.add('correct-placement');
+                        correctCount++;
+                    } else {
+                        card.classList.remove('correct-placement');
+                        card.classList.add('wrong-placement');
+                    }
+                });
+            });
+
+            // ಕೆಳಗೆ ಪೂಲ್‌ನಲ್ಲಿ ಉಳಿದುಹೋದ ಕಾರ್ಡ್‌ಗಳನ್ನು ತಪ್ಪು ಎಂದು ತೋರಿಸಲು
+            const remainingCards = document.getElementById('cards-container').querySelectorAll('.epic-card');
+            remainingCards.forEach(card => {
+                card.classList.remove('correct-placement');
+                card.classList.add('wrong-placement');
+            });
+
+            // ಬ್ರೌಸರ್ ಆಫ್‌ಲೈನ್ ಆಡಿಯೋ ಧ್ವನಿ ಸೃಷ್ಟಿ (ಯಾವುದೇ ಫೈಲ್ ಅಗತ್ಯವಿಲ್ಲ)
+            if (correctCount === totalCards) {
+                playAudioBeep(660, 0.15);
+                setTimeout(() => playAudioBeep(880, 0.2), 120);
+            } else {
+                playAudioBeep(260, 0.3);
+            }
+
+            // ಫಲಿತಾಂಶ ಸಂದೇಶ ಪ್ರದರ್ಶನ
+            const resultPanel = document.getElementById('result-display-panel');
+            if (correctCount === totalCards) {
+                resultPanel.innerHTML = `🎉 ಅದ್ಭುತ ಸಾಧನೆ! ಸ್ಕೋರ್: ${correctCount} / ${totalCards} <br><span style="color:#27ae60;">ನೀವು ರಾಮಾಯಣ ಮತ್ತು ಮಹಾಭಾರತದ ಎಲ್ಲಾ ರಹಸ್ಯಗಳನ್ನು ಸರಿಯಾಗಿ ಪತ್ತೆಹಚ್ಚಿ ಜೋಡಿಸಿದ್ದೀರಿ!</span>`;
+            } else {
+                resultPanel.innerHTML = `🤔 ಪ್ರಯತ್ನಿಸಿ! ಸ್ಕೋರ್: ${correctCount} / ${totalCards} <br><span style="color:#e74c3c;">ಕೆಲವು ಪಾತ್ರಗಳು ಅಥವಾ ಘಟನೆಗಳು ತಪ್ಪು ಮಹಾಕಾವ್ಯದ ಪೆಟ್ಟಿಗೆಯಲ್ಲಿವೆ, ಮತ್ತೊಮ್ಮೆ ಯೋಚಿಸಿ ಜೋಡಿಸಿ.</span>`;
+            }
+        }
+
+        // ಆಫ್‌ಲೈನ್ ಆಡಿಯೋ ಬೀಪ್ ಸೃಷ್ಟಿ
+        function playAudioBeep(freq, duration) {
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            oscillator.frequency.value = freq;
+            oscillator.start();
+            gainNode.gain.setValueAtTime(0.15, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+            oscillator.stop(audioCtx.currentTime + duration);
+        }
+    </script>
+</body>
+</html>

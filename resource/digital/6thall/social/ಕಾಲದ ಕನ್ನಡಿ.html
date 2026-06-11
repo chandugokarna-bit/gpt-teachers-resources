@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಕಾಲದ ಕನ್ನಡಿ - ವೇದಕಾಲದ ಇಂಟರಾಕ್ಟಿವ್ ಸ್ಲೈಡರ್</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #fcf8f2;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+            user-select: none;
+        }
+        h1 {
+            color: #b7950b;
+            margin-bottom: 5px;
+        }
+        .instruction {
+            color: #5d6d7e;
+            font-size: 18px;
+            margin-bottom: 35px;
+        }
+
+        /* ಮುಖ್ಯ ಗೇಮ್ ಬಾಕ್ಸ್ */
+        .main-card {
+            max-width: 850px;
+            background: #ffffff;
+            margin: 0 auto;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border-top: 8px solid #b7950b;
+        }
+
+        /* ಸ್ಲೈಡರ್ ನಿಯಂತ್ರಣ ವಿಭಾಗ */
+        .slider-control-zone {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            border: 1px solid #e5e8e8;
+        }
+        .period-labels {
+            display: flex;
+            justify-content: space-between;
+            max-width: 600px;
+            margin: 0 auto 10px auto;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        .label-early { color: #2980b9; }
+        .label-later { color: #c0392b; }
+        
+        .time-slider {
+            width: 80%;
+            max-width: 500px;
+            cursor: pointer;
+            accent-color: #b7950b;
+            height: 8px;
+            border-radius: 5px;
+        }
+
+        /* ಮಾಹಿತಿ ಪ್ರದರ್ಶಿಸುವ ಬೋರ್ಡ್ */
+        .info-display-board {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin-top: 15px;
+        }
+
+        /* ಪ್ರತ್ಯೇಕ ಮಾಹಿತಿ ಕಾರ್ಡ್ */
+        .info-block {
+            padding: 20px;
+            border-radius: 12px;
+            color: white;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            text-align: left;
+            min-height: 150px;
+            transform: translateY(0);
+        }
+        .info-block h3 {
+            margin-top: 0;
+            font-size: 18px;
+            border-bottom: 1px solid rgba(255,255,255,0.3);
+            padding-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .info-block p {
+            font-size: 15px;
+            line-height: 1.5;
+            margin-bottom: 0;
+        }
+
+        /* ಅನಿಮೇಷನ್ ಎಫೆಕ್ಟ್ */
+        .slide-change {
+            animation: cardFlip 0.4s ease;
+        }
+
+        @keyframes cardFlip {
+            0% { transform: scale(0.95); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>೪ನೇ ಪಾಠ: "ಕಾಲದ ಕನ್ನಡಿ" ಇಂಟರಾಕ್ಟಿವ್ ಸ್ಲೈಡರ್</h1>
+    <p class="instruction">ಸ್ಮಾರ್ಟ್ ಬೋರ್ಡ್ ಮೇಲೆ ಸ್ಲೈಡರ್ ಅನ್ನು ಎಡ-ಬಲಕ್ಕೆ ಸರಿಸಿ! ಪೂರ್ವ ವೇದಕಾಲ ಮತ್ತು ಉತ್ತರ ವೇದಕಾಲದ ವ್ಯತ್ಯಾಸಗಳನ್ನು ಕಲಿಯಿರಿ.</p>
+
+    <div class="main-card">
+        
+        <div class="slider-control-zone">
+            <div class="period-labels">
+                <span class="label-early">◀ ಪೂರ್ವ ವೇದಕಾಲ (ಋಗ್ವೇದ ಕಾಲ)</span>
+                <span class="label-later">ಉತ್ತರ ವೇದಕಾಲ (ಇತರ ೩ ವೇದಗಳು) ▶</span>
+            </div>
+            <input type="range" min="0" max="1" value="0" class="time-slider" id="periodSlider" onchange="switchVedicPeriod(this.value)">
+            <div style="margin-top: 15px; font-weight: bold; font-size: 18px; color: #34495e;">
+                ಪ್ರಸ್ತುತ ವೀಕ್ಷಣೆ: <span id="period-title" style="color: #2980b9;">ಪೂರ್ವ ವೇದಕಾಲದ ಸಂಸ್ಕೃತಿ</span>
+            </div>
+        </div>
+
+        <div class="info-display-board">
+            
+            <div class="info-block" id="box-social" style="background: linear-gradient(135deg, #2980b9, #3498db);">
+                <h3>👥 ಸಾಮಾಜಿಕ ವ್ಯವಸ್ಥೆ</h3>
+                <p id="p-social">ಕುಟುಂಬವೇ ಸಮಾಜದ ಮೂಲ ಘಟಕವಾಗಿದ್ದು ಅವಿಭಕ್ತ ಕುಟುಂಬ ಪದ್ಧತಿ ಇತ್ತು. ತಂದೆಯೇ ಕುಟುಂಬದ ಯಜಮಾನನಾಗಿದ್ದನು.</p>
+            </div>
+
+            <div class="info-block" id="box-women" style="background: linear-gradient(135deg, #8e44ad, #9b59b6);">
+                <h3>👩 ಸ್ತ್ರೀಯರ ಸ್ಥಾನಮಾನ</h3>
+                <p id="p-women">ಮಹಿಳೆಯರಿಗೆ ಗೌರವಾನ್ವಿತ ಸ್ಥಾನವಿತ್ತು. ಘೋಷಾ, ಅಪಾಲಾ, ಗಾರ್ಗಿ ಮುಂತಾದ ಮಹಿಳಾ ವಿದ್ವನ್ಮಣಿಗಳು ವೇದಕಾಲದ ಸೂಕ್ತಗಳನ್ನು ರಚಿಸಿದ್ದರು. ಮರುಮದುವೆಗೆ ಅವಕಾಶವಿತ್ತು.</p>
+            </div>
+
+            <div class="info-block" id="box-political" style="background: linear-gradient(135deg, #16a085, #1abc9c);">
+                <h3>🏛️ ರಾಜಕೀಯ ಮತ್ತು ಆಡಳಿತ</h3>
+                <p id="p-political">ಬಣದ ಮುಖ್ಯಸ್ಥನನ್ನು 'ರಾಜನ್' ಎನ್ನಲಾಗುತ್ತಿತ್ತು. ರಾಜನು ಸರ್ವಾಧಿಕಾರಿಯಾಗಿರಲಿಲ್ಲ, ಆಡಳಿತದಲ್ಲಿ ಸಲಹೆ ನೀಡಲು 'ಸಭಾ' ಮತ್ತು 'ಸಮಿತಿ' ಎಂಬ ಪ್ರಜಾಸತ್ತಾತ್ಮಕ ಸಂಸ್ಥೆಗಳಿದ್ದವು.</p>
+            </div>
+
+            <div class="info-block" id="box-religious" style="background: linear-gradient(135deg, #d35400, #e67e22);">
+                <h3>🔥 ಧಾರ್ಮಿಕ ಆಚರಣೆಗಳು</h3>
+                <p id="p-religious">ಜನರು ಪ್ರಕೃತಿಯ ದೇವತೆಗಳಾದ ಇಂದ್ರ, ಅಗ್ನಿ, ವರುಣ, ಮಿತ್ರ ಮತ್ತು ಸೂರ್ಯನನ್ನು ಆರಾಧಿಸುತ್ತಿದ್ದರು. ಯಾಗ-ಯಜ್ಞಗಳು ಅತ್ಯಂತ ಸರಳವಾಗಿದ್ದವು.</p>
+            </div>
+
+        </div>
+
+    </div>
+
+    <script>
+        // ಎರಡು ಕಾಲಘಟ್ಟಗಳ ಸಂಪೂರ್ಣ ಡೇಟಾಬೇಸ್
+        const vedicPeriodsData = {
+            // ಪೂರ್ವ ವೇದಕಾಲ (Slider Value = 0)
+            0: {
+                title: "ಪೂರ್ವ ವೇದಕಾಲದ ಸಂಸ್ಕೃತಿ",
+                titleColor: "#2980b9",
+                social: "ಕುಟುಂಬವೇ ಸಮಾಜದ ಮೂಲ ಘಟಕವಾಗಿದ್ದು ಅವಿಭಕ್ತ ಕುಟುಂಬ ಪದ್ಧತಿ ಇತ್ತು. ತಂದೆಯೇ ಕುಟುಂಬದ ಯಜಮಾನನಾಗಿದ್ದನು (ಗೃಹಪತಿ).",
+                socialBg: "linear-gradient(135deg, #2980b9, #3498db)",
+                women: "ಮಹಿಳೆಯರಿಗೆ ಗೌರವಾನ್ವಿತ ಸ್ಥಾನವಿತ್ತು. ಘೋಷಾ, ಅಪಾಲಾ, ಗಾರ್ಗಿ ಮುಂತಾದ ಮಹಿಳಾ ವಿದ್ವನ್ಮಣಿಗಳು ವೇದಕಾಲದ ಸೂಕ್ತಗಳನ್ನು ರಚಿಸಿದ್ದರು. ಮರುಮದುವೆಗೆ ಅವಕಾಶವಿತ್ತು.",
+                womenBg: "linear-gradient(135deg, #8e44ad, #9b59b6)",
+                political: "ಬಣದ ಮುಖ್ಯಸ್ಥನನ್ನು 'ರಾಜನ್' ಎನ್ನಲಾಗುತ್ತಿತ್ತು. ರಾಜನು ಸರ್ವಾಧಿಕಾರಿಯಾಗಿರಲಿಲ್ಲ, ಆಡಳಿತದಲ್ಲಿ ಸಲಹೆ ನೀಡಲು 'ಸಭಾ' ಮತ್ತು 'ಸಮಿತಿ' ಎಂಬ ಪ್ರಜಾಸತ್ತಾತ್ಮಕ ಸಂಸ್ಥೆಗಳಿದ್ದವು.",
+                politicalBg: "linear-gradient(135deg, #16a085, #1abc9c)",
+                religious: "ಜನರು ಪ್ರಕೃತಿಯ ದೇವತೆಗಳಾದ ಇಂದ್ರ, ಅಗ್ನಿ, ವರುಣ, ಮಿತ್ರ ಮತ್ತು ಸೂರ್ಯನನ್ನು ಆರಾಧಿಸುತ್ತಿದ್ದರು. ಯಾಗ-ಯಜ್ಞಗಳು ಅತ್ಯಂತ ಸರಳವಾಗಿದ್ದವು ಮತ್ತು ಪ್ರಾಣಿಬಲಿ ಇರಲಿಲ್ಲ."
+            },
+            // उत्तर ವೇದಕಾಲ (Slider Value = 1)
+            1: {
+                title: "ಉತ್ತರ ವೇದಕಾಲದ ಸಂಸ್ಕೃತಿ",
+                titleColor: "#c0392b",
+                social: "ಬ್ರಾಹ್ಮಣ, ಕ್ಷತ್ರಿಯ, ವೈಶ್ಯ ಮತ್ತು ಶೂದ್ರ ಎಂಬ <b>'ನಾಲ್ಕು ವರ್ಣಗಳ ವ್ಯವಸ್ಥೆ'</b> ಜನ್ಮದ ಆಧಾರದ ಮೇಲೆ ಬಿಗಿಯಾಯಿತು. ಬ್ರಹ್ಮಚರ್ಯ, ಗೃಹಸ್ಥ, ವಾನಪ್ರಸ್ಥ, ಸನ್ಯಾಸ ಎಂಬ ಚಾತುರಾಶ್ರಮ ಪದ್ಧತಿ ಜಾರಿಗೆ ಬಂತು.",
+                socialBg: "linear-gradient(135deg, #c0392b, #e74c3c)",
+                women: "ಮಹಿಳೆಯರ ಸ್ಥಾನಮಾನ ಗಣನೀಯವಾಗಿ ಕುಸಿಯಿತು. ಧಾರ್ಮಿಕ ಮತ್ತು ರಾಜಕೀಯ ಹಕ್ಕುಗಳನ್ನು ಕಸಿದುಕೊಳ್ಳಲಾಯಿತು. ಬಾಲ್ಯವಿವಾಹ, ವರದಕ್ಷಿಣೆ ಮತ್ತು ಜೂಜಾಟದಂತಹ ಸಾಮಾಜಿಕ ಪಿಡುಗುಗಳು ಆರಂಭವಾದವು.",
+                womenBg: "linear-gradient(135deg, #7d3c98, #af7ac5)",
+                political: "ರಾಜತ್ವವು ವಂಶಪಾರಂಪರ್ಯವಾಯಿತು. ರಾಜನ ಅಧಿಕಾರ ಮತ್ತು ಸಾಮ್ರಾಜ್ಯ ವಿಸ್ತರಣೆ ಹೆಚ್ಚಾಯಿತು. ಪೂರ್ವ ವೇದಕಾಲದ ಪ್ರಮುಖ ಸಂಸ್ಥೆಗಳಾದ 'ಸಭಾ' ಮತ್ತು 'ಸಮಿತಿ'ಗಳು ತಮ್ಮ ಪ್ರಾಮುಖ್ಯತೆಯನ್ನು ಕಳೆದುಕೊಂಡವು.",
+                politicalBg: "linear-gradient(135deg, #117a65, #16a085)",
+                religious: "ಬ್ರಹ್ಮ, ವಿಷ್ಣು ಮತ್ತು ಮಹೇಶ್ವರ (ಶಿವ) ಪ್ರಮುಖ ದೇವತೆಗಳಾದರು. ಯಾಗ-ಯಜ್ಞಗಳು ಅತ್ಯಂತ ದುಬಾರಿ, ಸಂಕೀರ್ಣ ಮತ್ತು ಆಡಂಬರದಿಂದ ಕೂಡಿದ್ದವು. ಯಜ್ಞಗಳಲ್ಲಿ ಪ್ರಾಣಿಬಲಿ ನೀಡುವ ಪದ್ಧತಿ ವ್ಯಾಪಕವಾಯಿತು."
+            }
+        };
+
+        // ಸ್ಲೈಡರ್ ಚಲಿಸಿದಾಗ ಮಾಹಿತಿ ಲೈವ್ ಆಗಿ ಬದಲಾಯಿಸುವ ಫಂಕ್ಷನ್
+        function switchVedicPeriod(sliderValue) {
+            const data = vedicPeriodsData[sliderValue];
+            
+            // ಶೀರ್ಷಿಕೆ ಮತ್ತು ಬಣ್ಣ ಬದಲಾವಣೆ
+            const titleElement = document.getElementById("period-title");
+            titleElement.innerText = data.title;
+            titleElement.style.color = data.titleColor;
+
+            // ಕಾರ್ಡ್‌ಗಳ ಮಾಹಿತಿ ಮತ್ತು ಹಿನ್ನೆಲೆ ಬಣ್ಣಗಳ ಬದಲಾವಣೆ
+            updateCard("box-social", "p-social", data.social, data.socialBg);
+            updateCard("box-women", "p-women", data.women, data.womenBg);
+            updateCard("box-political", "p-political", data.political, data.politicalBg);
+            updateCard("box-religious", "p-religious", data.religious, data.religious);
+
+            // ಆಕರ್ಷಕ ಸ್ಲೈಡ್ ಧ್ವನಿ (Swoosh effect)
+            playSliderTone(sliderValue == 0 ? 500 : 700, 0.15);
+        }
+
+        // ಕಾರ್ಡ್ ಅಪ್ಡೇಟ್ ಮತ್ತು ಅನಿಮೇಷನ್ ಸಹಾಯಕ ಫಂಕ್ಷನ್
+        function updateCard(boxId, pId, text, bg) {
+            const box = document.getElementById(boxId);
+            const p = document.getElementById(pId);
+            
+            // ಹಳೆಯ ಕ್ಲಾಸ್ ತೆಗೆದು ಅನಿಮೇಷನ್ ಮರುಪ್ರಾರಂಭಿಸುವುದು
+            box.classList.remove("slide-change");
+            void box.offsetWidth; // ಬ್ರೌಸರ್ ರಿಫ್ಲೋ ಟ್ರಿಗರ್ ಮಾಡಲು
+            box.classList.add("slide-change");
+            
+            box.style.background = bg;
+            p.innerHTML = text;
+        }
+
+        // ಆಫ್‌ಲೈನ್ ಆಡಿಯೋ ಸೌಂಡ್ ಕ್ರಿಯೇಟರ್
+        function playSliderTone(freq, duration) {
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            oscillator.frequency.value = freq;
+            oscillator.start();
+            gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+            oscillator.stop(audioCtx.currentTime + duration);
+        }
+    </script>
+</body>
+</html>
