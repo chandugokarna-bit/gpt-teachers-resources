@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ವರನಟನ ಪದಬಂಧ - ಅಲ್ಟ್ರಾ ಮಾಡರ್ನ್ ಜಂಬಲ್ ವರ್ಡ್</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .main-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 20px;
+            max-width: 550px;
+            width: 100%;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+        h1 {
+            color: #00f2fe;
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+            text-shadow: 0 0 10px rgba(0, 242, 254, 0.4);
+        }
+        .subtitle {
+            color: #bdc3c7;
+            font-size: 0.95rem;
+            margin-bottom: 25px;
+        }
+        
+        /* ಅಕ್ಷರಗಳ ಬಟನ್ ಸ್ಟೈಲ್ */
+        .letter-pool {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 25px;
+            min-height: 60px;
+            align-items: center;
+        }
+        .letter-btn {
+            background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
+            color: #000;
+            font-size: 1.4rem;
+            font-weight: bold;
+            padding: 10px 18px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 242, 254, 0.3);
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .letter-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 242, 254, 0.5);
+        }
+        .letter-btn:active { transform: translateY(1px); }
+
+        /* ಉತ್ತರ ಮೂಡುವ ಡಿಸ್ಪ್ಲೇ ಬಾಕ್ಸ್ */
+        .answer-display {
+            background: rgba(0, 0, 0, 0.3);
+            border: 2px dashed #4facfe;
+            border-radius: 12px;
+            min-height: 65px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            margin-bottom: 25px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #fff;
+        }
+        .answer-letter {
+            background: rgba(255,255,255,0.1);
+            padding: 5px 12px;
+            border-radius: 6px;
+            border: 1px solid rgba(255,255,255,0.2);
+            cursor: pointer;
+            animation: bounceIn 0.3s ease;
+        }
+
+        /* ವ್ಯಾಕರಣ ಪ್ರಕಾರದ ಬಟನ್‌ಗಳು */
+        .grammar-zone {
+            margin-bottom: 25px;
+        }
+        .grammar-zone p {
+            color: #a1a1aa;
+            margin-bottom: 12px;
+            font-size: 1rem;
+        }
+        .type-btn {
+            background: transparent;
+            border: 2px solid #475569;
+            color: #fff;
+            padding: 10px 24px;
+            font-size: 1rem;
+            font-weight: bold;
+            margin: 0 10px;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .type-btn.selected {
+            background: #ff007f;
+            border-color: #ff007f;
+            box-shadow: 0 0 15px rgba(255, 0, 127, 0.4);
+        }
+
+        /* ಆಕ್ಷನ್ ಬಟನ್ */
+        .action-btn {
+            width: 100%;
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 14px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background 0.2s;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        }
+        .action-btn:hover { background: #059669; }
+
+        /* ಮೆಸೇಜ್ ಸೆಕ್ಷನ್ */
+        .msg-box {
+            margin-top: 20px;
+            font-size: 1.15rem;
+            font-weight: bold;
+            min-height: 30px;
+        }
+        .text-success { color: #10b981; }
+        .text-error { color: #ef4444; }
+
+        @keyframes bounceIn {
+            0% { transform: scale(0.3); opacity: 0; }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="main-card" id="gameCard">
+        <h1>ವರನಟನ ಪದಬಂಧ 🧩</h1>
+        <p class="subtitle">ಅಕ್ಷರಗಳ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ ಪದ ಜೋಡಿಸಿ ಮತ್ತು ವ್ಯಾಕರಣ ಪ್ರಕಾರವನ್ನು ಗುರುತಿಸಿ!</p>
+
+        <div class="letter-pool" id="letterPool"></div>
+
+        <p style="font-size: 0.85rem; color: #a1a1aa; margin-bottom: 5px;">ನಿಮ್ಮ ಉತ್ತರ (ತೆಗೆಯಲು ಅಕ್ಷರದ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ):</p>
+        <div class="answer-display" id="answerDisplay"></div>
+
+        <div class="grammar-zone">
+            <p>ಈ ಪದವು ವ್ಯಾಕರಣದ ಯಾವ ರೂಪಕ್ಕೆ ಸೇರಿದೆ?</p>
+            <button class="type-btn" onclick="selectGrammarType('ನಾಮಪದ', this)">ನಾಮಪದ</button>
+            <button class="type-btn" onclick="selectGrammarType('ಕ್ರಿಯಾಪದ', this)">ಕ್ರಿಯಾಪದ</button>
+        </div>
+
+        <button class="action-btn" id="actionBtn" onclick="verifyAnswer()">ಉತ್ತರ ಪರಿಶೀಲಿಸಿ 🔍</button>
+        <div class="msg-box" id="msgBox"></div>
+    </div>
+
+<script>
+    // ಡಾ. ರಾಜ್‌ಕುಮಾರ್ ಪಾಠಕ್ಕೆ ಸಂಬಂಧಿಸಿದ ಅತ್ಯಾಧುನಿಕ ಡೇಟಾಬೇಸ್
+    // ಸೂಚನೆ: ಕನ್ನಡದಲ್ಲಿ ಅಕ್ಷರಗಳನ್ನು ಸರಿಯಾಗಿ ಕತ್ತರಿಸಲು ಅರೇ (Array) ಮಾದರಿಯಲ್ಲಿ ನೀಡಲಾಗಿದೆ.
+    const puzzleData = [
+        {
+            jumbled: ["ರ", "ನ", "ವ", "ಟ"],
+            correctWord: "ವರನಟ",
+            type: "ನಾಮಪದ"
+        },
+        {
+            jumbled: ["ಸಿ", "ದ", "ನು", "ಗಿ", "ನೆ"],
+            correctWord: "ನೆಗಿಸಿದನು",
+            type: "ಕ್ರಿಯಾಪದ"
+        },
+        {
+            jumbled: ["ನ", "ಗಾ", "ಜು", "ರು"],
+            correctWord: "ಗಾಜನೂರು",
+            type: "ನಾಮಪದ"
+        },
+        {
+            jumbled: ["ದ", "ರು", "ನೆ", "ನ", "ಪಿ", "ಸಿ"],
+            correctWord: "ನೆನಪಿಸಿದರು",
+            type: "ಕ್ರಿಯಾಪದ"
+        }
+    ];
+
+    let currentIndex = 0;
+    let score = 0;
+    let selectedLetters = [];
+    let selectedType = "";
+
+    const letterPool = document.getElementById('letterPool');
+    const answerDisplay = document.getElementById('answerDisplay');
+    const msgBox = document.getElementById('msgBox');
+    const actionBtn = document.getElementById('actionBtn');
+
+    function initRound() {
+        if (currentIndex >= puzzleData.length) {
+            showFinalScore();
+            return;
+        }
+
+        // ರಿಸೆಟ್ ಆಪ್ಷನ್ಗಳು
+        selectedLetters = [];
+        selectedType = "";
+        msgBox.innerHTML = "";
+        answerDisplay.innerHTML = "";
+        actionBtn.innerText = "ಉತ್ತರ ಪರಿಶೀಲಿಸಿ 🔍";
+        actionBtn.onclick = verifyAnswer;
+        actionBtn.style.background = "#10b981";
+
+        // ವ್ಯಾಕರಣ ಬಟನ್ ರಿಸೆಟ್
+        document.querySelectorAll('.type-btn').forEach(btn => btn.classList.remove('selected'));
+
+        // ಅಕ್ಷರಗಳ ಬಟನ್ ಸೃಷ್ಟಿ
+        letterPool.innerHTML = "";
+        const currentRound = puzzleData[currentIndex];
+        
+        currentRound.jumbled.forEach((char, index) => {
+            const btn = document.createElement('button');
+            btn.className = "letter-btn";
+            btn.innerText = char;
+            btn.id = `char-${index}`;
+            btn.onclick = () => moveLetterToAnswer(char, btn.id);
+            letterPool.appendChild(btn);
+        });
+    }
+
+    function moveLetterToAnswer(char, btnId) {
+        const originalBtn = document.getElementById(btnId);
+        originalBtn.style.visibility = "hidden"; // ಪೂಲ್‌ನಿಂದ ತಾತ್ಕಾಲಿಕವಾಗಿ ಮರೆಮಾಡುವುದು
+
+        selectedLetters.push({ char: char, id: btnId });
+        renderAnswer();
+    }
+
+    function removeLetterFromAnswer(indexInAnswer, btnId) {
+        // ವಾಪಸ್ ಪೂಲ್‌ಗೆ ಕಳುಹಿಸುವುದು
+        const originalBtn = document.getElementById(btnId);
+        if (originalBtn) originalBtn.style.visibility = "visible";
+
+        selectedLetters.splice(indexInAnswer, 1);
+        renderAnswer();
+    }
+
+    function renderAnswer() {
+        answerDisplay.innerHTML = "";
+        selectedLetters.forEach((item, index) => {
+            const span = document.createElement('span');
+            span.className = "answer-letter";
+            span.innerText = item.char;
+            span.onclick = () => removeLetterFromAnswer(index, item.id);
+            answerDisplay.appendChild(span);
+        });
+    }
+
+    function selectGrammarType(type, element) {
+        selectedType = type;
+        document.querySelectorAll('.type-btn').forEach(btn => btn.classList.remove('selected'));
+        element.classList.add('selected');
+    }
+
+    function verifyAnswer() {
+        const currentRound = puzzleData[currentIndex];
+        const constructedWord = selectedLetters.map(item => item.char).join('');
+
+        if (constructedWord === "") {
+            msgBox.className = "msg-box text-error";
+            msgBox.innerText = "⚠️ ದಯವಿಟ್ಟು ಅಕ್ಷರಗಳನ್ನು ಆಯ್ದು ಪದ ಜೋಡಿಸಿ!";
+            return;
+        }
+        if (selectedType === "") {
+            msgBox.className = "msg-box text-error";
+            msgBox.innerText = "⚠️ ಇದು ಯಾವ ವ್ಯಾಕರಣ ರೂಪ ಎಂದು ಬಟನ್ ಕ್ಲಿಕ್ ಮಾಡಿ ಆರಿಸಿ!";
+            return;
+        }
+
+        // ಮೌಲ್ಯಮಾಪನ
+        if (constructedWord === currentRound.correctWord && selectedType === currentRound.type) {
+            msgBox.className = "msg-box text-success";
+            msgBox.innerText = "✨ ಅದ್ಭುತ! ಸರಿಯಾದ ಉತ್ತರ.";
+            score++;
+        } else {
+            msgBox.className = "msg-box text-error";
+            msgBox.innerText = `❌ ತಪ್ಪು! ಸರಿಯಾದ ಪದ: "${currentRound.correctWord}" (${currentRound.type})`;
+        }
+
+        // ಬಟನ್ ಅನ್ನು ಮುಂದಿನ ಪ್ರಶ್ನೆಗೆ ಬದಲಾಯಿಸುವುದು
+        actionBtn.innerText = "ಮುಂದಿನ ಪ್ರಶ್ನೆ ➡️";
+        actionBtn.style.background = "#4facfe";
+        actionBtn.onclick = () => {
+            currentIndex++;
+            initRound();
+        };
+    }
+
+    function showFinalScore() {
+        const card = document.getElementById('gameCard');
+        card.innerHTML = `
+            <div style="font-size: 4rem; margin-bottom: 15px;">🏆</div>
+            <h1>ಶಹಬಾಷ್! ಆಟ ಮುಗಿಯಿತು</h1>
+            <p class="subtitle">ಡಾ. ರಾಜ್‌ಕುಮಾರ್ ಪಾಠದ ಪದಗಳ ಜೋಡಣೆ ಯಶಸ್ವಿಯಾಗಿದೆ.</p>
+            <div style="font-size: 1.5rem; font-weight: bold; margin: 25px 0; color: #00f2fe;">
+                ನಿಮ್ಮ ಒಟ್ಟು ಅಂಕಗಳು: ${score} / ${puzzleData.length}
+            </div>
+            <button class="action-btn" onclick="location.reload()">ಮತ್ತೆ ಮೊದಲಿನಿಂದ ಆಡಿ 🎮</button>
+        `;
+    }
+
+    // ಆಟ ಆರಂಭಿಸಿ
+    initRound();
+</script>
+
+</body>
+</html>

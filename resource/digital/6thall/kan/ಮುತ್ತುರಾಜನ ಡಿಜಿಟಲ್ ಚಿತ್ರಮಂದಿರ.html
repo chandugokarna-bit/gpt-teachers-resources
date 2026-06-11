@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಮುತ್ತುರಾಜನ ಚಿತ್ರಮಂದಿರ - ಇಂಟರ್ ಆಕ್ಟಿವ್ ಮೀಡಿಯಾ</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #09090b;
+            color: #fafafa;
+            padding: 40px 20px;
+            text-align: center;
+        }
+        h1 {
+            color: #ea580c;
+            font-size: 2.3rem;
+            margin-bottom: 5px;
+            text-shadow: 0 0 15px rgba(234, 88, 12, 0.4);
+        }
+        .subtitle {
+            color: #a1a1aa;
+            margin-bottom: 40px;
+            font-size: 1.1rem;
+        }
+
+        /* ಸಿನಿಮಾ ಹಾಲ್ ಗ್ರಿಡ್ */
+        .theatre-wall {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 25px;
+            max-width: 1000px;
+            margin: 0 auto 50px auto;
+        }
+
+        /* ಸಿನಿಮಾ ರೀಲ್ / ಪೋಸ್ಟರ್ ಕಾರ್ಡ್ */
+        .movie-card {
+            background: #18181b;
+            border: 2px solid #27272a;
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
+        .movie-card:hover {
+            transform: scale(1.05) translateY(-5px);
+            border-color: #ea580c;
+            box-shadow: 0 10px 25px rgba(234, 88, 12, 0.2);
+        }
+        .movie-icon {
+            font-size: 3.5rem;
+            margin-bottom: 15px;
+            display: inline-block;
+        }
+        .movie-title {
+            font-size: 1.3rem;
+            color: #f4f4f5;
+            font-weight: bold;
+        }
+
+        /* ಲೈವ್ ಪ್ರೊಜೆಕ್ಟರ್ ಸ್ಕ್ರೀನ್ (ಪರದೆ ಅನಿಮೇಷನ್) */
+        .cinema-screen {
+            display: none;
+            background: linear-gradient(180deg, #1e1b4b 0%, #0f172a 100%);
+            border: 4px solid #ea580c;
+            border-radius: 16px;
+            max-width: 650px;
+            margin: 30px auto;
+            padding: 30px;
+            box-shadow: 0 0 30px rgba(234, 88, 12, 0.3);
+            animation: slideDown 0.4s ease-out;
+        }
+        @keyframes slideDown {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .screen-title {
+            color: #fbbf24;
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+        .message-box {
+            background: rgba(0,0,0,0.4);
+            padding: 15px;
+            border-left: 5px solid #fbbf24;
+            border-radius: 4px;
+            text-align: left;
+            font-size: 1.1rem;
+            line-height: 1.7;
+            margin-bottom: 25px;
+        }
+
+        /* ವಿದ್ಯಾರ್ಥಿಗಳ ಲೈವ್ ಕಮೆಂಟ್ ಸೆಕ್ಷನ್ */
+        .review-input-zone h4 {
+            margin-bottom: 10px;
+            color: #e4e4e7;
+        }
+        .review-input-zone input {
+            width: 70%;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #3f3f46;
+            background: #09090b;
+            color: white;
+            font-size: 1rem;
+            outline: none;
+            margin-right: 10px;
+        }
+        .review-input-zone input:focus { border-color: #ea580c; }
+        .post-btn {
+            background: #ea580c;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .post-btn:hover { background: #c2410c; }
+
+        /* ಲೈವ್ ಡಿಜಿಟಲ್ ಬೋರ್ಡ್ */
+        .live-board-title {
+            margin-top: 50px;
+            font-size: 1.5rem;
+            color: #22c55e;
+            border-bottom: 2px dashed #27272a;
+            padding-bottom: 10px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .board-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+            max-width: 800px;
+            margin: 20px auto;
+        }
+        .sticky-note {
+            background: #fef08a;
+            color: #1c1917;
+            padding: 15px;
+            border-radius: 8px;
+            width: 220px;
+            box-shadow: 5px 5px 15px rgba(0,0,0,0.3);
+            font-weight: bold;
+            text-align: left;
+            transform: rotate(-1deg);
+            animation: popUp 0.3s ease;
+        }
+        .sticky-note:nth-child(even) { transform: rotate(2deg); background: #bfdbfe; }
+        .sticky-note span {
+            display: block;
+            font-size: 0.85rem;
+            color: #4b5563;
+            margin-top: 10px;
+            border-top: 1px solid rgba(0,0,0,0.1);
+            padding-top: 5px;
+        }
+        @keyframes popUp {
+            from { transform: scale(0.6); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>ಮುತ್ತುರಾಜನ ಡಿಜಿಟಲ್ ಚಿತ್ರಮಂದಿರ 🎬</h1>
+    <p class="subtitle">ಯಾವುದಾದರೂ ಒಂದು ಚಿತ್ರದ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ, ಅದರ ಸಾಮಾಜಿಕ ಸಂದೇಶದ ರಹಸ್ಯ ಪರದೆಯನ್ನು ತೆರೆಯಿರಿ!</p>
+
+    <div class="theatre-wall">
+        <div class="movie-card" onclick="showMovieMessage(0)">
+            <div class="movie-icon">🌾</div>
+            <div class="movie-title">ಬಂಗಾರದ ಮನುಷ್ಯ</div>
+        </div>
+        <div class="movie-card" onclick="showMovieMessage(1)">
+            <div class="movie-icon">💎</div>
+            <div class="movie-title">ಕಸ್ತೂರಿ ನಿವಾಸ</div>
+        </div>
+        <div class="movie-card" onclick="showMovieMessage(2)">
+            <div class="movie-icon">👑</div>
+            <div class="movie-title">ಮಯೂರ</div>
+        </div>
+        <div class="movie-card" onclick="showMovieMessage(3)">
+            <div class="movie-icon">📖</div>
+            <div class="movie-title">ಕವಿರತ್ನ ಕಾಳಿದಾಸ</div>
+        </div>
+    </div>
+
+    <div class="cinema-screen" id="cinemaScreen">
+        <h3 class="screen-title" id="screenMovieTitle">ಸಿನಿಮಾ ಹೆಸರು</h3>
+        <div class="message-box" id="screenMovieMessage">ಸಂದೇಶ ಇಲ್ಲಿ ಮೂಡುತ್ತದೆ...</div>
+        
+        <div class="review-input-zone">
+            <h4>ಈ ಸಿನಿಮಾದ ಬಗ್ಗೆ ನಿಮ್ಮ ಅನಿಸಿಕೆ ಅಥವಾ ನೀವು ಕಲಿತ ನೀತಿಯನ್ನು ಬರೆಯಿರಿ:</h4>
+            <input type="text" id="studentComment" placeholder="ನಿಮ್ಮ ಅನಿಸಿಕೆಯನ್ನು ಇಲ್ಲಿ ಟೈಪ್ ಮಾಡಿ..." autocomplete="off">
+            <button class="post-btn" onclick="postToDigitalBoard()">ಬೋರ್ಡ್‌ಗೆ ಸೇರಿಸಿ 📌</button>
+        </div>
+    </div>
+
+    <h3 class="live-board-title">ತರಗತಿಯ ಲೈವ್ ಚರ್ಚಾ ಬೋರ್ಡ್ (Digital Bulletin Board) 📌</h3>
+    <div class="board-container" id="boardContainer">
+        </div>
+
+<script>
+    // ಸಿನಿಮಾಗಳು ಮತ್ತು ಅವುಗಳ ಸಮಾಸ/ಸಾಮಾಜಿಕ ಸಂದೇಶಗಳ ವಿವರ
+    const moviesData = [
+        {
+            title: "ಬಂಗಾರದ ಮನುಷ್ಯ",
+            message: "📢 **ಸಾಮಾಜಿಕ ಸಂದೇಶ:** ಪಟ್ಟಣದ ವ್ಯಾಮೋಹ ಬಿಟ್ಟು ಹಳ್ಳಿಗೆ ಮರಳಿ, ಕೃಷಿ ಕಾಯಕದ ಮೂಲಕ ಸ್ವಾವಲಂಬಿ ಜೀವನ ನಡೆಸಬಹುದು ಮತ್ತು ದೇಶದ ಪ್ರಗತಿಗೆ ಕೊಡುಗೆ ನೀಡಬಹುದು ಎಂಬ ಅದ್ಭುತ ಸಂದೇಶವನ್ನು ಈ ಚಿತ್ರ ನೀಡುತ್ತದೆ."
+        },
+        {
+            title: "ಕಸ್ತೂರಿ ನಿವಾಸ",
+            message: "📢 **ಸಾಮಾಜಿಕ ಸಂದೇಶ:** ಅತಿಯಾದ ದಾನಗುಣ ಮತ್ತು ಔದಾರ್ಯವು ಮನುಷ್ಯನನ್ನು ಸಂಕಷ್ಟಕ್ಕೆ ಈಡುಮಾಡಿದರೂ, ಸತ್ಯ ಮತ್ತು ಪ್ರಾಮಾಣಿಕತೆಗಿಂತ ಮಿಗಿಲಾದದ್ದು ಯಾವುದೂ ಇಲ್ಲ ಎಂಬ ಉದಾತ್ತ ಮೌಲ್ಯವನ್ನು ಜಗತ್ತಿಗೆ ಸಾರುತ್ತದೆ."
+        },
+        {
+            title: "ಮಯೂರ",
+            message: "📢 **ಸಾಮಾಜಿಕ ಸಂದೇಶ:** ಮಾತೃಭೂಮಿಯ ರಕ್ಷಣೆ, ಸ್ವಾಭಿಮಾನ, ಹಾಗೂ ಕದಂಬ ಸಾಮ್ರಾಜ್ಯದ ಇತಿಹಾಸವನ್ನು ನೆನಪಿಸುತ್ತಾ, ಯುವ ಪೀಳಿಗೆಯಲ್ಲಿ ದೇಶಭಕ್ತಿ ಮತ್ತು ಧೀರತನದ ಕಿಡಿಯನ್ನು ಹೊತ್ತಿಸುತ್ತದೆ."
+        },
+        {
+            title: "ಕವಿರತ್ನ ಕಾಳಿದಾಸ",
+            message: "📢 **ಸಾಮಾಜಿಕ ಸಂದೇಶ:** ವಿದ್ಯೆ ಮತ್ತು ಬುದ್ಧಿವಂತಿಕೆ ಯಾರೊಬ್ಬರ ಸ್ವತ್ತಲ್ಲ. ತಾಯಿ ಶಾರದಾಂಬೆಯ ಕೃಪೆಯಿಂದ ಒಬ್ಬ ಸಾಮಾನ್ಯ ಕುರುಬನೂ ಮಹಾಕವಿಯಾಗಬಹುದು ಎಂಬ ಸಾಹಿತ್ಯಿಕ ಪ್ರೇರಣೆ ನೀಡುತ್ತದೆ."
+        }
+    ];
+
+    let activeMovieTitle = "";
+
+    const cinemaScreen = document.getElementById('cinemaScreen');
+    const screenMovieTitle = document.getElementById('screenMovieTitle');
+    const screenMovieMessage = document.getElementById('screenMovieMessage');
+    const studentComment = document.getElementById('studentComment');
+    const boardContainer = document.getElementById('boardContainer');
+
+    // ಪೋಸ್ಟರ್ ಕ್ಲಿಕ್ ಮಾಡಿದಾಗ ಸ್ಕ್ರೀನ್ ಓಪನ್ ಮಾಡುವ ಫಂಕ್ಷನ್
+    function showMovieMessage(index) {
+        const selectedMovie = moviesData[index];
+        activeMovieTitle = selectedMovie.title;
+
+        screenMovieTitle.innerText = `🎬 ಪ್ರೊಜೆಕ್ಟರ್ ಪ್ಲೇ ಆಗ್ತಿದೆ: ${selectedMovie.title}`;
+        screenMovieMessage.innerText = selectedMovie.message;
+        
+        studentComment.value = ""; // ಹಳೆಯ ಕಮೆಂಟ್ ಕ್ಲಿಯರ್ ಮಾಡಲು
+        cinemaScreen.style.display = "block";
+        
+        // ಸ್ಕ್ರೀನ್ ಕಡೆಗೆ ಸ್ಮೂತ್ ಆಗಿ ಸ್ಕ್ರಾಲ್ ಮಾಡಲು
+        cinemaScreen.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // ಲೈವ್ ಬೋರ್ಡ್‌ಗೆ ವಿದ್ಯಾರ್ಥಿಯ ಅನಿಸಿಕೆ ಪೋಸ್ಟ್ ಮಾಡುವುದು
+    function postToDigitalBoard() {
+        const text = studentComment.value.trim();
+        
+        if (text === "") {
+            alert("⚠️ ದಯವಿಟ್ಟು ಮೊದಲು ನಿಮ್ಮ ಅನಿಸಿಕೆಯನ್ನು ಟೈಪ್ ಮಾಡಿ!");
+            return;
+        }
+
+        // ಹೊಸ ಸ್ಟಿಕಿ ನೋಟ್ ಕಾರ್ಡ್ ಸೃಷ್ಟಿ
+        const note = document.createElement('div');
+        note.className = "sticky-note";
+        note.innerHTML = `
+            "${text}"
+            <span>🎬 ಚಿತ್ರ: ${activeMovieTitle}</span>
+        `;
+
+        // ಬೋರ್ಡ್‌ನ ಮೊದಲ ಸ್ಥಾನಕ್ಕೆ ಸೇರಿಸುವುದು
+        boardContainer.insertBefore(note, boardContainer.firstChild);
+
+        // ಇನ್‌ಪುಟ್ ಬಾಕ್ಸ್ ಕ್ಲಿಯರ್ ಮಾಡುವುದು
+        studentComment.value = "";
+        
+        // ಬೋರ್ಡ್ ಕಡೆಗೆ ಸ್ಕ್ರಾಲ್ ಮಾಡುವುದು
+        boardContainer.scrollIntoView({ behavior: 'smooth' });
+    }
+</script>
+
+</body>
+</html>

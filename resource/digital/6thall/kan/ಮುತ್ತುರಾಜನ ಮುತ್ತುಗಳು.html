@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಮುತ್ತುರಾಜನ ಮುತ್ತುಗಳು - ಡಿಜಿಟಲ್ ಎಸ್ಕೇಪ್ ರೂಮ್</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0f172a;
+            color: #f8fafc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+        .game-box {
+            background: #1e293b;
+            border: 2px solid #3b82f6;
+            border-radius: 16px;
+            padding: 30px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.2);
+            text-align: center;
+            position: relative;
+        }
+        h1 {
+            color: #38bdf8;
+            font-size: 2rem;
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
+        }
+        /* ಸ್ಟೇಟಸ್ ಬಾರ್ (ಲೈವ್ಸ್ ಮತ್ತು ಲೆವೆಲ್) */
+        .status-container {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 25px;
+            background: #0f172a;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+        .level-indicator { color: #fbbf24; }
+        .lives-indicator { color: #ef4444; }
+
+        /* ಪ್ರೋಗ್ರೆಸ್ ಬಾರ್ */
+        .progress-bar-container {
+            width: 100%;
+            height: 8px;
+            background: #334155;
+            border-radius: 4px;
+            margin-bottom: 25px;
+            overflow: hidden;
+        }
+        .progress-bar {
+            height: 100%;
+            width: 10%;
+            background: linear-gradient(90deg, #3b82f6, #06b6d4);
+            transition: width 0.4s ease;
+        }
+
+        /* ಪ್ರಶ್ನೆ ಮತ್ತು ಲಾಕ್ ಐಕಾನ್ */
+        .lock-visual {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            animation: pulse 2s infinite;
+        }
+        .question-text {
+            font-size: 1.25rem;
+            line-height: 1.6;
+            margin-bottom: 25px;
+            color: #e2e8f0;
+        }
+
+        /* ಆಯ್ಕೆಗಳ ಬಟನ್ */
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+        .option-btn {
+            background: #334155;
+            color: #f8fafc;
+            border: 2px solid #475569;
+            padding: 14px;
+            font-size: 1.05rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            text-align: left;
+            transition: all 0.2s ease;
+        }
+        .option-btn:hover {
+            background: #475569;
+            border-color: #38bdf8;
+            transform: translateX(5px);
+        }
+
+        /* ರಿಸಲ್ಟ್ ಸ್ಕ್ರೀನ್ */
+        .screen { display: none; }
+        .screen.active { display: block; }
+
+        .game-over-title { color: #ef4444; font-size: 2.5rem; margin-bottom: 15px; }
+        .victory-title { color: #10b981; font-size: 2.5rem; margin-bottom: 15px; }
+
+        .action-btn {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background 0.2s;
+        }
+        .action-btn:hover { background: #2563eb; }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.08); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="game-box">
+        <!-- ಗೇಮ್ ಪ್ಲೇ ಸ್ಕ್ರೀನ್ -->
+        <div id="playScreen" class="screen active">
+            <h1>ಮುತ್ತುರಾಜನ ಮುತ್ತುಗಳು 💎</h1>
+            <p style="color: #94a3b8; margin-bottom: 15px;">ಪ್ರತಿ ಪ್ರಶ್ನೆಗೆ ಸರಿಯಾದ ಉತ್ತರ ನೀಡಿ ೧೦ ಡಿಜಿಟಲ್ ಲಾಕ್‌ಗಳನ್ನು ಅನ್‌ಲಾಕ್ ಮಾಡಿ!</p>
+            
+            <div class="status-container">
+                <span class="level-indicator" id="levelLabel">ಹಂತ: 1 / 10</span>
+                <span class="lives-indicator" id="livesLabel">ಲೈಫ್ಸ್: ❤️ ❤️ ❤️</span>
+            </div>
+
+            <div class="progress-bar-container">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+
+            <div class="lock-visual" id="lockIcon">🔒</div>
+            <div class="question-text" id="questionText">ಪ್ರಶ್ನೆ ಲೋಡ್ ಆಗುತ್ತಿದೆ...</div>
+
+            <div class="options-grid" id="optionsGrid">
+                <!-- ಆಯ್ಕೆಗಳು ಇಲ್ಲಿ ಲೋಡ್ ಆಗುತ್ತವೆ -->
+            </div>
+        </div>
+
+        <!-- ಗೇಮ್ ಓವರ್ ಸ್ಕ್ರೀನ್ -->
+        <div id="gameOverScreen" class="screen">
+            <div style="font-size: 4rem;">💥</div>
+            <h2 class="game-over-title">ಗೇಮ್ ಓವರ್!</h2>
+            <p>ನಿಮ್ಮ ಎಲ್ಲಾ ಲೈಫ್ ಲೈನ್‌ಗಳು ಮುಗಿದುಹೋಗಿವೆ. ಮತ್ತೊಮ್ಮೆ ಪ್ರಯತ್ನಿಸಿ ಮತ್ತು ಪಾಠವನ್ನು ಚೆನ್ನಾಗಿ ನೆನಪಿಸಿಕೊಳ್ಳಿ.</p>
+            <button class="action-btn" onclick="restartGame()">ಮರುಪ್ರಯತ್ನಿಸಿ 🔄</button>
+        </div>
+
+        <!-- ವಿಕ್ಟರಿ ಸ್ಕ್ರೀನ್ -->
+        <div id="victoryScreen" class="screen">
+            <div style="font-size: 4rem;">👑</div>
+            <h2 class="victory-title">ಅಭಿನಂದನೆಗಳು!</h2>
+            <p>ನೀವು ಯಶಸ್ವಿಯಾಗಿ ಎಲ್ಲಾ ೧೦ ಇಂಟರ್ ಆಕ್ಟಿವ್ ಲಾಕ್‌ಗಳನ್ನು ಅನ್‌ಲಾಕ್ ಮಾಡಿ ಎಸ್ಕೇಪ್ ರೂಮ್ ಗೆದ್ದಿದ್ದೀರಿ!</p>
+            <p style="color: #fbbf24; margin-top: 10px; font-weight: bold;">ನೀವು ನಿಜವಾದ 'ಕನ್ನಡ ರತ್ನ' 🌟</p>
+            <button class="action-btn" style="background:#10b981;" onclick="restartGame()">ಮತ್ತೆ ಆಡಿ 🎮</button>
+        </div>
+    </div>
+
+<script>
+    // 10 ಹಂತಗಳ ಸಮಗ್ರ ಪ್ರಶ್ನೆಗಳ ಪಟ್ಟಿ
+    const levelsData = [
+        {
+            question: "[ಹಂತ 1 - ಬಾಲ್ಯದ ರಹಸ್ಯ] ಡಾ. ರಾಜ್‌ಕುಮಾರ್ ಅವರ ಬಾಲ್ಯದ ನಿಜವಾದ ಹೆಸರು (ಮೂಲ ಹೆಸರು) ಏನಾಗಿತ್ತು?",
+            options: ["ರಾಜಣ್ಣ", "ಮುತ್ತುರಾಜ", "ಸಿಂಗಾನಲ್ಲೂರು", "ಪುಟ್ಟಸ್ವಾಮಯ್ಯ"],
+            correct: 1
+        },
+        {
+            question: "[ಹಂತ 2 - ಚಿತ್ರರಂಗದ ಲಾಕ್] ಡಾ. ರಾಜ್‌ಕುಮಾರ್ ಅವರು ನಾಯಕ ನಟನಾಗಿ ನಟಿಸಿದ ಮೊದಲ ಪ್ರಸಿದ್ಧ ಚಲನಚಿತ್ರ ಯಾವುದು?",
+            options: ["ಮಯೂರ", "ಬಂಗಾರದ ಮನುಷ್ಯ", "ಬೇಡರ ಕಣ್ಣಪ್ಪ", "ಕಸ್ತೂರಿ ನಿವಾಸ"],
+            correct: 2
+        },
+        {
+            question: "[ಹಂತ 3 - ಚಳುವಳಿಯ ಕೋಡ್] ಕನ್ನಡ ಭาಷೆಯ ಉಳಿವಿಗಾಗಿ ಡಾ. ರಾಜ್‌ಕುಮಾರ್ ಅವರು ನೇತೃತ್ವ ವಹಿಸಿದ್ದ ಪ್ರಸಿದ್ಧ ಐತಿಹಾಸಿಕ ಹೋರಾಟ ಯಾವುದು?",
+            options: ["ಗೋಕಾಕ್ ಚಳುವಳಿ", "ಕರ್ನಾಟಕ ಏಕೀಕರಣ", "ಕನ್ನಡ ಸಾಹಿತ್ಯ ಪರಿಷತ್ ನಡೆ", "ಸ್ವಾತಂತ್ರ್ಯ ಹೋರಾಟ"],
+            correct: 0
+        },
+        {
+            question: "[ಹಂತ 4 - ಗಾಯನದ ಲಾಕ್] ಡಾ. ರಾಜ್‌ಕುಮಾರ್ ಅವರು ಯಾವ ಚಿತ್ರದ 'ನಾದಮಯ ಈ ಲೋಕವೆಲ್ಲಾ' ಹಾಡಿಗೆ ಅತ್ಯುತ್ತಮ ಹಿನ್ನೆಲೆ ಗಾಯಕ ರಾಷ್ಟ್ರ ಪ್ರಶಸ್ತಿ ಪಡೆದರು?",
+            options: ["ಭೂದಾನ", "ಸಂಪತ್ತಿಗೆ ಸವಾಲ್", "ಕವಿರತ್ನ ಕಾಳಿದಾಸ", "ಜೀವನ ಚೈತ್ರ"],
+            correct: 3
+        },
+        {
+            question: "[ಹಂತ 5 - ಪ್ರಶಸ್ತಿಯ ಕೋಡ್] ಭಾರತ ಸರ್ಕಾರವು ಡಾ. ರಾಜ್‌ಕುಮಾರ್ ಅವರಿಗೆ ಚಿತ್ರರಂಗದ ಅತ್ಯುನ್ನತ ಗೌರವವಾದ ಯಾವ ಪ್ರಶಸ್ತಿಯನ್ನು ನೀಡಿ ಪುರಸ್ಕರಿಸಿತು?",
+            options: ["ಪದ್ಮಶ್ರೀ", "ದಾದಾಸಾಹೇಬ್ ಫಾಲ್ಕೆ ಪ್ರಶಸ್ತಿ", "ಜ್ಞಾನಪೀಠ ಪ್ರಶಸ್ತಿ", "ಅರ್ಜುನ ಪ್ರಶಸ್ತಿ"],
+            correct: 1
+        },
+        {
+            question: "[ಹಂತ 6 - ಬಿರುದಿನ ರಹಸ್ಯ] ಡಾ. ರಾಜ್‌ಕುಮಾರ್ ಅವರಿಗೆ ಕನ್ನಡಿಗರು ಪ್ರೀತಿಯಿಂದ ನೀಡಿದ ಅತ್ಯಂತ ಪ್ರಸಿದ್ಧ ಬಿರುದು ಯಾವುದು?",
+            options: ["ಅಭಿನವ ಭಾರ್ಗವ", "ವರನಟ / ರಸಿಕರ ರಾಜ", "ಸಾಹಸ ಸಿಂಹ", "ನಟಭಯಂಕರ"],
+            correct: 1
+        },
+        {
+            question: "[ಹಂತ 7 - ಜನ್ಮಸ್ಥಳದ ಕೋಡ್] ಡಾ. ರಾಜ್‌ಕುಮಾರ್ ಅವರು ಜನಿಸಿದ 'ಗಾಜನೂರು' ಗ್ರಾಮವು ಪ್ರಸ್ತುತ ಯಾವ ರಾಜ್ಯದ ಗಡಿಯಲ್ಲಿದೆ?",
+            options: ["ಕೇರಳ", "ಆಂಧ್ರಪ್ರದೇಶ", "ತಮಿಳುನಾಡು", "ಮಹಾರಾಷ್ಟ್ರ"],
+            correct: 2
+        },
+        {
+            question: "[ಹಂತ 8 - ನಾಟಕ ರಂಗದ ಲಾಕ್] ರಾಜ್‌ಕುಮಾರ್ ಅವರು ಬಾಲ್ಯದಲ್ಲಿ ತಂದೆಯೊಂದಿಗೆ ಸೇರಿ ಅಭಿನಯಿಸುತ್ತಿದ್ದ ಪ್ರಸಿದ್ಧ ನಾಟಕ ಸಂಸ್ಥೆ ಯಾವುದು?",
+            options: ["ಗುಬ್ಬಿ ವೀರಣ್ಣ ನಾಟಕ营", "ಕೆ.ಬಿ.ಆರ್ ನಾಟಕ ಮಂಡಳಿ", "ಮಿತ್ರ ಮಂಡಳಿ", "ರಂಗಭೂಮಿ ಸಂಸ್ಥೆ"],
+            correct: 0
+        },
+        {
+            question: "[ಹಂತ 9 - ಕೃಷಿ ಪ್ರೇರಣೆಯ ಕೋಡ್] ಹಳ್ಳಿಯ ಜೀವನ ಮತ್ತು ಕೃಷಿಯ ಮಹತ್ವವನ್ನು ಸಾರುವ, ಕರ್ನಾಟಕದಲ್ಲಿ ದೊಡ್ಡ ಕ್ರಾಂತಿ ಉಂಟುಮಾಡಿದ ರಾಜ್ ಅವರ ಸಿನಿಮಾ ಯಾವುದು?",
+            options: ["ಬಂಗಾರದ ಮನುಷ್ಯ", "ಆಪರೇಷನ್ ಡೈಮಂಡ್ ರಾಕೆಟ್", "ಬಬ್ರುವಾಹನ", "ದೇವತಾ ಮನುಷ್ಯ"],
+            correct: 0
+        },
+        {
+            question: "[ಹಂತ 10 - ಮಹಾ ಲಾಕ್] ಮೈಸೂರು ವಿಶ್ವವಿದ್ಯಾಲಯವು ಡಾ. ರಾಜ್‌ಕುಮಾರ್ ಅವರಿಗೆ ಯಾವ ಗೌರವ ಪದವಿಯನ್ನು ನೀಡಿ ಸತ್ಕರಿಸಿತು?",
+            options: ["ಡಿ.ಲಿಟ್ (ಡಾಕ್ಟರೇಟ್)", "ಪಿಎಚ್.ಡಿ", "ಮಾಸ್ಟರ್ ಆಫ್ ಆರ್ಟ್ಸ್", "ಪ್ರೊಫೆಸರ್ ಪದವಿ"],
+            correct: 0
+        }
+    ];
+
+    let currentLevel = 0;
+    let lives = 3;
+
+    const playScreen = document.getElementById('playScreen');
+    const gameOverScreen = document.getElementById('gameOverScreen');
+    const victoryScreen = document.getElementById('victoryScreen');
+    
+    const questionText = document.getElementById('questionText');
+    const optionsGrid = document.getElementById('optionsGrid');
+    const levelLabel = document.getElementById('levelLabel');
+    const livesLabel = document.getElementById('livesLabel');
+    const progressBar = document.getElementById('progressBar');
+    const lockIcon = document.getElementById('lockIcon');
+
+    function loadLevel() {
+        if (currentLevel >= levelsData.length) {
+            showScreen(victoryScreen);
+            return;
+        }
+
+        // ಯುಐ ಅಪ್ಡೇಟ್
+        levelLabel.innerText = `ಹಂತ: ${currentLevel + 1} / ${levelsData.length}`;
+        progressBar.style.width = `${((currentLevel + 1) / levelsData.length) * 100}%`;
+        lockIcon.innerText = "🔒";
+        lockIcon.style.animation = "pulse 2s infinite";
+
+        // ಲೈವ್ಸ್ ಅಪ್ಡೇಟ್
+        updateLivesUI();
+
+        // ಪ್ರಶ್ನೆ ಮತ್ತು ಆಯ್ಕೆಗಳ ಲೋಡ್
+        const data = levelsData[currentLevel];
+        questionText.innerText = data.question;
+        optionsGrid.innerHTML = "";
+
+        data.options.forEach((option, index) => {
+            const button = document.createElement('button');
+            button.className = "option-btn";
+            button.innerText = `${String.fromCharCode(8101 + index)}) ${option}`;
+            button.onclick = () => handleAnswer(index, button);
+            optionsGrid.appendChild(button);
+        });
+    }
+
+    function handleAnswer(selectedIndex, selectedButton) {
+        const correctIndex = levelsData[currentLevel].correct;
+        const allButtons = optionsGrid.querySelectorAll('.option-btn');
+
+        // ಎಲ್ಲಾ ಬಟನ್‌ಗಳನ್ನು ಲಾಕ್ ಮಾಡುವುದು
+        allButtons.forEach(btn => btn.disabled = true);
+
+        if (selectedIndex === correctIndex) {
+            // ಸರಿಯಾದ ಉತ್ತರ
+            selectedButton.style.background = "#10b981";
+            selectedButton.style.borderColor = "#10b981";
+            lockIcon.innerText = "🔓";
+            lockIcon.style.animation = "none";
+
+            setTimeout(() => {
+                currentLevel++;
+                loadLevel();
+            }, 1200);
+        } else {
+            // ತಪ್ಪಾದ ಉತ್ತರ
+            selectedButton.style.background = "#ef4444";
+            selectedButton.style.borderColor = "#ef4444";
+            allButtons[correctIndex].style.background = "#10b981";
+
+            lives--;
+            updateLivesUI();
+
+            setTimeout(() => {
+                if (lives <= 0) {
+                    showScreen(gameOverScreen);
+                } else {
+                    // ಲೈಫ್ ಇದ್ದರೆ ಮತ್ತೊಮ್ಮೆ ಅವಕಾಶ
+                    allButtons.forEach(btn => {
+                        btn.disabled = false;
+                        if(btn !== selectedButton && btn !== allButtons[correctIndex]) {
+                            btn.style.background = "#334155";
+                            btn.style.borderColor = "#475569";
+                        }
+                    });
+                    selectedButton.style.display = "none"; // ತಪ್ಪಾದ ಉತ್ತರವನ್ನು ಹೈಡ್ ಮಾಡುವುದು
+                }
+            }, 1500);
+        }
+    }
+
+    function updateLivesUI() {
+        let hearts = "";
+        for (let i = 0; i < 3; i++) {
+            hearts += i < lives ? "❤️ " : "🖤 ";
+        }
+        livesLabel.innerText = `ಲೈಫ್ಸ್: ${hearts}`;
+    }
+
+    function showScreen(screenToShow) {
+        playScreen.classList.remove('active');
+        gameOverScreen.classList.remove('active');
+        victoryScreen.classList.remove('active');
+        
+        screenToShow.classList.add('active');
+    }
+
+    function restartGame() {
+        currentLevel = 0;
+        lives = 3;
+        showScreen(playScreen);
+        loadLevel();
+    }
+
+    // ಆಟವನ್ನು ಪ್ರಾರಂಭಿಸಲು
+    loadLevel();
+</script>
+
+</body>
+</html>
