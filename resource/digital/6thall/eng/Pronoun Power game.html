@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pronoun Power: Verb Matcher!</title>
+    <style>
+        :root {
+            --primary: #4a00e0;
+            --secondary: #8e2de2;
+            --success: #00b894;
+            --danger: #ff7675;
+            --dark: #2d3436;
+            --light: #f9f9f9;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            color: var(--dark);
+        }
+
+        .game-container {
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            width: 100%;
+            max-width: 650px;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        header {
+            margin-bottom: 25px;
+        }
+
+        h1 {
+            color: var(--primary);
+            font-size: 2.2rem;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        p.subtitle {
+            color: #666;
+            font-size: 1rem;
+        }
+
+        .scoreboard {
+            display: flex;
+            justify-content: space-between;
+            background: #f1f2f6;
+            padding: 12px 20px;
+            border-radius: 50px;
+            margin-bottom: 25px;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 10px;
+            background: #dfe4ea;
+            border-radius: 5px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--secondary), var(--primary));
+            transition: width 0.3s ease;
+        }
+
+        .question-card {
+            background: #f8f9fa;
+            border: 3px solid #e9ecef;
+            border-radius: 16px;
+            padding: 30px 20px;
+            margin-bottom: 25px;
+            min-height: 140px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .pronoun-badge {
+            background: var(--secondary);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+        }
+
+        .sentence {
+            font-size: 1.6rem;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+
+        .blank {
+            color: var(--primary);
+            border-bottom: 4px dashed var(--primary);
+            padding: 0 15px;
+            display: inline-block;
+            min-width: 80px;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .option-btn {
+            background: white;
+            border: 2px solid #ced4da;
+            border-radius: 12px;
+            padding: 15px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            outline: none;
+        }
+
+        .option-btn:hover {
+            border-color: var(--primary);
+            background-color: #f0f3ff;
+            transform: translateY(-2px);
+        }
+
+        .option-btn:active {
+            transform: translateY(0);
+        }
+
+        .option-btn.correct {
+            background-color: var(--success) !important;
+            border-color: var(--success) !important;
+            color: white;
+        }
+
+        .option-btn.wrong {
+            background-color: var(--danger) !important;
+            border-color: var(--danger) !important;
+            color: white;
+        }
+
+        .feedback {
+            font-size: 1.2rem;
+            font-weight: bold;
+            min-height: 30px;
+            margin-bottom: 15px;
+        }
+
+        .speak-btn {
+            background: #2d3436;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 10px;
+            transition: background 0.2s;
+        }
+
+        .speak-btn:hover {
+            background: #000;
+        }
+
+        .results-screen {
+            display: none;
+        }
+
+        .restart-btn {
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            padding: 15px 35px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(118, 75, 162, 0.4);
+            transition: transform 0.2s;
+        }
+
+        .restart-btn:hover {
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="game-container">
+        <!-- Game Stage -->
+        <div id="game-stage">
+            <header>
+                <h1>Pronoun Power! 🚀</h1>
+                <p class="subtitle">Choose the correct spoken verb form</p>
+            </header>
+
+            <div class="scoreboard">
+                <span id="score-display">Score: 0</span>
+                <span id="question-counter">Question: 1/10</span>
+            </div>
+
+            <div class="progress-bar-container">
+                <div class="progress-bar" id="progress-bar"></div>
+            </div>
+
+            <div class="question-card">
+                <span class="pronoun-badge" id="pronoun-tag">Pronoun: I</span>
+                <div class="sentence" id="sentence-display">I <span class="blank">?</span> a student.</div>
+                <button class="speak-btn" id="listen-btn" style="display:none;">🔊 Listen Sentence</button>
+            </div>
+
+            <div class="feedback" id="feedback-message"></div>
+
+            <div class="options-grid" id="options-container">
+                <!-- Dynamic buttons will load here -->
+            </div>
+        </div>
+
+        <!-- Results Stage -->
+        <div id="results-stage" class="results-screen">
+            <h1 style="font-size: 3rem; margin-bottom: 20px;">🎉 Finished! 🎉</h1>
+            <p style="font-size: 1.5rem; margin-bottom: 10px;">Amazing effort!</p>
+            <p style="font-size: 2rem; font-weight: bold; color: var(--primary); margin-bottom: 30px;" id="final-score">You scored: 0/10</p>
+            <button class="restart-btn" onclick="resetGame()">Play Again 🔄</button>
+        </div>
+    </div>
+
+    <script>
+        // Question Pool covering: am, is, are, was, were, has, have, do, does
+        const dataset = [
+            { pronoun: "I", sentence: "I ___ happy to see you today.", options: ["am", "is", "are"], answer: "am" },
+            { pronoun: "He", sentence: "He ___ an English class right now.", options: ["has", "have", "is"], answer: "has" },
+            { pronoun: "They", sentence: "They ___ playing football yesterday.", options: ["was", "were", "are"], answer: "were" },
+            { pronoun: "She", sentence: "She ___ not like hot coffee.", options: ["do", "does", "has"], answer: "does" },
+            { pronoun: "You", sentence: "You ___ a great singer!", options: ["am", "is", "are"], answer: "are" },
+            { pronoun: "It", sentence: "It ___ a beautiful day yesterday.", options: ["was", "were", "is"], answer: "was" },
+            { pronoun: "We", sentence: "We ___ finished our homework.", options: ["has", "have", "do"], answer: "have" },
+            { pronoun: "She", sentence: "She ___ her exercises every morning.", options: ["do", "does", "was"], answer: "does" },
+            { pronoun: "It", sentence: "It ___ a long tail.", options: ["has", "have", "is"], answer: "has" },
+            { pronoun: "You", sentence: "You ___  your best in everything.", options: ["do", "does", "has"], answer: "do" }
+        ];
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let canAnswer = true;
+        let currentSentenceText = "";
+
+        // Web Audio Synthesizer for Game Sound Effects
+        function playSoundEffect(isCorrect) {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            if (!AudioContext) return;
+            
+            const ctx = new AudioContext();
+            const osc = ctx.createOscillator();
+            const gainNode = ctx.createGain();
+            
+            osc.connect(gainNode);
+            gainNode.connect(ctx.destination);
+
+            if (isCorrect) {
+                // Happy high double-chime
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(523.25, ctx.currentTime); // C5
+                osc.frequency.setValueAtTime(659.25, ctx.currentTime + 0.1); // E5
+                gainNode.gain.setValueAtTime(0.2, ctx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.35);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.35);
+            } else {
+                // Low sad buzz
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(120, ctx.currentTime);
+                osc.frequency.linearRampToValueAtTime(80, ctx.currentTime + 0.3);
+                gainNode.gain.setValueAtTime(0.2, ctx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.3);
+            }
+        }
+
+        // Text To Speech Generator for Spoken Practice
+        function speakSentence(text) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel(); // Stop any ongoing speech
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.rate = 0.9; // Slightly slower for language learners
+                utterance.lang = 'en-US';
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        function loadQuestion() {
+            canAnswer = true;
+            document.getElementById("feedback-message").innerText = "";
+            document.getElementById("feedback-message").style.color = "initial";
+            document.getElementById("listen-btn").style.display = "none";
+            
+            const currentQuestion = dataset[currentQuestionIndex];
+            
+            // Updates Progress and UI Text
+            document.getElementById("question-counter").innerText = `Question: ${currentQuestionIndex + 1}/${dataset.length}`;
+            document.getElementById("score-display").innerText = `Score: ${score}`;
+            document.getElementById("progress-bar").style.width = `${((currentQuestionIndex) / dataset.length) * 100}%`;
+            document.getElementById("pronoun-tag").innerText = `Pronoun: ${currentQuestion.pronoun}`;
+            
+            // Setup Sentence format
+            document.getElementById("sentence-display").innerHTML = currentQuestion.sentence.replace("___", `<span class="blank" id="blank-space">?</span>`);
+            
+            // Render Options Buttons
+            const optionsContainer = document.getElementById("options-container");
+            optionsContainer.innerHTML = "";
+            
+            currentQuestion.options.forEach(option => {
+                const button = document.createElement("button");
+                button.classList.add("option-btn");
+                button.innerText = option;
+                button.onclick = () => handleAnswer(option, button);
+                optionsContainer.appendChild(button);
+            });
+        }
+
+        function handleAnswer(selectedOption, selectedButton) {
+            if (!canAnswer) return;
+            canAnswer = false;
+
+            const currentQuestion = dataset[currentQuestionIndex];
+            const blankSpace = document.getElementById("blank-space");
+            
+            // Build the complete final text for standard reading
+            currentSentenceText = currentQuestion.sentence.replace("___", currentQuestion.answer);
+
+            if (selectedOption === currentQuestion.answer) {
+                // Correct path
+                score++;
+                selectedButton.classList.add("correct");
+                blankSpace.innerText = currentQuestion.answer;
+                blankSpace.style.color = "var(--success)";
+                blankSpace.style.borderBottomColor = "var(--success)";
+                
+                document.getElementById("feedback-message").innerText = "Excellent! ✨";
+                document.getElementById("feedback-message").style.color = "var(--success)";
+                
+                playSoundEffect(true);
+                speakSentence(currentSentenceText); // Speak right away on success
+                document.getElementById("listen-btn").style.display = "inline-flex";
+            } else {
+                // Incorrect path
+                selectedButton.classList.add("wrong");
+                document.getElementById("feedback-message").innerText = `Try again! The correct verb is "${currentQuestion.answer}".`;
+                document.getElementById("feedback-message").style.color = "var(--danger)";
+                
+                playSoundEffect(false);
+                
+                // Show the right answer in the slot anyway for visual clarity
+                blankSpace.innerText = currentQuestion.answer;
+                blankSpace.style.color = "var(--danger)";
+                
+                // Reveal the correct button visually
+                const buttons = document.querySelectorAll(".option-btn");
+                buttons.forEach(btn => {
+                    if(btn.innerText === currentQuestion.answer) {
+                        btn.classList.add("correct");
+                    }
+                });
+                
+                speakSentence(currentSentenceText);
+                document.getElementById("listen-btn").style.display = "inline-flex";
+            }
+
+            // Set up repetition audio trigger button
+            document.getElementById("listen-btn").onclick = () => speakSentence(currentSentenceText);
+
+            // Transition to the next item automatically
+            setTimeout(() => {
+                currentQuestionIndex++;
+                if (currentQuestionIndex < dataset.length) {
+                    loadQuestion();
+                } else {
+                    showResults();
+                }
+            }, 3500);
+        }
+
+        function showResults() {
+            document.getElementById("progress-bar").style.width = "100%";
+            document.getElementById("game-stage").style.display = "none";
+            document.getElementById("results-stage").style.display = "block";
+            document.getElementById("final-score").innerText = `You scored: ${score} / ${dataset.length}`;
+        }
+
+        function resetGame() {
+            currentQuestionIndex = 0;
+            score = 0;
+            document.getElementById("game-stage").style.display = "block";
+            document.getElementById("results-stage").style.display = "none";
+            loadQuestion();
+        }
+
+        // Start the application on boot
+        window.onload = loadQuestion;
+    </script>
+</body>
+</html>

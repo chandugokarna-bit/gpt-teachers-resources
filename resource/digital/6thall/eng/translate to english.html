@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Magical Language Explorer! 🌟</title>
+    <style>
+        /* Colorful & Fun Theme for Kids */
+        body {
+            font-family: 'Comic Sans MS', 'Chalkboard SE', sans-serif;
+            background: linear-gradient(135deg, #A8E6CF 0%, #DCEDC1 100%, #FFD3B6 100%);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .game-container {
+            background: white;
+            border-radius: 25px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            width: 90%;
+            max-width: 600px;
+            text-align: center;
+            border: 6px solid #FFAAA5;
+            position: relative;
+        }
+
+        h1 {
+            color: #FF8C94;
+            font-size: 2.2rem;
+            margin-top: 0;
+            text-shadow: 2px 2px #FFE66D;
+        }
+
+        .score-board {
+            display: flex;
+            justify-content: space-between;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #4ECDC4;
+            margin-bottom: 20px;
+            background: #f4f4f4;
+            padding: 10px 20px;
+            border-radius: 50px;
+        }
+
+        /* The Kannada Sentence Box */
+        .sentence-box {
+            background-color: #FFE66D;
+            padding: 20px;
+            border-radius: 15px;
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #2F3E46;
+            margin-bottom: 25px;
+            box-shadow: inset 0 4px 0 rgba(0,0,0,0.05);
+            transition: transform 0.2s;
+        }
+
+        .sentence-box:hover {
+            transform: scale(1.02);
+        }
+
+        .instruction {
+            font-size: 1.1rem;
+            color: #777;
+            margin-bottom: 15px;
+        }
+
+        /* Word Bank & Workspace */
+        .word-bank {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 25px;
+            min-height: 50px;
+            padding: 15px;
+            background: #F7F9FA;
+            border-radius: 15px;
+            border: 3px dashed #CBD5E1;
+        }
+
+        .workspace {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 25px;
+            min-height: 60px;
+            padding: 15px;
+            background: #E8F5E9;
+            border-radius: 15px;
+            border: 4px dashed #4CAF50;
+        }
+
+        .word-card {
+            background: #4ECDC4;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 50px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 5px 0 #36B3A8;
+            transition: all 0.1s ease;
+            user-select: none;
+        }
+
+        .word-card:active {
+            transform: translateY(4px);
+            box-shadow: 0 1px 0 #36B3A8;
+        }
+
+        .word-card.used {
+            background: #FFD166;
+            box-shadow: 0 5px 0 #E5B84B;
+            color: #333;
+        }
+
+        /* Action Buttons */
+        .btn {
+            background: #FF6B6B;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 5px 0 #EE5253;
+            margin: 5px;
+            transition: transform 0.1s;
+        }
+
+        .btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 1px 0 #EE5253;
+        }
+
+        .btn-reset {
+            background: #95A5A6;
+            box-shadow: 0 5px 0 #7F8C8D;
+        }
+
+        /* Feedback Popups */
+        .feedback {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-top: 15px;
+            height: 35px;
+            transition: all 0.3s ease;
+        }
+
+        .correct { color: #4CAF50; animation: bounce 0.5s infinite alternate; }
+        .wrong { color: #F44336; animation: shake 0.3s; }
+
+        @keyframes bounce {
+            from { transform: translateY(0); }
+            to { transform: translateY(-10px); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        /* Sparkles for visual flair */
+        .speaking-icon {
+            display: inline-block;
+            animation: pulse 1s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="game-container">
+        <h1>Language Explorer! 🗺️✨</h1>
+        
+        <div class="score-board">
+            <div id="level-display">Level: 1/25</div>
+            <div id="score-display">Stars: ⭐ 0</div>
+        </div>
+
+        <div class="sentence-box" id="kannada-text">
+            ನನಗೆ ಹಣ್ಣು ಬೇಕು.
+        </div>
+
+        <div class="instruction" id="instruction-text">👇 Tap the English words in the correct order!</div>
+
+        <div class="workspace" id="workspace"></div>
+        <div class="word-bank" id="word-bank"></div>
+
+        <div>
+            <button class="btn btn-reset" onclick="resetSentence()">Clear ↩️</button>
+            <button class="btn" onclick="checkAnswer()">Check! ✅</button>
+        </div>
+
+        <div class="feedback" id="feedback"></div>
+    </div>
+
+<script>
+    // 25 Questions tailored for Class 3
+    const questions = [
+        { kannada: "ನನಗೆ ಹಣ್ಣು ಬೇಕು. 🍎", english: ["I", "want", "fruit"], options: ["I", "want", "fruit", "He", "apple", "likes"] },
+        { kannada: "ಇದು ನನ್ನ ಪುಸ್ತಕ. 📚", english: ["This", "is", "my", "book"], options: ["This", "is", "my", "book", "your", "that"] },
+        { kannada: "ಸೂರ್ಯನು ಹೊಳೆಯುತ್ತಿದ್ದಾನೆ. ☀️", english: ["The", "sun", "is", "shining"], options: ["The", "sun", "is", "shining", "moon", "star"] },
+        { kannada: "ನಾನು ಶಾಲೆಗೆ ಹೋಗುತ್ತಿದ್ದೇನೆ. 🏫", english: ["I", "am", "going", "to", "school"], options: ["I", "am", "going", "to", "school", "coming", "home"] },
+        { kannada: "ನಾಯಿ ಓಡುತ್ತಿದೆ. 🐕", english: ["The", "dog", "is", "running"], options: ["The", "dog", "is", "running", "cat", "sleeping"] },
+        { kannada: "ಬೆಕ್ಕು ಹಾಲು ಕುಡಿಯುತ್ತಿದೆ. 🐈", english: ["The", "cat", "is", "drinking", "milk"], options: ["The", "cat", "is", "drinking", "milk", "dog", "eating"] },
+        { kannada: "ನಾನು ಆಟ ಆಡುತ್ತಿದ್ದೇನೆ. ⚽", english: ["I", "am", "playing", "a", "game"], options: ["I", "am", "playing", "a", "game", "sleeping", "he"] },
+        { kannada: "ಅವಳು ಹಾಡು ಹೇಳುತ್ತಿದ್ದಾಳೆ. 🎵", english: ["She", "is", "singing", "a", "song"], options: ["She", "is", "singing", "a", "song", "dancing", "boy"] },
+        { kannada: "ಹಕ್ಕಿ ಹಾರುತ್ತಿದೆ. 🐦", english: ["The", "bird", "is", "flying"], options: ["The", "bird", "is", "flying", "swimming", "fish"] },
+        { kannada: "ನನಗೆ ಚಾಕೊಲೇಟ್ ಇಷ್ಟ. 🍫", english: ["I", "like", "chocolate"], options: ["I", "like", "chocolate", "hate", "you", "spicy"] },
+        { kannada: "ಇದು ದೊಡ್ಡ ಮರ. 🌳", english: ["This", "is", "a", "big", "tree"], options: ["This", "is", "a", "big", "tree", "small", "flower"] },
+        { kannada: "ಆಕಾಶ ನೀಲಿಯಾಗಿದೆ. ☁️", english: ["The", "sky", "is", "blue"], options: ["The", "sky", "is", "blue", "red", "grass"] },
+        { kannada: "ಮೀನು ಈಜುತ್ತಿದೆ. 🐟", english: ["The", "fish", "is", "swimming"], options: ["The", "fish", "is", "swimming", "bird", "flying"] },
+        { kannada: "ಮಳೆ ಬರುತ್ತಿದೆ. 🌧️", english: ["It", "is", "raining"], options: ["It", "is", "raining", "sunny", "he", "snowing"] },
+        { kannada: "ಹೂವು ಸುಂದರವಾಗಿದೆ. 🌸", english: ["The", "flower", "is", "beautiful"], options: ["The", "flower", "is", "beautiful", "ugly", "tree"] },
+        { kannada: "ನಾವು ಸ್ನೇಹಿತರು. 👫", english: ["We", "are", "friends"], options: ["We", "are", "friends", "enemies", "they", "is"] },
+        { kannada: "ನಾನು ನೀರು ಕುಡಿಯುತ್ತೇನೆ. 💧", english: ["I", "drink", "water"], options: ["I", "drink", "water", "eat", "juice", "you"] },
+        { kannada: "ಅವನು ಓದುತ್ತಿದ್ದಾನೆ. 📖", english: ["He", "is", "reading"], options: ["He", "is", "reading", "she", "writing", "book"] },
+        { kannada: "ಇದು ನನ್ನ ಮನೆ. 🏠", english: ["This", "is", "my", "house"], options: ["This", "is", "my", "house", "your", "school"] },
+        { kannada: "ಆನೆ ದೊಡ್ಡದಾಗಿದೆ. 🐘", english: ["The", "elephant", "is", "big"], options: ["The", "elephant", "is", "big", "mouse", "small"] },
+        { kannada: "ತಾಯಿ ಅಡುಗೆ ಮಾಡುತ್ತಿದ್ದಾರೆ. 🍲", english: ["Mother", "is", "cooking"], options: ["Mother", "is", "cooking", "father", "sleeping", "food"] },
+        { kannada: "ನನಗೆ ನಿದ್ದೆ ಬರುತ್ತಿದೆ. 😴", english: ["I", "am", "feeling", "sleepy"], options: ["I", "am", "feeling", "sleepy", "hungry", "you"] },
+        { kannada: "ಕಾರು ವೇಗವಾಗಿ ಹೋಗುತ್ತಿದೆ. 🚗", english: ["The", "car", "is", "going", "fast"], options: ["The", "car", "is", "going", "fast", "slow", "bike"] },
+        { kannada: "ಸೇಬು ಕೆಂಪು ಬಣ್ಣದಲ್ಲಿದೆ. 🍎", english: ["The", "apple", "is", "red"], options: ["The", "apple", "is", "red", "banana", "yellow"] },
+        { kannada: "ನಾನು ಕಥೆ ಕೇಳುತ್ತೇನೆ. 🎧", english: ["I", "listen", "to", "a", "story"], options: ["I", "listen", "to", "a", "story", "watch", "movie"] }
+    ];
+
+    let currentQuestionIdx = 0;
+    let score = 0;
+    let selectedWords = [];
+    let audioCtx = null;
+
+    const kannadaTextEl = document.getElementById('kannada-text');
+    const wordBankEl = document.getElementById('word-bank');
+    const workspaceEl = document.getElementById('workspace');
+    const feedbackEl = document.getElementById('feedback');
+    const scoreDisplayEl = document.getElementById('score-display');
+    const levelDisplayEl = document.getElementById('level-display');
+    const instructionEl = document.getElementById('instruction-text');
+
+    // Generate an artificial "ding/chime" sound so no external files are needed!
+    function playSuccessChime() {
+        try {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            
+            oscillator.type = 'sine';
+            oscillator.frequency.setValueAtTime(587.33, audioCtx.currentTime); // D5
+            oscillator.frequency.setValueAtTime(880.00, audioCtx.currentTime + 0.1); // A5
+            
+            gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 1);
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            
+            oscillator.start();
+            oscillator.stop(audioCtx.currentTime + 1);
+        } catch(e) {
+            console.log("Audio not supported in this browser.");
+        }
+    }
+
+    // Use Web Speech API to read the sentence aloud
+    function readSentenceAloud(sentenceArray, callback) {
+        if ('speechSynthesis' in window) {
+            const textToSpeak = sentenceArray.join(" ");
+            const utterance = new SpeechSynthesisUtterance(textToSpeak);
+            utterance.lang = 'en-US';
+            utterance.rate = 0.85; // Slightly slower, easier for kids to hear
+            utterance.pitch = 1.1; 
+            
+            instructionEl.innerHTML = `<span class="speaking-icon">🔊</span> Listening...`;
+
+            utterance.onend = () => {
+                instructionEl.innerHTML = `👇 Tap the English words in the correct order!`;
+                if(callback) callback();
+            };
+            
+            window.speechSynthesis.speak(utterance);
+        } else {
+            if(callback) setTimeout(callback, 1500); // fallback delay
+        }
+    }
+
+    function loadQuestion() {
+        feedbackEl.innerText = "";
+        feedbackEl.className = "feedback";
+        workspaceEl.innerHTML = "";
+        selectedWords = [];
+        
+        let q = questions[currentQuestionIdx];
+        kannadaTextEl.innerText = q.kannada;
+        levelDisplayEl.innerText = `Level: ${currentQuestionIdx + 1}/${questions.length}`;
+        
+        // Shuffle the options to make it a puzzle
+        let shuffledOptions = [...q.options].sort(() => Math.random() - 0.5);
+        
+        wordBankEl.innerHTML = "";
+        shuffledOptions.forEach((word, index) => {
+            let btn = document.createElement('div');
+            btn.className = 'word-card';
+            btn.innerText = word;
+            btn.onclick = () => handleWordClick(word, btn, index);
+            // Attach index to element to identify duplicates if needed
+            btn.dataset.index = index; 
+            wordBankEl.appendChild(btn);
+        });
+    }
+
+    function handleWordClick(word, btnElement, index) {
+        if(btnElement.classList.contains('used')) return; 
+        
+        // Add to tracking
+        selectedWords.push({word: word, index: index});
+        
+        // Create workspace chip
+        let workspaceBtn = document.createElement('div');
+        workspaceBtn.className = 'word-card used';
+        workspaceBtn.innerText = word;
+        
+        // Allow removing from workspace
+        workspaceBtn.onclick = () => {
+            selectedWords = selectedWords.filter(w => w.index !== index);
+            workspaceEl.removeChild(workspaceBtn);
+            btnElement.style.opacity = "1";
+            btnElement.classList.remove('used');
+        };
+        
+        workspaceEl.appendChild(workspaceBtn);
+        
+        // Gray out original
+        btnElement.style.opacity = "0.4";
+        btnElement.classList.add('used');
+    }
+
+    function resetSentence() {
+        workspaceEl.innerHTML = "";
+        selectedWords = [];
+        loadQuestion();
+    }
+
+    function checkAnswer() {
+        // Initialize audio context on first user interaction to bypass browser restrictions
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        let currentCorrectAnswer = questions[currentQuestionIdx].english;
+        
+        // Check if length matches and every word is in order
+        let isCorrect = selectedWords.length === currentCorrectAnswer.length &&
+                        selectedWords.every((val, i) => val.word === currentCorrectAnswer[i]);
+
+        if (isCorrect) {
+            score++;
+            scoreDisplayEl.innerText = `Stars: ⭐ ${score}`;
+            feedbackEl.innerText = "Superb! 🎉 Correct! 🌟";
+            feedbackEl.className = "feedback correct";
+            
+            // Play Sound
+            playSuccessChime();
+            
+            // Read Sentence Aloud, then go to next
+            readSentenceAloud(currentCorrectAnswer, () => {
+                currentQuestionIdx++;
+                if(currentQuestionIdx < questions.length) {
+                    loadQuestion();
+                } else {
+                    kannadaTextEl.innerText = "🏆 YOU WIN! 🏆";
+                    wordBankEl.innerHTML = `<h3>You completed all levels and earned ${score} Stars! 🌟🌟🌟</h3>`;
+                    workspaceEl.innerHTML = "Great Job, Little Linguist! Reload to play again!";
+                    feedbackEl.innerText = "";
+                    instructionEl.innerText = "";
+                }
+            });
+
+        } else {
+            feedbackEl.innerText = "Oops! Try again! 🤔";
+            feedbackEl.className = "feedback wrong";
+            setTimeout(() => { resetSentence(); }, 1500);
+        }
+    }
+
+    // Start Game
+    loadQuestion();
+</script>
+
+</body>
+</html>
