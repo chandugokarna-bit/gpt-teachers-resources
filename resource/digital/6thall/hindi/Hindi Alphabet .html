@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Hindi Alphabet (Varnamala)</title>
+    <style>
+        :root {
+            --primary: #4A90E2;
+            --secondary: #27ae60;
+            --background: #f4f7f6;
+            --card-bg: #ffffff;
+            --text-dark: #333333;
+            --text-light: #666666;
+            --accent: #f39c12;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--background);
+            color: var(--text-dark);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            color: var(--primary);
+            text-align: center;
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            color: var(--text-light);
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .container {
+            display: flex;
+            max-width: 1000px;
+            width: 100%;
+            gap: 20px;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            min-width: 220px;
+        }
+
+        button {
+            padding: 15px;
+            font-size: 16px;
+            font-weight: bold;
+            background-color: var(--card-bg);
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+        }
+
+        button:hover, button.active {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        /* Main Display Area */
+        .display-area {
+            flex: 3;
+            background-color: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .display-area h2 {
+            margin-top: 0;
+            color: var(--primary);
+            border-bottom: 2px solid var(--background);
+            padding-bottom: 10px;
+        }
+
+        .flex-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .stat-box {
+            background-color: var(--primary);
+            color: white;
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .audio-btn {
+            background-color: var(--secondary);
+            color: white;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .audio-btn:hover {
+            background-color: #219653;
+        }
+
+        .description {
+            font-size: 15px;
+            line-height: 1.6;
+            color: var(--text-light);
+            margin-bottom: 25px;
+        }
+
+        /* Alphabet Grid Styling */
+        .letter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 15px;
+        }
+
+        .letter-card {
+            background-color: var(--background);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #e0e0e0;
+            transition: transform 0.2s;
+        }
+
+        .letter-card:hover {
+            transform: translateY(-3px);
+            border-color: var(--primary);
+        }
+
+        .main-char {
+            font-size: 36px;
+            font-weight: bold;
+            color: var(--text-dark);
+            margin-bottom: 5px;
+        }
+
+        .hindi-word {
+            font-size: 18px;
+            color: var(--secondary);
+            font-weight: 600;
+        }
+
+        .eng-word {
+            font-size: 13px;
+            color: var(--text-light);
+            font-style: italic;
+        }
+
+        .meaning {
+            font-size: 12px;
+            color: var(--accent);
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-top: 2px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            .sidebar {
+                flex-direction: row;
+                flex-wrap: wrap;
+            }
+            .sidebar button {
+                flex: 1 1 45%;
+                text-align: center;
+                padding: 10px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Hindi Varnamala Explorer</h1>
+    <div class="subtitle">Click categories to explore letters, vocabulary words, and spoken audio pronunciations.</div>
+    
+    <div class="container">
+        <!-- Interactive Menu -->
+        <div class="sidebar">
+            <button class="active" onclick="updateContent('swara', this)">Swara (Vowels)</button>
+            <button onclick="updateContent('hrasva', this)">Hrasva Swara (Short)</button>
+            <button onclick="updateContent('dirgha', this)">Dirgha Swara (Long)</button>
+            <button onclick="updateContent('vyanjan', this)">Vyanjan (Consonants)</button>
+            <button onclick="updateContent('sanyukt', this)">Sanyukt (Combined)</button>
+        </div>
+
+        <!-- Dynamic Content Display -->
+        <div class="display-area" id="displayArea">
+            <h2 id="catTitle">Swara (Vowels)</h2>
+            
+            <div class="flex-actions">
+                <div class="stat-box">Total Count: <span id="catCount">11</span></div>
+                <button class="audio-btn" onclick="playAudio()">🔊 Listen to Category</button>
+            </div>
+
+            <div class="description" id="catDesc">
+                Vowels in Hindi are independent sounds that can be pronounced without the help of any other letter.
+            </div>
+            
+            <div class="letter-grid" id="catGrid">
+                <!-- Injected dynamically via JS -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentCategory = 'स्वर ';
+
+        // Complete Structured Data including Characters, Words, Transliterations, and Meanings
+        const varnamalaData = {
+            swara: {
+                title: " स्वर  (Vowels)",
+                count: "11 + 2 Modifiers",
+                desc: "Swara (vowels) are independent sounds that can be pronounced without the help of any other letter. Standard modern grammar separates the 11 basic vowels from the 2 final phonetic modifiers (Ayogavaha).",
+                items: [
+                    { ch: "अ", word: "अनार", eng: "Anār", mean: "Pomegranate" },
+                    { ch: "आ", word: "आम", eng: "Ām", mean: "Mango" },
+                    { ch: "इ", word: "इमली", eng: "Imlī", mean: "Tamarind" },
+                    { ch: "ई", word: "ईख", eng: "Īkh", mean: "Sugarcane" },
+                    { ch: "उ", word: "उल्लू", eng: "Ullū", mean: "Owl" },
+                    { ch: "ऊ", word: "ऊन", eng: "Ūn", mean: "Wool" },
+                    { ch: "ऋ", word: "ऋषि", eng: "Riṣi", mean: "Sage" },
+                    { ch: "ए", word: "एड़ी", eng: "Eḍī", mean: "Heel" },
+                    { ch: "ऐ", word: "ऐनक", eng: "Ainak", mean: "Glasses" },
+                    { ch: "ओ", word: "ओखली", eng: "Okhlī", mean: "Mortar" },
+                    { ch: "औ", word: "औरत", eng: "Aurat", mean: "Woman" },
+                    { ch: "अं", word: "अंगूर", eng: "Angūr", mean: "Grapes (Mod)" },
+                    { ch: "अः", word: "नमः", eng: "Namah", mean: "Salute (Mod)" }
+                ]
+            },
+            hrasva: {
+                title: "हृस्व स्वर (Short Vowels)",
+                count: "4",
+                desc: "Hrasva Swara are short vowels. They require only a single structural pulse or unit of time (one matra) to comfortably pronounce.",
+                items: [
+                    { ch: "अ", word: "अनार", eng: "Anār", mean: "Pomegranate" },
+                    { ch: "इ", word: "इमली", eng: "Imlī", mean: "Tamarind" },
+                    { ch: "उ", word: "उल्लू", eng: "Ullū", mean: "Owl" },
+                    { ch: "ऋ", word: "ऋषि", eng: "Riṣi", mean: "Sage" }
+                ]
+            },
+            dirgha: {
+                title: "दीर्घ स्वर (Long Vowels)",
+                count: "7",
+                desc: "Dirgha Swara are long vowels. They require double the pronunciation timing (two matras) compared to short vowels.",
+                items: [
+                    { ch: "आ", word: "आम", eng: "Ām", mean: "Mango" },
+                    { ch: "ई", word: "ईख", eng: "Īkh", mean: "Sugarcane" },
+                    { ch: "ऊ", word: "ऊन", eng: "Ūn", mean: "Wool" },
+                    { ch: "ए", word: "एड़ी", eng: "Eḍī", mean: "Heel" },
+                    { ch: "ऐ", word: "ऐनक", eng: "Ainak", mean: "Glasses" },
+                    { ch: "ओ", word: "ओखली", eng: "Okhlī", mean: "Mortar" },
+                    { ch: "औ", word: "औरत", eng: "Aurat", mean: "Woman" }
+                ]
+            },
+            vyanjan: {
+                title: "व्यंजन (Consonants)",
+                count: "33",
+                desc: "Vyanjan are sounds that rely on an attached vowel (inherently 'अ') to be completely pronounced out loud. They are grouped cleanly below by structural phonetic row positions.",
+                items: [
+                    { ch: "क", word: "कमल", eng: "Kamal", mean: "Lotus" },
+                    { ch: "ख", word: "खरगोश", eng: "Khargoś", mean: "Rabbit" },
+                    { ch: "ग", word: "गमला", eng: "Gamlā", mean: "Flowerpot" },
+                    { ch: "घ", word: "घर", eng: "Ghar", mean: "House" },
+                    { ch: "ङ", word: "गंगा", eng: "Gangā", mean: "Nasal Sound" },
+                    { ch: "च", word: "चम्मच", eng: "Chammach", mean: "Spoon" },
+                    { ch: "छ", word: "छतरी", eng: "Chhatrī", mean: "Umbrella" },
+                    { ch: "ज", word: "जहाज", eng: "Jahāj", mean: "Ship" },
+                    { ch: "झ", word: "झंडा", eng: "Jhaṇḍā", mean: "Flag" },
+                    { ch: "ञ", word: "चंचल", eng: "Chanchal", mean: "Nasal Sound" },
+                    { ch: "ट", word: "टमाटर", eng: "Ṭamāṭar", mean: "Tomato" },
+                    { ch: "ठ", word: "ठठेरा", eng: "Ṭhaṭhērā", mean: "Tinker" },
+                    { ch: "ड", word: "डमरू", eng: "Ḍamrū", mean: "Drum" },
+                    { ch: "ढ", word: "ढक्कन", eng: "Ḍhakkan", mean: "Lid" },
+                    { ch: "ण", word: "बाण", eng: "Bāṇ", mean: "Arrow (End)" },
+                    { ch: "त", word: "तरबूज", eng: "Tarbūj", mean: "Watermelon" },
+                    { ch: "थ", word: "थरमस", eng: "Thermas", mean: "Flask" },
+                    { ch: "द", word: "दवात", eng: "Davāt", mean: "Inkpot" },
+                    { ch: "ध", word: "धनुष", eng: "Dhanuṣ", mean: "Bow" },
+                    { ch: "न", word: "नल", eng: "Nal", mean: "Tap" },
+                    { ch: "प", word: "पतंग", eng: "Patang", mean: "Kite" },
+                    { ch: "फ", word: "फल", eng: "Phal", mean: "Fruit" },
+                    { ch: "ब", word: "बत्तख", eng: "Batthak", mean: "Duck" },
+                    { ch: "भ", word: "भालू", eng: "Bhālū", mean: "Bear" },
+                    { ch: "म", word: "मछली", eng: "Machhlī", mean: "Fish" },
+                    { ch: "य", word: "यज्ञ", eng: "Yagya", mean: "Ritual" },
+                    { ch: "र", word: "रथ", eng: "Rath", mean: "Chariot" },
+                    { ch: "ल", word: "लट्टू", eng: "Laṭṭū", mean: "Spinning Top" },
+                    { ch: "व", word: "वन", eng: "Van", mean: "Forest" },
+                    { ch: "श", word: "शलगम", eng: "Śalgam", mean: "Turnip" },
+                    { ch: "ष", word: "षट्कोण", eng: "Ṣaṭkōṇ", mean: "Hexagon" },
+                    { ch: "स", word: "सपेरा", eng: "Sapērā", mean: "Snake Charmer" },
+                    { ch: "ह", word: "हाथी", eng: "Hāthī", mean: "Elephant" }
+                ]
+            },
+            sanyukt: {
+                title: "संयुक्ताक्षर व्यंजन (Combined Consonants)",
+                count: "4",
+                desc: "These special compound letters are explicit conjunct structures formed natively by blending two distinct consonants together.",
+                items: [
+                    { ch: "क्ष", word: "क्षत्रिय", eng: "Kṣatriya", mean: "Warrior" },
+                    { ch: "त्र", word: "त्रिशूल", eng: "Triśūl", mean: "Trident" },
+                    { ch: "ज्ञ", word: "ज्ञानी", eng: "Gyānī", mean: "Wise" },
+                    { ch: "श्र", word: "श्रमिक", eng: "Śramik", mean: "Laborer" }
+                ]
+            }
+        };
+
+        // Render HTML Cards into Grid Layout Container Dynamically
+        function renderGrid(category) {
+            const gridContainer = document.getElementById('catGrid');
+            gridContainer.innerHTML = ''; // Clear prior grid context safely
+
+            varnamalaData[category].items.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'letter-card';
+                card.innerHTML = `
+                    <div class="main-char">${item.ch}</div>
+                    <div class="hindi-word">${item.word}</div>
+                    <div class="eng-word">${item.eng}</div>
+                    <div class="meaning">${item.mean}</div>
+                `;
+                gridContainer.appendChild(card);
+            });
+        }
+
+        // Action routing layout updater when sidebar components are interacted with
+        function updateContent(category, btnElement) {
+            currentCategory = category;
+            window.speechSynthesis.cancel(); // Terminate standing voice lines immediately
+
+            document.getElementById('catTitle').innerHTML = varnamalaData[category].title;
+            document.getElementById('catCount').innerHTML = varnamalaData[category].count;
+            document.getElementById('catDesc').innerHTML = varnamalaData[category].desc;
+            
+            renderGrid(category);
+
+            const buttons = document.querySelectorAll('.sidebar button');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            if(btnElement) btnElement.classList.add('active');
+        }
+
+        // Parse list objects structurally to construct fluent text line for browser voice synth engine
+        function playAudio() {
+            window.speechSynthesis.cancel();
+
+            // Construct standard sequential narrative reading form: "अ से अनार, आ से आम"
+            const vocalScript = varnamalaData[currentCategory].items
+                .map(item => `${item.ch} से ${item.word}`)
+                .join(', ');
+
+            const utterance = new SpeechSynthesisUtterance(vocalScript);
+            utterance.lang = 'hi-IN';
+            utterance.rate = 0.55; // Set smooth pacing rhythm balance 
+            utterance.pitch = 1.0;
+
+            window.speechSynthesis.speak(utterance);
+        }
+
+        // Kickoff application layout view mapping configuration natively on base load state
+        renderGrid('swara');
+    </script>
+</body>
+</html>
