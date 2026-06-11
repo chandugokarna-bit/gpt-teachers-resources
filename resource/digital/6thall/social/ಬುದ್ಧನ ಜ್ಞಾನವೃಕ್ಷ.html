@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಬುದ್ಧನ ಜ್ಞಾನವೃಕ್ಷ - ಅಲ್ಟ್ರಾ ಅಡ್ವಾನ್ಸ್ಡ್ ಟ್ರಿವಿಯಾ</title>
+    <style>
+        :root {
+            --slate-bg: #0f172a;
+            --gold: #f59e0b;
+            --emerald: #10b981;
+            --rose: #ef4444;
+            --card-bg: #1e293b;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--slate-bg);
+            color: #f1f5f9;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        h1 {
+            color: var(--gold);
+            margin-bottom: 5px;
+            text-align: center;
+            text-shadow: 0 0 10px rgba(245, 158, 11, 0.3);
+        }
+
+        p.instruction {
+            color: #94a3b8;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        /* ಮುಖ್ಯ ಗೇಮ್ ಏರಿಯಾ */
+        .game-container {
+            display: flex;
+            max-width: 1000px;
+            width: 100%;
+            gap: 30px;
+            background: rgba(30, 41, 59, 0.7);
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.05);
+            flex-wrap: wrap;
+        }
+
+        /* ಎಡಭಾಗ: ಬೋಧಿ ವೃಕ್ಷ (SVG ವಿಭಾಗ) */
+        .tree-section {
+            flex: 1;
+            min-width: 320px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        #bodhiTree {
+            width: 100%;
+            max-width: 400px;
+            height: auto;
+        }
+
+        /* ಎಲೆಗಳ ಅನಿಮೇಷನ್ */
+        .leaf {
+            transform-origin: center;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            opacity: 0;
+            transform: scale(0);
+        }
+
+        .leaf.active {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .leaf.falling {
+            animation: fall 1.5s forwards ease-in;
+        }
+
+        @keyframes fall {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(300px) rotate(90deg); opacity: 0; }
+        }
+
+        /* ಬಲಭಾಗ: ರಸಪ್ರಶ್ನೆ ಕಾರ್ಡ್ (Quiz ವಿಭಾಗ) */
+        .quiz-section {
+            flex: 1;
+            min-width: 320px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .quiz-card {
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            padding: 30px;
+            box-sizing: border-box;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            border-left: 5px solid var(--gold);
+        }
+
+        .question-text {
+            font-size: 1.25rem;
+            line-height: 1.6;
+            margin-bottom: 25px;
+            font-weight: 600;
+        }
+
+        .options-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option-btn {
+            background-color: #334155;
+            color: #f1f5f9;
+            border: 2px solid transparent;
+            padding: 14px 20px;
+            font-size: 1rem;
+            border-radius: 10px;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s ease;
+        }
+
+        .option-btn:hover:not([disabled]) {
+            background-color: #475569;
+            border-color: var(--gold);
+        }
+
+        .option-btn.correct {
+            background-color: rgba(16, 185, 129, 0.2);
+            border-color: var(--emerald);
+            color: #34d399;
+        }
+
+        .option-btn.wrong {
+            background-color: rgba(239, 68, 68, 0.2);
+            border-color: var(--rose);
+            color: #f87171;
+        }
+
+        /* ಡಿಜಿಟಲ್ ಬ್ಯಾಡ್ಜ್ ಪಾಪ್-ಅಪ್ */
+        .badge-container {
+            display: none;
+            text-align: center;
+            animation: popBadge 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        @keyframes popBadge {
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .badge {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            margin: 0 auto 15px auto;
+            box-shadow: 0 0 25px var(--gold);
+            border: 4px solid #fff;
+        }
+
+        .badge-title {
+            font-size: 1.8rem;
+            color: var(--gold);
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .reset-btn {
+            background-color: var(--gold);
+            color: #000;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 25px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: transform 0.2s;
+        }
+
+        .reset-btn:hover {
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+
+    <h1>ಬುದ್ಧನ ಜ್ಞಾನವೃಕ್ಷ (The Wisdom Tree Trivia)</h1>
+    <p class="instruction">🧘 <b>ಗೇಮಿಫೈಡ್ ರಸಪ್ರಶ್ನೆ:</b> ಸರಿಯಾದ ಉತ್ತರ ನೀಡಿದಾಗ ಬೋಧಿ ವೃಕ್ಷ ಚಿಗುರುತ್ತದೆ, ತಪ್ಪಾದರೆ ಎಲೆಗಳು ಉದುರುತ್ತವೆ!</p>
+
+    <div class="game-container">
+        
+        <div class="tree-section">
+            <svg id="bodhiTree" viewBox="0 0 200 200">
+                <path d="M95 190 C 95 160, 90 140, 85 120 C 80 100, 60 90, 50 85 C 65 85, 80 95, 88 110 C 92 90, 85 70, 70 55 C 85 65, 92 80, 94 95 C 98 75, 105 55, 125 45 C 115 60, 108 75, 104 95 C 110 85, 125 80, 145 85 C 130 90, 115 100, 108 115 C 108 135, 105 160, 105 190 Z" fill="#653b11"/>
+                
+                <path id="leaf0" class="leaf" d="M50 85 C 30 75, 25 55, 40 45 C 55 55, 55 75, 50 85 Z" fill="#10b981"/>
+                <path id="leaf1" class="leaf" d="M70 55 C 55 35, 60 15, 75 20 C 85 35, 80 50, 70 55 Z" fill="#047857"/>
+                <path id="leaf2" class="leaf" d="M125 45 C 135 25, 155 20, 155 40 C 145 55, 135 55, 125 45 Z" fill="#34d399"/>
+                <path id="leaf3" class="leaf" d="M145 85 C 165 80, 175 60, 165 50 C 150 60, 150 75, 145 85 Z" fill="#059669"/>
+                <path id="leaf4" class="leaf" d="M88 110 C 70 115, 60 130, 65 145 C 80 140, 85 125, 88 110 Z" fill="#10b981"/>
+            </svg>
+        </div>
+
+        <div class="quiz-section">
+            <div class="quiz-card" id="quizCard">
+                <div id="questionNumber" style="color: var(--gold); font-weight: bold; margin-bottom: 5px;">ಪ್ರಶ್ನೆ: 1 / 5</div>
+                <div class="question-text" id="questionText">ಲೋಡಿಂಗ್...</div>
+                <div class="options-grid" id="optionsGrid">
+                    </div>
+            </div>
+
+            <div class="badge-container" id="badgeContainer">
+                <div class="badge">👑</div>
+                <div class="badge-title">ಜ್ಞಾನೋದಯ ಸಿದ್ಧಿ!</div>
+                <p style="color: #cbd5e1; font-size: 1.1rem;">ಅದ್ಭುತ! ನೀವು ಎಲ್ಲಾ ಪ್ರಶ್ನೆಗಳಿಗೆ ಸರಿಯಾಗಿ ಉತ್ತರಿಸಿ ಬೋಧಿ ವೃಕ್ಷವನ್ನು ಪೂರ್ಣ ಹಸಿರಾಗಿಸಿದ್ದೀರಿ. ನಿಮಗೆ <b>'ಡಿಜಿಟಲ್ ಜ್ಞಾನೋದಯ ಬ್ಯಾಡ್ಜ್'</b> ಸಿಕ್ಕಿದೆ!</p>
+                <button class="reset-btn" onclick="restartGame()">ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ ↻</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // ಐದನೇ ಪಾಠ "ಹೊಸ ಧರ್ಮಗಳ ಉದಯ" ಆಧಾರಿತ ಪ್ರಶ್ನೆಗಳು
+        const quizData = [
+            {
+                q: "ಗೌತಮ ಬುದ್ಧನು ತನ್ನ ಮೊದಲ ಬೋಧನೆಯನ್ನು ಎಲ್ಲಿ ನೀಡಿದನು?",
+                options: ["ಲುಂಬಿನಿ", "ಗಯಾ", "ಸಾರನಾಥ", "ಕುಶಿನಗರ"],
+                correct: 2
+            },
+            {
+                q: "ವರ್ಧಮಾನ ಮಹಾವೀರನು ಜೈನ ಧರ್ಮದ ಎಷ್ಟನೆಯ ತೀರ್ಥಂಕರನಾಗಿದ್ದಾನೆ?",
+                options: ["೧ನೇ ತೀರ್ಥಂಕರ", "೨೩ನೇ ತೀರ್ಥಂಕರ", "೨೪ನೇ ತೀರ್ಥಂಕರ", "೧೦ನೇ ತೀರ್ಥಂಕರ"],
+                correct: 2
+            },
+            {
+                q: "ಬುದ್ಧನು ದುಃಖ ನಿವಾರಣೆಗಾಗಿ ಬೋಧಿಸಿದ ಮಾರ್ಗ ಯಾವುದು?",
+                options: ["ತ್ರಿರತ್ನಗಳು", "ಅಷ್ಟಾಂಗ ಮಾರ್ಗಗಳು", "ಪಂಚಶೀಲಗಳು", "ಯಜ್ಞ ಯಾಗಾದಿಗಳು"],
+                correct: 1
+            },
+            {
+                q: "ಬೌದ್ಧ ಧರ್ಮದ ಪವಿತ್ರ ಧರ್ಮ ಗ್ರಂಥಗಳನ್ನು ಏನೆಂದು ಕರೆಯುತ್ತಾರೆ?",
+                options: ["ಅಂಗಗಳು", "ತ್ರಿಪಿಟಕಗಳು", "ವೇದಗಳು", "ವಚನಗಳು"],
+                correct: 1
+            },
+            {
+                q: "ವರ್ಧಮಾನ ಮಹಾವೀರನಿಗೆ ಇಂದ್ರಿಯಗಳನ್ನು ಗೆದ್ದ ನಂತರ ಸಿಕ್ಕ ಬಿರುದು ಯಾವುದು?",
+                options: ["ಬುದ್ಧ", "ಜಿನ", "ಶಾಕ್ಯಮುನಿ", "ಸಿದ್ಧಾರ್ಥ"],
+                correct: 1
+            }
+        ];
+
+        let currentQIndex = 0;
+        let score = 0;
+
+        // ವೆಬ್ ಆಡಿಯೋ API ಬಳಸಿ ಕೃತಕ ಧ್ವನಿ ಸೃಷ್ಟಿಸುವ ಅತ್ಯಾಧುನಿಕ ಫಂಕ್ಷನ್ (No External Files Needed)
+        function playBeep(type) {
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+
+            if (type === 'correct') {
+                osc.frequency.setValueAtTime(600, ctx.currentTime);
+                gain.gain.setValueAtTime(0.2, ctx.currentTime);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.15);
+            } else if (type === 'wrong') {
+                osc.frequency.setValueAtTime(250, ctx.currentTime);
+                gain.gain.setValueAtTime(0.3, ctx.currentTime);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.3);
+            }
+        }
+
+        // ಪ್ರಶ್ನೆ ಲೋಡ್ ಮಾಡುವ ಫಂಕ್ಷನ್
+        function loadQuestion() {
+            if (currentQIndex < quizData.length) {
+                document.getElementById('questionNumber').innerText = `ಪ್ರಶ್ನೆ: ${currentQIndex + 1} / 5`;
+                document.getElementById('questionText').innerText = quizData[currentQIndex].q;
+                
+                const optionsGrid = document.getElementById('optionsGrid');
+                optionsGrid.innerHTML = '';
+
+                quizData[currentQIndex].options.forEach((opt, idx) => {
+                    const btn = document.createElement('button');
+                    btn.className = 'option-btn';
+                    btn.innerText = opt;
+                    btn.onclick = () => checkAnswer(idx, btn);
+                    optionsGrid.appendChild(btn);
+                });
+            } else {
+                endGame();
+            }
+        }
+
+        // ಉತ್ತರ ಪರಿಶೀಲಿಸುವ ಫಂಕ್ಷನ್
+        function checkAnswer(selectedIdx, clickedBtn) {
+            const correctIdx = quizData[currentQIndex].correct;
+            const allBtns = document.querySelectorAll('.option-btn');
+            
+            // ಎಲ್ಲಾ ಬಟನ್ ಡಿಸೇಬಲ್ ಮಾಡಿ
+            allBtns.forEach(btn => btn.disabled = true);
+
+            if (selectedIdx === correctIdx) {
+                // ಸರಿಯಾದ ಉತ್ತರ
+                clickedBtn.classList.add('correct');
+                playBeep('correct');
+                
+                // ಮರದ ಎಲೆಯನ್ನು ಚಿಗುರಿಸುವುದು (Activate Leaf)
+                const leaf = document.getElementById(`leaf${currentQIndex}`);
+                leaf.classList.remove('falling');
+                leaf.classList.add('active');
+                score++;
+            } else {
+                // ತಪ್ಪು ಉತ್ತರ
+                clickedBtn.classList.add('wrong');
+                allBtns[correctIdx].classList.add('correct'); // ಸರಿಯಾದ ಉತ್ತರವನ್ನು ಹಸಿರು ಮಾಡಿ ತೋರಿಸು
+                playBeep('wrong');
+
+                // ಎಲೆ ಉದುರುವ ಅನಿಮೇಷನ್ (Falling Leaf effect)
+                const leaf = document.getElementById(`leaf${currentQIndex}`);
+                leaf.classList.add('active'); // ಮೊದಲು ಪ್ರದರ್ಶಿಸಿ ನಂತರ ಉದುರಿಸು
+                setTimeout(() => {
+                    leaf.classList.add('falling');
+                }, 100);
+            }
+
+            // ಮುಂದಿನ ಪ್ರಶ್ನೆಗೆ ಸಮಯಾವಕಾಶ
+            setTimeout(() => {
+                currentQIndex++;
+                loadQuestion();
+            }, 1500);
+        }
+
+        // ಆಟದ ಮುಕ್ತಾಯ
+        function endGame() {
+            document.getElementById('quizCard').style.display = 'none';
+            document.getElementById('badgeContainer').style.display = 'block';
+            
+            if(score === 5) {
+                document.getElementById('badgeContainer').innerHTML = `
+                    <div class="badge">🎉</div>
+                    <div class="badge-title" style="color: var(--emerald);">ಪೂರ್ಣ ಜ್ಞಾನೋದಯ ಸಿದ್ಧಿ!</div>
+                    <p style="color: #cbd5e1; font-size: 1.1rem;">ಅದ್ಭುತ! ನೀವು 5/5 ಅಂಕ ಗಳಿಸಿ ಬೋಧಿ ವೃಕ್ಷವನ್ನು ಪೂರ್ತಿ ಹಸಿರಾಗಿಸಿದ್ದೀರಿ! ನಿಮಗೆ ಡಿಜಿಟಲ್ <b>'ಪರಮ ಜ್ಞಾನಿ ಬ್ಯಾಡ್ಜ್'</b> ಲಭಿಸಿದೆ.</p>
+                    <button class="reset-btn" onclick="restartGame()">ಮತ್ತೆ ಆಡಿ ↻</button>
+                `;
+            } else {
+                document.getElementById('badgeContainer').innerHTML = `
+                    <div class="badge" style="background: #64748b; box-shadow: none;">🧘</div>
+                    <div class="badge-title">ಪುನಃ ಪ್ರಯತ್ನಿಸಿ</div>
+                    <p style="color: #cbd5e1; font-size: 1.1rem;">ನೀವು ಗಳಿಸಿದ ಅಂಕಗಳು: ${score} / 5. ಮರದ ಕೆಲವು ಎಲೆಗಳು ಉದುರಿಹೋಗಿವೆ. ಮತ್ತೊಮ್ಮೆ ಧ್ಯಾನಸ್ಥರಾಗಿ ಪೂರ್ಣ ಅಂಕ ಗಳಿಸಲು ಪ್ರಯತ್ನಿಸಿ!</p>
+                    <button class="reset-btn" onclick="restartGame()">ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ ↻</button>
+                `;
+            }
+        }
+
+        // ಆಟವನ್ನು ರಿಸೆಟ್ ಮಾಡಿ ಮೊದಲಿನಿಂದ ಪ್ರಾರಂಭಿಸುವುದು
+        function restartGame() {
+            currentQIndex = 0;
+            score = 0;
+            document.getElementById('quizCard').style.display = 'block';
+            document.getElementById('badgeContainer').style.display = 'none';
+            
+            // ಎಲ್ಲಾ ಎಲೆಗಳನ್ನು ರಿಸೆಟ್ ಮಾಡಿ
+            for(let i=0; i<5; i++) {
+                const leaf = document.getElementById(`leaf${i}`);
+                leaf.classList.remove('active', 'falling');
+            }
+
+            loadQuestion();
+        }
+
+        // ಗೇಮ್ ಆರಂಭಿಸಿ
+        window.onload = loadQuestion;
+    </script>
+
+</body>
+</html>

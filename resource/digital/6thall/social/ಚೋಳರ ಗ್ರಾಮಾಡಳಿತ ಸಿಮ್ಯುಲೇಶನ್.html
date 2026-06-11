@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಚೋಳರ ಗ್ರಾಮಾಡಳಿತ - ಡಿಜಿಟಲ್ ಸಿಮ್ಯುಲೇಶನ್</title>
+    <style>
+        :root {
+            --royal-blue: #0f172a;
+            --gold: #f59e0b;
+            --card-bg: #1e293b;
+            --text-light: #f1f5f9;
+            --emerald: #10b981;
+            --rose: #ef4444;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--royal-blue);
+            color: var(--text-light);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        h1 {
+            color: var(--gold);
+            text-align: center;
+            margin-bottom: 5px;
+            text-shadow: 0 0 10px rgba(245, 158, 11, 0.2);
+        }
+
+        .subtitle {
+            color: #94a3b8;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+        }
+
+        /* ಸಿಮ್ಯುಲೇಶನ್ ಕಂಟೇನರ್ */
+        .sim-container {
+            max-width: 700px;
+            width: 100%;
+            background: rgba(30, 41, 59, 0.8);
+            border-radius: 20px;
+            padding: 35px;
+            box-sizing: border-box;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
+            transition: all 0.5s ease;
+        }
+
+        .scene-img {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, #334155, #1e293b);
+            border-radius: 12px;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.4);
+            border-bottom: 3px solid var(--gold);
+        }
+
+        .situation-text {
+            font-size: 1.2rem;
+            line-height: 1.7;
+            margin-bottom: 30px;
+            color: #e2e8f0;
+        }
+
+        .choices-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .choice-btn {
+            background-color: #334155;
+            color: var(--text-light);
+            border: 2px solid transparent;
+            padding: 16px 22px;
+            font-size: 1rem;
+            border-radius: 12px;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            line-height: 1.4;
+        }
+
+        .choice-btn:hover {
+            background-color: #475569;
+            border-color: var(--gold);
+            transform: translateX(5px);
+        }
+
+        /* ಪ್ರೋಗ್ರೆಸ್ ಬಾರ್ */
+        .progress-wrapper {
+            width: 100%;
+            height: 6px;
+            background-color: #334155;
+            border-radius: 3px;
+            margin-top: 30px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background-color: var(--gold);
+            width: 20%;
+            transition: width 0.5s ease;
+        }
+
+        /* ರಿಸಲ್ಟ್ ಸ್ಟೈಲ್ಸ್ */
+        .badge {
+            font-size: 4rem;
+            margin-bottom: 15px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>೬ನೇ ಪಾಠ: ಚೋಳರ ಗ್ರಾಮಾಡಳಿತ ಸಿಮ್ಯುಲೇಶನ್</h1>
+    <div class="subtitle">ಚೋಳರ ಕಾಲದ ಉತ್ತರಮೇರೂರು ಗ್ರಾಮದ ಮುಖಂಡನಾಗಿ ಆಡಳಿತ ನಡೆಸಿ!</div>
+
+    <div class="sim-container">
+        <div class="scene-img" id="sceneImg">👑</div>
+        
+        <div class="situation-text" id="situationText">ಲೋಡಿಂಗ್...</div>
+        
+        <div class="choices-grid" id="choicesGrid">
+            </div>
+
+        <div class="progress-wrapper">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+    </div>
+
+    <script>
+        // ಸಿಮ್ಯುಲೇಶನ್‌ನ ಬ್ರಾಂಚಿಂಗ್ ಕಥೆಯ ಡೇಟಾಬೇಸ್
+        const storyNodes = {
+            start: {
+                img: "🏛️",
+                text: "ಕ್ರಿ.ಶ. ೧೦ನೇ ಶತಮಾನ. ನೀವು ಚೋಳ ಸಾಮ್ರಾಜ್ಯದ 'ಉತ್ತರಮೇರೂರು' ಹಳ್ಳಿಯ ಮುಖಂಡರಾಗಿದ್ದೀರಿ. ರಾಜ ಪ್ರಥಮ ಪರಾಂತಕ ಚೋಳನ ಆದೇಶದಂತೆ ನಿಮ್ಮ ಹಳ್ಳಿಗೆ ನೀರಾವರಿ ಮತ್ತು ತೆರಿಗೆಯನ್ನು ನೋಡಿಕೊಳ್ಳಲು 'ಮಹಾ ಸಭೆ' (ಗ್ರಾಮ ಸಮಿತಿ) ರಚಿಸಬೇಕಾಗಿದೆ. ನೀವು ಮೊದಲು ಏನು ಮಾಡುತ್ತೀರಿ?",
+                progress: "20%",
+                choices: [
+                    { text: "ಗ್ರಾಮದ ಪ್ರಮುಖರನ್ನು ಕರೆದು ಸಮಿತಿಗೆ ಅರ್ಹರಾದವರ ಪಟ್ಟಿ ಸಿದ್ಧಪಡಿಸುತ್ತೇನೆ.", Lnode: "qualifications" },
+                    { text: "ನನ್ನ ಹತ್ತಿರದ ಸಂಬಂಧಿಕರನ್ನು ಮತ್ತು ಸ್ನೇಹಿತರನ್ನು ನೇರವಾಗಿ ಸಮಿತಿಗೆ ಆರಿಸುತ್ತೇನೆ.", Lnode: "nepotism_fail" }
+                ]
+            },
+            nepotism_fail: {
+                img: "😡",
+                text: "ತಪ್ಪು ನಿರ್ಧಾರ! ಚೋಳರ ಆಡಳಿತದಲ್ಲಿ ಸ್ವಜನಪಕ್ಷಪಾತಕ್ಕೆ ಅವಕಾಶವಿರಲಿಲ್ಲ. ನಿಮ್ಮ ನಿರ್ಧಾರದಿಂದ ಗ್ರಾಮಸ್ಥರು ಕೋಪಗೊಂಡು ದಂಗೆ ಎದ್ದಿದ್ದಾರೆ. ರಾಜನಿಗೆ ನಿಮ್ಮ ಮೇಲೆ ದೂರು ಹೋಗಿದೆ!",
+                progress: "40%",
+                choices: [
+                    { text: "↩ ತಪ್ಪು ಒಪ್ಪಿಕೊಂಡು ಮೊದಲಿನಿಂದ ಸರಿಯಾದ ಕ್ರಮ ಕೈಗೊಳ್ಳಿ", Lnode: "start" }
+                ]
+            },
+            qualifications: {
+                img: "📜",
+                text: "ಉತ್ತಮ ಆರಂಭ! ಚೋಳರ ಶಾಸನದ ಪ್ರಕಾರ ಸಮಿತಿಯ ಚುನಾವಣೆಗೆ ನಿಲ್ಲುವ ಅಭ್ಯರ್ಥಿಗೆ ಕೆಲವು ಕಠಿಣ ನಿಯಮಗಳಿದ್ದವು. ಕೆಳಗಿನ ಇಬ್ಬರಲ್ಲಿ ನೀವು ಯಾರನ್ನು ಅಭ್ಯರ್ಥಿಯನ್ನಾಗಿ ಆರಿಸುತ್ತೀರಿ?",
+                progress: "50%",
+                choices: [
+                    { text: "ಸ್ವಂತ ಮನೆ ಹೊಂದಿರುವ, ವೇದಗಳನ್ನು ತಿಳಿದಿರುವ ಮತ್ತು ೩೫ ರಿಂದ ೭೦ ವರ್ಷ ವಯಸ್ಸಿನ ಪ್ರಾಮಾಣಿಕ ವ್ಯಕ್ತಿ.", Lnode: "voting_method" },
+                    { text: "ಗ್ರಾಮದ ಅತ್ಯಂತ ಶ್ರೀಮಂತ, ಆದರೆ ಕಳೆದ ೩ ವರ್ಷಗಳಿಂದ ಆಡಳಿತ ಸಮಿತಿಯಲ್ಲಿದ್ದು ಲೆಕ್ಕಪತ್ರ ಒಪ್ಪಿಸದ ವ್ಯಕ್ತಿ.", Lnode: "account_fail" }
+                ]
+            },
+            account_fail: {
+                img: "❌",
+                text: "ಅನರ್ಹ ಅಭ್ಯರ್ಥಿ! ಚೋಳರ ನಿಯಮದ ಪ್ರಕಾರ ಕಳೆದ ೩ ವರ್ಷಗಳಲ್ಲಿ ಸಮಿತಿಯಲ್ಲಿದ್ದು ಸರಿಯಾಗಿ ಲೆಕ್ಕಪತ್ರ (Accounts) ಒಪ್ಪಿಸದ ವ್ಯಕ್ತಿ ಮತ್ತು ಅವನ ಸಂಬಂಧಿಕರು ಚುನಾವಣೆಗೆ ನಿಲ್ಲುವಂತಿರಲಿಲ್ಲ. ಗ್ರಾಮಸ್ಥರು ಇದನ್ನು ತಿರಸ್ಕರಿಸಿದ್ದಾರೆ.",
+                progress: "60%",
+                choices: [
+                    { text: "↩ ಚೋಳರ ನಿಯಮ ಪಾಲಿಸಿ ಸರಿಯಾದ ಅಭ್ಯರ್ಥಿ ಆರಿಸಿ", Lnode: "qualifications" }
+                ]
+            },
+            voting_method: {
+                img: "⚱️",
+                text: "ಅದ್ಭುತ! ಸರಿಯಾದ ಅರ್ಹತೆಯುಳ್ಳ ಅಭ್ಯರ್ಥಿಗಳ ಪಟ್ಟಿ ಸಿದ್ಧವಾಗಿದೆ. ಈಗ ಇವರಿಂದ ಸಮಿತಿಯ ಸದಸ್ಯರನ್ನು ಆಯ್ಕೆ ಮಾಡಲು ಚೋಳರ ಸಾಂಪ್ರದಾಯಿಕ ಚುನಾವಣಾ ಪದ್ಧತಿಯನ್ನು ಬಳಸಬೇಕು. ಆ ಪದ್ಧತಿ ಯಾವುದು?",
+                progress: "75%",
+                choices: [
+                    { text: "ಕುಡವೋಲೈ ಪದ್ಧತಿ (ಅಭ್ಯರ್ಥಿಗಳ ಹೆಸರನ್ನೊಳಗೊಂಡ ಓಲೆ ಎಲೆಗಳನ್ನು ಕುಡಕೆಯಲ್ಲಿ ಹಾಕಿ ಸಣ್ಣ ಹುಡುಗನಿಂದ ಚೀಟಿ ಎತ್ತಿಸುವುದು).", Lnode: "success_end" },
+                    { text: "ಕೈ ಎತ್ತುವ ಮೂಲಕ ಅಥವಾ ಕತ್ತಿ ವರಸೆಯ ಯುದ್ಧದ ಮೂಲಕ ವಿಜೇತರನ್ನು ಘೋಷಿಸುವುದು.", Lnode: "voting_fail" }
+                ]
+            },
+            voting_fail: {
+                img: "⚠️",
+                text: "ತಪ್ಪು ವಿಧಾನ! ಚೋಳರ ಗ್ರಾಮಾಡಳಿತದ ಪ್ರಮುಖ ಆಕರ್ಷಣೆಯೇ 'ಕುಡವೋಲೈ' (Pot-ticket system) ಎಂಬ ಪ್ರಜಾಪ್ರಭುತ್ವ ಮಾದರಿಯ ರಹಸ್ಯ ಚೀಟಿ ಪದ್ಧತಿಯಾಗಿತ್ತು. ಯುದ್ಧ ಅಥವಾ ಕೈ ಎತ್ತುವ ವಿಧಾನ ಇಲ್ಲಿ ಬಳಕೆಯಾಗುತ್ತಿರಲಿಲ್ಲ.",
+                progress: "85%",
+                choices: [
+                    { text: "↩ ಸರಿಯಾದ ಚೋಳರ ಚುನಾವಣಾ ವಿಧಾನ ಆರಿಸಿ", Lnode: "voting_method" }
+                ]
+            },
+            success_end: {
+                img: "🌾",
+                text: "🎉 ಅಭಿನಂದನೆಗಳು! ನೀವು 'ಕುಡವೋಲೈ' ಪದ್ಧತಿಯ ಮೂಲಕ ಯಶಸ್ವಿಯಾಗಿ ಗ್ರಾಮ ಮಹಾಸಭೆಯನ್ನು ರಚಿಸಿದ್ದೀರಿ. ನಿಮ್ಮ ಸಮಿತಿಯು ಕೆರೆಗಳನ್ನು ಬಾವಿಗಳನ್ನು ದುರಸ್ತಿ ಮಾಡಿ, ಕೃಷಿ ಉತ್ಪಾದನೆ ಹೆಚ್ಚಿಸಿದೆ. ಚೋಳರ ಅತ್ಯುತ್ತಮ ಸ್ವಾಯತ್ತ ಗ್ರಾಮಾಡಳಿತ ವ್ಯವಸ್ಥೆಯನ್ನು ನೀವು ಯಶಸ್ವಿಯಾಗಿ ಜಾರಿಗೆ ತಂದಿದ್ದೀರಿ!",
+                progress: "100%",
+                choices: [
+                    { text: "🏆 ನೀವು 'ಉತ್ತಮ ಆಡಳಿತಗಾರ' ಬ್ಯಾಡ್ಜ್ ಗೆದ್ದಿದ್ದೀರಿ! ಮತ್ತೆ ಆಡಿ ↻", Lnode: "start" }
+                ]
+            }
+        };
+
+        // ಸಿಮ್ಯುಲೇಶನ್ ನಡೆಸುವ ಮುಖ್ಯ ಫಂಕ್ಷನ್
+        function RenderScene(nodeKey) {
+            const scene = storyNodes[nodeKey];
+            
+            // UI ಕಂಟೆಂಟ್ ಅಪ್ಡೇಟ್
+            document.getElementById('sceneImg').innerText = scene.img;
+            document.getElementById('situationText').innerText = scene.text;
+            document.getElementById('progressBar').style.width = scene.progress;
+
+            // ಚಾಯ್ಸ್ ಬಟನ್‌ಗಳ ನಿರ್ಮಾಣ
+            const choicesGrid = document.getElementById('choicesGrid');
+            choicesGrid.innerHTML = '';
+
+            scene.choices.forEach(choice => {
+                const btn = document.createElement('button');
+                btn.className = 'choice-btn';
+                btn.innerText = choice.text;
+                btn.onclick = () => {
+                    // ಸ್ಮೂತ್ ಫೇಡ್-ಇನ್ ಎಫೆಕ್ಟ್‌ಗಾಗಿ
+                    const container = document.querySelector('.sim-container');
+                    container.style.opacity = '0.5';
+                    setTimeout(() => {
+                        RenderScene(choice.Lnode);
+                        container.style.opacity = '1';
+                    }, 300);
+                };
+                choicesGrid.appendChild(btn);
+            });
+        }
+
+        // ಆಟವನ್ನು ಲೋಡ್ ಮಾಡಿ
+        window.onload = () => {
+            RenderScene('start');
+        };
+    </script>
+
+</body>
+</html>

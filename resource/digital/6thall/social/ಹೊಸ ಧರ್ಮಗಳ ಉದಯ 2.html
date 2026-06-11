@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಹೊಸ ಧರ್ಮಗಳ ಉದಯ - ಗೇಮಿಫೈಡ್ ರಸಪ್ರಶ್ನೆ</title>
+    <style>
+        :root {
+            --bg-color: #f0f4f8;
+            --primary-color: #2c3e50;
+            --accent-color: #e67e22;
+            --success-color: #2ecc71;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            user-select: none;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 5px;
+            text-align: center;
+        }
+
+        p.instruction {
+            color: #555;
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .game-container {
+            display: flex;
+            gap: 40px;
+            max-width: 900px;
+            width: 100%;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        /* ಎಳೆಯುವ ಪದಗಳ ಲಿಸ್ಟ್ (Drag Items) */
+        .drag-zone {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            min-width: 200px;
+        }
+
+        .drag-item {
+            background-color: var(--accent-color);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            text-align: center;
+            cursor: grab;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.2s, background-color 0.2s;
+        }
+
+        .drag-item:active {
+            cursor: grabbing;
+            transform: scale(0.95);
+        }
+
+        /* ಡ್ರಾಪ್ ಮಾಡುವ ವಿವರಣೆಗಳ ಲಿಸ್ಟ್ (Drop Zones) */
+        .drop-zone-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            flex-content: 1;
+            max-width: 550px;
+            width: 100%;
+        }
+
+        .drop-row {
+            display: flex;
+            align-items: center;
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            gap: 15px;
+        }
+
+        .description {
+            flex: 1;
+            font-size: 1rem;
+            color: #333;
+            line-height: 1.4;
+        }
+
+        .drop-target {
+            width: 180px;
+            height: 45px;
+            border: 2px dashed #bdc3c7;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #fafafa;
+            transition: all 0.3s ease;
+        }
+
+        .drop-target.hovered {
+            border-color: var(--accent-color);
+            background-color: #fef5ec;
+        }
+
+        .drop-target.correct {
+            border-color: var(--success-color);
+            background-color: #e8f8f0;
+            color: var(--success-color);
+            font-weight: bold;
+        }
+
+        /* ರಿಸಲ್ಟ್ ಸೆಕ್ಷನ್ */
+        .result-box {
+            margin-top: 30px;
+            text-align: center;
+            display: none;
+        }
+
+        .score-text {
+            font-size: 1.5rem;
+            color: var(--success-color);
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        button.reset-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1rem;
+            border-radius: 25px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+
+        button.reset-btn:hover {
+            background-color: #1a252f;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>ಐದನೇ ಪಾಠ: ಹೊಸ ಧರ್ಮಗಳ ಉದಯ</h1>
+    <p class="instruction">🎮 <b>ಹೊಂದಿಸಿ ಬರೆಯಿರಿ ಆಟ:</b> ಎಡಭಾಗದಲ್ಲಿರುವ ಕೆಂಪು ಬಣ್ಣದ ತತ್ವಗಳನ್ನು ಎಳೆದು ತಂದು (Drag) ಬಲಭಾಗದ ಸರಿಯಾದ ವಿವರಣೆಯ ಬಾಕ್ಸ್‌ನಲ್ಲಿ ಹಾಕಿ!</p>
+
+    <div class="game-container">
+        <div class="drag-zone" id="dragZone">
+            <div class="drag-item" draggable="true" id="item-tri">ತ್ರಿರತ್ನಗಳು</div>
+            <div class="drag-item" draggable="true" id="item-ashta">ಅಷ್ಟಾಂಗ ಮಾರ್ಗಗಳು</div>
+            <div class="drag-item" draggable="true" id="item-pancha">ಪಂಚಶೀಲಗಳು</div>
+            <div class="drag-item" draggable="true" id="item-jina">ಜಿನ</div>
+        </div>
+
+        <div class="drop-zone-container">
+            <div class="drop-row">
+                <p class="description">ಬುದ್ಧನು ದುಃಖ ನಿವಾರಣೆಗಾಗಿ ಬೋಧಿಸಿದ ಎಂಟು ಸರಳ ನಿಯಮಗಳು (ಉದಾ: ಸದ್ವಿಚಾರ, ಸತ್ಕರ್ಮ).</p>
+                <div class="drop-target" data-match="item-ashta">ಇಲ್ಲಿ ಬಿಡಿ...</div>
+            </div>
+
+            <div class="drop-row">
+                <p class="description">ಜೈನ ಧರ್ಮದ ಪ್ರಮುಖ ಮೂರು ಸೂತ್ರಗಳು: ಸಮ್ಯಕ್ ಜ್ಞಾನ, ಸಮ್ಯಕ್ ದರ್ಶನ, ಸಮ್ಯಕ್ ಚಾರಿತ್ರ್ಯ.</p>
+                <div class="drop-target" data-match="item-tri">ಇಲ್ಲಿ ಬಿಡಿ...</div>
+            </div>
+
+            <div class="drop-row">
+                <p class="description">ವರ್ಧಮಾನ ಮಹಾವೀರನಿಗೆ ಸಿಕ್ಕ ಬಿರುದು, ಇದರ ಅರ್ಥ 'ತನ್ನ ಇಂದ್ರಿಯಗಳನ್ನು ಗೆದ್ದವನು' ಎಂದು.</p>
+                <div class="drop-target" data-match="item-jina">ಇಲ್ಲಿ ಬಿಡಿ...</div>
+            </div>
+
+            <div class="drop-row">
+                <p class="description">ಜೈನ ಧರ್ಮದ ಐದು ಮುಖ್ಯ ನೈತಿಕ ತತ್ವಗಳು (ಉದಾ: ಅಹಿಂಸೆ, ಸತ್ಯ, ಆಸ್ತೇಯ, ಅಪರಿಗ್ರಹ, ಬ್ರಹ್ಮಚರ್ಯ).</p>
+                <div class="drop-target" data-match="item-pancha">ಇಲ್ಲಿ ಬಿಡಿ...</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="result-box" id="resultBox">
+        <p class="score-text">🎉 ಅದ್ಭುತ! ನೀವು ಎಲ್ಲಾ ತತ್ವಗಳನ್ನು ಸರಿಯಾಗಿ ಹೊಂದಿಸಿದ್ದೀರಿ!</p>
+        <button class="reset-btn" onclick="resetGame()">ಮತ್ತೆ ಆಡಿ ↻</button>
+    </div>
+
+    <script>
+        const dragItems = document.querySelectorAll('.drag-item');
+        const dropTargets = document.querySelectorAll('.drop-target');
+        let correctMatches = 0;
+
+        // Drag ಈವೆಂಟ್‌ಗಳು
+        dragItems.forEach(item => {
+            item.addEventListener('dragstart', (e) => {
+                e.dataTransfer.setData('text/plain', item.id);
+            });
+        });
+
+        // Drop ಈವೆಂಟ್‌ಗಳು
+        dropTargets.forEach(target => {
+            target.addEventListener('dragover', (e) => {
+                e.preventDefault(); // ಡ್ರಾಪ್ ಮಾಡಲು ಅನುಮತಿ ನೀಡುತ್ತದೆ
+                target.classList.add('hovered');
+            });
+
+            target.addEventListener('dragleave', () => {
+                target.classList.remove('hovered');
+            });
+
+            target.addEventListener('drop', (e) => {
+                e.preventDefault();
+                target.classList.remove('hovered');
+                
+                const draggedId = e.dataTransfer.getData('text/plain');
+                const draggedElement = document.getElementById(draggedId);
+                
+                // ಸರಿಯಾದ ಹೊಂದಾಣಿಕೆಯನ್ನು ಪರಿಶೀಲಿಸುವುದು
+                if (target.getAttribute('data-match') === draggedId) {
+                    target.innerHTML = draggedElement.innerText;
+                    target.classList.add('correct');
+                    draggedElement.style.visibility = 'hidden'; // ಹೊಂದಿಸಿದ ಪದವನ್ನು ಹೈಡ್ ಮಾಡಿ
+                    correctMatches++;
+
+                    // ಆಟ ಮುಗಿದಿದೆಯೇ ಎಂದು ಪರಿಶೀಲಿಸಿ
+                    if (correctMatches === dragItems.length) {
+                        document.getElementById('resultBox').style.display = 'block';
+                    }
+                } else {
+                    // ತಪ್ಪು ಹೊಂದಾಣಿಕೆಯಾದರೆ ಸಣ್ಣದೊಂದು ಅಲರ್ಟ್ ಎಫೆಕ್ಟ್
+                    target.style.borderColor = '#e74c3c';
+                    setTimeout(() => {
+                        target.style.borderColor = '#bdc3c7';
+                    }, 500);
+                }
+            });
+        });
+
+        // ಗೇಮ್ ರಿಸೆಟ್ ಫಂಕ್ಷನ್
+        function resetGame() {
+            correctMatches = 0;
+            document.getElementById('resultBox').style.display = 'none';
+            
+            dragItems.forEach(item => {
+                item.style.visibility = 'visible';
+            });
+
+            dropTargets.forEach(target => {
+                target.innerHTML = 'ಇಲ್ಲಿ ಬಿಡಿ...';
+                target.classList.remove('correct');
+            });
+        }
+    </script>
+
+</body>
+</html>

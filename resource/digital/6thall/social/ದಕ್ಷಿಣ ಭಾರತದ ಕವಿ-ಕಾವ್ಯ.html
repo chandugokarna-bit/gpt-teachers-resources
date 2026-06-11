@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ದಕ್ಷಿಣ ಭಾರತದ ಸಾಹಿತ್ಯ - ಕವಿ-ಕಾವ್ಯ ಕ್ವೆಸ್ಟ್</title>
+    <style>
+        :root {
+            --bg-color: #f7f9fc;
+            --primary-dark: #1e293b;
+            --accent-orange: #ff9f43;
+            --success-green: #10ac84;
+            --error-red: #ee5253;
+            --card-bg: #ffffff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--primary-dark);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            touch-action:控制; /* ಮೊಬೈಲ್ ಸ್ಕ್ರಾಲ್ ನಿಯಂತ್ರಣಕ್ಕೆ */
+        }
+
+        h1 {
+            color: var(--primary-dark);
+            text-align: center;
+            margin-bottom: 5px;
+        }
+
+        p.instruction {
+            color: #64748b;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+        }
+
+        /* ಮುಖ್ಯ ಗೇಮ್ ಲೇಔಟ್ */
+        .game-wrapper {
+            display: flex;
+            gap: 50px;
+            max-width: 950px;
+            width: 100%;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        /* ಕವಿಗಳ ಲಿಸ್ಟ್ (Drag Side) */
+        .poets-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            min-width: 220px;
+        }
+
+        .poet-card {
+            background-color: var(--accent-orange);
+            color: white;
+            padding: 14px 20px;
+            border-radius: 10px;
+            font-weight: bold;
+            text-align: center;
+            cursor: grab;
+            box-shadow: 0 4px 10px rgba(255, 159, 67, 0.2);
+            transition: transform 0.2s, background-color 0.2s;
+            position: relative;
+            z-index: 10;
+        }
+
+        .poet-card:active {
+            cursor: grabbing;
+        }
+
+        /* ಕೃತಿಗಳ ಲಿಸ್ಟ್ (Drop Side) */
+        .books-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            flex-grow: 1;
+            max-width: 550px;
+            width: 100%;
+        }
+
+        .book-row {
+            display: flex;
+            align-items: center;
+            background: var(--card-bg);
+            padding: 12px 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            gap: 20px;
+            justify-content: space-between;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .book-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #334155;
+        }
+
+        .drop-target {
+            width: 200px;
+            height: 48px;
+            border: 2px dashed #cbd5e1;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f8fafc;
+            color: #94a3b8;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        /* ಡ್ರಾಗ್ ಮಾಡಿ ತಂದಾಗ ಆಗುವ ಬದಲಾವಣೆ */
+        .drop-target.drag-over {
+            border-color: var(--accent-orange);
+            background-color: #fff7ed;
+        }
+
+        /* ಸರಿಯಾದ ಉತ್ತರ ಬಂದಾಗ */
+        .book-row.correct-match {
+            border-color: var(--success-green);
+            background-color: #f0fdf4;
+        }
+
+        .drop-target.correct {
+            border: none;
+            background-color: var(--success-green);
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(16, 172, 132, 0.2);
+        }
+
+        /* ಸ್ಕೋರ್ ಬೋರ್ಡ್ */
+        .scoreboard {
+            margin-top: 35px;
+            text-align: center;
+            background: white;
+            padding: 15px 40px;
+            border-radius: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--primary-dark);
+        }
+
+        .score-val {
+            color: var(--success-green);
+        }
+
+        /* ರಿಸೆಟ್ ಬಟನ್ */
+        .success-modal {
+            display: none;
+            margin-top: 20px;
+            animation: popIn 0.5s ease;
+        }
+
+        button.play-again {
+            background-color: var(--primary-dark);
+            color: white;
+            border: none;
+            padding: 12px 35px;
+            font-size: 1rem;
+            border-radius: 25px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            transition: background 0.2s;
+        }
+
+        button.play-again:hover {
+            background-color: #0f172a;
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.9); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>೬ನೇ ಪಾಠ: ದಕ್ಷಿಣ ಭಾರತದ ಕವಿ-ಕಾವ್ಯ ಕ್ವೆಸ್ಟ್</h1>
+    <p class="instruction">🎮 <b>ಹೊಂದಿಸಿ ಬರೆಯಿರಿ ಆಟ:</b> ಎಡಭಾಗದಲ್ಲಿರುವ ಕವಿಗಳ ಕಾರ್ಡ್‌ಗಳನ್ನು ಎಳೆದು ತಂದು (Drag) ಬಲಭಾಗದ ಸರಿಯಾದ ಕೃತಿಯ ಬಾಕ್ಸ್‌ನಲ್ಲಿ ಹಾಕಿ!</p>
+
+    <div class="game-wrapper">
+        <div class="poets-container" id="poetsContainer">
+            </div>
+
+        <div class="books-container" id="booksContainer">
+            </div>
+    </div>
+
+    <div class="scoreboard">
+        ಅಂಕಗಳು: <span id="scoreDisplay" class="score-val">0</span> / 8
+    </div>
+
+    <div class="success-modal" id="successModal">
+        <h2 style="color: var(--success-green);">🎉 ಅದ್ಭುತ! ನೀವು ಎಲ್ಲಾ ಕವಿ-ಕಾವ್ಯಗಳನ್ನು ಸರಿಯಾಗಿ ಜೋಡಿಸಿದ್ದೀರಿ!</h2>
+        <button class="play-again" onclick="initGame()">ಮತ್ತೆ ಆಡಿ ↻</button>
+    </div>
+
+    <script>
+        // ಕವಿ ಮತ್ತು ಕಾವ್ಯಗಳ ಮಾಸ್ಟರ್ ಡೇಟಾಬೇಸ್ (8 ಜೋಡಿಗಳು)
+        const literatureData = [
+            { id: "pampa", poet: "ಪಂಪ", book: "ಆದೀಪುರಾಣ / ವಿಕ್ರಮಾರ್ಜುನ ವಿಜಯ" },
+            { id: "ranna", poet: "ರನ್ನ", book: "ಗದಾಯುದ್ಧ (ಸಾಹಸಭೀಮ ವಿಜಯ)" },
+            { id: "ponna", poet: "ಪೊನ್ನ", book: "ಶಾಂತಿಪುರಾಣ" },
+            { id: "hala", poet: "ಹಾಲ ರಾಜ", book: "ಗಾಥಾಸಪ್ತಶತಿ (ಪ್ರಾಕೃತ ಕೃತಿ)" },
+            { id: "srivijaya", poet: "ಶ್ರೀವಿಜಯ / ನೃಪತುಂಗ", book: "ಕವಿರಾಜಮಾರ್ಗ (ಮೊದಲ ಕನ್ನಡ ಕೃತಿ)" },
+            { id: "vignaneshvara", poet: "ವಿಜ್ಞಾನೇಶ್ವರ", book: "ಮಿತಾಕ್ಷರ ಸಂಹಿತೆ (ಕಾನೂನು ಗ್ರಂಥ)" },
+            { id: "shivakoti", poet: "ಶಿವಕೋಟ್ಯಾಚಾರ್ಯ", book: "ವಡ್ಡಾರಾಧನೆ (ಮೊದಲ ಕನ್ನಡ ಗದ್ಯ)" },
+            { id: "chavundaraya", poet: "ಚಾವುಂಡರಾಯ", book: "ಚಾವುಂಡರಾಯ ಪುರಾಣ" }
+        ];
+
+        let score = 0;
+
+        // ಅರೇಗಳನ್ನು ಮಿಕ್ಸ್ (Shuffle) ಮಾಡುವ ಫಂಕ್ಷನ್
+        function shuffle(array) {
+            return array.sort(() => Math.random() - 0.5);
+        }
+
+        // ಆಟವನ್ನು ಪ್ರಾರಂಭಿಸುವ ಫಂಕ್ಷನ್
+        function initGame() {
+            score = 0;
+            document.getElementById('scoreDisplay').innerText = score;
+            document.getElementById('successModal').style.display = 'none';
+
+            const poetsContainer = document.getElementById('poetsContainer');
+            const booksContainer = document.getElementById('booksContainer');
+            
+            poetsContainer.innerHTML = '';
+            booksContainer.innerHTML = '';
+
+            // ಕವಿಗಳನ್ನು ಮಾತ್ರ ಪ್ರತ್ಯೇಕವಾಗಿ ಶಫಲ್ ಮಾಡಿ ಪ್ರದರ್ಶಿಸುವುದು
+            const shuffledPoets = shuffle([...literatureData]);
+            shuffledPoets.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'poet-card';
+                card.draggable = true;
+                card.id = item.id;
+                card.innerText = item.poet;
+
+                // ಡೆಸ್ಕ್‌ಟಾಪ್ ಡ್ರಾಗ್ ಈವೆಂಟ್‌ಗಳು
+                card.addEventListener('dragstart', dragStart);
+
+                // ಮೊಬೈಲ್ ಟಚ್ ಈವೆಂಟ್‌ಗಳ ಸಪೋರ್ಟ್ (ಇನ್ನೋವೇಟಿವ್ ಮೊಬೈಲ್ ಫಿಕ್ಸ್)
+                card.addEventListener('touchstart', touchStart, {passive: false});
+                card.addEventListener('touchmove', touchMove, {passive: false});
+                card.addEventListener('touchend', touchEnd);
+
+                poetsContainer.appendChild(card);
+            });
+
+            // ಕೃತಿಗಳನ್ನು ಮಾತ್ರ ಪ್ರತ್ಯೇಕವಾಗಿ ಶಫಲ್ ಮಾಡಿ ಪ್ರದರ್ಶಿಸುವುದು
+            const shuffledBooks = shuffle([...literatureData]);
+            shuffledBooks.forEach(item => {
+                const row = document.createElement('div');
+                row.className = 'book-row';
+                row.id = 'row-' + item.id;
+
+                row.innerHTML = `
+                    <span class="book-title">${item.book}</span>
+                    <div class="drop-target" data-match="${item.id}" ondragover="allowDrop(event)" ondragleave="dragLeave(event)" ondrop="dropItem(event)">ಕವಿಯನ್ನು ಇಲ್ಲಿ ಬಿಡಿ...</div>
+                `;
+                booksContainer.appendChild(row);
+            });
+        }
+
+        // --- ಡೆಸ್ಕ್‌ಟಾಪ್ ಡ್ರಾಗ್ ಅಂಡ್ ಡ್ರಾಪ್ ಲಾಜಿಕ್ ---
+        function dragStart(e) {
+            e.dataTransfer.setData('text/plain', e.target.id);
+        }
+
+        function allowDrop(e) {
+            e.preventDefault();
+            e.target.classList.add('drag-over');
+        }
+
+        function dragLeave(e) {
+            e.target.classList.remove('drag-over');
+        }
+
+        function dropItem(e) {
+            e.preventDefault();
+            e.target.classList.remove('drag-over');
+            const draggedId = e.dataTransfer.getData('text/plain');
+            handleMatching(draggedId, e.target);
+        }
+
+        // --- ಮೊಬೈಲ್ ಟಚ್ ಲಾಜಿಕ್ (Advanced Touch Feature) ---
+        let activeTouchElement = null;
+
+        function touchStart(e) {
+            e.preventDefault();
+            activeTouchElement = e.target;
+            e.target.style.position = 'absolute';
+        }
+
+        function touchMove(e) {
+            if (!activeTouchElement) return;
+            e.preventDefault();
+            const touch = e.touches[0];
+            activeTouchElement.style.left = (touch.clientX - 100) + 'px';
+            activeTouchElement.style.top = (touch.clientY - 25) + 'px';
+        }
+
+        function touchEnd(e) {
+            if (!activeTouchElement) return;
+            const el = activeTouchElement;
+            activeTouchElement = null;
+            el.style.position = 'static';
+
+            const touch = e.changedTouches[0];
+            // ಟಚ್ ಬಿಟ್ಟ ಜಾಗದಲ್ಲಿ ಯಾವ ಡ್ರಾಪ್ ಟಾರ್ಗೆಟ್ ಇದೆ ಎಂದು ಪತ್ತೆ ಮಾಡುವುದು
+            const target = document.elementFromPoint(touch.clientX, touch.clientY);
+            
+            if (target && target.classList.contains('drop-target')) {
+                handleMatching(el.id, target);
+            } else {
+                initGame(); // ಮೊಬೈಲ್‌ನಲ್ಲಿ ಮಿಸ್ ಆದರೆ ರಿಸೆಟ್ ಮಾಡಲು ಸರಳ ಹಾದಿ
+            }
+        }
+
+        // --- ಹೊಂದಾಣಿಕೆ ಮತ್ತು ಅಂಕಗಳ ಹಂಚಿಕೆಯ ಕೋರ್ ಲಾಜಿಕ್ ---
+        function handleMatching(draggedId, targetElement) {
+            const correctAnswerId = targetElement.getAttribute('data-match');
+            const draggedElement = document.getElementById(draggedId);
+
+            if (draggedId === correctAnswerId) {
+                // ಸರಿಯಾದ ಜೋಡಿ
+                targetElement.innerText = draggedElement.innerText;
+                targetElement.classList.add('correct');
+                targetElement.removeAttribute('ondragover'); // ಮತ್ತೊಮ್ಮೆ ಡ್ರಾಗ್ ಮಾಡುವುದನ್ನು ತಡೆಯಲು
+                
+                document.getElementById('row-' + draggedId).classList.add('correct-match');
+                draggedElement.style.display = 'none'; // ಕವಿಯ ಕಾರ್ಡ್ ಅನ್ನು ಹೈಡ್ ಮಾಡಿ
+                
+                score++;
+                document.getElementById('scoreDisplay').innerText = score;
+
+                // ಎಲ್ಲಾ 8 ಜೋಡಿ ಸರಿಯಾದರೆ ಆಟ ಮುಕ್ತಾಯ
+                if (score === literatureData.length) {
+                    document.getElementById('successModal').style.display = 'block';
+                }
+            } else {
+                // ತಪ್ಪು ಜೋಡಿ ಬಂದಾಗ ಎಫೆಕ್ಟ್
+                targetElement.style.backgroundColor = 'var(--error-red)';
+                targetElement.style.color = 'white';
+                targetElement.innerText = 'ತಪ್ಪು! ಮತ್ತೆ ಯೋಚಿಸಿ';
+                setTimeout(() => {
+                    targetElement.style.backgroundColor = '#f8fafc';
+                    targetElement.style.color = '#94a3b8';
+                    targetElement.innerText = 'ಕವಿಯನ್ನು ಇಲ್ಲಿ ಬಿಡಿ...';
+                }, 1000);
+            }
+        }
+
+        // ಪೇಜ್ ಲೋಡ್ ಆದಾಗ ಆಟವನ್ನು ಪ್ರಾರಂಭಿಸಿ
+        window.onload = initGame;
+    </script>
+
+</body>
+</html>
