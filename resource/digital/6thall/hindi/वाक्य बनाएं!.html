@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>आओ हिंदी वाक्य बनाएं! (Hindi Sentence Builder)</title>
+    <style>
+        :root {
+            --primary-color: #FF6B6B;
+            --secondary-color: #4D96FF;
+            --success-color: #6BCB77;
+            --background-color: #FDFFEC;
+            --text-color: #2C3E50;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .game-container {
+            background: white;
+            border-radius: 25px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            padding: 30px;
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+            border: 4px solid #FFD93D;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            font-size: 2.5rem;
+            margin-bottom: 5px;
+            text-shadow: 2px 2px #FFE5E5;
+        }
+
+        .score-board {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--secondary-color);
+            margin-bottom: 20px;
+        }
+
+        .hint-box {
+            background-color: #F0F3FF;
+            border-left: 5px solid var(--secondary-color);
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            margin-bottom: 25px;
+            text-align: left;
+            line-height: 1.6;
+        }
+
+        .word-pool, .answer-zone {
+            min-height: 60px;
+            border: 2px dashed #CCD1D1;
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            align-content: center;
+        }
+
+        .answer-zone {
+            border: 2px solid var(--success-color);
+            background-color: #F4FBF7;
+        }
+
+        .word-card {
+            background-color: #FFF;
+            border: 2px solid #34495E;
+            border-radius: 12px;
+            padding: 10px 20px;
+            font-size: 1.4rem;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #34495E;
+            transition: transform 0.1s, box-shadow 0.1s;
+            user-select: none;
+        }
+
+        .word-card:active {
+            transform: translateY(4px);
+            box-shadow: 0 0px 0 #34495E;
+        }
+
+        .btn-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        button.action-btn {
+            font-size: 1.2rem;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            color: white;
+            box-shadow: 0 5px 0 rgba(0,0,0,0.2);
+            transition: all 0.2s;
+        }
+
+        button.action-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 1px 0 rgba(0,0,0,0.2);
+        }
+
+        #check-btn { background-color: var(--success-color); }
+        #reset-btn { background-color: #95A5A6; }
+        #next-btn { background-color: var(--secondary-color); display: none; }
+
+        .feedback {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-top: 15px;
+            height: 35px;
+        }
+
+        .correct-text { color: var(--success-color); }
+        .wrong-text { color: var(--primary-color); }
+    </style>
+</head>
+<body>
+
+    <div class="game-container">
+        <h1>आओ वाक्य बनाएं!</h1>
+        <div class="score-board">वाक्य: <span id="current-idx">1</span>/20 | अंक: <span id="score">0</span></div>
+        
+        <div class="hint-box">
+            <div><strong>English:</strong> <span id="hint-en">Loading...</span></div>
+            <div style="margin-top: 5px; color: #2C3E50;"><strong>ಕನ್ನಡ ಸುಳಿವು:</strong> <span id="hint-kn">Loading...</span></div>
+        </div>
+
+        <p style="font-weight: bold; color: #7F8C8D;">शब्दों को सही क्रम में चुनने के लिए क्लिक करें:</p>
+        <div class="word-pool" id="word-pool"></div>
+
+        <p style="font-weight: bold; color: #7F8C8D;">आपका वाक्य:</p>
+        <div class="answer-zone" id="answer-zone"></div>
+
+        <div class="feedback" id="feedback"></div>
+
+        <div class="btn-container">
+            <button class="action-btn" id="reset-btn" onclick="resetSentence()">फिर से बदलें (Reset)</button>
+            <button class="action-btn" id="check-btn" onclick="checkAnswer()">जांचें (Check)</button>
+            <button class="action-btn" id="next-btn" onclick="nextSentence()">अगला वाक्य (Next)</button>
+        </div>
+    </div>
+
+    <script>
+        // 20 Simple Hindi Sentences with English and Kannada Hints
+        const dataset = [
+            { correct: ["यह", "एक", "किताब", "है।"], hintEn: "This is a book.", hintKn: "ಇದು ಒಂದು ಪುಸ್ತಕ." },
+            { correct: ["वह", "आम", "मीठा", "है।"], hintEn: "That mango is sweet.", hintKn: "ಆ ಮಾವಿನಹಣ್ಣು ಸಿಹಿಯಾಗಿದೆ." },
+            { correct: ["राम", "स्कूल", "जाता", "है।"], hintEn: "Ram goes to school.", hintKn: "ರಾಮನು ಶಾಲೆಗೆ ಹೋಗುತ್ತಾನೆ." },
+            { correct: ["सीता", "गाना", "गाती", "है।"], hintEn: "Sita sings a song.", hintKn: "ಸೀತಾ ಹಾಡು ಹಾಡುತ್ತಾಳೆ." },
+            { correct: ["चिड़िया", "उड़", "रही", "है।"], hintEn: "The bird is flying.", hintKn: "ಪಕ್ಷಿ ಹಾರುತ್ತಿದೆ." },
+            { correct: ["पानी", "साफ़", "है।"], hintEn: "The water is clean.", hintKn: "ನೀರು ಸ್ವಚ್ಛವಾಗಿದೆ." },
+            { correct: ["सूरज", "चमक", "रहा", "है।"], hintEn: "The sun is shining.", hintKn: "ಸೂರ್ಯನು ಪ್ರಕಾಶಿಸುತ್ತಿದ್ದಾನೆ." },
+            { correct: ["मुझे", "सेब", "पसंद", "है।"], hintEn: "I like apples.", hintKn: "ನನಗೆ ಸೇಬು ಇಷ್ಟ." },
+            { correct: ["बिल्ली", "दूध", "पीती", "है।"], hintEn: "The cat drinks milk.", hintKn: "ಬೆಕ್ಕು ಹಾಲು ಕುಡಿಯುತ್ತದೆ." },
+            { correct: ["यह", "मेरा", "घर", "है।"], hintEn: "This is my house.", hintKn: "ಇದು ನನ್ನ ಮನೆ." },
+            { correct: ["तोता", "हरा", "होता", "है।"], hintEn: "The parrot is green.", hintKn: "ಗಿಣಿ ಹಸಿರಾಗಿರುತ್ತದೆ." },
+            { correct: ["फूल", "सुंदर", "हैं।"], hintEn: "The flowers are beautiful.", hintKn: "ಹೂವುಗಳು ಸುಂದರವಾಗಿವೆ." },
+            { correct: ["हम", "सब", "खेलते", "हैं।"], hintEn: "We all play.", hintKn: "ನಾವೆಲ್ಲರೂ ಆಡುತ್ತೇವೆ." },
+            { correct: ["आज", "बहुत", "गर्मी", "है।"], hintEn: "It is very hot today.", hintKn: "ಇಂದು ತುಂಬಾ ಬಿಸಿಯಾಗಿದೆ." },
+            { correct: ["गाय", "घास", "खाती", "है।"], hintEn: "The cow eats grass.", hintKn: "ಹಸು ಹುಲ್ಲು ತಿನ್ನುತ್ತದೆ." },
+            { correct: ["आसमान", "नीला", "है।"], hintEn: "The sky is blue.", hintKn: "ಆಕಾಶವು ನೀಲಿಯಾಗಿದೆ." },
+            { correct: ["लड़का", "दौड़", "रहा", "है।"], hintEn: "The boy is running.", hintKn: "ಹುಡುಗ ಓಡುತ್ತಿದ್ದಾನೆ." },
+            { correct: ["मोर", "नाच", "रहा", "है।"], hintEn: "The peacock is dancing.", hintKn: "ನವಿಲು ಕುಣಿಯುತ್ತಿದೆ." },
+            { correct: ["यह", "एक", "कुत्ता", "है।"], hintEn: "This is a dog.", hintKn: "ಇದು ಒಂದು ನಾಯಿ." },
+            { correct: ["माँ", "खाना", "बनाती", "हैं।"], hintEn: "Mother cooks food.", hintKn: "ಅಮ್ಮ ಅಡುಗೆ ಮಾಡುತ್ತಾರೆ." }
+        ];
+
+        let currentIndex = 0;
+        let score = 0;
+        let selectedWords = [];
+
+        const hintEnElem = document.getElementById('hint-en');
+        const hintKnElem = document.getElementById('hint-kn');
+        const wordPoolElem = document.getElementById('word-pool');
+        const answerZoneElem = document.getElementById('answer-zone');
+        const feedbackElem = document.getElementById('feedback');
+        const checkBtn = document.getElementById('check-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const scoreElem = document.getElementById('score');
+        const currentIdxElem = document.getElementById('current-idx');
+
+        function shuffle(array) {
+            let shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            if (JSON.stringify(shuffled) === JSON.stringify(array) && array.length > 1) {
+                return shuffle(array);
+            }
+            return shuffled;
+        }
+
+        function loadSentence() {
+            if (currentIndex >= dataset.length) {
+                document.querySelector('.game-container').innerHTML = `
+                    <h1 style="color: var(--success-color);">ಬಧಾಯಿ ಹೋ! (Congratulations!)</h1>
+                    <p style="font-size: 1.5rem; margin: 20px 0;">आपने सभी वाक्य पूरे कर लिए हैं। / ನೀವು ಎಲ್ಲಾ ವಾಕ್ಯಗಳನ್ನು ಪೂರ್ಣಗೊಳಿಸಿದ್ದೀರಿ.</p>
+                    <div style="font-size: 2rem; font-weight: bold; color: var(--secondary-color);">आपका स्कोर / ನಿಮ್ಮ ಸ್ಕೋರ್: ${score} / ${dataset.length}</div>
+                    <button class="action-btn" style="background-color: var(--primary-color); margin-top: 30px;" onclick="location.reload()">फिर से खेलें (Play Again)</button>
+                `;
+                return;
+            }
+
+            currentIdxElem.innerText = currentIndex + 1;
+            feedbackElem.innerText = '';
+            feedbackElem.className = 'feedback';
+            answerZoneElem.innerHTML = '';
+            selectedWords = [];
+            
+            checkBtn.style.display = 'inline-block';
+            nextBtn.style.display = 'none';
+
+            const currentData = dataset[currentIndex];
+            hintEnElem.innerText = currentData.hintEn;
+            hintKnElem.innerText = currentData.hintKn;
+
+            const jumbled = shuffle(currentData.correct);
+            wordPoolElem.innerHTML = '';
+            jumbled.forEach((word, idx) => {
+                const wordCard = document.createElement('div');
+                wordCard.className = 'word-card';
+                wordCard.innerText = word;
+                wordCard.setAttribute('data-id', idx);
+                wordCard.onclick = () => handleWordClick(wordCard, word);
+                wordPoolElem.appendChild(wordCard);
+            });
+        }
+
+        function handleWordClick(card, word) {
+            if (card.parentNode.id === 'word-pool') {
+                wordPoolElem.removeChild(card);
+                answerZoneElem.appendChild(card);
+                selectedWords.push(word);
+            } else {
+                answerZoneElem.removeChild(card);
+                wordPoolElem.appendChild(card);
+                const index = selectedWords.indexOf(word);
+                if (index > -1) selectedWords.splice(index, 1);
+            }
+        }
+
+        function resetSentence() {
+            loadSentence();
+        }
+
+        function checkAnswer() {
+            const currentData = dataset[currentIndex];
+            const isCorrect = JSON.stringify(selectedWords) === JSON.stringify(currentData.correct);
+
+            if (isCorrect) {
+                feedbackElem.innerText = "शाबाश! बिल्कुल सही। 🎉 (ಮಸ್ತ್! ಸರಿಯಾದ ಉತ್ತರ.)";
+                feedbackElem.className = "feedback correct-text";
+                score++;
+                scoreElem.innerText = score;
+                checkBtn.style.display = 'none';
+                nextBtn.style.display = 'inline-block';
+                document.querySelectorAll('.word-card').forEach(card => card.onclick = null);
+            } else {
+                feedbackElem.innerText = "गलत जवाब! फिर से कोशिश करें। 🤔 (ತಪ್ಪು ಉತ್ತರ! ಮತ್ತೊಮ್ಮೆ ಪ್ರಯತ್ನಿಸಿ.)";
+                feedbackElem.className = "feedback wrong-text";
+            }
+        }
+
+        function nextSentence() {
+            currentIndex++;
+            loadSentence();
+        }
+
+        loadSentence();
+    </script>
+</body>
+</html>

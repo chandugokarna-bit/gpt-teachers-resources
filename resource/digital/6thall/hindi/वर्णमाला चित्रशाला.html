@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <title>जादुई हिंदी वर्णमाला चित्रशाला</title>
+    <style>
+        body {
+            text-align: center;
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #fff5e6, #e6f7ff);
+            margin: 0;
+            padding: 20px;
+            user-select: none;
+        }
+        h1 {
+            color: #ff4500;
+            font-size: 40px;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.15);
+            margin-bottom: 5px;
+        }
+        p {
+            font-size: 20px;
+            color: #4a4a4a;
+            margin-bottom: 30px;
+        }
+        .विभाग-शीर्षक {
+            font-size: 28px;
+            color: #2e7d32;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            background: #e8f5e9;
+            display: inline-block;
+            padding: 10px 30px;
+            border-radius: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        .वर्णमाला-ग्रिड {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 10px;
+        }
+        .कार्ड {
+            background-color: transparent;
+            width: 140px;
+            height: 160px;
+            perspective: 1000px;
+            cursor: pointer;
+        }
+        .कार्ड-अंदर {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            border-radius: 20px;
+        }
+        .कार्ड.पलटा .कार्ड-अंदर {
+            transform: rotateY(180deg);
+        }
+        .सामने, .पीछे {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .सामने {
+            color: white;
+            font-size: 55px;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        .पीछे {
+            background-color: #ffffff;
+            color: #333;
+            transform: rotateY(180deg);
+            border: 3px solid #ffaa00;
+            box-sizing: border-box;
+        }
+        .चित्र {
+            font-size: 50px;
+            margin-bottom: 5px;
+        }
+        .नाम {
+            font-size: 18px;
+            font-weight: bold;
+            color: #d84315;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>जादुई वर्णमाला चित्रशाला</h1>
+    <p>अक्षरों पर क्लिक करें और उनके पीछे छुपा चित्र देखें!</p>
+
+    <div class="विभाग-शीर्षक">स्वर (Swar)</div>
+    <div class="वर्णमाला-ग्रिड" id="स्वर-क्षेत्र"></div>
+
+    <div class="विभाग-शीर्षक">व्यंजन (Vyanjan)</div>
+    <div class="वर्णमाला-ग्रिड" id="व्यंजन-क्षेत्र"></div>
+
+    <script>
+        // स्वर सूची - अक्षर, चित्र (इमोजी) और नाम
+        const स्वर = [
+            { अ: 'अ', चि: '🍍', ना: 'अनानास' }, { अ: 'आ', चि: '🥭', ना: 'आम' },
+            { अ: 'इ', चि: '🍁', na: 'इमली' },   { अ: 'ई', चि: '🌾', ना: 'ईख' },
+            { अ: 'उ', चि: '🦉', ना: 'उल्लू' },   { अ: 'ऊ', चि: '🧶', ना: 'ऊन' },
+            { अ: 'ऋ', चि: '🧘', ना: 'ऋषि' },   { अ: 'ए', चि: '🦶', ना: 'एड़ी' },
+            { अ: 'ऐ', चि: '👓', ना: 'ऐनक' },   { अ: 'ओ', चि: '🥣', ना: 'ओखली' },
+            { अ: 'औ', चि: '🔨', ना: 'औजार' },  { अ: 'अं', चि: '🍇', ना: 'अंगूर' }
+        ];
+
+        // व्यंजन सूची - अक्षर, चित्र (इमोजी) और नाम
+        const व्यंजन = [
+            { अ: 'क', चि: '🪷', ना: 'कमल' }, { अ: 'ख', चि: '🐇', ना: 'खरगोश' },
+            { अ: 'ग', चि: '🪴', ना: 'गमला' }, { अ: 'घ', चि: '⌚', ना: 'घड़ी' },
+            { अ: 'च', चि: '🥄', ना: 'चम्मच' }, { अ: 'छ', चि: '☂️', ना: 'छतरी' },
+            { अ: 'ज', चि: '🚢', ना: 'जहाज' }, { अ: 'झ', चि: '🇮🇳', ना: 'झंडा' },
+            { अ: 'ट', चि: '🍅', ना: 'टमाटर' }, { अ: 'ठ', चि: '🔨', ना: 'ठठेरा' },
+            { अ: 'ड', चि: '🪘', ना: 'डमरू' },  { अ: 'ढ', चि: '🥁', ना: 'ढोलक' },
+            { अ: 'त', चि: '🍉', na: 'तरबूज' }, { अ: 'थ', चि: '🍼', ना: 'थर्मस' },
+            { अ: 'द', चि: '✒️', ना: 'दवात' },  { अ: 'ध', चि: '🏹', ना: 'धनुष' },
+            { अ: 'न', चि: '🚰', ना: 'नल' },    { अ: 'प', चि: '🪁', na: 'पतंग' },
+            { अ: 'फ', चि: '🍎', ना: 'फल' },    { अ: 'ब', चि: '🦆', na: 'बत्तख' },
+            { अ: 'भ', चि: '🐻', na: 'भालू' },   { अ: 'म', चि: '🐟', ना: 'मछली' },
+            { अ: 'य', चि: '🔥', na: 'यज्ञ' },    { अ: 'र', चि: '🛒', na: 'रथ' },
+            { अ: 'ल', चि: '🪀', na: 'लट्टू' },  { अ: 'व', चि: '🌲', na: 'वन' },
+            { अ: 'श', चि: '🧅', na: 'शलगम' }, { अ: 'ष', चि: '⬡', na: 'षट्कोण' },
+            { अ: 'स', चि: '🐍', na: 'सपेरा' },  { अ: 'ह', चि: '🐘', na: 'हाथी' },
+            { अ: 'क्ष', चि: '⚔️', na: 'क्षत्रिय' }, { अ: 'त्र', चि: '🔱', na: 'त्रिशूल' },
+            { अ: 'ज्ञ', चि: '👨‍🏫', na: 'ज्ञानी' }
+        ];
+
+        // कार्ड के सामने के सुंदर आकर्षक रंग
+        const रंग_सूची = [
+            'linear-gradient(135deg, #ff5252, #ff7979)',
+            'linear-gradient(135deg, #ff793f, #ffb142)',
+            'linear-gradient(135deg, #2bcbba, #0fbcf9)',
+            'linear-gradient(135deg, #05c46b, #0be881)',
+            'linear-gradient(135deg, #ef5777, #ff5e7e)',
+            'linear-gradient(135deg, #5758bb, #9980fa)',
+            'linear-gradient(135deg, #60a3bc, #3c6382)'
+        ];
+
+        function कार्ड_बनाएँ(डेटा, कंटेनर_आईडी) {
+            const कंटेनर = document.getElementById(कंटेनर_आईडी);
+            
+            डेटा.forEach((वस्तु, सूचकांक) => {
+                const कार्ड = document.createElement('div');
+                कार्ड.classList.add('कार्ड');
+                
+                const अंदर = document.createElement('div');
+                अंदर.classList.add('कार्ड-अंदर');
+                
+                const सामने = document.createElement('div');
+                सामने.classList.add('सामने');
+                सामने.innerText = वस्तु.अ;
+                सामने.style.background = रंग_सूची[सूचकांक % रंग_सूची.length];
+                
+                const पीछे = document.createElement('div');
+                पीछे.classList.add('पीछे');
+                
+                const चित्र = document.createElement('div');
+                चित्र.classList.add('चित्र');
+                चित्र.innerText = वस्तु.चि;
+                
+                const नाम = document.createElement('div');
+                नाम.classList.add('नाम');
+                नाम.innerText = वस्तु.ना || वस्तु.na;
+                
+                पीछे.appendChild(चित्र);
+                पीछे.appendChild(नाम);
+                अंदर.appendChild(सामने);
+                अंदर.appendChild(पीछे);
+                कार्ड.appendChild(अंदर);
+                
+                // क्लिक करने पर पलटने का जादू
+                कार्ड.onclick = function() {
+                    this.classList.toggle('पलटा');
+                };
+                
+                कंटेनर.appendChild(कार्ड);
+            });
+        }
+
+        // लोड होने पर कार्ड बनाना
+        window.onload = function() {
+            कार्ड_बनाएँ(स्वर, 'स्वर-क्षेत्र');
+            कार्ड_बनाएँ(व्यंजन, 'व्यंजन-क्षेत्र');
+        };
+    </script>
+</body>
+</html>
