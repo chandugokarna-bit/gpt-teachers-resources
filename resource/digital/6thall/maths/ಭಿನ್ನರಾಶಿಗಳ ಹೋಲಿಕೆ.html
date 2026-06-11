@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ಭಿನ್ನರಾಶಿಗಳ ಹೋಲಿಕೆ</title>
+<style>
+  body {
+    font-family: 'Tunga', 'Kedage', sans-serif;
+    background-color: #fdf6e3;
+    color: #333;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+  }
+  .app-container {
+    background: white;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    text-align: center;
+    max-width: 700px;
+    width: 95%;
+  }
+  h1 {
+    color: #d81b60;
+    margin-bottom: 5px;
+  }
+  p.subtitle {
+    color: #666;
+    margin-top: 0;
+    margin-bottom: 25px;
+    font-size: 18px;
+  }
+  .comparison-area {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+  .fraction-card {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 15px;
+    border: 2px solid #e9ecef;
+    width: 200px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .svg-container {
+    width: 150px;
+    height: 150px;
+    margin-bottom: 15px;
+  }
+  .symbol-box {
+    font-size: 64px;
+    font-weight: bold;
+    color: #1e88e5;
+    background: #e3f2fd;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 4px 10px rgba(30,136,229,0.2);
+    margin: 20px;
+  }
+  .fraction-display {
+    font-size: 36px;
+    font-weight: bold;
+    color: #333;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .fraction-line {
+    border-top: 4px solid #333;
+    width: 50px;
+    margin: 4px 0;
+  }
+  .slider-group {
+    margin: 10px 0;
+    text-align: left;
+    width: 100%;
+  }
+  label {
+    font-size: 14px;
+    font-weight: bold;
+    color: #555;
+    display: flex;
+    justify-content: space-between;
+  }
+  input[type=range] {
+    width: 100%;
+    cursor: pointer;
+  }
+  .result-text {
+    font-size: 24px;
+    font-weight: bold;
+    padding: 15px;
+    border-radius: 10px;
+    margin-top: 10px;
+  }
+  .color-1 { color: #d81b60; accent-color: #d81b60; }
+  .color-2 { color: #00897b; accent-color: #00897b; }
+</style>
+</head>
+<body>
+
+<div class="app-container">
+  <h1>ಭಿನ್ನರಾಶಿಗಳ ಹೋಲಿಕೆ</h1>
+  <p class="subtitle">ಯಾವ ಭಿನ್ನರಾಶಿ ದೊಡ್ಡದು ಎಂದು ದೃಶ್ಯಗಳ ಮೂಲಕ ಕಂಡುಕೊಳ್ಳಿ!</p>
+
+  <div class="comparison-area">
+    
+    <div class="fraction-card" style="border-color: #f8bbd0;">
+      <h3 class="color-1" style="margin-top:0;">ಭಿನ್ನರಾಶಿ ೧</h3>
+      <div class="svg-container" id="svg1"></div>
+      <div class="fraction-display color-1">
+        <div id="numText1">1</div>
+        <div class="fraction-line" style="border-color: #d81b60;"></div>
+        <div id="denText1">2</div>
+      </div>
+      <div class="slider-group">
+        <label class="color-1">ಅಂಶ: <span id="numLabel1">1</span></label>
+        <input type="range" id="numSlider1" class="color-1" min="0" max="2" value="1">
+      </div>
+      <div class="slider-group">
+        <label class="color-1">ಛೇದ: <span id="denLabel1">2</span></label>
+        <input type="range" id="denSlider1" class="color-1" min="1" max="10" value="2">
+      </div>
+    </div>
+
+    <div class="symbol-box" id="symbolBox">=</div>
+
+    <div class="fraction-card" style="border-color: #b2dfdb;">
+      <h3 class="color-2" style="margin-top:0;">ಭಿನ್ನರಾಶಿ ೨</h3>
+      <div class="svg-container" id="svg2"></div>
+      <div class="fraction-display color-2">
+        <div id="numText2">1</div>
+        <div class="fraction-line" style="border-color: #00897b;"></div>
+        <div id="denText2">4</div>
+      </div>
+      <div class="slider-group">
+        <label class="color-2">ಅಂಶ: <span id="numLabel2">1</span></label>
+        <input type="range" id="numSlider2" class="color-2" min="0" max="4" value="1">
+      </div>
+      <div class="slider-group">
+        <label class="color-2">ಛೇದ: <span id="denLabel2">4</span></label>
+        <input type="range" id="denSlider2" class="color-2" min="1" max="10" value="4">
+      </div>
+    </div>
+
+  </div>
+
+  <div id="resultText" class="result-text"></div>
+
+</div>
+
+<script>
+  function drawPieChart(svgContainerId, num, den, color) {
+    const container = document.getElementById(svgContainerId);
+    let svg = `<svg viewBox="-1 -1 2 2" style="transform: rotate(-90deg); width: 100%; height: 100%; overflow: visible; filter: drop-shadow(1px 2px 3px rgba(0,0,0,0.1));">`;
+    
+    if (den === 1) {
+        let fill = num === 1 ? color : '#eeeeee';
+        svg += `<circle cx="0" cy="0" r="1" fill="${fill}" stroke="#fff" stroke-width="0.05" />`;
+    } else {
+        let angle = (Math.PI * 2) / den;
+        for (let i = 0; i < den; i++) {
+            let startAngle = i * angle;
+            let endAngle = (i + 1) * angle;
+            let x1 = Math.cos(startAngle), y1 = Math.sin(startAngle);
+            let x2 = Math.cos(endAngle), y2 = Math.sin(endAngle);
+            let largeArc = den <= 2 ? 0 : (angle > Math.PI ? 1 : 0);
+            if (den === 2) largeArc = 0; 
+            
+            let dPath = `M 0 0 L ${x1} ${y1} A 1 1 0 ${largeArc} 1 ${x2} ${y2} Z`;
+            let fill = i < num ? color : '#eeeeee'; 
+            
+            svg += `<path d="${dPath}" fill="${fill}" stroke="#ffffff" stroke-width="0.04" style="transition: fill 0.3s;" />`;
+        }
+    }
+    svg += `</svg>`;
+    container.innerHTML = svg;
+  }
+
+  function updateAll() {
+    // Get values
+    let n1 = parseInt(document.getElementById('numSlider1').value);
+    let d1 = parseInt(document.getElementById('denSlider1').value);
+    let n2 = parseInt(document.getElementById('numSlider2').value);
+    let d2 = parseInt(document.getElementById('denSlider2').value);
+
+    // Constrain numerators
+    if (n1 > d1) { n1 = d1; document.getElementById('numSlider1').value = n1; }
+    if (n2 > d2) { n2 = d2; document.getElementById('numSlider2').value = n2; }
+    document.getElementById('numSlider1').max = d1;
+    document.getElementById('numSlider2').max = d2;
+
+    // Update Text
+    document.getElementById('numText1').innerText = n1;
+    document.getElementById('denText1').innerText = d1;
+    document.getElementById('numLabel1').innerText = n1;
+    document.getElementById('denLabel1').innerText = d1;
+
+    document.getElementById('numText2').innerText = n2;
+    document.getElementById('denText2').innerText = d2;
+    document.getElementById('numLabel2').innerText = n2;
+    document.getElementById('denLabel2').innerText = d2;
+
+    // Draw SVGs
+    drawPieChart('svg1', n1, d1, '#f06292'); // Pinkish for 1
+    drawPieChart('svg2', n2, d2, '#4db6ac'); // Teal for 2
+
+    // Compare
+    let val1 = n1 * d2;
+    let val2 = n2 * d1;
+    let symbolBox = document.getElementById('symbolBox');
+    let resultText = document.getElementById('resultText');
+
+    if (val1 > val2) {
+      symbolBox.innerText = '>';
+      resultText.innerText = "ಭಿನ್ನರಾಶಿ ೧ ದೊಡ್ಡದಾಗಿದೆ!";
+      resultText.style.backgroundColor = "#fce4ec";
+      resultText.style.color = "#c2185b";
+    } else if (val1 < val2) {
+      symbolBox.innerText = '<';
+      resultText.innerText = "ಭಿನ್ನರಾಶಿ ೨ ದೊಡ್ಡದಾಗಿದೆ!";
+      resultText.style.backgroundColor = "#e0f2f1";
+      resultText.style.color = "#00796b";
+    } else {
+      symbolBox.innerText = '=';
+      resultText.innerText = "ಎರಡೂ ಭಿನ್ನರಾಶಿಗಳು ಸಮಾನವಾಗಿವೆ!";
+      resultText.style.backgroundColor = "#e8f5e9";
+      resultText.style.color = "#2e7d32";
+    }
+  }
+
+  // Event Listeners
+  document.getElementById('numSlider1').addEventListener('input', updateAll);
+  document.getElementById('denSlider1').addEventListener('input', updateAll);
+  document.getElementById('numSlider2').addEventListener('input', updateAll);
+  document.getElementById('denSlider2').addEventListener('input', updateAll);
+
+  // Init
+  updateAll();
+</script>
+
+</body>
+</html>

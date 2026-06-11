@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಸುತ್ತಳತೆ ಮತ್ತು ವಿಸ್ತೀರ್ಣ - ಗ್ರಾಫ್ ಆಟ</title>
+    <style>
+        :root {
+            --grid-color: #e0f2fe;
+            --line-color: #bae6fd;
+            --active-color: #ff5722;
+            --text-color: #1e293b;
+        }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #f0fdf4 0%, #ecfeff 100%);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            user-select: none;
+        }
+        .container {
+            background: white;
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            max-width: 900px;
+            width: 100%;
+            text-align: center;
+        }
+        h1 {
+            color: #059669;
+            margin-top: 0;
+            font-size: 28px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.05);
+        }
+        .instruction {
+            background-color: #f0fdf4;
+            border-left: 5px solid #22c55e;
+            padding: 12px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            font-size: 16px;
+            color: #166534;
+            text-align: left;
+        }
+        /* Dashboard Styling */
+        .dashboard {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+            gap: 15px;
+        }
+        .card {
+            flex: 1;
+            padding: 15px;
+            border-radius: 12px;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .card span {
+            display: block;
+            font-size: 32px;
+            margin-top: 5px;
+        }
+        .perimeter-card { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
+        .area-card { background: linear-gradient(135deg, #ec4899, #be185d); }
+
+        /* Graph Paper Grid */
+        .graph-wrapper {
+            overflow-x: auto;
+            padding: 10px;
+            background: #f8fafc;
+            border-radius: 8px;
+            border: 2px solid #cbd5e1;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(16, 35px);
+            grid-template-rows: repeat(12, 35px);
+            gap: 1px;
+            background-color: var(--line-color);
+            width: max-content;
+            margin: 0 auto;
+            border: 2px solid #0284c7;
+        }
+        .cell {
+            background-color: white;
+            cursor: pointer;
+            transition: background-color 0.1s ease;
+        }
+        .cell.active {
+            background-color: var(--active-color);
+            box-shadow: inset 0 0 4px rgba(0,0,0,0.2);
+        }
+        
+        /* Control Buttons */
+        .controls {
+            margin-top: 20px;
+        }
+        .btn {
+            background-color: #ef4444;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: all 0.2s;
+        }
+        .btn:hover {
+            background-color: #dc2626;
+            transform: translateY(-2px);
+        }
+        .btn:active { transform: translateY(0); }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>ಗ್ರಾಫ್ ಹಾಳೆಯಲ್ಲಿ ಸುತ್ತಳತೆ ಮತ್ತು ವಿಸ್ತೀರ್ಣ ಕಲಿಕೆ! 🎨</h1>
+    
+    <div class="instruction">
+        <strong>ಹೇಗೆ ಆಡುವುದು?</strong><br>
+        ಕೆಳಗಿನ ಗ್ರಾಫ್ ಪೇಪರ್‌ನ ಚೌಕಗಳ ಮೇಲೆ ನಿಮ್ಮ ಮೌಸ್ ಕ್ಲಿಕ್ ಮಾಡಿ ಅಥವಾ ಜಾರಿಸಿ (Drag) ಬಣ್ಣ ತುಂಬುವ ಮೂಲಕ ಯಾವುದೇ ಒಂದು ಆಕೃತಿಯನ್ನು ರಚಿಸಿ. ನೀವು ರಚಿಸುವ ಚಿತ್ರದ ವಿಸ್ತೀರ್ಣ ಮತ್ತು ಸುತ್ತಳತೆಯನ್ನು ಮ್ಯಾಜಿಕ್ ತರಹ ಇದು ತಾನಾಗಿಯೇ ಲೆಕ್ಕ ಹಾಕುತ್ತದೆ!
+    </div>
+
+    <div class="dashboard">
+        <div class="card perimeter-card">
+            📏 ಒಟ್ಟು ಸುತ್ತಳತೆ (Perimeter)
+            <br><span id="perimeter-val">0</span> ಮಾನಗಳು (units)
+        </div>
+        <div class="card area-card">
+            Square ವಿಸ್ತೀರ್ಣ (Area)
+            <br><span id="area-val">0</span> ಚದರ ಮಾನಗಳು (sq units)
+        </div>
+    </div>
+
+    <div class="graph-wrapper">
+        <div class="grid" id="graph-grid"></div>
+    </div>
+
+    <div class="controls">
+        <button class="btn" onclick="resetGrid()">ಗ್ರಾಫ್ ಅಳಿಸಿ (Reset)</button>
+    </div>
+</div>
+
+<script>
+    const ROWS = 12;
+    const COLS = 16;
+    const gridElement = document.getElementById('graph-grid');
+    let isDrawing = false;
+
+    // ಜಾಲಕವನ್ನು (Grid) ರಚಿಸುವುದು
+    function createGrid() {
+        for (let r = 0; r < ROWS; r++) {
+            for (let c = 0; c < COLS; c++) {
+                const cell = document.createElement('div');
+                cell.classList.add('cell');
+                cell.id = `cell-${r}-${c}`;
+                cell.dataset.row = r;
+                cell.dataset.col = c;
+
+                // ಮೌಸ್ ಇವೆಂಟ್‌ಗಳು (ಕ್ಲಿಕ್ ಮತ್ತು ಡ್ರ್ಯಾಗ್ ಸೌಲಭ್ಯಕ್ಕಾಗಿ)
+                cell.addEventListener('mousedown', (e) => {
+                    isDrawing = true;
+                    toggleCell(cell);
+                });
+                cell.addEventListener('mouseenter', () => {
+                    if (isDrawing) {
+                        toggleCell(cell);
+                    }
+                });
+
+                gridElement.appendChild(cell);
+            }
+        }
+    }
+
+    window.addEventListener('mouseup', () => {
+        isDrawing = false;
+    });
+
+    function toggleCell(cell) {
+        cell.classList.toggle('active');
+        calculateMath();
+    }
+
+    // ಸುತ್ತಳತೆ ಮತ್ತು ವಿಸ್ತೀರ್ಣದ ನೈಜ ಸಮಯದ ಲೆಕ್ಕಾಚಾರ
+    function calculateMath() {
+        let area = 0;
+        let perimeter = 0;
+
+        // 2D ಅರೇ ಮ್ಯಾಟ್ರಿಕ್ಸ್ ಸಿದ್ಧಪಡಿಸುವುದು
+        const matrix = Array(ROWS).fill().map(() => Array(COLS).fill(0));
+
+        for (let r = 0; r < ROWS; r++) {
+            for (let c = 0; c < COLS; c++) {
+                const cell = document.getElementById(`cell-${r}-${c}`);
+                if (cell.classList.contains('active')) {
+                    matrix[r][c] = 1;
+                    area++; // ಪ್ರತಿ ಬಣ್ಣದ ಚೌಕ = 1 ಚದರ ಮಾನ ವಿಸ್ತೀರ್ಣ
+                }
+            }
+        }
+
+        // ಹೊರಗಿನ ಅಂಚುಗಳನ್ನು (Edges) ಲೆಕ್ಕ ಹಾಕಿ ಸುತ್ತಳತೆ ತಿಳಿಯುವುದು
+        for (let r = 0; r < ROWS; r++) {
+            for (let c = 0; c < COLS; c++) {
+                if (matrix[r][c] === 1) {
+                    // ಮೇಲಿನ ಅಂಚು
+                    if (r === 0 || matrix[r - 1][c] === 0) perimeter++;
+                    // ಕೆಳಗಿನ ಅಂಚು
+                    if (r === ROWS - 1 || matrix[r + 1][c] === 0) perimeter++;
+                    // ಎಡ ಅಂಚು
+                    if (c === 0 || matrix[r][c - 1] === 0) perimeter++;
+                    // ಬಲ ಅಂಚು
+                    if (c === COLS - 1 || matrix[r][c + 1] === 0) perimeter++;
+                }
+            }
+        }
+
+        // ವೆಬ್ ಪುಟದಲ್ಲಿ ಅಂಕಿಸಂಖ್ಯೆಗಳನ್ನು ಅಪ್ಡೇಟ್ ಮಾಡುವುದು
+        document.getElementById('area-val').innerText = area;
+        document.getElementById('perimeter-val').innerText = perimeter;
+    }
+
+    // ಗ್ರಾಫ್ ಅನ್ನು ಮೊದಲಿನ ಸ್ಥಿತಿಗೆ ತರುವುದು
+    function resetGrid() {
+        const cells = document.querySelectorAll('.cell');
+        cells.forEach(cell => cell.classList.remove('active'));
+        document.getElementById('area-val').innerText = '0';
+        document.getElementById('perimeter-val').innerText = '0';
+    }
+
+    // ಉಪಕರಣವನ್ನು ಪ್ರಾರಂಭಿಸುವುದು
+    createGrid();
+</script>
+
+</body>
+</html>

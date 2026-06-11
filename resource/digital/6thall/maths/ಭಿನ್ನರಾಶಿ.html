@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ಸಂವಾದಾತ್ಮಕ ಭಿನ್ನರಾಶಿ ಪರಿಶೋಧಕ</title>
+<style>
+  body {
+    font-family: 'Tunga', 'Kedage', sans-serif; /* Standard Kannada fonts */
+    background-color: #f0f8ff;
+    color: #333;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+  }
+  .app-container {
+    background: white;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    text-align: center;
+    max-width: 500px;
+    width: 90%;
+  }
+  h1 {
+    color: #ff6b6b;
+    margin-bottom: 5px;
+  }
+  p.subtitle {
+    color: #666;
+    margin-top: 0;
+    margin-bottom: 25px;
+    font-size: 18px;
+  }
+  .visual-area {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    margin-bottom: 30px;
+  }
+  #svg-container {
+    width: 200px;
+    height: 200px;
+  }
+  .fraction-display {
+    font-size: 64px;
+    font-weight: bold;
+    color: #1a535c;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .fraction-line {
+    border-top: 6px solid #1a535c;
+    width: 80px;
+    margin: 5px 0;
+  }
+  .controls {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 15px;
+  }
+  .slider-group {
+    margin: 15px 0;
+    text-align: left;
+  }
+  label {
+    font-size: 18px;
+    font-weight: bold;
+    color: #457b9d;
+    display: flex;
+    justify-content: space-between;
+  }
+  input[type=range] {
+    width: 100%;
+    margin-top: 10px;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+
+<div class="app-container">
+  <h1>ಭಿನ್ನರಾಶಿ ಪರಿಶೋಧಕ</h1>
+  <p class="subtitle">ನಿಮ್ಮ ಭಿನ್ನರಾಶಿಯನ್ನು ರಚಿಸಲು ಸ್ಲೈಡರ್‌ಗಳನ್ನು ಬಳಸಿ!</p>
+
+  <div class="visual-area">
+    <div id="svg-container"></div>
+    
+    <div class="fraction-display">
+      <div id="numText">1</div>
+      <div class="fraction-line"></div>
+      <div id="denText">2</div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <div class="slider-group">
+      <label>ಅಂಶ (ಬಣ್ಣದ ಭಾಗಗಳು): <span id="numLabel">1</span></label>
+      <input type="range" id="numSlider" min="0" max="2" value="1">
+    </div>
+    
+    <div class="slider-group">
+      <label>ಛೇದ (ಒಟ್ಟು ಭಾಗಗಳು): <span id="denLabel">2</span></label>
+      <input type="range" id="denSlider" min="1" max="12" value="2">
+    </div>
+  </div>
+</div>
+
+<script>
+  const numSlider = document.getElementById('numSlider');
+  const denSlider = document.getElementById('denSlider');
+  const numText = document.getElementById('numText');
+  const denText = document.getElementById('denText');
+  const numLabel = document.getElementById('numLabel');
+  const denLabel = document.getElementById('denLabel');
+  const svgContainer = document.getElementById('svg-container');
+
+  function drawFraction() {
+    let den = parseInt(denSlider.value);
+    let num = parseInt(numSlider.value);
+
+    // Prevent numerator from being higher than denominator
+    if (num > den) {
+      num = den;
+      numSlider.value = num;
+    }
+    numSlider.max = den;
+
+    // Update text
+    numText.innerText = num;
+    denText.innerText = den;
+    numLabel.innerText = num;
+    denLabel.innerText = den;
+
+    // Draw SVG Pie Chart
+    let svg = `<svg viewBox="-1 -1 2 2" style="transform: rotate(-90deg); width: 100%; height: 100%; overflow: visible; filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.2));">`;
+    
+    if (den === 1) {
+        let fill = num === 1 ? '#4ecdc4' : '#eee';
+        svg += `<circle cx="0" cy="0" r="1" fill="${fill}" stroke="#2b2b2b" stroke-width="0.04" />`;
+    } else {
+        let angle = (Math.PI * 2) / den;
+        for (let i = 0; i < den; i++) {
+            let startAngle = i * angle;
+            let endAngle = (i + 1) * angle;
+            let x1 = Math.cos(startAngle), y1 = Math.sin(startAngle);
+            let x2 = Math.cos(endAngle), y2 = Math.sin(endAngle);
+            
+            let largeArc = den <= 2 ? 0 : (angle > Math.PI ? 1 : 0);
+            if (den === 2) largeArc = 0; 
+
+            let dPath = `M 0 0 L ${x1} ${y1} A 1 1 0 ${largeArc} 1 ${x2} ${y2} Z`;
+            let fill = i < num ? '#4ecdc4' : '#eee'; // Turquoise for colored, light gray for empty
+            
+            svg += `<path d="${dPath}" fill="${fill}" stroke="#2b2b2b" stroke-width="0.03" style="transition: fill 0.3s;" />`;
+        }
+    }
+    svg += `</svg>`;
+    svgContainer.innerHTML = svg;
+  }
+
+  // Event Listeners
+  numSlider.addEventListener('input', drawFraction);
+  denSlider.addEventListener('input', drawFraction);
+
+  // Initial draw
+  drawFraction();
+</script>
+
+</body>
+</html>
