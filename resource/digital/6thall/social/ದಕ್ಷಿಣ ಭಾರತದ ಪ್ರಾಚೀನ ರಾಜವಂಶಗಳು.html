@@ -3,255 +3,138 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ದಕ್ಷಿಣ ಭಾರತದ ಪ್ರಾಚೀನ ರಾಜವಂಶಗಳು - ಇಂಟರ್ಆಕ್ಟಿವ್ ಮ್ಯಾಪ್</title>
+    <title>ದಕ್ಷಿಣ ಭಾರತದ ಚಾರಿತ್ರಿಕ ತಾಣಗಳು - 360° ವರ್ಚುವಲ್ ಪ್ರವಾಸ</title>
+    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
     <style>
-        :root {
-            --primary-color: #d35400;
-            --overlay-bg: rgba(15, 23, 42, 0.85);
-            --card-bg: #ffffff;
-            --text-color: #1e293b;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f5f2eb;
-            margin: 0;
-            padding: 15px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-        }
-
-        h1 {
-            color: var(--text-color);
-            text-align: center;
-            margin-bottom: 5px;
-            font-size: 1.6rem;
-        }
-
-        p.instruction {
-            color: #64748b;
-            text-align: center;
-            margin-bottom: 25px;
-            font-size: 1rem;
-            line-height: 1.4;
-            max-width: 500px;
-        }
-
-        /* 🗺️ ಇನ್ನೋವೇಟಿವ್ ಸಿಎಸ್ಎಸ್ ಮ್ಯಾಪ್ ಔಟ್‌ಲೈನ್ ಫಿಕ್ಸ್ (No Image Needed!) */
-        .map-wrapper {
-            position: relative;
-            max-width: 420px;
-            width: 100%;
-            height: 530px;
-            border-radius: 20px;
-            box-shadow: 0 12px 28px rgba(0,0,0,0.12);
-            /* ದಕ್ಷಿಣ ಭಾರತದ ಭೌಗೋಳಿಕ ತ್ರಿಕೋನ ಆಕಾರವನ್ನು ಕೊಡುವ ಅದ್ಭುತ ಸಿಎಸ್ಎಸ್ ಲೇಯರ್ */
-            background: 
-                radial-gradient(circle at 10% 50%, #7ec8f8 20%, transparent 21%), /* ಅರಬ್ಬಿ ಸಮುದ್ರ ಎಫೆಕ್ಟ್ */
-                radial-gradient(circle at 90% 70%, #7ec8f8 20%, transparent 21%), /* ಬಂಗಾಳ ಕೊಲ್ಲಿ ಎಫೆಕ್ಟ್ */
-                linear-gradient(to bottom right, #f1e4d3 45%, #d9c3a5 50%, #7ec8f8 52%); /* ಪೆನಿನ್ಸುಲಾ ಔಟ್‌ಲೈನ್ */
-            border: 3px solid #bda385;
-            overflow: hidden;
-        }
-
-        /* ಮ್ಯಾಪ್‌ನ ಒಳಗಡೆ ಕರಾವಳಿ ತೀರದ ಶೇಡಿಂಗ್ ನೀಡಲು ಹೆಚ್ಚುವರಿ ಔಟ್‌ಲೈನ್ ಲೇಯರ್ */
-        .map-wrapper::before {
-            content: '';
+        /* UI Overlay Styles */
+        .tour-overlay {
             position: absolute;
-            top: 10%;
-            left: 20%;
-            width: 70%;
-            height: 85%;
-            background: #e6dfd3;
-            clip-path: polygon(0% 0%, 85% 0%, 100% 30%, 65% 85%, 50% 100%, 35% 80%, 10% 40%); /* ದಕ್ಷಿಣ ಭಾರತ ಮತ್ತು ಕರಾವಳಿಯ ಔಟ್‌ಲೈನ್ */
-            border-left: 2px dashed #bda385;
-            opacity: 0.9;
-            z-index: 1;
-        }
-
-        /* ಮ್ಯಾಪ್ ಶೀರ್ಷಿಕೆ ಹಿನ್ನೆಲೆಯಲ್ಲಿ ಮೂಡಲು */
-        .map-bg-text {
-            position: absolute;
-            bottom: 20px;
-            left: 20px;
-            font-size: 2.5rem;
-            font-weight: bold;
-            color: rgba(0,0,0,0.04);
-            z-index: 2;
-            pointer-events: none;
-        }
-
-        /* ಹಾಟ್‌ಸ್ಪಾಟ್‌ಗಳು */
-        .hotspot {
-            position: absolute;
-            width: 22px;
-            height: 22px;
-            border-radius: 50%;
-            cursor: pointer;
-            transform: translate(-50%, -50%);
-            z-index: 10;
-            border: 2px solid white;
-            box-shadow: 0 3px 8px rgba(0,0,0,0.35);
-            transition: transform 0.2s;
-        }
-
-        .hotspot:hover {
-            transform: translate(-50%, -50%) scale(1.3);
-        }
-
-        /* ನಿಖರವಾದ ಭೌಗೋಳಿಕ ಸ್ಥಾನಗಳು (ಕರ್ನಾಟಕ ಮತ್ತು ದಕ್ಷಿಣ ಭಾರತದ ಮ್ಯಾಪ್ ಪ್ರೊಪೋರ್ಷನ್) */
-        #badami { top: 32%; left: 45%; background-color: #f1c40f; animation: pulse 1.4s infinite; }
-        #banavasi { top: 45%; left: 36%; background-color: #2ecc71; animation: pulse 1.4s infinite; }
-        #dwarasamudra { top: 60%; left: 45%; background-color: #e67e22; animation: pulse 1.4s infinite; }
-        #talakadu { top: 68%; left: 51%; background-color: #9b59b6; animation: pulse 1.4s infinite; }
-        #thanjavur { top: 76%; left: 68%; background-color: #1abc9c; animation: pulse 1.4s infinite; }
-
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(255,255,255, 0.7); }
-            70% { box-shadow: 0 0 0 12px rgba(255,255,255, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(255,255,255, 0); }
-        }
-
-        /* ಲೇಬಲ್ ಸ್ಟೈಲ್ */
-        .hotspot-label {
-            position: absolute;
-            background: #1e293b;
-            color: #f8fafc;
-            padding: 3px 8px;
-            border-radius: 5px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            white-space: nowrap;
-            top: -28px;
+            top: 20px;
             left: 50%;
             transform: translateX(-50%);
-            pointer-events: none;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.85);
+            padding: 15px 25px;
+            border-radius: 30px;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+            text-align: center;
+            border: 2px solid #ff9900;
+            width: 85%;
+            max-width: 650px;
         }
-
-        /* ಮೊಡಾಲ್ ಪಾಪ್-ಅಪ್ ವಿಂಡೋ */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: var(--overlay-bg);
-            z-index: 100;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            box-sizing: border-box;
-        }
-
-        .modal.show { display: flex; }
-
-        .modal-content {
-            background-color: var(--card-bg);
-            padding: 22px;
-            border-radius: 16px;
-            max-width: 450px;
-            width: 100%;
-            position: relative;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            color: #334155;
-            animation: slideUp 0.3s ease;
-        }
-
-        @keyframes slideUp {
-            from { transform: translateY(15px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-
-        .close-btn {
-            position: absolute;
-            top: 10px;
-            right: 15px;
-            font-size: 28px;
+        .tour-title {
+            color: #fff;
+            margin: 0 0 12px 0;
+            font-size: 18px;
             font-weight: bold;
-            color: #94a3b8;
-            cursor: pointer;
         }
-
-        .close-btn:hover { color: #1e293b; }
-
-        .modal-content h2 {
-            margin-top: 0;
-            color: var(--text-color);
-            border-bottom: 2px solid #f1c40f;
-            padding-bottom: 5px;
-            font-size: 1.3rem;
-        }
-
-        .info-grid {
-            display: grid;
-            grid-template-columns: 100px 1fr;
+        .btn-container {
+            display: flex;
+            justify-content: center;
             gap: 10px;
-            margin-top: 15px;
-            font-size: 0.95rem;
-            line-height: 1.4;
+            flex-wrap: wrap;
         }
-
-        .info-label { font-weight: bold; color: #64748b; }
+        .tour-btn {
+            background: #ff9900;
+            color: #000;
+            border: none;
+            padding: 8px 16px;
+            font-size: 13px;
+            font-weight: bold;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .tour-btn:hover {
+            background: #fff;
+            transform: scale(1.05);
+        }
+        .tour-btn.active {
+            background: #00ffcc;
+            color: #000;
+        }
+        /* Educational Information Panel */
+        .info-panel {
+            position: absolute;
+            bottom: 30px;
+            left: 20px;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.85);
+            color: #fff;
+            padding: 15px;
+            border-radius: 10px;
+            font-family: sans-serif;
+            max-width: 340px;
+            border-left: 5px solid #00ffcc;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        }
     </style>
 </head>
 <body>
 
-    <h1>ಆರನೆಯ ಪಾಠ: ದಕ್ಷಿಣ ಭಾರತದ ಪ್ರಾಚೀನ ರಾಜವಂಶಗಳು</h1>
-    <p class="instruction">🗺️ ಭೂಪಟದಲ್ಲಿ ಮಿನುಗುತ್ತಿರುವ <b>ರಾಜಧಾನಿಗಳ (ಹಾಟ್‌ಸ್ಪಾಟ್)</b> ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ ಆ ಸಾಮ್ರಾಜ್ಯ, ಲಾಂಛನ ಮತ್ತು ಪ್ರಮುಖ ಸ್ಮಾರಕಗಳ ವಿವರ ತಿಳಿಯಿರಿ!</p>
-
-    <!-- ಮ್ಯಾಪ್ ಕಂಟೇನರ್ -->
-    <div class="map-wrapper">
-        <div class="map-bg-text">SOUTH INDIA</div>
-
-        <!-- ಹಾಟ್‌ಸ್ಪಾಟ್‌ಗಳು (ಈಗ ಇವು ನಕ್ಷೆಯ ಆಕಾರದ ಹಿನ್ನೆಲೆಯಲ್ಲಿ ಅಚ್ಚುಕಟ್ಟಾಗಿ ಕುಳಿತುಕೊಳ್ಳುತ್ತವೆ) -->
-        <div class="hotspot" id="badami" onclick="showEmpireInfo('badami')"><span class="hotspot-label">ಬಾದಾಮಿ (ಚಾಳುಕ್ಯರು)</span></div>
-        <div class="hotspot" id="banavasi" onclick="showEmpireInfo('banavasi')"><span class="hotspot-label">ಬನವಾಸಿ (ಕದಂಬರು)</span></div>
-        <div class="hotspot" id="dwarasamudra" onclick="showEmpireInfo('dwarasamudra')"><span class="hotspot-label">ಹಳೇಬೀಡು (ಹೊಯ್ಸಳರು)</span></div>
-        <div class="hotspot" id="talakadu" onclick="showEmpireInfo('talakadu')"><span class="hotspot-label">ತಲಕಾಡು (ಗಂಗರು)</span></div>
-        <div class="hotspot" id="thanjavur" onclick="showEmpireInfo('thanjavur')"><span class="hotspot-label">ತಂಜಾವೂರು (ಚೋಳರು)</span></div>
-    </div>
-
-    <!-- ಮಾಹಿತಿ ಪ್ರದರ್ಶಿಸುವ ಮೊಡಾಲ್ ಪಾಪ್-ಅಪ್ -->
-    <div class="modal" id="empireModal" onclick="closeEmpireModal()">
-        <div class="modal-content" onclick="event.stopPropagation()">
-            <span class="close-btn" onclick="closeEmpireModal()">&times;</span>
-            <h2 id="dynastyName">ರಾಜವಂಶ</h2>
-            <div class="info-grid">
-                <div class="info-label">ರಾಜಧಾನಿ:</div><div id="dynastyCapital">...</div>
-                <div class="info-label">ರಾಜಲಾಂಛನ:</div><div id="dynastyEmblem">...</div>
-                <div class="info-label">ಪ್ರಮುಖ ರಾಜರು:</div><div id="dynastyKings">...</div>
-                <div class="info-label">ವಿಶೇಷತೆ:</div><div id="dynastyMonument">...</div>
-            </div>
+    <div class="tour-overlay">
+        <h1 class="tour-title">🏛️ ದಕ್ಷಿಣ ಭಾರತದ ಪ್ರಾಚೀನ ರಾಜವಂಶಗಳು: ಟೈಮ್ ಟ್ರಾವೆಲ್ VR</h1>
+        <div class="btn-container">
+            <button class="tour-btn active" onclick="switchScene('tanja', this)">ಬೃಹದೀಶ್ವರ ದೇವಾಲಯ (ಚೋಳರು)</button>
+            <button class="tour-btn" onclick="switchScene('pattada', this)">ವಿರೂಪಾಕ್ಷ ದೇವಾಲಯ (ಚಾಳುಕ್ಯರು)</button>
+            <button class="tour-btn" onclick="switchScene('sravana', this)">ಗೊಮ್ಮಟೇಶ್ವರ ವಿಗ್ರಹ (ಗಂಗರು)</button>
         </div>
     </div>
 
+    <div id="infoPanel" class="info-panel">
+        <h3 id="infoTitle" style="margin-top:0; color:#ff9900;">ತಂಜಾವೂರಿನ ಬೃಹದೀಶ್ವರ ದೇವಾಲಯ</h3>
+        <p id="infoText" style="font-size:14px; line-height:1.4; margin-bottom:0;">ರಾಜರಾಜ ಚೋಳನ ಕೊಡುಗೆ. ಇದರ ಗೋಪುರ (ವಿಮಾನ) 61 ಮೀಟರ್ (200 ಅಡಿ) ಎತ್ತರವಿದ್ದು, ಭಾರತದಲ್ಲೇ ಅತಿ ದೊಡ್ಡ ದೇವಾಲಯವಾಗಿದೆ. ಇದು ಯುನೆಸ್ಕೋ ವಿಶ್ವಪರಂಪರೆಯ ತಾಣವಾಗಿದೆ.</p>
+    </div>
+
+    <a-scene embedded vr-mode-ui="enabled: true">
+        <a-assets>
+            <img id="tanjaSky" crossorigin="anonymous" src="https://chandugokarna-bit.github.io/gpt-teachers-resources/resources/image/tanja.jpeg">
+            <img id="pattadaSky" crossorigin="anonymous" src="https://chandugokarna-bit.github.io/gpt-teachers-resources/resources/image/pattada.jpeg">
+            <img id="sravanaSky" crossorigin="anonymous" src="https://chandugokarna-bit.github.io/gpt-teachers-resources/resources/image/shravana.jpeg">
+        </a-assets>
+
+        <a-sky id="imageDisplay" src="#tanjaSky" rotation="0 -90 0"></a-sky>
+
+        <a-entity camera look-controls></a-entity>
+    </a-scene>
+
     <script>
-        // ರಾಜವಂಶಗಳ ಪಠ್ಯಪುಸ್ತಕ ಆಧಾರಿತ ವಿವರಗಳು
-        const empireData = {
-            banavasi: { name: "ಕದಂಬ ರಾಜವಂಶ", capital: "ಬನವಾಸಿ", emblem: "ಸಿಂಹ", kings: "ಮಯೂರವರ್ಮ, ಕಾಕುಸ್ಥವರ್ಮ", monument: "ಕನ್ನಡದ ಮೊದಲ ಶಾಸನವಾದ 'ಹಲ್ಮಿಡಿ ಶಾಸನ' ಇವರ ಕಾಲದ್ದಾಗಿದೆ." },
-            talakadu: { name: "ಗಂಗ ರಾಜವಂಶ", capital: "ತಲಕಾಡು", emblem: "ಮದಗಜ (ಆನೆ)", kings: "ಕೊಂಗಣಿವರ್ಮ, ದುರ್ವಿನೀತ", monument: "ಶ್ರವಣಬೆಳಗೊಳದ ಭವ್ಯ ಏಕಶಿಲಾ ಗೊಮ್ಮಟೇಶ್ವರ ಮೂರ್ತಿಯನ್ನು ಇವರ ಕಾಲದಲ್ಲಿ ಕೆತ್ತಿಸಲಾಯಿತು." },
-            badami: { name: "ಬಾದಾಮಿ ಚಾಳುಕ್ಯರು", capital: "ಬಾದಾಮಿ", emblem: "ವರಾಹ", kings: "ಮೊದಲನೆಯ ಪುಲಿಕೇಶಿ, ಇಮ್ಮಡಿ ಪುಲಿಕೇಶಿ", monument: "ಬಾದಾಮಿಯ ಸುಂದರ ಗುಹಾಂತರ ದೇವಾಲಯಗಳು ಮತ್ತು ಐಹೊಳೆ-ಪಟ್ಟದಕಲ್ಲಿನ ಶಿಲ್ಪಕಲೆಗಳು ಪ್ರಸಿದ್ಧವಾಗಿವೆ." },
-            dwarasamudra: { name: "ಹೊಯ್ಸಳ ರಾಜವಂಶ", capital: "ದ್ವಾರಸಮುದ್ರ (ಹಳೇಬೀಡು)", emblem: "ಸಳನು ಸಿಂಹವನ್ನು ಕೊಲ್ಲುತ್ತಿರುವ ಚಿತ್ರ", kings: "ವಿಷ್ಣುವರ್ಧನ, ಇಮ್ಮಡಿ ballaala", monument: "ಬೇಲೂರಿನ ಚೆನ್ನಕೇಶವ ಹಾಗೂ ಹಳೇಬೀಡಿನ ಹೊಯ್ಸಳೇಶ್ವರ ದೇವಾಲಯಗಳು ಇವರ ಕೊಡುಗೆ." },
-            thanjavur: { name: "ಚೋಳ ರಾಜವಂಶ", capital: "ತಂಜಾವೂರು", emblem: "ಹುಲಿ", kings: "ರಾಜರಾಜ ಚೋಳ, ರಾಜೇಂದ್ರ ಚೋಳ", monument: "ತಂಜಾವೂರಿನ ವಿಶ್ವವಿಖ್ಯಾತ ಬೃಹದೀಶ್ವರ ದೇವಾಲಯ ಮತ್ತು ಇವರ ಗ್ರಾಮಾಡಳಿತ ಪದ್ಧತಿ ಜಗತ್ಪ್ರಸಿದ್ಧವಾಗಿದೆ." }
+        // Textbook Data Content Mapping
+        const siteData = {
+            tanja: {
+                title: "ತಂಜಾವೂರಿನ ಬೃಹದೀಶ್ವರ ದೇವಾಲಯ",
+                text: "ರಾಜರಾಜ ಚೋಳನ ಕೊಡುಗೆ[cite: 180]. ಇದರ ಗೋಪುರ (ವಿಮಾನ) 61 ಮೀಟರ್ (200 ಅಡಿ) ಎತ್ತರವಿದ್ದು [cite: 171], ಭಾರತದಲ್ಲೇ ಅತಿ ದೊಡ್ಡ ದೇವಾಲಯವಾಗಿದೆ[cite: 172]. ಇದು ಯುನೆಸ್ಕೋ ವಿಶ್ವಪರಂಪರೆಯ ತಾಣವಾಗಿದೆ[cite: 172].",
+                sky: "#tanjaSky"
+            },
+            pattada: {
+                title: "ಪಟ್ಟದಕಲ್ಲಿನ ವಿರೂಪಾಕ್ಷ ದೇವಾಲಯ",
+                text: "ಬಾದಾಮಿ ಚಾಳುಕ್ಯರ ಶ್ರೇಷ್ಠ ವಾಸ್ತುಶಿಲ್ಪ[cite: 87]. ಪಟ್ಟದಕಲ್ಲು ಯುನೆಸ್ಕೋದ ವಿಶ್ವಪರಂಪರೆ ಪಟ್ಟಿಗೆ ಸೇರಿದ ಅದ್ಭುತ ಸಾಂಸ್ಕೃತಿಕ ತಾಣವಾಗಿದೆ[cite: 87].",
+                sky: "#pattadaSky"
+            },
+            sravana: {
+                title: "ಶ್ರವಣಬೆಳಗೊಳದ ಗೊಮ್ಮಟೇಶ್ವರ",
+                text: "ಗಂಗರ ಪ್ರಧಾನಿ ಚಾವುಂಡರಾಯನು ವಿಂಧ್ಯಗಿರಿ ಬೆಟ್ಟದ ಮೇಲೆ ಕೆತ್ತಿಸಿದ 17.6 ಮೀಟರ್ (58 ಅಡಿ) ಎತ್ತರದ ಏಕಶಿಲಾ ಗೊಮ್ಮಟೇಶ್ವರ ಮೂರ್ತಿ[cite: 70]. ಇದು ತ್ಯಾಗದ ಪ್ರತೀಕವಾಗಿದೆ[cite: 68].",
+                sky: "#sravanaSky"
+            }
         };
 
-        function showEmpireInfo(key) {
-            const modal = document.getElementById('empireModal');
-            const data = empireData[key];
-            document.getElementById('dynastyName').innerText = data.name;
-            document.getElementById('dynastyCapital').innerText = data.capital;
-            document.getElementById('dynastyEmblem').innerText = data.emblem;
-            document.getElementById('dynastyKings').innerText = data.kings;
-            document.getElementById('dynastyMonument').innerText = data.monument;
-            modal.classList.add('show');
-        }
+        function switchScene(siteKey, buttonId) {
+            // Update button active states
+            const buttons = document.querySelectorAll('.tour-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            buttonId.classList.add('active');
 
-        function closeEmpireModal() {
-            document.getElementById('empireModal').classList.remove('show');
+            // Change 360 view source
+            const sky = document.getElementById('imageDisplay');
+            sky.setAttribute('src', siteData[siteKey].sky);
+
+            // Update educational descriptions dynamically
+            const title = document.getElementById('infoTitle');
+            const text = document.getElementById('infoText');
+
+            title.innerText = siteData[siteKey].title;
+            text.innerText = siteData[siteKey].text;
         }
     </script>
 </body>
