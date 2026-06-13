@@ -1,308 +1,578 @@
 <!DOCTYPE html>
 <html lang="kn">
 <head>
-<meta charset="UTF-8">
-<title>ಕನ್ನಡ ಮಾಧ್ಯಮ – ವಿಜ್ಞಾನ</title>
+  <meta charset="UTF-8">
+  <title>ಕನ್ನಡ ಮಾಧ್ಯಮ – ವಿಜ್ಞಾನ</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<style>
-body{
-  font-family: "Noto Sans Kannada", Arial, sans-serif;
-  background:#f5f5f5;
-  padding:15px;
-}
+  <style>
+    /* 🎨 ಅಲ್ಟ್ರಾ ಮಾಡರ್ನ್ ಪರ್ಪಲ್ ಡಿಜಿಟಲ್ ಶೈಲಿ */
+    body {
+      font-family: "Noto Sans Kannada", Arial, sans-serif;
+      background: #f4f0f7;
+      padding: 20px;
+      margin: 0;
+    }
 
-h2{
-  background:#7d3c98;
-  color:#fff;
-  padding:10px;
-  border-radius:6px;
-}
+    h2 {
+      background: linear-gradient(135deg, #7d3c98, #9b59b6);
+      color: #fff;
+      padding: 15px;
+      border-radius: 8px;
+      font-size: 20px;
+      box-shadow: 0 4px 10px rgba(125,60,152,0.2);
+      margin-top: 30px;
+      margin-bottom: 20px;
+    }
 
-.lesson{
-  background:#ffffff;
-  padding:12px;
-  margin:8px 0;
-  border-radius:6px;
-  cursor:pointer;
-  border-left:5px solid #9b59b6;
-}
+    /* ಪಾಠದ ಹೆಡರ್ ಬಟನ್ ಶೈಲಿ */
+    .lesson {
+      background: #ffffff;
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 8px;
+      cursor: pointer;
+      border-left: 6px solid #9b59b6;
+      font-weight: bold;
+      font-size: 16px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      transition: all 0.3s ease;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
 
-.lesson:hover{
-  background:#f5eef8;
-}
+    .lesson:hover {
+      background: #f5eef8;
+      transform: translateX(5px);
+    }
 
-.coming-soon{
-  display:none;
-  margin-top:8px;
-  color:#d35400;
-  font-size:14px;
-}
+    /* ಸ್ಥಿತಿ ತೋರಿಸುವ ಗುರುತು (Arrow) */
+    .lesson::after {
+      content: '▼';
+      font-size: 12px;
+      color: #7d3c98;
+      transition: transform 0.3s;
+    }
+    .lesson.active::after {
+      transform: rotate(180deg);
+    }
 
-.lesson.active .coming-soon{
-  display:block;
-}
-</style>
+    /* 🎮 ಚಟುವಟಿಕೆಗಳ ಮುಖ್ಯ ಗ್ರಿಡ್ ಬಾಕ್ಸ್ (ಆರಂಭದಲ್ಲಿ ಹೈಡ್ ಆಗಿರುತ್ತದೆ) */
+    .activities-container {
+      display: none;
+      background: #ffffff;
+      border: 1px solid #e8e0ec;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 15px;
+      box-shadow: inset 0 2px 5px rgba(0,0,0,0.02);
+    }
+    
+    .activities-container.active {
+      display: block;
+      animation: fadeIn 0.4s ease;
+    }
 
-<script>
-function toggleLesson(id){
-  document.getElementById(id).classList.toggle("active");
-}
-</script>
+    .ppt-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    /* 📊 ಪಿಪಿಟಿ ಚೌಕ ಕಾರ್ಡ್ ವಿನ್ಯಾಸ */
+    .ppt-card {
+      background: #ffffff;
+      border: 1px solid #dee2e6;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+      text-decoration: none;
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .ppt-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 15px rgba(125,60,152,0.15);
+    }
+
+    /* ಗೂಗಲ್ ಡ್ರೈವ್ ಮೂಲಕ ಫ್ರಂಟ್ ಪೇಜ್ ಇಮೇಜ್ ಪ್ರದರ್ಶನ ಬಾಕ್ಸ್ */
+    .thumbnail-box {
+      width: 100%;
+      height: 160px;
+      background: #000;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .thumbnail-box iframe {
+      width: 100%;
+      height: 180px;
+      border: none;
+      position: absolute;
+      top: -10px;
+      pointer-events: none;
+    }
+
+    .click-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.05);
+      z-index: 2;
+    }
+
+    .card-info {
+      padding: 12px;
+      background: #ffffff;
+      border-top: 1px solid #f1f1f1;
+      text-align: center;
+    }
+
+    .card-info h4 {
+      margin: 0 0 5px 0;
+      font-size: 14px;
+      color: #1a1a1a;
+    }
+
+    .card-info span {
+      font-size: 12px;
+      color: #7d3c98;
+      font-weight: bold;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
 </head>
-
 <body>
 
-<h2>6ನೇ ತರಗತಿ – ವಿಜ್ಞಾನ</h2>
- 
-<div class="lesson" id="k6s1" onclick="toggleLesson('k6s1')">1. ವಿಜ್ಞಾನದ ಅದ್ಭುತ ಪ್ರಪಂಚ
+  <h2>6ನೇ ತರಗತಿ – ವಿಜ್ಞಾನ</h2>
+
+  <div class="lesson" onclick="toggleLesson('lesson6_1', this)">1. ವಿಜ್ಞಾನದ ಅದ್ಭುತ ಪ್ರಪಂಚ</div>
+  <div class="activities-container" id="lesson6_1">
+    <div class="ppt-grid">
+      <a class="ppt-card" href="https://docs.google.com/presentation/d/1O83LwVSRnl7grl0AO0TuBJRkj2vqbGzG2znO6nENUso/preview" target="_blank">
+        <div class="thumbnail-box">
+          <iframe src="https://docs.google.com/presentation/d/1O83LwVSRnl7grl0AO0TuBJRkj2vqbGzG2znO6nENUso/preview" scrolling="no"></iframe>
+          <div class="click-overlay"></div>
+        </div>
+        <div class="card-info">
+          <h4>1. ವಿಜ್ಞಾನದ ಅದ್ಭುತ ಪ್ರಪಂಚ</h4>
+          <span>📊 OPEN PPT PRESENTATION</span>
+        </div>
+      </a>
+    </div>
   </div>
-<div class="activities" id="lesson1">
-  <a class="activity" href="https://docs.google.com/presentation/d/1O83LwVSRnl7grl0AO0TuBJRkj2vqbGzG2znO6nENUso/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-</div>
 
-<!-- LESSON -->
-<div class="lesson" onclick="toggleLesson('lesson2')">
-  2. ಕಾಂತಗಳ ಅನ್ವೇಷಣೆ
-</div>
+  <div class="lesson" onclick="toggleLesson('lesson6_2', this)">2. ಕಾಂತಗಳ ಅನ್ವೇಷಣೆ</div>
+  <div class="activities-container" id="lesson6_2">
+    <div class="ppt-grid">
+      <a class="ppt-card" href="resources/science/kannada/6th/ಕಾಂತಗಳೊಂದಿಗೆ-ಆಟ-ಘಟಕ-ಪರೀಕ್ಷೆ.html" target="_blank">
+        <div class="thumbnail-box" style="background: #2c3e50; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 14px; text-align: center; padding: 10px;">
+          📝 ಘಟಕ ಪರೀಕ್ಷೆ
+        </div>
+        <div class="card-info">
+          <h4>ಕಾಂತಗಳೊಂದಿಗೆ ಆಟ - ಘಟಕ ಪರೀಕ್ಷೆ</h4>
+          <span>📝 TEST FILE / GAME</span>
+        </div>
+      </a>
 
-<!-- ACTIVITIES (hidden by default) -->
-<div class="activities" id="lesson2">
-
-  <a class="activity"
-     href="resources/science/kannada/6th/ಕಾಂತಗಳೊಂದಿಗೆ-ಆಟ-ಘಟಕ-ಪರೀಕ್ಷೆ.html"
-     target="_blank">
-       ಕಾಂತಗಳೊಂದಿಗೆ-ಆಟ-ಘಟಕ-ಪರೀಕ್ಷೆ.html
-  </a>
+      <a class="ppt-card" href="https://docs.google.com/presentation/d/1IA-XMEoCXvQE42hTfVPjoIhZOR1wMNh5sVHDPPJdLgY/preview" target="_blank">
+        <div class="thumbnail-box">
+          <iframe src="https://docs.google.com/presentation/d/1IA-XMEoCXvQE42hTfVPjoIhZOR1wMNh5sVHDPPJdLgY/preview" scrolling="no"></iframe>
+          <div class="click-overlay"></div>
+        </div>
+        <div class="card-info">
+          <h4>2. ಕಾಂತಗಳ ಅನ್ವೇಷಣೆ</h4>
+          <span>📊 OPEN PPT PRESENTATION</span>
+        </div>
+      </a>
+    </div>
   </div>
-<div class="activities" id="lesson2">
-  <a class="activity" href="https://docs.google.com/presentation/d/1IA-XMEoCXvQE42hTfVPjoIhZOR1wMNh5sVHDPPJdLgY/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-</div>
 
-<div class="lesson" id="k6s3" onclick="toggleLesson('k6s3')">3. ಉದ್ದದ ಅಳತೆ ಮತ್ತು ಚಲನೆ
+  <div class="lesson" onclick="toggleLesson('lesson6_3', this)">3. ಉದ್ದದ ಅಳತೆ ಮತ್ತು ಚಲನೆ</div>
+  <div class="activities-container" id="lesson6_3">
+    <div class="ppt-grid">
+      <a class="ppt-card" href="https://docs.google.com/presentation/d/1SaARt4OtslTE3atUkru7U3Bp2OhqIuD5gt1E6rct1ZY/preview" target="_blank">
+        <div class="thumbnail-box">
+          <iframe src="https://docs.google.com/presentation/d/1SaARt4OtslTE3atUkru7U3Bp2OhqIuD5gt1E6rct1ZY/preview" scrolling="no"></iframe>
+          <div class="click-overlay"></div>
+        </div>
+        <div class="card-info">
+          <h4>3. ಉದ್ದದ ಅಳತೆ ಮತ್ತು ಚಲನೆ</h4>
+          <span>📊 OPEN PPT PRESENTATION</span>
+        </div>
+      </a>
+    </div>
   </div>
-<div class="activities" id="lesson3">
-  <a class="activity" href="https://docs.google.com/presentation/d/1SaARt4OtslTE3atUkru7U3Bp2OhqIuD5gt1E6rct1ZY/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-</div>
 
-<div class="lesson" id="k6s4" onclick="toggleLesson('k6s4')">4. ತಾಪ ಮತ್ತು ಅದರ ಅಳತೆ
+  <div class="lesson" onclick="toggleLesson('lesson6_4', this)">4. ತಾಪ ಮತ್ತು ಅದರ ಅಳತೆ</div>
+  <div class="activities-container" id="lesson6_4">
+    <div class="ppt-grid">
+      <a class="ppt-card" href="https://docs.google.com/presentation/d/1gLXMZTldaX5p0vSizuCZWyyflAHlZUu0tKlYHNbw6hA/preview" target="_blank">
+        <div class="thumbnail-box">
+          <iframe src="https://docs.google.com/presentation/d/1gLXMZTldaX5p0vSizuCZWyyflAHlZUu0tKlYHNbw6hA/preview" scrolling="no"></iframe>
+          <div class="click-overlay"></div>
+        </div>
+        <div class="card-info">
+          <h4>4. ತಾಪ ಮತ್ತು ಅದರ ಅಳತೆ</h4>
+          <span>📊 OPEN PPT PRESENTATION</span>
+        </div>
+      </a>
+    </div>
   </div>
-<div class="activities" id="lesson4">
-  <a class="activity" href="https://docs.google.com/presentation/d/1gLXMZTldaX5p0vSizuCZWyyflAHlZUu0tKlYHNbw6hA/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-</div>
 
-<div class="lesson" id="k6s5" onclick="toggleLesson('k6s5')">5. ಭೂಮಿಯಿಂದ ಆಚೆಗೆ
+  <div class="lesson" onclick="toggleLesson('lesson6_5', this)">5. ಭೂಮಿಯಿಂದ ಆಚೆಗೆ</div>
+  <div class="activities-container" id="lesson6_5">
+    <div class="ppt-grid">
+      <a class="ppt-card" href="https://docs.google.com/presentation/d/13xPVwpiNHa0U0YIPFD4-hUyVs5haxLWMnxWPNkOCoOs/preview" target="_blank">
+        <div class="thumbnail-box">
+          <iframe src="https://docs.google.com/presentation/d/13xPVwpiNHa0U0YIPFD4-hUyVs5haxLWMnxWPNkOCoOs/preview" scrolling="no"></iframe>
+          <div class="click-overlay"></div>
+        </div>
+        <div class="card-info">
+          <h4>5. ಭೂಮಿಯಿಂದ ಆಚೆಗೆ</h4>
+          <span>📊 OPEN PPT PRESENTATION</span>
+        </div>
+      </a>
+    </div>
   </div>
-<div class="activities" id="lesson5">
-  <a class="activity" href="https://docs.google.com/presentation/d/13xPVwpiNHa0U0YIPFD4-hUyVs5haxLWMnxWPNkOCoOs/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-</div>
 
-<div class="lesson" id="k6s6" onclick="toggleLesson('k6s6')">6. ನಮ್ಮ ಸುತ್ತಲಿನ ಸಾಮಗ್ರಿಗಳು
+  <div class="lesson" onclick="toggleLesson('lesson6_6', this)">6. ನಮ್ಮ ಸುತ್ತಲಿನ ಸಾಮಗ್ರಿಗಳು</div>
+  <div class="activities-container" id="lesson6_6">
+    <div class="ppt-grid">
+      <a class="ppt-card" href="https://docs.google.com/presentation/d/17Yf2pireN1w5U0o7IuWCFAv5DSX3v0QCdIRIfi1CYkg/preview" target="_blank">
+        <div class="thumbnail-box">
+          <iframe src="https://docs.google.com/presentation/d/17Yf2pireN1w5U0o7IuWCFAv5DSX3v0QCdIRIfi1CYkg/preview" scrolling="no"></iframe>
+          <div class="click-overlay"></div>
+        </div>
+        <div class="card-info">
+          <h4>6. ನಮ್ಮ ಸುತ್ತಲಿನ ಸಾಮಗ್ರಿಗಳು</h4>
+          <span>📊 OPEN PPT PRESENTATION</span>
+        </div>
+      </a>
+    </div>
   </div>
-<div class="activities" id="lesson6">
-  <a class="activity" href="https://docs.google.com/presentation/d/17Yf2pireN1w5U0o7IuWCFAv5DSX3v0QCdIRIfi1CYkg/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-</div>
 
-<div class="lesson" id="k6s7" onclick="toggleLesson('k6s7')">7. ನೀರಿನ ಸ್ಥಿತಿಗಳ ಮೂಲಕ ಒಂದು ಪಯಣ
+  <div class="lesson" onclick="toggleLesson('lesson6_7', this)">7. ನೀರಿನ ಸ್ಥಿತಿಗಳ ಮೂಲಕ ಒಂದು ಪಯಣ</div>
+  <div class="activities-container" id="lesson6_7">
+    <div class="ppt-grid">
+      <a class="ppt-card" href="https://docs.google.com/presentation/d/1N0lYQ0YAb8Dp9OfNWsOveghNUn62otezXvIX9hS-U78/preview" target="_blank">
+        <div class="thumbnail-box">
+          <iframe src="https://docs.google.com/presentation/d/1N0lYQ0YAb8Dp9OfNWsOveghNUn62otezXvIX9hS-U78/preview" scrolling="no"></iframe>
+          <div class="click-overlay"></div>
+        </div>
+        <div class="card-info">
+          <h4>7. ನೀರಿನ ಸ್ಥಿತಿಗಳ ಮೂಲಕ ಪಯಣ</h4>
+          <span>📊 OPEN PPT PRESENTATION</span>
+        </div>
+      </a>
+    </div>
   </div>
-<div class="activities" id="lesson7">
-  <a class="activity" href="https://docs.google.com/presentation/d/1N0lYQ0YAb8Dp9OfNWsOveghNUn62otezXvIX9hS-U78/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-</div>
 
-<!-- LESSON -->
-<div class="lesson" onclick="toggleLesson('lesson8')">
-  8. ದೈನಂದಿನ ಜೀವನದಲ್ಲಿ ಬೇರ್ಪಡಿಸುವಿಕೆಯ ವಿಧಾನಗಳು
-</div>
+  <div class="lesson" onclick="toggleLesson('lesson6_8', this)">8. ದೈನಂದಿನ ಜೀವನದಲ್ಲಿ ಬೇರ್ಪಡಿಸುವಿಕೆಯ ವಿಧಾನಗಳು</div>
+  <div class="activities-container" id="lesson6_8">
+    <div class="ppt-grid">
+      <a class="ppt-card" href="resources/science/kannada/6th/drag-and-drop-activity1.html" target="_blank">
+        <div class="thumbnail-box" style="background: #8e44ad; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">
+          🧩 DRAG & DROP GAME
+        </div>
+        <div class="card-info">
+          <h4>drag-and-drop-activity1</h4>
+          <span>🧩 PLAY INTERACTIVE GAME</span>
+        </div>
+      </a>
 
-<!-- ACTIVITIES (hidden by default) -->
-<div class="activities" id="lesson8">
-
-  <a class="activity"
-     href="resources/science/kannada/6th/drag-and-drop-activity1.html"
-     target="_blank">
-     🧩 drag-and-drop-activity1
-  </a>
+      <a class="ppt-card" href="https://docs.google.com/presentation/d/15siprtTiFv1TufFRWhHiOjnyuBa5-ho9s12pbsEMJrc/preview" target="_blank">
+        <div class="thumbnail-box">
+          <iframe src="https://docs.google.com/presentation/d/15siprtTiFv1TufFRWhHiOjnyuBa5-ho9s12pbsEMJrc/preview" scrolling="no"></iframe>
+          <div class="click-overlay"></div>
+        </div>
+        <div class="card-info">
+          <h4>8. ಬೇರ್ಪಡಿಸುವಿಕೆಯ ವಿಧಾನಗಳು</h4>
+          <span>📊 OPEN PPT PRESENTATION</span>
+        </div>
+      </a>
+    </div>
   </div>
-<div class="activities" id="lesson8">
-  <a class="activity" href="https://docs.google.com/presentation/d/15siprtTiFv1TufFRWhHiOjnyuBa5-ho9s12pbsEMJrc/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-</div>
-  
-<div class="lesson" id="k6s9" onclick="toggleLesson('k6s9')">9. ನಿಸರ್ಗದ ಸಂಪತ್ತು
- </div>
-<div class="activities" id="lesson9">
-  <a class="activity" href="https://docs.google.com/presentation/d/1K7z13fSfQ8GTdC_0bbzJAi6kwfgfIlvgHdh3nHOwnC0/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-</div>
 
-<div class="lesson" id="k6s10" onclick="toggleLesson('k6s10')">10. ಜೀವ ಜಗತ್ತಿನಲ್ಲಿ ವೈವಿಧ್ಯತೆ
+  <div class="lesson" onclick="toggleLesson('lesson6_9', this)">9. ನಿಸರ್ಗದ ಸಂಪತ್ತು</div>
+  <div class="activities-container" id="lesson6_9">
+    <div class="ppt-grid">
+      <a class="ppt-card" href="https://docs.google.com/presentation/d/1K7z13fSfQ8GTdC_0bbzJAi6kwfgfIlvgHdh3nHOwnC0/preview" target="_blank">
+        <div class="thumbnail-box">
+          <iframe src="https://docs.google.com/presentation/d/1K7z13fSfQ8GTdC_0bbzJAi6kwfgfIlvgHdh3nHOwnC0/preview" scrolling="no"></iframe>
+          <div class="click-overlay"></div>
+        </div>
+        <div class="card-info">
+          <h4>9. ನಿಸರ್ಗದ ಸಂಪತ್ತು</h4>
+          <span>📊 OPEN PPT PRESENTATION</span>
+        </div>
+      </a>
+    </div>
   </div>
-<div class="activities" id="lesson10">
-  <a class="activity" href="https://docs.google.com/presentation/d/1Q6F6mIvocmcpcPSQWkew_Yd4hpQzttY8ee2nwnMr6S0/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-</div>
 
-<div class="lesson" id="k6s11" onclick="toggleLesson('k6s11')">11. ಮನದುಂಬಿದ ಊಟ – ಸ್ವಸ್ಥ ಶರೀರಕ್ಕೆ ಸೋಪಾನ
+  <div class="lesson" onclick="toggleLesson('lesson6_10', this)">10. ಜೀವ ಜಗತ್ತಿನಲ್ಲಿ ವೈವಿಧ್ಯತೆ</div>
+  <div class="activities-container" id="lesson6_10">
+    <div class="ppt-grid">
+      <a class="ppt-card" href="https://docs.google.com/presentation/d/1Q6F6mIvocmcpcPSQWkew_Yd4hpQzttY8ee2nwnMr6S0/preview" target="_blank">
+        <div class="thumbnail-box">
+          <iframe src="https://docs.google.com/presentation/d/1Q6F6mIvocmcpcPSQWkew_Yd4hpQzttY8ee2nwnMr6S0/preview" scrolling="no"></iframe>
+          <div class="click-overlay"></div>
+        </div>
+        <div class="card-info">
+          <h4>10. ಜೀವ ಜಗತ್ತಿನಲ್ಲಿ ವೈವಿಧ್ಯತೆ</h4>
+          <span>📊 OPEN PPT PRESENTATION</span>
+        </div>
+      </a>
+    </div>
   </div>
-<div class="activities" id="lesson11">
-  <a class="activity" href="https://docs.google.com/presentation/d/1ETrL_XES263n0icMF11ofHVN6rBiUTTiH55pXGMmvwE/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-</div>
 
-<div class="lesson" id="k6s12" onclick="toggleLesson('k6s12')">12. ಜೀವಿಗಳು – ಅವುಗಳ ಗುಣಗಳ ಅನ್ವೇಷಣೆ
+  <div class="lesson" onclick="toggleLesson('lesson6_11', this)">11. ಮನದುಂಬಿದ ಊಟ – ಸ್ವಸ್ಥ ಶರೀರಕ್ಕೆ ಸೋಪಾನ</div>
+  <div class="activities-container" id="lesson6_11">
+    <div class="ppt-grid">
+      <a class="ppt-card" href="https://docs.google.com/presentation/d/1ETrL_XES263n0icMF11ofHVN6rBiUTTiH55pXGMmvwE/preview" target="_blank">
+        <div class="thumbnail-box">
+          <iframe src="https://docs.google.com/presentation/d/1ETrL_XES263n0icMF11ofHVN6rBiUTTiH55pXGMmvwE/preview" scrolling="no"></iframe>
+          <div class="click-overlay"></div>
+        </div>
+        <div class="card-info">
+          <h4>11. ಮನದುಂಬಿದ ಊಟ</h4>
+          <span>📊 OPEN PPT PRESENTATION</span>
+        </div>
+      </a>
+    </div>
   </div>
-<div class="activities" id="lesson12">
-  <a class="activity" href="https://docs.google.com/presentation/d/1UU9OPvkW0xOuNzxkXRnFDMWI23NaCc6qaqeBN8uZqyg/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-</div>
 
-  
-<h2>7ನೇ ತರಗತಿ – ವಿಜ್ಞಾನ</h2>
+  <div class="lesson" onclick="toggleLesson('lesson6_12', this)">12. ಜೀವಿಗಳು – ಅವುಗಳ ಗುಣಗಳ ಅನ್ವೇಷಣೆ</div>
+  <div class="activities-container" id="lesson6_12">
+    <div class="ppt-grid">
+      <a class="ppt-card" href="https://docs.google.com/presentation/d/1UU9OPvkW0xOuNzxkXRnFDMWI23NaCc6qaqeBN8uZqyg/preview" target="_blank">
+        <div class="thumbnail-box">
+          <iframe src="https://docs.google.com/presentation/d/1UU9OPvkW0xOuNzxkXRnFDMWI23NaCc6qaqeBN8uZqyg/preview" scrolling="no"></iframe>
+          <div class="click-overlay"></div>
+        </div>
+        <div class="card-info">
+          <h4>12. ಜೀವಿಗಳು ಮತ್ತು ಗುಣಗಳು</h4>
+          <span>📊 OPEN PPT PRESENTATION</span>
+        </div>
+      </a>
+    </div>
+  </div>
 
-<div class="lesson" onclick="toggleLesson('lesson1')">
-1. ನಿರಂತರವಾಗಿ ಬದಲಾಗುತ್ತಿರುವ ವಿಜ್ಞಾನದ ಜಗತ್ತು
-</div>
-<div class="activities" id="lesson1">
-  <a class="activity"href="https://docs.google.com/presentation/d/1-7g9e7hhfE5jfLIle7QHSqyIYt_7qNw8O9LTmnbC44E/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-</div>
 
-<div class="lesson" onclick="toggleLesson('lesson2')">
-2. ವಸ್ತುಗಳ ಅನ್ವೇಷಣೆ: ಆಮ್ಲೀಯ, ಪ್ರತ್ಯಾಮ್ಲೀಯ ಮತ್ತು ತಟಸ್ಥ
-</div>
-<div class="activities" id="lesson2">
-  <a class="activity" href="https://docs.google.com/presentation/d/1q3ZkBvZxMtpTgEQVwQ-qXM3nKQKYf9-a7lmCi7FsDaI/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-</div>
+  <h2>7ನೇ ತರಗತಿ – ವಿಜ್ಞಾನ</h2>
 
-<div class="lesson" onclick="toggleLesson('lesson3')">
-3. ವಿದ್ಯುಚ್ಛಕ್ತಿ: ಮಂಡಲಗಳು ಮತ್ತು ಅದರ ಘಟಕಗಳು
-</div>
-<div class="activities" id="lesson3">
-  <a class="activity" href="https://docs.google.com/presentation/d/1XLGMoT9i6ng2z3axSRt5JNkuMaJQEZQKDs9_CKw4gC8/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-</div>
+  <div class="lesson" onclick="toggleLesson('lesson7_1', this)">1. ನಿರಂತರವಾಗಿ ಬದಲಾಗುತ್ತಿರುವ ವಿಜ್ಞಾನದ ಜಗತ್ತು</div>
+  <div class="activities-container" id="lesson7_1">
+    <div class="ppt-grid">
+      <a class="ppt-card" href="https://docs.google.com/presentation/d/1-7g9e7hhfE5jfLIle7QHSqyIYt_7qNw8O9LTmnbC44E/preview" target="_blank">
+        <div class="thumbnail-box">
+          <iframe src="https://docs.google.com/presentation/d/1-7g9e7hhfE5jfLIle7QHSqyIYt_7qNw8O9LTmnbC44E/preview" scrolling="no"></iframe>
+          <div class="click-overlay"></div>
+        </div>
+        <div class="card-info">
+          <h4>1. ವಿಜ್ಞಾನದ ಜಗತ್ತು</h4>
+          <span>📊 OPEN PPT PRESENTATION</span>
+        </div>
+      </a>
+    </div>
+  </div>
 
-<div class="lesson" onclick="toggleLesson('lesson4')">
-4. ಲೋಹಗಳು ಮತ್ತು ಅಲೋಹಗಳ ಜಗತ್ತು
-</div>
-<div class="activities" id="lesson4">
-  <a class="activity" href="https://docs.google.com/presentation/d/1yEw1jT8U0fv2vCaVrZuFeIlX9EBg1HIG/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-</div>
+  <div class="lesson" onclick="toggleLesson('lesson7_2', this)">2. ವಸ್ತುಗಳ ಅನ್ವೇಷಣೆ: ಆಮ್ಲೀಯ, ಪ್ರತ್ಯಾಮ್ಲೀಯ ಮತ್ತು ತಟಸ್ಥ</div>
+  <div class="activities-container" id="lesson7_2">
+    <div class="ppt-grid">
+      <a class="ppt-card" href="https://docs.google.com/presentation/d/1q3ZkBvZxMtpTgEQVwQ-qXM3nKQKYf9-a7lmCi7FsDaI/preview" target="_blank">
+        <div class="thumbnail-box">
+          <iframe src="https://docs.google.com/presentation/d/1q3ZkBvZxMtpTgEQVwQ-qXM3nKQKYf9-a7lmCi7FsDaI/preview" scrolling="no"></iframe>
+          <div class="click-overlay"></div>
+        </div>
+        <div class="card-info">
+          <h4>2. ವಸ್ತುಗಳ ಅನ್ವೇಷಣೆ</h4>
+          <span>📊 OPEN PPT PRESENTATION</span>
+        </div>
+      </a>
+    </div>
+  </div>
 
-<div class="lesson" onclick="toggleLesson('lesson5')">
-5. ನಮ್ಮ ಸುತ್ತಲಿನ ಬದಲಾವಣೆಗಳು; ಭೌತ ಮತ್ತು ರಾಸಾಯನಿಕ
-</div>
-<div class="activities" id="lesson5">
-  <a class="activity" href="https://docs.google.com/presentation/d/1fBUMWiOyMYUHiA-IWNiU_RkKgmqnM3XYdLfTgkQw2nc/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-</div>
+  <div class="lesson" onclick="toggleLesson('lesson7_3', this)">3. ವಿದ್ಯುಚ್ಛಕ್ತಿ: ಮಂಡಲಗಳು ಮತ್ತು ಅದರ ಘಟಕಗಳು</div>
+  <div class="activities-container" id="lesson7_3">
+    <div class="ppt-grid">
+      <a class="ppt-card" href="https://docs.google.com/presentation/d/1XLGMoT9i6ng2z3axSRt5JNkuMaJQEZQKDs9_CKw4gC8/preview" target="_blank">
+        <div class="thumbnail-box">
+          <iframe src="https://docs.google.com/presentation/d/1XLGMoT9i6ng2z3axSRt5JNkuMaJQEZQKDs9_CKw4gC8/preview" scrolling="no"></iframe>
+          <div class="click-overlay"></div>
+        </div>
+        <div class="card-info">
+          <h4>3. ವಿದ್ಯುಚ್ಛಕ್ತಿ ಮಂಡಲಗಳು</h4>
+          <span>📊 OPEN PPT PRESENTATION</span>
+        </div>
+      </a>
+    </div>
+  </div>
 
-<div class="lesson" onclick="toggleLesson('lesson6')">
-6. ಹದಿಹರೆಯ: ಬೆಳವಣಿಗೆ ಮತ್ತು ಬದಲಾವಣೆಯ ಒಂದು ಹಂತ
-</div>
-<div class="activities" id="lesson6">
-  <a class="activity" href="https://docs.google.com/presentation/d/1l5ODXZZSUc6Tngcu7tDGyMPbmK1qmDk7D25DbigoWsE/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-</div>
+  <div class="lesson" onclick="toggleLesson('lesson7_4', this)">4. ಲೋಹಗಳು ಮತ್ತು ಅಲೋಹಗಳ ಜಗತ್ತು</div>
+  <div class="activities-container" id="lesson7_4">
+    <div class="ppt-grid">
+      <a class="ppt-card" href="https://docs.google.com/presentation/d/1yEw1jT8U0fv2vCaVrZuFeIlX9EBg1HIG/preview" target="_blank">
+        <div class="thumbnail-box">
+          <iframe src="https://docs.google.com/presentation/d/1yEw1jT8U0fv2vCaVrZuFeIlX9EBg1HIG/preview" scrolling="no"></iframe>
+          <div class="click-overlay"></div>
+        </div>
+        <div class="card-info">
+          <h4>4. ಲೋಹಗಳು ಮತ್ತು ಅಲೋಹಗಳು</h4>
+          <span>📊 OPEN PPT PRESENTATION</span>
+        </div>
+      </a>
+    </div>
+  </div>
 
-<div class="lesson" onclick="toggleLesson('lesson7')">
-7. ನಿಷ್ಪ್ರಯೋಜ್ಯ ಉಷ್ಣ ವರ್ಗಾವಣೆ
-</div>
-<div class="activities" id="lesson7">
-  <a class="activity" href="https://docs.google.com/presentation/d/1IQZpBQjE10CQRo73YWPDlHftHkugdPePAgPvW52T7As/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-</div>
+  <div class="lesson" onclick="toggleLesson('lesson7_5', this)">5. ನಮ್ಮ ಸುತ್ತಲಿನ ಬದಲಾವಣೆಗಳು; ಭೌತ ಮತ್ತು ರಾಸಾಯನಿಕ</div>
+  <div class="activities-container" id="lesson7_5">
+    <div class="ppt-grid">
+      <a class="ppt-card" href="https://docs.google.com/presentation/d/1fBUMWiOyMYUHiA-IWNiU_RkKgmqnM3XYdLfTgkQw2nc/preview" target="_blank">
+        <div class="thumbnail-box">
+          <iframe src="https://docs.google.com/presentation/d/1fBUMWiOyMYUHiA-IWNiU_RkKgmqnM3XYdLfTgkQw2nc/preview" scrolling="no"></iframe>
+          <div class="click-overlay"></div>
+        </div>
+        <div class="card-info">
+          <h4>5. ಭೌತ ಮತ್ತು ರಾಸಾಯನಿಕ ಬದಲಾವಣೆ</h4>
+          <span>📊 OPEN PPT PRESENTATION</span>
+        </div>
+      </a>
+    </div>
+  </div>
 
-<div class="lesson" onclick="toggleLesson('lesson8')">
-8. ಕಾಲ ಮತ್ತು ಚಲನೆಯ ಆಳತೆ
-</div>
-<div class="activities" id="lesson8">
-  <a class="activity" href="https://docs.google.com/presentation/d/1ibw5cG7ku-nWhRMGmfV4RtcSm3Q50-KXOZ3iJqI7NRA/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-</div>
+  <div class="lesson" onclick="toggleLesson('lesson7_6', this)">6. ಹದಿಹರೆಯ: ಬೆಳವಣಿಗೆ ಮತ್ತು ಬದಲಾವಣೆಯ ಒಂದು ಹಂತ</div>
+  <div class="activities-container" id="lesson7_6">
+    <div class="ppt-grid">
+      <a class="ppt-card" href="https://docs.google.com/presentation/d/1l5ODXZZSUc6Tngcu7tDGyMPbmK1qmDk7D25DbigoWsE/preview" target="_blank">
+        <div class="thumbnail-box">
+          <iframe src="https://docs.google.com/presentation/d/1l5ODXZZSUc6Tngcu7tDGyMPbmK1qmDk7D25DbigoWsE/preview" scrolling="no"></iframe>
+          <div class="click-overlay"></div>
+        </div>
+        <div class="card-info">
+          <h4>6. ಹದಿಹರೆಯ ಹಂತ</h4>
+          <span>📊 OPEN PPT PRESENTATION</span>
+        </div>
+      </a>
+    </div>
+  </div>
 
-<div class="lesson" onclick="toggleLesson('lesson9')">
-9. ಪ್ರಾಣಿಗಳಲ್ಲಿ ಜೀವ ಕ್ರಿಯೆಗಳು
-</div>
-<div class="activities" id="lesson9">
-  <a class="activity" href="https://docs.google.com/presentation/d/16Ob7qlNgPHnHO4eDJX4hAJUkX0i1NFBmwWA670oCtr8/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-</div>
+  <div class="lesson" onclick="toggleLesson('lesson7_7', this)">7. ನಿಷ್ಪ್ರಯೋಜ್ಯ ಉಷ್ಣ ವರ್ಗಾವಣೆ</div>
+  <div class="activities-container" id="lesson7_7">
+    <div class="ppt-grid">
+      <a class="ppt-card" href="https://docs.google.com/presentation/d/1IQZpBQjE10CQRo73YWPDlHftHkugdPePAgPvW52T7As/preview" target="_blank">
+        <div class="thumbnail-box">
+          <iframe src="https://docs.google.com/presentation/d/1IQZpBQjE10CQRo73YWPDlHftHkugdPePAgPvW52T7As/preview" scrolling="no"></iframe>
+          <div class="click-overlay"></div>
+        </div>
+        <div class="card-info">
+          <h4>7. ಉಷ್ಣ ವರ್ಗಾವಣೆ</h4>
+          <span>📊 OPEN PPT PRESENTATION</span>
+        </div>
+      </a>
+    </div>
+  </div>
 
-<div class="lesson" onclick="toggleLesson('lesson10')">
-10. ಸಸ್ಯಗಳಲ್ಲಿ ಜೀವ ಕ್ರಿಯೆಗಳು
-</div>
-<div class="activities" id="lesson10">
-  <a class="activity" href="https://docs.google.com/presentation/d/1LsF-St1jrjzFu50rw0XW5_iI1Bpoiv_8yEn2FawniYg/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-</div>
+  <div class="lesson" onclick="toggleLesson('lesson7_8', this)">8. ಕಾಲ ಮತ್ತು ಚಲನೆಯ ಆಳತೆ</div>
+  <div class="activities-container" id="lesson7_8">
+    <div class="ppt-grid">
+      <a class="ppt-card" href="https://docs.google.com/presentation/d/1ibw5cG7ku-nWhRMGmfV4RtcSm3Q50-KXOZ3iJqI7NRA/preview" target="_blank">
+        <div class="thumbnail-box">
+          <iframe src="https://docs.google.com/presentation/d/1ibw5cG7ku-nWhRMGmfV4RtcSm3Q50-KXOZ3iJqI7NRA/preview" scrolling="no"></iframe>
+          <div class="click-overlay"></div>
+        </div>
+        <div class="card-info">
+          <h4>8. ಕಾಲ ಮತ್ತು ಚಲನೆ</h4>
+          <span>📊 OPEN PPT PRESENTATION</span>
+        </div>
+      </a>
+    </div>
+  </div>
 
-<div class="lesson" onclick="toggleLesson('lesson11')">
-11. ಬೆಳಕು: ನೆರಳುಗಳು ಮತ್ತು ಪ್ರತಿಫಲನಗಳು
-</div>
-<div class="activities" id="lesson11">
-  <a class="activity" href="https://docs.google.com/presentation/d/13OeWJqADed9Q0qtjKirz7jXyWgPsh4gdedpYUYLsZNQ/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-</div>
+  <div class="lesson" onclick="toggleLesson('lesson7_9', this)">9. ಪ್ರಾಣಿಗಳಲ್ಲಿ ಜೀವ ಕ್ರಿಯೆಗಳು</div>
+  <div class="activities-container" id="lesson7_9">
+    <div class="ppt-grid">
+      <a class="ppt-card" href="https://docs.google.com/presentation/d/16Ob7qlNgPHnHO4eDJX4hAJUkX0i1NFBmwWA670oCtr8/preview" target="_blank">
+        <div class="thumbnail-box">
+          <iframe src="https://docs.google.com/presentation/d/16Ob7qlNgPHnHO4eDJX4hAJUkX0i1NFBmwWA670oCtr8/preview" scrolling="no"></iframe>
+          <div class="click-overlay"></div>
+        </div>
+        <div class="card-info">
+          <h4>9. ಪ್ರಾಣಿಗಳಲ್ಲಿ ಜೀವ ಕ್ರಿಯೆಗಳು</h4>
+          <span>📊 OPEN PPT PRESENTATION</span>
+        </div>
+      </a>
+    </div>
+  </div>
 
-<div class="lesson" onclick="toggleLesson('lesson12')">
-12. ಭೂಮಿ, ಚಂದ್ರ ಮತ್ತು ಸೂರ್ಯ
-</div>
-<div class="activities" id="lesson12">
-  <a class="activity" href="https://docs.google.com/presentation/d/1eYg0VgWRfuZxHEkoGOnA276dpuHU_-YxQd7ev7E3Etc/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-</div>
+  <div class="lesson" onclick="toggleLesson('lesson7_10', this)">10. ಸಸ್ಯಗಳಲ್ಲಿ ಜೀವ ಕ್ರಿಯೆಗಳು</div>
+  <div class="activities-container" id="lesson7_10">
+    <div class="ppt-grid">
+      <a class="ppt-card" href="https://docs.google.com/presentation/d/1LsF-St1jrjzFu50rw0XW5_iI1Bpoiv_8yEn2FawniYg/preview" target="_blank">
+        <div class="thumbnail-box">
+          <iframe src="https://docs.google.com/presentation/d/1LsF-St1jrjzFu50rw0XW5_iI1Bpoiv_8yEn2FawniYg/preview" scrolling="no"></iframe>
+          <div class="click-overlay"></div>
+        </div>
+        <div class="card-info">
+          <h4>10. ಸಸ್ಯಗಳಲ್ಲಿ ಜೀವ ಕ್ರಿಯೆಗಳು</h4>
+          <span>📊 OPEN PPT PRESENTATION</span>
+        </div>
+      </a>
+    </div>
+  </div>
 
-<script>
-function toggleLesson(id) {
-  const el = document.getElementById(id);
+  <div class="lesson" onclick="toggleLesson('lesson7_11', this)">11. ಬೆಳಕು: ನೆರಳುಗಳು ಮತ್ತು ಪ್ರತಿಫಲನಗಳು</div>
+  <div class="activities-container" id="lesson7_11">
+    <div class="ppt-grid">
+      <a class="ppt-card" href="https://docs.google.com/presentation/d/13OeWJqADed9Q0qtjKirz7jXyWgPsh4gdedpYUYLsZNQ/preview" target="_blank">
+        <div class="thumbnail-box">
+          <iframe src="https://docs.google.com/presentation/d/13OeWJqADed9Q0qtjKirz7jXyWgPsh4gdedpYUYLsZNQ/preview" scrolling="no"></iframe>
+          <div class="click-overlay"></div>
+        </div>
+        <div class="card-info">
+          <h4>11. ಬೆಳಕು ಮತ್ತು ನೆರಳುಗಳು</h4>
+          <span>📊 OPEN PPT PRESENTATION</span>
+        </div>
+      </a>
+    </div>
+  </div>
 
-  if (el.style.display === "block") {
-    el.style.display = "none";
-  } else {
-    el.style.display = "block";
-  }
-}
-</script>
-```
+  <div class="lesson" onclick="toggleLesson('lesson7_12', this)">12. ಭೂಮಿ, ಚಂದ್ರ ಮತ್ತು ಸೂರ್ಯ</div>
+  <div class="activities-container" id="lesson7_12">
+    <div class="ppt-grid">
+      <a class="ppt-card" href="https://docs.google.com/presentation/d/1eYg0VgWRfuZxHEkoGOnA276dpuHU_-YxQd7ev7E3Etc/preview" target="_blank">
+        <div class="thumbnail-box">
+          <iframe src="https://docs.google.com/presentation/d/1eYg0VgWRfuZxHEkoGOnA276dpuHU_-YxQd7ev7E3Etc/preview" scrolling="no"></iframe>
+          <div class="click-overlay"></div>
+        </div>
+        <div class="card-info">
+          <h4>12. ಭೂಮಿ, ಚಂದ್ರ ಮತ್ತು ಸೂರ್ಯ</h4>
+          <span>📊 OPEN PPT PRESENTATION</span>
+        </div>
+      </a>
+    </div>
+  </div>
 
-<script>
-function toggleLesson(id) {
-  const el = document.getElementById(id);
-  el.style.display = (el.style.display === "block") ? "none" : "block";
-}
-</script>
+  <script>
+    function toggleLesson(id, headerEl) {
+      // ಹೆಡರ್ ಆಕ್ಟಿವ್ ಕ್ಲಾಸ್ ಬದಲಾಯಿಸುವುದು
+      headerEl.classList.toggle("active");
+      
+      // ಬಾಕ್ಸ್ ಓಪನ್ ಅಥವಾ ಕ್ಲೋಸ್ ಮಾಡುವುದು
+      const container = document.getElementById(id);
+      container.classList.toggle("active");
+    }
+  </script>
+
 </body>
 </html>
