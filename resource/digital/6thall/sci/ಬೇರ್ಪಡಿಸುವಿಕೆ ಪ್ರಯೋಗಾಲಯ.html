@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಸಂವಾದಾತ್ಮಕ ಬೇರ್ಪಡಿಸುವಿಕೆ ಪ್ರಯೋಗಾಲಯ</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap');
+
+        :root {
+            --bg-color: #f0f8ff;
+            --text-color: #2d3436;
+            --magnet-color: #ff7675;
+            --filter-color: #74b9ff;
+            --heat-color: #fdcb6e;
+            --sieve-color: #a29bfe;
+            --wind-color: #55efc4; /* ತೂರುವಿಕೆಗೆ ಹೊಸ ಬಣ್ಣ */
+            --success: #00b894;
+            --error: #d63031;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            user-select: none;
+        }
+
+        header {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin: 0;
+            color: #0984e3;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        #score-board {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-top: 10px;
+            display: inline-block;
+        }
+
+        /* The Lab Bench (Drop Zones) */
+        .lab-bench {
+            display: flex;
+            gap: 20px;
+            margin-top: 40px;
+            flex-wrap: wrap;
+            justify-content: center;
+            max-width: 1000px; /* 5ನೇ ಸ್ಟೇಷನ್‌ಗೆ ಸ್ಥಳಾವಕಾಶ ಕಲ್ಪಿಸಲು ಅಗಲ ಹೆಚ್ಚಿಸಲಾಗಿದೆ */
+        }
+
+        .station {
+            width: 160px;
+            height: 180px;
+            background: white;
+            border-radius: 15px;
+            border: 4px dashed #b2bec3;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+        }
+
+        .station .icon {
+            font-size: 4rem;
+            margin-bottom: 10px;
+        }
+
+        .station.drag-over {
+            transform: scale(1.05);
+            border-style: solid;
+        }
+
+        #magnet-station.drag-over { border-color: var(--magnet-color); background: #ffeaa7; }
+        #filter-station.drag-over { border-color: var(--filter-color); background: #e0f7fa; }
+        #heat-station.drag-over { border-color: var(--heat-color); background: #ffccbc; }
+        #sieve-station.drag-over { border-color: var(--sieve-color); background: #ede7f6; }
+        #wind-station.drag-over { border-color: var(--wind-color); background: #e8f8f5; } /* ತೂರುವಿಕೆಗೆ ಡ್ರ್ಯಾಗ್-ಓವರ್ ಶೈಲಿ */
+
+        /* The Mixture to be sorted (Drag Source) */
+        .mixture-area {
+            margin-top: 50px;
+            height: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .mixture {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 50px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            cursor: grab;
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+            border: 3px solid #636e72;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: transform 0.2s;
+        }
+
+        .mixture:active {
+            cursor: grabbing;
+            transform: scale(0.95);
+        }
+
+        .mixture .emojis { font-size: 2.5rem; }
+
+        /* Animations */
+        @keyframes successPop {
+            0% { transform: scale(1); background: white; }
+            50% { transform: scale(1.2); background: var(--success); color: white; }
+            100% { transform: scale(1); background: white; }
+        }
+
+        @keyframes errorShake {
+            0%, 100% { transform: translateX(0); border-color: #b2bec3; }
+            25% { transform: translateX(-10px); border-color: var(--error); }
+            50% { transform: translateX(10px); border-color: var(--error); }
+            75% { transform: translateX(-10px); border-color: var(--error); }
+        }
+
+        .success { animation: successPop 0.6s ease; }
+        .error { animation: errorShake 0.4s ease; }
+
+        /* Confetti Canvas */
+        #confetti {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+    </style>
+</head>
+<body>
+
+    <canvas id="confetti"></canvas>
+
+    <header>
+        <h1>🧪 ಬೇರ್ಪಡಿಸುವಿಕೆ ಪ್ರಯೋಗಾಲಯ</h1>
+        <div id="score-board">ಸ್ಕೋರ್: <span id="score" style="color: #0984e3;">0</span> / 10</div>
+    </header>
+
+    <div class="lab-bench">
+        <div class="station" id="magnet-station" data-method="magnet">
+            <div class="icon">🧲</div>
+            <div>ಕಾಂತತ್ವ</div>
+        </div>
+        <div class="station" id="filter-station" data-method="filter">
+            <div class="icon">⚗️</div>
+            <div>ಶೋಧಿಸುವಿಕೆ</div>
+        </div>
+        <div class="station" id="heat-station" data-method="evaporation">
+            <div class="icon">🔥</div>
+            <div>ಬಾಷ್ಪೀಕರಣ</div>
+        </div>
+        <div class="station" id="sieve-station" data-method="sieve">
+            <div class="icon">🥣</div>
+            <div>ಜರಡಿ ಹಿಡಿಯುವಿಕೆ</div>
+        </div>
+        <div class="station" id="wind-station" data-method="winnowing">
+            <div class="icon">🌬️</div>
+            <div>ತೂರುವುದು</div>
+        </div>
+    </div>
+
+    <div class="mixture-area">
+        </div>
+
+    <script>
+        // Game Data (ಕನ್ನಡದಲ್ಲಿ ಅನುವಾದಿಸಲಾಗಿದೆ ಮತ್ತು ತೂರುವಿಕೆಯ ಮಿಶ್ರಣಗಳನ್ನು ಸೇರಿಸಲಾಗಿದೆ)
+        const mixturesData = [
+            { id: 1, text: "ಕಬ್ಬಿಣ ಮತ್ತು ಮರಳು", emojis: "🔩+🏖️", method: "magnet" },
+            { id: 2, text: "ಮಣ್ಣಿನ ನೀರು", emojis: "🟤💧", method: "filter" },
+            { id: 3, text: "ಉಪ್ಪಿನ ನೀರು", emojis: "🧂💧", method: "evaporation" },
+            { id: 4, text: "ಕಲ್ಲುಗಳು ಮತ್ತು ಮರಳು", emojis: "🪨+🏖️", method: "sieve" },
+            { id: 5, text: "ಸ್ಟೀಲ್ ಕ್ಲಿಪ್‌ಗಳು ಮತ್ತು ಕಾಗದ", emojis: "📎+📄", method: "magnet" },
+            { id: 6, text: "ಸೀಮೆಸುಣ್ಣ ಮತ್ತು ನೀರು", emojis: "🖍️💧", method: "filter" },
+            { id: 7, text: "ಸಕ್ಕರೆ ದ್ರಾವಣ", emojis: "🍬💧", method: "evaporation" },
+            { id: 8, text: "ಹಿಟ್ಟು ಮತ್ತು ಗೋಧಿ ತೌಡು", emojis: "🥖+🌾", method: "sieve" },
+            // ತೂರುವಿಕೆಗಾಗಿ (Winnowing) ಹೊಸ ಮಿಶ್ರಣಗಳು:
+            { id: 9, text: "ಭತ್ತ ಮತ್ತು ಹೊಟ್ಟು", emojis: "🌾+🍃", method: "winnowing" },
+            { id: 10, text: "ಕಡಲೆಕಾಯಿ ಮತ್ತು ಸಿಪ್ಪೆ", emojis: "🥜+🍂", method: "winnowing" }
+        ];
+
+        let score = 0;
+        let currentMixture = null;
+        const mixtureArea = document.querySelector('.mixture-area');
+        const scoreEl = document.getElementById('score');
+        const stations = document.querySelectorAll('.station');
+
+        // ಮೊದಲ ಮಿಶ್ರಣವನ್ನು ಪ್ರಾರಂಭಿಸಿ
+        loadNextMixture();
+
+        function loadNextMixture() {
+            // ಯಾದೃಚ್ಛಿಕ (random) ಮಿಶ್ರಣವನ್ನು ಆರಿಸಿ
+            const randomIndex = Math.floor(Math.random() * mixturesData.length);
+            currentMixture = mixturesData[randomIndex];
+
+            // ಡ್ರ್ಯಾಗ್ ಮಾಡಬಹುದಾದ ಎಲಿಮೆಂಟ್ ಅನ್ನು ರಚಿಸಿ
+            const mixEl = document.createElement('div');
+            mixEl.classList.add('mixture');
+            mixEl.draggable = true;
+            mixEl.innerHTML = `<span class="emojis">${currentMixture.emojis}</span> <span>${currentMixture.text}</span>`;
+            
+            // ಮಿಶ್ರಣಕ್ಕಾಗಿ ಡ್ರ್ಯಾಗ್ ಈವೆಂಟ್‌ಗಳನ್ನು ಹೊಂದಿಸಿ
+            mixEl.addEventListener('dragstart', (e) => {
+                e.dataTransfer.setData('text/plain', currentMixture.method);
+                setTimeout(() => mixEl.style.opacity = '0.5', 0); // ದೃಶ್ಯ ಪ್ರತಿಕ್ರಿಯೆ
+            });
+            
+            mixEl.addEventListener('dragend', () => {
+                mixEl.style.opacity = '1';
+            });
+
+            mixtureArea.innerHTML = '';
+            mixtureArea.appendChild(mixEl);
+        }
+
+        // ಡ್ರಾಪ್ ಝೋನ್‌ಗಳನ್ನು ಹೊಂದಿಸಿ
+        stations.forEach(station => {
+            station.addEventListener('dragover', (e) => {
+                e.preventDefault(); // ಡ್ರಾಪ್ ಮಾಡಲು ಅನುಮತಿಸಲು ಅಗತ್ಯವಿದೆ
+                station.classList.add('drag-over');
+            });
+
+            station.addEventListener('dragleave', () => {
+                station.classList.remove('drag-over');
+            });
+
+            station.addEventListener('drop', (e) => {
+                e.preventDefault();
+                station.classList.remove('drag-over');
+                
+                const requiredMethod = e.dataTransfer.getData('text/plain');
+                const stationMethod = station.getAttribute('data-method');
+
+                if (requiredMethod === stationMethod) {
+                    // ಸರಿಯಾಗಿದೆ!
+                    score++;
+                    scoreEl.innerText = score;
+                    station.classList.add('success');
+                    
+                    // JS ಮೂಲಕ ಸರಳ ಕಾನ್ಫೆಟ್ಟಿ (confetti) ಪರಿಣಾಮ
+                    createConfetti(e.clientX, e.clientY);
+
+                    setTimeout(() => {
+                        station.classList.remove('success');
+                        loadNextMixture();
+                    }, 600);
+
+                } else {
+                    // ತಪ್ಪಾಗಿದೆ!
+                    station.classList.add('error');
+                    setTimeout(() => station.classList.remove('error'), 400);
+                }
+            });
+        });
+
+        // ಕನಿಷ್ಠ ಕಾನ್ಫೆಟ್ಟಿ ಕಾರ್ಯ (ಯಾವುದೇ ಬಾಹ್ಯ ಲೈಬ್ರರಿಗಳಿಲ್ಲದೆ)
+        function createConfetti(x, y) {
+            for (let i = 0; i < 20; i++) {
+                const conf = document.createElement('div');
+                conf.innerText = "✨";
+                conf.style.position = 'fixed';
+                conf.style.left = x + 'px';
+                conf.style.top = y + 'px';
+                conf.style.fontSize = Math.random() * 20 + 10 + 'px';
+                conf.style.pointerEvents = 'none';
+                conf.style.transition = 'all 1s ease-out';
+                conf.style.transform = `translate(${(Math.random() - 0.5) * 200}px, ${(Math.random() - 0.5) * 200}px) rotate(${Math.random() * 360}deg)`;
+                conf.style.opacity = '1';
+                
+                document.body.appendChild(conf);
+
+                // ಅನಿಮೇಶನ್ ಟ್ರಿಗರ್ ಮಾಡಿ
+                setTimeout(() => {
+                    conf.style.opacity = '0';
+                    conf.style.transform += ' scale(0.5)';
+                }, 50);
+
+                // ಸ್ವಚ್ಛಗೊಳಿಸಿ
+                setTimeout(() => conf.remove(), 1000);
+            }
+        }
+    </script>
+</body>
+</html>

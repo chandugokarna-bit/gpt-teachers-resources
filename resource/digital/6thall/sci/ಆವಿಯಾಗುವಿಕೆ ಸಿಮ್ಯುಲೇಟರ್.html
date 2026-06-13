@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಸಮಗ್ರ ಆವಿಯಾಗುವಿಕೆ ಚಟುವಟಿಕೆ</title>
+    <style>
+        :root {
+            --bg-color: #f0f4f8;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+            --water-color: #4da6ff;
+            --accent-color: #2b6cb0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            margin: 0 0 10px 0;
+            color: var(--accent-color);
+        }
+
+        .controls {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        button {
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        #startBtn { background-color: #2ecc71; color: white; }
+        #startBtn:hover { background-color: #27ae60; }
+        #startBtn:disabled { background-color: #95a5a6; cursor: not-allowed; }
+
+        #resetBtn { background-color: #e74c3c; color: white; }
+        #resetBtn:hover { background-color: #c0392b; }
+
+        .timer {
+            font-size: 20px;
+            font-weight: bold;
+            font-family: monospace;
+            background: #fff;
+            padding: 10px 15px;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            width: 100%;
+            max-width: 1100px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 900px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 600px) { .grid { grid-template-columns: 1fr; } }
+
+        .sim-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            border: 2px solid #e2e8f0;
+        }
+
+        .sim-card.finished {
+            border-color: #cbd5e0;
+            background-color: #f7fafc;
+        }
+
+        .sim-card.winner {
+            border-color: #f1c40f;
+            background-color: #fffdf0;
+        }
+
+        .sim-card h3 {
+            margin: 0 0 5px 0;
+            color: #4a5568;
+            font-size: 16px;
+        }
+
+        .factor-tag {
+            font-size: 12px;
+            background: #e2e8f0;
+            padding: 3px 8px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .canvas-container {
+            position: relative;
+            width: 100%;
+            height: 200px;
+            background: #edf2f7;
+            border-radius: 8px;
+        }
+
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .stats {
+            margin-top: 10px;
+            font-size: 14px;
+            font-weight: bold;
+            width: 100%;
+            text-align: center;
+        }
+
+        .winner-badge {
+            display: none;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #f1c40f;
+            color: #000;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 12px;
+            animation: bounce 0.5s infinite alternate;
+        }
+
+        .activity-section {
+            width: 100%;
+            max-width: 900px;
+            background: #fff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        .activity-section h2 {
+            margin-top: 0;
+            color: var(--accent-color);
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th, td {
+            border: 1px solid #e2e8f0;
+            padding: 12px;
+            text-align: left;
+        }
+
+        th { background-color: #edf2f7; color: #4a5568; }
+        td.time-cell { font-family: monospace; font-weight: bold; }
+
+        @keyframes bounce {
+            from { transform: translateY(0); }
+            to { transform: translateY(-4px); }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>ಸಮಗ್ರ ಆವಿಯಾಗುವಿಕೆ ಸಿಮ್ಯುಲೇಟರ್</h1>
+        <p>ಆವಿಯಾಗುವಿಕೆಯ ಮೇಲೆ ಪ್ರಭಾವ ಬೀರುವ ಅಂಶಗಳ ತನಿಖೆ: ಮೇಲ್ಮೈ ವಿಸ್ತೀರ್ಣ, ಗಾಳಿ, ತಾಪಮಾನ, ಆರ್ದ್ರತೆ ಮತ್ತು ದ್ರವದ ಸ್ವರೂಪ.</p>
+    </header>
+
+    <div class="controls">
+        <button id="startBtn">ಸಮಯ ಪ್ರಾರಂಭಿಸಿ</button>
+        <button id="resetBtn">ಮರುಹೊಂದಿಸಿ</button>
+        <div class="timer">ವರ್ಚುವಲ್ ಸಮಯ: <span id="timeDisplay">00:00</span></div>
+    </div>
+
+    <div class="grid">
+        <div class="sim-card" id="card-bottle">
+            <div class="winner-badge" id="badge-bottle">ವಿಜೇತ!</div>
+            <h3>ಸೆಟಪ್ A: ಕಿರಿದಾದ ಬಾಟಲಿ</h3>
+            <div class="factor-tag">ನಿಯಂತ್ರಣ (ನೀರು)</div>
+            <div class="canvas-container"><canvas id="canvas-bottle"></canvas></div>
+            <div class="stats" id="stats-bottle">ದ್ರವ: 100%</div>
+        </div>
+
+        <div class="sim-card" id="card-plate">
+            <div class="winner-badge" id="badge-plate">ವಿಜೇತ!</div>
+            <h3>ಸೆಟಪ್ B: ಅಗಲವಾದ ತಟ್ಟೆ</h3>
+            <div class="factor-tag">ಮೇಲ್ಮೈ ವಿಸ್ತೀರ್ಣ ↑</div>
+            <div class="canvas-container"><canvas id="canvas-plate"></canvas></div>
+            <div class="stats" id="stats-plate">ದ್ರವ: 100%</div>
+        </div>
+
+        <div class="sim-card" id="card-fan">
+            <div class="winner-badge" id="badge-fan">ವಿಜೇತ!</div>
+            <h3>ಸೆಟಪ್ C: ಫ್ಯಾನ್ ಕೆಳಗೆ</h3>
+            <div class="factor-tag">ಗಾಳಿಯ ವೇಗ ↑</div>
+            <div class="canvas-container"><canvas id="canvas-fan"></canvas></div>
+            <div class="stats" id="stats-fan">ದ್ರವ: 100%</div>
+        </div>
+
+        <div class="sim-card" id="card-sun">
+            <div class="winner-badge" id="badge-sun">ವಿಜೇತ!</div>
+            <h3>ಸೆಟಪ್ D: ಬಿಸಿಲಿನಲ್ಲಿ</h3>
+            <div class="factor-tag">ತಾಪಮಾನ ↑</div>
+            <div class="canvas-container"><canvas id="canvas-sun"></canvas></div>
+            <div class="stats" id="stats-sun">ದ್ರವ: 100%</div>
+        </div>
+
+        <div class="sim-card" id="card-humid">
+            <div class="winner-badge" id="badge-humid">ವಿಜೇತ!</div>
+            <h3>ಸೆಟಪ್ E: ಆರ್ದ್ರ ಕೋಣೆ</h3>
+            <div class="factor-tag">ಆರ್ದ್ರತೆ ↑ (ನಿಧಾನ)</div>
+            <div class="canvas-container"><canvas id="canvas-humid"></canvas></div>
+            <div class="stats" id="stats-humid">ದ್ರವ: 100%</div>
+        </div>
+
+        <div class="sim-card" id="card-acetone">
+            <div class="winner-badge" id="badge-acetone">ವಿಜೇತ!</div>
+            <h3>ಸೆಟಪ್ F: ಅಸಿಟೋನ್</h3>
+            <div class="factor-tag">ದ್ರವದ ಸ್ವರೂಪ (ವೇಗ)</div>
+            <div class="canvas-container"><canvas id="canvas-acetone"></canvas></div>
+            <div class="stats" id="stats-acetone">ದ್ರವ: 100%</div>
+        </div>
+    </div>
+
+    <div class="activity-section">
+        <h2>ವೀಕ್ಷಣಾ ಲಾಗ್‌ಬುಕ್</h2>
+        <p>ಸಿಮ್ಯುಲೇಟರ್ ಅನ್ನು ವೀಕ್ಷಿಸಿ ಮತ್ತು ದ್ರವಗಳು ಸಂಪೂರ್ಣವಾಗಿ ಆವಿಯಾಗುವ ಕ್ರಮವನ್ನು ಗಮನಿಸಿ. ಟೇಬಲ್ ನಿಮ್ಮ ಫಲಿತಾಂಶಗಳನ್ನು ಸ್ವಯಂಚಾಲಿತವಾಗಿ ದಾಖಲಿಸುತ್ತದೆ!</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>ಸೆಟಪ್ ಹೆಸರು</th>
+                    <th>ಪರೀಕ್ಷಿಸಿದ ಅಂಶ</th>
+                    <th>ಆವಿಯಾಗುವ ಸಮಯ</th>
+                    <th>ಮುಕ್ತಾಯದ ಸ್ಥಾನ</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                <tr id="row-acetone"><td>ಸೆಟಪ್ F: ಅಸಿಟೋನ್</td><td>ದ್ರವದ ಸ್ವರೂಪ</td><td class="time-cell" id="time-acetone">--:--</td><td id="rank-acetone">-</td></tr>
+                <tr id="row-sun"><td>ಸೆಟಪ್ D: ಬಿಸಿಲಿನಲ್ಲಿ</td><td>ತಾಪಮಾನ ↑</td><td class="time-cell" id="time-sun">--:--</td><td id="rank-sun">-</td></tr>
+                <tr id="row-fan"><td>ಸೆಟಪ್ C: ಫ್ಯಾನ್ ಕೆಳಗೆ</td><td>ಗಾಳಿಯ ವೇಗ ↑</td><td class="time-cell" id="time-fan">--:--</td><td id="rank-fan">-</td></tr>
+                <tr id="row-plate"><td>ಸೆಟಪ್ B: ಅಗಲವಾದ ತಟ್ಟೆ</td><td>ಮೇಲ್ಮೈ ವಿಸ್ತೀರ್ಣ ↑</td><td class="time-cell" id="time-plate">--:--</td><td id="rank-plate">-</td></tr>
+                <tr id="row-bottle"><td>ಸೆಟಪ್ A: ಕಿರಿದಾದ ಬಾಟಲಿ</td><td>ನಿಯಂತ್ರಣ (ನೀರಿನ ಮೂಲ)</td><td class="time-cell" id="time-bottle">--:--</td><td id="rank-bottle">-</td></tr>
+                <tr id="row-humid"><td>ಸೆಟಪ್ E: ಆರ್ದ್ರ ಕೋಣೆ</td><td>ಆರ್ದ್ರತೆ ↑</td><td class="time-cell" id="time-humid">--:--</td><td id="rank-humid">-</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        const SETUPS = {
+            bottle:  { id: 'bottle',  rate: 0.015, color: 'rgba(77, 166, 255, 0.7)' },
+            plate:   { id: 'plate',   rate: 0.05,  color: 'rgba(77, 166, 255, 0.7)' },
+            fan:     { id: 'fan',     rate: 0.08,  color: 'rgba(77, 166, 255, 0.7)' },
+            sun:     { id: 'sun',     rate: 0.12,  color: 'rgba(77, 166, 255, 0.7)' },
+            humid:   { id: 'humid',   rate: 0.005, color: 'rgba(77, 166, 255, 0.7)' },
+            acetone: { id: 'acetone', rate: 0.18,  color: 'rgba(155, 89, 182, 0.7)' }
+        };
+
+        let isRunning = false;
+        let virtualMinutes = 0;
+        let animationFrameId = null;
+        let winnerDeclared = false;
+        let rankCounter = 0;
+
+        const states = {};
+        Object.keys(SETUPS).forEach(key => {
+            states[key] = { waterLevel: 100, particles: [], canvas: null, ctx: null, finished: false };
+        });
+
+        const startBtn = document.getElementById('startBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const timeDisplay = document.getElementById('timeDisplay');
+
+        function initCanvases() {
+            Object.keys(SETUPS).forEach(key => {
+                const canvas = document.getElementById(`canvas-${key}`);
+                canvas.width = canvas.parentElement.clientWidth;
+                canvas.height = canvas.parentElement.clientHeight;
+                states[key].canvas = canvas;
+                states[key].ctx = canvas.getContext('2d');
+            });
+        }
+
+        class Particle {
+            constructor(x, y, type) {
+                this.x = x;
+                this.y = y;
+                this.size = Math.random() * 3 + 1;
+                this.speedY = -(Math.random() * 1 + 0.5);
+                this.speedX = (Math.random() - 0.5) * 0.5;
+                this.alpha = 1;
+                this.type = type;
+
+                if (type === 'fan') {
+                    this.speedX = Math.random() * 2 + 1; 
+                    this.speedY = -(Math.random() * 0.5 + 0.2);
+                } else if (type === 'sun') {
+                    this.speedY = -(Math.random() * 2 + 1);
+                } else if (type === 'humid') {
+                    this.speedY = -(Math.random() * 0.3 + 0.1);
+                } else if (type === 'acetone') {
+                    this.speedY = -(Math.random() * 2.5 + 1);
+                }
+            }
+
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                this.alpha -= 0.01;
+            }
+
+            draw(ctx) {
+                ctx.save();
+                ctx.globalAlpha = this.alpha;
+                ctx.fillStyle = '#a5d6a7'; 
+                if (this.type === 'sun') ctx.fillStyle = '#ffcc80'; 
+                if (this.type === 'fan') ctx.fillStyle = '#b3e5fc';
+                if (this.type === 'acetone') ctx.fillStyle = '#d2b4de'; 
+                if (this.type === 'humid') ctx.fillStyle = '#cfd8dc'; 
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        function drawEnvironment(key, ctx, w, h, waterY) {
+            ctx.clearRect(0, 0, w, h);
+
+            if (key === 'sun') {
+                ctx.fillStyle = 'rgba(255, 204, 0, 0.2)';
+                ctx.beginPath(); ctx.arc(w - 30, 30, 40, 0, Math.PI*2); ctx.fill();
+                ctx.fillStyle = '#ffcc00';
+                ctx.beginPath(); ctx.arc(w - 30, 30, 20, 0, Math.PI*2); ctx.fill();
+            }
+            if (key === 'fan') {
+                ctx.strokeStyle = 'rgba(179, 229, 252, 0.6)';
+                ctx.lineWidth = 2;
+                for(let i=0; i<3; i++) {
+                    let lineY = 30 + i*25 + (Date.now() % 200) / 5;
+                    ctx.beginPath(); ctx.moveTo(20, lineY); ctx.lineTo(80, lineY + 10); ctx.stroke();
+                }
+            }
+            if (key === 'humid') {
+                ctx.fillStyle = 'rgba(207, 216, 220, 0.4)';
+                ctx.beginPath(); ctx.arc(w/2, 50, 60, 0, Math.PI, true); ctx.fill();
+            }
+
+            ctx.lineWidth = 4;
+            ctx.strokeStyle = '#718096';
+            ctx.fillStyle = SETUPS[key].color; 
+
+            if (key === 'bottle') {
+                let left = w/2 - 25, right = w/2 + 25, top = 50, bottom = h - 10;
+                if(waterY < bottom) {
+                    ctx.beginPath(); ctx.moveTo(left, waterY); ctx.lineTo(right, waterY); ctx.lineTo(right, bottom); ctx.lineTo(left, bottom); ctx.fill();
+                }
+                ctx.beginPath(); ctx.moveTo(w/2 - 15, top); ctx.lineTo(w/2 - 15, top + 30); ctx.lineTo(left, top + 50); ctx.lineTo(left, bottom); ctx.lineTo(right, bottom); ctx.lineTo(right, top + 50); ctx.lineTo(w/2 + 15, top + 30); ctx.lineTo(w/2 + 15, top); ctx.stroke();
+            } else if (key === 'plate') {
+                let left = 20, right = w - 20, bottom = h - 15, plateTop = bottom - 25;
+                if(waterY < bottom) {
+                    ctx.beginPath(); ctx.moveTo(left + 10, waterY); ctx.lineTo(right - 10, waterY); ctx.lineTo(right - 15, bottom); ctx.lineTo(left + 15, bottom); ctx.fill();
+                }
+                ctx.beginPath(); ctx.moveTo(left, plateTop); ctx.lineTo(left + 15, bottom); ctx.lineTo(right - 15, bottom); ctx.lineTo(right, plateTop); ctx.stroke();
+            } else {
+                let left = w/2 - 45, right = w/2 + 45, top = 60, bottom = h - 10;
+                if(waterY < bottom) {
+                    ctx.beginPath(); ctx.moveTo(left, waterY); ctx.lineTo(right, waterY); ctx.lineTo(right, bottom); ctx.lineTo(left, bottom); ctx.fill();
+                }
+                ctx.beginPath(); ctx.moveTo(left, top); ctx.lineTo(left, bottom); ctx.lineTo(right, bottom); ctx.lineTo(right, top); ctx.stroke();
+            }
+        }
+
+        function getWaterSurfaceBounds(key, w) {
+            if (key === 'bottle') return { minX: w/2 - 23, maxX: w/2 + 23 };
+            if (key === 'plate') return { minX: 35, maxX: w - 35 };
+            return { minX: w/2 - 43, maxX: w/2 + 43 };
+        }
+
+        function formatTime(minutes) {
+            let displayMins = Math.floor(minutes);
+            let displaySecs = Math.floor((minutes % 1) * 60);
+            return `${displayMins.toString().padStart(2, '0')}:${displaySecs.toString().padStart(2, '0')}`;
+        }
+
+        function getOrdinal(n) {
+            return n + "ನೇ";
+        }
+
+        function updateSimulation() {
+            if (!isRunning) return;
+
+            virtualMinutes += 0.5;
+            const currentTimeStr = formatTime(virtualMinutes);
+            timeDisplay.innerText = currentTimeStr;
+
+            let activeSimulations = 0;
+
+            Object.keys(SETUPS).forEach(key => {
+                const config = SETUPS[key];
+                const state = states[key];
+                const w = state.canvas.width, h = state.canvas.height;
+                let topLimit = (key === 'bottle') ? 100 : (key === 'plate') ? h - 35 : 85;
+                let bottomLimit = h - 12;
+                let liquidSpan = bottomLimit - topLimit;
+
+                if (state.waterLevel > 0) {
+                    activeSimulations++;
+                    state.waterLevel -= config.rate;
+                    
+                    if (state.waterLevel <= 0) {
+                        state.waterLevel = 0;
+                        state.finished = true;
+                        rankCounter++;
+                        
+                        let card = document.getElementById(`card-${key}`);
+                        card.classList.add('finished');
+                        
+                        if (!winnerDeclared) {
+                            winnerDeclared = true;
+                            card.classList.add('winner');
+                            document.getElementById(`badge-${key}`).style.display = 'block';
+                        }
+
+                        document.getElementById(`time-${key}`).innerText = currentTimeStr;
+                        document.getElementById(`rank-${key}`).innerText = getOrdinal(rankCounter);
+                    }
+                }
+
+                let currentWaterY = bottomLimit - (liquidSpan * (state.waterLevel / 100));
+                document.getElementById(`stats-${key}`).innerText = `ದ್ರವ: ${Math.ceil(state.waterLevel)}%`;
+
+                if (state.waterLevel > 0 && Math.random() < (config.rate * 8)) {
+                    let bounds = getWaterSurfaceBounds(key, w);
+                    state.particles.push(new Particle(Math.random() * (bounds.maxX - bounds.minX) + bounds.minX, currentWaterY, key));
+                }
+
+                drawEnvironment(key, state.ctx, w, h, currentWaterY);
+
+                state.particles.forEach((p, index) => {
+                    p.update();
+                    if (p.alpha <= 0 || p.y < 0 || p.x < 0 || p.x > w) state.particles.splice(index, 1);
+                    else p.draw(state.ctx);
+                });
+            });
+
+            if (activeSimulations === 0) {
+                isRunning = false;
+                startBtn.disabled = true;
+                return;
+            }
+            animationFrameId = requestAnimationFrame(updateSimulation);
+        }
+
+        startBtn.addEventListener('click', () => {
+            if (!isRunning) {
+                isRunning = true;
+                startBtn.innerText = "ವಿರಾಮ";
+                updateSimulation();
+            } else {
+                isRunning = false;
+                startBtn.innerText = "ಮುಂದುವರಿಸಿ";
+                cancelAnimationFrame(animationFrameId);
+            }
+        });
+
+        resetBtn.addEventListener('click', () => {
+            isRunning = false;
+            winnerDeclared = false;
+            rankCounter = 0;
+            cancelAnimationFrame(animationFrameId);
+            virtualMinutes = 0;
+            timeDisplay.innerText = "00:00";
+            startBtn.innerText = "ಸಮಯ ಪ್ರಾರಂಭಿಸಿ";
+            startBtn.disabled = false;
+
+            Object.keys(SETUPS).forEach(key => {
+                states[key].waterLevel = 100;
+                states[key].particles = [];
+                states[key].finished = false;
+                
+                let card = document.getElementById(`card-${key}`);
+                card.classList.remove('winner', 'finished');
+                document.getElementById(`badge-${key}`).style.display = 'none';
+                document.getElementById(`stats-${key}`).innerText = "ದ್ರವ: 100%";
+                
+                document.getElementById(`time-${key}`).innerText = "--:--";
+                document.getElementById(`rank-${key}`).innerText = "-";
+
+                let topLimit = (key === 'bottle') ? 100 : (key === 'plate') ? states[key].canvas.height - 35 : 85;
+                drawEnvironment(key, states[key].ctx, states[key].canvas.width, states[key].canvas.height, topLimit);
+            });
+        });
+
+        window.addEventListener('load', () => { initCanvases(); resetBtn.click(); });
+        window.addEventListener('resize', () => { initCanvases(); resetBtn.click(); });
+    </script>
+</body>
+</html>

@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಸಂವಾದಾತ್ಮಕ ಉಷ್ಣ ಪ್ರಯೋಗಾಲಯ (Interactive Temperature Lab)</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #f0fdf4;
+            color: #1e293b;
+            padding: 2rem;
+            margin: 0;
+        }
+        .sandbox {
+            background: white;
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+        }
+        .visual-area {
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-end;
+            margin: 2rem 0;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e2e8f0;
+            height: 280px;
+        }
+        
+        /* Thermometer Styling */
+        .thermometer-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 20%;
+        }
+        .glass {
+            width: 24px;
+            height: 200px;
+            background: #f1f5f9;
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: flex-end;
+            border: 2px solid #cbd5e1;
+        }
+        .fill {
+            width: 100%;
+            transition: height 0.15s ease-out;
+        }
+        #fill-c { background-color: #ef4444; }
+        #fill-f { background-color: #f59e0b; }
+        #fill-k { background-color: #10b981; }
+        .value-label {
+            margin-top: 12px;
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        /* Beaker & Water Styling */
+        .beaker-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 30%;
+        }
+        .beaker {
+            width: 120px;
+            height: 140px;
+            border: 4px solid #94a3b8;
+            border-top: none;
+            border-radius: 0 0 20px 20px;
+            position: relative;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.5);
+            display: flex;
+            align-items: flex-end;
+        }
+        
+        .water {
+            width: 100%;
+            height: 70%;
+            transition: all 0.5s ease;
+            position: relative;
+        }
+
+        /* Water States */
+        .state-liquid {
+            background-color: #3b82f6;
+            opacity: 0.8;
+            border-radius: 0 0 16px 16px;
+        }
+        .state-ice {
+            background-color: #a5f3fc;
+            opacity: 0.9;
+            border-top: 4px solid #fff;
+            border-radius: 0 0 16px 16px;
+        }
+        .state-boiling {
+            background-color: #ef4444;
+            opacity: 0.7;
+            border-radius: 0 0 16px 16px;
+            animation: boil 0.5s infinite alternate;
+        }
+
+        /* Bubbles for boiling effect */
+        .bubbles {
+            display: none;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: radial-gradient(circle, rgba(255,255,255,0.8) 20%, transparent 20%);
+            background-size: 20px 20px;
+            animation: rise 1s infinite linear;
+        }
+        .state-boiling .bubbles {
+            display: block;
+        }
+
+        @keyframes boil {
+            0% { height: 70%; }
+            100% { height: 75%; }
+        }
+        @keyframes rise {
+            0% { background-position: 0 20px; }
+            100% { background-position: 0 0; }
+        }
+
+        .beaker-label {
+            margin-top: 12px;
+            font-weight: bold;
+            color: #475569;
+        }
+
+        /* Controls */
+        .slider-container {
+            margin-top: 1rem;
+            background: #f8fafc;
+            padding: 1.5rem;
+            border-radius: 12px;
+        }
+        input[type="range"] {
+            width: 100%;
+            margin: 1rem 0;
+            cursor: pointer;
+            accent-color: #3b82f6;
+        }
+        .fact-box {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background: #e0f2fe;
+            border-left: 4px solid #0284c7;
+            border-radius: 4px;
+            font-size: 1rem;
+            min-height: 48px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sandbox">
+        <h2>ಸಂವಾದಾತ್ಮಕ ಉಷ್ಣ ಪ್ರಯೋಗಾಲಯ</h2>
+        <p>ತಾಪಮಾನದೊಂದಿಗೆ ನೀರಿನ ಭೌತಿಕ ಸ್ಥಿತಿ ಹೇಗೆ ಬದಲಾಗುತ್ತದೆ ಎಂಬುದನ್ನು ವೀಕ್ಷಿಸಿ!</p>
+
+        <div class="visual-area">
+            <div class="thermometer-wrapper">
+                <div class="glass"><div class="fill" id="fill-c"></div></div>
+                <div class="value-label" id="val-c">0 °C</div>
+            </div>
+            
+            <div class="beaker-container">
+                <div class="beaker">
+                    <div class="water state-liquid" id="water-visual">
+                        <div class="bubbles"></div>
+                    </div>
+                </div>
+                <div class="beaker-label" id="state-label">ದ್ರವ ನೀರು (Liquid)</div>
+            </div>
+
+            <div class="thermometer-wrapper">
+                <div class="glass"><div class="fill" id="fill-f"></div></div>
+                <div class="value-label" id="val-f">32 °F</div>
+            </div>
+            <div class="thermometer-wrapper">
+                <div class="glass"><div class="fill" id="fill-k"></div></div>
+                <div class="value-label" id="val-k">273 K</div>
+            </div>
+        </div>
+
+        <div class="slider-container">
+            <label for="heatSlider"><strong>ಉಷ್ಣವನ್ನು ಸೇರಿಸಿ ಅಥವಾ ತೆಗೆದುಹಾಕಿ (Heat Control)</strong></label>
+            <input type="range" id="heatSlider" min="-273.15" max="150" value="37" step="0.1">
+        </div>
+
+        <div class="fact-box" id="factBox">
+            37°C ನಲ್ಲಿ, ನೀವು ಸಾಮಾನ್ಯ ಮಾನವ ದೇಹದ ತಾಪಮಾನವನ್ನು ನೋಡುತ್ತಿರುವಿರಿ!
+        </div>
+    </div>
+
+    <script>
+        const slider = document.getElementById('heatSlider');
+        const fillC = document.getElementById('fill-c');
+        const fillF = document.getElementById('fill-f');
+        const fillK = document.getElementById('fill-k');
+        
+        const valC = document.getElementById('val-c');
+        const valF = document.getElementById('val-f');
+        const valK = document.getElementById('val-k');
+        
+        const waterVisual = document.getElementById('water-visual');
+        const stateLabel = document.getElementById('state-label');
+        const factBox = document.getElementById('factBox');
+
+        function updateLab() {
+            let c = parseFloat(slider.value);
+            let f = (c * 9/5) + 32;
+            let k = c + 273.15;
+
+            // Update numerical labels
+            valC.innerText = Math.round(c * 10) / 10 + ' °C';
+            valF.innerText = Math.round(f * 10) / 10 + ' °F';
+            valK.innerText = Math.round(k * 10) / 10 + ' K';
+
+            // Calculate fill heights (capped visual range for better UI)
+            let minVisual = -273.15;
+            let maxVisual = 150;
+            let range = maxVisual - minVisual;
+            let percent = ((c - minVisual) / range) * 100;
+            
+            fillC.style.height = percent + '%';
+            fillF.style.height = percent + '%';
+            fillK.style.height = percent + '%';
+
+            // Update Water Visuals and States
+            waterVisual.className = 'water'; // Reset classes
+            
+            if (c < 0) {
+                waterVisual.classList.add('state-ice');
+                stateLabel.innerText = "ಘನ (ಮಂಜುಗಡ್ಡೆ)";
+            } else if (c >= 100) {
+                waterVisual.classList.add('state-boiling');
+                stateLabel.innerText = "ಅನಿಲ (ಉಗಿ / ಕುದಿಯುವಿಕೆ)";
+            } else {
+                waterVisual.classList.add('state-liquid');
+                stateLabel.innerText = "ದ್ರವ ನೀರು";
+            }
+
+            // Update educational facts in Kannada
+            if (c === -273.15) {
+                factBox.innerHTML = "<strong>ಪರಮ ಶೂನ್ಯ (Absolute Zero - 0 K):</strong> ಎಲ್ಲಾ ಆಣ್ವಿಕ ಚಲನೆಗಳು ಸಂಪೂರ್ಣವಾಗಿ ನಿಲ್ಲುತ್ತವೆ! ಇದಕ್ಕಿಂತ ತಂಪಾಗಲು ಸಾಧ್ಯವಿಲ್ಲ.";
+            } else if (c < 0) {
+                factBox.innerHTML = "0°C (32°F) ಗಿಂತ ಕೆಳಗೆ, ನೀರಿನ ಅಣುಗಳು ಗಟ್ಟಿಯಾದ ಸ್ಫಟಿಕ ರಚನೆಗೆ ಲಾಕ್ ಆಗಿ ಮಂಜುಗಡ್ಡೆಯಾಗುತ್ತವೆ.";
+            } else if (c > -1 && c < 1) {
+                factBox.innerHTML = "<strong>0°C / 32°F / 273.15 K:</strong> ನೀರಿನ ನಿಖರವಾದ ಘನೀಕರಿಸುವ/ಕರಗುವ ಬಿಂದು (Freezing/Melting point).";
+            } else if (c > 36 && c < 38) {
+                factBox.innerHTML = "<strong>37°C / 98.6°F:</strong> ಸಾಮಾನ್ಯ ಮಾನವ ದೇಹದ ತಾಪಮಾನ. ದ್ರವ ನೀರಿಗೆ ಸೂಕ್ತವಾಗಿದೆ!";
+            } else if (c > 99 && c < 101) {
+                factBox.innerHTML = "<strong>100°C / 212°F / 373.15 K:</strong> ಕುದಿಯುವ ಬಿಂದು! ನೀರು ವೇಗವಾಗಿ ಅನಿಲವಾಗಿ ಬದಲಾಗುತ್ತದೆ.";
+            } else if (c > 100) {
+                factBox.innerHTML = "100°C ಗಿಂತ ಹೆಚ್ಚಿನ ತಾಪಮಾನದಲ್ಲಿ, ನೀರಿನ ಅಣುಗಳು ಹೆಚ್ಚಿನ ಶಕ್ತಿಯನ್ನು ಹೊಂದಿ ಉಗಿಯಾಗಿ ಹೊರಹೊಮ್ಮುತ್ತವೆ.";
+            } else {
+                factBox.innerHTML = "ತಾಪಮಾನ ಮಾಪಕಗಳು ಒಟ್ಟಿಗೆ ಏರುತ್ತಿರುವಾಗ ನೀರು ದ್ರವ ಸ್ಥಿತಿಯಲ್ಲಿಯೇ ಇರುವುದನ್ನು ಗಮನಿಸಿ.";
+            }
+        }
+
+        slider.addEventListener('input', updateLab);
+        updateLab(); // Run once on load
+    </script>
+</body>
+</html>

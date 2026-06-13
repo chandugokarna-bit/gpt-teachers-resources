@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <title>ವರ್ಣಮಯ ಭ್ರಮಣ ಸಮಮಿತಿ</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; background: linear-gradient(135deg, #fdfcfb 0%, #e2d1c3 100%); padding: 20px; }
+        canvas { background: white; border: 5px solid #333; border-radius: 15px; box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
+        .controls { background: rgba(255,255,255,0.9); padding: 20px; border-radius: 15px; display: inline-block; margin-bottom: 20px; border: 2px solid #ddd; }
+        select, input { padding: 10px; font-size: 16px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>ವರ್ಣಮಯ ಭ್ರಮಣ ಸಮಮಿತಿ (Colorful Rotational Symmetry)</h1>
+    <p>ಆಕೃತಿಯನ್ನು ತಿರುಗಿಸಿ ಮತ್ತು ಅದು ಬಣ್ಣ ಬದಲಾಯಿಸುವುದನ್ನು ಗಮನಿಸಿ!</p>
+    
+    <div class="controls">
+        <label>ಆಕೃತಿಯನ್ನು ಆಯ್ಕೆ ಮಾಡಿ: </label>
+        <select id="shapeSelect" onchange="draw()">
+            <option value="triangle">ತ್ರಿಕೋನ</option>
+            <option value="square">ಚೌಕ</option>
+            <option value="rectangle">ಆಯತ</option>
+            <option value="pentagon">ಪಂಚಭುಜ</option>
+            <option value="hexagon">ಷಡ್ಭುಜ</option>
+        </select>
+        <br><br>
+        <label>ತಿರುಗಿಸಿ: </label>
+        <input type="range" id="angleRange" min="0" max="360" value="0" oninput="draw()">
+        <span id="angleVal" style="font-weight:bold; color: #ff4500;">0°</span>
+    </div>
+    <br>
+    <canvas id="canvas" width="400" height="400"></canvas>
+
+    <script>
+        function drawShape(ctx, shape, color, opacity, fill) {
+            ctx.beginPath();
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 6;
+            ctx.globalAlpha = opacity;
+            ctx.fillStyle = fill;
+            
+            if(shape === 'triangle') {
+                ctx.moveTo(0, -100); ctx.lineTo(86, 50); ctx.lineTo(-86, 50);
+            } else if(shape === 'square') {
+                ctx.rect(-75, -75, 150, 150);
+            } else if(shape === 'rectangle') {
+                ctx.rect(-100, -50, 200, 100);
+            } else if(shape === 'pentagon') {
+                for(let i=0; i<5; i++) {
+                    let a = i * 2 * Math.PI / 5 - Math.PI/2;
+                    ctx.lineTo(100 * Math.cos(a), 100 * Math.sin(a));
+                }
+            } else if(shape === 'hexagon') {
+                for(let i=0; i<6; i++) {
+                    let a = i * 2 * Math.PI / 6;
+                    ctx.lineTo(100 * Math.cos(a), 100 * Math.sin(a));
+                }
+            }
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+            ctx.globalAlpha = 1.0;
+        }
+
+        function draw() {
+            const canvas = document.getElementById('canvas');
+            const ctx = canvas.getContext('2d');
+            const shape = document.getElementById('shapeSelect').value;
+            const angle = document.getElementById('angleRange').value;
+            
+            // ಬಣ್ಣವನ್ನು ಕೋನಕ್ಕೆ ಅನುಗುಣವಾಗಿ ಬದಲಾಯಿಸುವುದು (Dynamic Color)
+            const hue = angle; 
+            document.getElementById('angleVal').innerText = angle + "°";
+            document.getElementById('angleVal').style.color = `hsl(${hue}, 100%, 40%)`;
+
+            ctx.clearRect(0, 0, 400, 400);
+            
+            // ಹಿನ್ನೆಲೆ ಸ್ಥಿರ ಆಕೃತಿ
+            ctx.save();
+            ctx.translate(200, 200);
+            drawShape(ctx, shape, '#ccc', 0.3, 'rgba(200,200,200,0.1)'); 
+            
+            // ವರ್ಣಮಯ ತಿರುಗುವ ಆಕೃತಿ
+            ctx.rotate(angle * Math.PI / 180);
+            drawShape(ctx, shape, `hsl(${hue}, 80%, 50%)`, 0.8, `hsla(${hue}, 80%, 70%, 0.5)`);
+            ctx.restore();
+        }
+        draw();
+    </script>
+</body>
+</html>

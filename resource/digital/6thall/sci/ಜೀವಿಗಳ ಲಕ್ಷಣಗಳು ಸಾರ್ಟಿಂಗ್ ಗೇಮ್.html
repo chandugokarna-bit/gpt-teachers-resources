@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <title>ಜೀವಿ vs ನಿರ್ಜೀವಿ - ಮೋಜಿನ ಆಟ</title>
+    <style>
+        body { font-family: 'Arial', sans-serif; background: linear-gradient(135deg, #74ebd5, #9face6); text-align: center; padding: 20px; }
+        h1 { color: white; text-shadow: 2px 2px 4px #000; }
+        .game-container { display: flex; justify-content: center; gap: 30px; margin-top: 20px; }
+        
+        .box { width: 220px; height: 350px; border: 4px dashed white; border-radius: 15px; 
+               background: rgba(255,255,255,0.2); display: flex; flex-direction: column; align-items: center; padding: 10px; }
+        
+        .item { width: 160px; padding: 12px; margin: 8px; background: white; border-radius: 8px; 
+                cursor: grab; font-weight: bold; color: #333; box-shadow: 0 4px 6px rgba(0,0,0,0.2); 
+                transition: transform 0.2s; user-select: none; }
+        .item:hover { transform: scale(1.05); }
+
+        #items-pool { display: flex; flex-wrap: wrap; width: 320px; justify-content: center; align-content: flex-start; }
+    </style>
+</head>
+<body>
+
+    <h1>ಜೀವಿಗಳ ಲಕ್ಷಣಗಳು: ಸಾರ್ಟಿಂಗ್ ಗೇಮ್! 🧩</h1>
+    <p>ವಸ್ತುಗಳನ್ನು ಸರಿಯಾದ ಜಾಗಕ್ಕೆ ಎಳೆಯಿರಿ (ಪ್ರತಿ ಬಾರಿ ಕ್ರಮ ಬದಲಾಗುತ್ತದೆ!)</p>
+
+    <div class="game-container">
+        <div class="box" id="living-box" ondrop="drop(event)" ondragover="allowDrop(event)">
+            <h3 style="color:white;">ಜೀವಿಗಳು (Living)</h3>
+        </div>
+        
+        <div id="items-pool"></div>
+
+        <div class="box" id="nonliving-box" ondrop="drop(event)" ondragover="allowDrop(event)">
+            <h3 style="color:white;">ನಿರ್ಜೀವಿಗಳು (Non-living)</h3>
+        </div>
+    </div>
+
+    <script>
+        const itemsData = [
+            {id: 'dog', name: 'ನಾಯಿ 🐕', type: 'living'},
+            {id: 'tree', name: 'ಮರ 🌳', type: 'living'},
+            {id: 'butterfly', name: 'ಚಿಟ್ಟೆ 🦋', type: 'living'},
+            {id: 'sunflower', name: 'ಸೂರ್ಯಕಾಂತಿ 🌻', type: 'living'},
+            {id: 'stone', name: 'ಕಲ್ಲು 🪨', type: 'nonliving'},
+            {id: 'car', name: 'ಕಾರು 🚗', type: 'nonliving'},
+            {id: 'book', name: 'ಪುಸ್ತಕ 📚', type: 'nonliving'},
+            {id: 'robot', name: 'ರೋಬೋಟ್ 🤖', type: 'nonliving'}
+        ];
+
+        // Shuffle logic
+        const pool = document.getElementById('items-pool');
+        const shuffled = itemsData.sort(() => Math.random() - 0.5);
+
+        shuffled.forEach(item => {
+            let div = document.createElement('div');
+            div.className = 'item';
+            div.draggable = true;
+            div.id = item.id;
+            div.innerText = item.name;
+            div.dataset.type = item.type;
+            div.ondragstart = (ev) => ev.dataTransfer.setData("text", ev.target.id);
+            pool.appendChild(div);
+        });
+
+        function allowDrop(ev) { ev.preventDefault(); }
+
+        function drop(ev) {
+            ev.preventDefault();
+            const data = ev.dataTransfer.getData("text");
+            const draggedElement = document.getElementById(data);
+            const targetBox = ev.target.closest('.box');
+
+            if (!targetBox) return;
+
+            const isLivingBox = targetBox.id === 'living-box';
+            const isCorrect = (isLivingBox && draggedElement.dataset.type === 'living') ||
+                              (!isLivingBox && draggedElement.dataset.type === 'nonliving');
+
+            if (isCorrect) {
+                targetBox.appendChild(draggedElement);
+                // ಸಣ್ಣದಾದ ವಿಜಯದ ಧ್ವನಿ/ಸಂದೇಶ
+                console.log("ಸರಿಯಾದ ಉತ್ತರ!");
+            } else {
+                alert("ಅಯ್ಯೋ! ಇದು ಸರಿಯಾದ ವಿಭಾಗವಲ್ಲ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ! ❌");
+            }
+        }
+    </script>
+</body>
+</html>

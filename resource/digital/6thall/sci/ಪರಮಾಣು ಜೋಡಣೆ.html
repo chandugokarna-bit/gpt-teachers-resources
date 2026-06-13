@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಪರಮಾಣು ಜೋಡಣೆ ಪ್ರಯೋಗಾಲಯ</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #0d1117;
+            color: #c9d1d9;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        h1 {
+            color: #58a6ff;
+            margin-bottom: 10px;
+        }
+        .description {
+            max-width: 600px;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+            color: #8b949e;
+            height: 60px; /* Keep height consistent */
+        }
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        button {
+            background-color: #21262d;
+            color: #c9d1d9;
+            border: 1px solid #30363d;
+            padding: 10px 25px;
+            font-size: 1.1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        button:hover {
+            background-color: #30363d;
+        }
+        button.active {
+            background-color: #1f6feb;
+            color: white;
+            border-color: #58a6ff;
+            box-shadow: 0 0 15px rgba(88, 166, 255, 0.4);
+        }
+        canvas {
+            background-color: #161b22;
+            border: 2px solid #30363d;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+    </style>
+</head>
+<body>
+
+    <h1>ಪರಮಾಣು ಜೋಡಣೆ ಸಿಮ್ಯುಲೇಟರ್</h1>
+    
+    <div class="description" id="descText">
+        ಪರಮಾಣುಗಳು ಹೇಗೆ ಜೋಡಿಸಲ್ಪಟ್ಟಿವೆ ಮತ್ತು ಅವು ಹೇಗೆ ಚಲಿಸುತ್ತವೆ ಎಂಬುದನ್ನು ವೀಕ್ಷಿಸಲು ವಸ್ತುವಿನ ಸ್ಥಿತಿಯನ್ನು ಆಯ್ಕೆಮಾಡಿ.
+    </div>
+
+    <div class="controls">
+        <button id="btnSolid" onclick="setState('solid')">ಘನ (Solid)</button>
+        <button id="btnLiquid" onclick="setState('liquid')">ದ್ರವ (Liquid)</button>
+        <button id="btnGas" onclick="setState('gas')">ಅನಿಲ (Gas)</button>
+    </div>
+
+    <canvas id="simCanvas" width="500" height="400"></canvas>
+
+    <script>
+        const canvas = document.getElementById('simCanvas');
+        const ctx = canvas.getContext('2d');
+        const descText = document.getElementById('descText');
+        
+        let currentState = 'solid';
+        let particles = [];
+        const numParticles = 100; // 10x10 grid for solid
+        const radius = 10;
+
+        // Information for each state in Kannada
+        const descriptions = {
+            solid: "<b>ಘನ (Solid):</b> ಪರಮಾಣುಗಳು ಬಿಗಿಯಾಗಿ, ಒಂದು ನಿರ್ದಿಷ್ಟ ಆಕಾರದಲ್ಲಿ ಜೋಡಿಸಲ್ಪಟ್ಟಿರುತ್ತವೆ. ಅವು ತಮ್ಮ ಸ್ಥಳಗಳನ್ನು ಬದಲಾಯಿಸಲು ಸಾಧ್ಯವಿಲ್ಲ; ಅವು ಕೇವಲ ಕಂಪಿಸುತ್ತವೆ (vibrate).",
+            liquid: "<b>ದ್ರವ (Liquid):</b> ಪರಮಾಣುಗಳು ಹತ್ತಿರದಲ್ಲಿರುತ್ತವೆ ಆದರೆ ಯಾದೃಚ್ಛಿಕವಾಗಿ ಜೋಡಿಸಲ್ಪಟ್ಟಿರುತ್ತವೆ. ಅವು ಒಂದಕ್ಕೊಂದು ಜಾರುತ್ತವೆ ಮತ್ತು ಹರಿಯುತ್ತವೆ, ತಳದಲ್ಲಿ ಶೇಖರಗೊಳ್ಳುತ್ತವೆ.",
+            gas: "<b>ಅನಿಲ (Gas):</b> ಪರಮಾಣುಗಳು ಯಾವುದೇ ಜೋಡಣೆಯಿಲ್ಲದೆ ದೂರ ದೂರವಿರುತ್ತವೆ. ಅವು ಹೆಚ್ಚಿನ ವೇಗದಲ್ಲಿ ಚಲಿಸುತ್ತವೆ, ಇಡೀ ಸ್ಥಳವನ್ನು ಆಕ್ರಮಿಸಿಕೊಳ್ಳುತ್ತವೆ."
+        };
+
+        // Initialize particles with grid targets
+        function initParticles() {
+            particles = [];
+            let index = 0;
+            for (let row = 0; row < 10; row++) {
+                for (let col = 0; col < 10; col++) {
+                    particles.push({
+                        // Grid positions strictly in the center
+                        targetX: 135 + col * 25,
+                        targetY: 85 + row * 25,
+                        // Current positions
+                        x: 135 + col * 25,
+                        y: 85 + row * 25,
+                        // Velocities for liquid and gas
+                        vx: (Math.random() - 0.5) * 4,
+                        vy: (Math.random() - 0.5) * 4
+                    });
+                    index++;
+                }
+            }
+        }
+
+        // Change the active state
+        function setState(newState) {
+            currentState = newState;
+            
+            // Update UI
+            document.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('btn' + newState.charAt(0).toUpperCase() + newState.slice(1)).classList.add('active');
+            descText.innerHTML = descriptions[newState];
+
+            // Give particles a random "kick" when switching to liquid or gas
+            if (newState !== 'solid') {
+                particles.forEach(p => {
+                    p.vx = (Math.random() - 0.5) * (newState === 'gas' ? 10 : 2);
+                    p.vy = (Math.random() - 0.5) * (newState === 'gas' ? 10 : 2);
+                });
+            }
+        }
+
+        // Draw a single glowing atom
+        function drawAtom(x, y, state) {
+            let color = state === 'solid' ? '#3fb950' : (state === 'liquid' ? '#58a6ff' : '#ff7b72');
+            
+            ctx.beginPath();
+            ctx.arc(x, y, radius, 0, Math.PI * 2);
+            ctx.fillStyle = color;
+            ctx.fill();
+            
+            // Add a highlight to make it look like a 3D sphere
+            ctx.beginPath();
+            ctx.arc(x - 3, y - 3, radius * 0.4, 0, Math.PI * 2);
+            ctx.fillStyle = "rgba(255, 255, 255, 0.6)";
+            ctx.fill();
+        }
+
+        // Main animation loop
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            particles.forEach(p => {
+                if (currentState === 'solid') {
+                    // Pull back to grid position (spring effect)
+                    p.x += (p.targetX - p.x) * 0.1;
+                    p.y += (p.targetY - p.y) * 0.1;
+                    
+                    // Add tiny vibration
+                    let vibrateX = p.x + (Math.random() - 0.5) * 2;
+                    let vibrateY = p.y + (Math.random() - 0.5) * 2;
+                    drawAtom(vibrateX, vibrateY, currentState);
+                } 
+                else if (currentState === 'liquid') {
+                    // Gravity pulling down
+                    p.vy += 0.2; 
+                    p.x += p.vx;
+                    p.y += p.vy;
+
+                    // Keep atoms pooled in the bottom half
+                    if (p.x < radius) { p.x = radius; p.vx *= -0.5; }
+                    if (p.x > canvas.width - radius) { p.x = canvas.width - radius; p.vx *= -0.5; }
+                    
+                    if (p.y > canvas.height - radius) {
+                        p.y = canvas.height - radius;
+                        p.vy *= -0.3; // Dampened bounce
+                        p.vx += (Math.random() - 0.5) * 1.5; // Slide sideways randomly
+                    }
+                    
+                    // Gentle ceiling to keep them from splashing too high
+                    if (p.y < canvas.height / 2) {
+                        p.vy += 1;
+                    }
+
+                    drawAtom(p.x, p.y, currentState);
+                } 
+                else if (currentState === 'gas') {
+                    // Fly around rapidly
+                    p.x += p.vx;
+                    p.y += p.vy;
+
+                    // Perfect bouncing off all walls
+                    if (p.x < radius || p.x > canvas.width - radius) p.vx *= -1;
+                    if (p.y < radius || p.y > canvas.height - radius) p.vy *= -1;
+
+                    // Ensure they don't get stuck in walls
+                    p.x = Math.max(radius, Math.min(canvas.width - radius, p.x));
+                    p.y = Math.max(radius, Math.min(canvas.height - radius, p.y));
+
+                    drawAtom(p.x, p.y, currentState);
+                }
+            });
+
+            requestAnimationFrame(animate);
+        }
+
+        // Start everything
+        initParticles();
+        setState('solid');
+        animate();
+    </script>
+</body>
+</html>

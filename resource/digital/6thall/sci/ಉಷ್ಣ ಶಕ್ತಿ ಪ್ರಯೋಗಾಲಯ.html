@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ವಸ್ತುವಿನ ಮೇಲೆ ತಾಪಮಾನದ ಪ್ರಭಾವ</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+        .dashboard {
+            background: rgba(30, 41, 59, 0.8);
+            padding: 20px 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            margin-bottom: 20px;
+            z-index: 10;
+            border: 1px solid #334155;
+            backdrop-filter: blur(10px);
+            width: 80%;
+            max-width: 600px;
+        }
+        h1 {
+            margin: 0 0 10px 0;
+            font-size: 1.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #cbd5e1;
+        }
+        .status {
+            font-size: 1.4rem;
+            font-weight: bold;
+            margin: 15px 0;
+            padding: 10px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-weight: bold;
+        }
+        input[type="range"] {
+            flex-grow: 1;
+            -webkit-appearance: none;
+            height: 8px;
+            background: linear-gradient(to right, #3b82f6, #10b981, #f59e0b, #ef4444);
+            border-radius: 5px;
+            outline: none;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            background: #ffffff;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(255,255,255,0.8);
+        }
+        canvas {
+            background-color: #020617;
+            border-radius: 12px;
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.8);
+            border: 2px solid #1e293b;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="dashboard">
+        <h1>ಉಷ್ಣ ಶಕ್ತಿ ಪ್ರಯೋಗಾಲಯ</h1>
+        <div class="status" id="statusBox">
+            <span id="tempDisplay">-50°C</span> | ಸ್ಥಿತಿ: <span id="stateDisplay">ಘನ (Solid)</span>
+        </div>
+        <div class="slider-container">
+            <span>❄️ ತಂಪು</span>
+            <input type="range" id="tempSlider" min="-100" max="200" value="-50">
+            <span>🔥 ಬಿಸಿ</span>
+        </div>
+    </div>
+
+    <canvas id="labCanvas" width="600" height="400"></canvas>
+
+    <script>
+        const canvas = document.getElementById('labCanvas');
+        const ctx = canvas.getContext('2d');
+        const slider = document.getElementById('tempSlider');
+        const tempDisplay = document.getElementById('tempDisplay');
+        const stateDisplay = document.getElementById('stateDisplay');
+        const statusBox = document.getElementById('statusBox');
+
+        let particles = [];
+        const numParticles = 120; // 12x10 grid
+        const radius = 6;
+
+        // Initialize particles in a solid grid
+        for (let row = 0; row < 10; row++) {
+            for (let col = 0; col < 12; col++) {
+                particles.push({
+                    baseX: 150 + col * 25, // Centered grid
+                    baseY: 100 + row * 25,
+                    x: 150 + col * 25,
+                    y: 100 + row * 25,
+                    vx: (Math.random() - 0.5) * 2,
+                    vy: (Math.random() - 0.5) * 2
+                });
+            }
+        }
+
+        // Color mapping function based on temperature
+        function getParticleColor(temp) {
+            if (temp < 0) {
+                // Cold: Blue to Cyan
+                let intensity = Math.min(255, Math.max(0, 255 + temp * 2));
+                return `rgb(0, 200, 255)`; 
+            } else if (temp < 100) {
+                // Liquid: Cyan to Yellow
+                let green = 200 + (temp / 100) * 55;
+                let red = (temp / 100) * 255;
+                return `rgb(${red}, ${green}, 100)`;
+            } else {
+                // Gas: Yellow to Red
+                let green = 255 - ((temp - 100) / 100) * 200;
+                return `rgb(255, ${green}, 0)`;
+            }
+        }
+
+        function getBgColor(temp) {
+            if (temp < 0) return 'rgba(0, 50, 100, 0.1)';
+            if (temp < 100) return 'rgba(0, 100, 50, 0.1)';
+            return 'rgba(100, 20, 0, 0.1)';
+        }
+
+        function update() {
+            const temp = parseInt(slider.value);
+            
+            // UI Updates
+            tempDisplay.innerText = `${temp}°C`;
+            let particleColor = getParticleColor(temp);
+            
+            // State logic
+            let state = "";
+            let energyMultiplier = 0;
+
+            if (temp < 0) {
+                state = "ಘನ (Solid)";
+                statusBox.style.backgroundColor = "rgba(59, 130, 246, 0.3)";
+                statusBox.style.color = "#93c5fd";
+                // Energy goes from 0 at -100 to 1 at 0
+                energyMultiplier = (temp + 100) / 100; 
+            } else if (temp < 100) {
+                state = "ದ್ರವ (Liquid)";
+                statusBox.style.backgroundColor = "rgba(16, 185, 129, 0.3)";
+                statusBox.style.color = "#6ee7b7";
+                // Energy goes from 1 at 0 to 4 at 100
+                energyMultiplier = 1 + (temp / 100) * 3; 
+            } else {
+                state = "ಅನಿಲ (Gas)";
+                statusBox.style.backgroundColor = "rgba(239, 68, 68, 0.3)";
+                statusBox.style.color = "#fca5a5";
+                // Energy goes from 4 at 100 to 12 at 200
+                energyMultiplier = 4 + ((temp - 100) / 100) * 8; 
+            }
+
+            stateDisplay.innerText = state;
+
+            // Drawing background
+            ctx.fillStyle = getBgColor(temp);
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            // Trail effect
+            ctx.fillStyle = "rgba(2, 6, 23, 0.3)";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Particle Physics
+            particles.forEach(p => {
+                if (temp < 0) {
+                    // SOLID: Spring force pulling them back to original grid
+                    p.x += (p.baseX - p.x) * 0.1;
+                    p.y += (p.baseY - p.y) * 0.1;
+                    
+                    // Thermal vibration based on temperature
+                    p.x += (Math.random() - 0.5) * (energyMultiplier * 3);
+                    p.y += (Math.random() - 0.5) * (energyMultiplier * 3);
+                } 
+                else if (temp < 100) {
+                    // LIQUID: Gravity and sliding
+                    p.vy += 0.3; // Gravity
+                    
+                    // Add random kinetic energy based on temp
+                    p.vx += (Math.random() - 0.5) * (energyMultiplier * 0.2);
+                    p.vy += (Math.random() - 0.5) * (energyMultiplier * 0.2);
+
+                    p.x += p.vx;
+                    p.y += p.vy;
+
+                    // Floor collision (pools at the bottom)
+                    if (p.y > canvas.height - radius * 2) {
+                        p.y = canvas.height - radius * 2;
+                        p.vy *= -0.3; // Low bounce
+                        p.vx += (Math.random() - 0.5) * 2; // Spread out horizontally
+                    }
+                    // Wall collision
+                    if (p.x < radius * 2) { p.x = radius * 2; p.vx *= -0.8; }
+                    if (p.x > canvas.width - radius * 2) { p.x = canvas.width - radius * 2; p.vx *= -0.8; }
+                    
+                    // Thermal expansion: push them slightly away from the center to simulate volume increase
+                    if (p.y < canvas.height / 2) {
+                         p.vy += 1; // Keep them generally in the bottom half
+                    }
+
+                    // Apply some friction to limit speed
+                    p.vx *= 0.95;
+                    p.vy *= 0.98;
+                } 
+                else {
+                    // GAS: High kinetic energy, no gravity
+                    p.vx += (Math.random() - 0.5) * (energyMultiplier * 0.5);
+                    p.vy += (Math.random() - 0.5) * (energyMultiplier * 0.5);
+
+                    // Speed limit for gas
+                    let maxSpeed = energyMultiplier * 2;
+                    if (p.vx > maxSpeed) p.vx = maxSpeed;
+                    if (p.vx < -maxSpeed) p.vx = -maxSpeed;
+                    if (p.vy > maxSpeed) p.vy = maxSpeed;
+                    if (p.vy < -maxSpeed) p.vy = -maxSpeed;
+
+                    p.x += p.vx;
+                    p.y += p.vy;
+
+                    // Perfect elastic bouncing off all walls
+                    if (p.x <= radius * 2) { p.x = radius * 2; p.vx *= -1; }
+                    if (p.x >= canvas.width - radius * 2) { p.x = canvas.width - radius * 2; p.vx *= -1; }
+                    if (p.y <= radius * 2) { p.y = radius * 2; p.vy *= -1; }
+                    if (p.y >= canvas.height - radius * 2) { p.y = canvas.height - radius * 2; p.vy *= -1; }
+                }
+
+                // Draw Particle
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, radius, 0, Math.PI * 2);
+                ctx.fillStyle = particleColor;
+                ctx.fill();
+                
+                // Glow effect
+                ctx.shadowBlur = temp > 0 ? 10 : 2;
+                ctx.shadowColor = particleColor;
+                
+                // Add a white core highlight
+                ctx.beginPath();
+                ctx.arc(p.x - 2, p.y - 2, radius * 0.3, 0, Math.PI * 2);
+                ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
+                ctx.fill();
+                ctx.shadowBlur = 0; // Reset shadow for next draw
+            });
+
+            requestAnimationFrame(update);
+        }
+
+        update();
+    </script>
+</body>
+</html>

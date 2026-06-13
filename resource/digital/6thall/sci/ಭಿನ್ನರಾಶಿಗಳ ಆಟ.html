@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ಗಣಿತ ಪಾರ್ಕ್: ಭಿನ್ನರಾಶಿಗಳ ಆಟ</title>
+<style>
+  body {
+    font-family: 'Tunga', 'Kedage', 'Comic Sans MS', sans-serif;
+    background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
+    color: #333;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    padding: 20px;
+    box-sizing: border-box;
+  }
+  .game-container {
+    background: white;
+    padding: 30px;
+    border-radius: 25px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+    text-align: center;
+    max-width: 650px;
+    width: 100%;
+    border: 5px solid #ffb74d;
+  }
+  h1 {
+    color: #ff6f00;
+    font-size: 32px;
+    margin-top: 0;
+    text-shadow: 2px 2px 4px rgba(255, 111, 0, 0.2);
+  }
+  .score-board {
+    display: flex;
+    justify-content: space-around;
+    background: #fff3e0;
+    padding: 10px;
+    border-radius: 15px;
+    margin-bottom: 25px;
+    font-size: 20px;
+    font-weight: bold;
+    color: #ef6c00;
+  }
+  .problem-area {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    font-size: 40px;
+    font-weight: bold;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+  }
+  .fraction {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: #f5f5f5;
+    padding: 10px 20px;
+    border-radius: 15px;
+    border: 3px solid #e0e0e0;
+  }
+  .fraction-color-1 { border-color: #4db6ac; color: #00796b; background: #e0f2f1; }
+  .fraction-color-2 { border-color: #ba68c8; color: #6a1b9a; background: #f3e5f5; }
+  .fraction-input { border-color: #64b5f6; background: #e3f2fd; }
+  
+  .fraction-line {
+    border-top: 5px solid currentColor;
+    width: 100%;
+    margin: 8px 0;
+  }
+  .operator {
+    color: #d32f2f;
+    font-size: 50px;
+  }
+  input[type="number"] {
+    width: 60px;
+    height: 50px;
+    font-size: 30px;
+    font-weight: bold;
+    text-align: center;
+    border: 2px solid #2196f3;
+    border-radius: 10px;
+    color: #1565c0;
+    outline: none;
+  }
+  input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+  }
+  .btn {
+    background: #ff9800;
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    font-size: 22px;
+    font-weight: bold;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 0 5px 15px rgba(255, 152, 0, 0.4);
+    transition: transform 0.2s, background 0.2s;
+    font-family: 'Tunga', sans-serif;
+  }
+  .btn:hover {
+    background: #f57c00;
+    transform: translateY(-3px);
+  }
+  .btn:active {
+    transform: translateY(1px);
+  }
+  .message {
+    margin-top: 25px;
+    font-size: 24px;
+    font-weight: bold;
+    min-height: 35px;
+  }
+  .correct { color: #2e7d32; animation: pop 0.5s ease; }
+  .wrong { color: #c62828; animation: shake 0.5s ease; }
+  
+  @keyframes pop {
+    0% { transform: scale(0.8); opacity: 0; }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-10px); }
+    50% { transform: translateX(10px); }
+    75% { transform: translateX(-10px); }
+  }
+</style>
+</head>
+<body>
+
+<div class="game-container">
+  <h1>🌟 ಗಣಿತ ಪಾರ್ಕ್: ಭಿನ್ನರಾಶಿಗಳ ಆಟ 🌟</h1>
+  
+  <div class="score-board">
+    <div>ಅಂಕಗಳು (Score): <span id="score">0</span></div>
+    <div>ಪ್ರಯತ್ನಗಳು (Tries): <span id="tries">0</span></div>
+  </div>
+
+  <div class="problem-area">
+    <div class="fraction fraction-color-1">
+      <div id="n1">1</div>
+      <div class="fraction-line"></div>
+      <div id="d1">2</div>
+    </div>
+
+    <div class="operator" id="op">+</div>
+
+    <div class="fraction fraction-color-2">
+      <div id="n2">1</div>
+      <div class="fraction-line"></div>
+      <div id="d2">4</div>
+    </div>
+
+    <div class="operator">=</div>
+
+    <div class="fraction fraction-input">
+      <input type="number" id="userNum" placeholder="ಅಂಶ">
+      <div class="fraction-line" style="border-color:#2196f3;"></div>
+      <input type="number" id="userDen" placeholder="ಛೇದ">
+    </div>
+  </div>
+
+  <button class="btn" id="checkBtn" onclick="checkAnswer()">ಉತ್ತರ ಪರಿಶೀಲಿಸಿ ✔️</button>
+  
+  <div class="message" id="messageArea"></div>
+
+</div>
+
+<script>
+  let currentN1, currentD1, currentN2, currentD2, currentOp;
+  let score = 0;
+  let tries = 0;
+
+  function getRandomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
+  function generateProblem() {
+    // Clear inputs and messages
+    document.getElementById('userNum').value = '';
+    document.getElementById('userDen').value = '';
+    document.getElementById('messageArea').innerText = '';
+    document.getElementById('messageArea').className = 'message';
+    document.getElementById('checkBtn').innerText = 'ಉತ್ತರ ಪರಿಶೀಲಿಸಿ ✔️';
+    document.getElementById('checkBtn').onclick = checkAnswer;
+
+    // Decide operator: 0 for +, 1 for -
+    let isAddition = Math.random() > 0.5;
+    currentOp = isAddition ? '+' : '-';
+
+    // Generate denominators (keep it simple for kids: 2 to 6)
+    currentD1 = getRandomInt(2, 6);
+    // 50% chance to have same denominator to build confidence
+    currentD2 = Math.random() > 0.5 ? currentD1 : getRandomInt(2, 6);
+
+    // Generate numerators
+    currentN1 = getRandomInt(1, currentD1);
+    currentN2 = getRandomInt(1, currentD2);
+
+    // For subtraction, ensure fraction 1 is >= fraction 2 to avoid negative answers
+    if (!isAddition) {
+      let val1 = currentN1 / currentD1;
+      let val2 = currentN2 / currentD2;
+      if (val2 > val1) {
+        // Swap them
+        let tempN = currentN1, tempD = currentD1;
+        currentN1 = currentN2; currentD1 = currentD2;
+        currentN2 = tempN; currentD2 = tempD;
+      }
+    }
+
+    // Update UI
+    document.getElementById('n1').innerText = currentN1;
+    document.getElementById('d1').innerText = currentD1;
+    document.getElementById('n2').innerText = currentN2;
+    document.getElementById('d2').innerText = currentD2;
+    document.getElementById('op').innerText = currentOp;
+    
+    // Focus on first input
+    document.getElementById('userNum').focus();
+  }
+
+  function checkAnswer() {
+    let userN = parseInt(document.getElementById('userNum').value);
+    let userD = parseInt(document.getElementById('userDen').value);
+
+    let msgArea = document.getElementById('messageArea');
+
+    if (isNaN(userN) || isNaN(userD)) {
+      msgArea.innerText = "ದಯವಿಟ್ಟು ಅಂಶ ಮತ್ತು ಛೇದ ಎರಡನ್ನೂ ನಮೂದಿಸಿ!";
+      msgArea.className = "message wrong";
+      return;
+    }
+
+    tries++;
+    document.getElementById('tries').innerText = tries;
+
+    // Calculate correct mathematical answer (cross multiplication technique for equivalence)
+    let correctN, correctD;
+    if (currentOp === '+') {
+      correctN = (currentN1 * currentD2) + (currentN2 * currentD1);
+      correctD = currentD1 * currentD2;
+    } else {
+      correctN = (currentN1 * currentD2) - (currentN2 * currentD1);
+      correctD = currentD1 * currentD2;
+    }
+
+    // Check Equivalent Fraction: userN / userD == correctN / correctD
+    // => userN * correctD == correctN * userD
+    if (userN * correctD === correctN * userD) {
+      score += 10;
+      document.getElementById('score').innerText = score;
+      msgArea.innerText = "ಅದ್ಭುತ! ಸರಿಯಾದ ಉತ್ತರ 🎉🌟";
+      msgArea.className = "message correct";
+      
+      // Change button to next problem
+      let btn = document.getElementById('checkBtn');
+      btn.innerText = "ಮುಂದಿನ ಪ್ರಶ್ನೆ ➡️";
+      btn.onclick = generateProblem;
+    } else {
+      msgArea.innerText = "ಅಯ್ಯೋ! ತಪ್ಪಾಗಿದೆ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ. ❌";
+      msgArea.className = "message wrong";
+    }
+  }
+
+  // Start the first game
+  generateProblem();
+</script>
+
+</body>
+</html>
