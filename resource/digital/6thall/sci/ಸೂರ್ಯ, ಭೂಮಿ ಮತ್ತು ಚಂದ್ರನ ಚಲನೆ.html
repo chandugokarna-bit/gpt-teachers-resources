@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+    <title>ಸೂರ್ಯ, ಭೂಮಿ ಮತ್ತು ಚಂದ್ರನ ಚಲನೆ</title>
+    <style>
+        body { 
+            margin: 0; 
+            background: #000; 
+            color: white; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            text-align: center; 
+            overflow-x: hidden; 
+            padding-bottom: 30px;
+        }
+
+        h2 { color: #f1c40f; margin-top: 20px; font-size: 1.5em; padding: 0 10px; }
+
+        /* Information Panels */
+        .info-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 90%;
+            max-width: 900px;
+            margin: 15px auto;
+        }
+
+        @media (min-width: 768px) {
+            .info-panel { flex-direction: row; }
+            h2 { font-size: 2em; }
+        }
+
+        .info-card {
+            background: rgba(0, 150, 255, 0.15);
+            border: 1px solid #0984e3;
+            border-radius: 10px;
+            padding: 15px;
+            flex: 1;
+            text-align: left;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        }
+
+        .info-card h3 { color: #74b9ff; margin-top: 0; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 5px; font-size: 18px;}
+        .info-card p { font-size: 15px; line-height: 1.5; margin-bottom: 0; color: #dfe6e9; }
+        .highlight { color: #f1c40f; font-weight: bold; }
+
+        /* 2D Solar System Scene */
+        .scene {
+            position: relative;
+            width: 100%;
+            height: 350px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px 0;
+        }
+
+        .sun { 
+            width: 60px; height: 60px; 
+            background: radial-gradient(circle, #ffeb3b, #f39c12); 
+            border-radius: 50%; 
+            position: absolute; 
+            box-shadow: 0 0 40px #f39c12; 
+            z-index: 10;
+        }
+
+        .earth-orbit-line { 
+            width: 250px; height: 250px; 
+            border: 1px dashed rgba(255,255,255,0.3); 
+            border-radius: 50%; 
+            position: absolute; 
+        }
+
+        /* Earth Revolution Box centered at Sun */
+        .earth-revolution-box { 
+            position: absolute; 
+            width: 250px; height: 250px; 
+        }
+
+        /* Earth System keeps Moon and Earth together */
+        .earth-system {
+            position: absolute;
+            top: -25px; /* Half of system height */
+            left: 100px; /* Moves it to the edge of the orbit (250/2 - 25) */
+            width: 50px; height: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .moon-orbit-line {
+            position: absolute;
+            width: 80px; height: 80px;
+            border: 1px dotted rgba(255,255,255,0.4);
+            border-radius: 50%;
+        }
+
+        .earth { 
+            width: 35px; height: 35px; 
+            background: url('https://upload.wikimedia.org/wikipedia/commons/2/22/Earth_Western_Hemisphere_transparent_background.png') center/cover; 
+            border-radius: 50%; 
+            position: absolute; 
+            box-shadow: 0 0 10px rgba(52, 152, 219, 0.8);
+            z-index: 5;
+        }
+
+        /* Moon Revolution Box centered at Earth */
+        .moon-revolution-box {
+            position: absolute;
+            width: 80px; height: 80px;
+        }
+
+        .moon {
+            width: 12px; height: 12px;
+            background: #bdc3c7;
+            border-radius: 50%;
+            position: absolute;
+            top: -6px; /* Position at the edge of its orbit */
+            left: 34px;
+            box-shadow: 0 0 5px #fff;
+        }
+
+        /* Responsive scaling for larger screens (Laptops) */
+        @media (min-width: 600px) {
+            .scene { height: 450px; }
+            .sun { width: 80px; height: 80px; }
+            .earth-orbit-line { width: 350px; height: 350px; }
+            .earth-revolution-box { width: 350px; height: 350px; }
+            .earth-system { top: -25px; left: 150px; }
+            .earth { width: 45px; height: 45px; }
+            .moon-orbit-line { width: 110px; height: 110px; }
+            .moon-revolution-box { width: 110px; height: 110px; }
+            .moon { width: 15px; height: 15px; top: -7px; left: 47px; }
+        }
+
+        /* Controls Section */
+        .controls { 
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            background: rgba(255,255,255,0.1); 
+            padding: 20px; 
+            border-radius: 15px; 
+            width: 90%; 
+            max-width: 700px;
+            margin: 0 auto;
+            backdrop-filter: blur(5px); 
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+
+        .control-group label {
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #bdc3c7;
+        }
+
+        .control-group input[type=range] {
+            width: 100%;
+            cursor: pointer;
+        }
+
+        @media (min-width: 600px) {
+            .control-group { flex-direction: row; justify-content: space-between; }
+            .control-group label { margin-bottom: 0; width: 60%; text-align: right; margin-right: 20px; }
+            .control-group input[type=range] { width: 40%; }
+        }
+
+    </style>
+</head>
+<body>
+    <h2>🌍 ಸೂರ್ಯ, ಭೂಮಿ ಮತ್ತು ಚಂದ್ರನ ಚಲನೆ</h2>
+    
+    <div class="info-panel">
+        <div class="info-card">
+            <h3>🌍 ಭ್ರಮಣೆ (Rotation)</h3>
+            <p>ಭೂಮಿಯು ತನ್ನ ಅಕ್ಷದ ಸುತ್ತಲೂ ತಿರುಗುತ್ತದೆ. ಒಂದು ಪೂರ್ಣ ಭ್ರಮಣೆಗೆ <span class="highlight">24 ಗಂಟೆಗಳು ಬೇಕು (ಒಂದು ದಿನ)</span>.</p>
+        </div>
+        <div class="info-card">
+            <h3>☀️ ಪರಿಭ್ರಮಣೆ (Revolution)</h3>
+            <p>ಭೂಮಿಯು ಸೂರ್ಯನ ಸುತ್ತ ಪರಿಭ್ರಮಿಸುತ್ತದೆ. ಒಂದು ಪೂರ್ಣ ಪರಿಭ್ರಮಣೆಗೆ ಸುಮಾರು <span class="highlight">365 ದಿನಗಳು (ಒಂದು ವರ್ಷ)</span> ಬೇಕು.</p>
+        </div>
+        <div class="info-card">
+            <h3>🌕 ಚಂದ್ರನ ಪರಿಭ್ರಮಣೆ</h3>
+            <p>ಚಂದ್ರನು ಭೂಮಿಯ ಸುತ್ತ ಒಂದು ಪರಿಭ್ರಮಣೆಯನ್ನು ಪೂರ್ಣಗೊಳಿಸಲು ಸುಮಾರು <span class="highlight">27 ದಿನಗಳು</span> ಬೇಕು.</p>
+        </div>
+    </div>
+
+    <div class="scene">
+        <div class="earth-orbit-line"></div>
+        <div class="sun"></div>
+        
+        <div class="earth-revolution-box" id="earthRevBox">
+            
+            <div class="earth-system" id="earthSystemBox">
+                <div class="moon-orbit-line"></div>
+                
+                <div class="earth" id="earthObj"></div>
+                
+                <div class="moon-revolution-box" id="moonRevBox">
+                    <div class="moon"></div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="controls">
+        <div class="control-group">
+            <label>ಭೂಮಿಯ ಭ್ರಮಣೆ ವೇಗ (Earth's Spin / 24 hours):</label>
+            <input type="range" id="rotSpeed" min="0" max="15" value="3" step="0.1">
+        </div>
+        <div class="control-group">
+            <label>ಭೂಮಿಯ ಪರಿಭ್ರಮಣೆ ವೇಗ (Earth's Orbit / 1 Year):</label>
+            <input type="range" id="revSpeed" min="0" max="5" value="0.5" step="0.1">
+        </div>
+        <div class="control-group">
+            <label>ಚಂದ್ರನ ಪರಿಭ್ರಮಣೆ ವೇಗ (Moon's Orbit / 27 Days):</label>
+            <input type="range" id="moonSpeed" min="0" max="15" value="6.5" step="0.1">
+        </div>
+    </div>
+
+    <script>
+        let earthRevAngle = 0;
+        let earthRotAngle = 0;
+        let moonRevAngle = 0;
+
+        function animate() {
+            // Get slider values
+            let revSpeed = parseFloat(document.getElementById('revSpeed').value);
+            let rotSpeed = parseFloat(document.getElementById('rotSpeed').value);
+            let mSpeed = parseFloat(document.getElementById('moonSpeed').value);
+
+            // Update angles
+            earthRevAngle += revSpeed;
+            earthRotAngle += rotSpeed;
+            moonRevAngle += mSpeed;
+
+            // 1. Rotate the main box to make Earth revolve around the Sun
+            document.getElementById('earthRevBox').style.transform = `rotate(${earthRevAngle}deg)`;
+            
+            // 2. Counter-rotate the Earth System so it doesn't spin wildly, keeping the moon's orbit stable relative to the screen
+            document.getElementById('earthSystemBox').style.transform = `rotate(${-earthRevAngle}deg)`;
+            
+            // 3. Rotate the Earth itself for day/night
+            document.getElementById('earthObj').style.transform = `rotate(${earthRotAngle}deg)`;
+
+            // 4. Rotate the Moon around the Earth
+            document.getElementById('moonRevBox').style.transform = `rotate(${moonRevAngle}deg)`;
+
+            // Loop the animation
+            requestAnimationFrame(animate);
+        }
+        
+        // Start animation
+        animate();
+    </script>
+</body>
+</html>
