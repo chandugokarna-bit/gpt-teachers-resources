@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>जादुई वचन मशीन | Interactive Hindi Singular-Plural Game</title>
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --purple-magic: #6c5ce7;
+            --pink-magic: #fd79a8;
+            --yellow-magic: #ffeaa7;
+            --green-magic: #00b894;
+            --dark-bolt: #2d3436;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Baloo 2', cursive, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #a29bfe 0%, #74b9ff 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            color: var(--dark-bolt);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 3.2rem;
+            color: #fff;
+            text-shadow: 4px 4px 0px var(--dark-bolt);
+            margin-bottom: 5px;
+        }
+
+        .tagline {
+            font-size: 1.4rem;
+            background: var(--yellow-magic);
+            padding: 5px 20px;
+            border-radius: 50px;
+            border: 3px solid var(--dark-bolt);
+            display: inline-block;
+            box-shadow: 0 4px 0px var(--dark-bolt);
+            font-weight: bold;
+        }
+
+        /* Mode Switcher */
+        .mode-container {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .mode-btn {
+            padding: 10px 25px;
+            font-size: 1.2rem;
+            font-weight: 800;
+            border: 3px solid var(--dark-bolt);
+            border-radius: 20px;
+            cursor: pointer;
+            box-shadow: 0 5px 0px var(--dark-bolt);
+            background: white;
+            transition: all 0.1s ease;
+        }
+
+        .mode-btn.active {
+            background: var(--pink-magic);
+            color: white;
+            transform: translateY(3px);
+            box-shadow: 0 2px 0px var(--dark-bolt);
+        }
+
+        /* Main Game Board */
+        .game-board {
+            width: 100%;
+            max-width: 750px;
+            background: #ffffff;
+            border: 4px solid var(--dark-bolt);
+            border-radius: 32px;
+            box-shadow: 0 12px 0px var(--dark-bolt);
+            padding: 30px;
+            position: relative;
+            min-height: 460px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Score & Level Dashboard */
+        .dashboard {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin-bottom: 25px;
+            font-size: 1.3rem;
+            font-weight: bold;
+        }
+
+        .dash-badge {
+            background: #f1f2f6;
+            padding: 5px 15px;
+            border-radius: 15px;
+            border: 2px solid var(--dark-bolt);
+        }
+
+        /* The Magic Transformer Machine UI */
+        .machine-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            width: 100%;
+            margin-bottom: 30px;
+        }
+
+        .slots {
+            background: #ffeaa7;
+            border: 3px dashed var(--purple-magic);
+            padding: 20px;
+            border-radius: 20px;
+            min-width: 160px;
+            text-align: center;
+        }
+
+        .slot-title {
+            font-size: 1rem;
+            text-transform: uppercase;
+            color: #636e72;
+            margin-bottom: 5px;
+        }
+
+        .slot-word {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: var(--purple-magic);
+        }
+
+        .slot-emoji {
+            font-size: 2.5rem;
+            display: block;
+        }
+
+        .transformer-core {
+            font-size: 3rem;
+            animation: pulse 1s infinite alternate;
+        }
+
+        /* Brainstorming Hint System */
+        .hint-box {
+            width: 100%;
+            background: #dfe6e9;
+            border: 2px solid var(--dark-bolt);
+            border-radius: 15px;
+            padding: 12px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #2d3436;
+        }
+
+        .hint-btn {
+            background: var(--yellow-magic);
+            border: 2px solid var(--dark-bolt);
+            padding: 3px 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1rem;
+            margin-top: 5px;
+        }
+
+        /* Option Grid */
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            width: 100%;
+        }
+
+        .magic-option {
+            background: white;
+            border: 3px solid var(--dark-bolt);
+            border-radius: 20px;
+            padding: 15px;
+            font-size: 1.6rem;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 6px 0px var(--dark-bolt);
+            transition: all 0.1s;
+            text-align: center;
+        }
+
+        .magic-option:hover {
+            background: #fafafa;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 0px var(--dark-bolt);
+        }
+
+        .magic-option:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0px var(--dark-bolt);
+        }
+
+        /* Feedback classes */
+        .magic-option.correct {
+            background: var(--green-magic) !important;
+            color: white;
+        }
+
+        .magic-option.wrong {
+            background: var(--pink-magic) !important;
+            color: white;
+        }
+
+        /* Study Cards View */
+        .study-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            width: 100%;
+        }
+
+        .study-card {
+            background: #f9f9f9;
+            border: 3px solid var(--dark-bolt);
+            border-radius: 20px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 5px 0px var(--dark-bolt);
+        }
+
+        .study-label {
+            font-size: 0.9rem;
+            font-weight: bold;
+            padding: 2px 8px;
+            border-radius: 10px;
+            color: white;
+        }
+
+        .hidden { display: none !important; }
+
+        /* Animations */
+        @keyframes pulse {
+            0% { transform: scale(1) rotate(0deg); }
+            100% { transform: scale(1.1) rotate(10deg); }
+        }
+
+        @media (max-width: 600px) {
+            .machine-container { flex-direction: column; }
+            .options-grid { grid-template-columns: 1fr; }
+            h1 { font-size: 2.2rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>जादुई वचन मशीन ⚡</h1>
+        <div class="tagline">एकवचन को बहुवचन में बदलो और बुद्धिमान बनो!</div>
+    </header>
+
+    <div class="mode-container">
+        <button class="mode-btn active" id="playTab" onclick="toggleMode('play')">🎮 खेलें (Game)</button>
+        <button class="mode-btn" id="studyTab" onclick="toggleMode('study')">📖 नियम गाइड (Rules)</button>
+    </div>
+
+    <div class="game-board">
+        
+        <div id="playMode" style="width: 100%;">
+            <div class="dashboard">
+                <div class="dash-badge">जादू स्कोर: <span id="score">0</span>🌟</div>
+                <div class="dash-badge">सवाल: <span id="qCount">1</span>/8</div>
+            </div>
+
+            <div class="machine-container">
+                <div class="slots">
+                    <div class="slot-title">पोटली में है (एकवचन)</div>
+                    <span class="slot-emoji" id="singularEmoji">🎈</span>
+                    <span class="slot-word" id="singularWord">गुब्बारा</span>
+                </div>
+                
+                <div class="transformer-core">🌀</div>
+                
+                <div class="slots" style="background-color: #b2bec3;">
+                    <div class="slot-title">मशीन बनाएगी (बहुवचन)</div>
+                    <span class="slot-emoji">❓</span>
+                    <span class="slot-word" style="color: #636e72;">???</span>
+                </div>
+            </div>
+
+            <div class="hint-box">
+                <span id="hintText">💡 उलझन में हो? दिमागी सुराग पाने के लिए नीचे क्लिक करो!</span>
+                <br>
+                <button class="hint-btn" id="hintBtn" onclick="revealHint()">दिमागी सुराग (Hint) खोलें</button>
+            </div>
+
+            <div class="options-grid" id="optionsBox">
+                </div>
+        </div>
+
+        <div id="studyMode" class="study-grid hidden">
+            </div>
+
+        <div id="endMode" class="hidden" style="text-align: center;">
+            <h2 style="font-size: 2.5rem; color: var(--purple-magic);">🎉 कमाल का दिमाग पाया है!</h2>
+            <p style="font-size: 1.5rem; margin: 15px 0;">आपने जादुई मशीन को सफलतापूर्वक ठीक कर दिया!</p>
+            <div class="tagline" style="font-size: 1.8rem; margin-bottom: 20px;">आपका कुल स्कोर: <span id="finalScore">0</span>/8</div>
+            <br>
+            <button class="mode-btn" style="background: var(--green-magic); color: white;" onclick="resetGame()">फिर से खेलें 🔄</button>
+        </div>
+
+    </div>
+
+    <script>
+        // Brainstorming dataset suited for Class 3 grammar logic
+        const vachanDataset = [
+            { s: "गुब्बारा", p: "गुब्बारे", emoji: "🎈", hint: "नियम: अंत में 'आ' की मात्रा होने पर वह 'ए' की मात्रा में बदल जाती है।" },
+            { s: "लड़की", p: "लड़कियाँ", emoji: "👧", hint: "नियम: अंत में बड़ी 'ई' होने पर वह छोटी 'इ' बनकर अंत में 'याँ' जोड़ लेती है!" },
+            { s: "किताब", p: "किताबें", emoji: "📚", hint: "नियम: बिना मात्रा वाले शब्दों के अंत में 'एं' (ें) की बिंदीदार आवाज़ आती है।" },
+            { s: "चिड़िया", p: "चिड़ियाँ", emoji: "🐦", hint: "नियम: अगर शब्द के अंत में पहले से ही 'या' है, तो बस ऊपर चाँद-बिंदी (याँ) लगा दो!" },
+            { s: "मछली", p: "मछलियाँ", emoji: "🐟", hint: "नियम: 'ली' की मात्रा को छोटी 'लि' करो और पीछे 'याँ' का जादू लगाओ!" },
+            { s: "आँख", p: "आँखें", emoji: "👁️", hint: "नियम: अकारान्त शब्द (बिना मात्रा अंत) में 'एं' की मात्रा और अनुस्वार लगता है।" },
+            { s: "माला", p: "मालाएँ", emoji: "📿", hint: "नियम: अंत में 'आ' की मात्रा अपरिवर्तित रहे तो पीछे सीधे 'एँ' जुड़ जाता है।" },
+            { s: "तितली", p: "तितलियाँ", emoji: "🦋", hint: "नियम: क्या आपको 'लड़की' वाला नियम याद है? बड़ी 'ई' को छोटी 'इ' बनाकर 'याँ' जोड़ो!" }
+        ];
+
+        let currentIndex = 0;
+        let score = 0;
+        let shuffledQuestions = [];
+
+        function init() {
+            shuffledQuestions = [...vachanDataset].sort(() => Math.random() - 0.5);
+            loadQuestion();
+            renderStudyMode();
+        }
+
+        function loadQuestion() {
+            if(currentIndex >= 8) {
+                showEndScreen();
+                return;
+            }
+
+            // Reset Hint Button text
+            document.getElementById('hintText').innerHTML = "💡 उलझन में हो? दिमागी सुराग पाने के लिए नीचे क्लिक करो!";
+            document.getElementById('hintBtn').classList.remove('hidden');
+
+            const currentData = shuffledQuestions[currentIndex];
+            document.getElementById('singularWord').innerText = currentData.s;
+            document.getElementById('singularEmoji').innerText = currentData.emoji;
+            document.getElementById('qCount').innerText = currentIndex + 1;
+
+            // Generate options (1 correct, 2 tricky/wrong ones)
+            let wrongOption1 = currentData.s + "ों"; // e.g. गुब्बारों (common confusion)
+            let wrongOption2 = currentData.s + "ाँ"; // incorrect rule application
+            
+            if(currentData.s.endsWith("ी")) {
+                let base = currentData.s.slice(0, -1);
+                wrongOption1 = base + "ीयाँ"; // forgotten rule of shortening 'ee' to 'i'
+                wrongOption2 = currentData.s + "ें"; 
+            }
+
+            let options = [currentData.p, wrongOption1, wrongOption2];
+            // Remove duplicates if any generated dynamically
+            options = [...new Set(options)].sort(() => Math.random() - 0.5);
+
+            const optionsBox = document.getElementById('optionsBox');
+            optionsBox.innerHTML = '';
+
+            options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'magic-option';
+                btn.innerText = opt;
+                btn.onclick = () => verifyAnswer(btn, opt, currentData.p);
+                optionsBox.appendChild(btn);
+            });
+        }
+
+        function revealHint() {
+            const currentData = shuffledQuestions[currentIndex];
+            document.getElementById('hintText').innerHTML = `🧠 <strong>दिमागी सुराग:</strong> ${currentData.hint}`;
+            document.getElementById('hintBtn').classList.add('hidden');
+        }
+
+        function verifyAnswer(clickedBtn, selected, correct) {
+            const allBtns = document.querySelectorAll('.magic-option');
+            allBtns.forEach(b => b.style.pointerEvents = 'none'); // freeze
+
+            if(selected === correct) {
+                clickedBtn.classList.add('correct');
+                score++;
+                document.getElementById('score').innerText = score;
+            } else {
+                clickedBtn.classList.add('wrong');
+                allBtns.forEach(b => {
+                    if(b.innerText === correct) b.classList.add('correct');
+                });
+            }
+
+            setTimeout(() => {
+                currentIndex++;
+                loadQuestion();
+            }, 2000);
+        }
+
+        function toggleMode(mode) {
+            document.getElementById('playTab').classList.toggle('active', mode === 'play');
+            document.getElementById('studyTab').classList.toggle('active', mode === 'study');
+
+            if(mode === 'play') {
+                document.getElementById('playMode').classList.remove('hidden');
+                document.getElementById('studyMode').classList.add('hidden');
+                document.getElementById('endMode').classList.add('hidden');
+            } else {
+                document.getElementById('playMode').classList.add('hidden');
+                document.getElementById('studyMode').classList.remove('hidden');
+                document.getElementById('endMode').classList.add('hidden');
+            }
+        }
+
+        function renderStudyMode() {
+            const studyBox = document.getElementById('studyMode');
+            studyBox.innerHTML = '';
+            vachanDataset.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'study-card';
+                card.innerHTML = `
+                    <div style="font-size: 2rem;">${item.emoji}</div>
+                    <div style="font-weight: 800; font-size:1.4rem;">${item.s} ➡️ ${item.p}</div>
+                    <p style="font-size:0.95rem; color:#555; margin-top:5px; background:#fff; padding:5px; border-radius:10px;">${item.hint}</p>
+                `;
+                studyBox.appendChild(card);
+            });
+        }
+
+        function showEndScreen() {
+            document.getElementById('playMode').classList.add('hidden');
+            document.getElementById('endMode').classList.remove('hidden');
+            document.getElementById('finalScore').innerText = score;
+        }
+
+        function resetGame() {
+            currentIndex = 0;
+            score = 0;
+            document.getElementById('score').innerText = score;
+            shuffledQuestions = [...vachanDataset].sort(() => Math.random() - 0.5);
+            toggleMode('play');
+            loadQuestion();
+        }
+
+        // Run on start
+        init();
+    </script>
+</body>
+</html>

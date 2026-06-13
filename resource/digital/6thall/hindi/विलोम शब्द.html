@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>मजेदार विलोम शब्द गेम! | Interactive Hindi Opposites</title>
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #ff6b6b;
+            --secondary: #4ecdc4;
+            --accent: #ffe66d;
+            --background: #f7f9fc;
+            --text: #2d3436;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Baloo 2', cursive, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            color: var(--text);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            animation: bounce 2s infinite;
+        }
+
+        h1 {
+            font-size: 3rem;
+            color: #4a4e69;
+            text-shadow: 3px 3px 0px var(--accent);
+            margin-bottom: 10px;
+        }
+
+        p.subtitle {
+            font-size: 1.3rem;
+            color: #6c757d;
+            background: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        /* Mode Switcher */
+        .nav-tabs {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .tab-btn {
+            padding: 12px 30px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .tab-btn.active {
+            background-color: var(--primary);
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .tab-btn:not(.active) {
+            background-color: white;
+            color: var(--text);
+        }
+
+        .tab-btn:hover {
+            transform: translateY(-3px);
+        }
+
+        /* Container */
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 30px;
+            border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            min-height: 400px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Learn Mode Styles */
+        .flashcards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            width: 100%;
+        }
+
+        .card {
+            height: 180px;
+            perspective: 1000px;
+            cursor: pointer;
+        }
+
+        .card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+
+        .card.flipped .card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 15px;
+            padding: 15px;
+        }
+
+        .card-front {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+            color: #fff;
+        }
+
+        .card-back {
+            background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
+            color: #333;
+            transform: rotateY(180deg);
+        }
+
+        .word-text {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .meaning-text {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        .emoji {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        /* Quiz Mode Styles */
+        .quiz-box {
+            width: 100%;
+            text-align: center;
+        }
+
+        .score-board {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            font-weight: bold;
+            color: #4a4e69;
+            background: #ffe66d;
+            padding: 8px 20px;
+            border-radius: 30px;
+            display: inline-block;
+        }
+
+        .question-card {
+            background: #f8f9fa;
+            border: 3px dashed var(--secondary);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 25px;
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            width: 100%;
+        }
+
+        .option-btn {
+            padding: 15px 20px;
+            font-size: 1.4rem;
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: bold;
+        }
+
+        .option-btn:hover {
+            background: #f1f5f9;
+            border-color: #cbd5e1;
+            transform: translateY(-2px);
+        }
+
+        .option-btn.correct {
+            background-color: #4bb543 !important;
+            color: white !important;
+            border-color: #4bb543 !important;
+            animation: pop 0.3s ease;
+        }
+
+        .option-btn.wrong {
+            background-color: #ff4d4d !important;
+            color: white !important;
+            border-color: #ff4d4d !important;
+            animation: shake 0.3s ease;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Result Screen */
+        .result-screen {
+            text-align: center;
+        }
+
+        .result-title {
+            font-size: 2.5rem;
+            color: var(--secondary);
+            margin-bottom: 15px;
+        }
+
+        .restart-btn {
+            background: var(--primary);
+            color: white;
+            padding: 12px 35px;
+            font-size: 1.3rem;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            margin-top: 20px;
+            box-shadow: 0 5px 15px rgba(255,107,107,0.4);
+        }
+
+        /* Animations */
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        @keyframes pop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.08); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
+        }
+
+        @media (max-width: 600px) {
+            .options-grid {
+                grid-template-columns: 1fr;
+            }
+            h1 { font-size: 2.2rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>विलोम शब्द पाठशाला 🌟</h1>
+        <p class="subtitle">आओ मजेदार तरीके से उल्टे अर्थ वाले शब्द सीखें!</p>
+    </header>
+
+    <div class="nav-tabs">
+        <button class="tab-btn active" id="learnTab" onclick="switchMode('learn')">📖 सीखें (Learn)</button>
+        <button class="tab-btn" id="quizTab" onclick="switchMode('quiz')">🎮 क्विज़ खेलें (Quiz)</button>
+    </div>
+
+    <div class="container">
+        <div id="learnMode" class="flashcards-grid">
+            </div>
+
+        <div id="quizMode" class="quiz-box hidden">
+            <div class="score-board">स्कॉर (Score): <span id="score">0</span> / <span id="totalQs">0</span></div>
+            <div class="question-card">
+                <span id="questionWord">शब्द</span> का विलोम क्या है?
+            </div>
+            <div class="options-grid" id="optionsContainer">
+                </div>
+        </div>
+
+        <div id="resultMode" class="result-screen hidden">
+            <div class="result-title">🎉 अद्भुत! आपने खेल पूरा किया!</div>
+            <p style="font-size: 1.5rem;">आपका कुल स्कोर: <strong id="finalScore" style="color:var(--primary)">0</strong></p>
+            <button class="restart-btn" onclick="startQuiz()">फिर से खेलें 🔄</button>
+        </div>
+    </div>
+
+    <script>
+        // Words Dataset
+        const wordsData = [
+            { word: "दिन", opposite: "रात", emoji1: "☀️", emoji2: "🌙", english1: "Day", english2: "Night" },
+            { word: "बड़ा", opposite: "छोटा", emoji1: "🐘", emoji2: "🐭", english1: "Big", english2: "Small" },
+            { word: "साफ़", opposite: "गंदा", emoji1: "🧼", emoji2: "🦠", english1: "Clean", english2: "Dirty" },
+            { word: "ऊपर", opposite: "नीचे", emoji1: "🎈", emoji2: "👇", english1: "Up", english2: "Down" },
+            { word: "हंसना", opposite: "रोना", emoji1: "😄", emoji2: "😢", english1: "Laugh", english2: "Cry" },
+            { word: "ठंडा", opposite: "गर्म", emoji1: "🍦", emoji2: "🔥", english1: "Cold", english2: "Hot" },
+            { word: "अंदर", opposite: "बाहर", emoji1: "🏠", emoji2: "🌳", english1: "Inside", english2: "Outside" },
+            { word: "नया", opposite: "पुराना", emoji1: "✨", emoji2: "🕰️", english1: "New", english2: "Old" }
+        ];
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let quizWords = [];
+
+        // Initialize App
+        function init() {
+            renderFlashcards();
+        }
+
+        // Render Flashcards for Learn Mode
+        function renderFlashcards() {
+            const learnContainer = document.getElementById('learnMode');
+            learnContainer.innerHTML = '';
+            
+            wordsData.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.onclick = () => card.classList.toggle('flipped');
+                
+                card.innerHTML = `
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <span class="emoji">${item.emoji1}</span>
+                            <span class="word-text">${item.word}</span>
+                            <span class="meaning-text">(${item.english1})</span>
+                        </div>
+                        <div class="card-back">
+                            <span class="emoji">${item.emoji2}</span>
+                            <span class="word-text">${item.opposite}</span>
+                            <span class="meaning-text">(${item.english2})</span>
+                        </div>
+                    </div>
+                `;
+                learnContainer.appendChild(card);
+            });
+        }
+
+        // Switch Between Learn and Quiz Mode
+        function switchMode(mode) {
+            document.getElementById('learnTab').classList.toggle('active', mode === 'learn');
+            document.getElementById('quizTab').classList.toggle('active', mode === 'quiz');
+
+            if (mode === 'learn') {
+                document.getElementById('learnMode').classList.remove('hidden');
+                document.getElementById('quizMode').classList.add('hidden');
+                document.getElementById('resultMode').classList.add('hidden');
+            } else {
+                document.getElementById('learnMode').classList.add('hidden');
+                startQuiz();
+            }
+        }
+
+        // Start/Restart Quiz
+        function startQuiz() {
+            score = 0;
+            currentQuestionIndex = 0;
+            quizWords = [...wordsData].sort(() => Math.random() - 0.5); // Shuffle array
+            document.getElementById('totalQs').innerText = quizWords.length;
+            document.getElementById('score').innerText = score;
+            
+            document.getElementById('quizMode').classList.remove('hidden');
+            document.getElementById('resultMode').classList.add('hidden');
+            
+            loadQuestion();
+        }
+
+        // Load Next Question
+        function loadQuestion() {
+            if (currentQuestionIndex >= quizWords.length) {
+                showResults();
+                return;
+            }
+
+            const currentData = quizWords[currentQuestionIndex];
+            document.getElementById('questionWord').innerText = currentData.word;
+
+            // Generate options (1 correct, 3 wrong)
+            let options = [currentData.opposite];
+            let wrongOptions = wordsData
+                .map(item => item.opposite)
+                .filter(opp => opp !== currentData.opposite);
+            
+            // Shuffle wrong options and pick 3
+            wrongOptions.sort(() => Math.random() - 0.5);
+            for(let i=0; i<3; i++) {
+                if(wrongOptions[i]) options.push(wrongOptions[i]);
+            }
+            
+            // Shuffle final options list
+            options.sort(() => Math.random() - 0.5);
+
+            // Render option buttons
+            const optionsContainer = document.getElementById('optionsContainer');
+            optionsContainer.innerHTML = '';
+            
+            options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.innerText = opt;
+                btn.onclick = () => checkAnswer(btn, opt, currentData.opposite);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        // Check selected answer
+        function checkAnswer(selectedBtn, chosenOpt, correctOpt) {
+            // Disable all buttons after selection
+            const buttons = document.querySelectorAll('.option-btn');
+            buttons.forEach(btn => btn.style.pointerEvents = 'none');
+
+            if (chosenOpt === correctOpt) {
+                selectedBtn.classList.add('correct');
+                score++;
+                document.getElementById('score').innerText = score;
+            } else {
+                selectedBtn.classList.add('wrong');
+                // Highlight the correct answer
+                buttons.forEach(btn => {
+                    if (btn.innerText === correctOpt) btn.classList.add('correct');
+                });
+            }
+
+            // Wait 1.5 seconds and go to next question
+            setTimeout(() => {
+                currentQuestionIndex++;
+                loadQuestion();
+            }, 1500);
+        }
+
+        // Show final results
+        function showResults() {
+            document.getElementById('quizMode').classList.add('hidden');
+            document.getElementById('resultMode').classList.remove('hidden');
+            document.getElementById('finalScore').innerText = `${score} / ${quizWords.length}`;
+        }
+
+        // Run on load
+        init();
+    </script>
+</body>
+</html>
