@@ -1,286 +1,586 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="kn">
 <head>
-<meta charset="UTF-8">
-<title>English Medium – Science</title>
+  <meta charset="UTF-8">
+  <title>English Medium – Science</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<style>
-body{
-  font-family: Arial, sans-serif;
-  background:#f5f5f5;
-  padding:15px;
-}
+  <style>
+    /* 🎨 ಅಲ್ಟ್ರಾ ಮಾಡರ್ನ್ ಡಿಜಿಟಲ್ ಶೈಲಿ */
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #f0f4f8;
+      padding: 20px;
+      margin: 0;
+    }
 
-h2{
-  background:#1e8449;
-  color:#fff;
-  padding:10px;
-  border-radius:6px;
-}
+    h2 {
+      background: linear-gradient(135deg, #1e8449, #2ecc71);
+      color: #fff;
+      padding: 15px;
+      border-radius: 8px;
+      font-size: 20px;
+      box-shadow: 0 4px 10px rgba(30,132,73,0.2);
+      margin-top: 30px;
+      margin-bottom: 20px;
+    }
 
-.lesson{
-  background:#ffffff;
-  padding:12px;
-  margin:8px 0;
-  border-radius:6px;
-  cursor:pointer;
-  border-left:5px solid #2ecc71;
-}
+    /* ಪಾಠದ ಬಟನ್ ಶೈಲಿ */
+    .lesson {
+      background: #ffffff;
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 8px;
+      cursor: pointer;
+      border-left: 6px solid #2ecc71;
+      font-weight: bold;
+      font-size: 16px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      transition: all 0.3s ease;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
 
-.lesson:hover{
-  background:#eafaf1;
-}
+    .lesson:hover {
+      background: #eafaf1;
+      transform: translateX(5px);
+    }
 
-.coming-soon{
-  display:none;
-  margin-top:8px;
-  color:#d35400;
-  font-size:14px;
-}
+    /* ಪಾಠದ ಸ್ಥಿತಿ ತೋರಿಸುವ ಗುರುತು (Arrow) */
+    .lesson::after {
+      content: '▼';
+      font-size: 12px;
+      color: #1e8449;
+      transition: transform 0.3s;
+    }
+    .lesson.active::after {
+      transform: rotate(180deg);
+    }
 
-.lesson.active .coming-soon{
-  display:block;
-}
-</style>
+    /* 🎮 ಚಟುವಟಿಕೆಗಳ ಮುಖ್ಯ ಗ್ರಿಡ್ ಬಾಕ್ಸ್ (ಆರಂಭದಲ್ಲಿ ಹೈಡ್ ಆಗಿರುತ್ತದೆ) */
+    .activities-container {
+      display: none;
+      background: #ffffff;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 15px;
+      box-shadow: inset 0 2px 5px rgba(0,0,0,0.02);
+    }
+    
+    .activities-container.active {
+      display: block;
+      animation: fadeIn 0.4s ease;
+    }
 
-<script>
-function toggleLesson(id){
-  document.getElementById(id).classList.toggle("active");
-}
-</script>
+    .ppt-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    /* 📊 ಪಿಪಿಟಿ ಚೌಕ ಕಾರ್ಡ್ ವಿನ್ಯಾಸ */
+    .ppt-card {
+      background: #ffffff;
+      border: 1px solid #dee2e6;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+      text-decoration: none;
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .ppt-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+    }
+
+    /* ಗೂಗಲ್ ಡ್ರೈವ್ ಮೂಲಕ ಫ್ರಂಟ್ ಪೇಜ್ ಇಮೇಜ್ ಪ್ರದರ್ಶನ */
+    .thumbnail-box {
+      width: 100%;
+      height: 160px;
+      background: #000;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* 💡 ಗೂಗಲ್ ಡ್ರೈವ್‌ನ ಪ್ರಿವ್ಯೂ ಇಮೇಜ್ ಅನ್ನು ಇಲ್ಲಿ ಸ್ಮಾರ್ಟ್ ಆಗಿ ಲೋಡ್ ಮಾಡಲಾಗುತ್ತದೆ */
+    .thumbnail-box iframe {
+      width: 100%;
+      height: 180px;
+      border: none;
+      position: absolute;
+      top: -10px;
+      pointer-events: none; /* ಕ್ಲಿಕ್ ಮಾಡಿದಾಗ ಐಫ್ರೇಮ್ ಬ್ಲಾಕ್ ಆಗದಿರಲು */
+    }
+
+    /* ಕವರ್ ಲೇಯರ್ - ಇದು ಐಫ್ರೇಮ್ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಲು ಬಿಡುತ್ತದೆ */
+    .click-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.1);
+      z-index: 2;
+    }
+
+    .card-info {
+      padding: 12px;
+      background: #ffffff;
+      border-top: 1px solid #f1f1f1;
+      text-align: center;
+    }
+
+    .card-info h4 {
+      margin: 0 0 5px 0;
+      font-size: 14px;
+      color: #1a1a1a;
+    }
+
+    .card-info span {
+      font-size: 12px;
+      color: #ff4500;
+      font-weight: bold;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+
 </head>
-
 <body>
 
-<h2>English Medium – 6th Science</h2>
+  <h2>English Medium – 6th Science</h2>
 
-<div class="lesson" id="e6s1" onclick="toggleLesson('e6s1')">1. The Wonderful World of Science
+  <div class="lesson" onclick="toggleLesson('lesson6_1', this)">1. The Wonderful World of Science</div>
+  <div class="activities-container" id="lesson6_1">
+    <div class="ppt-grid">
+      <a class="ppt-card" href="https://docs.google.com/presentation/d/10Er8PoRl8qqwQsnorv_SnL9Y5AdE9DWpbG82Bye_FyM/preview" target="_blank">
+        <div class="thumbnail-box">
+          <iframe src="https://docs.google.com/presentation/d/10Er8PoRl8qqwQsnorv_SnL9Y5AdE9DWpbG82Bye_FyM/preview" scrolling="no"></iframe>
+          <div class="click-overlay"></div>
+        </div>
+        <div class="card-info">
+          <h4>1. Wonderful World of Science</h4>
+          <span>📊 OPEN PPT PRESENTATION</span>
+        </div>
+      </a>
+    </div>
   </div>
-<div class="activities" id="lesson1">
-  <a class="activity" href="https://docs.google.com/presentation/d/10Er8PoRl8qqwQsnorv_SnL9Y5AdE9DWpbG82Bye_FyM/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-</div>>
 
-<div class="lesson" id="e6s2" onclick="toggleLesson('e6s2')">2. Exploring Magnets
+  <div class="lesson" onclick="toggleLesson('lesson6_2', this)">2. Exploring Magnets</div>
+  <div class="activities-container" id="lesson6_2">
+    <div class="ppt-grid">
+      <a class="ppt-card" href="https://docs.google.com/presentation/d/1Ynkq5kU_Qaff7pLcIJg2A3tmwQ6hbi8keJEm1-2c83M/preview" target="_blank">
+        <div class="thumbnail-box">
+          <iframe src="https://docs.google.com/presentation/d/1Ynkq5kU_Qaff7pLcIJg2A3tmwQ6hbi8keJEm1-2c83M/preview" scrolling="no"></iframe>
+          <div class="click-overlay"></div>
+        </div>
+        <div class="card-info">
+          <h4>2. Exploring Magnets</h4>
+          <span>📊 OPEN PPT PRESENTATION</span>
+        </div>
+      </a>
+    </div>
   </div>
-<div class="activities" id="lesson2">
-  <a class="activity" href="https://docs.google.com/presentation/d/1Ynkq5kU_Qaff7pLcIJg2A3tmwQ6hbi8keJEm1-2c83M/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-</div>>
 
-<div class="lesson" id="e6s3" onclick="toggleLesson('e6s3')">3. Measurement of Length and Motion
- </div>
-<div class="activities" id="lesson3">
-  <a class="activity" href="https://docs.google.com/presentation/d/11-i0bmDcRCO4i3KA0RAJ0FnLyH2F8qKUlP3bng8XCVQ/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-</div>>
-
-<div class="lesson" id="e6s4" onclick="toggleLesson('e6s4')">4. Temperature and its Measurement
+  <div class="lesson" onclick="toggleLesson('lesson6_3', this)">3. Measurement of Length and Motion</div>
+  <div class="activities-container" id="lesson6_3">
+    <div class="ppt-grid">
+      <a class="ppt-card" href="https://docs.google.com/presentation/d/11-i0bmDcRCO4i3KA0RAJ0FnLyH2F8qKUlP3bng8XCVQ/preview" target="_blank">
+        <div class="thumbnail-box">
+          <iframe src="https://docs.google.com/presentation/d/11-i0bmDcRCO4i3KA0RAJ0FnLyH2F8qKUlP3bng8XCVQ/preview" scrolling="no"></iframe>
+          <div class="click-overlay"></div>
+        </div>
+        <div class="card-info">
+          <h4>3. Length and Motion</h4>
+          <span>📊 OPEN PPT PRESENTATION</span>
+        </div>
+      </a>
+    </div>
   </div>
-<div class="activities" id="lesson4">
-  <a class="activity" href="https://docs.google.com/presentation/d/1rml_h5MZGt-EkHQyGKXtprZgAsWgfX8KHYQvqiwxIcc/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-</div>>
 
-<div class="lesson" id="e6s5" onclick="toggleLesson('e6s5')">5. Beyond Earth
+  <div class="lesson" onclick="toggleLesson('lesson6_4', this)">4. Temperature and its Measurement</div>
+  <div class="activities-container" id="lesson6_4">
+    <div class="ppt-grid">
+      <a class="ppt-card" href="https://docs.google.com/presentation/d/1rml_h5MZGt-EkHQyGKXtprZgAsWgfX8KHYQvqiwxIcc/preview" target="_blank">
+        <div class="thumbnail-box">
+          <iframe src="https://docs.google.com/presentation/d/1rml_h5MZGt-EkHQyGKXtprZgAsWgfX8KHYQvqiwxIcc/preview" scrolling="no"></iframe>
+          <div class="click-overlay"></div>
+        </div>
+        <div class="card-info">
+          <h4>4. Temperature Measurement</h4>
+          <span>📊 OPEN PPT PRESENTATION</span>
+        </div>
+      </a>
+    </div>
   </div>
-<div class="activities" id="lesson5">
-  <a class="activity" href="https://docs.google.com/presentation/d/13MjdbsnD7Z9hC27jsSBk1hMrzSvnZicpRAzDGghIa1Y/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-</div>>
 
-<div class="lesson" id="e6s6" onclick="toggleLesson('e6s6')">6. Materials Around Us
+  <div class="lesson" onclick="toggleLesson('lesson6_5', this)">5. Beyond Earth</div>
+  <div class="activities-container" id="lesson6_5">
+    <div class="ppt-grid">
+      <a class="ppt-card" href="https://docs.google.com/presentation/d/13MjdbsnD7Z9hC27jsSBk1hMrzSvnZicpRAzDGghIa1Y/preview" target="_blank">
+        <div class="thumbnail-box">
+          <iframe src="https://docs.google.com/presentation/d/13MjdbsnD7Z9hC27jsSBk1hMrzSvnZicpRAzDGghIa1Y/preview" scrolling="no"></iframe>
+          <div class="click-overlay"></div>
+        </div>
+        <div class="card-info">
+          <h4>5. Beyond Earth</h4>
+          <span>📊 OPEN PPT PRESENTATION</span>
+        </div>
+      </a>
+    </div>
   </div>
-<div class="activities" id="lesson6">
-  <a class="activity" href="https://docs.google.com/presentation/d/13qtOZ_zhiZ99Yk41GRj9yY62Knks8qvKkPAMONWFeiI/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-</div>>
 
-<div class="lesson" id="e6s7" onclick="toggleLesson('e6s7')">7. A Journey through States of Water
+  <div class="lesson" onclick="toggleLesson('lesson6_6', this)">6. Materials Around Us</div>
+  <div class="activities-container" id="lesson6_6">
+    <div class="ppt-grid">
+      <a class="ppt-card" href="https://docs.google.com/presentation/d/13qtOZ_zhiZ99Yk41GRj9yY62Knks8qvKkPAMONWFeiI/preview" target="_blank">
+        <div class="thumbnail-box">
+          <iframe src="https://docs.google.com/presentation/d/13qtOZ_zhiZ99Yk41GRj9yY62Knks8qvKkPAMONWFeiI/preview" scrolling="no"></iframe>
+          <div class="click-overlay"></div>
+        </div>
+        <div class="card-info">
+          <h4>6. Materials Around Us</h4>
+          <span>📊 OPEN PPT PRESENTATION</span>
+        </div>
+      </a>
+    </div>
   </div>
-<div class="activities" id="lesson7">
-  <a class="activity" href="https://docs.google.com/presentation/d/1oyjx5j-Hn2E5diCAzhaY94BkT32sQ8Xc1pw7f5bzrUw/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-</div>>
 
-<!-- LESSON -->
-<div class="lesson" onclick="toggleLesson('lesson8')">
-  8. Methods of Separation in Everyday Life
-</div>
-
-<!-- ACTIVITIES (hidden by default) -->
-<div class="activities" id="lesson8">
-
-  <a class="activity"
-     href="resources/science/kannada/6th/separation-techniques-activity1.html"
-     target="_blank">
-     🧩 separation-techniques-activity1
-  </a>
-</div>
-<div class="activities" id="lesson8">
-  <a class="activity" href="https://docs.google.com/presentation/d/1_c06KxXEeDYR9QxnmkBuc_uzb5uJzIb8hrHNiK5mumE/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-</div>>
-
-<div class="lesson" id="e6s9" onclick="toggleLesson('e6s9')">9. Nature's Treasures
- </div>
-<div class="activities" id="lesson9">
-  <a class="activity" href="https://docs.google.com/presentation/d/1GhfRjxsIWxBuh83u3ChXMhvsdwrWYJjh5uYxbJxAhvA/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-</div>>
-
-<div class="lesson" id="e6s10" onclick="toggleLesson('e6s10')">10. Diversity in the Living World
+  <div class="lesson" onclick="toggleLesson('lesson6_7', this)">7. A Journey through States of Water</div>
+  <div class="activities-container" id="lesson6_7">
+    <div class="ppt-grid">
+      <a class="ppt-card" href="https://docs.google.com/presentation/d/1oyjx5j-Hn2E5diCAzhaY94BkT32sQ8Xc1pw7f5bzrUw/preview" target="_blank">
+        <div class="thumbnail-box">
+          <iframe src="https://docs.google.com/presentation/d/1oyjx5j-Hn2E5diCAzhaY94BkT32sQ8Xc1pw7f5bzrUw/preview" scrolling="no"></iframe>
+          <div class="click-overlay"></div>
+        </div>
+        <div class="card-info">
+          <h4>7. States of Water</h4>
+          <span>📊 OPEN PPT PRESENTATION</span>
+        </div>
+      </a>
+    </div>
   </div>
-<div class="activities" id="lesson10">
-  <a class="activity" href="https://docs.google.com/presentation/d/1_dzqG_rp-iPhklk5ANRX92PMQ0eaCvuDqUt_n89L8wo/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-</div>>
 
-<div class="lesson" id="e6s11" onclick="toggleLesson('e6s11')">11. Mindful Eating – A Path to Healthy Body
+  <div class="lesson" onclick="toggleLesson('lesson6_8', this)">8. Methods of Separation in Everyday Life</div>
+  <div class="activities-container" id="lesson6_8">
+    <div class="ppt-grid">
+      <a class="ppt-card" href="resources/science/kannada/6th/separation-techniques-activity1.html" target="_blank">
+        <div class="thumbnail-box" style="background: #2c3e50; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">
+          🧩 INTERACTIVE GAME
+        </div>
+        <div class="card-info">
+          <h4>Separation Activity 1</h4>
+          <span>🧩 PLAY INTERACTIVE GAME</span>
+        </div>
+      </a>
+      
+      <a class="ppt-card" href="https://docs.google.com/presentation/d/1_c06KxXEeDYR9QxnmkBuc_uzb5uJzIb8hrHNiK5mumE/preview" target="_blank">
+        <div class="thumbnail-box">
+          <iframe src="https://docs.google.com/presentation/d/1_c06KxXEeDYR9QxnmkBuc_uzb5uJzIb8hrHNiK5mumE/preview" scrolling="no"></iframe>
+          <div class="click-overlay"></div>
+        </div>
+        <div class="card-info">
+          <h4>8. Methods of Separation</h4>
+          <span>📊 OPEN PPT PRESENTATION</span>
+        </div>
+      </a>
+    </div>
   </div>
-<div class="activities" id="lesson11">
-  <a class="activity" href="https://docs.google.com/presentation/d/1r0epGW20B-qPhdEEEhGsxgIrjOiNDgwEny7Z5lpUN08/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-</div>>
 
-<div class="lesson" id="e6s12" onclick="toggleLesson('e6s12')">12. Living Creatures – Exploring their Characteristics
+  <div class="lesson" onclick="toggleLesson('lesson6_9', this)">9. Nature's Treasures</div>
+  <div class="activities-container" id="lesson6_9">
+    <div class="ppt-grid">
+      <a class="ppt-card" href="https://docs.google.com/presentation/d/1GhfRjxsIWxBuh83u3ChXMhvsdwrWYJjh5uYxbJxAhvA/preview" target="_blank">
+        <div class="thumbnail-box">
+          <iframe src="https://docs.google.com/presentation/d/1GhfRjxsIWxBuh83u3ChXMhvsdwrWYJjh5uYxbJxAhvA/preview" scrolling="no"></iframe>
+          <div class="click-overlay"></div>
+        </div>
+        <div class="card-info">
+          <h4>9. Nature's Treasures</h4>
+          <span>📊 OPEN PPT PRESENTATION</span>
+        </div>
+      </a>
+    </div>
   </div>
-<div class="activities" id="lesson12">
-  <a class="activity" href="https://docs.google.com/presentation/d/1csk2f8P-_P3-S2m8o66uwJ5sLyXutfZggRj5BsBSTm8/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-</div>>
 
-  
-<h2>7th Standard – Science (English Medium)</h2>
+  <div class="lesson" onclick="toggleLesson('lesson6_10', this)">10. Diversity in the Living World</div>
+  <div class="activities-container" id="lesson6_10">
+    <div class="ppt-grid">
+      <a class="ppt-card" href="https://docs.google.com/presentation/d/1_dzqG_rp-iPhklk5ANRX92PMQ0eaCvuDqUt_n89L8wo/preview" target="_blank">
+        <div class="thumbnail-box">
+          <iframe src="https://docs.google.com/presentation/d/1_dzqG_rp-iPhklk5ANRX92PMQ0eaCvuDqUt_n89L8wo/preview" scrolling="no"></iframe>
+          <div class="click-overlay"></div>
+        </div>
+        <div class="card-info">
+          <h4>10. Diversity in Living World</h4>
+          <span>📊 OPEN PPT PRESENTATION</span>
+        </div>
+      </a>
+    </div>
+  </div>
 
-<div class="lesson" onclick="toggleLesson('eslesson1')">
-1. The Ever Evolving World of Science
-</div>
-<div class="activities" id="lesson7">
-  <a class="activity" href="https://docs.google.com/presentation/d/1AsbAVjZ5yhHr7U2koSXARgxu0J0bY7VBS-repz7Vyts/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-</div>>
+  <div class="lesson" onclick="toggleLesson('lesson6_11', this)">11. Mindful Eating – Path to Healthy Body</div>
+  <div class="activities-container" id="lesson6_11">
+    <div class="ppt-grid">
+      <a class="ppt-card" href="https://docs.google.com/presentation/d/1r0epGW20B-qPhdEEEhGsxgIrjOiNDgwEny7Z5lpUN08/preview" target="_blank">
+        <div class="thumbnail-box">
+          <iframe src="https://docs.google.com/presentation/d/1r0epGW20B-qPhdEEEhGsxgIrjOiNDgwEny7Z5lpUN08/preview" scrolling="no"></iframe>
+          <div class="click-overlay"></div>
+        </div>
+        <div class="card-info">
+          <h4>11. Mindful Eating</h4>
+          <span>📊 OPEN PPT PRESENTATION</span>
+        </div>
+      </a>
+    </div>
+  </div>
 
-<div class="lesson" onclick="toggleLesson('eslesson2')">
-2. Exploring Substances: Acidic, Basic and Neutral
-</div>
-<div class="activities" id="lesson7">
-  <a class="activity" href="https://docs.google.com/presentation/d/1EzXebc8UAoQDcCjGEw9EIoAjg0DsfQkWmpE0z0SJe-s/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-</div>
+  <div class="lesson" onclick="toggleLesson('lesson6_12', this)">12. Living Creatures – Exploring Characteristics</div>
+  <div class="activities-container" id="lesson6_12">
+    <div class="ppt-grid">
+      <a class="ppt-card" href="https://docs.google.com/presentation/d/1csk2f8P-_P3-S2m8o66uwJ5sLyXutfZggRj5BsBSTm8/preview" target="_blank">
+        <div class="thumbnail-box">
+          <iframe src="https://docs.google.com/presentation/d/1csk2f8P-_P3-S2m8o66uwJ5sLyXutfZggRj5BsBSTm8/preview" scrolling="no"></iframe>
+          <div class="click-overlay"></div>
+        </div>
+        <div class="card-info">
+          <h4>12. Living Creatures</h4>
+          <span>📊 OPEN PPT PRESENTATION</span>
+        </div>
+      </a>
+    </div>
+  </div>
 
-<div class="lesson" onclick="toggleLesson('eslesson3')">
-3. Electricity Circuits and Their Components
-</div>
-<div class="activities" id="lesson7">
-  <a class="activity" href="https://docs.google.com/presentation/d/1RX0MptRgDHDRwdYEAJywzrREMuLNjFuUdf6aQZtK1BQ/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-</div>
 
-<div class="lesson" onclick="toggleLesson('eslesson4')">
-4. The World of Metals and Non-metals
-</div>
-<div class="activities" id="lesson7">
-  <a class="activity" href="https://docs.google.com/presentation/d/1HxtJUHFwxhRaQcEwJ53eJc6FuPJ_lJr8LXAA9zQynP8/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-</div>
+  <h2>7th Standard – Science (English Medium)</h2>
 
-<div class="lesson" onclick="toggleLesson('eslesson5')">
-5. Changes Around Us: Physical and Chemical
-</div>
-<div class="activities" id="lesson7">
-  <a class="activity" href="https://docs.google.com/presentation/d/13qtOZ_zhiZ99Yk41GRj9yY62Knks8qvKkPAMONWFeiI/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-  <div class="activities" id="lesson7">
-  <a class="activity" href=" https://docs.google.com/presentation/d/1x0qG-wuUnDRXE7PO9ARXZZ-r3gkiaaODJjqQ-dptVug/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-</div>
+  <div class="lesson" onclick="toggleLesson('lesson7_1', this)">1. The Ever Evolving World of Science</div>
+  <div class="activities-container" id="lesson7_1">
+    <div class="ppt-grid">
+      <a class="ppt-card" href="https://docs.google.com/presentation/d/ AsbAVjZ5yhHr7U2koSXARgxu0J0bY7VBS-repz7Vyts/preview" target="_blank">
+        <div class="thumbnail-box">
+          <iframe src="https://docs.google.com/presentation/d/AsbAVjZ5yhHr7U2koSXARgxu0J0bY7VBS-repz7Vyts/preview" scrolling="no"></iframe>
+          <div class="click-overlay"></div>
+        </div>
+        <div class="card-info">
+          <h4>1. Evolving World of Science</h4>
+          <span>📊 OPEN PPT PRESENTATION</span>
+        </div>
+      </a>
+    </div>
+  </div>
 
-<div class="lesson" onclick="toggleLesson('eslesson6')">
-6. Adolescence: A Stage of Growth and Change
-</div>
-<div class="activities" id="lesson7">
-  <a class="activity" href="https://docs.google.com/presentation/d/17pykhLQf00kgkxW1DvELxojv-Xbx1nvng1TaulkbNnA/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-</div>
+  <div class="lesson" onclick="toggleLesson('lesson7_2', this)">2. Exploring Substances: Acidic, Basic and Neutral</div>
+  <div class="activities-container" id="lesson7_2">
+    <div class="ppt-grid">
+      <a class="ppt-card" href="https://docs.google.com/presentation/d/1EzXebc8UAoQDcCjGEw9EIoAjg0DsfQkWmpE0z0SJe-s/preview" target="_blank">
+        <div class="thumbnail-box">
+          <iframe src="https://docs.google.com/presentation/d/1EzXebc8UAoQDcCjGEw9EIoAjg0DsfQkWmpE0z0SJe-s/preview" scrolling="no"></iframe>
+          <div class="click-overlay"></div>
+        </div>
+        <div class="card-info">
+          <h4>2. Exploring Substances</h4>
+          <span>📊 OPEN PPT PRESENTATION</span>
+        </div>
+      </a>
+    </div>
+  </div>
 
-<div class="lesson" onclick="toggleLesson('eslesson7')">
-7. Heat Transfer in Nature
-</div>
-<div class="activities" id="lesson7">
-  <a class="activity" href="https://docs.google.com/presentation/d/1ONF9FXswToAVcVvixEEGIihKWVLwGr9lhCuC3QPWdTw/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-</div>
+  <div class="lesson" onclick="toggleLesson('lesson7_3', this)">3. Electricity Circuits and Their Components</div>
+  <div class="activities-container" id="lesson7_3">
+    <div class="ppt-grid">
+      <a class="ppt-card" href="https://docs.google.com/presentation/d/1RX0MptRgDHDRwdYEAJywzrREMuLNjFuUdf6aQZtK1BQ/preview" target="_blank">
+        <div class="thumbnail-box">
+          <iframe src="https://docs.google.com/presentation/d/1RX0MptRgDHDRwdYEAJywzrREMuLNjFuUdf6aQZtK1BQ/preview" scrolling="no"></iframe>
+          <div class="click-overlay"></div>
+        </div>
+        <div class="card-info">
+          <h4>3. Electricity Circuits</h4>
+          <span>📊 OPEN PPT PRESENTATION</span>
+        </div>
+      </a>
+    </div>
+  </div>
 
-<div class="lesson" onclick="toggleLesson('eslesson8')">
-8. Measurement of Time and Motion
-</div>
-<div class="activities" id="lesson7">
-  <a class="activity" href="https://docs.google.com/presentation/d/1p8sbx-IRMvQgsXHIpGhNeRJxBshMiCqA4hAU_HW6nRY/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-</div>
-<div class="lesson" onclick="toggleLesson('eslesson9')">
-9. Life Processes in Animals
-</div>
-<div class="activities" id="lesson7">
-  <a class="activity" href="https://docs.google.com/presentation/d/1NL3m7cDFr5nDN4UG8578sbY-1NbwSkbmhEaq6hZQ7Rg/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-</div>
+  <div class="lesson" onclick="toggleLesson('lesson7_4', this)">4. The World of Metals and Non-metals</div>
+  <div class="activities-container" id="lesson7_4">
+    <div class="ppt-grid">
+      <a class="ppt-card" href="https://docs.google.com/presentation/d/1HxtJUHFwxhRaQcEwJ53eJc6FuPJ_lJr8LXAA9zQynP8/preview" target="_blank">
+        <div class="thumbnail-box">
+          <iframe src="https://docs.google.com/presentation/d/1HxtJUHFwxhRaQcEwJ53eJc6FuPJ_lJr8LXAA9zQynP8/preview" scrolling="no"></iframe>
+          <div class="click-overlay"></div>
+        </div>
+        <div class="card-info">
+          <h4>4. Metals and Non-metals</h4>
+          <span>📊 OPEN PPT PRESENTATION</span>
+        </div>
+      </a>
+    </div>
+  </div>
 
-<div class="lesson" onclick="toggleLesson('eslesson10')">
-10. Life Processes in Plants
-</div>
-<div class="activities" id="lesson7">
-  <a class="activity" href="https://docs.google.com/presentation/d/1IJ_ctbEBLQ2oZqBR4qkxy5V4LFhr4ezV_ele_0Q0tvU/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-</div>
-  
-<div class="lesson" onclick="toggleLesson('eslesson11')">
-11. Light, Shadows and Reflections
-</div>
-<div class="activities" id="lesson7">
-  <a class="activity" href="https://docs.google.com/presentation/d/17Zd9njSuIOe9aHkeREPdSV4CZx34WqQgjn0NZNshrJM/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-</div>
+  <div class="lesson" onclick="toggleLesson('lesson7_5', this)">5. Changes Around Us: Physical and Chemical</div>
+  <div class="activities-container" id="lesson7_5">
+    <div class="ppt-grid">
+      <a class="ppt-card" href="https://docs.google.com/presentation/d/13qtOZ_zhiZ99Yk41GRj9yY62Knks8qvKkPAMONWFeiI/preview" target="_blank">
+        <div class="thumbnail-box">
+          <iframe src="https://docs.google.com/presentation/d/13qtOZ_zhiZ99Yk41GRj9yY62Knks8qvKkPAMONWFeiI/preview" scrolling="no"></iframe>
+          <div class="click-overlay"></div>
+        </div>
+        <div class="card-info">
+          <h4>5. Physical & Chemical Changes (Part 1)</h4>
+          <span>📊 OPEN PPT PRESENTATION</span>
+        </div>
+      </a>
+      
+      <a class="ppt-card" href="https://docs.google.com/presentation/d/1x0qG-wuUnDRXE7PO9ARXZZ-r3gkiaaODJjqQ-dptVug/preview" target="_blank">
+        <div class="thumbnail-box">
+          <iframe src="https://docs.google.com/presentation/d/1x0qG-wuUnDRXE7PO9ARXZZ-r3gkiaaODJjqQ-dptVug/preview" scrolling="no"></iframe>
+          <div class="click-overlay"></div>
+        </div>
+        <div class="card-info">
+          <h4>5. Physical & Chemical Changes (Part 2)</h4>
+          <span>📊 OPEN PPT PRESENTATION</span>
+        </div>
+      </a>
+    </div>
+  </div>
 
-<div class="lesson" onclick="toggleLesson('eslesson12')">
-12. Earth, Moon and the Sun
-</div>
-<div class="activities" id="lesson7">
-  <a class="activity" href="https://docs.google.com/presentation/d/1UxmHyOHeyFlMKCm1jjzCPsn3UBPAGgiSwn9lySSxTSU/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-</div>
+  <div class="lesson" onclick="toggleLesson('lesson7_6', this)">6. Adolescence: A Stage of Growth and Change</div>
+  <div class="activities-container" id="lesson7_6">
+    <div class="ppt-grid">
+      <a class="ppt-card" href="https://docs.google.com/presentation/d/17pykhLQf00kgkxW1DvELxojv-Xbx1nvng1TaulkbNnA/preview" target="_blank">
+        <div class="thumbnail-box">
+          <iframe src="https://docs.google.com/presentation/d/17pykhLQf00kgkxW1DvELxojv-Xbx1nvng1TaulkbNnA/preview" scrolling="no"></iframe>
+          <div class="click-overlay"></div>
+        </div>
+        <div class="card-info">
+          <h4>6. Adolescence Stage</h4>
+          <span>📊 OPEN PPT PRESENTATION</span>
+        </div>
+      </a>
+    </div>
+  </div>
 
-<script>
-function toggleLesson(id) {
-  const el = document.getElementById(id);
-  el.style.display = (el.style.display === "block") ? "none" : "block";
-}
-</script>
+  <div class="lesson" onclick="toggleLesson('lesson7_7', this)">7. Heat Transfer in Nature</div>
+  <div class="activities-container" id="lesson7_7">
+    <div class="ppt-grid">
+      <a class="ppt-card" href="https://docs.google.com/presentation/d/1ONF9FXswToAVcVvixEEGIihKWVLwGr9lhCuC3QPWdTw/preview" target="_blank">
+        <div class="thumbnail-box">
+          <iframe src="https://docs.google.com/presentation/d/1ONF9FXswToAVcVvixEEGIihKWVLwGr9lhCuC3QPWdTw/preview" scrolling="no"></iframe>
+          <div class="click-overlay"></div>
+        </div>
+        <div class="card-info">
+          <h4>7. Heat Transfer</h4>
+          <span>📊 OPEN PPT PRESENTATION</span>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <div class="lesson" onclick="toggleLesson('lesson7_8', this)">8. Measurement of Time and Motion</div>
+  <div class="activities-container" id="lesson7_8">
+    <div class="ppt-grid">
+      <a class="ppt-card" href="https://docs.google.com/presentation/d/1p8sbx-IRMvQgsXHIpGhNeRJxBshMiCqA4hAU_HW6nRY/preview" target="_blank">
+        <div class="thumbnail-box">
+          <iframe src="https://docs.google.com/presentation/d/1p8sbx-IRMvQgsXHIpGhNeRJxBshMiCqA4hAU_HW6nRY/preview" scrolling="no"></iframe>
+          <div class="click-overlay"></div>
+        </div>
+        <div class="card-info">
+          <h4>8. Time and Motion</h4>
+          <span>📊 OPEN PPT PRESENTATION</span>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <div class="lesson" onclick="toggleLesson('lesson7_9', this)">9. Life Processes in Animals</div>
+  <div class="activities-container" id="lesson7_9">
+    <div class="ppt-grid">
+      <a class="ppt-card" href="https://docs.google.com/presentation/d/1NL3m7cDFr5nDN4UG8578sbY-1NbwSkbmhEaq6hZQ7Rg/preview" target="_blank">
+        <div class="thumbnail-box">
+          <iframe src="https://docs.google.com/presentation/d/1NL3m7cDFr5nDN4UG8578sbY-1NbwSkbmhEaq6hZQ7Rg/preview" scrolling="no"></iframe>
+          <div class="click-overlay"></div>
+        </div>
+        <div class="card-info">
+          <h4>9. Life Processes in Animals</h4>
+          <span>📊 OPEN PPT PRESENTATION</span>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <div class="lesson" onclick="toggleLesson('lesson7_10', this)">10. Life Processes in Plants</div>
+  <div class="activities-container" id="lesson7_10">
+    <div class="ppt-grid">
+      <a class="ppt-card" href="https://docs.google.com/presentation/d/1IJ_ctbEBLQ2oZqBR4qkxy5V4LFhr4ezV_ele_0Q0tvU/preview" target="_blank">
+        <div class="thumbnail-box">
+          <iframe src="https://docs.google.com/presentation/d/1IJ_ctbEBLQ2oZqBR4qkxy5V4LFhr4ezV_ele_0Q0tvU/preview" scrolling="no"></iframe>
+          <div class="click-overlay"></div>
+        </div>
+        <div class="card-info">
+          <h4>10. Life Processes in Plants</h4>
+          <span>📊 OPEN PPT PRESENTATION</span>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <div class="lesson" onclick="toggleLesson('lesson7_11', this)">11. Light, Shadows and Reflections</div>
+  <div class="activities-container" id="lesson7_11">
+    <div class="ppt-grid">
+      <a class="ppt-card" href="https://docs.google.com/presentation/d/17Zd9njSuIOe9aHkeREPdSV4CZx34WqQgjn0NZNshrJM/preview" target="_blank">
+        <div class="thumbnail-box">
+          <iframe src="https://docs.google.com/presentation/d/17Zd9njSuIOe9aHkeREPdSV4CZx34WqQgjn0NZNshrJM/preview" scrolling="no"></iframe>
+          <div class="click-overlay"></div>
+        </div>
+        <div class="card-info">
+          <h4>11. Light and Shadows</h4>
+          <span>📊 OPEN PPT PRESENTATION</span>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <div class="lesson" onclick="toggleLesson('lesson7_12', this)">12. Earth, Moon and the Sun</div>
+  <div class="activities-container" id="lesson7_12">
+    <div class="ppt-grid">
+      <a class="ppt-card" href="https://docs.google.com/presentation/d/1UxmHyOHeyFlMKCm1jjzCPsn3UBPAGgiSwn9lySSxTSU/preview" target="_blank">
+        <div class="thumbnail-box">
+          <iframe src="https://docs.google.com/presentation/d/1UxmHyOHeyFlMKCm1jjzCPsn3UBPAGgiSwn9lySSxTSU/preview" scrolling="no"></iframe>
+          <div class="click-overlay"></div>
+        </div>
+        <div class="card-info">
+          <h4>12. Earth, Moon and Sun</h4>
+          <span>📊 OPEN PPT PRESENTATION</span>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <script>
+    function toggleLesson(id, headerEl) {
+      // ಪಾಠದ ಹೆಡರ್ ಆಕ್ಟಿವ್ ಕ್ಲಾಸ್ ಬದಲಾಯಿಸುವುದು
+      headerEl.classList.toggle("active");
+      
+      // ಕಂಟೇನರ್ ಓಪನ್/ಕ್ಲೋಸ್ ಮಾಡುವುದು
+      const container = document.getElementById(id);
+      if (container.classList.contains("active")) {
+        container.classList.remove("active");
+      } else {
+        container.classList.add("active");
+      }
+    }
+  </script>
+
 </body>
 </html>
