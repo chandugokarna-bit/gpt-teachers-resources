@@ -1,476 +1,946 @@
 <!DOCTYPE html>
 <html lang="kn">
 <head>
-<meta charset="UTF-8">
-<title>ಕನ್ನಡ ಮಾಧ್ಯಮ – ಸಮಾಜ ವಿಜ್ಞಾನ</title>
+  <meta charset="UTF-8">
+  <title>ಕನ್ನಡ ಮಾಧ್ಯಮ – ಸಮಾಜ ವಿಜ್ಞಾನ</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<style>
-body{
-  font-family: "Noto Sans Kannada", Arial, sans-serif;
-  background:#f5f5f5;
-  padding:15px;
-}
+  <style>
+    /* 🎨 ಅಲ್ಟ್ರಾ ಮಾಡರ್ನ್ ಬ್ರೌನ್ ಪ್ರೀಮಿಯಂ ಡಿಜಿಟಲ್ ಶೈಲಿ */
+    body {
+      font-family: "Noto Sans Kannada", Arial, sans-serif;
+      background: #fdfbf7;
+      padding: 20px;
+      margin: 0;
+    }
 
-h2{
-  background:#6d4c41;
-  color:#fff;
-  padding:10px;
-  border-radius:6px;
-}
+    h2 {
+      background: linear-gradient(135deg, #6d4c41, #8d6e63);
+      color: #fff;
+      padding: 15px;
+      border-radius: 8px;
+      font-size: 20px;
+      box-shadow: 0 4px 10px rgba(109,76,65,0.2);
+      margin-top: 30px;
+      margin-bottom: 20px;
+    }
 
-.lesson{
-  padding:12px;
-  margin:10px 0;
-  background:#ffffff;
-  border-left:6px solid #8d6e63;
-  font-weight:bold;
-  cursor:pointer;
-  border-radius:6px;
-}
+    /* ಮಾಹಿತಿ ಪಟ್ಟಿ ಬ್ಯಾನರ್ */
+    .info-banner {
+      background: #efebe9;
+      color: #4e342e;
+      padding: 12px;
+      border-radius: 6px;
+      font-weight: bold;
+      margin-bottom: 15px;
+      border-left: 5px solid #d7ccc8;
+      font-size: 14px;
+    }
 
-.lesson:hover{
-  background:#f2f2f2;
-}
+    /* ಪಾಠದ ಹೆಡರ್ ಬಟನ್ ಶೈಲಿ */
+    .lesson {
+      background: #ffffff;
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 8px;
+      cursor: pointer;
+      border-left: 6px solid #8d6e63;
+      font-weight: bold;
+      font-size: 16px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      transition: all 0.3s ease;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
 
-.activities{
-  display:none;
-  margin-left:25px;
-  margin-bottom:15px;
-}
+    .lesson:hover {
+      background: #f5f2f0;
+      transform: translateX(5px);
+    }
 
-.activity{
-  display:block;
-  margin:6px 0;
-  padding:8px 12px;
-  background:#ede7f6;
-  color:#4a148c;
-  text-decoration:none;
-  border-radius:6px;
-  width:fit-content;
-}
+    /* ಸ್ಥಿತಿ ತೋರಿಸುವ ಗುರುತು (Arrow) */
+    .lesson::after {
+      content: '▼';
+      font-size: 12px;
+      color: #6d4c41;
+      transition: transform 0.3s;
+    }
+    .lesson.active::after {
+      transform: rotate(180deg);
+    }
 
-.activity:hover{
-  background:#d1c4e9;
-}
-</style>
+    /* 🎮 ಚಟುವಟಿಕೆಗಳ ಮುಖ್ಯ ಗ್ರಿಡ್ ಬಾಕ್ಸ್ (ಆರಂಭದಲ್ಲಿ ಹೈಡ್ ಆಗಿರುತ್ತದೆ) */
+    .activities-container {
+      display: none;
+      background: #ffffff;
+      border: 1px solid #ebdcd5;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 15px;
+      box-shadow: inset 0 2px 5px rgba(0,0,0,0.02);
+    }
+    
+    .activities-container.active {
+      display: block;
+      animation: fadeIn 0.4s ease;
+    }
 
-<script>
-function toggleLesson(id){
-  const el = document.getElementById(id);
-  el.style.display = (el.style.display === "block") ? "none" : "block";
-}
-</script>
+    .ppt-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    /* 📊 ಪಿಪಿಟಿ ಚೌಕ ಕಾರ್ಡ್ ವಿನ್ಯಾಸ */
+    .ppt-card {
+      background: #ffffff;
+      border: 1px solid #dee2e6;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+      text-decoration: none;
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .ppt-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 15px rgba(109,76,65,0.15);
+    }
+
+    /* ਗೂಗಲ್ ಡ್ರೈವ್ ಮೂಲಕ ಫ್ರಂಟ್ ಪೇಜ್ ಇಮೇಜ್ ಪ್ರದರ್ಶನ ಬಾಕ್ಸ್ */
+    .thumbnail-box {
+      width: 100%;
+      height: 160px;
+      background: #000;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .thumbnail-box iframe {
+      width: 100%;
+      height: 180px;
+      border: none;
+      position: absolute;
+      top: -10px;
+      pointer-events: none;
+    }
+
+    .click-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.03);
+      z-index: 2;
+    }
+
+    .card-info {
+      padding: 12px;
+      background: #ffffff;
+      border-top: 1px solid #f1f1f1;
+      text-align: center;
+    }
+
+    .card-info h4 {
+      margin: 0 0 5px 0;
+      font-size: 14px;
+      color: #1a1a1a;
+      line-height: 1.4;
+    }
+
+    .card-info span {
+      font-size: 12px;
+      color: #8d6e63;
+      font-weight: bold;
+    }
+
+    .coming-soon {
+      color: #d35400;
+      font-weight: bold;
+      font-size: 14px;
+      padding: 5px;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
 </head>
-
 <body>
 
-<h2>6ನೇ ತರಗತಿ – ಸಮಾಜ ವಿಜ್ಞಾನ</h2>
-
-  <div class="pptx" onclick="toggleLesson('doc')">
-  ಪಾಠದ ಹೆಸರಿನ ಮೇಲೆ ಕ್ಲಿಕ್‌ ಮಾಡಿ (pptx,html,quiz)
-</div>
-
-<div class="lesson" onclick="toggleLesson('ks6-1')">
-  1. ಇತಿಹಾಸದ ಪರಿಚಯ ಮತ್ತು ಆರಂಭಿಕ ಸಮಾಜ
-</div>
-<div class="activities" id="ks6-1">
-  <a class="activity" href="https://docs.google.com/presentation/d/1-5BOksdi9WH7mfPH75hTib2R9ZxlQ4zyKamem3O_UMk/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-</div>
-
-<div class="lesson" onclick="toggleLesson('ks6-2')">2. ಭಾರತ ನಮ್ಮ ಹೆಮ್ಮೆ</div>
-<div class="activities" id="ks6-2">
-  <div class="coming-soon">🚧 Coming Soon</div>
-</div>
-
-<div class="lesson" onclick="toggleLesson('ks6-3')">3. ನಮ್ಮ ಹೆಮ್ಮೆಯ – ಕರ್ನಾಟಕ</div>
-<div class="activities" id="ks6-3">
-  <div class="coming-soon">🚧 Coming Soon</div>
-</div>
-
-<div class="lesson" onclick="toggleLesson('ks6-4')">4. ವೇದ ಕಾಲದ ಸಂಸ್ಕೃತಿ</div>
-<div class="activities" id="ks6-4">
-  <div class="coming-soon">🚧 Coming Soon</div>
-</div>
-
-<div class="lesson" onclick="toggleLesson('ks6-5')">5. ಹೊಸ ಧರ್ಮಗಳ ಉದಯ</div>
-<div class="activities" id="ks6-5">
-  <div class="coming-soon">🚧 Coming Soon</div>
-</div>
-
-<div class="lesson" onclick="toggleLesson('ks6-6')">6. ದಕ್ಷಿಣ ಭಾರತದ ಪ್ರಾಚೀನ ರಾಜವಂಶಗಳು</div>
-<div class="activities" id="ks6-6">
-  <a class="activity" href="https://docs.google.com/presentation/d/15qINulOCKQSKONl1izbvljQNjB4n8Mfy8WrYAH74vqI/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-</div>
-  <a class="activity" href="https://docs.google.com/presentation/d/15qINulOCKQSKONl1izbvljQNjB4n8Mfy8WrYAH74vqI/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-</div>
-  <a class="activity" href="https://docs.google.com/presentation/d/15qINulOCKQSKONl1izbvljQNjB4n8Mfy8WrYAH74vqI/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-</div>
-  <a class="activity" href="https://docs.google.com/presentation/d/15qINulOCKQSKONl1izbvljQNjB4n8Mfy8WrYAH74vqI/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-</div>
-
-<div class="lesson" onclick="toggleLesson('ks6-7')">7. ಪೌರ ಮತ್ತು ಪೌರತ್ವ</div>
-<div class="activities" id="ks6-7">
-  <div class="coming-soon">🚧 Coming Soon</div>
-</div>
-
-<div class="lesson" onclick="toggleLesson('ks6-8')">8. ನಮ್ಮ ಸಂವಿಧಾನ</div>
-<div class="activities" id="ks6-8">
-  <div class="coming-soon">🚧 Coming Soon</div>
-</div>
-
-<div class="lesson" onclick="toggleLesson('ks6-9')">9. ಪ್ರಭುತ್ವದ ಪ್ರಕಾರಗಳು</div>
-<div class="activities" id="ks6-9">
-  <div class="coming-soon">🚧 Coming Soon</div>
-</div>
-
-<div class="lesson" onclick="toggleLesson('ks6-10')">10. ಗ್ಲೋಬ್ ಮತ್ತು ನಕಾಶೆಗಳು</div>
-<div class="activities" id="ks6-10">
-  <div class="coming-soon">🚧 Coming Soon</div>
-</div>
-
-<div class="lesson" onclick="toggleLesson('ks6-11')">11. ಭೂಮಿಯ ಸ್ವರೂಪ</div>
-<div class="activities" id="ks6-11">
- <a class="activity" href="https://docs.google.com/presentation/d/1Ef--YMFiuwr9maBR3EJztgzMkvtW28ulRYjEam49mBQ/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-</div>
-
-<div class="lesson" onclick="toggleLesson('ks6-12')">12. ಉತ್ತರ ಭಾರತದ ಪ್ರಾಚೀನ ರಾಜ ಮನೆತನಗಳು</div>
-<div class="activities" id="ks6-12">
-  <a class="activity" href="https://docs.google.com/presentation/d/1GMNmrjtYeAQOl7fQ3mJ5yZ0blgZVkFBtbWuxl2OddTQ/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-</div>
-
-<div class="lesson" onclick="toggleLesson('ks6-13')">13. ದೆಹಲಿಯ ಸುಲ್ತಾನರು</div>
-<div class="activities" id="ks6-13">
-  <div class="coming-soon">🚧 Coming Soon</div>
-</div>
-
-<div class="lesson" onclick="toggleLesson('ks6-14')">14. ವಿಜಯನಗರ ಸಾಮ್ರಾಜ್ಯ ಹಾಗೂ ಬಹುಮನಿ ರಾಜ್ಯ</div>
-<div class="activities" id="ks6-14">
-  <div class="coming-soon">🚧 Coming Soon</div>
-</div>
-
-<div class="lesson" onclick="toggleLesson('ks6-15')">15. ಮೊಘಲರು ಹಾಗೂ ಮರಾಠರು</div>
-<div class="activities" id="ks6-15">
-  <div class="coming-soon">🚧 Coming Soon</div>
-</div>
-
-<div class="lesson" onclick="toggleLesson('ks6-16')">16. ಭಾರತೀಯ ವೈಚಾರಿಕತೆ ಹಾಗೂ ಭಕ್ತಿಪಂಥ</div>
-<div class="activities" id="ks6-16">
-  <div class="coming-soon">🚧 Coming Soon</div>
-</div>
-
-<div class="lesson" onclick="toggleLesson('ks6-17')">17. ಪ್ರಜಾಪ್ರಭುತ್ವ</div>
-<div class="activities" id="ks6-17">
-  <div class="coming-soon">🚧 Coming Soon</div>
-</div>
-
-<div class="lesson" onclick="toggleLesson('ks6-18')">18. ರಾಜ್ಯ ನೀತಿ ನಿರ್ದೇಶಕ ತತ್ವಗಳು</div>
-<div class="activities" id="ks6-18">
-  <div class="coming-soon">🚧 Coming Soon</div>
-</div>
-
-<div class="lesson" onclick="toggleLesson('ks6-19')">19. ಮಾನವ ಹಕ್ಕುಗಳು, ಮೂಲಭೂತ ಹಕ್ಕುಗಳು ಮತ್ತು ಕರ್ತವ್ಯಗಳು</div>
-<div class="activities" id="ks6-19">
-  <div class="coming-soon">🚧 Coming Soon</div>
-</div>
-
-<div class="lesson" onclick="toggleLesson('ks6-20')">20. ರಾಷ್ಟ್ರೀಯ ಭಾವ್ಯೇಕ್ಯತೆ</div>
-<div class="activities" id="ks6-20">
-  <div class="coming-soon">🚧 Coming Soon</div>
-</div>
-
-<div class="lesson" onclick="toggleLesson('ks6-21')">21. ರಾಷ್ಟ್ರೀಯ ಚಿಹ್ನೆಗಳು ಮತ್ತು ರಾಷ್ಟ್ರೀಯ ದಿನಾಚರಣೆ</div>
-<div class="activities" id="ks6-21">
-  <a class="activity" href="https://docs.google.com/presentation/d/1Wkckac76dKUjoJ8vwtRw0HviLkQ_pV7y8V-_4wZlRWs/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-</div>
-
-<div class="lesson" onclick="toggleLesson('ks6-22')">22. ಏಷ್ಯಾ ಖಂಡ</div>
-<div class="activities" id="ks6-22">
-  <a class="activity" href="https://docs.google.com/presentation/d/13PUhO9Zuzyux79WMw9qO3yTQjt-f_oZgejY4HjGcojI/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-</div>
+  <h2>6ನೇ ತರಗತಿ – ಸಮಾಜ ವಿಜ್ಞಾನ</h2>
   
-<div class="lesson" onclick="toggleLesson('ks6-23')">23. ಯೂರೋಪ್ ಖಂಡ</div>
-<div class="activities" id="ks6-23">
-  <a class="activity" href="https://docs.google.com/presentation/d/1GERp5WekmEZI88s79sOEFJrOnsk8K1x9M13VXrXCK8k/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-</div>
+  <div class="info-banner">💡 ಪಾಠದ ಹೆಸರಿನ ಮೇಲೆ ಕ್ಲಿಕ್‌ ಮಾಡಿ (PPTX, HTML, QUIZ ಸಂಪನ್ಮೂಲಗಳು ಇಲ್ಲಿವೆ)</div>
 
-<div class="lesson" onclick="toggleLesson('ks6-24')">24. ಆಫ್ರಿಕ ಖಂಡ</div>
-<div class="activities" id="ks6-24">
-  <div class="coming-soon">🚧 Coming Soon</div>
-</div>
-
-<hr>
-
-<h2>7ನೇ ತರಗತಿ – ಸಮಾಜ ವಿಜ್ಞಾನ</h2>
-
-   <div class="pptx" onclick="toggleLesson('doc')">
-  ಪಾಠದ ಹೆಸರಿನ ಮೇಲೆ ಕ್ಲಿಕ್‌ ಮಾಡಿ (pptx,html,quiz)
-</div>
-
-<div class="lesson" onclick="toggleLesson('ks7-1')">1. ಜಗತ್ತಿನ ಪ್ರಮುಖ ಘಟನೆಗಳು</div>
-<div class="activities" id="ks7-1">
-  <a class="activity" href="https://docs.google.com/presentation/d/1EC4Xwl90AJF6_yJEFXUdn-o0QYjdwx3BgE12OCg8HJQ/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-  <a class="activity" href="https://docs.google.com/presentation/d/1U-m8yCbvEUFDplx1XhVoEDDZANjELDFy2gz1_kQHZ3E/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-</div>
-  
-<div class="lesson" onclick="toggleLesson('ks7-2')">2. ಮಧ್ಯಯುಗದ ಯುರೋಪ್</div>
-<div class="activities" id="ks7-2">
-  <a class="activity" href="https://docs.google.com/presentation/d/1_LM3dKuDEkJebzO7ZUPeuttj8uD0-ALt7XqUEPteywg/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-  <a class="activity" href="https://docs.google.com/presentation/d/1HviVSuv59C8WW02zz9VGusquZSGlUlCbv1CUgsVAiy4/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-</div>
-
-<div class="lesson" onclick="toggleLesson('ks7-3')">3. ಭಾರತಕ್ಕೆ ಐರೋಪ್ಯರ ಆಗಮನ</div>
-<div class="activities" id="ks7-3">
-  <a class="activity" href="https://docs.google.com/presentation/d/1cmwxXGtkgkOf7LwhRjtvZ4j81pbIGe7Ki9XQYO70KwU/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-   <a class="activity" href="https://docs.google.com/presentation/d/11G_fgZTMFnblr3ww8a8PtDOGyo64eXI9o0I3lA3Vkr4/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-</div>
-
-<div class="lesson" onclick="toggleLesson('ks7-4')">4. ಹದಿನೆಂಟನೆಯ ಶತಮಾನದ ಭಾರತ</div>
-<div class="activities" id="ks7-4">
-  <a class="activity" href="https://docs.google.com/presentation/d/1FDuK4cT7847QKt_c1loaimVKnswghNa15Y3k2pKSakw/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
- <a class="activity" href="https://docs.google.com/presentation/d/1dZ9KAepUor1r66ZKXALrOloMBirjbVaEdRPUbQSrY18/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-</div>
-  
-<div class="lesson" onclick="toggleLesson('ks7-5')">5. ಬ್ರಿಟಿಷ್ ಪ್ರಾಬಲ್ಯದ ಬೆಳವಣಿಗೆ</div>
-<div class="activities" id="ks7-5">
-  <a class="activity"
-     href="resource/pptx/5.html"
-     target="_blank">
-       5. ಬ್ರಿಟಿಷ್ ಪ್ರಾಬಲ್ಯದ ಬೆಳವಣಿಗೆ
-  </a>
-   <a class="activity" href="https://docs.google.com/presentation/d/1vf7ztt18CBXyOlSuqFNiYmy21mF_i5DzvqcPkL8cQU0/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-</div>
-
-
-<div class="lesson" onclick="toggleLesson('ks7-6')">6. ಬ್ರಿಟಿಷ್ ಆಳ್ವಿಕೆಯ ಪರಿಣಾಮಗಳು</div>
-<div class="activities" id="ks7-6">
-  <a class="activity" href="https://docs.google.com/presentation/d/1Uk4XYLnBRUdkpuYS4mNNiChcW8gdmlBXnitEkbyMIzg/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-<a class="activity" href="https://docs.google.com/presentation/d/1Uk4XYLnBRUdkpuYS4mNNiChcW8gdmlBXnitEkbyMIzg/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-</div>
-
-<div class="lesson" onclick="toggleLesson('ks7-7')">7. ಮೈಸೂರು ಮತ್ತು ಇತರ ಸಂಸ್ಥಾನಗಳು</div>
-<div class="activities" id="ks7-7">
-  <a class="activity" href="https://docs.google.com/presentation/d/1rcIVbJCBp0Xz5dyQbyJN5dJ3qJC2B_nxW3RRht4b0Ts/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-</div>
-<div class="lesson" onclick="toggleLesson('ks7-8')">8. ಭಕ್ತಿ ಪಂಥ ಹಾಗೂ ಸೂಫಿ ಪರಂಪರೆ</div>
-<div class="activities" id="ks7-8">
-  <a class="activity" href="https://docs.google.com/presentation/d/1cc4Y2V-lv1tCewhaHn0_Z33IQuUAkBVps8345tKlv-g/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-</div>
-
-<div class="lesson" onclick="toggleLesson('ks7-9')">9. ಶಾಸಕಾಂಗ, ಕಾರ್ಯಾಂಗ ಮತ್ತು ನ್ಯಾಯಾಂಗ</div>
-<div class="activities" id="ks7-9">
-  <a class="activity" href="https://docs.google.com/presentation/d/16wU7u-XReuufq_B0ktxLv9aKpCX9B1toif03QjCSAk8/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-</div>
-
-<div class="lesson" onclick="toggleLesson('ks7-10')">10. ಕೇಂದ್ರ ಸರ್ಕಾರ</div>
-<div class="activities" id="ks7-10">
-  <a class="activity" href="https://docs.google.com/presentation/d/1NSkKsM-wcS2HjniSRvucnVM27iDSiU11HfY7tnT0_rk/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-</div>
-
-<div class="lesson" onclick="toggleLesson('ks7-11')">11. ರಾಜ್ಯ ಸರ್ಕಾರ</div>
-<div class="activities" id="ks7-11">
-  <a class="activity" href="https://docs.google.com/presentation/d/1LiViwj5HkkC397zXxBbSepK4jo5WdW9Umq114qnqjS0/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-</div>
-
-<div class="lesson" onclick="toggleLesson('ks7-12')">12. ಭಾರತದ ಪ್ರಾಕೃತಿಕ ವಿಭಾಗಗಳು</div>
-<div class="activities" id="ks7-12">
-  <a class="activity" href="https://docs.google.com/presentation/d/1_ENKkFHfWyrDt5KhrwBp8ECsA1wVuiWpqfci3OoUJvQ/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-</div>
-
-<div class="lesson" onclick="toggleLesson('ks7-13')">13. ಉತ್ತರ ಅಮೇರಿಕ ಖಂಡ</div>
-<div class="activities" id="ks7-13">
-  <a class="activity" href="https://docs.google.com/presentation/d/1YWvcNzTZ854tgsRfFlnjSz0vVgPBB6RLXN4PR5UeeCE/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-   <a class="activity" href="https://docs.google.com/presentation/d/19p3gH8bCsRsUzBMapQWjfqrKBH586OmUIVcoCnjpJgQ/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-</div>
-
-<div class="lesson" onclick="toggleLesson('ks7-14')">14. ದಕ್ಷಿಣ ಅಮೇರಿಕ ಖಂಡ</div>
-<div class="activities" id="ks7-14">
- <a class="activity" href="https://docs.google.com/presentation/d/1PjgL_Ef8xvt54RNQ3GDwZGliYR-q9RA27nhpTdab0cU/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-   <a class="activity" href="https://docs.google.com/presentation/d/1YWvcNzTZ854tgsRfFlnjSz0vVgPBB6RLXN4PR5UeeCE/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-</div>
-
-<div class="lesson" onclick="toggleLesson('ks7-15')">15. ಸಾಮಾಜಿಕ ಮತ್ತು ಧಾರ್ಮಿಕ ಸುಧಾರಣೆಗಳು</div>
-<div class="activities" id="ks7-15">
-   <a class="activity" href="https://docs.google.com/presentation/d/1jC2VccPO2TYLsxGIRZ-DvNGQ8sgYOgXRfkp8pq6i3g4/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-</div>
-
-<div class="lesson" onclick="toggleLesson('ks7-16')">16. ಭಾರತದ ಪ್ರಥಮ ಸ್ವಾತಂತ್ರ್ಯ ಸಂಗ್ರಾಮ</div>
-<div class="activities" id="ks7-16">
-   <a class="activity" href="https://docs.google.com/presentation/d/1vf7ztt18CBXyOlSuqFNiYmy21mF_i5DzvqcPkL8cQU0/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-</div>
-<div class="lesson" onclick="toggleLesson('ks7-17')">17. ಸ್ವಾತಂತ್ರ್ಯ ಚಳುವಳಿ</div>
-<div class="activities" id="ks7-17">
-   <a class="activity" href="https://docs.google.com/presentation/d/1b_GEsT5sTxg68YPfokV0HL7MypTYQD9tqbWqP1g9b3A/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-   <a class="activity" href="https://docs.google.com/presentation/d/15qINulOCKQSKONl1izbvljQNjB4n8Mfy8WrYAH74vqI/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-  <a class="activity" href="https://docs.google.com/presentation/d/1Ol1YK4Gh38WWAyQR4OcNRXDc0RevdUJq5O2KHvBYAow/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-</div>
-  
-<div class="lesson" onclick="toggleLesson('ks7-18')">18. ಕರ್ನಾಟಕದ ಏಕೀಕರಣ ಮತ್ತು ಗಡಿ ವಿವಾದಗಳು</div>
-<div class="activities" id="ks7-18">
-  <a class="activity" href="https://docs.google.com/presentation/d/1guLDmDhccsv6oHe0W6cmqeB9gZfsl12uG6CuC31Lg6Q/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-
-  <a class="activity" href="https://docs.google.com/presentation/d/1MBWqWy22lKr2G1sW_1rp0VjfG9dRryXDEzOIuXynTyg/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-</div>
-  
-<div class="lesson" onclick="toggleLesson('ks7-19')">19. ಕರ್ನಾಟಕದ ಸಮಾಜಮುಖಿ ಚಳವಳಿಗಳು</div>
-<div class="activities" id="ks7-19">
-  <a class="activity" href="https://docs.google.com/presentation/d/10VHPASLN6llHO07UT2I58iyUr7AhjTFgck5lvRXJGCA/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-</div>
-
-<div class="lesson" onclick="toggleLesson('ks7-20')">20. ಕರ್ನಾಟಕ ಆರ್ಥಿಕ ಮತ್ತು ಸಾಮಾಜಿಕ ಪರಿವರ್ತನೆ</div>
-<div class="activities" id="ks7-20">
- <a class="activity" href="https://docs.google.com/presentation/d/1QDYTN0SHnk73pMJbqy28_-JjbcAHssFjEyjLqDQ_CN0/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-</div>
-
-<div class="lesson" onclick="toggleLesson('ks7-21')">21. ವಿವಿಧ ಕ್ಷೇತ್ರಗಳಲ್ಲಿ ಮುನ್ನಡೆ</div>
-<div class="activities" id="ks7-21">
-  <a class="activity" href="https://docs.google.com/presentation/d/1o0WvNAG6r4DwBN8ztnr5sE56h0oj2uPniVZthLLSgv4/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-</div>
-
-<div class="lesson" onclick="toggleLesson('ks7-22')">22. ನ್ಯಾಯಾಂಗ</div>
-<div class="activities" id="ks7-22">
-  <a class="activity" href="https://docs.google.com/presentation/d/1Uqsgs1nNXNna6AFb3hhONgjmr8zwytF92QttigL0KJI/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-</div>
-
-<div class="lesson" onclick="toggleLesson('ks7-23')">23. ರಕ್ಷಣಾ ಪಡೆಗಳು</div>
-<div class="activities" id="ks7-23">
-  <div class="coming-soon">🚧 Coming Soon</div>
-</div>
-
-<div class="lesson" onclick="toggleLesson('ks7-24')">24. ಭಾರತ ಮತ್ತು ನೆರೆ ದೇಶಗಳು</div>
-<div class="activities" id="ks7-24">
-   <a class="activity" href="https://docs.google.com/presentation/d/1dMacGlvEWcsrG1ct-FasuWfLlulB0SWOpqlNBuioYi4/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-</div>
-
-<div class="lesson" onclick="toggleLesson('ks7-25')">25. ವಿಶ್ವಸಂಸ್ಥೆ</div>
-<div class="activities" id="ks7-25">
-  <a class="activity" href="https://docs.google.com/presentation/d/1_QQA0EJRRAZyVRboV_zpwzU5poEwk8-OYlKhQZlAY14/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-
-    <a class="activity"
-     href="resource/htmlfile/ವಿಶ್ವಸಂಸ್ಥೆ ಭಾಗ 1.html"
-     target="_blank">
-       ವಿಶ್ವಸಂಸ್ಥೆ ಭಾಗ 1
-  </a>
-  
-   <a class="activity"
-     href="resource/htmlfile/ವಿಶ್ವಸಂಸ್ಥೆ ಭಾಗ 2.html"
-     target="_blank">
-       ವಿಶ್ವಸಂಸ್ಥೆ ಭಾಗ 2
-  </a>
- 
-   <a class="activity"
-     href="resource/htmlfile/ವಿಶ್ವಸಂಸ್ಥೆ ಭಾಗ 3.html"
-     target="_blank">
-       ವಿಶ್ವಸಂಸ್ಥೆ ಭಾಗ 3
-  </a>
-</div>
-<div class="lesson" onclick="toggleLesson('ks7-26')">26. ಆಸ್ಟ್ರೇಲಿಯ</div>
-<div class="activities" id="ks7-26">
-   <a class="activity" href="https://docs.google.com/presentation/d/1EzUyMprvdVKtUT4P-QrM97LHVJYiXWswDH442NGZi30/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-</div>
-
-<div class="lesson" onclick="toggleLesson('ks7-27')">27. ಅಂಟಾರ್ಟಿಕ</div>
-  <div class="activities" id="ks7-27">
-   <a class="activity" href="https://docs.google.com/presentation/d/14O-ox2Tdaeuj1RxOXeqkVYpJnlXjQNcDt312Z36OwVs/preview" target="_blank">
-    📊 PPT Presentation
-  </a>
-</div>
-
-<a class="activity"
-     href="resources/social/kannada/7th/antartica-quiz1.html"
-     target="_blank">
-       antartica-quiz1.html
-  </a>
+  <div class="lesson" onclick="toggleLesson('ks6_1', this)">1. ಇತಿಹಾಸದ ಪರಿಚಯ ಮತ್ತು ಆರಂಭಿಕ ಸಮಾಜ</div>
+  <div class="activities-container" id="ks6_1">
+    <div class="ppt-grid">
+      <a class="ppt-card" href="https://docs.google.com/presentation/d/1-5BOksdi9WH7mfPH75hTib2R9ZxlQ4zyKamem3O_UMk/preview" target="_blank">
+        <div class="thumbnail-box">
+          <iframe src="https://docs.google.com/presentation/d/1-5BOksdi9WH7mfPH75hTib2R9ZxlQ4zyKamem3O_UMk/preview" scrolling="no"></iframe>
+          <div class="click-overlay"></div>
+        </div>
+        <div class="card-info">
+          <h4>1. ಇತಿಹಾಸದ ಪರಿಚಯ ಮತ್ತು ಆರಂಭಿಕ ಸಮಾಜ</h4>
+          <span>📊 OPEN PPT PRESENTATION</span>
+        </div>
+      </a>
+    </div>
   </div>
-  
+
+  <div class="lesson" onclick="toggleLesson('ks6_2', this)">2. ಭಾರತ ನಮ್ಮ ಹೆಮ್ಮೆ</div>
+  <div class="activities-container" id="ks6_2">
+    <div class="coming-soon">🚧 Coming Soon - ಸದ್ಯದಲ್ಲೇ ಅಪ್ಲೋಡ್ ಮಾಡಲಾಗುವುದು</div>
+  </div>
+
+  <div class="lesson" onclick="toggleLesson('ks6_3', this)">3. ನಮ್ಮ ಹೆಮ್ಮೆಯ – ಕರ್ನಾಟಕ</div>
+  <div class="activities-container" id="ks6_3">
+    <div class="coming-soon">🚧 Coming Soon - ಸದ್ಯದಲ್ಲೇ ಅಪ್ಲೋಡ್ ಮಾಡಲಾಗುವುದು</div>
+  </div>
+
+  <div class="lesson" onclick="toggleLesson('ks6_4', this)">4. ವೇದ ಕಾಲದ ಸಂಸ್ಕೃತಿ</div>
+  <div class="activities-container" id="ks6_4">
+    <div class="coming-soon">🚧 Coming Soon - ಸದ್ಯದಲ್ಲೇ ಅಪ್ಲೋಡ್ ಮಾಡಲಾಗುವುದು</div>
+  </div>
+
+  <div class="lesson" onclick="toggleLesson('ks6_5', this)">5. ಹೊಸ ಧರ್ಮಗಳ ಉದಯ</div>
+  <div class="activities-container" id="ks6_5">
+    <div class="coming-soon">🚧 Coming Soon - ಸದ್ಯದಲ್ಲೇ ಅಪ್ಲೋಡ್ ಮಾಡಲಾಗುವುದು</div>
+  </div>
+
+  <div class="lesson" onclick="toggleLesson('ks6_6', this)">6. ದಕ್ಷಿಣ ಭಾರತದ ಪ್ರಾಚೀನ ರಾಜವಂಶಗಳು</div>
+  <div class="activities-container" id="ks6_6">
+    <div class="ppt-grid">
+      <a class="ppt-card" href="https://docs.google.com/presentation/d/15qINulOCKQSKONl1izbvljQNjB4n8Mfy8WrYAH74vqI/preview" target="_blank">
+        <div class="thumbnail-box">
+          <iframe src="https://docs.google.com/presentation/d/15qINulOCKQSKONl1izbvljQNjB4n8Mfy8WrYAH74vqI/preview" scrolling="no"></iframe>
+          <div class="click-overlay"></div>
+        </div>
+        <div class="card-info">
+          <h4>6. ದಕ್ಷಿಣ ಭಾರತದ ಪ್ರಾಚೀನ ರಾಜವಂಶಗಳು</h4>
+          <span>📊 OPEN PPT PRESENTATION</span>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <div class="lesson" onclick="toggleLesson('ks6_7', this)">7. ಪೌರ ಮತ್ತು ಪೌರತ್ವ</div>
+  <div class="activities-container" id="ks6_7">
+    <div class="coming-soon">🚧 Coming Soon</div>
+  </div>
+
+  <div class="lesson" onclick="toggleLesson('ks6_8', this)">8. ನಮ್ಮ ಸಂವಿಧಾನ</div>
+  <div class="activities-container" id="ks6_8">
+    <div class="coming-soon">🚧 Coming Soon</div>
+  </div>
+
+  <div class="lesson" onclick="toggleLesson('ks6_9', this)">9. ಪ್ರಭುತ್ವದ ಪ್ರಕಾರಗಳು</div>
+  <div class="activities-container" id="ks6_9">
+    <div class="coming-soon">🚧 Coming Soon</div>
+  </div>
+
+  <div class="lesson" onclick="toggleLesson('ks6_10', this)">10. ಗ್ಲೋಬ್ ಮತ್ತು ನಕಾಶೆಗಳು</div>
+  <div class="activities-container" id="ks6_10">
+    <div class="coming-soon">🚧 Coming Soon</div>
+  </div>
+
+  <div class="lesson" onclick="toggleLesson('ks6_11', this)">11. ಭೂಮಿಯ ಸ್ವರೂಪ</div>
+  <div class="activities-container" id="ks6_11">
+    <div class="ppt-grid">
+      <a class="ppt-card" href="https://docs.google.com/presentation/d/1Ef--YMFiuwr9maBR3EJztgzMkvtW28ulRYjEam49mBQ/preview" target="_blank">
+        <div class="thumbnail-box">
+          <iframe src="https://docs.google.com/presentation/d/1Ef--YMFiuwr9maBR3EJztgzMkvtW28ulRYjEam49mBQ/preview" scrolling="no"></iframe>
+          <div class="click-overlay"></div>
+        </div>
+        <div class="card-info">
+          <h4>11. ಭೂಮಿಯ ಸ್ವರೂಪ</h4>
+          <span>📊 OPEN PPT PRESENTATION</span>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <div class="lesson" onclick="toggleLesson('ks6_12', this)">12. ಉತ್ತರ ಭಾರತದ ಪ್ರಾಚೀನ ರಾಜ ಮನೆತನಗಳು</div>
+  <div class="activities-container" id="ks6_12">
+    <div class="ppt-grid">
+      <a class="ppt-card" href="https://docs.google.com/presentation/d/1GMNmrjtYeAQOl7fQ3mJ5yZ0blgZVkFBtbWuxl2OddTQ/preview" target="_blank">
+        <div class="thumbnail-box">
+          <iframe src="https://docs.google.com/presentation/d/1GMNmrjtYeAQOl7fQ3mJ5yZ0blgZVkFBtbWuxl2OddTQ/preview" scrolling="no"></iframe>
+          <div class="click-overlay"></div>
+        </div>
+        <div class="card-info">
+          <h4>12. ಉತ್ತರ ಭಾರತದ ಪ್ರಾಚೀನ ರಾಜ ಮನೆತನಗಳು</h4>
+          <span>📊 OPEN PPT PRESENTATION</span>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <div class="lesson" onclick="toggleLesson('ks6_13', this)">13. ದೆಹಲಿಯ ಸುಲ್ತಾನರು</div>
+  <div class="activities-container" id="ks6_13">
+    <div class="coming-soon">🚧 Coming Soon</div>
+  </div>
+
+  <div class="lesson" onclick="toggleLesson('ks6_14', this)">14. ವಿಜಯನಗರ ಸಾಮ್ರಾಜ್ಯ ಹಾಗೂ ಬಹುಮನಿ ರಾಜ್ಯ</div>
+  <div class="activities-container" id="ks6_14">
+    <div class="coming-soon">🚧 Coming Soon</div>
+  </div>
+
+  <div class="lesson" onclick="toggleLesson('ks6_15', this)">15. மொಘಲರು ಹಾಗೂ ಮರಾಠರು</div>
+  <div class="activities-container" id="ks6_15">
+    <div class="coming-soon">🚧 Coming Soon</div>
+  </div>
+
+  <div class="lesson" onclick="toggleLesson('ks6_16', this)">16. ಭಾರತೀಯ ವೈಚಾರಿಕತೆ ಹಾಗೂ ಭಕ್ತಿಪಂಥ</div>
+  <div class="activities-container" id="ks6_16">
+    <div class="coming-soon">🚧 Coming Soon</div>
+  </div>
+
+  <div class="lesson" onclick="toggleLesson('ks6_17', this)">17. ಪ್ರಜಾಪ್ರಭುತ್ವ</div>
+  <div class="activities-container" id="ks6_17">
+    <div class="coming-soon">🚧 Coming Soon</div>
+  </div>
+
+  <div class="lesson" onclick="toggleLesson('ks6_18', this)">18. राज्य ನೀತಿ ನಿರ್ದೇಶಕ ತತ್ವಗಳು</div>
+  <div class="activities-container" id="ks6_18">
+    <div class="coming-soon">🚧 Coming Soon</div>
+  </div>
+
+  <div class="lesson" onclick="toggleLesson('ks6_19', this)">19. ಮಾನವ ಹಕ್ಕುಗಳು, मूलभूत ಹಕ್ಕುಗಳು ಮತ್ತು ಕರ್ತವ್ಯಗಳು</div>
+  <div class="activities-container" id="ks6_19">
+    <div class="coming-soon">🚧 Coming Soon</div>
+  </div>
+
+  <div class="lesson" onclick="toggleLesson('ks6_20', this)">20. ರಾಷ್ಟ್ರೀಯ ಭಾವ್ಯೇಕ್ಯತೆ</div>
+  <div class="activities-container" id="ks6_20">
+    <div class="coming-soon">🚧 Coming Soon</div>
+  </div>
+
+  <div class="lesson" onclick="toggleLesson('ks6_21', this)">21. ರಾಷ್ಟ್ರೀಯ ಚಿಹ್ನೆಗಳು ಮತ್ತು ರಾಷ್ಟ್ರೀಯ ದಿನಾಚರಣೆ</div>
+  <div class="activities-container" id="ks6_21">
+    <div class="ppt-grid">
+      <a class="ppt-card" href="https://docs.google.com/presentation/d/1Wkckac76dKUjoJ8vwtRw0HviLkQ_pV7y8V-_4wZlRWs/preview" target="_blank">
+        <div class="thumbnail-box">
+          <iframe src="https://docs.google.com/presentation/d/1Wkckac76dKUjoJ8vwtRw0HviLkQ_pV7y8V-_4wZlRWs/preview" scrolling="no"></iframe>
+          <div class="click-overlay"></div>
+        </div>
+        <div class="card-info">
+          <h4>21. ರಾಷ್ಟ್ರೀಯ ಚಿಹ್ನೆಗಳು & ದಿನಾಚರಣೆ</h4>
+          <span>📊 OPEN PPT PRESENTATION</span>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <div class="lesson" onclick="toggleLesson('ks6_22', this)">22. ಏಷ್ಯಾ ಖಂಡ</div>
+  <div class="activities-container" id="ks6_22">
+    <div class="ppt-grid">
+      <a class="ppt-card" href="https://docs.google.com/presentation/d/13PUhO9Zuzyux79WMw9qO3yTQjt-f_oZgejY4HjGcojI/preview" target="_blank">
+        <div class="thumbnail-box">
+          <iframe src="https://docs.google.com/presentation/d/13PUhO9Zuzyux79WMw9qO3yTQjt-f_oZgejY4HjGcojI/preview" scrolling="no"></iframe>
+          <div class="click-overlay"></div>
+        </div>
+        <div class="card-info">
+          <h4>22. ಏಷ್ಯಾ ಖಂಡ</h4>
+          <span>📊 OPEN PPT PRESENTATION</span>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <div class="lesson" onclick="toggleLesson('ks6_23', this)">23. ಯೂರೋಪ್ ಖಂಡ</div>
+  <div class="activities-container" id="ks6_23">
+    <div class="ppt-grid">
+      <a class="ppt-card" href="https://docs.google.com/presentation/d/1GERp5WekmEZI88s79sOEFJrOnsk8K1x9M13VXrXCK8k/preview" target="_blank">
+        <div class="thumbnail-box">
+          <iframe src="https://docs.google.com/presentation/d/1GERp5WekmEZI88s79sOEFJrOnsk8K1x9M13VXrXCK8k/preview" scrolling="no"></iframe>
+          <div class="click-overlay"></div>
+        </div>
+        <div class="card-info">
+          <h4>23. ಯೂರೋಪ್ ಖಂಡ</h4>
+          <span>📊 OPEN PPT PRESENTATION</span>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <div class="lesson" onclick="toggleLesson('ks6_24', this)">24. ಆಫ್ರಿಕ ಖಂಡ</div>
+  <div class="activities-container" id="ks6_24">
+    <div class="coming-soon">🚧 Coming Soon</div>
+  </div>
+
+
+  <h2>7ನೇ ತರಗತಿ – ಸಮಾಜ ವಿಜ್ಞಾನ</h2>
+
+  <div class="lesson" onclick="toggleLesson('ks7_1', this)">1. ಜಗತ್ತಿನ ಪ್ರಮುಖ ಘಟನೆಗಳು</div>
+  <div class="activities-container" id="ks7_1">
+    <div class="ppt-grid">
+      <a class="ppt-card" href="https://docs.google.com/presentation/d/1EC4Xwl90AJF6_yJEFXUdn-o0QYjdwx3BgE12OCg8HJQ/preview" target="_blank">
+        <div class="thumbnail-box">
+          <iframe src="https://docs.google.com/presentation/d/1EC4Xwl90AJF6_yJEFXUdn-o0QYjdwx3BgE12OCg8HJQ/preview" scrolling="no"></iframe>
+          <div class="click-overlay"></div>
+        </div>
+        <div class="card-info">
+          <h4>1. ಜಗತ್ತಿನ ಪ್ರಮುಖ ಘಟನೆಗಳು (ಭಾಗ 1)</h4>
+          <span>📊 OPEN PPT PRESENTATION</span>
+        </div>
+      </a>
+      <a class="ppt-card" href="https://docs.google.com/presentation/d/1U-m8yCbvEUFDplx1XhVoEDDZANjELDFy2gz1_kQHZ3E/preview" target="_blank">
+        <div class="thumbnail-box">
+          <iframe src="https://docs.google.com/presentation/d/1U-m8yCbvEUFDplx1XhVoEDDZANjELDFy2gz1_kQHZ3E/preview" scrolling="no"></iframe>
+          <div class="click-overlay"></div>
+        </div>
+        <div class="card-info">
+          <h4>1. ಜಗತ್ತಿನ ಪ್ರಮುಖ ಘಟನೆಗಳು (ಭಾಗ 2)</h4>
+          <span>📊 OPEN PPT PRESENTATION</span>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <div class="lesson" onclick="toggleLesson('ks7_2', this)">2. ಮಧ್ಯಯುಗದ ಯುರೋಪ್</div>
+  <div class="activities-container" id="ks7_2">
+    <div class="ppt-grid">
+      <a class="ppt-card" href="https://docs.google.com/presentation/d/1_LM3dKuDEkJebzO7ZUPeuttj8uD0-ALt7XqUEPteywg/preview" target="_blank">
+        <div class="thumbnail-box">
+          <iframe src="https://docs.google.com/presentation/d/1_LM3dKuDEkJebzO7ZUPeuttj8uD0-ALt7XqUEPteywg/preview" scrolling="no"></iframe>
+          <div class="click-overlay"></div>
+        </div>
+        <div class="card-info">
+          <h4>2. ಮಧ್ಯಯುಗದ ಯುರೋಪ್ (ಭಾಗ 1)</h4>
+          <span>📊 OPEN PPT PRESENTATION</span>
+        </div>
+      </a>
+      <a class="ppt-card" href="https://docs.google.com/presentation/d/1HviVSuv59C8WW02zz9VGusquZSGlUlCbv1CUgsVAiy4/preview" target="_blank">
+        <div class="thumbnail-box">
+          <iframe src="https://docs.google.com/presentation/d/1HviVSuv59C8WW02zz9VGusquZSGlUlCbv1CUgsVAiy4/preview" scrolling="no"></iframe>
+          <div class="click-overlay"></div>
+        </div>
+        <div class="card-info">
+          <h4>2. ಮಧ್ಯಯುಗದ ಯುರೋಪ್ (ಭಾಗ 2)</h4>
+          <span>📊 OPEN PPT PRESENTATION</span>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <div class="lesson" onclick="toggleLesson('ks7_3', this)">3. ಭಾರತಕ್ಕೆ ಐರೋಪ್ಯರ ಆಗಮನ</div>
+  <div class="activities-container" id="ks7_3">
+    <div class="ppt-grid">
+      <a class="ppt-card" href="https://docs.google.com/presentation/d/1cmwxXGtkgkOf7LwhRjtvZ4j81pbIGe7Ki9XQYO70KwU/preview" target="_blank">
+        <div class="thumbnail-box">
+          <iframe src="https://docs.google.com/presentation/d/1cmwxXGtkgkOf7LwhRjtvZ4j81pbIGe7Ki9XQYO70KwU/preview" scrolling="no"></iframe>
+          <div class="click-overlay"></div>
+        </div>
+        <div class="card-info">
+          <h4>3. ಭಾರತಕ್ಕೆ ಐರೋಪ್ಯರ ಆಗಮನ (ಭಾಗ 1)</h4>
+          <span>📊 OPEN PPT PRESENTATION</span>
+        </div>
+      </a>
+      <a class="ppt-card" href="https://docs.google.com/presentation/d/11G_fgZTMFnblr3ww8a8PtDOGyo64eXI9o0I3lA3Vkr4/preview" target="_blank">
+        <div class="thumbnail-box">
+          <iframe src="https://docs.google.com/presentation/d/11G_fgZTMFnblr3ww8a8PtDOGyo64eXI9o0I3lA3Vkr4/preview" scrolling="no"></iframe>
+          <div class="click-overlay"></div>
+        </div>
+        <div class="card-info">
+          <h4>3. ಭಾರತಕ್ಕೆ ಐರೋಪ್ಯರ ಆಗಮನ (ಭಾಗ 2)</h4>
+          <span>📊 OPEN PPT PRESENTATION</span>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <div class="lesson" onclick="toggleLesson('ks7_4', this)">4. ಹದಿನೆಂಟನೆಯ ಶತಮಾನದ ಭಾರತ</div>
+  <div class="activities-container" id="ks7_4">
+    <div class="ppt-grid">
+      <a class="ppt-card" href="https://docs.google.com/presentation/d/1FDuK4cT7847QKt_c1loaimVKnswghNa15Y3k2pKSakw/preview" target="_blank">
+        <div class="thumbnail-box">
+          <iframe src="https://docs.google.com/presentation/d/1FDuK4cT7847QKt_c1loaimVKnswghNa15Y3k2pKSakw/preview" scrolling="no"></iframe>
+          <div class="click-overlay"></div>
+        </div>
+        <div class="card-info">
+          <h4>4. ಹದಿನೆಂಟನೆಯ ಶತಮಾನದ ಭಾರತ (ಭಾಗ 1)</h4>
+          <span>📊 OPEN PPT PRESENTATION</span>
+        </div>
+      </a>
+      <a class="ppt-card" href="https://docs.google.com/presentation/d/1dZ9KAepUor1r66ZKXALrOloMBirjbVaEdRPUbQSrY18/preview" target="_blank">
+        <div class="thumbnail-box">
+          <iframe src="https://docs.google.com/presentation/d/1dZ9KAepUor1r66ZKXALrOloMBirjbVaEdRPUbQSrY18/preview" scrolling="no"></iframe>
+          <div class="click-overlay"></div>
+        </div>
+        <div class="card-info">
+          <h4>4. ಹದಿನೆಂಟನೆಯ ಶತಮಾನದ ಭಾರತ (ಭಾಗ 2)</h4>
+          <span>📊 OPEN PPT PRESENTATION</span>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <div class="lesson" onclick="toggleLesson('ks7_5', this)">5. ಬ್ರಿಟಿಷ್ ಪ್ರಾಬಲ್ಯದ ಬೆಳವಣಿಗೆ</div>
+  <div class="activities-container" id="ks7_5">
+    <div class="ppt-grid">
+      <a class="ppt-card" href="resource/pptx/5.html" target="_blank">
+        <div class="thumbnail-box" style="background: #5d4037; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; text-align: center; padding: 10px;">
+          📖 ಬ್ರಿಟಿಷ್ ಪ್ರಾಬಲ್ಯದ ಬೆಳವಣಿಗೆ HTML
+        </div>
+        <div class="card-info">
+          <h4>5. ಬ್ರಿಟಿಷ್ ಪ್ರಾಬಲ್ಯದ ಬೆಳವಣಿಗೆ</h4>
+          <span>📂 OPEN WEB DOCUMENT</span>
+        </div>
+      </a>
+      <a class="ppt-card" href="https://docs.google.com/presentation/d/1vf7ztt18CBXyOlSuqFNiYmy21mF_i5DzvqcPkL8cQU0/preview" target="_blank">
+        <div class="thumbnail-box">
+          <iframe src="https://docs.google.com/presentation/d/1vf7ztt18CBXyOlSuqFNiYmy21mF_i5DzvqcPkL8cQU0/preview" scrolling="no"></iframe>
+          <div class="click-overlay"></div>
+        </div>
+        <div class="card-info">
+          <h4>5. ಬ್ರಿಟಿಷ್ ಪ್ರಾಬಲ್ಯದ ಬೆಳವಣಿಗೆ (PPT)</h4>
+          <span>📊 OPEN PPT PRESENTATION</span>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <div class="lesson" onclick="toggleLesson('ks7_6', this)">6. ಬ್ರಿಟಿಷ್ ಆಳ್ವಿಕೆಯ ಪರಿಣಾಮಗಳು</div>
+  <div class="activities-container" id="ks7_6">
+    <div class="ppt-grid">
+      <a class="ppt-card" href="https://docs.google.com/presentation/d/1Uk4XYLnBRUdkpuYS4mNNiChcW8gdmlBXnitEkbyMIzg/preview" target="_blank">
+        <div class="thumbnail-box">
+          <iframe src="https://docs.google.com/presentation/d/1Uk4XYLnBRUdkpuYS4mNNiChcW8gdmlBXnitEkbyMIzg/preview" scrolling="no"></iframe>
+          <div class="click-overlay"></div>
+        </div>
+        <div class="card-info">
+          <h4>6. ಬ್ರಿಟಿಷ್ ಆಳ್ವಿಕೆಯ ಪರಿಣಾಮಗಳು</h4>
+          <span>📊 OPEN PPT PRESENTATION</span>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <div class="lesson" onclick="toggleLesson('ks7_7', this)">7. ಮೈಸೂರು ಮತ್ತು ಇತರ ಸಂಸ್ಥಾನಗಳು</div>
+  <div class="activities-container" id="ks7_7">
+    <div class="ppt-grid">
+      <a class="ppt-card" href="https://docs.google.com/presentation/d/1rcIVbJCBp0Xz5dyQbyJN5dJ3qJC2B_nxW3RRht4b0Ts/preview" target="_blank">
+        <div class="thumbnail-box">
+          <iframe src="https://docs.google.com/presentation/d/1rcIVbJCBp0Xz5dyQbyJN5dJ3qJC2B_nxW3RRht4b0Ts/preview" scrolling="no"></iframe>
+          <div class="click-overlay"></div>
+        </div>
+        <div class="card-info">
+          <h4>7. ಮೈಸೂರು ಮತ್ತು ಇತರ ಸಂಸ್ಥಾನಗಳು</h4>
+          <span>📊 OPEN PPT PRESENTATION</span>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <div class="lesson" onclick="toggleLesson('ks7_8', this)">8. ಭಕ್ತಿ ಪಂಥ ಹಾಗೂ ಸೂಫಿ ಪರಂಪರೆ</div>
+  <div class="activities-container" id="ks7_8">
+    <div class="ppt-grid">
+      <a class="ppt-card" href="https://docs.google.com/presentation/d/1cc4Y2V-lv1tCewhaHn0_Z33IQuUAkBVps8345tKlv-g/preview" target="_blank">
+        <div class="thumbnail-box">
+          <iframe src="https://docs.google.com/presentation/d/1cc4Y2V-lv1tCewhaHn0_Z33IQuUAkBVps8345tKlv-g/preview" scrolling="no"></iframe>
+          <div class="click-overlay"></div>
+        </div>
+        <div class="card-info">
+          <h4>8. ಭಕ್ತಿ ಪಂಥ ಹಾಗೂ ಸೂಫಿ ಪರಂಪರೆ</h4>
+          <span>📊 OPEN PPT PRESENTATION</span>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <div class="lesson" onclick="toggleLesson('ks7_9', this)">9. ಶಾಸಕಾಂಗ, ಕಾರ್ಯಾಂಗ ಮತ್ತು ನ್ಯಾಯಾಂಗ</div>
+  <div class="activities-container" id="ks7_9">
+    <div class="ppt-grid">
+      <a class="ppt-card" href="https://docs.google.com/presentation/d/16wU7u-XReuufq_B0ktxLv9aKpCX9B1toif03QjCSAk8/preview" target="_blank">
+        <div class="thumbnail-box">
+          <iframe src="https://docs.google.com/presentation/d/16wU7u-XReuufq_B0ktxLv9aKpCX9B1toif03QjCSAk8/preview" scrolling="no"></iframe>
+          <div class="click-overlay"></div>
+        </div>
+        <div class="card-info">
+          <h4>9. ಶಾಸಕಾಂಗ, ಕಾರ್ಯಾಂಗ ಮತ್ತು ನ್ಯಾಯಾಂಗ</h4>
+          <span>📊 OPEN PPT PRESENTATION</span>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <div class="lesson" onclick="toggleLesson('ks7_10', this)">10. ಕೇಂದ್ರ ಸರ್ಕಾರ</div>
+  <div class="activities-container" id="ks7_10">
+    <div class="ppt-grid">
+      <a class="ppt-card" href="https://docs.google.com/presentation/d/1NSkKsM-wcS2HjniSRvucnVM27iDSiU11HfY7tnT0_rk/preview" target="_blank">
+        <div class="thumbnail-box">
+          <iframe src="https://docs.google.com/presentation/d/1NSkKsM-wcS2HjniSRvucnVM27iDSiU11HfY7tnT0_rk/preview" scrolling="no"></iframe>
+          <div class="click-overlay"></div>
+        </div>
+        <div class="card-info">
+          <h4>10. ಕೇಂದ್ರ ಸರ್ಕಾರ</h4>
+          <span>📊 OPEN PPT PRESENTATION</span>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <div class="lesson" onclick="toggleLesson('ks7_11', this)">11. ರಾಜ್ಯ ಸರ್ಕಾರ</div>
+  <div class="activities-container" id="ks7_11">
+    <div class="ppt-grid">
+      <a class="ppt-card" href="https://docs.google.com/presentation/d/1LiViwj5HkkC397zXxBbSepK4jo5WdW9Umq114qnqjS0/preview" target="_blank">
+        <div class="thumbnail-box">
+          <iframe src="https://docs.google.com/presentation/d/1LiViwj5HkkC397zXxBbSepK4jo5WdW9Umq114qnqjS0/preview" scrolling="no"></iframe>
+          <div class="click-overlay"></div>
+        </div>
+        <div class="card-info">
+          <h4>11. ರಾಜ್ಯ ಸರ್ಕಾರ</h4>
+          <span>📊 OPEN PPT PRESENTATION</span>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <div class="lesson" onclick="toggleLesson('ks7_12', this)">12. ಭಾರತದ ಪ್ರಾಕೃತಿಕ ವಿಭಾಗಗಳು</div>
+  <div class="activities-container" id="ks7_12">
+    <div class="ppt-grid">
+      <a class="ppt-card" href="https://docs.google.com/presentation/d/1_ENKkFHfWyrDt5KhrwBp8ECsA1wVuiWpqfci3OoUJvQ/preview" target="_blank">
+        <div class="thumbnail-box">
+          <iframe src="https://docs.google.com/presentation/d/1_ENKkFHfWyrDt5KhrwBp8ECsA1wVuiWpqfci3OoUJvQ/preview" scrolling="no"></iframe>
+          <div class="click-overlay"></div>
+        </div>
+        <div class="card-info">
+          <h4>12. ಭಾರತದ ಪ್ರಾಕೃತಿಕ ವಿಭಾಗಗಳು</h4>
+          <span>📊 OPEN PPT PRESENTATION</span>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <div class="lesson" onclick="toggleLesson('ks7_13', this)">13. ಉತ್ತರ ಅಮೇರಿಕ ಖಂಡ</div>
+  <div class="activities-container" id="ks7_13">
+    <div class="ppt-grid">
+      <a class="ppt-card" href="https://docs.google.com/presentation/d/1YWvcNzTZ854tgsRfFlnjSz0vVgPBB6RLXN4PR5UeeCE/preview" target="_blank">
+        <div class="thumbnail-box">
+          <iframe src="https://docs.google.com/presentation/d/1YWvcNzTZ854tgsRfFlnjSz0vVgPBB6RLXN4PR5UeeCE/preview" scrolling="no"></iframe>
+          <div class="click-overlay"></div>
+        </div>
+        <div class="card-info">
+          <h4>13. ಉತ್ತರ ಅಮೇರಿಕ ಖಂಡ (ಭಾಗ 1)</h4>
+          <span>📊 OPEN PPT PRESENTATION</span>
+        </div>
+      </a>
+      <a class="ppt-card" href="https://docs.google.com/presentation/d/19p3gH8bCsRsUzBMapQWjfqrKBH586OmUIVcoCnjpJgQ/preview" target="_blank">
+        <div class="thumbnail-box">
+          <iframe src="https://docs.google.com/presentation/d/19p3gH8bCsRsUzBMapQWjfqrKBH586OmUIVcoCnjpJgQ/preview" scrolling="no"></iframe>
+          <div class="click-overlay"></div>
+        </div>
+        <div class="card-info">
+          <h4>13. ಉತ್ತರ ಅಮೇರಿಕ ಖಂಡ (ಭಾಗ 2)</h4>
+          <span>📊 OPEN PPT PRESENTATION</span>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <div class="lesson" onclick="toggleLesson('ks7_14', this)">14. ದಕ್ಷಿಣ ಅಮೇರಿಕ ಖಂಡ</div>
+  <div class="activities-container" id="ks7_14">
+    <div class="ppt-grid">
+      <a class="ppt-card" href="https://docs.google.com/presentation/d/1PjgL_Ef8xvt54RNQ3GDwZGliYR-q9RA27nhpTdab0cU/preview" target="_blank">
+        <div class="thumbnail-box">
+          <iframe src="https://docs.google.com/presentation/d/1PjgL_Ef8xvt54RNQ3GDwZGliYR-q9RA27nhpTdab0cU/preview" scrolling="no"></iframe>
+          <div class="click-overlay"></div>
+        </div>
+        <div class="card-info">
+          <h4>14. ದಕ್ಷಿಣ ಅಮೇರಿಕ ಖಂಡ (ಭಾಗ 1)</h4>
+          <span>📊 OPEN PPT PRESENTATION</span>
+        </div>
+      </a>
+      <a class="ppt-card" href="https://docs.google.com/presentation/d/1YWvcNzTZ854tgsRfFlnjSz0vVgPBB6RLXN4PR5UeeCE/preview" target="_blank">
+        <div class="thumbnail-box">
+          <iframe src="https://docs.google.com/presentation/d/1YWvcNzTZ854tgsRfFlnjSz0vVgPBB6RLXN4PR5UeeCE/preview" scrolling="no"></iframe>
+          <div class="click-overlay"></div>
+        </div>
+        <div class="card-info">
+          <h4>14. ದಕ್ಷಿಣ ಅಮೇರಿಕ ಖಂಡ (ಭಾಗ 2)</h4>
+          <span>📊 OPEN PPT PRESENTATION</span>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <div class="lesson" onclick="toggleLesson('ks7_15', this)">15. ಸಾಮಾಜಿಕ ಮತ್ತು ಧಾರ್ಮಿಕ ಸುಧಾರಣೆಗಳು</div>
+  <div class="activities-container" id="ks7_15">
+    <div class="ppt-grid">
+      <a class="ppt-card" href="https://docs.google.com/presentation/d/1jC2VccPO2TYLsxGIRZ-DvNGQ8sgYOgXRfkp8pq6i3g4/preview" target="_blank">
+        <div class="thumbnail-box">
+          <iframe src="https://docs.google.com/presentation/d/1jC2VccPO2TYLsxGIRZ-DvNGQ8sgYOgXRfkp8pq6i3g4/preview" scrolling="no"></iframe>
+          <div class="click-overlay"></div>
+        </div>
+        <div class="card-info">
+          <h4>15. ಸಾಮಾಜಿಕ ಮತ್ತು ಧಾರ್ಮಿಕ ಸುಧಾರಣೆಗಳು</h4>
+          <span>📊 OPEN PPT PRESENTATION</span>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <div class="lesson" onclick="toggleLesson('ks7_16', this)">16. ಭಾರತದ ಪ್ರಥಮ ಸ್ವಾತಂತ್ರ್ಯ ಸಂಗ್ರಾಮ</div>
+  <div class="activities-container" id="ks7_16">
+    <div class="ppt-grid">
+      <a class="ppt-card" href="https://docs.google.com/presentation/d/1vf7ztt18CBXyOlSuqFNiYmy21mF_i5DzvqcPkL8cQU0/preview" target="_blank">
+        <div class="thumbnail-box">
+          <iframe src="https://docs.google.com/presentation/d/1vf7ztt18CBXyOlSuqFNiYmy21mF_i5DzvqcPkL8cQU0/preview" scrolling="no"></iframe>
+          <div class="click-overlay"></div>
+        </div>
+        <div class="card-info">
+          <h4>16. ಭಾರತದ ಪ್ರಥಮ ಸ್ವಾತಂತ್ರ್ಯ ಸಂಗ್ರಾಮ</h4>
+          <span>📊 OPEN PPT PRESENTATION</span>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <div class="lesson" onclick="toggleLesson('ks7_17', this)">17. ಸ್ವಾತಂತ್ರ್ಯ ಚಳುವಳಿ</div>
+  <div class="activities-container" id="ks7_17">
+    <div class="ppt-grid">
+      <a class="ppt-card" href="https://docs.google.com/presentation/d/1b_GEsT5sTxg68YPfokV0HL7MypTYQD9tqbWqP1g9b3A/preview" target="_blank">
+        <div class="thumbnail-box">
+          <iframe src="https://docs.google.com/presentation/d/1b_GEsT5sTxg68YPfokV0HL7MypTYQD9tqbWqP1g9b3A/preview" scrolling="no"></iframe>
+          <div class="click-overlay"></div>
+        </div>
+        <div class="card-info">
+          <h4>17. ಸ್ವಾತಂತ್ರ್ಯ ಚಳುವಳಿ (ಭಾಗ 1)</h4>
+          <span>📊 OPEN PPT PRESENTATION</span>
+        </div>
+      </a>
+      <a class="ppt-card" href="https://docs.google.com/presentation/d/15qINulOCKQSKONl1izbvljQNjB4n8Mfy8WrYAH74vqI/preview" target="_blank">
+        <div class="thumbnail-box">
+          <iframe src="https://docs.google.com/presentation/d/15qINulOCKQSKONl1izbvljQNjB4n8Mfy8WrYAH74vqI/preview" scrolling="no"></iframe>
+          <div class="click-overlay"></div>
+        </div>
+        <div class="card-info">
+          <h4>17. ಸ್ವಾತಂತ್ರ್ಯ ಚಳುವಳಿ (ಭಾಗ 2)</h4>
+          <span>📊 OPEN PPT PRESENTATION</span>
+        </div>
+      </a>
+      <a class="ppt-card" href="https://docs.google.com/presentation/d/1Ol1YK4Gh38WWAyQR4OcNRXDc0RevdUJq5O2KHvBYAow/preview" target="_blank">
+        <div class="thumbnail-box">
+          <iframe src="https://docs.google.com/presentation/d/1Ol1YK4Gh38WWAyQR4OcNRXDc0RevdUJq5O2KHvBYAow/preview" scrolling="no"></iframe>
+          <div class="click-overlay"></div>
+        </div>
+        <div class="card-info">
+          <h4>17. ಸ್ವಾತಂತ್ರ್ಯ ಚಳುವಳಿ (ಭಾಗ 3)</h4>
+          <span>📊 OPEN PPT PRESENTATION</span>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <div class="lesson" onclick="toggleLesson('ks7_18', this)">18. ಕರ್ನಾಟಕದ ಏಕೀಕರಣ ಮತ್ತು ಗಡಿ ವಿವಾದಗಳು</div>
+  <div class="activities-container" id="ks7_18">
+    <div class="ppt-grid">
+      <a class="ppt-card" href="https://docs.google.com/presentation/d/1guLDmDhccsv6oHe0W6cmqeB9gZfsl12uG6CuC31Lg6Q/preview" target="_blank">
+        <div class="thumbnail-box">
+          <iframe src="https://docs.google.com/presentation/d/1guLDmDhccsv6oHe0W6cmqeB9gZfsl12uG6CuC31Lg6Q/preview" scrolling="no"></iframe>
+          <div class="click-overlay"></div>
+        </div>
+        <div class="card-info">
+          <h4>18. ಕರ್ನಾಟಕದ ಏಕೀಕರಣ (ಭಾಗ 1)</h4>
+          <span>📊 OPEN PPT PRESENTATION</span>
+        </div>
+      </a>
+      <a class="ppt-card" href="https://docs.google.com/presentation/d/1MBWqWy22lKr2G1sW_1rp0VjfG9dRryXDEzOIuXynTyg/preview" target="_blank">
+        <div class="thumbnail-box">
+          <iframe src="https://docs.google.com/presentation/d/1MBWqWy22lKr2G1sW_1rp0VjfG9dRryXDEzOIuXynTyg/preview" scrolling="no"></iframe>
+          <div class="click-overlay"></div>
+        </div>
+        <div class="card-info">
+          <h4>18. ಕರ್ನಾಟಕದ ಏಕೀಕರಣ (ಭಾಗ 2)</h4>
+          <span>📊 OPEN PPT PRESENTATION</span>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <div class="lesson" onclick="toggleLesson('ks7_19', this)">19. ಕರ್ನಾಟಕದ ಸಮಾಜಮುಖಿ ಚಳವಳಿಗಳು</div>
+  <div class="activities-container" id="ks7_19">
+    <div class="ppt-grid">
+      <a class="ppt-card" href="https://docs.google.com/presentation/d/10VHPASLN6llHO07UT2I58iyUr7AhjTFgck5lvRXJGCA/preview" target="_blank">
+        <div class="thumbnail-box">
+          <iframe src="https://docs.google.com/presentation/d/10VHPASLN6llHO07UT2I58iyUr7AhjTFgck5lvRXJGCA/preview" scrolling="no"></iframe>
+          <div class="click-overlay"></div>
+        </div>
+        <div class="card-info">
+          <h4>19. ಕರ್ನಾಟಕದ ಸಮಾಜಮುಖಿ ಚಳವಳಿಗಳು</h4>
+          <span>📊 OPEN PPT PRESENTATION</span>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <div class="lesson" onclick="toggleLesson('ks7_20', this)">20. ಕರ್ನಾಟಕ ಆರ್ಥಿಕ ಮತ್ತು ಸಾಮಾಜಿಕ ಪರಿವರ್ತನೆ</div>
+  <div class="activities-container" id="ks7_20">
+    <div class="ppt-grid">
+      <a class="ppt-card" href="https://docs.google.com/presentation/d/1QDYTN0SHnk73pMJbqy28_-JjbcAHssFjEyjLqDQ_CN0/preview" target="_blank">
+        <div class="thumbnail-box">
+          <iframe src="https://docs.google.com/presentation/d/1QDYTN0SHnk73pMJbqy28_-JjbcAHssFjEyjLqDQ_CN0/preview" scrolling="no"></iframe>
+          <div class="click-overlay"></div>
+        </div>
+        <div class="card-info">
+          <h4>20. ಆರ್ಥಿಕ ಮತ್ತು ಸಾಮಾಜಿಕ ಪರಿವರ್ತನೆ</h4>
+          <span>📊 OPEN PPT PRESENTATION</span>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <div class="lesson" onclick="toggleLesson('ks7_21', this)">21. ವಿವಿಧ ಕ್ಷೇತ್ರಗಳಲ್ಲಿ ಮುನ್ನಡೆ</div>
+  <div class="activities-container" id="ks7_21">
+    <div class="ppt-grid">
+      <a class="ppt-card" href="https://docs.google.com/presentation/d/1o0WvNAG6r4DwBN8ztnr5sE56h0oj2uPniVZthLLSgv4/preview" target="_blank">
+        <div class="thumbnail-box">
+          <iframe src="https://docs.google.com/presentation/d/1o0WvNAG6r4DwBN8ztnr5sE56h0oj2uPniVZthLLSgv4/preview" scrolling="no"></iframe>
+          <div class="click-overlay"></div>
+        </div>
+        <div class="card-info">
+          <h4>21. ವಿವಿಧ ಕ್ಷೇತ್ರಗಳಲ್ಲಿ ಮುನ್ನಡೆ</h4>
+          <span>📊 OPEN PPT PRESENTATION</span>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <div class="lesson" onclick="toggleLesson('ks7_22', this)">22. ನ್ಯಾಯಾಂಗ</div>
+  <div class="activities-container" id="ks7_22">
+    <div class="ppt-grid">
+      <a class="ppt-card" href="https://docs.google.com/presentation/d/1Uqsgs1nNXNna6AFb3hhONgjmr8zwytF92QttigL0KJI/preview" target="_blank">
+        <div class="thumbnail-box">
+          <iframe src="https://docs.google.com/presentation/d/1Uqsgs1nNXNna6AFb3hhONgjmr8zwytF92QttigL0KJI/preview" scrolling="no"></iframe>
+          <div class="click-overlay"></div>
+        </div>
+        <div class="card-info">
+          <h4>22. ನ್ಯಾಯಾಂಗ</h4>
+          <span>📊 OPEN PPT PRESENTATION</span>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <div class="lesson" onclick="toggleLesson('ks7_23', this)">23. ರಕ್ಷಣಾ ಪಡೆಗಳು</div>
+  <div class="activities-container" id="ks7_23">
+    <div class="coming-soon">🚧 Coming Soon</div>
+  </div>
+
+  <div class="lesson" onclick="toggleLesson('ks7_24', this)">24. ಭಾರತ ಮತ್ತು ನೆರೆ ದೇಶಗಳು</div>
+  <div class="activities-container" id="ks7_24">
+    <div class="ppt-grid">
+      <a class="ppt-card" href="https://docs.google.com/presentation/d/1dMacGlvEWcsrG1ct-FasuWfLlulB0SWOpqlNBuioYi4/preview" target="_blank">
+        <div class="thumbnail-box">
+          <iframe src="https://docs.google.com/presentation/d/1dMacGlvEWcsrG1ct-FasuWfLlulB0SWOpqlNBuioYi4/preview" scrolling="no"></iframe>
+          <div class="click-overlay"></div>
+        </div>
+        <div class="card-info">
+          <h4>24. ಭಾರತ ಮತ್ತು ನೆರೆ ದೇಶಗಳು</h4>
+          <span>📊 OPEN PPT PRESENTATION</span>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <div class="lesson" onclick="toggleLesson('ks7_25', this)">25. ವಿಶ್ವಸಂಸ್ಥೆ</div>
+  <div class="activities-container" id="ks7_25">
+    <div class="ppt-grid">
+      <a class="ppt-card" href="https://docs.google.com/presentation/d/1_QQA0EJRRAZyVRboV_zpwzU5poEwk8-OYlKhQZlAY14/preview" target="_blank">
+        <div class="thumbnail-box">
+          <iframe src="https://docs.google.com/presentation/d/1_QQA0EJRRAZyVRboV_zpwzU5poEwk8-OYlKhQZlAY14/preview" scrolling="no"></iframe>
+          <div class="click-overlay"></div>
+        </div>
+        <div class="card-info">
+          <h4>25. ವಿಶ್ವಸಂಸ್ಥೆ (PPT)</h4>
+          <span>📊 OPEN PPT PRESENTATION</span>
+        </div>
+      </a>
+      <a class="ppt-card" href="resource/htmlfile/ವಿಶ್ವಸಂಸ್ಥೆ ಭಾಗ 1.html" target="_blank">
+        <div class="thumbnail-box" style="background: #6d4c41; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">
+          📖 ವಿಶ್ವಸಂಸ್ಥೆ ಭಾಗ 1
+        </div>
+        <div class="card-info">
+          <h4>ವಿಶ್ವಸಂಸ್ಥೆ ಭಾಗ 1</h4>
+          <span>📂 OPEN HTML DOCUMENT</span>
+        </div>
+      </a>
+      <a class="ppt-card" href="resource/htmlfile/ವಿಶ್ವಸಂಸ್ಥೆ ಭಾಗ 2.html" target="_blank">
+        <div class="thumbnail-box" style="background: #6d4c41; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">
+          📖 ವಿಶ್ವಸಂಸ್ಥೆ ಭಾಗ 2
+        </div>
+        <div class="card-info">
+          <h4>ವಿಶ್ವಸಂಸ್ಥೆ ಭಾಗ 2</h4>
+          <span>📂 OPEN HTML DOCUMENT</span>
+        </div>
+      </a>
+      <a class="ppt-card" href="resource/htmlfile/ವಿಶ್ವಸಂಸ್ಥೆ ಭಾಗ 3.html" target="_blank">
+        <div class="thumbnail-box" style="background: #6d4c41; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">
+          📖 ವಿಶ್ವಸಂಸ್ಥೆ भाग 3
+        </div>
+        <div class="card-info">
+          <h4>ವಿಶ್ವಸಂಸ್ಥೆ ಭಾಗ 3</h4>
+          <span>📂 OPEN HTML DOCUMENT</span>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <div class="lesson" onclick="toggleLesson('ks7_26', this)">26. ಆಸ್ಟ್ರೇಲಿಯ</div>
+  <div class="activities-container" id="ks7_26">
+    <div class="ppt-grid">
+      <a class="ppt-card" href="https://docs.google.com/presentation/d/1EzUyMprvdVKtUT4P-QrM97LHVJYiXWswDH442NGZi30/preview" target="_blank">
+        <div class="thumbnail-box">
+          <iframe src="https://docs.google.com/presentation/d/1EzUyMprvdVKtUT4P-QrM97LHVJYiXWswDH442NGZi30/preview" scrolling="no"></iframe>
+          <div class="click-overlay"></div>
+        </div>
+        <div class="card-info">
+          <h4>26. ಆಸ್ಟ್ರೇಲಿಯ ಖಂಡ</h4>
+          <span>📊 OPEN PPT PRESENTATION</span>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <div class="lesson" onclick="toggleLesson('ks7_27', this)">27. ಅಂಟಾರ್ಟಿಕ</div>
+  <div class="activities-container" id="ks7_27">
+    <div class="ppt-grid">
+      <a class="ppt-card" href="https://docs.google.com/presentation/d/14O-ox2Tdaeuj1RxOXeqkVYpJnlXjQNcDt312Z36OwVs/preview" target="_blank">
+        <div class="thumbnail-box">
+          <iframe src="https://docs.google.com/presentation/d/14O-ox2Tdaeuj1RxOXeqkVYpJnlXjQNcDt312Z36OwVs/preview" scrolling="no"></iframe>
+          <div class="click-overlay"></div>
+        </div>
+        <div class="card-info">
+          <h4>27. ಅಂಟಾರ್ಟಿಕ ಖಂಡ</h4>
+          <span>📊 OPEN PPT PRESENTATION</span>
+        </div>
+      </a>
+      <a class="ppt-card" href="resources/social/kannada/7th/antartica-quiz1.html" target="_blank">
+        <div class="thumbnail-box" style="background: #2c3e50; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">
+          🧩 QUIZ GAME
+        </div>
+        <div class="card-info">
+          <h4>ಅಂಟಾರ್ಟಿಕ ಕ್ವಿಜ್ 1</h4>
+          <span>🧩 PLAY QUIZ GAME</span>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <script>
+    function toggleLesson(id, headerEl) {
+      headerEl.classList.toggle("active");
+      const container = document.getElementById(id);
+      container.classList.toggle("active");
+    }
+  </script>
+
 </body>
 </html>
