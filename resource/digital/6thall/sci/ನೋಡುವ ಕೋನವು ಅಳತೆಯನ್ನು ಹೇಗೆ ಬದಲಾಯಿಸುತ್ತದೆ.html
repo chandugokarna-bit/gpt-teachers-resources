@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <title>ಲಂಬನ ದೋಷದ ಪ್ರಯೋಗ</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%); text-align: center; padding: 20px; }
+        .container { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); max-width: 600px; margin: auto; position: relative; }
+        #ruler { width: 100%; height: 60px; background: #ffd54f; border-radius: 5px; position: relative; margin-top: 150px; border: 2px solid #ffb300; }
+        .tick { position: absolute; bottom: 0; width: 2px; height: 15px; background: black; }
+        .tick:nth-child(10n) { height: 30px; }
+        #object { width: 200px; height: 30px; background: #ef5350; position: absolute; top: -30px; left: 100px; border-radius: 5px; }
+        #eye { font-size: 40px; position: absolute; top: 20px; left: 50%; transform: translateX(-50%); transition: left 0.1s; }
+        #reading { font-size: 24px; font-weight: bold; margin-top: 20px; color: #333; }
+        input[type=range] { width: 80%; margin-top: 30px; }
+        svg { position: absolute; top: 60px; left: 0; width: 100%; height: 90px; pointer-events: none; }
+        line { stroke: #2196f3; stroke-width: 3; stroke-dasharray: 5,5; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>👁️ ಲಂಬನ ದೋಷದ (Parallax Error) ಪ್ರಯೋಗ</h2>
+        <p>ನೋಡುವ ಕೋನವು ಅಳತೆಯನ್ನು ಹೇಗೆ ಬದಲಾಯಿಸುತ್ತದೆ ಎಂಬುದನ್ನು ನೋಡಲು ಕಣ್ಣನ್ನು ಸರಿಸಿ!</p>
+        
+        <div id="eye">👁️</div>
+        
+        <svg><line id="sightLine" x1="300" y1="0" x2="300" y2="90" /></svg>
+        
+        <div id="ruler">
+            <div id="object"></div>
+            </div>
+
+        <input type="range" id="eyeSlider" min="0" max="600" value="300">
+        <div id="reading">ಅಳತೆ: <span style="color:green;">ನಿಖರವಾಗಿದೆ!</span></div>
+    </div>
+
+    <script>
+        const ruler = document.getElementById('ruler');
+        for(let i=0; i<=600; i+=10) {
+            let tick = document.createElement('div');
+            tick.className = 'tick';
+            tick.style.left = i + 'px';
+            ruler.appendChild(tick);
+        }
+
+        const slider = document.getElementById('eyeSlider');
+        const eye = document.getElementById('eye');
+        const sightLine = document.getElementById('sightLine');
+        const reading = document.getElementById('reading');
+
+        slider.oninput = function() {
+            let eyeX = this.value;
+            eye.style.left = eyeX + 'px';
+            sightLine.setAttribute('x1', eyeX);
+            
+            // The edge of the object is at exactly 300px
+            sightLine.setAttribute('x2', 300 + (300 - eyeX)*0.2); 
+            
+            if (eyeX == 300) {
+                reading.innerHTML = 'ಅಳತೆ: <span style="color:green;">ನಿಖರವಾಗಿದೆ! (ನೇರವಾಗಿ ಮೇಲ್ಭಾಗದಲ್ಲಿದೆ)</span>';
+                sightLine.style.stroke = "green";
+            } else if (eyeX < 300) {
+                reading.innerHTML = 'ಅಳತೆ: <span style="color:red;">ಹೆಚ್ಚಾಗಿ ತೋರುತ್ತದೆ!</span>';
+                sightLine.style.stroke = "red";
+            } else {
+                reading.innerHTML = 'ಅಳತೆ: <span style="color:red;">ಕಡಿಮೆಯಾಗಿ ತೋರುತ್ತದೆ!</span>';
+                sightLine.style.stroke = "red";
+            }
+        }
+    </script>
+</body>
+</html>
