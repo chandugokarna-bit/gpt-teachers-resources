@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಮೊಘಲರು ಹಾಗೂ ಮರಾಠರು - ಪ್ರೀಮಿಯಂ ಡಿಜಿಟಲ್ ತರಗತಿ</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Kannada:wght@400;700&family=Tiro+Kannada&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --bg-deep: #0a0e14; 
+            --bg-slide: #141b26; 
+            --accent-gold: #ffb400; 
+            --text-main: #e2e8f0; 
+            --text-dim: #94a3b8; 
+        }
+
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            font-family: 'Noto Sans Kannada', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .presentation-container {
+            width: 1280px;
+            height: 720px;
+            position: relative;
+            background-color: var(--bg-slide);
+            border-radius: 12px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+            overflow: hidden;
+            border: 1px solid rgba(255,180,0,0.1);
+        }
+
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            padding: 60px 80px;
+            display: none; 
+            flex-direction: column;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.4s ease-in-out;
+        }
+
+        .slide.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        h1, h2, h3 {
+            margin: 0;
+            font-family: 'Tiro Kannada', serif;
+        }
+
+        .slide-title {
+            color: var(--accent-gold);
+            font-size: 44px;
+            margin-bottom: 30px;
+            position: relative;
+            display: inline-block;
+        }
+
+        .slide-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 80px;
+            height: 4px;
+            background-color: var(--accent-gold);
+        }
+
+        p, li {
+            font-size: 23px;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        strong { color: var(--accent-gold); }
+
+        .content-wrapper {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 50px;
+            align-items: center;
+            height: 100%;
+        }
+
+        .image-container {
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.4);
+            border: 2px solid rgba(255,180,0,0.2);
+            height: 380px;
+        }
+
+        .image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .bullet-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .bullet-list li {
+            padding-left: 40px;
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .bullet-list li::before {
+            content: '\f105'; 
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            left: 0;
+            color: var(--accent-gold);
+            font-size: 26px;
+        }
+
+        .controls {
+            position: absolute;
+            bottom: 30px;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 80px;
+            z-index: 100;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 20px;
+        }
+
+        .btn {
+            background-color: transparent;
+            border: 2px solid var(--accent-gold);
+            color: var(--accent-gold);
+            padding: 10px 25px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn:hover {
+            background-color: var(--accent-gold);
+            color: var(--bg-deep);
+        }
+
+        .btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .dots {
+            display: flex;
+            gap: 10px;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            background-color: #334155;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .dot.active {
+            background-color: var(--accent-gold);
+            box-shadow: 0 0 10px var(--accent-gold);
+        }
+
+        .page-num {
+            color: var(--accent-gold);
+            font-weight: bold;
+            font-size: 20px;
+        }
+
+        .title-slide {
+            text-align: center;
+            justify-content: center;
+            background: linear-gradient(rgba(20, 27, 38, 0.85), rgba(20, 27, 38, 0.85)), url('https://images.unsplash.com/photo-1599661046289-e31897846e41?q=80&w=1200') no-repeat center center;
+            background-size: cover;
+        }
+
+        .title-slide h1 {
+            font-size: 75px;
+            color: var(--accent-gold);
+            line-height: 1.2;
+            margin-bottom: 20px;
+        }
+
+        .title-slide p {
+            font-size: 30px;
+            color: var(--text-dim);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="presentation-container">
+
+        <div class="slide title-slide active" id="slide1">
+            <p>ಸಮಾಜ ವಿಜ್ಞಾನ - ಅಧ್ಯಾಯ 15</p>
+            <h1>ಮೊಘಲರು ಹಾಗೂ ಮರಾಠರು</h1>
+            <p><strong>ಬಾಬರ್</strong>ನಿಂದ <strong>ಶಿವಾಜಿ</strong>ಯವರೆಗಿನ ಐತಿಹಾಸಿಕ ವಿವರಣೆ</p>
+        </div>
+
+        <div class="slide" id="slide2">
+            <h2 class="slide-title">ಪಾಠದ ಪರಿಚಯ</h2>
+            <div class="content-wrapper">
+                <div class="text-area">
+                    <ul class="bullet-list">
+                        <li>ಸಾ.ಶ. 1526ರಲ್ಲಿ <strong>ಬಾಬರ್</strong> ದೆಹಲಿ ಸುಲ್ತಾನರ ಆಳ್ವಿಕೆಯನ್ನು ಅಂತ್ಯಗೊಳಿಸಿ ಮೊಘಲ್ ಸಾಮ್ರಾಜ್ಯವನ್ನು ಸ್ಥಾಪಿಸಿದನು.</li>
+                        <li>ಈ ಅಧ್ಯಾಯದಲ್ಲಿ ನಾವು ಅಕ್ಬರ್ ಮತ್ತು ಔರಂಗಜೇಬನ ಆಳ್ವಿಕೆ, ಮೊಘಲರ ಆಡಳಿತ ಮತ್ತು ಸಾಂಸ್ಕೃತಿಕ ಕೊಡುಗೆಗಳನ್ನು ಅಭ್ಯಸಿಸುತ್ತೇವೆ.</li>
+                        <li>ಮರಾಠ ರಾಜ್ಯದ ಸ್ಥಾಪಕ <strong>ಛತ್ರಪತಿ ಶಿವಾಜಿ</strong>ಯ ಸಾಹಸೀ ಕಥನ ಹಾಗೂ ಆಡಳಿತ ಕ್ರಮವನ್ನು ಪರಿಚಯಿಸಲಾಗಿದೆ.</li>
+                    </ul>
+                </div>
+                <div class="image-container">
+                    <img src="https://lh3.googleusercontent.com/u/0/d/1FS7Amhbngacrc9X3Y8DbwsvvPQgU6r7T" alt="Moghal1 Image">
+                </div>
+            </div>
+        </div>
+
+        <div class="slide" id="slide3">
+            <h2 class="slide-title">ಸ್ಥಾಪಕ: ಬಾಬರ್</h2>
+            <div class="content-wrapper">
+                <div class="text-area">
+                    <p>ಬಾಬರ್ ಮಂಗೋಲ್ ಸಂತತಿಯವನು. 'ಮೊಘಲ್' ಪದದ ಮೂಲ <strong>'ಮಂಗೋಲ್'</strong> ಆಗಿದೆ.</p>
+                    <ul class="bullet-list">
+                        <li>ದೆಹಲಿಯ ಸುಲ್ತಾನ ಇಬ್ರಾಹಿಂ ಲೋಧಿಯನ್ನು ಸೋಲಿಸಿ ದೆಹಲಿ ಮತ್ತು ಆಗ್ರಾವನ್ನು ವಶಪಡಿಸಿಕೊಂಡನು.</li>
+                        <li>ಭಾರತಕ್ಕೆ <strong>ಗುಲಾಬಿ</strong> ಹೂವನ್ನು ಪರಿಚಯಿಸಿದ ಕೀರ್ತಿ ಈತನಿಗೆ ಸಲ್ಲುತ್ತದೆ.</li>
+                        <li>ವೀರಯೋಧನಾಗಿದ್ದ ಬಾಬರ್ ತನ್ನ ಉತ್ತಮ ಶಸ್ತ್ರಾಸ್ತ್ರ ಬಲ ಹಾಗೂ ತೋಪುಗಳ ಬಳಕೆಯಿಂದ ವಿಜಯಿಯಾದನು.</li>
+                    </ul>
+                </div>
+                <div class="image-container">
+                    <img src="https://lh3.googleusercontent.com/u/0/d/1E2w-GbKXp_LPcDDjzLEFTmFFqlkVdCtY" alt="Moghal1 Image">
+                </div>
+            </div>
+        </div>
+
+        <div class="slide" id="slide4">
+            <h2 class="slide-title">ಹುಮಾಯೂನ್</h2>
+            <div class="content-wrapper">
+                <div class="text-area">
+                    <p>ಬಾಬರ್ ನಂತರ ಅವನ ಮಗ ಹುಮಾಯೂನ್ ಅಧಿಕಾರಕ್ಕೆ ಬಂದನು.</p>
+                    <ul class="bullet-list">
+                        <li>ಆಫ್ಘನ್ನರ ಸರದಾರ <strong>ಶೇರ್‌ಷಾ ಸೂರಿ</strong>ಯಿಂದ ಪರಾಜಯಗೊಂಡು ಪರ್ಷಿಯಾಕ್ಕೆ ಪಲಾಯನ ಮಾಡಬೇಕಾಯಿತು.</li>
+                        <li>ಅಲ್ಲಿ 15 ವರ್ಷಗಳ ಕಾಲ ದೇಶಭ್ರಷ್ಟನಾಗಿದ್ದ ಈತ, ಶೇರ್‌ಷಾನ ಮರಣದ ನಂತರ ಮರಳಿ ಭಾರತಕ್ಕೆ ಬಂದು ದೆಹಲಿಯನ್ನು ವಶಪಡಿಸಿಕೊಂಡನು.</li>
+                        <li>ಆದರೆ, ಗ್ರಂಥಾಲಯದ ಮೆಟ್ಟಿಲುಗಳಿಂದ ಜಾರಿ ಬಿದ್ದು ಅಲ್ಪಕಾಲದಲ್ಲೇ ಮರಣ ಹೊಂದಿದನು.</li>
+                    </ul>
+                </div>
+                <div class="image-container">
+                    <img src="https://lh3.googleusercontent.com/u/0/d/1fOMcrqqV4YG5QXrYofPQ7CroLV5Icwlq" alt="Moghal1 Image">
+                </div>
+            </div>
+        </div>
+
+        <div class="slide" id="slide5">
+            <h2 class="slide-title">ಸಾಮ್ರಾಟ ಅಕ್ಬರ್</h2>
+            <div class="content-wrapper">
+                <div class="text-area">
+                    <p>ಹುಮಾಯೂನ್ನ ಮಗ ಅಕ್ಬರ್ ಮೊಘಲ್ ದೊರೆಗಳಲ್ಲಿ ಅತ್ಯಂತ ಪ್ರಸಿದ್ಧ ಹಾಗೂ ವಿಶಾಲ ಮನೋಭಾವದ ದೊರೆಯಾಗಿದ್ದನು.</p>
+                    <ul class="bullet-list">
+                        <li>ಗುಜರಾತ್, ಬಂಗಾಳ, ಕಾಶ್ಮೀರ ಮತ್ತು ಕಾಬೂಲ್ ಗೆಲ್ಲುವ ಮೂಲಕ ಬೃಹತ್ ಸಾಮ್ರಾಜ್ಯ ಕಟ್ಟಿದನು.</li>
+                        <li>ಬಹುಸಂಖ್ಯಾತ ಹಿಂದೂ ಪ್ರಜೆಗಳ ವಿಶ್ವಾಸ ಗಳಿಸಲು ರಾಜತಾಂತ್ರಿಕ ಹಾಗೂ ವೈವಾಹಿಕ ಸಂಬಂಧಗಳನ್ನು ಬೆಳೆಸಿದನು.</li>
+                        <li>ರಜಪೂತ ಅರಸರನ್ನು ಉನ್ನತ ಹುದ್ದೆಗಳಿಗೆ ನೇಮಿಸಿಕೊಂಡನು.</li>
+                    </ul>
+                </div>
+                <div class="image-container">
+                    <img src="https://lh3.googleusercontent.com/u/0/d/12jWT-kQZpyxdICHC3BX6SAQXzBXxvBwb" alt="Moghal1 Image">
+                </div>
+            </div>
+        </div>
+
+        <div class="slide" id="slide6">
+            <h2 class="slide-title">ವೀರ ರಾಣಾ ಪ್ರತಾಪಸಿಂಹ</h2>
+            <div class="content-wrapper">
+                <div class="text-area">
+                    <p>ಮೇವಾಡದ ಈ ಮಹಾಶೂರ ರಜಪೂತ ಅರಸನು ಅಕ್ಬರನ ಸಾರ್ವಭೌಮತ್ವಕ್ಕೆ ಮಣಿಯಲಿಲ್ಲ.</p>
+                    <ul class="bullet-list">
+                        <li>ಸಾ.ಶ. 1576ರಲ್ಲಿ ಅಕ್ಬರನ ಸೈನ್ಯ ಹಾಗೂ ರಾಣಾ ಪ್ರತಾಪನ ನಡುವೆ <strong>ಹಲ್ಡಿಘಾಟ್</strong> ಎಂಬಲ್ಲಿ ಭೀಕರ ಕದನ ನಡೆಯಿತು.</li>
+                        <li>ತನ್ನ ನೆಚ್ಚಿನ ಅಪ್ರತಿಮ ಕುದುರೆ <strong>'ಚೇತಕ್'</strong> ಏರಿ ರಣರಂಗದಲ್ಲಿ ವೀರಾವೇಶದಿಂದ ಹೋರಾಡಿದನು.</li>
+                        <li>ಸ್ವದೇಶಾಭಿಮಾನ ಹಾಗೂ ಸ್ವಾಭಿಮಾನದ ಸಂಕೇತವಾಗಿ ಇಂದಿಗೂ ಅಮರನಾಗಿದ್ದಾನೆ.</li>
+                    </ul>
+                </div>
+                <div class="image-container">
+                    <img src="https://lh3.googleusercontent.com/u/0/d/1hwpP-OWx155RUJoetiuQqm0UIxvjgKjN" alt="Moghal1 Image">
+                </div>
+            </div>
+        </div>
+
+        <div class="slide" id="slide7">
+            <h2 class="slide-title">ಅಕ್ಬರನ ಆಡಳಿತ ಸುಧಾರಣೆಗಳು</h2>
+            <div class="content-wrapper">
+                <div class="text-area">
+                    <ul class="bullet-list">
+                        <li>ಹಿಂದೂಗಳ ಮೇಲಿದ್ದ ಕ್ರೂರ <strong>'ಜೆಸಿಯಾ' (ಜಿಜಿಯಾ)</strong> ತೆರಿಗೆ ಮತ್ತು ಯಾತ್ರಾ ತೆರಿಗೆಯನ್ನು ರದ್ದುಗೊಳಿಸಿದನು.</li>
+                        <li>ಸತಿ ಪದ್ಧತಿ, ಬಾಲ್ಯವಿವಾಹವನ್ನು ವಿರೋಧಿಸಿದನು ಹಾಗೂ ಗೋಹತ್ಯೆಯನ್ನು ನಿಷೇಧಿಸಿದನು.</li>
+                        <li>ಈತನ ಕಂದಾಯ ಮಂತ್ರಿ <strong>ರಾಜಾ ತೋದರ್‌ಮಲ್</strong> ಭೂಮಿಯನ್ನು ವೈಜ್ಞಾನಿಕವಾಗಿ ಅಳೆದು, ಫಲವತ್ತತೆಯ ಆಧಾರದ ಮೇಲೆ ಕಂದಾಯ ನಿಗದಿಪಡಿಸುವ ಅದ್ಭುತ ಪದ್ಧತಿ ಜಾರಿಗೆ ತಂದನು.</li>
+                    </ul>
+                </div>
+                <div class="image-container">
+                    <img src="https://lh3.googleusercontent.com/u/0/d/10XHd66TRq_4jp0magGUFG-fVByHoftul" alt="Moghal1 Image">
+                </div>
+            </div>
+        </div>
+
+        <div class="slide" id="slide8">
+            <h2 class="slide-title">ಧಾರ್ಮಿಕ ನೀತಿ: ದೀನ್-ಎ-ಇಲಾಹಿ</h2>
+            <div class="content-wrapper">
+                <div class="text-area">
+                    <p>ಅಕ್ಬರನು ಎಲ್ಲಾ ಧರ್ಮಗಳ ಸಾರವನ್ನು ಗೌರವಿಸುವ ಧಾರ್ಮಿಕ ಸಹಿಷ್ಣುವಾಗಿದ್ದನು.</p>
+                    <ul class="bullet-list">
+                        <li><strong>ಇಬಾದತ್ ಖಾನಾ:</strong> ಫತೇಪುರ್‌ಸಿಕ್ರಿಯಲ್ಲಿ ಹಿಂದೂ, ಜೈನ, ಬೌದ್ಧ, ಕ್ರಿಶ್ಚಿಯನ್ ಮುಖಂಡರೊಂದಿಗೆ ಧಾರ್ಮಿಕ ಚರ್ಚೆ ನಡೆಸಲು ಕಟ್ಟಿಸಿದ ಪ್ರಾರ್ಥನಾ ಮಂದಿರ.</li>
+                        <li>ಎಲ್ಲಾ ಧರ್ಮಗಳ ಉತ್ತಮ ತತ್ವಗಳನ್ನು ಒಳಗೊಂಡ <strong>'ದೀನ್-ಎ-ಇಲಾಹಿ'</strong> ಎಂಬ ಹೊಸ ಪಂಥವನ್ನು ಸ್ಥಾಪಿಸಿದನು.</li>
+                    </ul>
+                </div>
+                <div class="image-container">
+                    <img src="https://lh3.googleusercontent.com/u/0/d/1d4MFxk6FU8Xax-7CCL18PI4AwcTRftGg" alt="Moghal1 Image">
+                </div>
+            </div>
+        </div>
+
+        <div class="slide" id="slide9">
+            <h2 class="slide-title">ಕಲೆ ಮತ್ತು ವಾಸ್ತುಶಿಲ್ಪ: ಷಹಜಹಾನ್</h2>
+            <div class="content-wrapper">
+                <div class="text-area">
+                    <p>ಷಹಜಹಾನನ ಕಾಲವನ್ನು ಮೊಘಲ್ ವಾಸ್ತುಶಿಲ್ಪದ <strong>'ಸುವರ್ಣ ಯುಗ'</strong> ಎನ್ನಲಾಗುತ್ತದೆ.</p>
+                    <ul class="bullet-list">
+                        <li><strong>ತಾಜ್‌ಮಹಲ್:</strong> ತನ್ನ ಪ್ರೀತಿಯ ಪತ್ನಿ ಮುಮ್ತಾಜ್ ಮಹಲ್ ಸ್ಮರಣಾರ್ಥವಾಗಿ ಆಗ್ರಾದಲ್ಲಿ ಯಮುನಾ ನದಿ ದಂಡೆಯ ಮೇಲೆ ಬಿಳಿ ಅಮೃತಶಿಲೆಯಿಂದ ನಿರ್ಮಿಸಿದ ಜಗತ್ಪ್ರಸಿದ್ಧ ಸ್ಮಾರಕ.</li>
+                        <li>ದೆಹಲಿಯ ಬೃಹತ್ <strong>ಕೆಂಪುಕೋಟೆ</strong> (Red Fort) ಮತ್ತು ಜುಮ್ಮಾ ಮಸೀದಿಗಳನ್ನು ಈತನೇ ನಿರ್ಮಿಸಿದನು.</li>
+                    </ul>
+                </div>
+                <div class="image-container">
+                    <img src="https://lh3.googleusercontent.com/u/0/d/1gvRlpkwvLC4G9Q4NhHkL5yK_DIr7iSIP" alt="Moghal1 Image">
+                </div>
+            </div>
+        </div>
+
+        <div class="slide" id="slide10">
+            <h2 class="slide-title">ಸಾಹಿತ್ಯ, ಸಂಗೀತ ಮತ್ತು ಚಿತ್ರಕಲೆ</h2>
+            <div class="content-wrapper">
+                <div class="text-area">
+                    <ul class="bullet-list">
+                        <li><strong>ಸಾಹಿತ್ಯ:</strong> ಅಬುಲ್ ಫಜಲ್ ಬರೆದ <strong>'ಅಕ್ಬರ್ ನಾಮಾ'</strong> ಪ್ರಮುಖ ಆಕರ ಗ್ರಂಥ. ಇದೇ ಕಾಲದಲ್ಲಿ ತುಳಸೀದಾಸರು 'ರಾಮಚರಿತಮಾನಸ' ಕೃತಿ ರಚಿಸಿದರು.</li>
+                        <li><strong>ಸಂಗೀತ:</strong> ಅಕ್ಬರನ ಆಸ್ಥಾನದಲ್ಲಿದ್ದ ಅಮರ ಗಾಯಕ <strong>ತಾನ್‌ಸೇನ್</strong> ಸಂಗೀತ ಲೋಕದ ಶ್ರೇಷ್ಠ ಕೊಡುಗೆ.</li>
+                        <li><strong>ಚಿತ್ರಕಲೆ:</strong> ಮೊಘಲರ ಕಾಲದ ವಿಶಿಷ್ಟ ಸೂಕ್ಷ್ಮ ಚಿತ್ರಕಲೆಯನ್ನು <strong>'ಚಿಕಿಣಿ'</strong> ಚಿತ್ರಕಲೆ ಎಂದು ಕರೆಯಲಾಗುತ್ತಿತ್ತು.</li>
+                    </ul>
+                </div>
+                <div class="image-container">
+                    <img src="https://lh3.googleusercontent.com/u/0/d/1jk_s0rNF0zkodWRu_44Uj3mBdMVz4dmL" alt="Moghal1 Image">
+                </div>
+            </div>
+        </div>
+
+        <div class="slide" id="slide11">
+            <h2 class="slide-title">ಔರಂಗಜೇಬನ ಆಳ್ವಿಕೆ</h2>
+            <div class="content-wrapper">
+                <div class="text-area">
+                    <p>ಕೊನೆಯ ಪ್ರಬಲ ಮೊಘಲ್ ಚಕ್ರವರ್ತಿಯಾದ ಔರಂಗಜೇಬ್ ಸುಮಾರು 50 ವರ್ಷಗಳ ಸುದೀರ್ಘ ಆಳ್ವಿಕೆ ನಡೆಸಿದನು.</p>
+                    <ul class="bullet-list">
+                        <li>ಈತ ಅಕ್ಬರನ ಉದಾರ ನೀತಿಗಳನ್ನು ಕೈಬಿಟ್ಟು ತೀವ್ರ ಸಂಪ್ರದಾಯವಾದಿ ಆಡಳಿತ ನಡೆಸಿದನು.</li>
+                        <li>ಹಿಂದೂಗಳ ಮೇಲೆ ಮತ್ತೆ <strong>ಜೆಸಿಯಾ</strong> ತೆರಿಗೆ ಹೇರಿದನು ಮತ್ತು ಆಚರಣೆಗಳನ್ನು ನಿರ್ಬಂಧಿಸಿದನು.</li>
+                        <li>ಇವನ ಸಂಕುಚಿತ ನೀತಿಗಳಿಂದಾಗಿ ರಜಪೂತರು, ಮರಾಠರು ಮತ್ತು ಸಿಖ್ಖರು ಪ್ರಬಲವಾಗಿ ದಂಗೆಯೆದ್ದರು.</li>
+                    </ul>
+                </div>
+                <div class="image-container">
+                    <img src="https://lh3.googleusercontent.com/u/0/d/10BbGVnobaHa9ZenBfuWWOoSGtPW-Y32X" alt="Moghal1 Image">
+                </div>
+            </div>
+        </div>
+
+        <div class="slide" id="slide12">
+            <h2 class="slide-title">ಸಿಖ್ಖರ ಹೋರಾಟ ಮತ್ತು ಖಾಲ್ಸಾ ಪಂಥ</h2>
+            <div class="content-wrapper">
+                <div class="text-area">
+                    <p>ಔರಂಗಜೇಬನ ಧಾರ್ಮಿಕ ಕಿರುಕುಳದ ವಿರುದ್ಧ ಸಿಖ್ ಸಮುದಾಯ ಸಿಡಿದೆದ್ದಿತು.</p>
+                    <ul class="bullet-list">
+                        <li>ಒಂಬತ್ತನೇ ಸಿಖ್ ಗುರು <strong>ತೇಜ್ ಬಹಾದೂರ್</strong> ಅವರ ಬಲಿದಾನದ ನಂತರ, ಅವರ ಮಗ <strong>ಗುರು ಗೋವಿಂದಸಿಂಹರು</strong> ಸಿಖ್ಖರನ್ನು ಸೈನಿಕ ಶಕ್ತಿಯಾಗಿ ಸಂಘಟಿಸಿದರು.</li>
+                        <li>ಅವರು ಸಿಖ್ಖರಿಗೆ ವೀರದೀಕ್ಷೆ ನೀಡಿ <strong>'ಖಾಲ್ಸಾ'</strong> ಪಂಥ ಸ್ಥಾಪಿಸಿದರು ಹಾಗೂ ಎಲ್ಲರ ಹೆಸರಿನ ಹಿಂದೆ <strong>'ಸಿಂಗ್' (ಸಿಂಹ)</strong> ಎಂದು ಸೇರಿಸಲು ಕರೆ ನೀಡಿದರು.</li>
+                        <li>ಕಡ್ಡಾಯವಾಗಿ ಪಂಚ 'ಕ'ಕಾರಗಳನ್ನು (ಕೇಶ, ಕಂಗಾ, ಕೃಪಾಣ, ಕಚ್ಚೆ, ಕಂಕಣ) ಧರಿಸಲು ಆದೇಶಿಸಿದರು.</li>
+                    </ul>
+                </div>
+                <div class="image-container">
+                    <img src="https://lh3.googleusercontent.com/u/0/d/1pyFcanOxSWib8cIRvy7IKLfvBF7kF4a0" alt="Moghal1 Image">
+                </div>
+            </div>
+        </div>
+
+        <div class="slide" id="slide13">
+            <h2 class="slide-title">ಮರಾಠರ ಸಿಂಹ: ಛತ್ರಪತಿ ಶಿವಾಜಿ</h2>
+            <div class="content-wrapper">
+                <div class="text-area">
+                    <p>ದಕ್ಷಿಣ ಭಾರತದಲ್ಲಿ ಮೊಘಲರ ಹಾಗೂ ವಿಜಯಪುರ ಸುಲ್ತಾನರ ಪ್ರಬಲ ಶಕ್ತಿಯನ್ನು ಸದೆಬಡಿದು ಸ್ವತಂತ್ರ ಮರಾಠ ಸಾಮ್ರಾಜ್ಯ ಕಟ್ಟಿದ ಮಹಾವೀರ ಶಿವಾಜಿ.</p>
+                    <ul class="bullet-list">
+                        <li>ತಾಯಿ ಜೀಜಾಬಾಯಿ ಮತ್ತು ಗುರು ದಾದಾಜಿ ಕೊಂಡದೇವರಿಂದ ಸಂಸ್ಕಾರ ಹಾಗೂ ಯುದ್ಧ ತರಬೇತಿ ಪಡೆದನು.</li>
+                        <li>ಬೆಟ್ಟ-ಗುಡ್ಡಗಳ ಪ್ರದೇಶಕ್ಕೆ ಸೂಕ್ತವಾದ <strong>'ಗೆರಿಲ್ಲಾ' (ಮಿಂಚಿನ ದಾಳಿ)</strong> ಯುದ್ಧತಂತ್ರವನ್ನು ಯಶಸ್ವಿಯಾಗಿ ಬಳಸಿದನು.</li>
+                        <li>ರೈತಸ್ನೇಹಿ ಕಂದಾಯ ನೀತಿ ಹಾಗೂ <strong>'ಅಷ್ಟಪ್ರಧಾನ'</strong> ಎಂಬ ಎಂಟು ಮಂತ್ರಿಗಳ ಮಂಡಳಿಯ ಮೂಲಕ ಸುಭದ್ರ ಆಡಳಿತ ನೀಡಿದನು.</li>
+                    </ul>
+                </div>
+                <div class="image-container">
+                    <img src="https://lh3.googleusercontent.com/u/0/d/1fOMT8YOtneYLPisJqSptYjfcHuC_hLPf" alt="Moghal1 Image">
+                </div>
+            </div>
+        </div>
+
+        <div class="slide" id="slide14">
+            <h2 class="slide-title">ಮೊಘಲ್ ಸಾಮ್ರಾಜ್ಯದ ಅವನತಿಯ ಕಾರಣಗಳು</h2>
+            <div class="content-wrapper">
+                <div class="text-area">
+                    <ul class="bullet-list">
+                        <li>ಔರಂಗಜೇಬನ ಕಠಿಣ ಧಾರ್ಮಿಕ ನೀತಿಗಳು ಮತ್ತು ದೀರ್ಘಕಾಲದ ದಖನ್ ಯುದ್ಧಗಳು ಖಜಾನೆಯನ್ನು ಬರಿದು ಮಾಡಿದವು.</li>
+                        <li>ಅವನ ನಂತರ ಬಂದ ಉತ್ತರಾಧಿಕಾರಿಗಳು ಅತ್ಯಂತ ದುರ್ಬಲ ಹಾಗೂ ವಿಲಾಸಿ ಜೀವನಕ್ಕೆ ಒಗ್ಗಿಕೊಂಡವರಾಗಿದ್ದರು.</li>
+                        <li>ಸಾ.ಶ. 1739ರಲ್ಲಿ ಪರ್ಷಿಯಾದ ಕ್ರೂರ ದಾಳಿಕೋರ <strong>ನಾದಿರ್‌ಷಾ</strong> ದೆಹಲಿಯ ಮೇಲೆ ದಾಳಿ ಮಾಡಿ ಬೃಹತ್ ಪ್ರಮಾಣದ ಆಸ್ತಿಯನ್ನು ಸೂರೆಗೈದನು.</li>
+                        <li>ಭಾರತದ ಹೆಮ್ಮೆಯ <strong>ಕೊಹಿನೂರ್ ವಜ್ರ</strong> ಮತ್ತು ಅಮೂಲ್ಯ <strong>ಮಯೂರ ಸಿಂಹಾಸನ</strong>ವನ್ನು ತನ್ನ ದೇಶಕ್ಕೆ ಹೊತ್ತೊಯ್ದನು.</li>
+                    </ul>
+                </div>
+                <div class="image-container">
+                    <img src="https://lh3.googleusercontent.com/u/0/d/1ZaiO35Sqq-l3BBzLJlqQjLQ-2c4kyy8x" alt="Moghal1 Image">
+                </div>
+            </div>
+        </div>
+
+        <div class="slide" id="slide15" style="text-align: center;">
+            <i class="fa-solid fa-graduation-cap" style="font-size: 100px; color: var(--accent-gold); margin-bottom: 30px;"></i>
+            <h2 style="font-size: 60px; color: var(--accent-gold);">ಪ್ರಶ್ನೋತ್ತರಗಳು</h2>
+            <p style="font-size: 30px; margin-top: 30px;">ಧನ್ಯವಾದಗಳು. ಕಲಿಕೆ ಸದಾ ಮುಂದುವರಿಯಲಿ!</p>
+        </div>
+
+        <div class="controls">
+            <span class="page-num" id="slideNum">1 / 15</span>
+            <div class="dots" id="dotContainer"></div>
+            <div class="nav-buttons">
+                <button class="btn" id="prevBtn" disabled><i class="fa-solid fa-chevron-left"></i> ಹಿಂದಿನ ಸ್ಲೈಡ್</button>
+                <button class="btn" id="nextBtn">ಮುಂದಿನ ಸ್ಲೈಡ್ <i class="fa-solid fa-chevron-right"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const slideNumDisplay = document.getElementById('slideNum');
+        const dotContainer = document.getElementById('dotContainer');
+
+        slides.forEach((_, index) => {
+            const dot = document.createElement('div');
+            dot.classList.add('dot');
+            if (index === 0) dot.classList.add('active');
+            dot.addEventListener('click', () => showSlide(index));
+            dotContainer.appendChild(dot);
+        });
+
+        const dots = document.querySelectorAll('.dot');
+
+        function showSlide(index) {
+            slides[currentSlide].classList.remove('active');
+            dots[currentSlide].classList.remove('active');
+            
+            currentSlide = index;
+            
+            slides[currentSlide].classList.add('active');
+            dots[currentSlide].classList.add('active');
+            
+            prevBtn.disabled = currentSlide === 0;
+            nextBtn.disabled = currentSlide === slides.length - 1;
+            
+            slideNumDisplay.innerText = `${currentSlide + 1} / ${slides.length}`;
+        }
+
+        nextBtn.addEventListener('click', () => {
+            if (currentSlide < slides.length - 1) showSlide(currentSlide + 1);
+        });
+
+        prevBtn.addEventListener('click', () => {
+            if (currentSlide > 0) showSlide(currentSlide - 1);
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') nextBtn.click();
+            if (e.key === 'ArrowLeft') prevBtn.click();
+        });
+    </script>
+</body>
+</html>
