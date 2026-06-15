@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Lesson - Sympathy (Poem)</title>
+    <style>
+        :root {
+            --primary: #6d28d9;
+            --primary-light: #ede9fe;
+            --gold: #f59e0b;
+            --gold-light: #fef3c7;
+            --success: #10b981;
+            --danger: #ef4444;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-sub: #475569;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+            padding: 2rem 1rem;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 950px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+            background: linear-gradient(135deg, #6d28d9, #4f46e5);
+            padding: 2.5rem;
+            border-radius: 24px;
+            color: white;
+            box-shadow: 0 10px 25px -5px rgba(109, 40, 217, 0.3);
+        }
+
+        header h1 { font-size: 2.5rem; margin-bottom: 0.5rem; }
+        header p { font-size: 1.1rem; opacity: 0.9; }
+
+        /* Navigation Grid */
+        .nav-menu {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .nav-btn {
+            background: var(--card-bg);
+            border: 2px solid #e2e8f0;
+            padding: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 14px;
+            color: var(--text-sub);
+            font-size: 0.9rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .nav-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            box-shadow: 0 10px 15px -3px rgba(109, 40, 217, 0.25);
+            transform: translateY(-2px);
+        }
+
+        /* Activity Cards */
+        .activity-card {
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 2.5rem;
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.05);
+            display: none;
+            animation: slideUp 0.4s ease;
+        }
+
+        .activity-card.active { display: block; }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2.title {
+            font-size: 1.7rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .desc {
+            color: var(--text-sub);
+            margin-bottom: 2rem;
+            font-style: italic;
+        }
+
+        /* ACT 1: SUMMARY CSS */
+        .summary-box {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .stanza-summary {
+            background: #f1f5f9;
+            padding: 1.5rem;
+            border-radius: 16px;
+            border-left: 6px solid var(--primary);
+            transition: transform 0.2s;
+        }
+
+        .stanza-summary:hover { transform: scale(1.01); }
+        .stanza-tag {
+            font-weight: bold;
+            color: var(--primary);
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            margin-bottom: 0.4rem;
+        }
+        .summary-text { font-size: 1.15rem; color: var(--text-main); }
+
+        /* ACT 2: GOLD VS WORDS CSS */
+        .split-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .char-column {
+            background: #fafafa;
+            border: 2px dashed #cbd5e1;
+            border-radius: 16px;
+            padding: 1.5rem;
+            min-height: 250px;
+        }
+
+        .char-column h3 { text-align: center; margin-bottom: 1rem; }
+        .proud-box { background: var(--gold-light); border-color: var(--gold); color: #92400e; }
+        .poor-box { background: #d1fae5; border-color: var(--success); color: #065f46; }
+
+        .items-bank {
+            grid-column: 1 / span 2;
+            background: #f1f5f9;
+            padding: 1.2rem;
+            border-radius: 16px;
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .drag-item {
+            background: white;
+            padding: 0.75rem 1.2rem;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: grab;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.08);
+            border: 1px solid #e2e8f0;
+        }
+
+        .drop-zone {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            padding-bottom: 2rem;
+        }
+
+        /* ACT 3: EMOTION SLIDER CSS */
+        .slider-container {
+            text-align: center;
+            padding: 2rem 0;
+        }
+
+        .slider {
+            width: 80%;
+            -webkit-appearance: none;
+            height: 15px;
+            border-radius: 10px;
+            background: #cbd5e1;
+            outline: none;
+            margin: 2rem 0;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+        }
+
+        .emoji-display { font-size: 5rem; animation: pulse 0.5s infinite alternate; }
+        .emotion-title { font-size: 1.8rem; font-weight: bold; margin-top: 1rem; color: var(--primary); }
+        .emotion-poem-context { font-size: 1.2rem; color: var(--text-sub); margin-top: 0.5rem; max-width: 600px; margin-left: auto; margin-right: auto; }
+
+        /* ACT 4: SUMMARY FILL IN CSS */
+        .fill-blank-text {
+            font-size: 1.25rem;
+            line-height: 2.2;
+            background: #fffdf5;
+            padding: 2rem;
+            border-radius: 16px;
+            border: 1px solid #fef08a;
+        }
+
+        .blank-input {
+            width: 130px;
+            padding: 0.2rem 0.5rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border: 2px solid #cbd5e1;
+            border-radius: 8px;
+            text-align: center;
+            outline: none;
+            color: var(--primary);
+        }
+
+        .blank-input.correct { border-color: var(--success); background: #e6fffa; color: #047857; }
+        .blank-input.wrong { border-color: var(--danger); background: #fef2f2; color: #b91c1c; }
+
+        /* ACT 5: ODD WORD CSS */
+        .odd-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+        }
+
+        .odd-row {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            padding: 1.2rem;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .odd-row span { font-weight: bold; width: 80px; font-size: 1.1rem; }
+        .options-group { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+        
+        .opt-btn {
+            background: white;
+            border: 1px solid #cbd5e1;
+            padding: 0.6rem 1.2rem;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .opt-btn:hover { background: #f1f5f9; border-color: #94a3b8; }
+        .opt-btn.correct { background: var(--success); color: white; border-color: var(--success); }
+        .opt-btn.wrong { background: var(--danger); color: white; border-color: var(--danger); }
+
+        /* BUTTONS & FOOTER */
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.85rem 1.8rem;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn:hover { background: #5b21b6; }
+        .score-board {
+            margin-top: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .status-msg { font-weight: bold; font-size: 1.1rem; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Sympathy</h1>
+        <p>By Charles Mackay • Interactive Digital Learning Experience</p>
+    </header>
+
+    <nav class="nav-menu">
+        <button class="nav-btn active" onclick="showTab(0)">1. Easy Summary</button>
+        <button class="nav-btn" onclick="showTab(1)">2. Gift Sorter</button>
+        <button class="nav-btn" onclick="showTab(2)">3. Emotion Meter</button>
+        <button class="nav-btn" onclick="showTab(3)">4. Smart Fill</button>
+        <button class="nav-btn" onclick="showTab(4)">5. Odd Word Out</button>
+    </nav>
+
+    <div class="activity-card active" id="tab-0">
+        <h2 class="title">📝 Activity 1: Simple Poem Summary</h2>
+        <p class="desc">Read the summary of the poem in very easy sentences, broken down paragraph by paragraph.</p>
+        
+        <div class="summary-box">
+            <div class="stanza-summary">
+                <div class="stanza-tag">Paragraph 1 (Stanza 1)</div>
+                <div class="summary-text">The poet was in deep sadness and pain[cite: 307]. A proud, rich man heard his cry[cite: 307]. The rich man gave him gold (money) but did not speak any kind or loving words to him[cite: 307, 308].</div>
+            </div>
+            <div class="stanza-summary">
+                <div class="stanza-tag">Paragraph 2 (Stanza 2)</div>
+                <div class="summary-text">When the poet's bad times passed, he went back and returned all the money to the proud man[cite: 308]. He stood straight, said "Thank You", and blessed the rich man's charity[cite: 309].</div>
+            </div>
+            <div class="stanza-summary">
+                <div class="stanza-tag">Paragraph 3 (Stanza 3)</div>
+                <div class="summary-text">Later, the poet fell into trouble, pain, and poverty again[cite: 309, 314]. This time, a poor man passed by him[cite: 310]. The poor man tied a bandage on his head, gave him bread to eat, and took care of him day and night[cite: 310].</div>
+            </div>
+            <div class="stanza-summary">
+                <div class="stanza-tag">Paragraph 4 (Stanza 4)</div>
+                <div class="summary-text">The poet wonders how he can ever pay back the poor man for his pure love[cite: 312]! Money is great, but a heavenly feeling like **Sympathy** is far greater than any gold in the world[cite: 312, 313]!</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="activity-card" id="tab-1">
+        <h2 class="title">🤝 Activity 2: Proud Man vs Poor Man</h2>
+        <p class="desc">Drag the deeds/gifts from the bottom and drop them under the correct person who offered them in the poem.</p>
+        
+        <div class="split-layout">
+            <div class="char-column proud-box">
+                <h3>👑 The Proud Man</h3>
+                <div class="drop-zone" id="zone-proud" data-owner="proud" ondragover="allowDrop(event)" ondragleave="leaveDrop(event)" ondrop="drop(event)"></div>
+            </div>
+            <div class="char-column poor-box">
+                <h3>🏡 The Poor Man</h3>
+                <div class="drop-zone" id="zone-poor" data-owner="poor" ondragover="allowDrop(event)" ondragleave="leaveDrop(event)" ondrop="drop(event)"></div>
+            </div>
+
+            <div class="items-bank">
+                <div class="drag-item" draggable="true" id="item1" data-target="proud" ondragstart="drag(event)">Gave Gold / Money</div>
+                <div class="drag-item" draggable="true" id="item2" data-target="poor" ondragstart="drag(event)">Gave Bread (Food)</div>
+                <div class="drag-item" draggable="true" id="item3" data-target="proud" ondragstart="drag(event)">Cold Looks / No Kind Words</div>
+                <div class="drag-item" draggable="true" id="item4" data-target="poor" ondragstart="drag(event)">Bound / Bandaged Head</div>
+                <div class="drag-item" draggable="true" id="item5" data-target="poor" ondragstart="drag(event)">Watched Day and Night</div>
+            </div>
+        </div>
+        <div class="score-board">
+            <span class="status-msg" id="drag-status" style="color:var(--primary)">Sort the elements!</span>
+            <button class="btn" onclick="resetDrag()">Reset Sorter</button>
+        </div>
+    </div>
+
+    <div class="activity-card" id="tab-2">
+        <h2 class="title">🎭 Activity 3: Poet's Emotion Meter</h2>
+        <p class="desc">Slide the meter to explore the different emotional phases of the poet throughout the poem.</p>
+        
+        <div class="slider-container">
+            <div class="emoji-display" id="emoji">😭</div>
+            <div class="emotion-title" id="emo-title">Deep Sorrow</div>
+            <div class="emotion-poem-context" id="emo-context">"I lay in sorrow, deep depressed..." The poet begins the poem in heavy grief and pain.</div>
+            
+            <input type="range" min="1" max="4" value="1" class="slider" id="emotionSlider" oninput="updateEmotionMeter(this.value)">
+        </div>
+    </div>
+
+    <div class="activity-card" id="tab-3">
+        <h2 class="title">🧠 Activity 4: Smart Summary Fill</h2>
+        <p class="desc">Type the correct words to complete the summary of the poem. (Clues: gold, sorrow, sympathy, poor, thanked)</p>
+        
+        <div class="fill-blank-text">
+            Once, the poet was in deep <input type="text" class="blank-input" data-ans="sorrow">[cite: 323]. A proud man came and gave him <input type="text" class="blank-input" data-ans="gold"> but no kind words[cite: 323, 324]. When the pain was over, the poet returned the money and <input type="text" class="blank-input" data-ans="thanked"> him[cite: 324]. Later, the poet was in trouble again[cite: 325]. A <input type="text" class="blank-input" data-ans="poor"> man helped him and gave him bread[cite: 325, 326]. The poet feels he cannot repay him because heavenly <input type="text" class="blank-input" data-ans="sympathy"> is greater than gold[cite: 327]!
+        </div>
+
+        <div class="score-board">
+            <span class="status-msg" id="fill-status"></span>
+            <button class="btn" onclick="checkBlanks()">Verify Summary</button>
+        </div>
+    </div>
+
+    <div class="activity-card" id="tab-4">
+        <h2 class="title">⚡ Activity 5: Vocabulary Spark</h2>
+        <p class="desc">Identify and click on the **ODD** word in each set that does not match the meaning of the others.</p>
+        
+        <div class="odd-grid">
+            <div class="odd-row">
+                <span>Set 1:</span>
+                <div class="options-group" data-correct="pride">
+                    <button class="opt-btn" onclick="checkOdd(this, 'sorrow')">Sorrow</button>
+                    <button class="opt-btn" onclick="checkOdd(this, 'grief')">Grief</button>
+                    <button class="opt-btn" onclick="checkOdd(this, 'distress')">Distress</button>
+                    <button class="opt-btn" onclick="checkOdd(this, 'pride')">Pride</button>
+                </div>
+            </div>
+            <div class="odd-row">
+                <span>Set 2:</span>
+                <div class="options-group" data-correct="cold">
+                    <button class="opt-btn" onclick="checkOdd(this, 'hot')">Hot</button>
+                    <button class="opt-btn" onclick="checkOdd(this, 'cold')">Cold (Unfriendly)</button>
+                    <button class="opt-btn" onclick="checkOdd(this, 'warm')">Warm</button>
+                    <button class="opt-btn" onclick="checkOdd(this, 'boiling')">Boiling</button>
+                </div>
+            </div>
+            <div class="odd-row">
+                <span>Set 3:</span>
+                <div class="options-group" data-correct="poor">
+                    <button class="opt-btn" onclick="checkOdd(this, 'rich')">Rich</button>
+                    <button class="opt-btn" onclick="checkOdd(this, 'poor')">Poor</button>
+                    <button class="opt-btn" onclick="checkOdd(this, 'wealthy')">Wealthy</button>
+                    <button class="opt-btn" onclick="checkOdd(this, 'well-to-do')">Well-to-do</button>
+                </div>
+            </div>
+        </div>
+        <div class="score-board">
+            <span class="status-msg" id="odd-status" style="color:var(--primary)">Click the odd ones out!</span>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Tab controller
+    function showTab(index) {
+        document.querySelectorAll('.nav-btn').forEach((btn, idx) => btn.classList.toggle('active', idx === index));
+        document.querySelectorAll('.activity-card').forEach((card, idx) => card.classList.toggle('active', idx === index));
+    }
+
+    // --- ACT 2: DRAG AND DROP LOGIC ---
+    function allowDrop(ev) { ev.preventDefault(); }
+    function leaveDrop(ev) { }
+    function drag(ev) { ev.dataTransfer.setData("text", ev.target.id); }
+    
+    let dragCount = 0;
+    function drop(ev) {
+        ev.preventDefault();
+        let id = ev.dataTransfer.getData("text");
+        let dragged = document.getElementById(id);
+        let zone = ev.target.closest('.drop-zone');
+        
+        if (zone && zone.getAttribute('data-owner') === dragged.getAttribute('data-target')) {
+            zone.appendChild(dragged);
+            dragged.style.cursor = 'default';
+            dragged.setAttribute('draggable', 'false');
+            dragged.style.background = '#f8fafc';
+            dragCount++;
+            if(dragCount === 5) {
+                document.getElementById('drag-status').innerText = "🏆 Incredible! You sorted all acts correctly.";
+                document.getElementById('drag-status').style.color = "var(--success)";
+            }
+        } else {
+            document.getElementById('drag-status').innerText = "❌ Wrong slot! Try again.";
+            document.getElementById('drag-status').style.color = "var(--danger)";
+        }
+    }
+
+    function resetDrag() {
+        dragCount = 0;
+        const bank = document.querySelector('.items-bank');
+        const items = ["item1", "item2", "item3", "item4", "item5"];
+        items.forEach(id => {
+            let item = document.getElementById(id);
+            bank.appendChild(item);
+            item.setAttribute('draggable', 'true');
+            item.style.background = 'white';
+        });
+        document.getElementById('drag-status').innerText = "Sort the elements!";
+        document.getElementById('drag-status').style.color = "var(--primary)";
+    }
+
+    // --- ACT 3: SLIDER LOGIC ---
+    const emotions = [
+        { emoji: "😭", title: "Deep Sorrow", context: '"I lay in sorrow, deep depressed..." The poet begins the poem in heavy grief and pain.' },
+        { emoji: "😐", title: "Cold Gratitude", context: '"I paid him back the gold... then spoke my thanks." The poet returns the money but felt no warmth from the proud man.' },
+        { emoji: "🤕", title: "Pain & Need", context: '"I lay in want, and grief and pain." The poet falls into trouble for the second time.' },
+        { emoji: "💖", title: "Heavenly Joy", context: '"Oh! Gold is great, but greater far is heavenly sympathy!" The poet is moved by the poor man\'s absolute kindness.' }
+    ];
+
+    function updateEmotionMeter(val) {
+        const data = emotions[val - 1];
+        document.getElementById('emoji').innerText = data.emoji;
+        document.getElementById('emo-title').innerText = data.title;
+        document.getElementById('emo-context').innerText = data.context;
+    }
+
+    // --- ACT 4: FILL BLANKS LOGIC ---
+    function checkBlanks() {
+        const inputs = document.querySelectorAll('.blank-input');
+        let correct = 0;
+        inputs.forEach(input => {
+            if(input.value.trim().toLowerCase() === input.getAttribute('data-ans').toLowerCase()) {
+                input.className = "blank-input correct";
+                correct++;
+            } else {
+                input.className = "blank-input wrong";
+            }
+        });
+        const msg = document.getElementById('fill-status');
+        if(correct === inputs.length) {
+            msg.innerText = "🎉 All answers are perfect! Excellent reading.";
+            msg.style.color = "var(--success)";
+        } else {
+            msg.innerText = `You got ${correct} / ${inputs.length} right. Rectify the errors!`;
+            msg.style.color = "var(--danger)";
+        }
+    }
+
+    // --- ACT 5: ODD WORD LOGIC ---
+    function checkOdd(btn, word) {
+        const group = btn.closest('.options-group');
+        const correctWord = group.getAttribute('data-correct');
+        const allBtns = group.querySelectorAll('.opt-btn');
+        
+        allBtns.forEach(b => b.className = "opt-btn"); // reset row
+        
+        if(word === correctWord) {
+            btn.classList.add('correct');
+            document.getElementById('odd-status').innerText = "🎯 Spot on! That word stands odd.";
+            document.getElementById('odd-status').style.color = "var(--success)";
+        } else {
+            btn.classList.add('wrong');
+            document.getElementById('odd-status').innerText = "❌ Incorrect choice. Think about the word meanings!";
+            document.getElementById('odd-status').style.color = "var(--danger)";
+        }
+    }
+</script>
+
+</body>
+</html>

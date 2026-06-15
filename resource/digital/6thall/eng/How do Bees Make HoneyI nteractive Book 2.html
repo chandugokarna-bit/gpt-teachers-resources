@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Honey Bees - Interactive Lab Part 2</title>
+    <style>
+        :root {
+            --honey-dark: #78350f;
+            --honey-bright: #d97706;
+            --honey-gold: #f59e0b;
+            --honey-bg: #fffbeb;
+            --dark-blue: #1e1b4b;
+            --success: #10b981;
+            --danger: #ef4444;
+            --white: #ffffff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+
+        body {
+            background-color: var(--honey-bg);
+            color: var(--dark-blue);
+            padding: 2rem 1rem;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 950px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+            background: linear-gradient(135deg, #fbbf24, #d97706);
+            padding: 2rem;
+            border-radius: 24px;
+            color: white;
+            box-shadow: 0 10px 20px rgba(217, 119, 6, 0.2);
+        }
+
+        header h1 { font-size: 2.3rem; margin-bottom: 0.3rem; }
+        header p { font-size: 1.1rem; font-weight: 500; opacity: 0.9; }
+
+        /* Modern Dashboard Navigation Tabs */
+        .nav-menu {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .nav-menu { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        .nav-link {
+            background: var(--white);
+            border: 2px solid #fef08a;
+            padding: 0.9rem;
+            font-weight: 700;
+            cursor: pointer;
+            border-radius: 14px;
+            color: var(--honey-dark);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link.active {
+            background: var(--dark-blue);
+            color: #fef08a;
+            border-color: var(--dark-blue);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.15);
+        }
+
+        .activity-view {
+            background: var(--white);
+            border-radius: 24px;
+            padding: 2.5rem;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.03);
+            display: none;
+            animation: fadeIn 0.4s ease;
+            border: 2px solid #fde047;
+        }
+
+        .activity-view.active { display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .view-title { font-size: 1.7rem; color: var(--honey-dark); margin-bottom: 0.5rem; }
+        .instructions { color: #6b7280; font-style: italic; margin-bottom: 2rem; }
+
+        /* ACT 1: BEE ROLES LINKER CSS */
+        .linker-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+        @media (max-width: 600px) { .linker-layout { grid-template-columns: 1fr; } }
+
+        .role-box {
+            background: #fffbeb;
+            border: 2px solid #fde047;
+            padding: 1.2rem;
+            border-radius: 16px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .role-select {
+            width: 100%;
+            padding: 0.6rem;
+            margin-top: 0.75rem;
+            border: 2px solid #cbd5e1;
+            border-radius: 10px;
+            font-weight: 600;
+            outline: none;
+            background: white;
+            cursor: pointer;
+        }
+        .role-select.correct { border-color: var(--success); background: #d1fae5; }
+        .role-select.wrong { border-color: var(--danger); background: #fee2e2; }
+
+        /* ACT 2: SUFFIX DISCOVERY CSS */
+        .suffix-card {
+            background: #fafafa;
+            border-left: 6px solid var(--honey-gold);
+            padding: 1.5rem;
+            margin-bottom: 1.2rem;
+            border-radius: 0 16px 16px 0;
+            font-size: 1.15rem;
+        }
+
+        .suffix-input {
+            width: 140px;
+            padding: 0.3rem 0.6rem;
+            font-size: 1.05rem;
+            font-weight: bold;
+            border: 2px solid #cbd5e1;
+            border-radius: 8px;
+            text-align: center;
+            outline: none;
+        }
+        .suffix-input:focus { border-color: var(--honey-gold); }
+        .suffix-input.correct { border-color: var(--success); background: #d1fae5; color: #065f46; }
+        .suffix-input.wrong { border-color: var(--danger); background: #fee2e2; color: #991b1b; }
+
+        /* ACT 3: PHONETIC VOWEL MATCHING */
+        .vowel-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #f8fafc;
+            padding: 1rem 1.5rem;
+            border-radius: 14px;
+            margin-bottom: 1rem;
+            border: 1px solid #e2e8f0;
+        }
+        .vowel-row span { font-weight: bold; font-size: 1.1rem; }
+
+        .vowel-btn {
+            background: white;
+            border: 2px solid #cbd5e1;
+            padding: 0.5rem 1.2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        .vowel-btn:hover { background: #f1f5f9; }
+        .vowel-btn.correct { background: var(--success); color: white; border-color: var(--success); }
+        .vowel-btn.wrong { background: var(--danger); color: white; border-color: var(--danger); }
+
+        /* ACT 4: SMART QUIZ ENGINE */
+        .quiz-item { margin-bottom: 2rem; }
+        .quiz-question { font-size: 1.2rem; font-weight: bold; margin-bottom: 0.8rem; }
+        .quiz-options { display: flex; flex-direction: column; gap: 0.5rem; }
+        
+        .quiz-opt-btn {
+            background: #fffdf5;
+            border: 1.5px solid #fef08a;
+            padding: 0.8rem 1.2rem;
+            border-radius: 10px;
+            text-align: left;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1.05rem;
+            transition: background 0.2s;
+        }
+        .quiz-opt-btn:hover { background: #fefcbf; }
+        .quiz-opt-btn.correct { background: var(--success); color: white; border-color: var(--success); }
+        .quiz-opt-btn.wrong { background: var(--danger); color: white; border-color: var(--danger); }
+
+        /* FOOTER & CONTROLS */
+        .btn {
+            background: var(--honey-bright);
+            color: white;
+            border: none;
+            padding: 0.85rem 1.8rem;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn:hover { background: var(--honey-dark); }
+        .score-panel {
+            margin-top: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .status-txt { font-weight: bold; font-size: 1.1rem; color: var(--honey-dark); }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Honey Bees Lab Room</h1>
+        <p>Textbook Exercise Extension Suite • Phase II</p>
+    </header>
+
+    <nav class="nav-menu">
+        <button class="nav-link active" onclick="switchView(0)">1. Bee Ecosystem</button>
+        <button class="nav-link" onclick="switchView(1)">2. Suffix Spark</button>
+        <button class="nav-link" onclick="switchView(2)">3. Sound Studio</button>
+        <button class="nav-link" onclick="switchView(3)">4. Mastery Check</button>
+    </nav>
+
+    <div class="activity-view active" id="view-0">
+        <h2 class="view-title">🏰 Activity 1: Hive Duty Allocator</h2>
+        <p class="instructions">Assign the correct structural responsibilities to House Bees, Field Bees, and the Queen Bee based on the text.</p>
+        
+        <div class="linker-layout">
+            <div class="role-box">
+                <div>🧹 House Bees Duty</div>
+                <select class="role-select" data-ans="clean">
+                    <option value="">-- Choose Assignment --</option>
+                    <option value="clean">Keep house clean, ventilated & build combs</option>
+                    <option value="search">Fly far away to search for nectar resource</option>
+                    <option value="eggs">Lay eggs to maintain population</option>
+                </select>
+            </div>
+            <div class="role-box">
+                <div>🌻 Field Bees Duty</div>
+                <select class="role-select" data-ans="search">
+                    <option value="">-- Choose Assignment --</option>
+                    <option value="clean">Keep house clean, ventilated & build combs</option>
+                    <option value="search">Fly far away to search for nectar resource</option>
+                    <option value="eggs">Lay eggs to maintain population</option>
+                </select>
+            </div>
+            <div class="role-box" style="grid-column: 1 / span 2; max-width: 450px; margin: 0 auto;">
+                <div>👑 Queen Bee Duty</div>
+                <select class="role-select" data-ans="eggs">
+                    <option value="">-- Choose Assignment --</option>
+                    <option value="clean">Keep house clean, ventilated & build combs</option>
+                    <option value="search">Fly far away to search for nectar resource</option>
+                    <option value="eggs">Lay eggs to maintain population</option>
+                </select>
+            </div>
+        </div>
+        <div class="score-panel">
+            <span class="status-txt" id="linker-status">Map roles to evaluate!</span>
+            <button class="btn" onclick="verifyRoles()">Verify Ecosystem</button>
+        </div>
+    </div>
+
+    <div class="activity-view" id="view-1">
+        <h2 class="view-title">⛓️ Activity 2: Suffix Generator (-less)</h2>
+        <p class="instructions">Complete the sentences by supplying custom architectural words containing the suffix '-less' (meaning 'without').</p>
+        
+        <div class="suffix-area">
+            <div class="suffix-card">
+                1. The children on the land had no way to guide the lost sailors. They felt <input type="text" class="suffix-input" data-correct="helpless">.
+            </div>
+            <div class="suffix-card">
+                2. There isn't enough drinking water left in our village. The entire local situation is <input type="text" class="suffix-input" data-correct="hopeless">.
+            </div>
+            <div class="suffix-card">
+                3. Raju is an incredibly strong and brave boy. He is completely <input type="text" class="suffix-input" data-correct="fearless">.
+            </div>
+            <div class="suffix-card">
+                4. I emptied all the heavy weights and items from the bag. Now it feels <input type="text" class="suffix-input" data-correct="weightless">.
+            </div>
+        </div>
+        <div class="score-panel">
+            <span class="status-txt" id="suffix-status"></span>
+            <button class="btn" onclick="verifySuffixes()">Verify Suffixes</button>
+        </div>
+    </div>
+
+    <div class="activity-view" id="view-2">
+        <h2 class="view-title">🎵 Activity 3: Minimal Vowel Matcher</h2>
+        <p class="instructions">Find the matching vowel sound pair for the keyword highlighted on the left, matching your textbook phonetic guidance.</p>
+        
+        <div class="vowel-matrix">
+            <div class="vowel-row">
+                <span>1. Keyword: <strong>cool</strong></span>
+                <div class="options-group" data-ans="room">
+                    <button class="vowel-btn" onclick="checkVowel(this, 'sit')">sit</button>
+                    <button class="vowel-btn" onclick="checkVowel(this, 'room')">room</button>
+                    <button class="vowel-btn" onclick="checkVowel(this, 'wash')">wash</button>
+                </div>
+            </div>
+            <div class="vowel-row">
+                <span>2. Keyword: <strong>make</strong></span>
+                <div class="options-group" data-ans="take">
+                    <button class="vowel-btn" onclick="checkVowel(this, 'take')">take</button>
+                    <button class="vowel-btn" onclick="checkVowel(this, 'will')">will</button>
+                    <button class="vowel-btn" onclick="checkVowel(this, 'meet')">meet</button>
+                </div>
+            </div>
+            <div class="vowel-row">
+                <span>3. Keyword: <strong>watch</strong></span>
+                <div class="options-group" data-ans="wash">
+                    <button class="vowel-btn" onclick="checkVowel(this, 'poor')">poor</button>
+                    <button class="vowel-btn" onclick="checkVowel(this, 'tell')">tell</button>
+                    <button class="vowel-btn" onclick="checkVowel(this, 'wash')">wash</button>
+                </div>
+            </div>
+        </div>
+        <div class="score-panel">
+            <span class="status-txt" id="vowel-status">Click matching vocal options!</span>
+        </div>
+    </div>
+
+    <div class="activity-view" id="view-3">
+        <h2 class="view-title">🎯 Activity 4: Reading Comprehension Blitz</h2>
+        <p class="instructions">Test your comprehensive knowledge regarding the dietary properties and structural facts of honey mentioned in the lesson.</p>
+        
+        <div class="quiz-container">
+            <div class="quiz-item">
+                <div class="quiz-question">Q1. What vital natural minerals are explicitly present inside Honey?</div>
+                <div class="quiz-options" data-correct="A">
+                    <button class="quiz-opt-btn" onclick="evaluateQuiz(this, 'A')">A) Iron and Calcium</button>
+                    <button class="quiz-opt-btn" onclick="evaluateQuiz(this, 'B')">B) Vitamin C and Zinc</button>
+                    <button class="quiz-opt-btn" onclick="evaluateQuiz(this, 'C')">C) Magnesium and Potassium</button>
+                </div>
+            </div>
+            <div class="quiz-item">
+                <div class="quiz-question">Q2. Approximately how much water content remains in fully dehydrated, finished honey?</div>
+                <div class="quiz-options" data-correct="C">
+                    <button class="quiz-opt-btn" onclick="evaluateQuiz(this, 'A')">A) Around 80%</button>
+                    <button class="quiz-opt-btn" onclick="evaluateQuiz(this, 'B')">B) Exactly 50%</button>
+                    <button class="quiz-opt-btn" onclick="evaluateQuiz(this, 'C')">C) About 14% to 18%</button>
+                </div>
+            </div>
+        </div>
+        <div class="score-panel">
+            <span class="status-txt" id="quiz-status">Select your terminal options!</span>
+        </div>
+    </div>
+</div>
+
+<script>
+    // System View Tab Switching
+    function switchView(targetIdx) {
+        document.querySelectorAll('.nav-link').forEach((lnk, idx) => lnk.classList.toggle('active', idx === targetIdx));
+        document.querySelectorAll('.activity-view').forEach((vw, idx) => vw.classList.toggle('active', idx === targetIdx));
+    }
+
+    // --- ACTIVITY 1: EVALUATION ENGINE ---
+    function verifyRoles() {
+        const selects = document.querySelectorAll('.role-select');
+        let score = 0;
+        selects.forEach(sel => {
+            if(sel.value === sel.getAttribute('data-ans')) {
+                sel.className = "role-select correct";
+                score++;
+            } else {
+                sel.className = "role-select wrong";
+            }
+        });
+        document.getElementById('linker-status').innerText = `Ecosystem Checklist: ${score} / 3 Correct!`;
+    }
+
+    // --- ACTIVITY 2: SUFFIX EVALUATION ENGINE ---
+    function verifySuffixes() {
+        const inputs = document.querySelectorAll('.suffix-input');
+        let score = 0;
+        inputs.forEach(inp => {
+            if(inp.value.trim().toLowerCase() === inp.getAttribute('data-correct').toLowerCase()) {
+                inp.className = "suffix-input correct";
+                score++;
+            } else {
+                inp.className = "suffix-input wrong";
+            }
+        });
+        document.getElementById('suffix-status').innerText = `Suffix Scoreboard: ${score} / 4 Checked!`;
+    }
+
+    // --- ACTIVITY 3: PHONETIC VOWEL SYSTEM ---
+    function checkVowel(btn, selectedVal) {
+        const group = btn.closest('.options-group');
+        const correctVal = group.getAttribute('data-ans');
+        const allRowBtns = group.querySelectorAll('.vowel-btn');
+        
+        allRowBtns.forEach(b => b.className = "vowel-btn"); // resetting row state
+        
+        if(selectedVal === correctVal) {
+            btn.classList.add('correct');
+            document.getElementById('vowel-status').innerText = "✨ Perfect matching rhythm!";
+        } else {
+            btn.classList.add('wrong');
+            document.getElementById('vowel-status').innerText = "❌ Vowel length mismatch. Listen closely!";
+        }
+    }
+
+    // --- ACTIVITY 4: QUIZ EVALUATION ENGINE ---
+    function evaluateQuiz(btn, selectedLetter) {
+        const optionsBox = btn.closest('.quiz-options');
+        const correctLetter = optionsBox.getAttribute('data-correct');
+        const allOptBtns = optionsBox.querySelectorAll('.quiz-opt-btn');
+        
+        allOptBtns.forEach(b => b.className = "quiz-opt-btn"); // clear state
+        
+        if(selectedLetter === correctLetter) {
+            btn.classList.add('correct');
+            document.getElementById('quiz-status').innerText = "🎯 Correct fact confirmed!";
+        } else {
+            btn.classList.add('wrong');
+            document.getElementById('quiz-status').innerText = "❌ Incorrect data point. Re-read the chapter metrics!";
+        }
+    }
+</script>
+
+</body>
+</html>

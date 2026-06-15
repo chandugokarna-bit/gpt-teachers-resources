@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Classroom Activities - The Scholar's Mother Tongue</title>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --secondary: #0ea5e9;
+            --success: #10b981;
+            --danger: #ef4444;
+            --background: #f8fafc;
+            --surface: #ffffff;
+            --text: #1e293b;
+            --text-light: #64748b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--background);
+            color: var(--text);
+            padding: 2rem 1rem;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        header h1 {
+            color: var(--primary);
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        header p {
+            color: var(--text-light);
+            font-size: 1.1rem;
+        }
+
+        .nav-tabs {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .tab-btn {
+            background: var(--surface);
+            border: 2px solid #e2e8f0;
+            padding: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            color: var(--text-light);
+            font-size: 0.95rem;
+        }
+
+        .tab-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.3);
+        }
+
+        .activity-card {
+            background: var(--surface);
+            border-radius: 24px;
+            padding: 2.5rem;
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.05);
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .activity-card.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .activity-title {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+            color: #0f172a;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .instructions {
+            color: var(--text-light);
+            margin-bottom: 2rem;
+            font-style: italic;
+        }
+
+        /* --- ACTIVITY 1: TICKLE GAME CSS --- */
+        .bedroom-scene {
+            background: linear-gradient(to bottom, #1e1b4b, #311042);
+            height: 350px;
+            border-radius: 16px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            box-shadow: inset 0 0 50px rgba(0,0,0,0.5);
+        }
+
+        .sleeping-pandit {
+            width: 200px;
+            height: 100px;
+            background: #eab308;
+            border-radius: 50px 50px 0 0;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            color: #78350f;
+            cursor: pointer;
+            transition: transform 0.1s ease;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+        }
+
+        .sleeping-pandit::after {
+            content: '💤';
+            position: absolute;
+            top: -20px;
+            right: 20px;
+            font-size: 1.5rem;
+            animation: floatZ 3s infinite linear;
+        }
+
+        @keyframes floatZ {
+            0% { transform: translateY(0) scale(0.8); opacity: 0; }
+            50% { opacity: 1; }
+            100% { transform: translateY(-40px) scale(1.2); opacity: 0; }
+        }
+
+        .feather-cursor {
+            position: absolute;
+            font-size: 2.5rem;
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+            display: none;
+            transition: transform 0.1s ease;
+        }
+
+        .bedroom-scene:hover .feather-cursor {
+            display: block;
+        }
+
+        .bedroom-scene:active .feather-cursor {
+            transform: translate(-50%, -50%) rotate(-30deg);
+        }
+
+        .dialogue-bubble {
+            position: absolute;
+            background: white;
+            padding: 1rem 1.5rem;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: var(--danger);
+            top: 40px;
+            box-shadow: 0 10px 15px rgba(0,0,0,0.2);
+            display: none;
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes popIn {
+            from { transform: scale(0); }
+            to { transform: scale(1); }
+        }
+
+        /* --- ACTIVITY 2: DRAG & DROP CSS --- */
+        .drag-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .word-bank {
+            background: #f1f5f9;
+            padding: 1.5rem;
+            border-radius: 16px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            align-content: flex-start;
+            border: 2px dashed #cbd5e1;
+        }
+
+        .draggable-box {
+            background: white;
+            padding: 0.75rem 1.2rem;
+            border-radius: 10px;
+            cursor: grab;
+            font-weight: 600;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            border: 1px solid #e2e8f0;
+            transition: transform 0.2s;
+        }
+
+        .draggable-box:active { cursor: grabbing; }
+
+        .drop-zone-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .drop-row {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            padding: 1rem;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .drop-target {
+            width: 150px;
+            height: 45px;
+            background: #e2e8f0;
+            border-radius: 8px;
+            border: 2px dashed #94a3b8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .drop-target.hovered {
+            background: #cbd5e1;
+            border-color: var(--primary);
+        }
+
+        .drop-target.correct {
+            background: #d1fae5;
+            border-color: var(--success);
+            color: #065f46;
+            border-style: solid;
+        }
+
+        /* --- ACTIVITY 3: PYRAMID CSS --- */
+        .pyramid-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 2rem 0;
+        }
+
+        .pyramid-row {
+            display: flex;
+            gap: 0.25rem;
+        }
+
+        .pyramid-cell {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.1rem;
+            border-radius: 6px;
+        }
+
+        .cell-fixed {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .cell-input {
+            width: 40px;
+            height: 40px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.1rem;
+            border: 2px solid #cbd5e1;
+            border-radius: 6px;
+            text-transform: uppercase;
+            outline: none;
+        }
+
+        .cell-input:focus { border-color: var(--primary); }
+        .cell-input.correct { background: #d1fae5; border-color: var(--success); }
+        .cell-input.wrong { background: #fee2e2; border-color: var(--danger); }
+
+        .clues-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            background: #f1f5f9;
+            padding: 1.5rem;
+            border-radius: 12px;
+        }
+
+        /* --- ACTIVITY 4: GRAMMAR STORY CSS --- */
+        .story-box {
+            background: #fffbeb;
+            border-left: 6px solid #f59e0b;
+            padding: 2rem;
+            border-radius: 0 16px 16px 0;
+            font-size: 1.2rem;
+            line-height: 2;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+        }
+
+        .story-select {
+            padding: 0.3rem 0.6rem;
+            font-size: 1.05rem;
+            font-weight: 600;
+            border: 2px solid #f59e0b;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            color: #b45309;
+            outline: none;
+        }
+
+        .story-select.correct { border-color: var(--success); background: #d1fae5; color: #065f46; }
+        .story-select.wrong { border-color: var(--danger); background: #fee2e2; color: #991b1b; }
+
+        /* GENERAL UI ELEMENTS */
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn:hover { background: var(--primary-hover); }
+        
+        .score-board {
+            margin-top: 1.5rem;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--primary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>The Scholar's Mother Tongue</h1>
+        <p>Ultra-Modern Interactive Learning Suite</p>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <nav class="nav-tabs">
+        <button class="tab-btn active" onclick="switchTab(0)">1. Secret Mission</button>
+        <button class="tab-btn" onclick="switchTab(1)">2. Opposites Match</button>
+        <button class="tab-btn" onclick="switchTab(2)">3. Word Pyramid</button>
+        <button class="tab-btn" onclick="switchTab(3)">4. Story Builder</button>
+    </nav>
+
+    <!-- ACTIVITY 1: THE SECRET MISSION (TICKLE GAME) -->
+    <div class="activity-card active" id="act-0">
+        <h2 class="activity-title">🌌 Activity 1: Birbal's Secret Mission</h2>
+        <p class="instructions">Move the feather over the sleeping Pandit to tickle his ear and find out his true mother tongue, just like Birbal did!</p>
+        
+        <div class="bedroom-scene" id="scene" onmousemove="moveFeather(event)">
+            <div class="feather-cursor" id="feather">🪶</div>
+            <div class="sleeping-pandit" onclick="ticklePandit()">
+                😴 Learned Pandit
+            </div>
+            <div class="dialogue-bubble" id="bubble">Yevaradi? (ఎವರದಿ?) 😡</div>
+        </div>
+
+        <div id="mission-ui" style="display:none; text-align: center; margin-top: 1rem;">
+            <p style="font-size: 1.2rem; margin-bottom: 1rem;">🎉 The Pandit shouted in his sleep! What is his mother tongue?</p>
+            <button class="btn" onclick="checkTongue('Telugu')">Telugu</button>
+            <button class="btn" style="background:#64748b" onclick="checkTongue('Hindi')">Hindi</button>
+            <button class="btn" style="background:#64748b" onclick="checkTongue('Kannada')">Kannada</button>
+        </div>
+        <p id="mission-result" style="text-align:center; margin-top:1rem; font-weight:bold; font-size:1.2rem;"></p>
+    </div>
+
+    <!-- ACTIVITY 2: OPPOSITES MATCH (DRAG AND DROP) -->
+    <div class="activity-card" id="act-1">
+        <h2 class="activity-title">🔄 Activity 2: Antonym Connect</h2>
+        <p class="instructions">Drag the correct opposite words from the Word Bank and drop them into the appropriate boxes.</p>
+        
+        <div class="drag-container">
+            <div class="word-bank" id="wordBank">
+                <div class="draggable-box" draggable="true" id="w1" ondragstart="drag(event)">Easy</div>
+                <div class="draggable-box" draggable="true" id="w2" ondragstart="drag(event)">Awake</div>
+                <div class="draggable-box" draggable="true" id="w3" ondragstart="drag(event)">Succeeded</div>
+                <div class="draggable-box" draggable="true" id="w4" ondragstart="drag(event)">Loud/Noisy</div>
+                <div class="draggable-box" draggable="true" id="w5" ondragstart="drag(event)">Different</div>
+                <div class="draggable-box" draggable="true" id="w6" ondragstart="drag(event)">Refused</div>
+            </div>
+
+            <div class="drop-zone-container">
+                <div class="drop-row"><span>1. Same × </span><div class="drop-target" data-match="Different" ondragover="allowDrop(event)" ondragleave="leaveDrop(event)" ondrop="drop(event)">Drop Here</div></div>
+                <div class="drop-row"><span>2. Failed × </span><div class="drop-target" data-match="Succeeded" ondragover="allowDrop(event)" ondragleave="leaveDrop(event)" ondrop="drop(event)">Drop Here</div></div>
+                <div class="drop-row"><span>3. Quiet × </span><div class="drop-target" data-match="Loud/Noisy" ondragover="allowDrop(event)" ondragleave="leaveDrop(event)" ondrop="drop(event)">Drop Here</div></div>
+                <div class="drop-row"><span>4. Asleep × </span><div class="drop-target" data-match="Awake" ondragover="allowDrop(event)" ondragleave="leaveDrop(event)" ondrop="drop(event)">Drop Here</div></div>
+                <div class="drop-row"><span>5. Accepted × </span><div class="drop-target" data-match="Refused" ondragover="allowDrop(event)" ondragleave="leaveDrop(event)" ondrop="drop(event)">Drop Here</div></div>
+                <div class="drop-row"><span>6. Difficult × </span><div class="drop-target" data-match="Easy" ondragover="allowDrop(event)" ondragleave="leaveDrop(event)" ondrop="drop(event)">Drop Here</div></div>
+            </div>
+        </div>
+        <div class="score-board">
+            <span id="drag-score">Score: 0 / 6</span>
+            <button class="btn" onclick="resetDragActivity()">Reset Game</button>
+        </div>
+    </div>
+
+    <!-- ACTIVITY 3: WORD PYRAMID -->
+    <div class="activity-card" id="act-2">
+        <h2 class="activity-title">📐 Activity 3: The Clever 'IT' Pyramid</h2>
+        <p class="instructions">Complete the word pyramid. Every word contains the letters 'IT' at the center!</p>
+        
+        <div class="pyramid-container">
+            <!-- Row 1 -->
+            <div class="pyramid-row">
+                <div class="pyramid-cell cell-fixed">I</div>
+                <div class="pyramid-cell cell-fixed">T</div>
+            </div>
+            <!-- Row 2 -->
+            <div class="pyramid-row">
+                <input type="text" class="cell-input p2" maxlength="1" data-ans="B">
+                <div class="pyramid-cell cell-fixed">I</div>
+                <div class="pyramid-cell cell-fixed">T</div>
+            </div>
+            <!-- Row 3 -->
+            <div class="pyramid-row">
+                <input type="text" class="cell-input p3" maxlength="1" data-ans="S">
+                <div class="pyramid-cell cell-fixed">I</div>
+                <div class="pyramid-cell cell-fixed">T</div>
+            </div>
+            <!-- Row 4 -->
+            <div class="pyramid-row">
+                <input type="text" class="cell-input p4" maxlength="1" data-ans="K">
+                <div class="pyramid-cell cell-fixed">I</div>
+                <div class="pyramid-cell cell-fixed">T</div>
+                <input type="text" class="cell-input p4" maxlength="1" data-ans="T">
+                <input type="text" class="cell-input p4" maxlength="1" data-ans="E">
+                <input type="text" class="cell-input p4" maxlength="1" data-ans="N">
+            </div>
+            <!-- Row 5 -->
+            <div class="pyramid-row">
+                <input type="text" class="cell-input p5" maxlength="1" data-ans="C</div>
+                <input type="text" class="cell-input p5" maxlength="1" data-ans="A">
+                <input type="text" class="cell-input p5" maxlength="1" data-ans="P">
+                <div class="pyramid-cell cell-fixed">I</div>
+                <div class="pyramid-cell cell-fixed">T</div>
+                <input type="text" class="cell-input p5" maxlength="1" data-ans="A">
+                <input type="text" class="cell-input p5" maxlength="1" data-ans="L">
+            </div>
+        </div>
+
+        <div class="clues-grid">
+            <div><strong>Row 2 Clue:</strong> The dog will ___ you. Be careful!</div>
+            <div><strong>Row 3 Clue:</strong> Don't stand, ___ down.</div>
+            <div><strong>Row 4 Clue:</strong> A cat's baby is called a ___.</div>
+            <div><strong>Row 5 Clue:</strong> The headquarters of a state/country.</div>
+        </div>
+
+        <div class="score-board">
+            <button class="btn" onclick="checkPyramid()">Check Answers</button>
+            <span id="pyramid-result"></span>
+        </div>
+    </div>
+
+    <!-- ACTIVITY 4: GRAMMAR STORY BUILDER -->
+    <div class="activity-card" id="act-3">
+        <h2 class="activity-title">📖 Activity 4: Past Tense Story Builder</h2>
+        <p class="instructions">Help complete Birbal's victory story by selecting the correct past tense form of the verbs.</p>
+        
+        <div class="story-box">
+            One day a great scholar 
+            <select class="story-select" data-correct="came">
+                <option value="">--choose--</option>
+                <option value="came">came</option>
+                <option value="coming">coming</option>
+            </select> to King Akbar's court. He 
+            <select class="story-select" data-correct="knew">
+                <option value="">--choose--</option>
+                <option value="knows">knows</option>
+                <option value="knew">knew</option>
+            </select> many languages. He challenged everyone to find out his mother tongue. Everyone tried but 
+            <select class="story-select" data-correct="failed">
+                <option value="">--choose--</option>
+                <option value="failed">failed</option>
+                <option value="fails">fails</option>
+            </select>. That night, Birbal 
+            <select class="story-select" data-correct="went">
+                <option value="">--choose--</option>
+                <option value="go">go</option>
+                <option value="went">went</option>
+            </select> quietly into the bedroom. Birbal 
+            <select class="story-select" data-correct="took">
+                <option value="">--choose--</option>
+                <option value="takes">takes</option>
+                <option value="took">took</option>
+            </select> a small feather and tickled his ear. The scholar 
+            <select class="story-select" data-correct="shouted">
+                <option value="">--choose--</option>
+                <option value="shouts">shouts</option>
+                <option value="shouted">shouted</option>
+            </select> words in his mother tongue! King Akbar 
+            <select class="story-select" data-correct="rewarded">
+                <option value="">--choose--</option>
+                <option value="rewarded">rewarded</option>
+                <option value="reward">reward</option>
+            </select> Birbal for his magnificent wit.
+        </div>
+
+        <div class="score-board">
+            <button class="btn" onclick="checkStory()">Verify Story</button>
+            <span id="story-result"></span>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Tab Switching Logic
+    function switchTab(tabIndex) {
+        document.querySelectorAll('.tab-btn').forEach((btn, idx) => {
+            btn.classList.toggle('active', idx === tabIndex);
+        });
+        document.querySelectorAll('.activity-card').forEach((card, idx) => {
+            card.classList.toggle('active', idx === tabIndex);
+        });
+    }
+
+    // --- ACTIVITY 1: TICKLE GAME LOGIC ---
+    function moveFeather(e) {
+        const feather = document.getElementById('feather');
+        const scene = document.getElementById('scene');
+        const rect = scene.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        feather.style.left = x + 'px';
+        feather.style.top = y + 'px';
+    }
+
+    function ticklePandit() {
+        const bubble = document.getElementById('bubble');
+        bubble.style.display = 'block';
+        document.getElementById('mission-ui').style.display = 'block';
+    }
+
+    function checkTongue(lang) {
+        const res = document.getElementById('mission-result');
+        if(lang === 'Telugu') {
+            res.innerHTML = "🏆 Correct! Birbal discovered that the Pandit's mother tongue is indeed Telugu!";
+            res.style.color = "var(--success)";
+        } else {
+            res.innerHTML = "❌ Oops! Try again. Remember what language the Pandit spoke when in difficulty!";
+            res.style.color = "var(--danger)";
+        }
+    }
+
+    // --- ACTIVITY 2: DRAG & DROP LOGIC ---
+    let dragScore = 0;
+    function allowDrop(ev) { ev.preventDefault(); ev.target.classList.add('hovered'); }
+    function leaveDrop(ev) { ev.target.classList.remove('hovered'); }
+    
+    function drag(ev) {
+        ev.dataTransfer.setData("text", ev.target.id);
+    }
+
+    function drop(ev) {
+        ev.preventDefault();
+        ev.target.classList.remove('hovered');
+        const data = ev.dataTransfer.getData("text");
+        const draggedElement = document.getElementById(data);
+        
+        if (ev.target.getAttribute('data-match') === draggedElement.innerText) {
+            ev.target.innerHTML = draggedElement.innerText;
+            ev.target.classList.add('correct');
+            draggedElement.style.visibility = 'hidden';
+            dragScore++;
+            document.getElementById('drag-score').innerText = `Score: ${dragScore} / 6`;
+        }
+    }
+
+    function resetDragActivity() {
+        dragScore = 0;
+        document.getElementById('drag-score').innerText = "Score: 0 / 6";
+        const targets = document.querySelectorAll('.drop-target');
+        targets.forEach(t => {
+            t.innerText = "Drop Here";
+            t.className = "drop-target";
+        });
+        const words = document.querySelectorAll('.draggable-box');
+        words.forEach(w => w.style.visibility = 'visible');
+    }
+
+    // --- ACTIVITY 3: PYRAMID LOGIC ---
+    function checkPyramid() {
+        const inputs = document.querySelectorAll('.cell-input');
+        let correctCount = 0;
+        inputs.forEach(input => {
+            if(input.value.toUpperCase() === input.getAttribute('data-ans')) {
+                input.className = "cell-input correct";
+                correctCount++;
+            } else {
+                input.className = "cell-input wrong";
+            }
+        });
+        const res = document.getElementById('pyramid-result');
+        if(correctCount === inputs.length) {
+            res.innerText = "🌟 Mastermind! All words match perfectly.";
+            res.style.color = "var(--success)";
+        } else {
+            res.innerText = "Keep trying! Check the marked cells.";
+            res.style.color = "var(--danger)";
+        }
+    }
+
+    // --- ACTIVITY 4: STORY BUILDER LOGIC ---
+    function checkStory() {
+        const selects = document.querySelectorAll('.story-box select');
+        let score = 0;
+        selects.forEach(sel => {
+            if(sel.value === sel.getAttribute('data-correct')) {
+                sel.className = "story-select correct";
+                score++;
+            } else {
+                sel.className = "story-select wrong";
+            }
+        });
+        const res = document.getElementById('story-result');
+        res.innerText = `Verified! Score: ${score} / ${selects.length}`;
+        res.style.color = (score === selects.length) ? "var(--success)" : "var(--danger)";
+    }
+</script>
+
+</body>
+</html>

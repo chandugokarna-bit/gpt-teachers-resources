@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Rainbow Poem - Interactive Studio</title>
+    <style>
+        :root {
+            --violet: #7c3aed;
+            --indigo: #4f46e5;
+            --blue: #2563eb;
+            --green: #16a34a;
+            --yellow: #ca8a04;
+            --orange: #ea580c;
+            --red: #dc2626;
+            --bg-gradient: linear-gradient(135deg, #eff6ff, #faf5ff, #f0fdf4);
+            --card-bg: #ffffff;
+            --text-dark: #0f172a;
+            --text-muted: #475569;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+
+        body {
+            background: var(--bg-gradient);
+            color: var(--text-dark);
+            padding: 2.5rem 1rem;
+            line-height: 1.7;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        /* Extraordinary Colorful Header */
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            background: linear-gradient(45deg, #ff0055, #00ff55, #0055ff, #ff0055);
+            background-size: 400% 400%;
+            animation: rainbowBg 12s ease infinite;
+            padding: 3rem;
+            border-radius: 32px;
+            color: white;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        @keyframes rainbowBg {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        header h1 { font-size: 2.8rem; margin-bottom: 0.5rem; font-weight: 800; text-shadow: 0 3px 6px rgba(0,0,0,0.15); }
+        header p { font-size: 1.2rem; font-weight: 500; opacity: 0.95; }
+
+        /* Split Layout Architecture */
+        .poem-section {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            margin-bottom: 3.5rem;
+        }
+
+        .row-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            align-items: stretch;
+        }
+
+        @media (max-width: 768px) {
+            .row-container { grid-template-columns: 1fr; gap: 1rem; }
+        }
+
+        /* Left Column: Poem Stanza Card */
+        .poem-card {
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 2.5rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.03);
+            border: 2px solid transparent;
+            font-size: 1.25rem;
+            font-style: italic;
+            font-weight: 600;
+            color: #1e1b4b;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .poem-card::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 8px;
+        }
+
+        .card-stanza-1 { border-color: #bfdbfe; }
+        .card-stanza-1::before { background: linear-gradient(to bottom, var(--blue), var(--green)); }
+        
+        .card-stanza-2 { border-color: #fef08a; }
+        .card-stanza-2::before { background: linear-gradient(to bottom, var(--gold), var(--red)); }
+
+        .poem-line { margin-bottom: 0.5rem; }
+
+        /* Right Column: Summary Card */
+        .summary-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(8px);
+            border-radius: 24px;
+            padding: 2.5rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.02);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            border: 1px solid #e2e8f0;
+        }
+
+        .summary-tag {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            font-weight: 800;
+            letter-spacing: 1px;
+            margin-bottom: 0.75rem;
+            display: inline-block;
+        }
+
+        .tag-1 { color: var(--blue); }
+        .tag-2 { color: var(--red); }
+
+        .summary-title { font-size: 1.4rem; color: var(--text-dark); margin-bottom: 0.75rem; font-weight: 700; }
+        .summary-text { font-size: 1.15rem; color: var(--text-muted); line-height: 1.8; }
+
+        /* Rainbow Interactive Activity Module */
+        .rainbow-lab {
+            background: var(--white);
+            border-radius: 28px;
+            padding: 2.5rem;
+            box-shadow: 0 20px 30px rgba(0,0,0,0.04);
+            border: 2px solid #e9d5ff;
+            background: white;
+        }
+
+        .lab-title { font-size: 1.7rem; color: var(--violet); margin-bottom: 0.5rem; font-weight: 700; }
+        .instructions { font-style: italic; color: var(--text-muted); margin-bottom: 2rem; }
+
+        .vibgyor-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (max-width: 600px) { .vibgyor-grid { grid-template-columns: repeat(4, 1fr); } }
+
+        .color-node {
+            background: #f1f5f9;
+            border: 2px solid #cbd5e1;
+            padding: 1rem;
+            border-radius: 16px;
+            text-align: center;
+            font-weight: 800;
+            font-size: 1.2rem;
+        }
+
+        .color-input {
+            width: 100%;
+            padding: 0.5rem;
+            margin-top: 0.5rem;
+            border: 2px solid #cbd5e1;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: bold;
+            text-transform: uppercase;
+            outline: none;
+        }
+        .color-input.correct { border-color: #10b981; background: #d1fae5; color: #065f46; }
+        .color-input.wrong { border-color: #ef4444; background: #fee2e2; color: #991b1b; }
+
+        .btn {
+            background: var(--violet);
+            color: white;
+            border: none;
+            padding: 0.9rem 2rem;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn:hover { background: #6d28d9; transform: translateY(-1px); }
+        
+        .score-board {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1.5rem;
+        }
+        .result-txt { font-weight: bold; font-size: 1.1rem; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>The Rainbow Poem</h1>
+        <p>By Christina Rossetti • Paragraph-Wise Parallel Learning Studio</p>
+    </header>
+
+    <div class="poem-section">
+        
+        <div class="row-container">
+            <div class="poem-card card-stanza-1">
+                <div class="poem-line">Boats sail in the rivers,</div>
+                <div class="poem-line">And ships sail on the seas;</div>
+                <div class="poem-line">But clouds that sail across the sky,</div>
+                <div class="poem-line">Are prettier far than these.</div>
+            </div>
+            <div class="summary-card">
+                <span class="summary-tag tag-1">Stanza 1 Summary</span>
+                <h3 class="summary-title">⛵ Earthly vs Heavenly Beauty</h3>
+                <p class="summary-text">The poet says that man-made boats traveling on rivers and big ships traveling on the wide seas look very beautiful. However, natural clouds floating across the wide blue sky are much more beautiful than any boat or ship built by humans.</p>
+            </div>
+        </div>
+
+        <div class="row-container">
+            <div class="poem-card card-stanza-2">
+                <div class="poem-line">There are bridges on the rivers,</div>
+                <div class="poem-line">As pretty as you please;</div>
+                <div class="poem-line">But the bow that bridges heaven,</div>
+                <div class="poem-line">And overtops the trees,</div>
+                <div class="poem-line">And builds a road from earth to sky,</div>
+                <div class="poem-line">Is prettier far than these.</div>
+            </div>
+            <div class="summary-card">
+                <span class="summary-tag tag-2">Stanza 2 Summary</span>
+                <h3 class="summary-title">🌈 The Road to Heaven</h3>
+                <p class="summary-text">Human-built bridges over rivers look very neat and helpful. But a rainbow—which acts like a giant bridge to heaven, rises high over the tall green trees, and makes an imaginary colorful highway from the ground to the clouds—is vastly superior and more majestic than any human bridge.</p>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="rainbow-lab">
+        <h2 class="lab-title">🎨 Activity: VIBGYOR Spectrum Unlocked</h2>
+        <p class="instructions">Expand the alphabet tokens into their exact corresponding mrainbow color names to complete the textbook task!</p>
+        
+        <div class="vibgyor-grid">
+            <div class="color-node" style="color: #4c1d95;">V<input type="text" class="color-input" data-ans="VIOLET" placeholder="???"></div>
+            <div class="color-node" style="color: #1e3a8a;">I<input type="text" class="color-input" data-ans="INDIGO" placeholder="???"></div>
+            <div class="color-node" style="color: #1d4ed8;">B<input type="text" class="color-input" data-ans="BLUE" placeholder="???"></div>
+            <div class="color-node" style="color: #15803d;">G<input type="text" class="color-input" data-ans="GREEN" placeholder="???"></div>
+            <div class="color-node" style="color: #a16207;">Y<input type="text" class="color-input" data-ans="YELLOW" placeholder="???"></div>
+            <div class="color-node" style="color: #c2410c;">O<input type="text" class="color-input" data-ans="ORANGE" placeholder="???"></div>
+            <div class="color-node" style="color: #b91c1c;">R<input type="text" class="color-input" data-ans="RED" placeholder="???"></div>
+        </div>
+
+        <div class="score-board">
+            <span class="result-txt" id="lab-res" style="color: var(--violet)">Fill out all slots to execute check!</span>
+            <button class="btn" onclick="checkRainbowSpectrum()">Check Spectrum</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    function checkRainbowSpectrum() {
+        const inputs = document.querySelectorAll('.color-input');
+        let scoreCount = 0;
+        
+        inputs.forEach(input => {
+            const userVal = input.value.trim().toUpperCase();
+            const correctAns = input.getAttribute('data-ans');
+            
+            if(userVal === correctAns) {
+                input.className = "color-input correct";
+                scoreCount++;
+            } else {
+                input.className = "color-input wrong";
+            }
+        });
+
+        const feedbackBox = document.getElementById('lab-res');
+        if(scoreCount === inputs.length) {
+            feedbackBox.innerText = "🎉 Magnificent! You accurately unlocked the full VIBGYOR spectrum!";
+            feedbackBox.style.color = "#10b981";
+        } else {
+            feedbackBox.innerText = `Keep practicing! You got ${scoreCount} out of 7 correct. Check the marked boxes.`;
+            feedbackBox.style.color = "#ef4444";
+        }
+    }
+</script>
+
+</body>
+</html>

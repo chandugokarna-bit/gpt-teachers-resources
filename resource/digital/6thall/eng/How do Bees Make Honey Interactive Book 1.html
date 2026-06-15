@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Learning - How do Bees Make Honey?</title>
+    <style>
+        :root {
+            --amber-dark: #b45309;
+            --amber-mid: #f59e0b;
+            --amber-light: #fef3c7;
+            --bee-black: #1e1b4b;
+            --success: #10b981;
+            --danger: #ef4444;
+            --bg: #fffbeb;
+            --card-bg: #ffffff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--bee-black);
+            padding: 2rem 1rem;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            padding: 2.5rem;
+            border-radius: 30px;
+            color: white;
+            box-shadow: 0 10px 25px -5px rgba(217, 119, 6, 0.3);
+        }
+
+        header h1 { font-size: 2.6rem; margin-bottom: 0.5rem; text-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        header p { font-size: 1.2rem; font-weight: 500; }
+
+        /* Tabs Layout */
+        .nav-tabs {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .nav-tabs { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        .tab-btn {
+            background: var(--card-bg);
+            border: 2px solid #fef08a;
+            padding: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            border-radius: 16px;
+            color: var(--amber-dark);
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn.active {
+            background: var(--bee-black);
+            color: #fef08a;
+            border-color: var(--bee-black);
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+        }
+
+        .activity-card {
+            background: var(--card-bg);
+            border-radius: 28px;
+            padding: 2.5rem;
+            box-shadow: 0 20px 25px -5px rgba(217,119,6,0.05);
+            display: none;
+            animation: popUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            border: 3px solid #fef08a;
+        }
+
+        .activity-card.active { display: block; }
+
+        @keyframes popUp {
+            from { opacity: 0; transform: scale(0.97) translateY(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .act-title { font-size: 1.8rem; color: var(--amber-dark); margin-bottom: 0.5rem; }
+        .instructions { color: #6b7280; font-style: italic; margin-bottom: 2rem; }
+
+        /* ACT 1: VISUAL HONEY PROCESS CSS */
+        .process-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (max-width: 768px) { .process-grid { grid-template-columns: 1fr; } }
+
+        .step-card {
+            background: #fffdf5;
+            border: 2px dashed var(--amber-mid);
+            border-radius: 20px;
+            padding: 1.5rem;
+            text-align: center;
+            cursor: grab;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .step-card:active { cursor: grabbing; }
+
+        .visual-box {
+            font-size: 3.5rem;
+            background: var(--amber-light);
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 14px;
+            margin-bottom: 1rem;
+        }
+
+        .step-desc { font-weight: 600; font-size: 1.05rem; }
+
+        .slots-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-top: 2rem;
+            background: #fefcbf;
+            padding: 2rem;
+            border-radius: 24px;
+        }
+        @media (max-width: 768px) { .slots-grid { grid-template-columns: 1fr; } }
+
+        .slot-target {
+            background: white;
+            border: 3px dashed #cbd5e1;
+            min-height: 180px;
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            font-weight: bold;
+            color: #94a3b8;
+        }
+        .slot-target.correct { background: #d1fae5; border-color: var(--success); color: #065f46; }
+
+        /* ACT 2 & 3: WHEELS AND LINGUISTICS CSS */
+        .wheel-container {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 2rem;
+        }
+
+        .wheel-box {
+            text-align: center;
+            background: #fffbeb;
+            padding: 1.5rem;
+            border-radius: 20px;
+            border: 2px solid #fef08a;
+            width: 280px;
+        }
+
+        .wheel-box h3 { margin-bottom: 1rem; color: var(--bee-black); }
+
+        .action-input {
+            width: 100%;
+            padding: 0.75rem;
+            margin-top: 0.5rem;
+            border: 2px solid #cbd5e1;
+            border-radius: 10px;
+            font-weight: 600;
+            text-align: center;
+            outline: none;
+        }
+        .action-input:focus { border-color: var(--amber-mid); }
+        .action-input.correct { background: #d1fae5; border-color: var(--success); }
+
+        /* ACT 4: SUBJECT VERB CONCORD */
+        .grammar-zone {
+            background: #fafafa;
+            padding: 2rem;
+            border-radius: 20px;
+            font-size: 1.25rem;
+            line-height: 2.2;
+            border: 1px solid #e2e8f0;
+        }
+
+        .gram-select {
+            padding: 0.3rem 0.6rem;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border: 2px solid var(--amber-mid);
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            color: var(--amber-dark);
+        }
+        .gram-select.correct { border-color: var(--success); background: #d1fae5; }
+        .gram-select.wrong { border-color: var(--danger); background: #fee2e2; }
+
+        /* ACT 5: APPLE MILKSHAKE BLENDER */
+        .blender-box {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+        @media (max-width: 768px) { .blender-box { grid-template-columns: 1fr; } }
+
+        .recipe-pane {
+            background: #f8fafc;
+            padding: 1.5rem;
+            border-radius: 16px;
+            font-size: 1.1rem;
+            line-height: 1.8;
+        }
+
+        /* GENERAL STYLES */
+        .btn {
+            background: var(--amber-mid);
+            color: white;
+            border: none;
+            padding: 0.85rem 1.8rem;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn:hover { background: var(--amber-dark); }
+        .score-board {
+            margin-top: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .status-msg { font-weight: bold; font-size: 1.1rem; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>How do Bees Make Honey?</h1>
+        <p>Interactive Ultra-Modern Digital Lab Suite</p>
+    </header>
+
+    <nav class="nav-tabs">
+        <button class="tab-btn active" onclick="showTab(0)">1. Honey Factory (Visual)</button>
+        <button class="tab-btn" onclick="showTab(1)">2. Action Wheels (Word-Power)</button>
+        <button class="tab-btn" onclick="showTab(2)">3. Photosynthesis Lab</button>
+        <button class="tab-btn" onclick="showTab(3)">4. Recipe Blender</button>
+    </nav>
+
+    <div class="activity-card active" id="tab-0">
+        <h2 class="act-title">🐝 Activity 1: Visual Honey Factory Sequence</h2>
+        <p class="instructions">Drag each honey-making phase from the bank and sequence them correctly into the production pipeline slots below!</p>
+        
+        <div class="process-grid">
+            <div class="step-card" draggable="true" id="step3" data-step="3" ondragstart="drag(event)">
+                <div class="visual-box">🪽</div>
+                <div class="step-desc">Bees fan wings to evaporate water</div>
+            </div>
+            <div class="step-card" draggable="true" id="step1" data-step="1" ondragstart="drag(event)">
+                <div class="visual-box">🌸</div>
+                <div class="step-desc">Bees visit flowers & collect nectar</div>
+            </div>
+            <div class="step-card" draggable="true" id="step2" data-step="2" ondragstart="drag(event)">
+                <div class="visual-box">🍯</div>
+                <div class="step-desc">Nectar converts into honey inside sac</div>
+            </div>
+        </div>
+
+        <div class="slots-grid">
+            <div class="slot-target" data-expected="1" ondragover="allowDrop(event)" ondrop="drop(event)">Pipeline Step 1 (Drop Here)</div>
+            <div class="slot-target" data-expected="2" ondragover="allowDrop(event)" ondrop="drop(event)">Pipeline Step 2 (Drop Here)</div>
+            <div class="slot-target" data-expected="3" ondragover="allowDrop(event)" ondrop="drop(event)">Pipeline Step 3 (Drop Here)</div>
+        </div>
+        <div class="score-board">
+            <span class="status-msg" id="factory-status" style="color: var(--amber-dark)">Align the production loop!</span>
+            <button class="btn" onclick="window.location.reload()">Reset Lab</button>
+        </div>
+    </div>
+
+    <div class="activity-card" id="tab-1">
+        <h2 class="act-title">⚙️ Activity 2 & 3: Action Association Webs</h2>
+        <p class="instructions">Type corresponding action verbs associated with "Honey", "Book", and "House" as instructed in V1 & V2 textbook modules.</p>
+        
+        <div class="wheel-container">
+            <div class="wheel-box">
+                <h3>🍯 Honey Actions</h3>
+                <input type="text" class="action-input" data-ans="pour" placeholder="Action 1 (Hint: p___)">
+                <input type="text" class="action-input" data-ans="taste" placeholder="Action 2 (Hint: t___)">
+                <input type="text" class="action-input" data-ans="fill" placeholder="Action 3 (Hint: f___)">
+            </div>
+            <div class="wheel-box">
+                <h3>📚 Book Actions</h3>
+                <input type="text" class="action-input" data-ans="open" placeholder="Action 1 (Hint: o___)">
+                <input type="text" class="action-input" data-ans="read" placeholder="Action 2 (Hint: r___)">
+                <input type="text" class="action-input" data-ans="close" placeholder="Action 3 (Hint: c___)">
+            </div>
+            <div class="wheel-box">
+                <h3>🏡 House Actions</h3>
+                <input type="text" class="action-input" data-ans="build" placeholder="Action 1 (Hint: b___)">
+                <input type="text" class="action-input" data-ans="clean" placeholder="Action 2 (Hint: c___)">
+                <input type="text" class="action-input" data-ans="live" placeholder="Action 3 (Hint: l___)">
+            </div>
+        </div>
+        <div class="score-board">
+            <span class="status-msg" id="wheels-status"></span>
+            <button class="btn" onclick="checkWheels()">Verify Action Webs</button>
+        </div>
+    </div>
+
+    <div class="activity-card" id="tab-2">
+        <h2 class="act-title">🌱 Activity 4: Photosynthesis Grammar Lab</h2>
+        <p class="instructions">Select the correct verbs from the brackets to complete the science report while maintaining perfect subject-verb concord.</p>
+        
+        <div class="grammar-zone">
+            Plants <select class="gram-select" data-correct="are"><option value="">--?</option><option value="is">is</option><option value="are">are</option></select> very important to us. All the food people eat <select class="gram-select" data-correct="comes"><option value="">--?</option><option value="come">come</option><option value="comes">comes</option></select> directly or indirectly from plants. They <select class="gram-select" data-correct="make"><option value="">--?</option><option value="make">make</option><option value="makes">makes</option></select> their own food! A plant <select class="gram-select" data-correct="needs"><option value="">--?</option><option value="need">need</option><option value="needs">needs</option></select> chlorophyll, water, and sunlight. During photosynthesis, plants <select class="gram-select" data-correct="release"><option value="">--?</option><option value="release">release</option><option value="releases">releases</option></select> oxygen into the air.
+        </div>
+        <div class="score-board">
+            <span class="status-msg" id="grammar-status"></span>
+            <button class="btn" onclick="checkGrammar()">Validate Concord</button>
+        </div>
+    </div>
+
+    <div class="activity-card" id="tab-3">
+        <h2 class="act-title">🥤 Activity 5 & 6: Apple Milkshake Blender</h2>
+        <p class="instructions">Fill in the blending procedural words to execute the kitchen task successfully.</p>
+        
+        <div class="blender-box">
+            <div class="recipe-pane">
+                <p style="margin-bottom: 0.5rem;"><strong>Step 1:</strong> <input type="text" class="action-input" style="width:120px; display:inline;" data-ans="cut" placeholder="c__"> apple into small pieces.</p>
+                <p style="margin-bottom: 0.5rem;"><strong>Step 2:</strong> Now <input type="text" class="action-input" style="width:120px; display:inline;" data-ans="put" placeholder="p__"> milk, sugar and apple pieces into a mixer.</p>
+                <p style="margin-bottom: 0.5rem;"><strong>Step 3:</strong> <input type="text" class="action-input" style="width:120px; display:inline;" data-ans="grind" placeholder="g____"> cardamom to a powder and mix it.</p>
+                <p style="margin-bottom: 0.5rem;"><strong>Step 4:</strong> Now <input type="text" class="action-input" style="width:120px; display:inline;" data-ans="blend" placeholder="b____"> the shake until smooth and serve chilled!</p>
+            </div>
+            <div style="display:flex; align-items:center; justify-content:center; background:#fffbeb; border-radius:20px; font-size:5rem;" id="blender-graphic">
+                🥛
+            </div>
+        </div>
+        <div class="score-board">
+            <span class="status-msg" id="recipe-status"></span>
+            <button class="btn" onclick="checkBlender()">Activate Blender</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Tab Architecture Logic
+    function showTab(index) {
+        document.querySelectorAll('.tab-btn').forEach((btn, idx) => btn.classList.toggle('active', idx === index));
+        document.querySelectorAll('.activity-card').forEach((card, idx) => card.classList.toggle('active', idx === index));
+    }
+
+    // --- ACTIVITY 1: DRAG & DROP FACTORY LOOP ---
+    function allowDrop(ev) { ev.preventDefault(); }
+    function drag(ev) { ev.dataTransfer.setData("text", ev.target.id); }
+    
+    let factoryScore = 0;
+    function drop(ev) {
+        ev.preventDefault();
+        let data = ev.dataTransfer.getData("text");
+        let draggedElement = document.getElementById(data);
+        let targetSlot = ev.target.closest('.slot-target');
+        
+        if (targetSlot && targetSlot.getAttribute('data-expected') === draggedElement.getAttribute('data-step')) {
+            targetSlot.innerHTML = "";
+            targetSlot.appendChild(draggedElement);
+            targetSlot.classList.add('correct');
+            draggedElement.setAttribute('draggable', 'false');
+            factoryScore++;
+            if(factoryScore === 3) {
+                let status = document.getElementById('factory-status');
+                status.innerText = "🏆 Hurrah! You unlocked the Honey Production Flowchart perfectly!";
+                status.style.color = "var(--success)";
+            }
+        }
+    }
+
+    // --- ACTIVITY 2 & 3: ACTION WHEELS VALIDATION ---
+    function checkWheels() {
+        const inputs = document.querySelectorAll('.action-input:not(span input)');
+        let correct = 0;
+        inputs.forEach(input => {
+            if(input.value.trim().toLowerCase() === input.getAttribute('data-ans')) {
+                input.className = "action-input correct";
+                correct++;
+            }
+        });
+        document.getElementById('wheels-status').innerText = `Scored: ${correct} / ${inputs.length} correct actions!`;
+    }
+
+    // --- ACTIVITY 4: GRAMMAR CONCORD VALIDATION ---
+    function checkGrammar() {
+        const selects = document.querySelectorAll('.gram-select');
+        let score = 0;
+        selects.forEach(sel => {
+            if(sel.value === sel.getAttribute('data-correct')) {
+                sel.className = "gram-select correct";
+                score++;
+            } else {
+                sel.className = "gram-select wrong";
+            }
+        });
+        document.getElementById('grammar-status').innerText = `Grammar Evaluation: Score ${score} / ${selects.length}`;
+    }
+
+    // --- ACTIVITY 5 & 6: RECIPE AND BLENDER VALIDATION ---
+    function checkBlender() {
+        const inputs = document.querySelectorAll('.recipe-pane .action-input');
+        let score = 0;
+        inputs.forEach(inp => {
+            if(inp.value.trim().toLowerCase() === inp.getAttribute('data-ans')) {
+                inp.className = "action-input correct";
+                score++;
+            }
+        });
+        if(score === 4) {
+            document.getElementById('blender-graphic').innerText = "🍹🎉";
+            document.getElementById('recipe-status').innerText = "Yum! The Blender whipped up a perfect Milkshake!";
+            document.getElementById('recipe-status').style.color = "var(--success)";
+        } else {
+            document.getElementById('recipe-status').innerText = "Check your recipe terminology items.";
+        }
+    }
+</script>
+
+</body>
+</html>
