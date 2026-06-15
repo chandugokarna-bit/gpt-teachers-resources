@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಮಂಗಳನ ಅಂಗಳಕ್ಕೆ ಹಾರು - ತೂಕ ಮತ್ತು ಗುರುತ್ವಾಕರ್ಷಣೆ ಸಿಮ್ಯುಲೇಟರ್</title>
+    <style>
+        :root {
+            --space-bg: #0b0d1b;
+            --mars-orange: #ff6b4a;
+            --earth-blue: #4a90e2;
+            --text-color: #ffffff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #05070f;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            color: var(--text-color);
+        }
+
+        .activity-container {
+            background: linear-gradient(145deg, #0f1123, #151833);
+            padding: 30px;
+            border-radius: 25px;
+            box-shadow: 0 15px 40px rgba(255, 107, 74, 0.15);
+            max-width: 800px;
+            width: 100%;
+            text-align: center;
+            border: 1px solid rgba(255, 107, 74, 0.2);
+        }
+
+        h2 {
+            color: var(--mars-orange);
+            margin-bottom: 5px;
+            font-size: 24px;
+            text-shadow: 0 0 10px rgba(255, 107, 74, 0.5);
+        }
+
+        .instruction {
+            color: #a0a5c0;
+            font-size: 16px;
+            margin-bottom: 25px;
+        }
+
+        /* ಇನ್‌ಪುಟ್ ಜಾಗ */
+        .input-zone {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 15px;
+            display: inline-flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .input-zone label {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .weight-input {
+            background: #05070f;
+            border: 2px solid var(--mars-orange);
+            color: #fff;
+            padding: 10px 15px;
+            font-size: 18px;
+            border-radius: 8px;
+            width: 100px;
+            text-align: center;
+            outline: none;
+            box-shadow: 0 0 10px rgba(255, 107, 74, 0.2);
+        }
+
+        /* ಸಿಮ್ಯುಲೇಟರ್ ಡಿಸ್ಪ್ಲೇ */
+        .simulator-display {
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-end;
+            gap: 20px;
+            margin-bottom: 35px;
+            min-height: 220px;
+            position: relative;
+        }
+
+        .planet-column {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+
+        .planet-img {
+            font-size: 70px;
+            filter: drop-shadow(0 0 15px rgba(255,255,255,0.2));
+            margin-bottom: 15px;
+        }
+
+        #marsImg {
+            filter: drop-shadow(0 0 20px rgba(255, 107, 74, 0.6));
+            animation: rotateMars 20s linear infinite;
+        }
+
+        @keyframes rotateMars {
+            100% { transform: rotate(360deg); }
+        }
+
+        /* ಪುಟ್ಟಿ (ಗಗನಯಾತ್ರಿ) ಅನಿಮೇಷನ್ */
+        .putti-avatar {
+            font-size: 45px;
+            position: absolute;
+            bottom: 100px;
+            transition: all 0.5s ease;
+            user-select: none;
+        }
+
+        #puttiEarth {
+            animation: earthWalk 2s ease-in-out infinite alternate;
+        }
+
+        #puttiMars {
+            /* ಮಂಗಳ ಗ್ರಹದಲ್ಲಿ ತೇಲುವ (High Jump) ಅನಿಮೇಷನ್ */
+            animation: marsFloat 3.5s ease-in-out infinite alternate;
+        }
+
+        @keyframes earthWalk {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-10px); }
+        }
+
+        @keyframes marsFloat {
+            0% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-90px) scale(1.1) rotate(5deg); }
+            100% { transform: translateY(0) scale(1); }
+        }
+
+        /* ಫಲಿತಾಂಶದ ಕಾರ್ಡ್‌ಗಳು */
+        .result-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 15px;
+            border-radius: 12px;
+            width: 85%;
+            text-align: center;
+        }
+
+        .planet-name {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .earth-text { color: var(--earth-blue); }
+        .mars-text { color: var(--mars-orange); }
+
+        .weight-display {
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        /* ಮಾಹಿತಿ ಫಲಕ */
+        .info-panel {
+            background: rgba(255, 107, 74, 0.05);
+            border-left: 4px solid var(--mars-orange);
+            padding: 15px;
+            border-radius: 0 12px 12px 0;
+            text-align: left;
+            font-size: 15px;
+            line-height: 1.6;
+            color: #d1d4e0;
+        }
+    </style>
+</head>
+<body>
+
+<div class="activity-container">
+    <h2>೧. ಮಂಗಳನ ಅಂಗಳಕ್ಕೆ ಹಾರು! 🚀</h2>
+    <p class="instruction">"ಮಂಗಳ ಗ್ರಹದಲ್ಲಿ ಪುಟ್ಟಿ" ಪಾಠದ ಸೈನ್ಸ್ ಸಿಮ್ಯುಲೇಟರ್: ನಿಮ್ಮ ತೂಕವನ್ನು ಹಾಕಿ ಮಂಗಳ ಗ್ರಹದ ಮ್ಯಾಜಿಕ್ ನೋಡಿ!</p>
+
+    <div class="input-zone">
+        <label for="userWeight">ನಿಮ್ಮ ತೂಕವನ್ನು ಹಾಕಿ (KG):</label>
+        <input type="number" id="userWeight" class="weight-input" value="30" min="1" max="200" oninput="calculateMarsWeight()">
+    </div>
+
+    <div class="simulator-display">
+        <div class="planet-column">
+            <div class="putti-avatar" id="puttiEarth">🧑‍🚀</div>
+            <div class="planet-img">🌍</div>
+            <div class="result-card">
+                <div class="planet-name earth-text">ಭೂಮಿಯ ಮೇಲೆ ತೂಕ</div>
+                <div class="weight-display" id="earthWeightDisplay">30 KG</div>
+            </div>
+        </div>
+
+        <div class="planet-column">
+            <div class="putti-avatar" id="puttiMars">🧑‍🚀</div>
+            <div class="planet-img" id="marsImg">🪐</div>
+            <div class="result-card">
+                <div class="planet-name mars-text">ಮಂಗಳನ ಮೇಲೆ ತೂಕ</div>
+                <div class="weight-display" id="marsWeightDisplay">11.4 KG</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="info-panel" id="scienceFact">
+        💡 <b>ವಿಜ್ಞಾನದ ರಹಸ್ಯ:</b> ಮಂಗಳ ಗ್ರಹದ ಗಾತ್ರ ಮತ್ತು ದ್ರವ್ಯರಾಶಿ ಭೂಮಿಗಿಂತ ಕಡಿಮೆಯಿರುವುದರಿಂದ, ಅಲ್ಲಿನ <b>ಗುರುತ್ವಾಕರ್ಷಣ ಬಲವು ಭೂಮಿಯ ಕೇವಲ ೩೮% (0.38) ರಷ್ಟಿರುತ್ತದೆ</b>. ಆದ್ದರಿಂದಲೇ ಪುಟ್ಟಿ ಮಂಗಳ ಗ್ರಹಕ್ಕೆ ಹೋದಾಗ ತೂಕ ಹಗುರವಾಗಿ ಗಾಳಿಯಲ್ಲಿ ಸುಲಭವಾಗಿ ತೇಲುತ್ತಾ ಜಿಗಿಯಲು ಸಾಧ್ಯವಾಯಿತು!
+    </div>
+</div>
+
+<script>
+    // ಕೃತಕವಾಗಿ ಸ್ಪೇಸ್ ಸೌಂಡ್ ಎಫೆಕ್ಟ್ (Sci-Fi Beep) ಸೃಷ್ಟಿಸುವ ಫಂಕ್ಷನ್
+    function playSpaceSound() {
+        try {
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+
+            oscillator.type = 'sine';
+            // ಬಾಹ್ಯಾಕಾಶದ ತರಂಗದ ಧ್ವನಿ
+            oscillator.frequency.setValueAtTime(440, audioCtx.currentTime); 
+            oscillator.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.3);
+
+            gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+
+            oscillator.start();
+            oscillator.stop(audioCtx.currentTime + 0.3);
+        } catch(e) {
+            console.log("Audio not supported or blocked by browser");
+        }
+    }
+
+    function calculateMarsWeight() {
+        const weightInput = document.getElementById('userWeight').value;
+        const earthDisplay = document.getElementById('earthWeightDisplay');
+        const marsDisplay = document.getElementById('marsWeightDisplay');
+
+        if (weightInput > 0) {
+            // ಭೂಮಿಯ ತೂಕ ಅಪ್ಡೇಟ್
+            earthDisplay.innerText = weightInput + " KG";
+            
+            // ಮಂಗಳ ಗ್ರಹದ ತೂಕ ಲೆಕ್ಕಾಚಾರ (ಭೂಮಿಯ ತೂಕ * 0.38)
+            const marsWeight = (weightInput * 0.38).toFixed(1);
+            marsDisplay.innerText = marsWeight + " KG";
+
+            // ಪ್ರತಿ ಬಾರಿ ಸಂಖ್ಯೆ ಬದಲಾದಾಗ ಸಣ್ಣ ಸ್ಪೇಸ್ ಸೌಂಡ್ ಬರುತ್ತದೆ
+            playSpaceSound();
+        } else {
+            earthDisplay.innerText = "0 KG";
+            marsDisplay.innerText = "0 KG";
+        }
+    }
+</script>
+
+</body>
+</html>

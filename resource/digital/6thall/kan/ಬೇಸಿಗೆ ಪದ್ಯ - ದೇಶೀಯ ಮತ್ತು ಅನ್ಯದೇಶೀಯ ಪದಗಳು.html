@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಬೇಸಿಗೆ ಪದ್ಯ - ದೇಶೀಯ ಮತ್ತು ಅನ್ಯದೇಶೀಯ ಪದಗಳು</title>
+    <style>
+        :root {
+            --space-bg: #060814;
+            --neon-blue: #00d2d3;
+            --neon-pink: #ff9ff3;
+            --neon-green: #1dd1a1;
+            --danger-red: #ff4d4d;
+            --card-dark: #101428;
+            --text-light: #f1f2f6;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--space-bg);
+            color: var(--text-light);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            user-select: none;
+        }
+
+        .activity-container {
+            background: linear-gradient(145deg, #0e122d, #161b3d);
+            padding: 30px;
+            border-radius: 25px;
+            box-shadow: 0 15px 40px rgba(0, 210, 211, 0.15);
+            max-width: 800px;
+            width: 100%;
+            text-align: center;
+            border: 1px solid rgba(0, 210, 211, 0.2);
+        }
+
+        h2 {
+            color: var(--neon-blue);
+            margin-bottom: 5px;
+            text-shadow: 0 0 12px rgba(0, 210, 211, 0.4);
+            font-size: 26px;
+        }
+
+        .instruction {
+            color: #a4b0be;
+            font-size: 16px;
+            margin-bottom: 25px;
+        }
+
+        .word-display-zone {
+            min-height: 120px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 35px;
+            background: #040610;
+            border-radius: 18px;
+            padding: 15px;
+            border: 1px solid #1e2548;
+        }
+
+        .active-word-card {
+            background: linear-gradient(135deg, #ff9ff3, #00d2d3);
+            color: #000000;
+            font-size: 26px;
+            font-weight: 900;
+            padding: 18px 45px;
+            border-radius: 50px;
+            box-shadow: 0 8px 25px rgba(0, 210, 211, 0.3);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: inline-block;
+        }
+
+        .baskets-container {
+            display: flex;
+            justify-content: space-around;
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+
+        .basket-box {
+            flex: 1;
+            background: var(--card-dark);
+            border: 2px solid #3d4852;
+            border-radius: 20px;
+            padding: 25px 15px;
+            min-height: 160px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.4);
+        }
+
+        .basket-box:hover { transform: translateY(-5px); }
+        .basket-icon { font-size: 55px; margin-bottom: 12px; transition: transform 0.2s; }
+        .basket-box:hover .basket-icon { transform: scale(1.12); }
+        .basket-title { font-size: 19px; font-weight: bold; }
+
+        #nativeBasket {
+            border-color: var(--neon-green);
+            color: #a3f7bf;
+            background: rgba(29, 209, 161, 0.02);
+        }
+        #nativeBasket:hover {
+            background: rgba(29, 209, 161, 0.08);
+            box-shadow: 0 10px 20px rgba(29, 209, 161, 0.2);
+        }
+
+        #foreignBasket {
+            border-color: var(--neon-pink);
+            color: #ffb6c1;
+            background: rgba(255, 159, 243, 0.02);
+        }
+        #foreignBasket:hover {
+            background: rgba(255, 159, 243, 0.08);
+            box-shadow: 0 10px 20px rgba(255, 159, 243, 0.2);
+        }
+
+        .progress-board { font-size: 17px; font-weight: bold; color: #a4b0be; margin-top: 15px; }
+        #feedbackMsg { margin-top: 20px; font-size: 18px; font-weight: bold; min-height: 27px; line-height: 1.5; }
+        .correct-text { color: var(--neon-green); }
+        .wrong-text { color: var(--danger-red); }
+
+        .reset-btn {
+            margin-top: 20px;
+            background: linear-gradient(135deg, var(--neon-blue), var(--neon-pink));
+            color: #000000;
+            border: none;
+            padding: 12px 30px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            display: none;
+        }
+
+        @media (max-width: 600px) {
+            .baskets-container { flex-direction: column; gap: 20px; }
+            .basket-box { min-height: 130px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="activity-container">
+    <h2>೧. ಭಾಷಾ ನಿಧಿ: ದೇಶೀಯ ಹಾಗೂ ಅನ್ಯದೇಶೀಯ ಪದಗಳ ಭೇಟೆ 🧺</h2>
+    <p class="instruction"><b>ಟಚ್ ಹೆಲ್ಪ್:</b> ಮೇಲಿರುವ ಪದವನ್ನು ಓದಿ, ಅದು 'ದೇಶೀಯ (ಮೂಲ ಕನ್ನಡ)' ಅಥವಾ 'ಅನ್ಯದೇಶೀಯ' ಪದವೇ ಎಂಬುದನ್ನು ಕೆಳಗಿನ ಸರಿಯಾದ ಬುಟ್ಟಿ ಕ್ಲಿಕ್ ಮಾಡಿ ವಿಂಗಡಿಸಿ!</p>
+
+    <div class="word-display-zone">
+        <div class="active-word-card" id="wordCard">ಲೋಡ್ ಆಗುತ್ತಿದೆ...</div>
+    </div>
+
+    <div class="baskets-container">
+        <div class="basket-box" id="nativeBasket" onclick="classifyWord('ದೇಶೀಯ ಪದ')">
+            <span class="basket-icon">🧺</span>
+            <span class="basket-title">ದೇಶೀಯ ಪದಗಳು</span>
+        </div>
+        <div class="basket-box" id="foreignBasket" onclick="classifyWord('ಅನ್ಯದೇಶೀಯ ಪದ')">
+            <span class="basket-icon">🏺</span>
+            <span class="basket-title">ಅನ್ಯದೇಶೀಯ ಪದಗಳು</span>
+        </div>
+    </div>
+
+    <div class="progress-board">ಪ್ರಗತಿ ಹಂತ: <span id="scoreText">0</span> / <span id="totalText">0</span></div>
+    <div id="feedbackMsg"></div>
+    <button class="reset-btn" id="resetBtn" onclick="resetGame()">ಮತ್ತೆ ಆಡಿ 🔄</button>
+</div>
+
+<script>
+    // ಪಿಡಿಎಫ್ ಪುಟ ೩ ಮತ್ತು ೪ ರ ಪಠ್ಯಪುಸ್ತಕದ ನಿಖರ ಉದಾಹರಣೆಗಳು
+    const wordsDatabase = [
+        { word: "ಬೆಲ್ಲ", type: "ದೇಶೀಯ ಪದ", detail: "ಇದು ನಮ್ಮ ಮೂಲ ಅಚ್ಚಗನ್ನಡದ ದೇಶೀಯ ಪದವಾಗಿದೆ." },
+        { word: "ಲೈಟು", type: "ಅನ್ಯದೇಶೀಯ ಪದ", detail: "ಇದು ಇಂಗ್ಲಿಷ್ ಭಾಷೆಯಿಂದ ಕನ್ನಡಕ್ಕೆ ಬಂದಿರುವ ಪದವಾಗಿದೆ." },
+        { word: "ನೀರು", type: "ದೇಶೀಯ ಪದ", detail: "ಇದು ನಮ್ಮ ನಿತ್ಯಬಳಕೆಯ ಅಚ್ಚಗನ್ನಡದ ಮೂಲ ಶಬ್ದವಾಗಿದೆ." },
+        { word: "ಅಲಮಾರು", type: "ಅನ್ಯದೇಶೀಯ ಪದ", detail: "ಇದು ಪೋರ್ಚುಗೀಸ್ ಭಾಷೆಯಿಂದ ಕನ್ನಡಕ್ಕೆ ಬಂದು ಸೇರಿದ ಪದವಾಗಿದೆ." },
+        { word: "ಹೊಲ", type: "ದೇಶೀಯ ಪದ", detail: "ಇದು ಕೃಷಿ ಸಂಸ್ಕೃತಿಯ ಮೂಲ ಕನ್ನಡ ದೇಶೀಯ ಪದವಾಗಿದೆ." },
+        { word: "ದಿವಾನ", type: "ಅನ್ಯದೇಶೀಯ ಪದ", detail: "ಇದು ಪರ್ಷಿಯನ್ ಭಾಷೆಯಿಂದ ಕನ್ನಡಕ್ಕೆ ಬಂದಿರುವ ಪದವಾಗಿದೆ." },
+        { word: "ಆಟ", type: "ದೇಶೀಯ ಪದ", detail: "ಇದು ನಮ್ಮ ಮೂಲ ಅಚ್ಚಗನ್ನಡದ ದೇಶೀಯ ಶಬ್ದವಾಗಿದೆ." },
+        { word: "ಸಾಬೂನು", type: "ಅನ್ಯದೇಶೀಯ ಪದ", detail: "ಇದು ಪೋರ್ಚುಗೀಸ್ ಭಾಷೆಯಿಂದ ಕನ್ನಡಕ್ಕೆ ಬಂದಿರುವ ಪದವಾಗಿದೆ." },
+        { word: "ಹುಲ್ಲು", type: "ದೇಶೀಯ ಪದ", detail: "ಇದು ಪ್ರಕೃತಿಯ ಮೂಲ ಕನ್ನಡದ್ದೇ ಆದ ದೇಶೀಯ ಪದವಾಗಿದೆ." },
+        { word: "ಸರಕಾರ", type: "ಅನ್ಯದೇಶೀಯ ಪದ", detail: "ಇದು ಪರ್ಷಿಯನ್ ಭಾಷೆಯಿಂದ ಬಂದು ಕನ್ನಡದ್ದೇ ಆಗಿ ಹೋಗಿರುವ ಪದವಾಗಿದೆ." }
+    ];
+
+    let shuffledList = [];
+    let currentIndex = 0;
+    let score = 0;
+
+    const wordCard = document.getElementById('wordCard');
+    const scoreText = document.getElementById('scoreText');
+    const totalText = document.getElementById('totalText');
+    const feedbackMsg = document.getElementById('feedbackMsg');
+    const resetBtn = document.getElementById('resetBtn');
+
+    function playAudio(isCorrect) {
+        try {
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            oscillator.type = 'sine';
+            oscillator.frequency.setValueAtTime(isCorrect ? 850 : 250, audioCtx.currentTime);
+            gainNode.gain.setValueAtTime(0.08, audioCtx.currentTime);
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            oscillator.start();
+            oscillator.stop(audioCtx.currentTime + 0.2);
+        } catch (e) {}
+    }
+
+    function initGame() {
+        shuffledList = [...wordsDatabase].sort(() => Math.random() - 0.5);
+        currentIndex = 0;
+        score = 0;
+        totalText.innerText = shuffledList.length;
+        scoreText.innerText = score;
+        feedbackMsg.innerText = "";
+        resetBtn.style.display = "none";
+        wordCard.style.display = "inline-block";
+        displayCurrentWord();
+    }
+
+    function displayCurrentWord() {
+        if (currentIndex < shuffledList.length) {
+            wordCard.innerText = shuffledList[currentIndex].word;
+        } else {
+            wordCard.style.display = "none";
+            feedbackMsg.className = "correct-text";
+            feedbackMsg.innerHTML = `🏆 <b>ಭಾಷಾ ಪಂಡಿತ ಮಿಷನ್ ಯಶಸ್ವಿ!</b><br>ನಿಮ್ಮ ಒಟ್ಟು ಸ್ಕೋರ್: <b>${score} / ${shuffledList.length}</b><br>ವಿದ್ಯಾರ್ಥಿಗಳು ದೇಶೀಯ ಹಾಗೂ ಅನ್ಯದೇಶೀಯ ಪದಗಳ ವ್ಯತ್ಯಾಸವನ್ನು ಯಶಸ್ವಿಯಾಗಿ ಕಲಿತಿದ್ದಾರೆ!`;
+            resetBtn.style.display = "inline-block";
+        }
+    }
+
+    function classifyWord(selectedType) {
+        if (currentIndex >= shuffledList.length) return;
+        const currentObj = shuffledList[currentIndex];
+
+        if (selectedType === currentObj.type) {
+            score++;
+            scoreText.innerText = score;
+            feedbackMsg.className = "correct-text";
+            feedbackMsg.innerHTML = `✅ <b>ಸರಿ ಉತ್ತರ!</b> "<b>${currentObj.word}</b>" ಎಂಬುದು <b>${currentObj.type}</b> ಹೌದು.<br><small style='color:#a4b0be;'>💡 <b>ಮೂಲ ವಿವರ:</b> ${currentObj.detail}</small>`;
+            playAudio(true);
+        } else {
+            feedbackMsg.className = "wrong-text";
+            feedbackMsg.innerHTML = `❌ <b>ತಪ್ಪು ಉತ್ತರ!</b> "<b>${currentObj.word}</b>" ನಿಜವಾಗಿ <b>${currentObj.type}</b> ಆಗಿದೆ.<br><small style='color:#a4b0be;'>💡 <b>ಮೂಲ ವಿವರ:</b> ${currentObj.detail}</small>`;
+            playAudio(false);
+        }
+        currentIndex++;
+        setTimeout(displayCurrentWord, 1500);
+    }
+
+    function resetGame() { initGame(); }
+    initGame();
+</script>
+</body>
+</html>

@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ನೀವು ಹೋದ ಮರುದಿನ - ಜೋಡುನುಡಿಗಳ ಭೇಟೆ</title>
+    <style>
+        :root {
+            --space-dark: #080b18;
+            --neon-blue: #00d2d3;
+            --neon-pink: #ff9ff3;
+            --neon-green: #1dd1a1;
+            --danger-red: #ff4d4d;
+            --panel-bg: #141935;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--space-dark);
+            color: #ffffff;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .activity-container {
+            background: linear-gradient(145deg, #0e132b, #192045);
+            padding: 30px;
+            border-radius: 25px;
+            box-shadow: 0 15px 40px rgba(255, 159, 243, 0.1);
+            max-width: 800px;
+            width: 100%;
+            text-align: center;
+            border: 1px solid rgba(255, 159, 243, 0.15);
+        }
+
+        h2 {
+            color: var(--neon-pink);
+            margin-bottom: 5px;
+            text-shadow: 0 0 12px rgba(255, 159, 243, 0.4);
+        }
+
+        .instruction {
+            color: #a0a5c0;
+            font-size: 16px;
+            margin-bottom: 25px;
+        }
+
+        /* ಪ್ರಸ್ತುತ ಪದ ಪ್ರದರ್ಶಿಸುವ ಕಾರ್ಡ್ */
+        .word-display-zone {
+            min-height: 110px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 35px;
+            background: #040610;
+            border-radius: 18px;
+            padding: 15px;
+            border: 1px solid #1e2548;
+        }
+
+        .active-word-card {
+            background: linear-gradient(135deg, #ff9ff3, #feca57);
+            color: #000000;
+            font-size: 26px;
+            font-weight: 900;
+            padding: 15px 45px;
+            border-radius: 50px;
+            box-shadow: 0 8px 20px rgba(255, 159, 243, 0.3);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: inline-block;
+            letter-spacing: 1px;
+        }
+
+        /* ಬುಟ್ಟಿಗಳ ವಲಯ */
+        .baskets-container {
+            display: flex;
+            justify-content: space-around;
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+
+        .basket-box {
+            flex: 1;
+            background: var(--panel-bg);
+            border: 2px solid #3d4852;
+            border-radius: 20px;
+            padding: 25px 15px;
+            min-height: 160px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+        }
+
+        .basket-box:hover {
+            transform: translateY(-5px);
+        }
+
+        .basket-icon {
+            font-size: 55px;
+            margin-bottom: 12px;
+            transition: transform 0.2s;
+        }
+
+        .basket-box:hover .basket-icon {
+            transform: scale(1.15);
+        }
+
+        .basket-title {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        /* ಜೋಡುನುಡಿ ಬುಟ್ಟಿಯ ಶೈಲಿ */
+        #joduBasket {
+            border-color: var(--neon-green);
+            color: #a3f7bf;
+            background: rgba(29, 209, 161, 0.02);
+        }
+        #joduBasket:hover {
+            background: rgba(29, 209, 161, 0.08);
+            box-shadow: 0 10px 20px rgba(29, 209, 161, 0.15);
+        }
+
+        /* ಸಾಧಾರಣ ಪದ ಬುಟ್ಟಿಯ ಶೈಲಿ */
+        #sadharanaBasket {
+            border-color: var(--neon-blue);
+            color: #9ee7f5;
+            background: rgba(0, 210, 211, 0.02);
+        }
+        #sadharanaBasket:hover {
+            background: rgba(0, 210, 211, 0.08);
+            box-shadow: 0 10px 20px rgba(0, 210, 211, 0.15);
+        }
+
+        /* ಲೈವ್ ಪ್ರಗತಿ ಫಲಕ */
+        .progress-board {
+            font-size: 18px;
+            font-weight: bold;
+            color: #a0a5c0;
+            margin-top: 15px;
+        }
+
+        #feedbackMessage {
+            margin-top: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            min-height: 27px;
+            line-height: 1.5;
+        }
+
+        .correct-text { color: var(--neon-green); }
+        .wrong-text { color: var(--danger-red); }
+
+        .reset-btn {
+            margin-top: 20px;
+            background: linear-gradient(135deg, var(--neon-pink), #f19066);
+            color: #000000;
+            border: none;
+            padding: 12px 30px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: none;
+        }
+
+        @media (max-width: 600px) {
+            .baskets-container { flex-direction: column; gap: 20px; }
+            .basket-box { min-height: 130px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="activity-container">
+    <h2>೪. ವ್ಯಾಕರಣಾಂಶ: ಜೋಡುನುಡಿಗಳ ಭೇಟೆ 🧺</h2>
+    <p class="instruction"><b>ಟಚ್ ಹೆಲ್ಪ್:</b> ಮೇಲಿರುವ ಪದದ ಕಾರ್ಡ್ ಅನ್ನು ನೋಡಿ, ಅದು 'ಜೋಡುನುಡಿ'ಯೋ ಅಥವಾ 'ಸಾಧಾರಣ ಪದ'ವೋ ಎಂಬುದನ್ನು ಕೆಳಗಿನ ಬುಟ್ಟಿ ಕ್ಲಿಕ್ ಮಾಡಿ ವಿಂಗಡಿಸಿ!</p>
+
+    <div class="word-display-zone">
+        <div class="active-word-card" id="wordCard">ಲೋಡ್ ಆಗುತ್ತಿದೆ...</div>
+    </div>
+
+    <div class="baskets-container">
+        <div class="basket-box" id="joduBasket" onclick="classifyWord('ಜೋಡುನುಡಿ')">
+            <span class="basket-icon">🧺</span>
+            <span class="basket-title">ಜೋಡುನುಡಿಗಳು</span>
+        </div>
+        <div class="basket-box" id="sadharanaBasket" onclick="classifyWord('ಸಾಧಾರಣ ಪದ')">
+            <span class="basket-icon">🏺</span>
+            <span class="basket-title">ಸಾಧಾರಣ ಪದಗಳು</span>
+        </div>
+    </div>
+
+    <div class="progress-board">ಪ್ರಗತಿ ಹಂತ: <span id="scoreText">0</span> / <span id="totalText">0</span></div>
+    <div id="feedbackMessage"></div>
+    <button class="reset-btn" id="resetBtn" onclick="resetGame()">ಮತ್ತೆ ಆಡಿ 🔄</button>
+</div>
+
+<script>
+    // ಪಠ್ಯಪುಸ್ತಕ ಮತ್ತು ಪದ್ಯದ ವ್ಯಾಕರಣಾಧಾರಿತ ಪದಗಳ ಪಟ್ಟಿ
+    const wordsDatabase = [
+        { word: "ಕಲ್ಲು-ಮುಳ್ಳು", type: "ಜೋಡುನುಡಿ" },
+        { word: "ಮರುದಿನ", type: "ಸಾಧಾರಣ ಪದ" },
+        { word: "ಹಗಲು-ರಾತ್ರಿ", type: "ಜೋಡುನುಡಿ" },
+        { word: "ಎಂದಿನಂತೆ", type: "ಸಾಧಾರಣ ಪದ" },
+        { word: "ಕೆರೆ-ಕಟ್ಟೆ", type: "ಜೋಡುನುಡಿ" },
+        { word: "ಜಗತ್ತು", type: "ಸಾಧಾರಣ ಪದ" },
+        { word: "ಗಿಡ-ಮರ", type: "ಜೋಡುನುಡಿ" },
+        { word: "ಮೂಡಣ", type: "ಸಾಧಾರಣ ಪದ" },
+        { word: "ಅಳು-ನಗು", type: "ಜೋಡುನುಡಿ" },
+        { word: "ಹಾಡಿತು", type: "ಸಾಧಾರಣ ಪದ" },
+        { word: "ಸೂರ್ಯ-ಚಂದ್ರ", type: "ಜೋಡುನುಡಿ" },
+        { word: "ವಿಸ್ತಾರ", type: "ಸಾಧಾರಣ ಪದ" }
+    ];
+
+    let shuffledWordsList = [];
+    let currentWordIndex = 0;
+    let currentScore = 0;
+
+    const wordCard = document.getElementById('wordCard');
+    const scoreText = document.getElementById('scoreText');
+    const totalText = document.getElementById('totalText');
+    const feedbackMessage = document.getElementById('feedbackMessage');
+    const resetBtn = document.getElementById('resetBtn');
+
+    // ಮ್ಯಾಜಿಕಲ್ ಸೌಂಡ್ ಎಫೆಕ್ಟ್
+    function playBeepSound(isCorrect) {
+        try {
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            oscillator.type = 'sine';
+            oscillator.frequency.setValueAtTime(isCorrect ? 850 : 260, audioCtx.currentTime);
+            gainNode.gain.setValueAtTime(0.08, audioCtx.currentTime);
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            oscillator.start();
+            oscillator.stop(audioCtx.currentTime + 0.2);
+        } catch (e) {}
+    }
+
+    function initGame() {
+        // ಆಟದ ಆರಂಭದಲ್ಲಿ ಪದಗಳ ಕ್ರಮವನ್ನು ಅದಲು ಬದಲು ಮಾಡುವುದು (Shuffle)
+        shuffledWordsList = [...wordsDatabase].sort(() => Math.random() - 0.5);
+        currentWordIndex = 0;
+        currentScore = 0;
+        
+        totalText.innerText = shuffledWordsList.length;
+        scoreText.innerText = currentScore;
+        feedbackMessage.innerText = "";
+        resetBtn.style.display = "none";
+        wordCard.style.display = "inline-block";
+        
+        displayCurrentWord();
+    }
+
+    function displayCurrentWord() {
+        if (currentWordIndex < shuffledWordsList.length) {
+            wordCard.innerText = shuffledWordsList[currentWordIndex].word;
+            // ಅನಿಮೇಷನ್ ಎಫೆಕ್ಟ್
+            wordCard.style.transform = "scale(0.9)";
+            setTimeout(() => { wordCard.style.transform = "scale(1)"; }, 100);
+        } else {
+            // ಎಲ್ಲಾ ಪದಗಳು ಮುಗಿದಾಗ
+            wordCard.style.display = "none";
+            feedbackMessage.className = "correct-text";
+            feedbackMessage.innerHTML = `🎉 ಅತ್ಯದ್ಭುತ ವ್ಯಾಕರಣ ಜ್ಞಾನ! ಎಲ್ಲಾ ಪದಗಳನ್ನು ಸರಿಯಾಗಿ ವಿಂಗಡಿಸಿದ್ದೀರಿ!<br>ನಿಮ್ಮ ಒಟ್ಟು ಸ್ಕೋರ್: <b>${currentScore} / ${shuffledWordsList.length}</b>`;
+            resetBtn.style.display = "inline-block";
+        }
+    }
+
+    function classifyWord(selectedType) {
+        if (currentWordIndex >= shuffledWordsList.length) return;
+
+        const activeWordObj = shuffledWordsList[currentWordIndex];
+        const joduBasket = document.getElementById('joduBasket');
+        const sadharanaBasket = document.getElementById('sadharanaBasket');
+
+        if (selectedType === activeWordObj.type) {
+            currentScore++;
+            scoreText.innerText = currentScore;
+            feedbackMessage.className = "correct-text";
+            feedbackMessage.innerHTML = `✅ ಸರಿ ಉತ್ತರ! "<b>${activeWordObj.word}</b>" ಎಂಬುದು <b>${activeWordObj.type}</b> ಹೌದು.`;
+            playBeepSound(true);
+        } else {
+            feedbackMessage.className = "wrong-text";
+            feedbackMessage.innerHTML = `❌ ತಪ್ಪು ಉತ್ತರ! "<b>${activeWordObj.word}</b>" ನಿಜವಾಗಿ <b>${activeWordObj.type}</b> ಆಗಿದೆ.`;
+            playBeepSound(false);
+        }
+
+        // ಮುಂದಿನ ಪದಕ್ಕೆ ಸಾಗುವುದು
+        currentWordIndex++;
+        // 1.2 ಸೆಕೆಂಡ್ ಉತ್ತರವನ್ನು ನೋಡಲು ಸಮಯ ನೀಡಿ ಆಮೇಲೆ ಮುಂದಿನ ಪದ ಬರುತ್ತದೆ
+        setTimeout(displayCurrentWord, 1200); 
+    }
+
+    function resetGame() {
+        initGame();
+    }
+
+    // ಆಟವನ್ನು ಪ್ರಾರಂಭಿಸುವುದು
+    initGame();
+</script>
+
+</body>
+</html>

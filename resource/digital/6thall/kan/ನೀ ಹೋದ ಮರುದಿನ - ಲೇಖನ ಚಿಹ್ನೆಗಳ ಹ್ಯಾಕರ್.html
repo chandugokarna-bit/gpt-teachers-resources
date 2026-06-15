@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ನೀ ಹೋದ ಮರುದಿನ - ಲೇಖನ ಚಿಹ್ನೆಗಳ ಹ್ಯಾಕರ್</title>
+    <style>
+        :root {
+            --bg-cyber: #04050e;
+            --neon-cyan: #00d2d3;
+            --neon-green: #1dd1a1;
+            --neon-gold: #ff9f43;
+            --neon-pink: #f53b57;
+            --card-bg: #0f1225;
+            --text-color: #f1f2f6;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-cyber);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            user-select: none;
+        }
+
+        .activity-container {
+            background: linear-gradient(145deg, #090b1c, #131738);
+            padding: 30px;
+            border-radius: 25px;
+            box-shadow: 0 20px 50px rgba(0, 210, 211, 0.15);
+            max-width: 800px;
+            width: 100%;
+            text-align: center;
+            border: 1px solid rgba(0, 210, 211, 0.2);
+        }
+
+        h2 {
+            color: var(--neon-cyan);
+            text-shadow: 0 0 15px rgba(0, 210, 211, 0.4);
+            font-size: 26px;
+            margin-bottom: 5px;
+        }
+
+        .instruction {
+            color: #a4b0be;
+            font-size: 15px;
+            margin-bottom: 35px;
+        }
+
+        /* ಸೈಬರ್ ಬೋರ್ಡ್ ವಿನ್ಯಾಸ */
+        .decoder-board {
+            background: #02030a;
+            border: 2px solid #1e254e;
+            border-radius: 20px;
+            padding: 30px 20px;
+            margin-bottom: 30px;
+            min-height: 90px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: inset 0 0 20px rgba(0, 210, 211, 0.05);
+        }
+
+        .hidden-sentence {
+            font-size: 23px;
+            font-weight: bold;
+            line-height: 1.6;
+            letter-spacing: 0.5px;
+            color: #ffffff;
+        }
+
+        .missing-mark {
+            display: inline-block;
+            width: 35px;
+            height: 35px;
+            background: #12162f;
+            border: 2px dashed var(--neon-gold);
+            border-radius: 6px;
+            vertical-align: middle;
+            margin: 0 8px;
+            animation: pulse 1s infinite alternate;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 5px rgba(255, 159, 67, 0.3); }
+            100% { box-shadow: 0 0 15px rgba(255, 159, 67, 0.7); border-color: #ff9f43; }
+        }
+
+        /* ನಿಯಾನ್ ಲೇಖನ ಚಿಹ್ನೆ ಬಟನ್‌ಗಳು */
+        .marks-grid {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 25px;
+        }
+
+        .mark-btn {
+            background: #0f1225;
+            border: 2px solid #283061;
+            color: var(--neon-cyan);
+            width: 65px;
+            height: 65px;
+            font-size: 28px;
+            font-weight: 900;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 5px 10px rgba(0,0,0,0.3);
+        }
+
+        .mark-btn:hover:not(:disabled) {
+            transform: translateY(-4px) scale(1.05);
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 20px rgba(0, 210, 211, 0.4);
+            color: #ffffff;
+        }
+
+        .mark-btn:disabled { opacity: 0.4; cursor: default; }
+
+        /* ಸರಿ/ತಪ್ಪು ಪ್ರತಿಕ್ರಿಯೆ ಎಫೆಕ್ಟ್ */
+        .unlocked-success {
+            color: var(--neon-green) !important;
+            text-shadow: 0 0 15px rgba(29, 209, 161, 0.5);
+        }
+
+        #feedbackLog {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            min-height: 50px;
+            line-height: 1.6;
+            text-align: left;
+            background: rgba(15, 18, 37, 0.6);
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid #1e254e;
+        }
+
+        .next-stage-btn {
+            margin-top: 20px;
+            background: linear-gradient(135deg, var(--neon-cyan), #01a3a4);
+            color: white;
+            border: none;
+            padding: 12px 35px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="activity-container">
+    <h2>೩. ಲೇಖನ ಚಿಹ್ನೆಗಳ ಹ್ಯಾಕರ್: ಕೋಡ್ ಬ್ರೇಕರ್ 🔐</h2>
+    <p class="instruction"><b>ಸೈಬರ್ ವ್ಯಾಕರಣ ಮಿಷನ್:</b> ವಾಕ್ಯದ ಅರ್ಥವನ್ನು ಗ್ರಹಿಸಿ, ನಾಪತ್ತೆಯಾಗಿರುವ ಜಾಗಕ್ಕೆ ಕೆಳಗಿನ ಸರಿಯಾದ ನಿಯಾನ್ ಚಿಹ್ನೆಯನ್ನು ಕ್ಲಿಕ್ ಮಾಡಿ ಕೋಡ್ ಬ್ರೇಕ್ ಮಾಡಿ!</p>
+
+    <div class="decoder-board">
+        <div class="hidden-sentence" id="sentenceDisplay">ಲೋಡ್ ಆಗುತ್ತಿದೆ...</div>
+    </div>
+
+    <div class="marks-grid" id="keypad">
+        <button class="mark-btn" onclick="crackCode('.')">.</button>
+        <button class="mark-btn" onclick="crackCode(';')">;</button>
+        <button class="mark-btn" onclick="crackCode(',')">,</button>
+        <button class="mark-btn" onclick="crackCode('?')">?</button>
+        <button class="mark-btn" onclick="crackCode('!')">!</button>
+    </div>
+
+    <div id="feedbackLog"></div>
+    <button class="next-stage-btn" id="nextStageBtn" onclick="loadNextStage()">ಮುಂದಿನ ಕೋಡ್ ಅನ್‌ಲಾಕ್ ಮಾಡಿ ➡️</button>
+</div>
+
+<script>
+    // ಪಿಡಿಎಫ್ ಪುಟ ೪ ಮತ್ತು ೫ ರ ವ್ಯಾಕರಣ ಮಾಹಿತಿಯಲ್ಲಿರುವ ನಿಖರ ವಾಕ್ಯಗಳು ಮತ್ತು ನಿಯಮಗಳು
+    const cyberDatabase = [
+        {
+            before: "೧. ಒಂದಾನೊಂದು ಕಾಲದಲ್ಲಿ ಒಂದು ದಟ್ಟವಾದ ಅರಣ್ಯವಿತ್ತು",
+            after: "೧. ಒಂದಾನೊಂದು ಕಾಲದಲ್ಲಿ ಒಂದು ದಟ್ಟವಾದ ಅರಣ್ಯವಿತ್ತು.",
+            mark: ".",
+            name: "ಪೂರ್ಣವಿರಾಮ ಚಿಹ್ನೆ (ಬಿಂದು)",
+            rule: "ಇದು ವಾಕ್ಯದ ಪೂರ್ಣಾರ್ಥ ಕ್ರಿಯೆಯನ್ನು ಸೂಚಿಸುತ್ತದೆ ಹಾಗೂ ವಾಕ್ಯದ ಕೊನೆಯಲ್ಲಿ ಬಳಕೆಯಾಗುತ್ತದೆ."
+        },
+        {
+            before: "೨. ತಾಯಿಗಿಂತ ಬಂಧುವಿಲ್ಲ",
+            after: "೨. ತಾಯಿಗಿಂತ ಬಂಧುವಿಲ್ಲ; ಉಪ್ಪಿಗಿಂತ ರುಚಿಯಿಲ್ಲ.",
+            append: " ಉಪ್ಪಿಗಿಂತ ರುಚಿಯಿಲ್ಲ.",
+            mark: ";",
+            name: "ಅರ್ಧವಿರಾಮ ಚಿಹ್ನೆ",
+            rule: "ಇದು ಪ್ರಧಾನ ವಾಕ್ಯಗಳಲ್ಲಿನ ಉಪವಾಕ್ಯಗಳ ಅಂತ್ಯದಲ್ಲಿ (ವಾಕ್ಯದ ನಡುವೆ) ಬಳಕೆಯಾಗುತ್ತದೆ."
+        },
+        {
+            before: "೩. ಮಂಧರಕ",
+            after: "೩. ಮಂಧರಕ, ಹಿರಣ್ಯರೋಮ, ಲಘುಪತನಕ ಮತ್ತು ಚಿತ್ರಾಂಗ ನಾಲ್ವರು ಗೆಳೆಯರು.",
+            append: " ಹಿರಣ್ಯರೋಮ, ಲಘುಪತನಕ ಮತ್ತು ಚಿತ್ರಾಂಗ ನಾಲ್ವರು ಗೆಳೆಯರು.",
+            mark: ",",
+            name: "ಅಲ್ಪವಿರಾಮ ಚಿಹ್ನೆ",
+            rule: "ಇದು ಸಂಬೋಧನೆಯ ಮುಂದೆ, ಕರ್ತೃ, ಕರ್ಮ ಪದಗಳಿಗೆ ವಿಶೇಷಣಗಳು ಬಂದಾಗ ಹಾಗೂ ಪದಗಳ ನಡುವೆ ಅಗತ್ಯಕ್ಕೆ ತಕ್ಕಂತೆ ಬಳಕೆಯಾಗುತ್ತದೆ."
+        },
+        {
+            before: "೪. ನೀನು ಏಕೆ ಓಡೋಡಿ ಬಂದೆ",
+            after: "೪. ನೀನು ಏಕೆ ಓಡೋಡಿ ಬಂದೆ?",
+            mark: "?",
+            name: "ಪ್ರಶ್ನಾರ್ಥಕ ಚಿಹ್ನೆ",
+            rule: "ಇದು ಪ್ರಶ್ನೆ ಕೇಳುವ ಸಂದರ್ಭದಲ್ಲಿ ಪದ ಅಥವಾ ವಾಕ್ಯದ ಅಂತ್ಯದಲ್ಲಿ ಬಳಕೆಯಾಗುತ್ತದೆ."
+        },
+        {
+            before: "೫. ಅಬ್ಬಾ",
+            after: "೫. ಅಬ್ಬಾ! ಎಂಥ ಸೊಗಸಾದ ಹಾಡು.",
+            append: " ಎಂಥ ಸೊಗಸಾದ ಹಾಡು.",
+            mark: "!",
+            name: "ಭಾವಸೂಚಕ ಚಿಹ್ನೆ (ಆಶ್ಚರ್ಯಸೂಚಕ)",
+            rule: "ಇದು ಆಶ್ಚರ್ಯ, ಹರ್ಷ, ಶೋಕ ಮುಂತಾದ ಗಾಢ ಭಾವನೆಗಳನ್ನು ವ್ಯಕ್ತಪಡಿಸುವ ಸಂದರ್ಭದಲ್ಲಿ ಬಳಕೆಯಾಗುತ್ತದೆ."
+        }
+    ];
+
+    let currentStageIndex = 0;
+    let hackerPoints = 0;
+
+    const sentenceDisplay = document.getElementById('sentenceDisplay');
+    const feedbackLog = document.getElementById('feedbackLog');
+    const nextStageBtn = document.getElementById('nextStageBtn');
+    const keypad = document.getElementById('keypad');
+
+    function playCyberSound(isSuccess) {
+        try {
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = isSuccess ? 'sine' : 'sawtooth';
+            osc.frequency.setValueAtTime(isSuccess ? 1100 : 150, audioCtx.currentTime);
+            if(isSuccess) osc.frequency.exponentialRampToValueAtTime(550, audioCtx.currentTime + 0.15);
+            gain.gain.setValueAtTime(0.06, audioCtx.currentTime);
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            osc.start(); osc.stop(audioCtx.currentTime + 0.15);
+        } catch(e) {}
+    }
+
+    function loadStage() {
+        feedbackLog.innerText = "📟 ಸಿಸ್ಟಮ್ ಸ್ಥಿತಿ: ಚಿಹ್ನೆಯನ್ನು ನಿರೀಕ್ಷಿಸಲಾಗುತ್ತಿದೆ...";
+        nextStageBtn.style.display = "none";
+        toggleKeypad(false);
+
+        const data = cyberDatabase[currentStageIndex];
+        // ಮಿಸ್ಸಿಂಗ್ ಚಿಹ್ನೆಯನ್ನು ಚೌಕಾಕಾರದ ಬಾಕ್ಸ್ ರೂಪದಲ್ಲಿ ತೋರಿಸುವುದು
+        if (data.append) {
+            sentenceDisplay.innerHTML = `${data.before}<span class="missing-mark" id="targetMark"></span>${data.append}`;
+        } else {
+            sentenceDisplay.innerHTML = `${data.before}<span class="missing-mark" id="targetMark"></span>`;
+        }
+    }
+
+    function toggleKeypad(disabled) {
+        const buttons = keypad.querySelectorAll('.mark-btn');
+        buttons.forEach(b => b.disabled = disabled);
+    }
+
+    function crackCode(chosenMark) {
+        toggleKeypad(true);
+        const data = cyberDatabase[currentStageIndex];
+        const targetMark = document.getElementById('targetMark');
+
+        if (chosenMark === data.mark) {
+            hackerPoints++;
+            playCyberSound(true);
+            sentenceDisplay.className = "hidden-sentence unlocked-success";
+            targetMark.className = "";
+            targetMark.innerText = ` ${data.mark} `;
+            targetMark.style.border = "none";
+            
+            feedbackLog.innerHTML = `<span style='color:var(--neon-green);'>🔑 <b>ಕೋಡ್ ಬ್ರೇಕ್ ಯಶಸ್ವಿ!</b></span><br><b>ಚಿಹ್ನೆ:</b> ${data.name}.<br>⚙️ <b>ವ್ಯಾಕರಣ ನಿಯಮ:</b> ${data.rule}`;
+        } else {
+            playCyberSound(false);
+            sentenceDisplay.className = "hidden-sentence";
+            targetMark.innerText = ` ${data.mark} `;
+            targetMark.style.borderColor = "var(--neon-pink)";
+            targetMark.style.color = "var(--neon-pink)";
+            
+            feedbackLog.innerHTML = `<span style='color:var(--neon-pink);'>❌ <b>ಕೋಡ್ ಕ್ರಾಶ್ ಆಗಿದೆ!</b></span><br>ಇಲ್ಲಿ ಬರಬೇಕಾದ ಸರಿಯಾದ ಚಿಹ್ನೆ "<b>${data.mark}</b>" (<b>${data.name}</b>).<br>⚙️ <b>ವ್ಯಾಕರಣ ನಿಯಮ:</b> ${data.rule}`;
+        }
+
+        nextStageBtn.style.display = "inline-block";
+        if (currentStageIndex === cyberDatabase.length - 1) {
+            nextStageBtn.innerText = "ಅಂತಿಮ ಹ್ಯಾಕಿಂಗ್ ರಿಪೋರ್ಟ್ 📊";
+        }
+    }
+
+    function loadNextStage() {
+        sentenceDisplay.className = "hidden-sentence";
+        if (currentStageIndex < cyberDatabase.length - 1) {
+            currentStageIndex++;
+            loadStage();
+        } else {
+            sentenceDisplay.innerText = "💻 ಲೇಖನ ಚಿಹ್ನೆಗಳ ಡಿಕೋಡಿಂಗ್ ಪೂರ್ಣಗೊಂಡಿದೆ!";
+            keypad.style.display = "none";
+            
+            let rank = "";
+            if (hackerPoints === cyberDatabase.length) {
+                rank = "<span style='color:var(--neon-green);'>🥇 ಮಹಾ ವ್ಯಾಕರಣ ಸೈಬರ್ ಮಾಸ್ಟರ್! ನಿಮ್ಮ ಚಿಂತನೆ ಅದ್ಭುತವಾದದ್ದು.</span>";
+            } else {
+                rank = "<span style='color:var(--neon-gold);'>✨ ಉತ್ತಮ ಪ್ರಯತ್ನ! ಚಿಹ್ನೆಗಳ ಬಳಕೆಯನ್ನು ಇನ್ನು ಆಳವಾಗಿ ಅಭ್ಯಾಸ ಮಾಡಿ.</span>";
+            }
+
+            feedbackLog.innerHTML = `📊 <b>ಹ್ಯಾಕಿಂಗ್ ಪ್ರಗತಿ ವರದಿ:</b><br>ಒಟ್ಟು ಭೇದಿಸಿದ ಕೋಡ್‌ಗಳು: <b>${hackerPoints} / ${cyberDatabase.length}</b><br><br>${rank}`;
+            nextStageBtn.innerText = "ಮಿಷನ್ ರಿಸೆಟ್ 🔄";
+            nextStageBtn.onclick = () => {
+                currentStageIndex = 0; hackerPoints = 0;
+                keypad.style.display = "flex";
+                nextStageBtn.innerText = "ಮುಂದಿನ ಕೋಡ್ ಅನ್‌ಲಾಕ್ ಮಾಡಿ ➡️";
+                nextStageBtn.onclick = loadNextStage;
+                loadStage();
+            };
+        }
+    }
+
+    loadStage();
+</script>
+</body>
+</html>

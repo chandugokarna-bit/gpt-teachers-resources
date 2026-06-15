@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಬಾಹ್ಯಾಕಾಶದ ಹೊಸ ಪದಗಳ ನಕ್ಷತ್ರಲೋಕ</title>
+    <style>
+        :root {
+            --space-bg: #03050a;
+            --neon-blue: #00d2d3;
+            --neon-pink: #ff9ff3;
+            --neon-green: #1dd1a1;
+            --grid-bg: #0f1224;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--space-bg);
+            color: #ffffff;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .activity-container {
+            background: linear-gradient(145deg, #0a0d1a, #12162e);
+            padding: 30px;
+            border-radius: 25px;
+            box-shadow: 0 15px 40px rgba(0, 210, 211, 0.1);
+            max-width: 850px;
+            width: 100%;
+            text-align: center;
+            border: 1px solid rgba(0, 210, 211, 0.15);
+        }
+
+        h2 {
+            color: var(--neon-blue);
+            margin-bottom: 5px;
+            text-shadow: 0 0 10px rgba(0, 210, 211, 0.4);
+        }
+
+        .instruction {
+            color: #a0a5c0;
+            font-size: 15px;
+            margin-bottom: 25px;
+        }
+
+        /* ಆಟದ ಮುಖ್ಯ ವಲಯ */
+        .game-layout {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 30px;
+            margin-bottom: 25px;
+        }
+
+        /* ವರ್ಡ್ ಸರ್ಚ್ ಗ್ರಿಡ್ ಬೋರ್ಡ್ */
+        .word-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+            background: var(--grid-bg);
+            padding: 15px;
+            border-radius: 18px;
+            border: 2px solid #2c314e;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+            user-select: none;
+        }
+
+        .grid-cell {
+            width: 45px;
+            height: 45px;
+            background: #171c35;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #cdd4f8;
+            border: 1px solid #232946;
+        }
+
+        .grid-cell:hover {
+            background: #252b4e;
+            color: #ffffff;
+        }
+
+        /* ಸೆಲೆಕ್ಟ್ ಆದಾಗ ಮತ್ತು ಕರೆಕ್ಟ್ ಆದಾಗ ಬರುವ ಸ್ಟೈಲ್ಸ್ */
+        .grid-cell.selected {
+            background: var(--neon-blue);
+            color: #000000;
+            box-shadow: 0 0 10px var(--neon-blue);
+        }
+
+        .grid-cell.found {
+            background: var(--neon-green);
+            color: #000000;
+            font-weight: 900;
+            cursor: default;
+        }
+
+        /* ಹುಡುಕಬೇಕಾದ ಪದಗಳ ಪಟ್ಟಿ */
+        .word-list-panel {
+            background: #0b0e1a;
+            border: 1px solid #222946;
+            border-radius: 15px;
+            padding: 20px;
+            width: 200px;
+            text-align: left;
+        }
+
+        .word-list-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: var(--neon-pink);
+            margin-bottom: 12px;
+            border-bottom: 1px solid #222946;
+            padding-bottom: 5px;
+        }
+
+        .word-item {
+            font-size: 16px;
+            margin: 8px 0;
+            color: #a0a5c0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s;
+        }
+
+        .word-item.found-word {
+            color: var(--neon-green);
+            text-decoration: line-through;
+            font-weight: bold;
+        }
+
+        #message {
+            margin-top: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--neon-green);
+            min-height: 27px;
+        }
+
+        .reset-btn {
+            margin-top: 15px;
+            background: linear-gradient(135deg, var(--neon-blue), #0984e3);
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            display: none;
+        }
+
+        @media (max-width: 650px) {
+            .game-layout { flex-direction: column; align-items: center; }
+            .word-list-panel { width: 90%; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="activity-container">
+    <h2>೪. ಬಾಹ್ಯಾಕಾಶದ ಪದಗಳ ನಕ್ಷತ್ರಲೋಕ 🌌</h2>
+    <p class="instruction"><b>ಟಚ್ ಹೆಲ್ಪ್:</b> ಪಟ್ಟಿಯಲ್ಲಿರುವ ಪದದ ಮೊದಲ ಅಕ್ಷರ ಮತ್ತು ಕೊನೆಯ ಅಕ್ಷರವನ್ನು ಗ್ರಿಡ್‌ನಲ್ಲಿ ಕ್ಲಿಕ್ ಮಾಡಿ ಪದ ಹುಡುಕಿ!</p>
+
+    <div class="game-layout">
+        <div class="word-grid" id="gridBoard"></div>
+
+        <div class="word-list-panel">
+            <div class="word-list-title">🚀 ಹುಡುಕಬೇಕಾದ ಪದಗಳು:</div>
+            <div id="wordsListTarget"></div>
+        </div>
+    </div>
+
+    <div id="message"></div>
+    <button class="reset-btn" id="resetBtn" onclick="initGame()">ಮತ್ತೆ ಆಡಿ 🔄</button>
+</div>
+
+<script>
+    // ಗ್ರಿಡ್ ಡೇಟಾ ಮತ್ತು ಪದಗಳ ಇಂಡೆಕ್ಸ್ ವ್ಯಾಪ್ತಿ (ಸ್ಟಾರ್ಟ್ ಮತ್ತು ಎಂಡ್ ಸೆಲ್ ಐಡಿ)
+    const gridLetters = [
+        'ಮ', 'ಂ', 'ಗ', 'ಳ', 'ಕ', 'ಕ್ಷ', 'ಕ',
+        'ನ', 'ರ', 'ವ', 'ಜ', 'ರ', 'ಕ', 'ಕ್ಷ',
+        'ಗ', 'ಲ', 'ಗ', 'ನ', 'ನೌ', 'ಕೆ', 'ಬು',
+        'ನ', 'ಗು', 'ರು', 'ತ್ವಾ', 'ಕ', 'ರ್ಷ', 'ಣೆ',
+        'ಕ', 'ಕ್ಷ', 'ಬ', 'ಪು', 'ಟ್ಟಿ', 'ಧ', 'ನೆ',
+        'ವಿ', 'ಜ್ಞಾ', 'ನ', 'ಭೂ', 'ಮಿ', 'ಳಿ', 'ಮ',
+        'ಕ', 'ಬಾ', 'ಹಾ', 'ಕಾ', 'ಶ', 'ಲ', 'ಲೋ'
+    ];
+
+    const targetWords = [
+        { text: "ಮಂಗಳ", start: 0, end: 2 },
+        { text: "ಗಗನನೌಕೆ", start: 16, end: 19 },
+        { text: "ಗುರುತ್ವಾಕರ್ಷಣೆ", start: 22, end: 27 },
+        { text: "ಪುಟ್ಟಿ", start: 31, end: 32 },
+        { text: "ಬಾಹ್ಯಾಕಾಶ", start: 43, end: 46 }
+    ];
+
+    let selectedCells = [];
+    let foundCount = 0;
+
+    const gridBoard = document.getElementById('gridBoard');
+    const wordsListTarget = document.getElementById('wordsListTarget');
+    const message = document.getElementById('message');
+    const resetBtn = document.getElementById('resetBtn');
+
+    // ಲೇಸರ್ ಸೌಂಡ್ ಸೃಷ್ಟಿ
+    function playLaser() {
+        try {
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            oscillator.type = 'triangle';
+            oscillator.frequency.setValueAtTime(500, audioCtx.currentTime);
+            oscillator.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.2);
+            gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            oscillator.start();
+            oscillator.stop(audioCtx.currentTime + 0.2);
+        } catch(e) {}
+    }
+
+    function initGame() {
+        foundCount = 0;
+        selectedCells = [];
+        message.innerText = "";
+        resetBtn.style.display = "none";
+        
+        // ಗ್ರಿಡ್ ಸೃಷ್ಟಿ
+        gridBoard.innerHTML = "";
+        gridLetters.forEach((letter, index) => {
+            const cell = document.createElement('div');
+            cell.className = 'grid-cell';
+            cell.innerText = letter;
+            cell.dataset.id = index;
+            cell.onclick = () => handleCellClick(index);
+            gridBoard.appendChild(cell);
+        });
+
+        // ಪದಗಳ ಪಟ್ಟಿ ಸೃಷ್ಟಿ
+        wordsListTarget.innerHTML = "";
+        targetWords.forEach((word, index) => {
+            const item = document.createElement('div');
+            item.className = 'word-item';
+            item.id = 'word_' + index;
+            item.innerHTML = `🪐 <span>${word.text}</span>`;
+            wordsListTarget.appendChild(item);
+        });
+    }
+
+    function handleCellClick(index) {
+        const cell = document.querySelector(`[data-id='${index}']`);
+        if (cell.classList.contains('found')) return;
+
+        // ಈಗಾಗಲೇ ಸೆಲೆಕ್ಟ್ ಆಗಿದ್ದರೆ ಅನ್-ಸೆಲೆಕ್ಟ್ ಮಾಡುವುದು
+        if (cell.classList.contains('selected')) {
+            cell.classList.remove('selected');
+            selectedCells = selectedCells.filter(id => id !== index);
+            return;
+        }
+
+        // ಗರಿಷ್ಠ ೨ ಅಕ್ಷರ ಮಾತ್ರ ಸೆಲೆಕ್ಟ್ ಮಾಡಲು ಅವಕಾಶ (ಮೊದಲ ಮತ್ತು ಕೊನೆಯ ಅಕ್ಷರ)
+        if (selectedCells.length < 2) {
+            cell.classList.add('selected');
+            selectedCells.push(index);
+        }
+
+        // ಎರಡು ಅಕ್ಷರಗಳು ಸೆಲೆಕ್ಟ್ ಆದಾಗ ಮ್ಯಾಚ್ ಚೆಕ್ ಮಾಡುವುದು
+        if (selectedCells.length === 2) {
+            checkWordMatch();
+        }
+    }
+
+    function checkWordMatch() {
+        const start = Math.min(selectedCells[0], selectedCells[1]);
+        const end = Math.max(selectedCells[0], selectedCells[1]);
+
+        let isMatched = false;
+
+        targetWords.forEach((word, idx) => {
+            if (word.start === start && word.end === end) {
+                // ಪದ ಸಿಕ್ಕಾಗ ಹಸಿರು ಬಣ್ಣಕ್ಕೆ ಬದಲಾಯಿಸುವುದು
+                for (let i = start; i <= end; i++) {
+                    const c = document.querySelector(`[data-id='${i}']`);
+                    c.className = "grid-cell found";
+                }
+                
+                // ಲಿಸ್ಟ್‌ನಲ್ಲಿ ರೈಟ್ ಮಾರ್ಕ್ ಹಾಕುವುದು
+                const listItem = document.getElementById('word_' + idx);
+                listItem.className = "word-item found-word";
+                listItem.innerHTML = `✅ <span>${word.text}</span>`;
+
+                isMatched = true;
+                foundCount++;
+                playLaser();
+            }
+        });
+
+        // ಸೆಲೆಕ್ಷನ್ ಕ್ಲಿಯರ್ ಮಾಡುವುದು
+        const allSelected = document.querySelectorAll('.grid-cell.selected');
+        allButtons = Array.from(allSelected);
+        allButtons.forEach(c => c.classList.remove('selected'));
+        selectedCells = [];
+
+        // ಆಟ ಮುಕ್ತಾಯದ ಪರಿಶೀಲನೆ
+        if (foundCount === targetWords.length) {
+            message.innerText = "🎉 ಅದ್ಭುತ! ನಕ್ಷತ್ರಲೋಕದ ಎಲ್ಲಾ ಬಾಹ್ಯಾಕಾಶ ಪದಗಳನ್ನು ಯಶಸ್ವಿಯಾಗಿ ಕಂಡುಹಿಡಿದಿದ್ದೀರಿ!";
+            resetBtn.style.display = "inline-block";
+        }
+    }
+
+    // ಆಟ ಆರಂಭ
+    initGame();
+</script>
+
+</body>
+</html>

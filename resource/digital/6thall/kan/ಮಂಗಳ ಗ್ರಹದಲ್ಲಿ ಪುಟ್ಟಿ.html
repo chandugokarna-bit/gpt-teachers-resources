@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಮಂಗಳ ಗ್ರಹದಲ್ಲಿ ಪುಟ್ಟಿ - ಕಲಿಕಾ ಫಲ ಆಕ್ಟಿವಿಟಿ (೮ ಪ್ರಶ್ನೆಗಳು)</title>
+    <style>
+        :root {
+            --space-dark: #070919;
+            --neon-blue: #00d2d3;
+            --neon-purple: #9b59b6;
+            --neon-green: #1dd1a1;
+            --danger-red: #ff4d4d;
+            --card-bg: #14172e;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--space-dark);
+            color: #ffffff;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .activity-container {
+            background: linear-gradient(145deg, #0f1229, #191d3a);
+            padding: 30px;
+            border-radius: 25px;
+            box-shadow: 0 15px 40px rgba(0, 210, 211, 0.15);
+            max-width: 780px;
+            width: 100%;
+            text-align: center;
+            border: 1px solid rgba(0, 210, 211, 0.2);
+        }
+
+        h2 {
+            color: var(--neon-blue);
+            margin-bottom: 5px;
+            text-shadow: 0 0 10px rgba(0, 210, 211, 0.3);
+        }
+
+        .outcome-badge {
+            background: rgba(155, 89, 182, 0.2);
+            color: var(--neon-purple);
+            border: 1px solid var(--neon-purple);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+
+        /* ರಾಕೆಟ್ ಲಾಂಚ್ ಪ್ರೋಗ್ರೆಸ್ ಬಾರ್ */
+        .rocket-progress-zone {
+            background: #0b0d1f;
+            border: 1px solid #23274c;
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-line {
+            flex: 1;
+            background: #2c3159;
+            height: 8px;
+            border-radius: 5px;
+            margin: 0 15px;
+            position: relative;
+        }
+
+        .progress-fill {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, var(--neon-purple), var(--neon-blue));
+            border-radius: 5px;
+            transition: width 0.6s ease;
+        }
+
+        .rocket-icon {
+            font-size: 28px;
+            transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform: rotate(45deg);
+        }
+
+        /* ಕ್ವಿಜ್ ಕಾರ್ಡ್ */
+        .quest-card {
+            background: var(--card-bg);
+            border: 1px solid #23274c;
+            border-radius: 18px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+        }
+
+        .quest-text {
+            font-size: 20px;
+            font-weight: bold;
+            line-height: 1.5;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        /* ಆಪ್ಷನ್ ಬಟನ್ಸ್‌ */
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .opt-btn {
+            background: #1c203e;
+            border: 2px solid #343a6b;
+            color: #ffffff;
+            padding: 15px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: left;
+        }
+
+        .opt-btn:hover:not(:disabled) {
+            border-color: var(--neon-blue);
+            background: #252a52;
+            transform: translateX(5px);
+        }
+
+        .opt-btn.correct-lo {
+            background: rgba(29, 209, 161, 0.15) !important;
+            border-color: var(--neon-green) !important;
+            color: var(--neon-green) !important;
+        }
+
+        .opt-btn.wrong-lo {
+            background: rgba(255, 77, 77, 0.15) !important;
+            border-color: var(--danger-red) !important;
+            color: var(--danger-red) !important;
+        }
+
+        #feedbackMsg {
+            font-size: 17px;
+            font-weight: bold;
+            margin-top: 20px;
+            min-height: 27px;
+            text-align: left;
+            line-height: 1.5;
+        }
+
+        .action-btn {
+            margin-top: 20px;
+            background: linear-gradient(135deg, var(--neon-blue), #0984e3);
+            color: white;
+            border: none;
+            padding: 12px 35px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="activity-container">
+    <h2>ಮಂಗಳ ಗ್ರಹದಲ್ಲಿ ಪುಟ್ಟಿ: ಮಹಾ ಮಿಷನ್ 🚀</h2>
+    <div class="outcome-badge" id="loBadge">ಕಲಿಕಾ ಫಲ ಲೋಡ್ ಆಗುತ್ತಿದೆ...</div>
+    
+    <div class="rocket-progress-zone">
+        <span>🌍 ಭೂಮಿ</span>
+        <div class="progress-line">
+            <div class="progress-fill" id="progFill"></div>
+        </div>
+        <div class="rocket-icon" id="rocketIcon">🚀</div>
+        <span>🪐 ಮಂಗಳ</span>
+    </div>
+
+    <div class="quest-card">
+        <div class="quest-text" id="questionText">ಪ್ರಶ್ನೆ ಲೋಡ್ ಆಗುತ್ತಿದೆ...</div>
+        <div class="options-list" id="optionsGroup"></div>
+    </div>
+
+    <div id="feedbackMsg"></div>
+    <button class="action-btn" id="nextMissionBtn" onclick="nextMission()">ಮುಂದಿನ ಹಂತಕ್ಕೆ ಹಾರು ➡️</button>
+</div>
+
+<script>
+    // ೮ ಪ್ರಶ್ನೆಗಳ ಸಂಪೂರ್ಣ ಬ್ಯಾಂಕ್ (ಕಲಿಕಾ ಫಲಗಳಿಗೆ ಅನುಗುಣವಾಗಿ)
+    const outcomesData = [
+        {
+            loName: "ಕಲಿಕಾ ಫಲ ೧: ವಿಜ್ಞಾನ ಮತ್ತು ತಂತ್ರಜ್ಞಾನದ ಅರಿವು",
+            question: "೧. ಪುಟ್ಟಿ ಮಂಗಳ ಗ್ರಹದಲ್ಲಿ ತೇಲುತ್ತಾ ಜಿಗಿಯಲು ಅಲ್ಲಿನ ಯಾವ ವೈಜ್ಞಾನಿಕ ಬದಲಾವಣೆ ಕಾರಣವಾಗಿತ್ತು?",
+            options: [
+                "ಮಂಗಳ ಗ್ರಹದಲ್ಲಿ ಬಿರುಗಾಳಿ ಜೋರಾಗಿತ್ತು",
+                "ಮಂಗಳ ಗ್ರಹದ ಗುರುತ್ವಾಕರ್ಷಣ ಬಲವು ಭೂಮಿಗಿಂತ ತುಂಬಾ ಕಡಿಮೆಯಿದೆ",
+                "ಪುಟ್ಟಿ ಸ್ಪೆಷಲ್ ಮ್ಯಾಜಿಕ್ ಶೂ ಧರಿಸಿದ್ದಳು",
+                "ಮಂಗಳ ಗ್ರಹದಲ್ಲಿ ಆಮ್ಲಜನಕ ಹೆಚ್ಚಾಗಿತ್ತು"
+            ],
+            correct: 1,
+            explanation: "ಮಂಗಳ ಗ್ರಹದ ಗುರುತ್ವಾಕರ್ಷಣೆಯು ಭೂಮಿಯ ಕೇವಲ ೩೮% ಇರುವುದರಿಂದ ವಸ್ತುಗಳು ಹಗುರವಾಗಿ ತೇಲುತ್ತವೆ."
+        },
+        {
+            loName: "ಕಲಿಕಾ ಫಲ ೨: ಪಠ್ಯ ಗ್ರಹಣ ಶಕ್ತಿ ಮತ್ತು ವಿಶ್ಲೇಷಣೆ",
+            question: "೨. ಮಂಗಳ ಗ್ರಹದ ಜೀವಿಗಳು (Aliens) ಪುಟ್ಟಿಯೊಂದಿಗೆ ಯುದ್ಧ ಮಾಡಲು ಬಾರದೆ ಸ್ನೇಹದಿಂದ ವರ್ತಿಸಲು ಕಾರಣವೇನು?",
+            options: [
+                "ಅವರಿಗೆ ಪುಟ್ಟಿಯ ಗಗನನೌಕೆ ಇಷ್ಟವಾಗಿತ್ತು",
+                "ಅವರು ಪುಟ್ಟಿಯನ್ನು ನೋಡಿ ಹೆದರಿದ್ದರು",
+                "ಅವರು ಶಾಂತಿಪ್ರಿಯರು ಮತ್ತು ಪುಟ್ಟಿಯನ್ನು ತಮ್ಮ ಸ್ನೇಹಿತೆಯಾಗಿ ಕಂಡರು",
+                "ಅವರಿಗೆ ಕನ್ನಡ ಭಾಷೆ ಬರುತ್ತಿತ್ತು"
+            ],
+            correct: 2,
+            explanation: "ಬಾಹ್ಯಾಕಾಶ ಜೀವಿಗಳು ಜ್ಞಾನ ಮತ್ತು ಸ್ನೇಹಕ್ಕೆ ಬೆಲೆ ನೀಡುವ ಶಾಂತಿಪ್ರಿಯ ಜೀವಿಗಳಾಗಿದ್ದರು."
+        },
+        {
+            loName: "ಕಲಿಕಾ ಫಲ ೩: ಭಾಷಾ ಸಾಮರ್ಥ್ಯ ಮತ್ತು ಪಾರಿಭಾಷಿಕ ಪದಗಳು",
+            question: "೩. ಬಾಹ್ಯಾಕಾಶದಲ್ಲಿ ಪ್ರಯಾಣಿಸಲು ವಿಜ್ಞಾನಿಗಳು ಬಳಸುವ ವಿಶೇಷ ವಾಹನಕ್ಕೆ ಏನೆಂದು ಕರೆಯುತ್ತಾರೆ?",
+            options: [
+                "ಸಮುದ್ರ ನೌಕೆ",
+                "ಆಕಾಶ ಬುಟ್ಟಿ",
+                "ಗಗನನೌಕೆ (Spaceship)",
+                "ವಿಮಾನ"
+            ],
+            correct: 2,
+            explanation: "ಖಗೋಳ ವಿಜ್ಞಾನದಲ್ಲಿ ಬಾಹ್ಯಾಕಾಶ ಪ್ರಯಾಣಕ್ಕೆ ಬಳಸುವ ವಾಹನವನ್ನು ಗಗನನೌಕೆ ಎನ್ನಲಾಗುತ್ತದೆ."
+        },
+        {
+            loName: "ಕಲಿಕಾ ಫಲ ೪: ಗ್ರಹಗಳ ಸಾಮಾನ್ಯ ಜ್ಞಾನ",
+            question: "೪. ಸೌರಮಂಡಲದಲ್ಲಿ 'ಕೆಂಪು ಗ್ರಹ' (Red Planet) ಎಂದು ಯಾವ ಗ್ರಹವನ್ನು ಕರೆಯಲಾಗುತ್ತದೆ?",
+            options: [
+                "ಬುಧ ಗ್ರಹ",
+                "ಶುಕ್ರ ಗ್ರಹ",
+                "ಮಂಗಳ ಗ್ರಹ",
+                "ಶನಿ ಗ್ರಹ"
+            ],
+            correct: 2,
+            explanation: "ಮಂಗಳ ಗ್ರಹದ ಮೇಲ್ಮೈಯಲ್ಲಿ ಕಬ್ಬಿಣದ ಆಕ್ಸೈಡ್ (ಸವೆದ ಮಣ್ಣು) ಹೆಚ್ಚಿರುವುದರಿಂದ ಅದು ಕೆಂಪಾಗಿ ಕಾಣುತ್ತದೆ."
+        },
+        {
+            loName: "ಕಲಿಕಾ ಫಲ ೫: ಕಲ್ಪನಾ ಶಕ್ತಿ ಮತ್ತು ಪರಿಸರ ಪ್ರಜ್ಞೆ",
+            question: "೫. ಪುಟ್ಟಿ ಮಂಗಳ ಗ್ರಹಕ್ಕೆ ಹೋದಾಗ ಅಲ್ಲಿ ಭೂಮಿಯಂತೆ ಕಾಣದ ವಿಚಿತ್ರ ಪರಿಸರ ಯಾವುದು?",
+            options: [
+                "ಅಲ್ಲಿ ದಟ್ಟವಾದ ಕಾಡುಗಳಿದ್ದವು",
+                "ಅಲ್ಲಿ ನದಿ, ಹಸಿರು ಗಿಡಗಳು ಇರದೆ ಕೇವಲ ಕೆಂಪು ಕಲ್ಲು-ಮಣ್ಣಿನ ಮರುಭೂಮಿಯಂತಿತ್ತು",
+                "ಅಲ್ಲಿ ಭಾರಿ ಮಳೆ ಸುರಿಯುತ್ತಿತ್ತು",
+                "ಅಲ್ಲಿ ದೊಡ್ಡ ಸಮುದ್ರಗಳಿದ್ದವು"
+            ],
+            correct: 1,
+            explanation: "ಮಂಗಳ ಗ್ರಹವು ಸದ್ಯಕ್ಕೆ ನೀರು ಮತ್ತು ವಾತಾವರಣದ ಕೊರತೆಯಿರುವ ಒಣ ಮರುಭೂಮಿಯಂತಿದೆ."
+        },
+        {
+            loName: "ಕಲಿಕಾ ಫಲ ೬: ವ್ಯಾಕರಣ ಮತ್ತು ಭಾಷಾ ಪ್ರಯೋಗ",
+            question: "೬. 'ಗಗನನೌಕೆ' ಎಂಬ ಪದವನ್ನು ಬಿಡಿಸಿ ಬರೆದಾಗ ಸಿಗುವ ಸರಿಯಾದ ರೂಪ ಯಾವುದು?",
+            options: [
+                "ಗಗನ + ನೌಕೆ",
+                "ಗಗನಕ್ಕೆ + ನೌಕೆ",
+                "ಗಗನದ + ನೌಕೆ",
+                "ಗಗನದಲ್ಲಿ + ನೌಕೆ"
+            ],
+            correct: 2,
+            explanation: "ಗಗನದ ನೌಕೆ = ಗಗನನೌಕೆ (ಇದು ಶಷ್ಠೀ ತತ್ಪುರುಷ ಸಮಾಸಕ್ಕೆ ಉದಾಹರಣೆಯಾಗಿದೆ)."
+        },
+        {
+            loName: "ಕಲಿಕಾ ಫಲ ೭: ಬಾಹ್ಯಾಕಾಶ ಸೂಟಿನ ಮಹತ್ವ",
+            question: "೭. ಗಗನಯಾತ್ರಿಗಳು ಬಾಹ್ಯಾಕಾಶಕ್ಕೆ ಹೋಗುವಾಗ ವಿಶೇಷವಾದ 'ಸ್ಪೇಸ್ ಸೂಟ್' ಏಕೆ ಧರಿಸಬೇಕು?",
+            options: [
+                "ಅದು ನೋಡಲು ತುಂಬಾ ಸುಂದರವಾಗಿರುತ್ತದೆ",
+                "ಅದು ತೂಕ ಹೆಚ್ಚಿಸಲು ಸಹಾಯ ಮಾಡುತ್ತದೆ",
+                "ಅದು ಬಾಹ್ಯಾಕಾಶದ ಶೂನ್ಯ ಒತ್ತಡ ಮತ್ತು ಆಮ್ಲಜನಕದ ಕೊರತೆಯಿಂದ ಜೀವ ರಕ್ಷಿಸುತ್ತದೆ",
+                "ಏಲಿಯನ್‌ಗಳಿಗೆ ಹೆದರಿಸಲು ಅದು ಬೇಕು"
+            ],
+            correct: 2,
+            explanation: "ಬಾಹ್ಯಾಕಾಶ ಸೂಟ್‌ಗಳು ಗಗನಯಾತ್ರಿಗಳಿಗೆ ಕೃತಕ ವಾತಾವರಣ ಮತ್ತು ಆಮ್ಲಜನಕವನ್ನು ಒದಗಿಸುತ್ತವೆ."
+        },
+        {
+            loName: "ಕಲಿಕಾ ಫಲ ೮: ಪಾಠದ ನೈತಿಕ ಮೌಲ್ಯ",
+            question: "೮. 'ಮಂಗಳ ಗ್ರಹದಲ್ಲಿ ಪುಟ್ಟಿ' ಪಾಠದಿಂದ ವಿದ್ಯಾರ್ಥಿಗಳು ಕಲಿಯಬೇಕಾದ ಮುಖ್ಯ ಆದರ್ಶ ಗುಣ ಯಾವುದು?",
+            options: [
+                "ಯಾರಿಗೂ ಹೇಳದೆ ದೂರ ಪ್ರಯಾಣ ಮಾಡುವುದು",
+                "ಹೊಸ ಜಾಗ ಮತ್ತು ವಿಜ್ಞಾನದ ಬಗ್ಗೆ ಕುತೂಹಲ ಹಾಗೂ ವೈಜ್ಞಾನಿಕ ಆಲೋಚನೆ ಬೆಳೆಸಿಕೊಳ್ಳುವುದು",
+                "ಯಾವಾಗಲೂ ಮೊಬೈಲ್ ಗೇಮ್ ಆಡುವುದು",
+                "ಕಲ್ಪನಾ ಲೋಕದಲ್ಲೇ ಮುಳುಗಿರುವುದು"
+            ],
+            correct: 1,
+            explanation: "ಈ ಪಾಠವು ಮಕ್ಕಳಲ್ಲಿ ಖಗೋಳ ವಿಜ್ಞಾನದ ಆಸಕ್ತಿ ಮತ್ತು ಸಂಶೋಧನಾ ಮನೋಭಾವವನ್ನು ಮೂಡಿಸುತ್ತದೆ."
+        }
+    ];
+
+    let currentStage = 0;
+    let score = 0;
+
+    const loBadge = document.getElementById('loBadge');
+    const questionText = document.getElementById('questionText');
+    const optionsGroup = document.getElementById('optionsGroup');
+    const feedbackMsg = document.getElementById('feedbackMsg');
+    const nextMissionBtn = document.getElementById('nextMissionBtn');
+    const progFill = document.getElementById('progFill');
+    const rocketIcon = document.getElementById('rocketIcon');
+
+    // ಲೈವ್ ಸೌಂಡ್ ಇಫೆಕ್ಟ್
+    function playBeep(isCorrect) {
+        try {
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            oscillator.type = 'sine';
+            oscillator.frequency.setValueAtTime(isCorrect ? 800 : 250, audioCtx.currentTime);
+            gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            oscillator.start();
+            oscillator.stop(audioCtx.currentTime + 0.2);
+        } catch(e) {}
+    }
+
+    function loadStage() {
+        feedbackMsg.innerText = "";
+        nextMissionBtn.style.display = "none";
+        
+        const currentData = outcomesData[currentStage];
+        loBadge.innerText = currentData.loName;
+        questionText.innerText = currentData.question;
+        optionsGroup.innerHTML = "";
+
+        currentData.options.forEach((opt, idx) => {
+            const btn = document.createElement('button');
+            btn.className = "opt-btn";
+            btn.id = "opt_" + idx;
+            btn.innerText = opt;
+            btn.onclick = () => evaluateAnswer(idx, currentData.correct, currentData.explanation);
+            optionsGroup.appendChild(btn);
+        });
+    }
+
+    function evaluateAnswer(selected, correct, explanation) {
+        const allBtns = optionsGroup.querySelectorAll('.opt-btn');
+        allBtns.forEach(b => b.disabled = true);
+
+        if (selected === correct) {
+            document.getElementById("opt_" + selected).classList.add('correct-lo');
+            feedbackMsg.innerHTML = `<span style='color:var(--neon-green);'>✅ ಸರಿಯಾದ ಉತ್ತರ! ರಾಕೆಟ್ ಮುಂದೆ ಸಾಗಿತು.</span><br><small style='color:#aaa;'>💡 <b>ವಿವರಣೆ:</b> ${explanation}</small>`;
+            playBeep(true);
+            score++;
+        } else {
+            document.getElementById("opt_" + selected).classList.add('wrong-lo');
+            document.getElementById("opt_" + correct).classList.add('correct-lo');
+            feedbackMsg.innerHTML = `<span style='color:var(--danger-red);'>❌ ತಪ್ಪು ಉತ್ತರ! ಸರಿಯಾದ ವಿವರಣೆ ಗಮನಿಸಿ.</span><br><small style='color:#aaa;'>💡 <b>ವಿವರಣೆ:</b> ${explanation}</small>`;
+            playBeep(false);
+        }
+
+        // ರಾಕೆಟ್ ನ ಲೈವ್ ಅನಿಮೇಷನ್ ದೂರದ ಲೆಕ್ಕಾಚಾರ (೮ ಪ್ರಶ್ನೆಗಳಿಗೆ ತಕ್ಕಂತೆ)
+        const progressPercent = ((currentStage + 1) / outcomesData.length) * 100;
+        progFill.style.width = progressPercent + "%";
+        
+        // ರೆಸ್ಪಾನ್ಸಿವ್ ಮೂವ್ಮೆಂಟ್ ಫಾರ್ ರಾಕೆಟ್
+        const maxMove = progFill.parentElement.offsetWidth - 40; 
+        const currentMove = (progressPercent / 100) * maxMove;
+        rocketIcon.style.transform = `translateX(${currentMove}px) rotate(45deg)`;
+
+        nextMissionBtn.style.display = "inline-block";
+        if (currentStage === outcomesData.length - 1) {
+            nextMissionBtn.innerText = "ಮಿಷನ್ ಕಂಪ್ಲೀಟ್ ರಿಪೋರ್ಟ್ 📋";
+        }
+    }
+
+    function nextMission() {
+        if (currentStage < outcomesData.length - 1) {
+            currentStage++;
+            loadStage();
+        } else {
+            // ರಿಸಲ್ಟ್ ಸ್ಕ್ರೀನ್
+            loBadge.innerText = "ಮಿಷನ್ ಯಶಸ್ವಿ";
+            questionText.innerText = "🏁 ಬಾಹ್ಯಾಕಾಶದ ಮಹಾ ಮಿಷನ್ ಪೂರ್ಣಗೊಂಡಿದೆ!";
+            optionsGroup.innerHTML = "";
+            
+            let evaluationResult = "";
+            if (score === outcomesData.length) {
+                evaluationResult = "<span style='color:var(--neon-green);'>🥇 ಅದ್ಭುತ ಸಾಧನೆ! ವಿದ್ಯಾರ್ಥಿಯು ಎಲ್ಲಾ ೮ ಕಲಿಕಾ ಫಲಗಳನ್ನು (100%) ಸಂಪೂರ್ಣವಾಗಿ ಗಳಿಸಿದ್ದಾನೆ!</span>";
+            } else if (score >= 5) {
+                evaluationResult = "<span style='color:var(--neon-blue);'>✨ ಉತ್ತಮ ಪ್ರಗತಿ! ಮಗುವು ಪಾಠದ ಬಹುತೇಕ ಆಶಯಗಳನ್ನು ಚೆನ್ನಾಗಿ ಗ್ರಹಿಸಿದೆ.</span>";
+            } else {
+                evaluationResult = "<span style='color:var(--danger-red);'>🔄 ಕಲಿಕಾ ಫಲದ ಕೊರತೆಯಿದೆ. ಪಾಠದ ಮುಖ್ಯ ವಿಷಯಗಳನ್ನು ಮತ್ತೊಮ್ಮೆ ಬೋಧಿಸುವುದು ಸೂಕ್ತ.</span>";
+            }
+
+            feedbackMsg.innerHTML = `📊 <b>ಕಲಿಕಾ ಫಲ ಮಹಾ ವರದಿ:</b><br>ಒಟ್ಟು ಸಾಧಿಸಿದ ಅಂಕಗಳು: <b>${score} / ${outcomesData.length}</b><br><br>${evaluationResult}`;
+            
+            nextMissionBtn.innerText = "ಮಿಷನ್ ರಿಸೆಟ್ 🔄";
+            nextMissionBtn.onclick = () => {
+                currentStage = 0;
+                score = 0;
+                progFill.style.width = "0%";
+                rocketIcon.style.transform = "translateX(0px) rotate(45deg)";
+                nextMissionBtn.innerText = "ಮುಂದಿನ ಹಂತಕ್ಕೆ ಹಾರು ➡️";
+                nextMissionBtn.onclick = nextMission;
+                loadStage();
+            };
+        }
+    }
+
+    // ಪ್ರಾರಂಭ
+    loadStage();
+</script>
+
+</body>
+</html>

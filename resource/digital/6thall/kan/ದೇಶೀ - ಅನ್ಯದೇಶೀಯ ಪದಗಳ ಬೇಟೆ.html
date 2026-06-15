@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ದೇಶೀ - ಅನ್ಯದೇಶೀಯ ಪದಗಳ ಬೇಟೆ</title>
+    <style>
+        :root {
+            --primary-color: #341f97;
+            --deshi-color: #ff6b6b;
+            --anyadeshi-color: #48dbfb;
+            --success-color: #1dd1a1;
+            --bg-color: #f8f9fa;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .activity-container {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            max-width: 800px;
+            width: 100%;
+            text-align: center;
+        }
+
+        h2 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .instruction {
+            color: #7f8c8d;
+            font-size: 16px;
+            margin-bottom: 25px;
+        }
+
+        /* ಪದದ ಕಾರ್ಡ್ ಪ್ರದರ್ಶಿಸುವ ಜಾಗ */
+        .card-display-zone {
+            min-height: 120px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 40px;
+            background: #f1f2f6;
+            border-radius: 15px;
+            padding: 10px;
+        }
+
+        .word-card {
+            background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            padding: 15px 40px;
+            border-radius: 50px;
+            box-shadow: 0 8px 15px rgba(108, 92, 231, 0.3);
+            cursor: grab;
+            user-select: none;
+            transition: transform 0.2s;
+            display: inline-block;
+        }
+
+        .word-card:active {
+            cursor: grabbing;
+            transform: scale(0.95);
+        }
+
+        .word-card.dragging {
+            opacity: 0.7;
+        }
+
+        /* ಬುಟ್ಟಿಗಳ ಜಾಗ */
+        .baskets-zone {
+            display: flex;
+            justify-content: space-around;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .basket {
+            flex: 1;
+            border: 3px dashed #c8d6e5;
+            border-radius: 20px;
+            padding: 25px 15px;
+            min-height: 180px;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .basket-icon {
+            font-size: 60px;
+            margin-bottom: 10px;
+            transition: transform 0.3s;
+        }
+
+        .basket-title {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        /* ದೇಶೀ ಬುಟ್ಟಿಯ ಶೈಲಿ */
+        #deshiBasket {
+            background-color: #fff5f5;
+            border-color: var(--deshi-color);
+            color: #b33939;
+        }
+        #deshiBasket.hovered {
+            background-color: #ffb8b8;
+            border-style: solid;
+        }
+
+        /* ಅನ್ಯದೇಶೀಯ ಬುಟ್ಟಿಯ ಶೈಲಿ */
+        #anyadeshiBasket {
+            background-color: #f0faff;
+            border-color: var(--anyadeshi-color);
+            color: #227093;
+        }
+        #anyadeshiBasket.hovered {
+            background-color: #c7ecee;
+            border-style: solid;
+        }
+
+        .basket.hovered .basket-icon {
+            transform: scale(1.2);
+        }
+
+        /* ಸ್ಕೋರ್ ಬೋರ್ಡ್ */
+        .score-board {
+            font-size: 18px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-top: 15px;
+        }
+
+        #message {
+            margin-top: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            min-height: 27px;
+        }
+
+        .success-text { color: var(--success-color); }
+        .error-text { color: #ff4d4d; }
+
+        .reset-btn {
+            margin-top: 15px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: none;
+        }
+
+        .reset-btn:hover {
+            background-color: #5743d9;
+        }
+
+        @media (max-width: 600px) {
+            .baskets-zone { flex-direction: column; }
+            .basket { min-height: 140px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="activity-container">
+    <h2>೨. ದೇಶೀ - ಅನ್ಯದೇಶೀಯ ಪದಗಳ ಬೇಟೆ 🧺</h2>
+    <p class="instruction">ಮೇಲಿರುವ ಪದದ ಕಾರ್ಡ್ ಅನ್ನು ಎಳೆದು ತಂದು (Drag), ಅದು ದೇಶೀ ಪದವೋ ಅಥವಾ ಅನ್ಯದೇಶೀಯ ಪದವೋ ಎಂಬುದನ್ನು ಸರಿಯಾದ ಬುಟ್ಟಿಗೆ ಹಾಕಿ!</p>
+
+    <div class="card-display-zone">
+        <div class="word-card" draggable="true" id="currentWord">ಲೋಡ್ ಆಗುತ್ತಿದೆ...</div>
+    </div>
+
+    <div class="baskets-zone">
+        <div class="basket" id="deshiBasket" data-type="ದೇಶೀ">
+            <span class="basket-icon">🧺</span>
+            <span class="basket-title">ದೇಶೀ ಪದಗಳು</span>
+        </div>
+        <div class="basket" id="anyadeshiBasket" data-type="ಅನ್ಯದೇಶೀಯ">
+            <span class="basket-icon">🚢</span>
+            <span class="basket-title">ಅನ್ಯದೇಶೀಯ ಪದಗಳು</span>
+        </div>
+    </div>
+
+    <div class="score-board">ಪ್ರಗತಿ: <span id="currentScore">0</span> / <span id="totalWords">0</span></div>
+    <div id="message"></div>
+    <button class="reset-btn" id="resetBtn" onclick="resetGame()">ಮತ್ತೆ ಆಡಿ 🔄</button>
+</div>
+
+<script>
+    // ಪಠ್ಯಪುಸ್ತಕದ ಆಧಾರದ ಮೇಲೆ ಶಬ್ದಗಳ ಪಟ್ಟಿ
+    const wordsPool = [
+        { text: "ಕದ", type: "ದೇಶೀ" },
+        { text: "ಅಂಗಳ", type: "ದೇಶೀ" },
+        { text: "ಚೆನ್ನಾಗಿ", type: "ದೇಶೀ" },
+        { text: "ಮೂಡಣ", type: "ದೇಶೀ" },
+        { text: "ಮರ", type: "ದೇಶೀ" },
+        { text: "ಬೆಲ್ಲ", type: "ದೇಶೀ" },
+        { text: "ನೀರು", type: "ದೇಶೀ" },
+        { text: "ಹುಲ್ಲು", type: "ದೇಶೀ" },
+        { text: "ಹೊಲ", type: "ದೇಶೀ" },
+        { text: "ಆಟ", type: "ದೇಶೀ" },
+        { text: "ಭೂಮಿ", type: "ಅನ್ಯದೇಶೀಯ" },
+        { text: "ಮಿತ್ರ", type: "ಅನ್ಯದೇಶೀಯ" },
+        { text: "ಕಾಗದ", type: "ಅನ್ಯದೇಶೀಯ" },
+        { text: "ಮೇಜು", type: "ಅನ್ಯದೇಶೀಯ" },
+        { text: "ರಸ್ತೆ", type: "ಅನ್ಯದೇಶೀಯ" },
+        { text: "ಸಂಗಮ", type: "ಅನ್ಯದೇಶೀಯ" },
+        { text: "ಕುಮಾರ", type: "ಅನ್ಯದೇಶೀಯ" },
+        { text: "ಬಸ್ಸು", type: "ಅನ್ಯದೇಶೀಯ" },
+        { text: "ಸಾಬೂನು", type: "ಅನ್ಯದೇಶೀಯ" },
+        { text: "ಸರಕಾರ", type: "ಅನ್ಯದೇಶೀಯ" }
+    ];
+
+    let currentWordsList = [];
+    let currentIndex = 0;
+    let score = 0;
+
+    const wordCard = document.getElementById('currentWord');
+    const baskets = document.querySelectorAll('.basket');
+    const scoreSpan = document.getElementById('currentScore');
+    const totalSpan = document.getElementById('totalWords');
+    const message = document.getElementById('message');
+    const resetBtn = document.getElementById('resetBtn');
+
+    function initGame() {
+        // ಶಬ್ದಗಳ ಪಟ್ಟಿಯನ್ನು ಪ್ರತಿ ಬಾರಿ ಆಡುವಾಗಲೂ ಅದಲು ಬದಲು (Shuffle) ಮಾಡುವುದು
+        currentWordsList = [...wordsPool].sort(() => Math.random() - 0.5);
+        currentIndex = 0;
+        score = 0;
+        totalSpan.innerText = currentWordsList.length;
+        scoreSpan.innerText = score;
+        message.innerText = "";
+        resetBtn.style.display = "none";
+        wordCard.style.display = "inline-block";
+        showNextWord();
+    }
+
+    function showNextWord() {
+        if (currentIndex < currentWordsList.length) {
+            wordCard.innerText = currentWordsList[currentIndex].text;
+            message.className = "";
+        } else {
+            wordCard.style.display = "none";
+            message.className = "success-text";
+            message.innerText = `🎉 ಅಭಿನಂದನೆಗಳು! ಎಲ್ಲಾ ಪದಗಳನ್ನು ಯಶಸ್ವಿಯಾಗಿ ವಿಂಗಡಿಸಿದ್ದೀರಿ! ಒಟ್ಟು ಸ್ಕೋರ್: ${score}/${currentWordsList.length}`;
+            resetBtn.style.display = "inline-block";
+        }
+    }
+
+    // Drag Events
+    wordCard.addEventListener('dragstart', () => {
+        wordCard.classList.add('dragging');
+    });
+
+    wordCard.addEventListener('dragend', () => {
+        wordCard.classList.remove('dragging');
+    });
+
+    // Drop Events
+    baskets.forEach(basket => {
+        basket.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            basket.classList.add('hovered');
+        });
+
+        basket.addEventListener('dragleave', () => {
+            basket.classList.remove('hovered');
+        });
+
+        basket.addEventListener('drop', () => {
+            basket.classList.remove('hovered');
+            const currentWordObj = currentWordsList[currentIndex];
+
+            if (basket.dataset.type === currentWordObj.type) {
+                score++;
+                scoreSpan.innerText = score;
+                message.className = "success-text";
+                message.innerText = `✅ ಸರಿಯಾದ ಉತ್ತರ: "${currentWordObj.text}" ಎಂಬುದು ${currentWordObj.type} ಪದ!`;
+            } else {
+                message.className = "error-text";
+                message.innerText = `❌ ತಪ್ಪು ಉತ್ತರ! "${currentWordObj.text}" ನಿಜವಾಗಿ ${currentWordObj.type} ಪದ.`;
+            }
+
+            // ಮುಂದಿನ ಪದಕ್ಕೆ ಹೋಗುವುದು
+            currentIndex++;
+            setTimeout(showNextWord, 1200); // 1.2 ಸೆಕೆಂಡ್ ಉತ್ತರ ನೋಡಿ ಆಮೇಲೆ ಮುಂದಿನ ಪದ ಬರುತ್ತದೆ
+        });
+    });
+
+    function resetGame() {
+        initGame();
+    }
+
+    // ಆಟವನ್ನು ಪ್ರಾರಂಭಿಸುವುದು
+    initGame();
+</script>
+
+</body>
+</html>

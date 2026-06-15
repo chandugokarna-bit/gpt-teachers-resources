@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಗಗನಯಾತ್ರಿಯ ಸೂಟ್ ಜೋಡಿಸು - ಇಂಟರಾಕ್ಟಿವ್ ಆಕ್ಟಿವಿಟಿ (ಟಚ್ ಫ್ರೆಂಡ್ಲಿ)</title>
+    <style>
+        :root {
+            --space-dark: #090a14;
+            --neon-blue: #00d2d3;
+            --neon-green: #1dd1a1;
+            --neon-red: #ff6b6b;
+            --card-bg: #1e272e;
+            --select-bg: #2980b9;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--space-dark);
+            color: #ffffff;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .activity-container {
+            background: linear-gradient(145deg, #111424, #1a1d36);
+            padding: 30px;
+            border-radius: 25px;
+            box-shadow: 0 15px 40px rgba(0, 210, 211, 0.15);
+            max-width: 850px;
+            width: 100%;
+            text-align: center;
+            border: 1px solid rgba(0, 210, 211, 0.2);
+        }
+
+        h2 {
+            color: var(--neon-blue);
+            margin-bottom: 5px;
+            text-shadow: 0 0 10px rgba(0, 210, 211, 0.4);
+        }
+
+        .instruction {
+            color: #a0a5c0;
+            font-size: 16px;
+            margin-bottom: 30px;
+        }
+
+        .game-zone {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .parts-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 220px;
+        }
+
+        /* ಕ್ಲಿಕ್ ಮಾಡಬಹುದಾದ ಕಾರ್ಡ್‌ಗಳ ಶೈಲಿ */
+        .clickable-part {
+            background-color: var(--card-bg);
+            border: 2px solid #57606f;
+            padding: 15px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: bold;
+            text-align: center;
+            transition: all 0.2s ease;
+            user-select: none;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+
+        /* ವಿದ್ಯಾರ್ಥಿ ಕಾರ್ಡ್ ಕ್ಲಿಕ್ ಮಾಡಿದಾಗ ಆಕ್ಟಿವ್ ಆಗುವ ಶೈಲಿ */
+        .clickable-part.selected {
+            background-color: var(--select-bg);
+            border-color: #3498db;
+            box-shadow: 0 0 15px rgba(52, 152, 219, 0.6);
+            transform: scale(1.05);
+        }
+
+        .astronaut-hub {
+            position: relative;
+            width: 260px;
+            height: 380px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 2px dashed #57606f;
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s;
+        }
+
+        .astronaut-hub.all-done {
+            border-color: var(--neon-green);
+            background: rgba(29, 209, 161, 0.05);
+            box-shadow: 0 0 30px rgba(29, 209, 161, 0.2);
+        }
+
+        .avatar-base {
+            font-size: 100px;
+            margin-bottom: 20px;
+            transition: transform 0.5s ease;
+            position: relative;
+            z-index: 1;
+        }
+
+        @keyframes rocketLaunch {
+            0% { transform: translateY(0); }
+            10% { transform: translateY(10px) rotate(2deg); }
+            20% { transform: translateY(-10px) rotate(-2deg); }
+            100% { transform: translateY(-500px) scale(0.2); opacity: 0; }
+        }
+
+        .launch-animation {
+            animation: rocketLaunch 4s cubic-bezier(0.55, 0.055, 0.675, 0.19) forwards;
+        }
+
+        .drop-zone-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            width: 90%;
+            position: relative;
+            z-index: 2;
+        }
+
+        .suit-target-box {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px dashed var(--neon-blue);
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 14px;
+            color: #a0a5c0;
+            cursor: pointer;
+            transition: all 0.3s;
+            min-height: 25px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .suit-target-box:hover:not(.filled) {
+            background: rgba(0, 210, 211, 0.1);
+        }
+
+        .suit-target-box.filled {
+            background: rgba(29, 209, 161, 0.15);
+            border-color: var(--neon-green);
+            color: #1dd1a1;
+            font-weight: bold;
+            border-style: solid;
+            cursor: default;
+        }
+
+        #message {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            min-height: 27px;
+        }
+        .success-color { color: var(--neon-green); }
+
+        .reset-btn {
+            margin-top: 15px;
+            background-color: var(--neon-blue);
+            color: black;
+            border: none;
+            padding: 12px 30px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: none;
+        }
+
+        .reset-btn:hover {
+            background-color: #01a3a4;
+        }
+
+        @media (max-width: 750px) {
+            .game-zone { flex-direction: column; }
+            .parts-container { width: 100%; flex-direction: row; flex-wrap: wrap; justify-content: center; }
+            .clickable-part { flex: 1; min-width: 130px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="activity-container">
+    <h2>೨. ಗಗನಯಾತ್ರಿಯ ಸೂಟ್ ಜೋಡಿಸು 🧑‍🚀</h2>
+    <p class="instruction"><b>ಟಚ್ ಸ್ಕ್ರೀನ್ ಸಹಾಯ:</b> ಮೊದಲು ಯಾವುದಾದರೂ ಒಂದು ಭಾಗವನ್ನು ಕ್ಲಿಕ್ ಮಾಡಿ, ನಂತರ ಮಧ್ಯದ ಸರಿಯಾದ ಬಾಕ್ಸ್ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ ಜೋಡಿಸಿ!</p>
+
+    <div class="game-zone">
+        <div class="parts-container" id="leftParts">
+            <div class="clickable-part" id="part1" onclick="selectPart('part1')">🪖 ಸ್ಪೇಸ್ ಹೆಲ್ಮೆಟ್</div>
+            <div class="clickable-part" id="part2" onclick="selectPart('part2')">🎒 ಆಮ್ಲಜನಕ ಸಿಲಿಂಡರ್</div>
+        </div>
+
+        <div class="astronaut-hub" id="astroHub">
+            <div class="avatar-base" id="avatar">🧑‍🚀</div>
+            
+            <div class="drop-zone-grid">
+                <div class="suit-target-box" data-match="🪖...ಸ್ಪೇಸ್...ಹೆಲ್ಮೆಟ್" id="target1" onclick="matchWithTarget('target1', '🪖 ಸ್ಪೇಸ್ ಹೆಲ್ಮೆಟ್')">தலೆಯ ಭಾಗಕ್ಕೆ ಹಾಕಿ</div>
+                <div class="suit-target-box" data-match="🎒...ಆಮ್ಲಜನಕ...ಸಿಲಿಂಡರ್" id="target2" onclick="matchWithTarget('target2', '🎒 ಆಮ್ಲಜನಕ ಸಿಲಿಂಡರ್')">ಬೆನ್ನಿನ ಭಾಗಕ್ಕೆ ಜೋಡಿಸಿ</div>
+                <div class="suit-target-box" data-match="🧥...ರಕ್ಷಣಾ...ಕವಚ...ಸೂಟ್" id="target3" onclick="matchWithTarget('target3', '🧥 ರಕ್ಷಣಾ ಕವಚ ಸೂಟ್')">ದೇಹದ ಭಾಗಕ್ಕೆ ಧರಿಸಿ</div>
+                <div class="suit-target-box" data-match="🥾...ವಿಶೇಷ...ಸ್ಪೇಸ್...ಬೂಟುಗಳು" id="target4" onclick="matchWithTarget('target4', '🥾 ವಿಶೇಷ...ಸ್ಪೇಸ್...ಬೂಟುಗಳು')">ಪಾದದ ಭಾಗಕ್ಕೆ ಹಾಕಿ</div>
+            </div>
+        </div>
+
+        <div class="parts-container" id="rightParts">
+            <div class="clickable-part" id="part3" onclick="selectPart('part3')">🧥 ರಕ್ಷಣಾ ಕವಚ ಸೂಟ್</div>
+            <div class="clickable-part" id="part4" onclick="selectPart('part4')">🥾 ವಿಶೇಷ ಸ್ಪೇಸ್ ಬೂಟುಗಳು</div>
+        </div>
+    </div>
+
+    <div id="message"></div>
+    <button class="reset-btn" id="resetBtn" onclick="resetGame()">ಮತ್ತೆ ಜೋಡಿಸಿ 🔄</button>
+</div>
+
+<script>
+    let selectedPartId = null;
+    let filledCount = 0;
+
+    const avatar = document.getElementById('avatar');
+    const astroHub = document.getElementById('astroHub');
+    const message = document.getElementById('message');
+    const resetBtn = document.getElementById('resetBtn');
+
+    // ವೆಬ್ ಆಡಿಯೋ ಸೌಂಡ್ಸ್ 
+    function playSoundEffect(type) {
+        try {
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+
+            if (type === 'success') {
+                oscillator.type = 'sine';
+                oscillator.frequency.setValueAtTime(600, audioCtx.currentTime);
+                oscillator.frequency.setValueAtTime(900, audioCtx.currentTime + 0.1);
+                gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+                oscillator.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+                oscillator.start();
+                oscillator.stop(audioCtx.currentTime + 0.2);
+            } else if (type === 'launch') {
+                const bufferSize = audioCtx.sampleRate * 3;
+                const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+                const data = buffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) { data[i] = Math.random() * 2 - 1; }
+                const noise = audioCtx.createBufferSource();
+                noise.buffer = buffer;
+                const filter = audioCtx.createBiquadFilter();
+                filter.type = 'lowpass'; filter.frequency.value = 300;
+                const gain = audioCtx.createGain();
+                gain.gain.setValueAtTime(0.4, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 3);
+                noise.connect(filter); filter.connect(gain); gain.connect(audioCtx.destination);
+                noise.start();
+            }
+        } catch (e) { console.log("Audio blocked."); }
+    }
+
+    // ೧. ಕಾರ್ಡ್ ಸೆಲೆಕ್ಟ್ ಮಾಡುವ ಫಂಕ್ಷನ್
+    function selectPart(partId) {
+        // ಮುಂಚೆ ಯಾವುದಾದರೂ ಸೆಲೆಕ್ಟ್ ಆಗಿದ್ದರೆ ಅದನ್ನು ತೆಗೆಯುವುದು
+        const previouslySelected = document.querySelector('.clickable-part.selected');
+        if (previouslySelected) {
+            previouslySelected.classList.remove('selected');
+        }
+
+        // ಹೊಸ ಕಾರ್ಡ್ ಸೆಲೆಕ್ಟ್ ಮಾಡುವುದು
+        selectedPartId = partId;
+        document.getElementById(partId).classList.add('selected');
+    }
+
+    // ೨. ಬಾಕ್ಸ್‌ಗೆ ಮ್ಯಾಚ್ ಮಾಡುವ ಫಂಕ್ಷನ್
+    function matchWithTarget(targetId, targetText) {
+        if (!selectedPartId) {
+            message.innerHTML = "<span style='color:var(--neon-red);'>⚠️ ಮೊದಲು ಎಡ ಅಥವಾ ಬಲ ಬದಿಯ ಯಾವುದಾದರೂ ಒಂದು ಭಾಗವನ್ನು ಕ್ಲಿಕ್ ಮಾಡಿ!</span>";
+            return;
+        }
+
+        const targetBox = document.getElementById(targetId);
+        if (targetBox.classList.contains('filled')) return;
+
+        const selectedCard = document.getElementById(selectedPartId);
+        
+        // ಪಠ್ಯ ಹೊಂದಾಣಿಕೆ ಪರಿಶೀಲನೆ (ಹೆಸರುಗಳು ಮ್ಯಾಚ್ ಆದರೆ)
+        if (selectedCard.innerText.trim() === targetText.trim() || targetId === 'target4' && selectedPartId === 'part4') {
+            targetBox.classList.add('filled');
+            targetBox.innerText = "✅ " + selectedCard.innerText;
+            selectedCard.style.visibility = 'hidden';
+            selectedCard.classList.remove('selected');
+            
+            selectedPartId = null;
+            filledCount++;
+            message.innerText = "";
+            playSoundEffect('success');
+            
+            checkMissionComplete();
+        } else {
+            // ತಪ್ಪು ಬಾಕ್ಸ್‌ಗೆ ಕ್ಲಿಕ್ ಮಾಡಿದಾಗ ಕೆಂಪು ಫ್ಲ್ಯಾಶ್
+            targetBox.style.borderColor = 'var(--neon-red)';
+            message.innerHTML = "<span style='color:var(--neon-red);'>❌ ತಪ್ಪು ಜೋಡಣೆ! ಸರಿಯಾದ ಜಾಗಕ್ಕೆ ಕ್ಲಿಕ್ ಮಾಡಿ.</span>";
+            setTimeout(() => {
+                if (!targetBox.classList.contains('filled')) targetBox.style.borderColor = '';
+            }, 500);
+        }
+    }
+
+    function checkMissionComplete() {
+        if (filledCount === 4) {
+            astroHub.classList.add('all-done');
+            message.className = "success-color";
+            message.innerHTML = "🚀 ಅದ್ಭುತ! ಪುಟ್ಟಿಯ ಗಗನಯಾತ್ರಿ ಸೂಟ್ ಸಂಪೂರ್ಣ ಸಿದ್ಧವಾಗಿದೆ. ಕೌಂಟ್‌ಡೌನ್ ಶುರು... 3.. 2.. 1.. ಬ್ಲಾಸ್ಟ್ ಆಫ್!!";
+            
+            playSoundEffect('launch');
+            avatar.classList.add('launch-animation');
+
+            setTimeout(() => {
+                resetBtn.style.display = "inline-block";
+            }, 3000);
+        }
+    }
+
+    function resetGame() {
+        filledCount = 0;
+        selectedPartId = null;
+        message.innerText = "";
+        message.className = "";
+        resetBtn.style.display = "none";
+        astroHub.className = "astronaut-hub";
+        avatar.className = "avatar-base";
+        
+        const originalTexts = [
+            "തലೆಯ ಭಾಗಕ್ಕೆಹಾಕಿ",
+            "ಬೆನ್ನಿನ ಭಾಗಕ್ಕೆ ಜೋಡಿಸಿ",
+            "ದೇಹದ ಭಾಗಕ್ಕೆ ಧರಿಸಿ",
+            "ಪಾದದ ಭಾಗಕ್ಕೆ ಹಾಕಿ"
+        ];
+
+        dropBoxes = document.querySelectorAll('.suit-target-box');
+        dropBoxes.forEach((box, idx) => {
+            box.className = "suit-target-box";
+            box.innerText = originalTexts[idx];
+            box.style.borderColor = '';
+        });
+
+        const cards = document.querySelectorAll('.clickable-part');
+        cards.forEach(card => {
+            card.style.visibility = 'visible';
+            card.classList.remove('selected');
+        });
+    }
+</script>
+
+</body>
+</html>

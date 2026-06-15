@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಕೃಷ್ಣ - ಸುಧಾಮ: ವ್ಯಾಕರಣಾಂಶ ಆಕ್ಟಿವಿಟಿ (ಅಪ್‌ಡೇಟೆಡ್)</title>
+    <style>
+        :root {
+            --bg-space: #060814;
+            --neon-blue: #00d2d3;
+            --neon-purple: #a29bfe;
+            --neon-green: #1dd1a1;
+            --danger-red: #ff4d4d;
+            --card-dark: #101428;
+            --text-light: #f1f2f6;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-space);
+            color: var(--text-light);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            user-select: none;
+        }
+
+        .activity-container {
+            background: linear-gradient(145deg, #0e122d, #161b3d);
+            padding: 30px;
+            border-radius: 25px;
+            box-shadow: 0 15px 40px rgba(162, 155, 254, 0.15);
+            max-width: 800px;
+            width: 100%;
+            text-align: center;
+            border: 1px solid rgba(162, 155, 254, 0.2);
+        }
+
+        h2 {
+            color: var(--neon-blue);
+            margin-bottom: 5px;
+            text-shadow: 0 0 12px rgba(0, 210, 211, 0.4);
+            font-size: 26px;
+        }
+
+        .instruction {
+            color: #a4b0be;
+            font-size: 16px;
+            margin-bottom: 25px;
+        }
+
+        /* ಪ್ರಸ್ತುತ ಪದ ಪ್ರದರ್ಶಿಸುವ ಕಾರ್ಡ್ ವಲಯ */
+        .word-display-zone {
+            min-height: 120px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 35px;
+            background: #040610;
+            border-radius: 18px;
+            padding: 15px;
+            border: 1px solid #1e2548;
+        }
+
+        .active-grammar-card {
+            background: linear-gradient(135deg, #a29bfe, #00d2d3);
+            color: #000000;
+            font-size: 24px;
+            font-weight: 900;
+            padding: 18px 40px;
+            border-radius: 50px;
+            box-shadow: 0 8px 25px rgba(0, 210, 211, 0.3);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: inline-block;
+            line-height: 1.4;
+        }
+
+        /* ಬುಟ್ಟಿಗಳ ವಲಯ */
+        .baskets-container {
+            display: flex;
+            justify-content: space-around;
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+
+        .basket-box {
+            flex: 1;
+            background: var(--card-dark);
+            border: 2px solid #3d4852;
+            border-radius: 20px;
+            padding: 25px 15px;
+            min-height: 160px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.4);
+        }
+
+        .basket-box:hover {
+            transform: translateY(-5px);
+        }
+
+        .basket-icon {
+            font-size: 55px;
+            margin-bottom: 12px;
+            transition: transform 0.2s;
+        }
+
+        .basket-box:hover .basket-icon {
+            transform: scale(1.12);
+        }
+
+        .basket-title {
+            font-size: 19px;
+            font-weight: bold;
+        }
+
+        /* ನುಡಿಗಟ್ಟು ಬುಟ್ಟಿಯ ಶೈಲಿ */
+        #nudigattuBasket {
+            border-color: var(--neon-blue);
+            color: #9ee7f5;
+            background: rgba(0, 210, 211, 0.02);
+        }
+        #nudigattuBasket:hover {
+            background: rgba(0, 210, 211, 0.08);
+            box-shadow: 0 10px 20px rgba(0, 210, 211, 0.2);
+        }
+
+        /* ಗಾದೆ ಮಾತು ಬುಟ್ಟಿಯ ಶೈಲಿ */
+        #gadeBasket {
+            border-color: var(--neon-green);
+            color: #a3f7bf;
+            background: rgba(29, 209, 161, 0.02);
+        }
+        #gadeBasket:hover {
+            background: rgba(29, 209, 161, 0.08);
+            box-shadow: 0 10px 20px rgba(29, 209, 161, 0.2);
+        }
+
+        /* ಲೈವ್ ಪ್ರಗತಿ */
+        .progress-board {
+            font-size: 17px;
+            font-weight: bold;
+            color: #a4b0be;
+            margin-top: 15px;
+        }
+
+        #feedbackMsg {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            min-height: 27px;
+            line-height: 1.5;
+        }
+
+        .correct-text { color: var(--neon-green); }
+        .wrong-text { color: var(--danger-red); }
+
+        .reset-btn {
+            margin-top: 20px;
+            background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
+            color: #ffffff;
+            border: none;
+            padding: 12px 30px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            display: none;
+        }
+
+        @media (max-width: 600px) {
+            .baskets-container { flex-direction: column; gap: 20px; }
+            .basket-box { min-height: 130px; }
+            .active-grammar-card { font-size: 20px; padding: 15px 30px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="activity-container">
+    <h2>೨. ವ್ಯಾಕರಣಾಂಶ: ನುಡಿಗಟ್ಟು ಮತ್ತು ಗಾದೆಗಳ ಭೇಟೆ 🧺</h2>
+    <p class="instruction"><b>ಟಚ್ ಹೆಲ್ಪ್:</b> ಮೇಲಿರುವ ಪದಪುಂಜವನ್ನು ಓದಿ, ಅದು 'ನುಡಿಗಟ್ಟು' ಅಥವಾ 'ಗಾದೆ ಮಾತು' ಎಂಬುದನ್ನು ಕೆಳಗಿನ ಸರಿಯಾದ ಬುಟ್ಟಿ ಕ್ಲಿಕ್ ಮಾಡಿ ವಿಂಗಡಿಸಿ!</p>
+
+    <div class="word-display-zone">
+        <div class="active-word-card" id="grammarCard">ಲೋಡ್ ಆಗುತ್ತಿದೆ...</div>
+    </div>
+
+    <div class="baskets-container">
+        <div class="basket-box" id="nudigattuBasket" onclick="classifyGrammar('ನುಡಿಗಟ್ಟು')">
+            <span class="basket-icon">🧺</span>
+            <span class="basket-title">ನುಡಿಗಟ್ಟುಗಳು</span>
+        </div>
+        <div class="basket-box" id="gadeBasket" onclick="classifyGrammar('ಗಾದೆ ಮಾತು')">
+            <span class="basket-icon">🏺</span>
+            <span class="basket-title">ಗಾದೆ ಮಾತುಗಳು</span>
+        </div>
+    </div>
+
+    <div class="progress-board">ಪ್ರಗತಿ ಹಂತ: <span id="scoreText">0</span> / <span id="totalText">0</span></div>
+    <div id="feedbackMsg"></div>
+    <button class="reset-btn" id="resetBtn" onclick="resetGame()">ಮತ್ತೆ ಆಡಿ 🔄</button>
+</div>
+
+<script {
+type: text/javascript
+}>
+    // ತಾಂತ್ರಿಕ ದೋಷವನ್ನು ಸಂಪೂರ್ಣವಾಗಿ ಸರಿಪಡಿಸಲಾದ ನಿಖರವಾದ ಡೇಟಾಬೇಸ್
+    const grammarDatabase = [
+        { phrase: "ಅಟ್ಟಕ್ಕೇರಿಸು", type: "ನುಡಿಗಟ್ಟು", detail: "ಹೊಗಳಿ ಹೊಗಳಿ ಉಬ್ಬಿಸುವುದು ಎಂದರ್ಥ." },
+        { phrase: "ಕೂತು ಉಣ್ಣುವವನಿಗೆ ಕುಡಿಕೆ ಹೊನ್ನು ಸಾಲದು", type: "ಗಾದೆ ಮಾತು", detail: "ದುಡಿಯದೆ ಕುಳಿತು ತಿಂದರೆ ಎಷ್ಟೇ ಹಣವಿದ್ದರೂ ಸಾಲುವುದಿಲ್ಲ ಎಂಬ ಜಾನಪದ ಅನುಭವದ ನುಡಿ." },
+        { phrase: "ಗುಡ್ಡವನ್ನು ಬೆಟ್ಟ ಮಾಡು", type: "ನುಡಿಗಟ್ಟು", detail: "ಅಲ್ಪ ವಿಷಯವನ್ನು ದೊಡ್ಡದು ಮಾಡುವುದು ಎಂದರ್ಥ." },
+        { phrase: "ನಾಲಿಗೆ ಚೆನ್ನಾಗಿದ್ದರೆ ನಾಡೆಲ್ಲಾ ಒಳ್ಳೆಯದು", type: "ಗಾದೆ ಮಾತು", detail: "ನಮ್ಮ ಮಾತು ಮೃದುವಾಗಿದ್ದರೆ ಇಡೀ ಸಮಾಜವೇ ನಮಗೆ ಒಳ್ಳೆಯದಾಗುತ್ತದೆ ಎಂಬ ಲೋಕೋಕ್ತಿ." },
+        { phrase: "ಕಂಬಿ ಕೀಳು", type: "ನುಡಿಗಟ್ಟು", detail: "ಹೇಳದೆ ಕೇಳದೆ ಓಡಿ ಹೋಗು ಅಥವಾ ಪಲಾಯನ ಮಾಡು ಎಂದರ್ಥ." },
+        { phrase: "ಕೈಕೆಸರಾದರೆ ಬಾಯಿ ಮೊಸರು", type: "ಗಾದೆ ಮಾತು", detail: "ಕಷ್ಟಪಟ್ಟು ಶ್ರಮ ವಹಿಸಿ ಕೆಲಸ ಮಾಡಿದರೆ ಮಾತ್ರ ಜೀವನದಲ್ಲಿ ಉತ್ತಮ ಫಲ ಸಿಗುತ್ತದೆ ಎಂಬ ಸತ್ಯ." },
+        { phrase: "ನೀರಿನ ಮೇಲೆ ಹೋಮ", type: "ನುಡಿಗಟ್ಟು", detail: "ಭಾರಿ ದೊಡ್ಡ ಕೆಲಸ ಮಾಡಿದರೂ ಏನೂ ಪ್ರತಿಫಲ ದೊರಕದೆ ಹೋಗುವುದು ಎಂದರ್ಥ." },
+        { phrase: "ದೂರದ ಬೆಟ್ಟ ಕಣ್ಣಿಗೆ ನುಣ್ಣಗೆ", type: "ಗಾದೆ ಮಾತು", detail: "ಯಾವುದೇ ವಿಷಯವಾಗಲಿ ದೂರದಿಂದ ನೋಡಲು ಸುಂದರವಾಗಿದ್ದರೂ ಹತ್ತಿರ ಹೋದಾಗ ಅದರ ಕಷ್ಟ ತಿಳಿಯುತ್ತದೆ." },
+        { phrase: "ಗುಬ್ಬಿ ಮೇಲೆ ಬ್ರಹ್ಮಾಸ್ತ್ರ", type: "ನುಡಿಗಟ್ಟು", detail: "ಸಣ್ಣವರ ಅಥವಾ ಅಸಹಾಯಕರ ಮೇಲೆ ದೊಡ್ಡ ಬಲ ಪ್ರದರ್ಶನ ಮಾಡುವುದು ಎಂದರ್ಥ." },
+        { phrase: "ಕುಣಿಯಲಾರದವ ನೆಲ ಡೊಂಕು ಅಂದ", type: "ಗಾದೆ ಮಾತು", detail: "ತನಗೆ ಕೆಲಸ ಮಾಡಲು ಬಾರದಿದ್ದಾಗ ಬೇರೆಯದರ ಮೇಲೆ ತಪ್ಪು ಹೊರಿಸುವ ಮಾನವ ಸಹಜ ಗುಣ." }
+    ];
+
+    let shuffledGrammarList = [];
+    let currentIndex = 0;
+    let score = 0;
+
+    const grammarCard = document.getElementById('grammarCard');
+    const scoreText = document.getElementById('scoreText');
+    const totalText = document.getElementById('totalText');
+    const feedbackMsg = document.getElementById('feedbackMsg');
+    const resetBtn = document.getElementById('resetBtn');
+
+    function playBeep(isCorrect) {
+        try {
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            oscillator.type = 'sine';
+            oscillator.frequency.setValueAtTime(isCorrect ? 800 : 260, audioCtx.currentTime);
+            gainNode.gain.setValueAtTime(0.08, audioCtx.currentTime);
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            oscillator.start();
+            oscillator.stop(audioCtx.currentTime + 0.2);
+        } catch (e) {}
+    }
+
+    function initGame() {
+        shuffledGrammarList = [...grammarDatabase].sort(() => Math.random() - 0.5);
+        currentIndex = 0;
+        score = 0;
+        
+        totalText.innerText = shuffledGrammarList.length;
+        scoreText.innerText = score;
+        feedbackMsg.innerText = "";
+        resetBtn.style.display = "none";
+        grammarCard.style.display = "inline-block";
+        
+        displayCurrentPhrase();
+    }
+
+    function displayCurrentPhrase() {
+        if (currentIndex < shuffledGrammarList.length) {
+            grammarCard.className = "active-grammar-card";
+            grammarCard.innerText = shuffledGrammarList[currentIndex].phrase;
+            
+            grammarCard.style.transform = "scale(0.9)";
+            setTimeout(() => { grammarCard.style.transform = "scale(1)"; }, 100);
+        } else {
+            grammarCard.style.display = "none";
+            feedbackMsg.className = "correct-text";
+            feedbackMsg.innerHTML = `🏆 <b>ವ್ಯಾಕರಣ ಮಹಾ ಪಂಡಿತ ಮಿಷನ್ ಯಶಸ್ವಿ!</b><br>ನಿಮ್ಮ ಒಟ್ಟು ಸಾಧನೆ ಸ್ಕೋರ್: <b>${score} / ${shuffledGrammarList.length}</b><br>ವಿದ್ಯಾರ್ಥಿಗಳು ನಾಟಕದ ನುಡಿಗಟ್ಟು ಹಾಗೂ ಗಾದೆಗಳ ಜ್ಞಾನವನ್ನು ಯಶಸ್ವಿಯಾಗಿ ಗಳಿಸಿದ್ದಾರೆ!`;
+            resetBtn.style.display = "inline-block";
+        }
+    }
+
+    function classifyGrammar(selectedType) {
+        if (currentIndex >= shuffledGrammarList.length) return;
+
+        const currentObj = shuffledGrammarList[currentIndex];
+
+        if (selectedType === currentObj.type) {
+            score++;
+            scoreText.innerText = score;
+            feedbackMsg.className = "correct-text";
+            feedbackMsg.innerHTML = `✅ <b>ಸರಿಯಾದ ಉತ್ತರ!</b> "<b>${currentObj.phrase}</b>" ಎಂಬುದು <b>${currentObj.type}</b> ಹೌದು.<br><small style='color:#ced6e0;'>💡 <b>ಒಳಾರ್ಥ:</b> ${currentObj.detail}</small>`;
+            playBeep(true);
+        } else {
+            feedbackMsg.className = "wrong-text";
+            feedbackMsg.innerHTML = `❌ <b>ತಪ್ಪು ಉತ್ತರ!</b> "<b>${currentObj.phrase}</b>" ನಿಜವಾಗಿ <b>${currentObj.type}</b> ಆಗಿದೆ.<br><small style='color:#ced6e0;'>💡 <b>ಒಳಾರ್ಥ:</b> ${currentObj.detail}</small>`;
+            playBeep(false);
+        }
+
+        currentIndex++;
+        setTimeout(displayCurrentPhrase, 1400);
+    }
+
+    function resetGame() {
+        initGame();
+    }
+
+    initGame();
+</script>
+
+</body>
+</html>

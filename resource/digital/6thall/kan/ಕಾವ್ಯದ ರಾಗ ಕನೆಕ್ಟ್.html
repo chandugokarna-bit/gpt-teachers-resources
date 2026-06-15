@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಕಾವ್ಯದ ರಾಗ ಕನೆಕ್ಟ್ - ಇಂಟರಾಕ್ಟಿವ್ ಆಕ್ಟಿವಿಟಿ</title>
+    <style>
+        :root {
+            --primary-color: #00b894;
+            --selection-color: #0984e3;
+            --success-color: #1dd1a1;
+            --bg-color: #f8f9fa;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .activity-container {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            max-width: 850px;
+            width: 100%;
+            text-align: center;
+        }
+
+        h2 {
+            color: #009432;
+            margin-bottom: 10px;
+        }
+
+        .instruction {
+            color: #7f8c8d;
+            font-size: 16px;
+            margin-bottom: 30px;
+        }
+
+        /* ಮ್ಯಾಚಿಂಗ್ ಜೋನ್ */
+        .match-zone {
+            display: flex;
+            justify-content: space-between;
+            gap: 40px;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .column {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .column-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 2px solid #dfe6e9;
+        }
+
+        /* ಕಾರ್ಡ್‌ಗಳ ಶೈಲಿ */
+        .lyric-card {
+            background: white;
+            border: 2px solid #dcdde1;
+            padding: 15px 20px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s ease;
+            position: relative;
+            user-select: none;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+        }
+
+        .lyric-card:hover:not(.matched) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.08);
+            border-color: #b2bec3;
+        }
+
+        /* ಸೆಲೆಕ್ಟ್ ಮಾಡಿದಾಗ */
+        .lyric-card.selected {
+            border-color: var(--selection-color);
+            background-color: #e3f2fd;
+            color: #0d47a1;
+            font-weight: bold;
+            transform: scale(1.02);
+        }
+
+        /* ಸರಿಯಾಗಿ ಮ್ಯಾಚ್ ಆದಾಗ */
+        .lyric-card.matched {
+            background-color: #e3faf2;
+            border-color: var(--success-color);
+            color: #0f9b74;
+            cursor: default;
+            font-weight: bold;
+        }
+
+        .lyric-card.matched::after {
+            content: "✓";
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 18px;
+        }
+
+        #message {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--success-color);
+            min-height: 27px;
+        }
+
+        .reset-btn {
+            margin-top: 15px;
+            background-color: #009432;
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: none;
+        }
+
+        .reset-btn:hover {
+            background-color: #26de81;
+        }
+
+        @media (max-width: 600px) {
+            .match-zone { flex-direction: column; gap: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="activity-container">
+    <h2>೩. ಕಾವ್ಯದ ರಾಗ ಕನೆಕ್ಟ್ 🎵</h2>
+    <p class="instruction">ಎಡಭಾಗದ ಪದ್ಯದ ಸಾಲನ್ನು ಕ್ಲಿಕ್ ಮಾಡಿ, ತಕ್ಷಣ ಬಲಭಾಗದಲ್ಲಿರುವ ಅದರ ಸರಿಯಾದ ಮುಂದುವರಿಕೆಯ ಸಾಲನ್ನು ಕ್ಲಿಕ್ ಮಾಡಿ ಜೋಡಿಸಿ!</p>
+
+    <div class="match-zone">
+        <div class="column" id="leftColumn">
+            <div class="column-title">ಪದ್ಯದ ಆರಂಭದ ಸಾಲು</div>
+            </div>
+
+        <div class="column" id="rightColumn">
+            <div class="column-title">ಮುಂದುವರಿಕೆಯ ಸಾಲು</div>
+            </div>
+    </div>
+
+    <div id="message"></div>
+    <button class="reset-btn" id="resetBtn" onclick="resetGame()">ಮತ್ತೆ ಆಡಿ 🔄</button>
+</div>
+
+<script>
+    // ಪಠ್ಯಪುಸ್ತಕದ 'ಬೇಸಿಗೆ' ಪದ್ಯದ ಸಾಲುಗಳು
+    const lyricsData = [
+        { id: 1, left: "ಬಂದಿದೆ ಬೇಸಿಗೆ ರಜಾ...", right: "ಇದ್ದರೂ ಬಿಸಿಲಿನ ಸಜಾ" },
+        { id: 2, left: "ಏಕೆ ರವಿಗಿಂತ ತಾಪ...", right: "ಯಾರ ಮೇಲವನ ಕೋಪ?" },
+        { id: 3, left: "ಮೋಡ ಕೂಡಿಸಲು, ಇಳೆಗೆ...", right: "ಮಳೆ ತರಲು ದುಡಿಯುತಿಹನು, ಪಾಪ!" },
+        { id: 4, left: "ಹೊಗಳಿಕೆ ಬೇಕಿಲ್ಲ...", right: "ತೆಗಳಿದರೆ ಅವ ಕುಗ್ಗುವುದಿಲ್ಲ" },
+        { id: 5, left: "ಕಷ್ಟಗಳಿಗಂಜದೆ ನಮ್ಮ...", right: "ಕರ್ತವ್ಯ ಮರೆಯದೆ ಧನ್ಯತೆ ಗಳಿಸೋಣ" }
+    ];
+
+    let selectedLeft = null;
+    let selectedRight = null;
+    let matchedCount = 0;
+
+    const leftColumn = document.getElementById('leftColumn');
+    const rightColumn = document.getElementById('rightColumn');
+    const message = document.getElementById('message');
+    const resetBtn = document.getElementById('resetBtn');
+
+    function initGame() {
+        matchedCount = 0;
+        message.innerText = "";
+        resetBtn.style.display = "none";
+        
+        // ಹಳೆಯ ಕಾರ್ಡ್‌ಗಳನ್ನು ತೆರವುಗೊಳಿಸುವುದು (ಶೀರ್ಷಿಕೆಗಳನ್ನು ಬಿಟ್ಟು)
+        leftColumn.innerHTML = '<div class="column-title">ಪದ್ಯದ ಆರಂಭದ ಸಾಲು</div>';
+        rightColumn.innerHTML = '<div class="column-title">ಮುಂದುವರಿಕೆಯ ಸಾಲು</div>';
+
+        // ಎಡಭಾಗದ ಸಾಲುಗಳನ್ನು ಯಥಾವತ್ತಾಗಿ ಜೋಡಿಸುವುದು
+        lyricsData.forEach(item => {
+            const card = document.createElement('div');
+            card.className = 'lyric-card';
+            card.innerText = item.left;
+            card.dataset.id = item.id;
+            card.addEventListener('click', handleLeftClick);
+            leftColumn.appendChild(card);
+        });
+
+        // ಬಲಭಾಗದ ಸಾಲುಗಳನ್ನು ಅದಲು ಬದಲು (Shuffle) ಮಾಡಿ ಜೋಡಿಸುವುದು
+        const shuffledRight = [...lyricsData].sort(() => Math.random() - 0.5);
+        shuffledRight.forEach(item => {
+            const card = document.createElement('div');
+            card.className = 'lyric-card';
+            card.innerText = item.right;
+            card.dataset.id = item.id;
+            card.addEventListener('click', handleRightClick);
+            rightColumn.appendChild(card);
+        });
+    }
+
+    function handleLeftClick(e) {
+        if (e.target.classList.contains('matched')) return;
+
+        // ಮುಂಚೆ ಸೆಲೆಕ್ಟ್ ಆಗಿದ್ದ ಎಡ ಕಾರ್ಡ್‌ನ ಶೈಲಿ ತೆಗೆಯುವುದು
+        const previouslySelected = leftColumn.querySelector('.selected');
+        if (previouslySelected) previouslySelected.classList.remove('selected');
+
+        selectedLeft = e.target;
+        selectedLeft.classList.add('selected');
+
+        checkMatch();
+    }
+
+    function handleRightClick(e) {
+        if (e.target.classList.contains('matched')) return;
+
+        // ಮುಂಚೆ ಸೆಲೆಕ್ಟ್ ಆಗಿದ್ದ ಬಲ ಕಾರ್ಡ್‌ನ ಶೈಲಿ ತೆಗೆಯುವುದು
+        const previouslySelected = rightColumn.querySelector('.selected');
+        if (previouslySelected) previouslySelected.classList.remove('selected');
+
+        selectedRight = e.target;
+        selectedRight.classList.add('selected');
+
+        checkMatch();
+    }
+
+    function checkMatch() {
+        if (selectedLeft && selectedRight) {
+            // ಎರಡು ಕಾರ್ಡ್‌ಗಳ ID ಒಂದೇ ಆಗಿದ್ದರೆ ಅದು ಸರಿಯಾದ ಜೋಡಿ
+            if (selectedLeft.dataset.id === selectedRight.dataset.id) {
+                selectedLeft.className = 'lyric-card matched';
+                selectedRight.className = 'lyric-card matched';
+                matchedCount++;
+                
+                selectedLeft = null;
+                selectedRight = null;
+
+                if (matchedCount === lyricsData.length) {
+                    message.innerText = "🎉 ಅದ್ಭುತ ಕಾವ್ಯ ಜ್ಞಾನ! ಪದ್ಯದ ಎಲ್ಲಾ ಸಾಲುಗಳನ್ನು ರಾಗಬದ್ಧವಾಗಿ ಕನೆಕ್ಟ್ ಮಾಡಿದ್ದೀರಿ!";
+                    resetBtn.style.display = "inline-block";
+                }
+            } else {
+                // ತಪ್ಪು ಮ್ಯಾಚ್ ಆದಾಗ ಕಾರ್ಡ್‌ಗಳು ಕೆಂಪು ಬಣ್ಣಕ್ಕೆ ತಿರುಗಿ ನಾರ್ಮಲ್ ಆಗುತ್ತವೆ
+                const tempLeft = selectedLeft;
+                const tempRight = selectedRight;
+                
+                tempLeft.style.borderColor = '#ff4d4d';
+                tempRight.style.borderColor = '#ff4d4d';
+
+                setTimeout(() => {
+                    if (tempLeft.classList.contains('selected')) tempLeft.classList.remove('selected');
+                    if (tempRight.classList.contains('selected')) tempRight.classList.remove('selected');
+                    tempLeft.style.borderColor = '';
+                    tempRight.style.borderColor = '';
+                }, 500);
+
+                selectedLeft = null;
+                selectedRight = null;
+            }
+        }
+    }
+
+    function resetGame() {
+        initGame();
+    }
+
+    // ಆಟವನ್ನು ಪ್ರಾರಂಭಿಸುವುದು
+    initGame();
+</script>
+
+</body>
+</html>
