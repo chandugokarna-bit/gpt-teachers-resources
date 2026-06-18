@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಹುತ್ತರಿ ಹಾಡು - ಕಾವ್ಯ ಭಾವಾರ್ಥ ಕನ್ಸೋಲ್</title>
+    <style>
+        :root {
+            --neon-gold: #ffd700;
+            --neon-cyan: #00f2fe;
+            --neon-green: #39ff14;
+            --neon-pink: #ff007f;
+            --dark-core: #06070a;
+            --panel-bg: rgba(22, 26, 38, 0.98);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: radial-gradient(circle at center, #1b2035 0%, var(--dark-core) 100%);
+            margin: 0;
+            padding: 20px;
+            color: #fff;
+            min-height: 100vh;
+        }
+
+        .ai-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: var(--panel-bg);
+            border-radius: 24px;
+            padding: 30px;
+            box-shadow: 0 0 40px rgba(255, 215, 0, 0.15);
+            border: 2px solid rgba(255, 215, 0, 0.2);
+        }
+
+        header {
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 2.3rem;
+            background: linear-gradient(90deg, var(--neon-gold), var(--neon-cyan), var(--neon-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 0 0 10px 0;
+            font-weight: 800;
+        }
+
+        .instruction {
+            color: #a0aabf;
+            font-size: 1.1rem;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        /* Split Screen Engine Layout */
+        .split-engine {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 25px;
+            margin-top: 20px;
+        }
+
+        /* Left Side: Poem Paragraphs */
+        .poem-stream {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .poem-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-left: 5px solid var(--neon-cyan);
+            border-radius: 14px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            line-height: 1.8;
+            font-size: 1.15rem;
+        }
+
+        .poem-card:hover {
+            border-color: var(--neon-gold);
+            background: rgba(255, 215, 0, 0.04);
+            transform: scale(1.01);
+        }
+
+        .poem-card.active {
+            background: rgba(0, 242, 254, 0.08);
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 20px rgba(0, 242, 254, 0.2);
+        }
+
+        .para-tag {
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: var(--neon-gold);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        /* Right Side: Smart Summary Display */
+        .summary-display {
+            background: rgba(0, 0, 0, 0.3);
+            border: 2px dashed rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 25px;
+            position: sticky;
+            top: 40px;
+            height: fit-content;
+            min-height: 300px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .summary-display.highlight {
+            border-color: var(--neon-green);
+            background: rgba(57, 255, 20, 0.02);
+            box-shadow: 0 0 25px rgba(57, 255, 20, 0.1);
+        }
+
+        .summary-title {
+            color: var(--neon-green);
+            font-size: 1.4rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            border-bottom: 1px solid rgba(57, 255, 20, 0.2);
+            padding-bottom: 10px;
+        }
+
+        .summary-body {
+            font-size: 1.2rem;
+            line-height: 1.7;
+            color: #e2e8f0;
+            text-align: justify;
+        }
+
+        .placeholder-text {
+            color: #666;
+            text-align: center;
+            font-size: 1.2rem;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+
+<div class="ai-container">
+    <header>
+        <h1>🌾 ಹುತ್ತರಿ ಹಾಡು: ಕಾವ್ಯ ಸಾರಾಂಶ ಮ್ಯಾಟ್ರಿಕ್ಸ್ 🌾</h1>
+        <p style="margin: 0; color: #a0aabf;">ಪಂಜೆ ಮಂಗೇಶರಾವ್ ಅವರ ಅದ್ಭುತ ಪ್ರಕೃತಿ ಕಾವ್ಯದ ಡಿಜಿಟಲ್ ಲೋಕ</p>
+    </header>
+
+    <div class="instruction">💡 **ಮಕ್ಕಳಿಗಾಗಿ ಸೂಚನೆ:** ಎಡಭಾಗದ ಯಾವುದೇ ಪ್ಯಾರಾಗ್ರಾಫ್ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ, ಬಲಭಾಗದಲ್ಲಿ ಅದರ ಅತ್ಯಂತ ಸರಳ ಸಾರಾಂಶವನ್ನು ತಕ್ಷಣ ನೋಡಿ ತಿಳಿಯಿರಿ!</div>
+
+    <div class="split-engine">
+        <!-- LEFT COLUMN: POEM LINES -->
+        <div class="poem-stream">
+            <div class="poem-card" onclick="showSummary(0, this)">
+                <div class="para-tag">ಪ್ಯಾರಾಗ್ರಾಫ್ ೧</div>
+                ಎಲ್ಲಿ ಭೂರಮೆ ದೇವ ಸನ್ನಿಧಿ ಬಯಸಿ ಬಿಮ್ಮನೆ ಬಂದಳೋ?<br>
+                Sub ಎಲ್ಲಿ ಮೋಹನ ಗಿರಿಯ ಬೆರಗಿನ ರೂಪಿನಿಂದಲಿ ನಿಂದಳೋ?<br>
+                ಎಲ್ಲಿ ಮುಗಿಲಲಿ ಮಿಂಚಿನೋಲ್ ಕಾವೇರಿ ಹೊಳೆ ಹೊಳೆ ಹೊಳೆವಳೋ?<br>
+                ಎಲ್ಲಿ ನೆಲವನು ತಣಿಸಿ ಜನಮನ ಹೊಲದ ಕಳೆಕಳೆ ಕಳೆವಳೋ?<br>
+                ಅಲ್ಲೆ ಆ ಕಡೆ ನೋಡಲಾ! ಅಲ್ಲೆ ಕೊಡಗರ ನಾಡಲಾ! ಅಲ್ಲೆ ಕೊಡವರ ಬೀಡಲಾ!
+            </div>
+
+            <div class="poem-card" onclick="showSummary(1, this)">
+                <div class="para-tag">ಪ್ಯಾರಾಗ್ರಾಫ್ ೨</div>
+                ಸವಿದು ಮೆದ್ದರೊ ಯಾರು ಪೂರ್ವದಿ ಹುಲಿಯ ಹಾಲಿನ ಮೇವನು?<br>
+                ಕವಣೆ ತಿರಿಕಲ್ಲಾಟ ಹಗ್ಗಕೆ ಸೆಳೆದರೋ ಹೆಬ್ಬಾವನು?<br>
+                ಸವರಿ ಆನೆಯ ಸೊಂಡಲಿನ ರಣಕೊಂಬನಾರ್ ಭೋರ್ಗರೆದರೋ?<br>
+                ಸವೆದು ಸವೆಯದ ಸಾಹಸತ್ವದ ಕ್ಷಾತ್ರ ಬೇಟೆಯ ಮೆರೆದರೋ?<br>
+                ಅವರು ಸೋಲ್ ಸಾವರಿಯರು! ಅವರು ಕಡುಗಲಿ ಗರಿಯರು! ಅವರೆ ಕೊಡಗಿನ hಿರಿಯರು!
+            </div>
+
+            <div class="poem-card" onclick="showSummary(2, this)">
+                <div class="para-tag">ಪ್ಯಾರಾಗ್ರಾಫ್ ೩</div>
+                ತಮ್ಮ ನಾಡಿನ ಕೊರಳು ದಾಸ್ಯದ ನೊಗದ ಭಾರಕೆ ಬಗ್ಗದೋಲ್<br>
+                ಹೆಮ್ಮೆಹಗೆಗಳ ಹೊಡೆದು ಹಿರಿಯರು ಹಸಿದು ಹಾರುವ ಬಗ್ಗದೋಲ್<br>
+                ಬೊಮ್ಮಗಿರಿಯಿಂ ಪುಷ್ಪಗಿರಿ ಪರ್ಯಂತ ಬೆಳೆದೀ ದೇಶವು<br>
+                ಧರ್ಮದಾನವ ಕಟ್ಟು ಕಟ‍್ಠಳೆ ರೀತಿ ನೀತಿಯ ಕೋಶವು<br>
+                ನಮ್ಮ ಕೊಡಗಿದು ಜಮ್ಮ ಕೊಡಗಿದು ನಮ್ಮೊಡಲ್ ಬಿಡಲಮ್ಮದು !
+            </div>
+
+            <div class="poem-card" onclick="showSummary(3, this)">
+                <div class="para-tag">ಪ್ಯಾರಾಗ್ರಾಫ್ ೪</div>
+                ಇದು ಅಗಸ್ಯನ ತಪದ ಮನೆ, ಕಾವೇರಿ ತಾಯ ತವರ್ಮನೆ,<br>
+                ಕದನ ಸಿರಿಗುಯ್ಯಾಲೆ ತೂಗಿದನಿಲ್ಲಿ ಚಂದರವರ್ಮನೆ!<br>
+                ಇದಕೊ! ಚೆಂಗಾಳ್ವರಸರಾಡಂಬರವು ಕುಣಿದ ಶ್ರೀರಂಗವು<br>
+                ಇದೊ! ಇದೊ! ಇಲ್ಲರುಳ ಹಾಲೇರಿಯರ ಬಲಗಿರಿಶೃಂಗವು<br>
+                ವಿಧಿಯ ಮಾಟದ ಕೊಡಗಿದು ಮೊದಲೆ ನಮ್ಮದು, ಕಡೆಗಿದು ಕದಲದೆಮ್ಮನು; ಬೆಡಗಿದು.
+            </div>
+
+            <div class="poem-card" onclick="showSummary(4, this)">
+                <div class="para-tag">ಪ್ಯಾರಾಗ್ರಾಫ್ ೫</div>
+                ಒಮ್ಮತವು ಒಗ್ಗಟ್ಟು ಒಂದೇ ಮನವು ಎಲ್ಲಿದೆ ಹೇಳಿರಿ?<br>
+                ಸುಮ್ಮನಿತ್ತರೊ ದಟ್ಟಿಕುಪ್ಪಸ? ಹಾಡುಹುತ್ತರಿಗೇಳಿರಿ!<br>
+                ಚಿಮ್ಮಿ ಪಾತುರೆಕೋಲ ಹೊಯ್ಲಿಗೆ ಕುಣಿವ ಪದ ಹೊರ ಹೊಮ್ಮಲಿ!<br>
+                ಅಮ್ಮೆ ಹರಸಿದ ಸೀಮೆ ನಮಗಿದು ಇರಲಿ ನಮ್ಮದೆ ನಮ್ಮಲಿ!<br>
+                ನೆಮ್ಮದಿಯನಿದು ತಾಳಲಿ ಅಮ್ಮೆಯಾ ಬಲತೋಳಲಿ ನಮ್ಮ ಕೊಡಗಿದು ಬಾಳಲಿ
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN: SMART DYNAMIC SUMMARY -->
+        <div class="summary-display" id="summary-panel">
+            <div class="placeholder-text" id="placeholder">👈 ಯಾವುದೇ ಪ್ಯಾರಾಗ್ರಾಫ್ ಸಾಲುಗಳನ್ನು ಕ್ಲಿಕ್ ಮಾಡಿದಾಗ ಅದರ ಸರಳ ಭಾವಾರ್ಥ ಇಲ್ಲಿ ಮೂಡುತ್ತದೆ.</div>
+            <div id="summary-content" style="display: none;">
+                <div class="summary-title" id="s-title">ಭಾವಾರ್ಥ</div>
+                <div class="summary-body" id="s-body">ಸಾರಾಂಶ ಕಂಟೆಂಟ್...</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Pure, Short and Crisp Summaries derived directly from the textbook context
+    const summaries = [
+        "ಭೂದೇವಿಯು ದೇವರ ಸಾನ್ನಿಧ್ಯವನ್ನು ಬಯಸಿ ಸೌಂದರ್ಯದ ರೂಪದಿಂದ ಬಂದು ನಿಂತಿರುವ ಜಾಗವೇ ಕೊಡಗು[cite: 1]. ಇಲ್ಲಿ ಆಕಾಶದಲ್ಲಿ ಮಿಂಚಿನಂತೆ ಹೊಳೆಯುವ ಕಾವೇರಿ ನದಿಯು ಹರಿದು[cite: 1], ಇಡೀ ನೆಲವನ್ನು ತಣಿಸಿ ಜನರ ಮನಸ್ಸಿನ ಬೇಸರವನ್ನು ಕಳೆದು ಸಂತೋಷ ನೀಡುತ್ತದೆ[cite: 1]. ಅದೇ ಕೊಡಗರ ಸುಂದರ ನಾಡು ಮತ್ತು ಶೂರರ ಬೀಡು[cite: 1].",
+        "ಕೊಡಗಿನ ಹಿರಿಯರು ಅತ್ಯಂತ ಸಾಹಸಿಗಳು[cite: 1]. ಅವರು ಹುಲಿಯ ಹಾಲನ್ನು ಕುಡಿದು ಬೆಳೆದ ಶೂರರಾಗಿದ್ದು[cite: 1], ದೊಡ್ಡ ಹೆಬ್ಬಾವನ್ನೇ ಹಗ್ಗದಂತೆ ಸೆಳೆಯುವ ಮತ್ತು ಆನೆಯ ಸೊಂಡಲನ್ನು ಸವರಿ ಯುದ್ಧದ ರಣಕೊಂಬನ್ನು ಊದುವ ಧೀರರಾಗಿದ್ದಾರೆ[cite: 1]. ಇವರು ಸೋಲನ್ನೇ ಅರಿಯದ ಕಡುಗಲಿಗಳು ಮತ್ತು ಸಾಹಸ ಬೇಟೆಯನ್ನು ಮೆರೆದ ಹಿರಿಯರಾಗಿದ್ದಾರೆ[cite: 1].",
+        "ಕೊಡಗಿನ ಹಿರಿಯರು ತಮ್ಮ ನಾಡಿನ ಗೌರವವನ್ನು ಎಂದಿಗೂ ಗುಲಾಮಗಿರಿಗೆ ಒಪ್ಪಿಸದವರು[cite: 1]. ಹಸಿದ ಹುಲಿಯಂತೆ ಶತ್ರುಗಳನ್ನು ಬೇಟೆಯಾಡಿದವರು[cite: 1]. ಬೊಮ್ಮಗಿರಿಯಿಂದ ಪುಷ್ಪಗಿರಿ ತನಕ ವಿಸ್ತರಿಸಿರುವ ಈ ನಾಡು ಧರ್ಮ, ದಾನ, ರೀತಿ-ನೀತಿಗಳ ಕಣಜವಾಗಿದೆ[cite: 1]. ನಮ್ಮ ಪ್ರಾಣ ಹೋದರೂ ಈ ಜಮ್ಮ ಕೊಡಗನ್ನು ನಾವು ಬಿಟ್ಟುಕೊಡುವುದಿಲ್ಲ[cite: 1].",
+        "ಕೊಡಗು ನಾಡು ಅಗಸ್ತ್ಯ ಮುನಿಗಳು ತಪಸ್ಸು ಮಾಡಿದ ಪವಿತ್ರ ಭೂಮಿ ಮತ್ತು ಕಾವೇರಿ ತಾಯಿಯ ತಾಯ್ಮನೆಯಾಗಿದೆ[cite: 1]. ಚಂದರವರ್ಮ, ಚೆಂಗಾಳ್ವರಸರು ಹಾಗೂ ಹಾಲೇರಿ ರಾಜವಂಶಸ್ಥರು ಆಡಳಿತ ನಡೆಸಿ ವೈಭವ ಮೆರೆದ ವೀರಭೂಮಿ ಇದಾಗಿದ್ದು, ಇದು ಪ್ರಕೃತಿ ನಿರ್ಮಿಸಿದ ಕದಲದ ಸುಂದರ ನಾಡಾಗಿದೆ[cite: 1].",
+        "ಕೊಡಗಿನ ಜನರಲ್ಲಿ ಸದಾ ಒಗ್ಗಟ್ಟು ಮತ್ತು ಒಂದೇ ಮನಸ್ಸು ಇರಬೇಕು[cite: 1]. ಸುಗ್ಗಿಯ ಹಬ್ಬವಾದ ಹುತ್ತರಿ ಬಂದಾಗ ಸಾಂಪ್ರದಾಯಿಕ ದಟ್ಟಿಕುಪ್ಪಸ ಧರಿಸಿ[cite: 1], ಪಾತುರೆಕೋಲನ್ನು ಚಿಮ್ಮುತ್ತಾ ಸಂಭ್ರಮದ ಹಾಡುಗಳೊಂದಿಗೆ ಕುಣಿಯಬೇಕು[cite: 1]. ತಾಯಿ ಕಾವೇರಿ ಹರಸಿದ ಈ ನಾಡು ಸದಾ ನೆಮ್ಮದಿಯಿಂದ ಬಾಳಲಿ ಎಂದು ಕವಿ ಹಾರೈಸಿದ್ದಾರೆ[cite: 1]."
+    ];
+
+    function showSummary(index, card) {
+        // Highlight active card
+        document.querySelectorAll('.poem-card').forEach(c => c.classList.remove('active'));
+        card.classList.add('active');
+
+        // Configure Summary View
+        document.getElementById('placeholder').style.display = 'none';
+        const content = document.getElementById('summary-content');
+        content.style.display = 'block';
+
+        const panel = document.getElementById('summary-panel');
+        panel.classList.add('highlight');
+        setTimeout(() => panel.classList.remove('highlight'), 400);
+
+        // Load Content
+        document.getElementById('s-title').innerText = ` ಪ್ಯಾರಾಗ್ರಾಫ್ ${index + 1} ರ ಸಂಕ್ಷಿಪ್ತ ಭಾವಾರ್ಥ`;
+        document.getElementById('s-body').innerText = summaries[index];
+    }
+</script>
+
+</body>
+</html>

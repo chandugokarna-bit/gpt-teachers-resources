@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಸ್ವಾತಂತ್ರ್ಯ ಸ್ವರ್ಗ - ನೆಕ್ಸ್ಟ್-ಜೆನ್ ವ್ಯಾಕರಣ ಮತ್ತು ಕ್ವಿಜ್ ಕನ್ಸೋಲ್</title>
+    <style>
+        :root {
+            --neon-blue: #00f2fe;
+            --neon-green: #39ff14;
+            --neon-pink: #ff007f;
+            --neon-purple: #9d4edd;
+            --neon-yellow: #ffee00;
+            --dark-core: #05060b;
+            --panel-bg: rgba(18, 20, 35, 0.98);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: radial-gradient(circle at center, #141a2e 0%, var(--dark-core) 100%);
+            margin: 0;
+            padding: 20px;
+            color: #fff;
+            min-height: 100vh;
+        }
+
+        .ai-container {
+            max-width: 950px;
+            margin: 0 auto;
+            background: var(--panel-bg);
+            border-radius: 24px;
+            padding: 30px;
+            box-shadow: 0 0 40px rgba(0, 242, 254, 0.15);
+            border: 2px solid rgba(0, 242, 254, 0.2);
+        }
+
+        header {
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 2.3rem;
+            background: linear-gradient(90deg, var(--neon-blue), var(--neon-purple), var(--neon-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 0 0 10px 0;
+            font-weight: 800;
+        }
+
+        /* 5 Activity Grid Navigation */
+        .matrix-nav {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+            margin-bottom: 35px;
+        }
+
+        .matrix-card {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 14px 8px;
+            border-radius: 12px;
+            cursor: pointer;
+            text-align: center;
+            font-weight: bold;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+
+        .matrix-card:hover {
+            border-color: var(--neon-blue);
+            background: rgba(0, 242, 254, 0.08);
+            transform: translateY(-2px);
+        }
+
+        .matrix-card.active {
+            background: linear-gradient(135deg, var(--neon-blue) 0%, var(--neon-purple) 100%);
+            color: #000;
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 20px rgba(0, 242, 254, 0.4);
+        }
+
+        .panel {
+            display: none;
+            background: rgba(0, 0, 0, 0.25);
+            border-radius: 16px;
+            padding: 25px;
+            border: 1px solid rgba(255,255,255,0.05);
+            min-height: 400px;
+        }
+
+        .panel.active { display: block; }
+
+        h2 { color: var(--neon-blue); margin-top: 0; margin-bottom: 20px; }
+
+        .dashboard-hud {
+            display: flex; justify-content: space-between; background: rgba(0,0,0,0.4);
+            padding: 12px 20px; border-radius: 10px; margin-bottom: 25px;
+            border-left: 4px solid var(--neon-pink); font-weight: bold;
+        }
+
+        /* MCQ Grid */
+        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px; }
+        .game-btn {
+            background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1);
+            color: white; padding: 16px; border-radius: 10px; font-size: 1.05rem;
+            cursor: pointer; text-align: left; transition: 0.2s; line-height: 1.4;
+        }
+        .game-btn:hover { border-color: var(--neon-blue); background: rgba(255,255,255,0.08); }
+        .game-btn.correct { background: rgba(57, 255, 20, 0.15) !important; border-color: var(--neon-green) !important; color: var(--neon-green); }
+        .game-btn.wrong { background: rgba(255, 0, 127, 0.15) !important; border-color: var(--neon-pink) !important; color: var(--neon-pink); }
+
+        /* Sorter System (Act 3) */
+        .basket-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; }
+        .cyber-basket { background: rgba(0,0,0,0.4); border: 2px dashed rgba(255,255,255,0.15); border-radius: 15px; padding: 20px; min-height: 140px; }
+        .item-capsule { background: var(--neon-purple); color: white; padding: 8px 16px; border-radius: 20px; display: inline-block; margin: 5px; cursor: pointer; font-weight: bold; }
+
+        /* Reveal Box */
+        .reveal-box {
+            background: rgba(0, 242, 254, 0.04); border: 1px dashed var(--neon-blue);
+            border-radius: 8px; padding: 12px; margin-top: 15px; cursor: pointer; text-align: center;
+        }
+        .reveal-content { display: none; color: #fff; font-size: 1.1rem; margin-top: 8px; border-top: 1px solid rgba(0,242,254,0.2); padding-top: 8px; line-height: 1.5; }
+    </style>
+</head>
+<body>
+
+<div class="ai-container">
+    <header>
+        <h1>✨ ಸ್ವಾತಂತ್ರ್ಯ ಸ್ವರ್ಗ ಕನ್ಸೋಲ್ ✨</h1>
+        <p style="margin: 0; color: #a0aabf;">ದ್ವಿತೀಯ ಪದ್ಯದ ವಿನೂತನ ವ್ಯಾಕರಣ ಮತ್ತು ರಸಪ್ರಶ್ನೆ ಅಖಾಡ</p>
+    </header>
+
+    <!-- 5 Activity Navigation Matrix -->
+    <div class="matrix-nav">
+        <div class="matrix-card active" data-target="act1">೧. ಪದ್ಯದ ರಸಪ್ರಶ್ನೆ</div>
+        <div class="matrix-card" data-target="act2">೨. ಕಾವ್ಯ ವಿವರಣೆ ಹಬ್</div>
+        <div class="matrix-card" data-target="act3">೩. ವಚನಗಳ ವರ್ಗೀಕರಣ</div>
+        <div class="matrix-card" data-target="act4">೪. ಪದ ವಿಂಗಡಣೆ ಯಂತ್ರ</div>
+        <div class="matrix-card" data-target="act5">೫. ಸಮಾನಾರ್ಥಕ ಲೋಕ</div>
+    </div>
+
+    <!-- ACT 1: COMPREHENSION MCQ -->
+    <div id="act1" class="panel active">
+        <h2>🎯 ಆಕ್ಟಿವಿಟಿ 1: ಕಾವ್ಯ ಗ್ರಹಿಕೆ (ಒಂದು ವಾಕ್ಯದ ಪ್ರಶ್ನೆಗಳು)</h2>
+        <div class="dashboard-hud"><span id="hud-a1-q">ಪ್ರಶ್ನೆ: 1/4</span><span id="hud-a1-s">ಸ್ಕೋರ್: 0</span></div>
+        <div class="question-card">
+            <div id="a1-qtext" style="font-size: 1.3rem; margin-bottom: 20px; font-weight: bold;">ಲೋಡ್ ಆಗುತ್ತಿದೆ...</div>
+            <div class="options-grid" id="a1-options"></div>
+        </div>
+    </div>
+
+    <!-- ACT 2: REFLECTIVE REVEAL BOXES -->
+    <div id="act2" class="panel">
+        <h2>📝 ಆಕ್ಟಿವಿಟಿ 2: ವೈಚಾರಿಕ ಸಾರಾಂಶ前进 ಸ್ಪೇಸ್ (ದೀರ್ಘ ಚಿಂತನೆ)</h2>
+        <p style="color: #ccc; margin-bottom: 20px;">ಸೂಚನೆ: ಕೆಳಗಿನ ಪ್ರಮುಖ ವೈಚಾರಿಕ ಪ್ರಶ್ನೆಗಳ ಉತ್ತರವನ್ನು ಯೋಚಿಸಿ ನಿಮ್ಮ ನೋಟ್‌ಬುಕ್‌ನಲ್ಲಿ ಬರೆಯಿರಿ. ನಂತರ ಸಹಾಯ ಪೆಟ್ಟಿಗೆಯನ್ನು ಬಳಸಿ ಪರಿಶೀಲಿಸಿ:</p>
+        
+        <div class="question-card">
+            <div style="font-size:1.2rem; font-weight:bold;">೧. ಕವಿಯು ಆಶಿಸುವ ಸ್ವಾತಂತ್ರ್ಯವು ಎಂತಹ ಸ್ವರ್ಗವಾಗಬೇಕು? (ಆಶಯ ಭಾಗದ ಆಧಾರದ ಮೇಲೆ)</div>
+            <div class="reveal-box" onclick="toggleReveal('rev1')">
+                <span style="color:var(--neon-blue); font-weight:bold;">💡 ಉತ್ತರ ಪರಿಶೀಲಿಸಲು ಇಲ್ಲಿ ಕ್ಲಿಕ್ ಮಾಡಿ</span>
+                <div class="reveal-content" id="rev1">ಕವಿಯು ಆಶಿಸುವ ಸ್ವಾತಂತ್ರ್ಯವು ಕೇವಲ ಸ್ವಚ್ಛಂದತೆಯ ಅಥವಾ ಶ್ವೇಚ್ಛೆಯ ಸ್ವರ್ಗವಲ್ಲ[cite: 1]. ಅಲ್ಲಿ ಯಾವುದೇ ಹೆದರಿಕೆ ಇರಬಾರದು[cite: 1]. ಜನರು ತಮ್ಮ ಬಗ್ಗೆ, ತಮ್ಮವರ ಬಗ್ಗೆ ಹಾಗೂ ತಮ್ಮ ನಾಡಿನ ಬಗ್ಗೆ ಹೆಮ್ಮೆಯಿಂದ ತಲೆಯೆತ್ತಿ ನಡೆಯುವಂತಿರಬೇಕು ಮತ್ತು ಎಲ್ಲರೂ ಒಂದು ಎಂಬ ಜೀವಪ್ರೇಮದ ಭಾವನೆ ಅಲ್ಲಿರಬೇಕು[cite: 1].</div>
+            </div>
+        </div>
+
+        <div class="question-card">
+            <div style="font-size:1.2rem; font-weight:bold;">೨. "ವಿಶ್ವವೆಂಬುವುದೆಲ್ಲ ಹೋಳು ಹೋಳಾಗದೆಯೆ ಒಂದಾಗಿ ಚೆಂದಾಗಿ ಬಾಳುತಿಹುದು" - ಈ ಸಾಲಿನ ಅರ್ಥವೇನು?</div>
+            <div class="reveal-box" onclick="toggleReveal('rev2')">
+                <span style="color:var(--neon-blue); font-weight:bold;">💡 ಉತ್ತರ ಪರಿಶೀಲಿಸಲು ಇಲ್ಲಿ ಕ್ಲಿಕ್ ಮಾಡಿ</span>
+                <div class="reveal-content" id="rev2">ಸ್ವಾತಂತ್ರ್ಯದ ನೈಜ ಸ್ವರ್ಗದಲ್ಲಿ ಜನರ ಮನಸ್ಸುಗಳು ಸಂಕುಚಿತ ಭಾವನೆಯಿಂದ ದೂರವಿರಬೇಕು[cite: 1]. ಜಾತಿ, ಮತ, ಭಾಷೆ ಅಥವಾ ಪ್ರಾಂತ್ಯಗಳ ಹೆಸರಿನಲ್ಲಿ ಇಡೀ ಜಗತ್ತು ಛಿನ್ನಭಿನ್ನವಾಗಿ ಹೋಳುಗಳಾಗಬಾರದು[cite: 1]. ಬದಲಾಗಿ ಇಡೀ ವಿಶ್ವವೇ ಒಂದು ಎಂಬ ವಿಶಾಲ ಮನೋವೃತ್ತಿಯಿಂದ ಎಲ್ಲರೂ ಒಟ್ಟಾಗಿ ಅತ್ಯಂತ ಸುಂದರವಾಗಿ ಬಾಳಬೇಕು ಎಂದು ಕವಿ ತಿಳಿಸಿದ್ದಾರೆ[cite: 1].</div>
+            </div>
+        </div>
+
+        <div class="question-card">
+            <div style="font-size:1.2rem; font-weight:bold;">೩. ಕವಿಯು ದಣಿವರಿಯದ ದುಡಿಮೆಯು ಪೂರ್ಣತೆಗೆ ಹೇಗೆ ಕೈಚಾಚಬೇಕು ಎಂದು ಬಯಸುತ್ತಾರೆ?</div>
+            <div class="reveal-box" onclick="toggleReveal('rev3')">
+                <span style="color:var(--neon-blue); font-weight:bold;">💡 ಉತ್ತರ ಪರಿಶೀಲಿಸಲು ಇಲ್ಲಿ ಕ್ಲಿಕ್ ಮಾಡಿ</span>
+                <div class="reveal-content" id="rev3">ಯಾರ ನಾಲಿಗೆಯಿಂದಲೂ ಸುಳ್ಳು ಹೊರಬರದೆ, ಎಲ್ಲರ ನಕ್ಕ ಹೂವಿನಂಥ ಮನಸ್ಸಿನ ಆಳದಿಂದ ಕೇವಲ ಸತ್ಯದ ನುಡಿಗಳು ಮಾತ್ರ ಹೊರಬರಬೇಕು[cite: 1]. ಅಲ್ಲಿ ನಡೆಯುವ ಪ್ರತಿಯೊಂದು ದುಡಿಮೆಯು ಕೇವಲ ಸ್ವಾರ್ಥಕ್ಕಾಗಿರದೆ, ಯಾವುದೇ ದಣಿವನ್ನು ಅರಿಯದೆ ಮತ್ತು ದಣಿವಿಂಗೆ ತಲೆಬಾಗದೆ ದೇಶದ ಸರ್ವಾಂಗೀಣ ಅಭಿವೃದ್ಧಿ ಹಾಗೂ ಪೂರ್ಣತೆಯ ಸಾಧನೆಗಾಗಿ ಸದಾ ಮುನ್ನಡೆಯುತ್ತಿರಬೇಕು ಎಂದು ಬಯಸುತ್ತಾರೆ[cite: 1].</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ACT 3: VACHANA GRAMMAR SORTER -->
+    <div id="act3" class="panel" style="border-color: var(--neon-green);">
+        <h2>🧺 ಆಕ್ಟಿವಿಟಿ 3: ಕ್ರಿಯಾತ್ಮಕ ವ್ಯಾಕರಣ (ಏಕವಚನ - ಬಹುವಚನ ವಿಂಗಡಣೆ)</h2>
+        <p style="color:#ccc;">ಪಠ್ಯಪುಸ್ತಕದ ವ್ಯಾಕರಣ ಮಾಹಿತಿಯಲ್ಲಿರುವ ಪದಗಳನ್ನು ಕ್ಲಿಕ್ ಮಾಡಿ ಸರಿಯಾದ ವಚನದ ಬುಟ್ಟಿಗೆ ವರ್ಗಾಯಿಸಿ[cite: 1]:</p>
+        <div id="word-pool" style="background:rgba(0,0,0,0.3); padding:15px; border-radius:10px; min-height:50px; margin-bottom:20px; text-align:center;"></div>
+        <div class="basket-grid">
+            <div class="cyber-basket" id="bin-ekavachana"><h3>👤 ಏಕವಚನ ಪದಗಳು[cite: 1]</h3></div>
+            <div class="cyber-basket" id="bin-bahuvachana"><h3>👥 ಬಹುವಚನ ಪದಗಳು[cite: 1]</h3></div>
+        </div>
+        <div style="text-align:center; margin-top:20px;"><button class="btn-action" onclick="verifySorting()">ಬುಟ್ಟಿಗಳನ್ನು ಪರಿಶೀಲಿಸಿ ✅</button></div>
+    </div>
+
+    <!-- ACT 4: WORD SPLITTING YANTRA -->
+    <div id="act4" class="panel" style="border-color: var(--neon-purple);">
+        <h2>🔄 ಆಕ್ಟಿವಿಟಿ 4: ಶಬ್ದ ವಿಶ್ಲೇಷಣೆ (ಪದ ವಿಂಗಡಣೆ ಯಂತ್ರ)</h2>
+        <div class="dashboard-hud"><span id="hud-a4-q">ಪ್ರಶ್ನೆ: 1/5</span><span id="hud-a4-s">ಸ್ಕೋರ್: 0</span></div>
+        <div class="question-card">
+            <p style="color: #aaa;">ಪಠ್ಯಪುಸ್ತಕದಲ್ಲಿ ನೀಡಿರುವ 'ಪದ ವಿಂಗಡಣೆ' ನಿಯಮದಂತೆ ಸರಿಯಾದ ಬಿಡಿಸಿದ ರೂಪವನ್ನು ಆರಿಸಿ[cite: 1]:</p>
+            <div id="a4-qtext" style="font-size: 1.3rem; margin-bottom: 20px; font-weight: bold;">ಲೋಡ್ ಆಗುತ್ತಿದೆ...</div>
+            <div class="options-grid" id="a4-options"></div>
+        </div>
+    </div>
+
+    <!-- ACT 5: SYNONYMS MCQ -->
+    <div id="act5" class="panel" style="border-color: var(--neon-yellow);">
+        <h2>🌟 ಆಕ್ಟಿವಿಟಿ 5: ಶಬ್ದಕೋಶ ಮಲ್ಟಿವರ್ಸ್ (ಸಮಾನಾರ್ಥಕ ಪದಗಳ ಅನ್ವೇಷಣೆ)</h2>
+        <div class="dashboard-hud"><span id="hud-a5-q">ಪ್ರಶ್ನೆ: 1/5</span><span id="hud-a5-s">ಸ್ಕೋರ್: 0</span></div>
+        <div class="question-card">
+            <p style="color: #aaa;">ಪಠ್ಯಪುಸ್ತಕದ ಅಭ್ಯಾಸ ಭಾಗದಲ್ಲಿ ಕೇಳಲಾಗಿರುವ ಪದಕ್ಕೆ ಸರಿಯಾದ ಸಮಾನಾರ್ಥಕ ರೂಪ ಆರಿಸಿ[cite: 1]:</p>
+            <div id="a5-qtext" style="font-size: 1.3rem; margin-bottom: 20px; font-weight: bold;">ಲೋಡ್ ಆಗುತ್ತಿದೆ...</div>
+            <div class="options-grid" id="a5-options"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // NAVIGATION MATRIX LOGIC
+    document.querySelectorAll('.matrix-card').forEach(card => {
+        card.addEventListener('click', () => {
+            document.querySelectorAll('.matrix-card').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+            card.classList.add('active');
+            document.getElementById(card.dataset.target).classList.add('active');
+        });
+    });
+
+    function toggleReveal(id) {
+        const target = document.getElementById(id);
+        target.style.display = target.style.display === 'block' ? 'none' : 'block';
+    }
+
+    // --- ACTIVITY 1: COMPREHENSION MCQ DATA ---
+    const act1Data = [
+        {q: "೧. ಸ್ವಾತಂತ್ರ್ಯ ಸ್ವರ್ಗದಲ್ಲಿ ಅಭಿಮಾನಧನವೆನಿಪ ಮಸ್ತಕವು (ತಲೆ) ಹೇಗೆ ನಿಂತಿರುತ್ತದೆ?[cite: 1]", o: ["ಬಯದಿಂದ ಜಗ್ಗಿ ನಿಂತಿರುತ್ತದೆ", "ಜಗ್ಗದೆಯೆ ಕುಗ್ಗದೆಯೆ ತಗ್ಗದೆಯೆ ಬಗ್ಗದೆಯೆ ನೀಟಾಗಿ ನಿಂತಿರುವುದು[cite: 1]", "ಸಂಕುಚಿತವಾಗಿ ತಗ್ಗಿರುತ್ತದೆ"], a: "ಜಗ್ಗದೆಯೆ ಕುಗ್ಗದೆಯೆ ತಗ್ಗದೆಯೆ ಬಗ್ಗದೆಯೆ ನೀಟಾಗಿ ನಿಂತಿರುವುದು[cite: 1]"},
+        {q: "೨. ಕವಿಯ ಆಶಯದ ಪ್ರಕಾರ ಅಲ್ಲಿ 'ಅರಿವು' (ಜ್ಞಾನ) ಎಂತಹದ್ದಾಗಿರಬೇಕು?[cite: 1]", o: ["ಸಂಕುಚಿತವಾಗಿರಬೇಕು", "ಸರ್ವಸ್ವತಂತ್ರವಾಗಿರಲಿಹುದು[cite: 1]", "ಬಂಧನದಲ್ಲಿರಬೇಕು"], a: "ಸರ್ವಸ್ವತಂತ್ರವಾಗಿರಲಿಹುದು[cite: 1]"},
+        {q: "೩. ಸಂಪ್ರದಾಯದ ಅನಿಷ್ಟ ರೂಢಿ-ನಿಯಮಗಳನ್ನು ಕವಿ ಯಾವುದಕ್ಕೆ ಹೋಲಿಸಿದ್ದಾರೆ?[cite: 1]", o: ["ಹಸಿರು ಕಣಿವೆಯ ಬಯಲಿಗೆ", "ನಿರ್ಜನದ ಮರುಭೂಮಿ ಹರಹಿಗೆ[cite: 1]", "ಪರಿಶುದ್ಧ ಹರಿಯುವ ನದಿಗೆ"], a: "ನಿರ್ಜನದ ಮರುಭೂಮಿ ಹರಹಿಗೆ[cite: 1]"},
+        {q: "೪. ಕವಿಯು ತನ್ನ ಒಲವು, ದಯೆ ಮತ್ತು ಕೃಪೆಯಿಂದ ಯಾರನ್ನು ಧ್ರುವತಾರೆ ಎಂದು ಅರಿಯಬೇಕು ಎನ್ನುತ್ತಾರೆ?[cite: 1]", o: ["ಬ್ರಿಟಿಷ್ ಅಧಿಕಾರಿಗಳನ್ನು", "ಸ್ವಾತಂತ್ರ್ಯದ ದೇವನನ್ನು / ಓ ತಂದೆ (ಭಗವಂತನನ್ನು)[cite: 1]", "ಸಂಪ್ರದಾಯದ ನಿಯಮಗಳನ್ನು"], a: "ಸ್ವಾತಂತ್ರ್ಯದ ದೇವನನ್ನು / ಓ ತಂದೆ (ಭಗವಂತನನ್ನು)[cite: 1]"}
+    ];
+    let a1Idx = 0, a1Score = 0;
+    function loadAct1() {
+        if(a1Idx >= act1Data.length) { document.getElementById('a1-qtext').innerText = `🏆 ಕಾವ್ಯ ರಸಪ್ರಶ್ನೆ ಮುಕ್ತಾಯ! ನಿಮ್ಮ ಒಟ್ಟು ಅಂಕಗಳು: ${a1Score * 25}/100`; document.getElementById('a1-options').innerHTML=''; return; }
+        document.getElementById('hud-a1-q').innerText = `ಪ್ರಶ್ನೆ: ${a1Idx+1}/4`;
+        document.getElementById('hud-a1-s').innerText = `ಸ್ಕೋರ್: ${a1Score * 25}`;
+        const item = act1Data[a1Idx]; document.getElementById('a1-qtext').innerText = item.q;
+        const box = document.getElementById('a1-options'); box.innerHTML = '';
+        item.o.forEach(o => {
+            const btn = document.createElement('button'); btn.className = 'game-btn'; btn.innerText = o;
+            btn.onclick = () => {
+                if(o === item.a) { btn.classList.add('correct'); a1Score++; } else { btn.classList.add('wrong'); }
+                setTimeout(() => { a1Idx++; loadAct1(); }, 700);
+            };
+            box.appendChild(btn);
+        });
+    }
+
+    // --- ACTIVITY 3: VACHANA GRAMMAR SORTER DATA ---
+    const poolWords = [
+        {w: "ಪುಸ್ತಕ[cite: 1]", target: "bin-ekavachana"}, {w: "ಮನೆ[cite: 1]", target: "bin-ekavachana"}, {w: "ಬಾಲಕ[cite: 1]", target: "bin-ekavachana"},
+        {w: "ಚೆಂಡುಗಳು[cite: 1]", target: "bin-bahuvachana"}, {w: "ಹುಡುಗಿಯರು[cite: 1]", target: "bin-bahuvachana"}, {w: "ಮುದುಕರು[cite: 1]", target: "bin-bahuvachana"}
+    ];
+    function loadAct3() {
+        const pool = document.getElementById('word-pool'); pool.innerHTML = '';
+        poolWords.sort(() => Math.random() - 0.5).forEach((item, i) => {
+            pool.innerHTML += `<span class="item-capsule" id="vach-${i}" onclick="selectVachWord('vach-${i}')">${item.w}</span>`;
+        });
+    }
+    let selectedVachId = null;
+    function selectVachWord(id) {
+        selectedVachId = id;
+        document.getElementById('bin-ekavachana').onclick = () => moveToBin('bin-ekavachana');
+        document.getElementById('bin-bahuvachana').onclick = () => moveToBin('bin-bahuvachana');
+        alert("ಪದವನ್ನು ಆರಿಸಲಾಗಿದೆ! ಈಗ ಕೆಳಗಿನ ಸರಿಯಾದ ವಚನದ ಬುಟ್ಟಿಯ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ.");
+    }
+    function moveToBin(binId) {
+        if(selectedVachId) {
+            document.getElementById(binId).appendChild(document.getElementById(selectedVachId));
+            selectedVachId = null;
+        }
+    }
+    function verifySorting() {
+        let allCorrect = true;
+        poolWords.forEach((item, i) => {
+            const el = document.getElementById(`vach-${i}`);
+            if(!el || el.parentElement.id !== item.target) allCorrect = false;
+        });
+        alert(allCorrect ? "🥳 ವರ್ಗೀಕರಣ ನೂರಕ್ಕೆ ನೂರು ಸರಿಯಾಗಿದೆ!" : "❌ ಕೆಲವು ಪದಗಳು ತಪ್ಪು ಲೇನ್‌ಗೆ ಹೋಗಿವೆ, ಮತ್ತೊಮ್ಮೆ ಪ್ರಯತ್ನಿಸಿ ಬಾಲಮಿತ್ರರೇ.");
+    }
+
+    // --- ACTIVITY 4: WORD SPLITTING DATA ---
+    const act4Data = [
+        {q: "೧. 'ನಿರ್ಮುಕ್ತ' ಪದದ ಸರಿಯಾದ ವಿಂಗಡಣೆ ರೂಪ ಆರಿಸಿ:[cite: 1]", o: ["ನಿರ + ಮುಕ್ತ", "ನಿರ್ + ಮುಕ್ತ[cite: 1]", "ನಿರ್ಮು + ಕತ್ತ"], a: "ನಿರ್ + ಮುಕ್ತ[cite: 1]"},
+        {q: "೨. 'ನಿನ್ನೊಲವು' ಪದವನ್ನು ಪಠ್ಯಪುಸ್ತಕದಂತೆ ಬಿಡಿಸಿ ಬರೆದಾಗ:[cite: 1]", o: ["ನಿನ್ನ + ಒಲವು[cite: 1]", "ನಿನ್ನೊ + ಲವು", "ನಿನ್ + ಒಲವು"], a: "ನಿನ್ನ + ಒಲವು[cite: 1]"},
+        {q: "೩. 'ಹರಿಗಡಿಯದೆ' ಪದದ ಸರಿಯಾದ ವಿಂಗಡಣೆ ಯಾವುದು?[cite: 1]", o: ["ಹರಿಗ + ಅಡಿಯದೆ", "ಹರಿ + ಗಡಿಯದೆ", "ಹರಿ + ಕಡಿಯದೆ[cite: 1]"], a: "ಹರಿ + ಕಡಿಯದೆ[cite: 1]"},
+        {q: "೪. 'ಮನವರಳಿ' ಪದವನ್ನು ಬಿಡಿಸಿ ಬರೆಯುವ ಸರಿಯಾದ ಶೈಲಿ:[cite: 1]", o: ["ಮನ + ವರಳಿ", "ಮನ + ಅರಳಿ[cite: 1]", "ಮನವ + ರಳಿ"], a: "ಮನ + ಅರಳಿ[cite: 1]"},
+        {q: "೫. 'ಧ್ರುವತಾರೆಯೆಂದರಿವುದು' ಪದದ ಪೂರ್ಣ ಪದ ವಿಂಗಡಣೆ ರೂಪ ಆರಿಸಿ:[cite: 1]", o: ["ಧ್ರುವತಾರೆ + ಎಂದು + ಅರಿವುದು[cite: 1]", "ಧ್ರುವತಾರೆಯೆ + ಅರಿವುದು", "ಧ್ರುವ + ತಾರೆ + ಅರಿವುದು"], a: "ಧ್ರುವತಾರೆ + ಎಂದು + ಅರಿವುದು[cite: 1]"}
+    ];
+    let a4Idx = 0, a4Score = 0;
+    function loadAct4() {
+        if(a4Idx >= act4Data.length) { document.getElementById('a4-qtext').innerText = `⚡ ಪದ ವಿಂಗಡಣೆ ಯಂತ್ರ ಮುಕ್ತಾಯಗೊಂಡಿದೆ! ನಿಮ್ಮ ಸ್ಕೋರ್: ${a4Score}/5`; document.getElementById('a4-options').innerHTML=''; return; }
+        document.getElementById('hud-a4-q').innerText = `ಪ್ರಶ್ನೆ: ${a4Idx+1}/5`;
+        document.getElementById('hud-a4-s').innerText = `ಸ್ಕೋರ್: ${a4Score}`;
+        const item = act4Data[a4Idx]; document.getElementById('a4-qtext').innerText = item.q;
+        const box = document.getElementById('a4-options'); box.innerHTML = '';
+        item.o.forEach(o => {
+            const btn = document.createElement('button'); btn.className = 'game-btn'; btn.innerText = o;
+            btn.style.borderColor = 'var(--neon-purple)';
+            btn.onclick = () => {
+                if(o === item.a) { btn.classList.add('correct'); a4Score++; } else { btn.classList.add('wrong'); }
+                setTimeout(() => { a4Idx++; loadAct4(); }, 700);
+            };
+            box.appendChild(btn);
+        });
+    }
+
+    // --- ACTIVITY 5: SYNONYMS MCQ DATA ---
+    const act5Data = [
+        {q: "೧. ಪದ್ಯದಲ್ಲಿ ಬಂದಿರುವ 'ಮस्तक' ಎಂಬ ಪದದ ನೈಜ ಅರ್ಥವೇನು?[cite: 1]", o: ["ಕೈಗಳು", "ತಲೆ / ಶಿರಸ್ಸು[cite: 1]", "ಪಾದಗಳು"], a: "ತಲೆ / ಶಿರಸ್ಸು[cite: 1]"},
+        {q: "೨. 'ಹರಹು' ಎಂಬ ಪದದ ನಿಖರವಾದ ಸಮಾನಾರ್ಥಕ ರೂಪ ಯಾವುದು?[cite: 1]", o: ["ಸಣ್ಣ ಜಾಗ", "ವಿಸ್ತಾರ / ಹರಡುವಿಕೆ[cite: 1]", "ಮರಳಿನ ರಾಶಿ"], a: "ವಿಸ್ತಾರ / ಹರಡುವಿಕೆ[cite: 1]"},
+        {q: "೩. 'ವಾಹಿನಿ' ಪದಕ್ಕೆ ಪಠ್ಯಪುಸ್ತಕದ ಪದಕೋಶದಲ್ಲಿ ನೀಡಲಾಗಿರುವ ಅರ್ಥವೇನು?[cite: 1]", o: ["ವಾಹನ", "ನದಿ / ಪರಿಶುದ್ಧ ಪ್ರವಾಹ[cite: 1]", "ದೊಡ್ಡ ಬೆಟ್ಟ"], a: "ನದಿ / ಪರಿಶುದ್ಧ ಪ್ರವಾಹ[cite: 1]"},
+        {q: "೪. 'ವೈಶಾಲ್ಯ' ಎಂಬ ಪದದ ನೈಜ ತಾತ್ಪರ್ಯವೇನು?[cite: 1]", o: ["ಸಂಕುಚಿತತೆ", "ವಿಶಾಲತೆ / ವಿಶ್ವಾತ್ಮಕತೆ[cite: 1]", "ದೊಡ್ಡ ತೊಂದರೆ"], a: "ವಿಶಾಲತೆ / ವಿಶ್ವಾತ್ಮಕತೆ[cite: 1]"},
+        {q: "೫. 'ನಿರ್ಮುಕ್ತ' ಪದಕ್ಕೆ ಕಾವ್ಯದಲ್ಲಿ ನೀಡಲಾಗಿರುವ ಅರ್ಥರೂಪ ಯಾವುದು?[cite: 1]", o: ["ಬಂಧನದಲ್ಲಿರುವುದು", "ಸರ್ವಸ್ವತಂತ್ರ / ಸಂಪೂರ್ಣ ಮುಕ್ತವಾದ[cite: 1]", "ಕೋಪಗೊಂಡ"], a: "ಸರ್ವಸ್ವತಂತ್ರ / ಸಂಪೂರ್ಣ ಮುಕ್ತವಾದ[cite: 1]"}
+    ];
+    let a5Idx = 0, a5Score = 0;
+    function loadAct5() {
+        if(a5Idx >= act5Data.length) { document.getElementById('a5-qtext').innerText = `🏆 ನಿಮ್ಮ ಒಟ್ಟು ಅಂಕಗಳು: ${a5Score}/5`; document.getElementById('a5-options').innerHTML=''; return; }
+        document.getElementById('hud-a5-q').innerText = `ಪ್ರಶ್ನೆ: ${a5Idx+1}/5`;
+        document.getElementById('hud-a5-s').innerText = `ಸ್ಕೋರ್: ${a5Score}`;
+        const item = act5Data[a5Idx]; document.getElementById('a5-qtext').innerText = item.q;
+        const box = document.getElementById('a5-options'); box.innerHTML = '';
+        item.o.forEach(o => {
+            const btn = document.createElement('button'); btn.className = 'game-btn'; btn.innerText = o;
+            btn.style.borderColor = 'var(--neon-yellow)';
+            btn.onclick = () => {
+                if(o === item.a) { btn.classList.add('correct'); a5Score++; } else { btn.classList.add('wrong'); }
+                setTimeout(() => { a5Idx++; loadAct5(); }, 700);
+            };
+            box.appendChild(btn);
+        });
+    }
+
+    window.onload = () => {
+        loadAct1();
+        loadAct3();
+        loadAct4();
+        loadAct5();
+    };
+</script>
+</body>
+</html>

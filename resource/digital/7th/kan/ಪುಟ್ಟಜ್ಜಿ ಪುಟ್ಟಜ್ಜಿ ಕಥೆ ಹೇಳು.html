@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಪುಟ್ಟಜ್ಜಿ ಪುಟ್ಟಜ್ಜಿ ಕಥೆ ಹೇಳು - ಇಂಟರಾಕ್ಟಿವ್ ಆಕ್ಟಿವಿಟಿಗಳು</title>
+    <style>
+        :root {
+            --primary: #FF5722;
+            --success: #4CAF50;
+            --bg-gradient: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-gradient);
+            margin: 0;
+            padding: 20px;
+            color: #333;
+            text-align: center;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+
+        h1 {
+            color: #d32f2f;
+            text-shadow: 2px 2px #ffcdd2;
+            font-size: 2.2rem;
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            color: #555;
+            font-size: 1.1rem;
+            margin-bottom: 25px;
+        }
+
+        /* Tabs Menu */
+        .tabs {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 30px;
+            background: #f1f1f1;
+            padding: 10px;
+            border-radius: 12px;
+        }
+
+        .tab-btn {
+            background: white;
+            border: 2px solid #ddd;
+            padding: 10px 18px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+        }
+
+        /* Active Tabs Theme Colors */
+        .tab-btn[data-target="act1"].active, .tab-btn[data-target="act1"]:hover { background: #FF9800; color: white; border-color: #FF9800; }
+        .tab-btn[data-target="act2"].active, .tab-btn[data-target="act2"]:hover { background: #E91E63; color: white; border-color: #E91E63; }
+        .tab-btn[data-target="act3"].active, .tab-btn[data-target="act3"]:hover { background: #4CAF50; color: white; border-color: #4CAF50; }
+        .tab-btn[data-target="act4"].active, .tab-btn[data-target="act4"]:hover { background: #9C27B0; color: white; border-color: #9C27B0; }
+        .tab-btn[data-target="act5"].active, .tab-btn[data-target="act5"]:hover { background: #2196F3; color: white; border-color: #2196F3; }
+
+        .activity-panel {
+            display: none;
+            animation: fadeIn 0.5s ease-in-out;
+            padding: 20px;
+            border-radius: 15px;
+            min-height: 350px;
+        }
+
+        .activity-panel.active { display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Shared Game Elements */
+        .btn {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 1.1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .btn:hover { background: #45a049; }
+
+        .score-board {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-top: 15px;
+            color: #333;
+            background: #e0f2f1;
+            padding: 8px;
+            border-radius: 8px;
+            display: inline-block;
+        }
+
+        /* --- ACT 1: Chronology Drag & Drop --- */
+        .drag-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .drag-item {
+            background: #fff3e0;
+            border: 2px dashed #ff9800;
+            padding: 15px;
+            border-radius: 8px;
+            cursor: grab;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .drag-item:active { cursor: grabbing; }
+
+        /* --- ACT 2: Dialog Matching --- */
+        .match-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .match-box {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .match-card {
+            background: #fce4ec;
+            border: 2px solid #e91e63;
+            padding: 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        .match-card.selected { background: #e91e63; color: white; }
+        .match-card.matched { background: #c8e6c9; border-color: #4caf50; cursor: not-allowed; color: #2e7d32; }
+
+        /* --- ACT 3: Noun Sorter --- */
+        .sorter-bins {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 25px;
+        }
+        .bin {
+            background: #e8f5e9;
+            border: 3px solid #4caf50;
+            border-radius: 12px;
+            padding: 20px 10px;
+            min-height: 100px;
+        }
+        .bin h3 { margin-top: 0; color: #2e7d32; }
+        .word-pool {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 20px;
+            background: #fafafa;
+            padding: 15px;
+            border-radius: 10px;
+            min-height: 50px;
+        }
+        .sort-word {
+            background: #fff;
+            border: 2px solid #4caf50;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: grab;
+            font-weight: bold;
+        }
+
+        /* --- ACT 4: Gender Machine --- */
+        .gender-container {
+            background: #f3e5f5;
+            padding: 25px;
+            border-radius: 12px;
+            max-width: 500px;
+            margin: 0 auto;
+            border: 2px solid #9c27b0;
+        }
+        .word-display {
+            font-size: 2rem;
+            color: #4a148c;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        .opt-btn {
+            background: white;
+            border: 2px solid #9c27b0;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .opt-btn:hover { background: #ea80fc; }
+
+        /* --- ACT 5: Balloon Pop --- */
+        .balloon-area {
+            background: #e3f2fd;
+            border: 2px solid #2196f3;
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 15px;
+        }
+        .balloon-grid {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .balloon {
+            background: #ff4081;
+            color: white;
+            padding: 20px 25px;
+            border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.1rem;
+            box-shadow: inset -5px -5px 10px rgba(0,0,0,0.2);
+            transition: transform 0.1s;
+        }
+        .balloon:hover { transform: scale(1.05); }
+        .balloon.popped { background: #b0bec5; text-decoration: line-through; opacity: 0.5; pointer-events: none; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🎈 ಪುಟ್ಟಜ್ಜಿ ಪುಟ್ಟಜ್ಜಿ ಕಥೆ ಹೇಳು 🎈</h1>
+    <div class="subtitle">ಡಿಜಿಟಲ್ ಕ್ಲಾಸ್‌ರೂಮ್ ಇಂಟರಾಕ್ಟಿವ್ ಗೇಮ್ಸ್</div>
+
+    <div class="tabs">
+        <button class="tab-btn active" data-target="act1">೧. ಕಥೆಯ ಹಾದಿ</button>
+        <button class="tab-btn" data-target="act2">೨. ಯಾರು ಹೇಳಿದರು?</button>
+        <button class="tab-btn" data-target="act3">೩. ವ್ಯಾಕರಣ ಬುಟ್ಟಿ</button>
+        <button class="tab-btn" data-target="act4">೪. ಲಿಂಗ ಬದಲಿಸಿ</button>
+        <button class="tab-btn" data-target="act5">೫. ಗುಂಪಿಗೆ ಸೇರದ ಪದ</button>
+    </div>
+
+    <div id="act1" class="activity-panel active" style="border: 3px solid #ff9800;">
+        <h2>🔄 ಕಥೆಯ ಘಟನೆಗಳನ್ನು ಸರಿಯಾದ ಕ್ರಮದಲ್ಲಿ ಜೋಡಿಸಿ:</h2>
+        <p style="color: #666;">(ವಾಕ್ಯಗಳನ್ನು ಮೇಲಕ್ಕೆ-ಕೆಳಕ್ಕೆ ಎಳೆದು ಸರಿಯಾದ ಕ್ರಮಕ್ಕೆ ತನ್ನಿ)</p>
+        <div class="drag-container" id="drag-list">
+            </div>
+        <button class="btn" onclick="checkChronology()">ಕ್ರಮವನ್ನು ಪರಿಶೀಲಿಸಿ ✅</button>
+    </div>
+
+    <div id="act2" class="activity-panel" style="border: 3px solid #e91e63;">
+        <h2>🗣️ ಸಂಭಾಷಣೆಯನ್ನು ಯಾರು ಯಾರಿಗೆ ಹೇಳಿದರು ಎಂದು ಹೊಂದಿಸಿ:</h2>
+        <p>ಎಡಭಾಗದ ವಾಕ್ಯವನ್ನು ಮತ್ತು ಬಲಭಾಗದ ಸರಿಯಾದ ಪಾತ್ರವನ್ನು ಕ್ಲಿಕ್ ಮಾಡಿ</p>
+        <div class="match-grid">
+            <div class="match-box" id="dialogues-box"></div>
+            <div class="match-box" id="characters-box"></div>
+        </div>
+        <div class="score-board" id="act2-score">ಸ್ಕೋರ್: 0 / 5</div>
+    </div>
+
+    <div id="act3" class="activity-panel" style="border: 3px solid #4caf50;">
+        <h2>🧺 ನಾಮಪದಗಳನ್ನು ಸರಿಯಾದ ವ್ಯಾಕರಣ ಬುಟ್ಟಿಗೆ ಹಾಕಿ:</h2>
+        <div class="word-pool" id="word-pool" ondrop="drop(event)" ondragover="allowDrop(event)">
+            </div>
+        <div class="sorter-bins">
+            <div class="bin" id="rudha" ondrop="drop(event)" ondragover="allowDrop(event)">
+                <h3>🧺 ರೂಢನಾಮ</h3>
+            </div>
+            <div class="bin" id="ankita" ondrop="drop(event)" ondragover="allowDrop(event)">
+                <h3>🧺 ಅಂಕಿತನಾಮ</h3>
+            </div>
+            <div class="bin" id="anvarta" ondrop="drop(event)" ondragover="allowDrop(event)">
+                <h3>🧺 ಅನ್ವರ್ಥನಾಮ</h3>
+            </div>
+        </div>
+        <button class="btn" onclick="checkSorting()">ಬುಟ್ಟಿಗಳನ್ನು ಪರಿಶೀಲಿಸಿ 🧺</button>
+    </div>
+
+    <div id="act4" class="activity-panel" style="border: 3px solid #9c27b0;">
+        <h2>🔄 ಲಿಂಗ ಬದಲಿಸುವ ಯಂತ್ರ!</h2>
+        <p>ನೀಡಿರುವ ಪದಕ್ಕೆ ಸರಿಯಾದ ಲಿಂಗರೂಪದ ಪದವನ್ನು ಆರಿಸಿ:</p>
+        <div class="gender-container">
+            <div class="word-display" id="gender-word">ಪದ</div>
+            <div class="options-grid" id="gender-options"></div>
+        </div>
+        <div class="score-board" id="act4-score" style="margin-top:20px;">ಪ್ರಶ್ನೆ: 1 / 5 | ಸ್ಕೋರ್: 0</div>
+    </div>
+
+    <div id="act5" class="activity-panel" style="border: 3px solid #2196f3;">
+        <h2>🎈 ಗುಂಪಿಗೆ ಸೇರದ ಪದದ ಬಲೂನ್ ಒಡೆಯಿರಿ (Pop)!</h2>
+        <div class="balloon-area">
+            <h3 id="balloon-question-title">ಪ್ರಶ್ನೆ ಲೋಡ್ ಆಗುತ್ತಿದೆ...</h3>
+            <div class="balloon-grid" id="balloon-box"></div>
+        </div>
+        <div class="score-board" id="act5-score" style="margin-top:20px;">ಹಂತ: 1 / 5 | ಸ್ಕೋರ್: 0</div>
+    </div>
+
+</div>
+
+<script>
+    // --- NAVIGATION TABS LOGIC ---
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.activity-panel').forEach(p => p.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById(btn.dataset.target).classList.add('active');
+        });
+    });
+
+    // ==========================================
+    // --- ACT 1: CHRONOLOGY LOGIC ---
+    const correctOrder = [
+        "ಯುವಕನು ಕಾಡಿನ ಹೊರಗಿನ ಸೊಗಸಾದ ಜಾಗದಲ್ಲಿ ಮನೆ ಕಟ್ಟಿ ತೋಟ ಮಾಡಿದನು.",
+        "ಹುಲಿಗೆ ಹೆದರಿ ಬೇಟೆಯಾಡಲ್ಪಟ್ಟ ಜಿಂಕೆಯೊಂದು ಯುವಕನ ಅಂಗಳಕ್ಕೆ ಓಡಿ ಬಂದಿತು.",
+        "ಯುವಕನು ಹುಲಿಯ ವಿರುದ್ಧ ಹೋರಾಡಿ ಗಾಯಗೊಂಡು ಜಿಂಕೆಯನ್ನು ರಕ್ಷಿಸಿದನು.",
+        "ಕಾಡಿಗೆ ಹೋಗಿ ಗಿಡಮೂಲಿಕೆ ತಂದು ಜಿಂಕೆಯು ಯುವಕನ ಗಾಯಕ್ಕೆ ಮದ್ದು ಮಾಡಿತು.",
+        "ಜಿಂಕೆಯನ್ನು ಹುಡುಕುತ್ತಾ ಬಂದ ಯುವತಿ ಚುಕ್ಕಿಯನ್ನು ಅಪ್ಪಿಕೊಂಡು ಆನಂದಪಟ್ಟು ತನ್ನ ಪರಿಚಯ ಹೇಳಿದಳು."
+    ];
+    let currentOrder = [...correctOrder].sort(() => Math.random() - 0.5);
+
+    function loadChronology() {
+        const list = document.getElementById('drag-list');
+        list.innerHTML = '';
+        currentOrder.forEach((text, index) => {
+            const item = document.createElement('div');
+            item.className = 'drag-item';
+            item.draggable = true;
+            item.innerText = text;
+            item.dataset.index = index;
+            
+            item.addEventListener('dragstart', dragStart);
+            item.addEventListener('dragover', dragOver);
+            item.addEventListener('drop', dragDrop);
+            list.appendChild(item);
+        });
+    }
+
+    let draggedItemIndex;
+    function dragStart(e) { draggedItemIndex = +this.dataset.index; }
+    function dragOver(e) { e.preventDefault(); }
+    function dragDrop(e) {
+        const targetIndex = +this.dataset.index;
+        const temp = currentOrder[draggedItemIndex];
+        currentOrder[draggedItemIndex] = currentOrder[targetIndex];
+        currentOrder[targetIndex] = temp;
+        loadChronology();
+    }
+    function checkChronology() {
+        let isCorrect = true;
+        currentOrder.forEach((text, i) => { if(text !== correctOrder[i]) isCorrect = false; });
+        alert(isCorrect ? "🥳 ಅದ್ಭುತ! ಸರಿಯಾದ ಕ್ರಮದಲ್ಲಿ ಜೋಡಿಸಿದ್ದೀರಿ!" : "❌ ತಪ್ಪು ಕ್ರಮ, ಮತ್ತೊಮ್ಮೆ ಪ್ರಯತ್ನಿಸಿ ಬಾಲಮಿತ್ರರೇ!");
+    }
+
+    // ==========================================
+    // --- ACT 2: DIALOG MATCHING LOGIC ---
+    const matches = [
+        { d: "“ಯಾವ ಯಾವುದಾದರೂ ಒಂದು ಹಾಡ್ಗತೆ ಹೇಳು”", c: "ಮೊಮ್ಮಗ" },
+        { d: "“ಬಾ ಮಗ ಹೇಳೇನಿ ಒಳ್ಳೇದೊಂದು ಕತೆಯಾ”", c: "ಪುಟ್ಟಜ್ಜಿ" },
+        { d: "“ಏಯ್! ಯುವಕ, ಈ ಜಿಂಕೆ ನನ್ನ ಆಹಾರ”", c: "ಹುಲಿ" },
+        { d: "“ನಾನು ಇದನ್ನು ಬಿಟ್ಟು ಕೊಡುವುದಿಲ್ಲ”", c: "ಯುವಕ" },
+        { d: "“ಇದು ನಾವು ಸಾಕಿಕೊಂಡ ಜಿಂಕೆ... ಇದರ ಹೆಸರು ಚುಕ್ಕಿ”", c: "ಯುವತಿ" }
+    ];
+    let selectedDiag = null, selectedChar = null, act2Score = 0;
+
+    function loadMatching() {
+        const dBox = document.getElementById('dialogues-box');
+        const cBox = document.getElementById('characters-box');
+        dBox.innerHTML = ''; cBox.innerHTML = '';
+        
+        [...matches].sort(() => Math.random() - 0.5).forEach(m => {
+            const el = document.createElement('div'); el.className = 'match-card'; el.innerText = m.d;
+            el.onclick = () => { document.querySelectorAll('#dialogues-box .match-card').forEach(c => c.classList.remove('selected')); el.classList.add('selected'); selectedDiag = m; checkMatch(); };
+            dBox.appendChild(el);
+        });
+        [...matches].sort(() => Math.random() - 0.5).forEach(m => {
+            const el = document.createElement('div'); el.className = 'match-card'; el.innerText = m.c;
+            el.onclick = () => { document.querySelectorAll('#characters-box .match-card').forEach(c => c.classList.remove('selected')); el.classList.add('selected'); selectedChar = m; checkMatch(); };
+            cBox.appendChild(el);
+        });
+    }
+    function checkMatch() {
+        if(selectedDiag && selectedChar) {
+            if(selectedDiag.c === selectedChar.c) {
+                act2Score++;
+                document.getElementById('act2-score').innerText = `ಸ್ಕೋರ್: ${act2Score} / 5`;
+                document.querySelectorAll('.match-card.selected').forEach(el => { el.classList.remove('selected'); el.classList.add('matched'); el.onclick = null; });
+                if(act2Score === 5) alert("🎉 ಶಾಬಾಶ್! ಎಲ್ಲಾ ಸಂಭಾಷಣೆಗಳನ್ನು ಸರಿಯಾಗಿ ಹೊಂದಿಸಿದ್ದೀರಿ!");
+            } else {
+                alert("❌ ತಪ್ಪು ಜೋಡಿ! ಮತ್ತೊಮ್ಮೆ ಯೋಚಿಸಿ.");
+                document.querySelectorAll('.match-card.selected').forEach(el => el.classList.remove('selected'));
+            }
+            selectedDiag = null; selectedChar = null;
+        }
+    }
+
+    // ==========================================
+    // --- ACT 3: NOUN SORTER LOGIC ---
+    const nouns = [
+        {w: "ನದಿ", t: "rudha"}, {w: "ಹುಲಿ", t: "rudha"},
+        {w: "ಚುಕ್ಕಿ", t: "ankita"}, {w: "ಪುಟ್ಟಜ್ಜಿ", t: "ankita"},
+        {w: "ವೈದ್ಯ", t: "anvarta"}, {w: "ಶಿಕ್ಷಕಿ", t: "anvarta"}
+    ];
+    function allowDrop(e) { e.preventDefault(); }
+    function dragWord(e) { e.dataTransfer.setData("text", e.target.id); }
+    function drop(e) {
+        e.preventDefault();
+        var data = e.dataTransfer.getData("text");
+        var target = e.target.closest('.bin') || document.getElementById('word-pool');
+        target.appendChild(document.getElementById(data));
+    }
+    function loadSorter() {
+        const pool = document.getElementById('word-pool');
+        pool.innerHTML = '';
+        nouns.sort(() => Math.random() - 0.5).forEach((n, i) => {
+            const w = document.createElement('div'); w.className = 'sort-word'; w.id = 'word-'+i;
+            w.innerText = n.w; w.draggable = true; w.dataset.type = n.t;
+            w.addEventListener('dragstart', dragWord);
+            pool.appendChild(w);
+        });
+    }
+    function checkSorting() {
+        let correct = true;
+        nouns.forEach((n, i) => {
+            const el = document.getElementById('word-'+i);
+            if(!el.parentElement || el.parentElement.id !== el.dataset.type) correct = false;
+        });
+        alert(correct ? "🥳 ಅದ್ಭುತ! ಎಲ್ಲಾ ವ್ಯಾಕರಣ ಬುಟ್ಟಿಗಳು ಸರಿಯಾಗಿ ತುಂಬಿವೆ!" : "❌ ಕೆಲವು ಪದಗಳು ತಪ್ಪು ಬುಟ್ಟಿ ಸೇರಿವೆ, ದಯವಿಟ್ಟು ಮರುಪರಿಶೀಲಿಸಿ!");
+    }
+
+    // ==========================================
+    // --- ACT 4: GENDER MACHINE LOGIC ---
+    const genderData = [
+        { q: "ಯುವಕ", a: "ಯುವತಿ", o: ["ಮಹಿಳೆ", "ಯುವತಿ", "ಹುಡುಗಿ", "ಜ್ಜಿ"] },
+        { q: "ಕೋಣ", a: "ಎಮ್ಮೆ", o: ["ಆಕಳು", "ಹಸು", "ಎಮ್ಮೆ", "ಜಿಂಕೆ"] },
+        { q: "ಹುಲಿ (ಗಂಡು)", a: "ಹೆಣ್ಣುಹುಲಿ", o: ["ಸಿಂಹಿಣಿ", "ಚಿಂತೆ", "ಹೆಣ್ಣುಹುಲಿ", "ಕರಡಿ"] },
+        { q: "ಮಗ", a: "ಮಗಳು", o: ["ಸೊಸೆ", "ಮಗಳು", "ಅಕ್ಕ", "ತಾಯಿ"] },
+        { q: "ತಾತ", a: "ಅಜ್ಜಿ", o: ["ಅಜ್ಜಿ", "ಅಮ್ಮ", "ಚಿಕ್ಕಮ್ಮ", "ವೈದ್ಯೆ"] }
+    ];
+    let currentGenderIdx = 0, act4Score = 0;
+    function loadGenderGame() {
+        if(currentGenderIdx >= genderData.length) {
+            alert(`🎉 ಆಟ ಮುಗಿಯಿತು! ನಿಮ್ಮ ಒಟ್ಟು ಸ್ಕೋರ್: ${act4Score}/5`);
+            currentGenderIdx = 0; act4Score = 0;
+        }
+        document.getElementById('act4-score').innerText = `ಪ್ರಶ್ನೆ: ${currentGenderIdx + 1} / 5 | ಸ್ಕೋರ್: ${act4Score}`;
+        const data = genderData[currentGenderIdx];
+        document.getElementById('gender-word').innerText = data.q;
+        const opts = document.getElementById('gender-options'); opts.innerHTML = '';
+        data.o.forEach(o => {
+            const btn = document.createElement('button'); btn.className = 'opt-btn'; btn.innerText = o;
+            btn.onclick = () => {
+                if(o === data.a) { alert("🥳 ಸರಿಯಾದ ಉತ್ತರ!"); act4Score++; } 
+                else { alert(`❌ ತಪ್ಪು ಉತ್ತರ! ಸರಿಯಾದ ರೂಪ: ${data.a}`); }
+                currentGenderIdx++; loadGenderGame();
+            };
+            opts.appendChild(btn);
+        });
+    }
+
+    // ==========================================
+    // --- ACT 5: BALLOON POP LOGIC ---
+    const balloonData = [
+        { q: "ವನ್ಯಜೀವಿಗಳ ಗುಂಪಿಗೆ ಸೇರದ ಪ್ರಾಣಿ ಗುರುತಿಸಿ:", a: "ಹಸು", o: ["ಹುಲಿ", "ಚಿರತೆ", "ಕರಡಿ", "ಹಸು"] },
+        { q: "ಪಾಠದ ಪಾತ್ರಗಳ ಗುಂಪಿಗೆ ಸೇರದ ಹೆಸರನ್ನು ಒಡೆಯಿರಿ:", a: "ರಾಮ", o: ["ಪುಟ್ಟಜ್ಜಿ", "ಚುಕ್ಕಿ", "ಯುವಕ", "ರಾಮ"] },
+        { q: "ನಾಮಪದಗಳಲ್ಲದ ಕ್ರಿಯಾಪದವನ್ನು ಗುರುತಿಸಿ:", a: "ಓಡಿದನು", o: ["ತೋಟ", "ಮನೆ", "ಓಡಿದನು", "ಜಿಂಕೆ"] },
+        { q: "ಪಕ್ಷಿಗಳ ಗುಂಪಿಗೆ ಸೇರಿದ್ದಲ್ಲದ ಜೀವಿಯನ್ನು ಪೋಪ್ ಮಾಡಿ:", a: "ಹಾವು", o: ["ಗಿಣಿ", "ಹಾವು", "ಕಾಗೆ", "ಕೋಗಿಲೆ"] },
+        { q: "ಕಥೆಗಳ ಪ್ರಕಾರಕ್ಕೆ ಸೇರದ ಪದ ಯಾವುದು?", a: "ಮೊಬೈಲ್", o: ["ದೊಡ್ಡ ಕಥೆ", "ತಮಾಷೆ ಕಥೆ", "ಹಾಡ್ಗತೆ", "ಮೊಬೈಲ್"] }
+    ];
+    let currentBalloonIdx = 0, act5Score = 0;
+    function loadBalloonGame() {
+        if(currentBalloonIdx >= balloonData.length) {
+            alert(`🎈 ಅದ್ಭುತ ಆಟ! ಬಲೂನ್ ಕ್ವಿಜ್ ಮುಗಿಯಿತು. ಸ್ಕೋರ್: ${act5Score}/5`);
+            currentBalloonIdx = 0; act5Score = 0;
+        }
+        document.getElementById('act5-score').innerText = `ಹಂತ: ${currentBalloonIdx + 1} / 5 | ಸ್ಕೋರ್: ${act5Score}`;
+        const data = balloonData[currentBalloonIdx];
+        document.getElementById('balloon-question-title').innerText = data.q;
+        const box = document.getElementById('balloon-box'); box.innerHTML = '';
+        
+        data.o.forEach(word => {
+            const b = document.createElement('div'); b.className = 'balloon'; b.innerText = word;
+            // random background colors for balloons
+            b.style.backgroundColor = `hsl(${Math.random() * 360}, 80%, 60%)`;
+            b.onclick = () => {
+                b.classList.add('popped');
+                if(word === data.a) { alert("💥 POP! ಸರಿಯಾದ ಉತ್ತರ!"); act5Score++; }
+                else { alert(`❌ ಅಯ್ಯೋ ತಪ್ಪು ಬಲೂನ್! ಸರಿಯಾದ ಉತ್ತರ: ${data.a}`); }
+                currentBalloonIdx++; setTimeout(loadBalloonGame, 500);
+            };
+            box.appendChild(b);
+        });
+    }
+
+    // --- INITIAL LOAD ---
+    window.onload = () => {
+        loadChronology();
+        loadMatching();
+        loadSorter();
+        loadGenderGame();
+        loadBalloonGame();
+    };
+</script>
+</body>
+</html>

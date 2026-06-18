@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಹಿಲ್ಟನ್ ಹೆಡ್ ಚಳುವಳಿ - ನೆಕ್ಸ್ಟ್-ಜೆನ್ ಇಂಟರಾಕ್ಟಿವ್ ಕನ್ಸೋಲ್</title>
+    <style>
+        :root {
+            --neon-blue: #00f2fe;
+            --neon-green: #39ff14;
+            --neon-pink: #ff007f;
+            --neon-purple: #9d4edd;
+            --neon-yellow: #ffee00;
+            --dark-core: #090a12;
+            --panel-bg: rgba(20, 24, 42, 0.98);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: radial-gradient(circle at center, #1a2238 0%, var(--dark-core) 100%);
+            margin: 0;
+            padding: 20px;
+            color: #fff;
+            min-height: 100vh;
+        }
+
+        .ai-container {
+            max-width: 950px;
+            margin: 0 auto;
+            background: var(--panel-bg);
+            border-radius: 24px;
+            padding: 30px;
+            box-shadow: 0 0 40px rgba(0, 242, 254, 0.15);
+            border: 2px solid rgba(0, 242, 254, 0.2);
+        }
+
+        header {
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 2.3rem;
+            background: linear-gradient(90deg, var(--neon-blue), var(--neon-purple), var(--neon-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 0 0 10px 0;
+            font-weight: 800;
+        }
+
+        /* 6 Activity Grid System */
+        .matrix-nav {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 10px;
+            margin-bottom: 35px;
+        }
+
+        .matrix-card {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 12px;
+            border-radius: 12px;
+            cursor: pointer;
+            text-align: center;
+            font-weight: bold;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .matrix-card:hover {
+            border-color: var(--neon-blue);
+            background: rgba(0, 242, 254, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .matrix-card.active {
+            background: linear-gradient(135deg, var(--neon-blue) 0%, var(--neon-purple) 100%);
+            color: #000;
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 20px rgba(0, 242, 254, 0.4);
+        }
+
+        .panel {
+            display: none;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 16px;
+            padding: 25px;
+            border: 1px solid rgba(255,255,255,0.05);
+            min-height: 400px;
+        }
+
+        .panel.active { display: block; }
+
+        h2 { color: var(--neon-blue); margin-top: 0; margin-bottom: 20px; }
+
+        /* Game Core UI Components */
+        .btn-action {
+            background: linear-gradient(90deg, var(--neon-blue), var(--neon-purple));
+            color: #000; font-weight: bold; padding: 12px 30px;
+            border: none; border-radius: 10px; cursor: pointer;
+            font-size: 1.1rem; transition: 0.2s; margin-top: 20px;
+        }
+        .btn-action:hover { transform: scale(1.03); box-shadow: 0 0 15px var(--neon-blue); }
+
+        .dashboard-hud {
+            display: flex; justify-content: space-between; background: rgba(0,0,0,0.4);
+            padding: 12px 20px; border-radius: 10px; margin-bottom: 25px;
+            border-left: 4px solid var(--neon-pink); font-weight: bold;
+        }
+
+        /* MCQ & Grid Styles */
+        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px; }
+        .game-btn {
+            background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1);
+            color: white; padding: 15px; border-radius: 10px; font-size: 1.05rem;
+            cursor: pointer; text-align: left; transition: 0.2s;
+        }
+        .game-btn:hover { border-color: var(--neon-blue); background: rgba(255,255,255,0.08); }
+        .game-btn.correct { background: rgba(57, 255, 20, 0.15) !important; border-color: var(--neon-green) !important; color: var(--neon-green); }
+        .game-btn.wrong { background: rgba(255, 0, 127, 0.15) !important; border-color: var(--neon-pink) !important; color: var(--neon-pink); }
+
+        /* Drag-Drop Sorting (Act 4) */
+        .basket-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; }
+        .cyber-basket { background: rgba(0,0,0,0.4); border: 2px dashed rgba(255,255,255,0.15); border-radius: 15px; padding: 20px; min-height: 130px; }
+        .item-capsule { background: var(--neon-purple); color: white; padding: 8px 16px; border-radius: 20px; display: inline-block; margin: 5px; cursor: pointer; font-weight: bold; }
+
+        /* Reveal Box System (Act 2) */
+        .reveal-box {
+            background: rgba(255, 0, 127, 0.05); border: 1px dashed var(--neon-pink);
+            border-radius: 8px; padding: 12px; margin-top: 15px; cursor: pointer; text-align: center;
+        }
+        .reveal-content { display: none; color: #fff; font-size: 1.1rem; margin-top: 8px; border-top: 1px solid rgba(255,0,127,0.2); padding-top: 8px; }
+
+        /* Sentence Builder Drag List */
+        .flex-drag-layout { display: flex; flex-direction: column; gap: 10px; margin-top: 15px; }
+        .drag-node { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); padding: 15px; border-radius: 10px; cursor: grab; display: flex; align-items: center; gap: 15px; }
+        .num-tag { background: var(--neon-pink); width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; color: #000; font-weight: bold;}
+    </style>
+</head>
+<body>
+
+<div class="ai-container">
+    <header>
+        <h1>🏝️ ಹಿಲ್ಟನ್ ಹೆಡ್ ಚಳುವಳಿ 🏝️</h1>
+        <p style="margin: 0; color: #8a94b5;">ಅಲ್ಟ್ರಾ ಮಾಡರ್ನ್ ಗೇಮಿಫೈಡ್ ಲರ್ನಿಂಗ್ ಕನ್ಸೋಲ್</p>
+    </header>
+
+    <!-- Matrix Navigation for 6 Activities -->
+    <div class="matrix-nav">
+        <div class="matrix-card active" data-target="act1">೧. ಒಂದು ವಾಕ್ಯ ಕ್ವಿಜ್</div>
+        <div class="matrix-card" data-target="act2">೨. ಎರಡು-ಮೂರು ವಾಕ್ಯ</div>
+        <div class="matrix-card" data-target="act3">೩. ವಿಭಕ್ತಿ ಪ್ರತ್ಯಯ</div>
+        <div class="matrix-card" data-target="act4">೪. ವಿರುದ್ಧಾರ್ಥಕ ಸಾರ್ಟರ್</div>
+        <div class="matrix-card" data-target="act5">೫. ಭಾಷಾ ಪ್ರಕೃತಿ ಜೋಡಣೆ</div>
+        <div class="matrix-card" data-target="act6">೬. ಪದಗಳ ಅರ್ಥಲೋಕ</div>
+    </div>
+
+    <!-- ACT 1: ONE SENTENCE MCQ -->
+    <div id="act1" class="panel active">
+        <h2>🎯 ಆಕ್ಟಿವಿಟಿ 1: ಒನ್-ಲೈನ್ ಸೈಬರ್ ರೇಸ್ (ಒಂದು ವಾಕ್ಯದ ಪ್ರಶ್ನೆಗಳು)</h2>
+        <div class="dashboard-hud"><span id="hud-a1-q">ಪ್ರಶ್ನೆ: 1/5</span><span id="hud-a1-s">ಸ್ಕೋರ್: 0</span></div>
+        <div class="question-card">
+            <div id="a1-qtext" style="font-size: 1.3rem; margin-bottom: 20px; font-weight: bold;">ಲೋಡ್ ಆಗುತ್ತಿದೆ...</div>
+            <div class="options-grid" id="a1-options"></div>
+        </div>
+    </div>
+
+    <!-- ACT 2: TWO-THREE SENTENCE REVEAL -->
+    <div id="act2" class="panel">
+        <h2>📝 ಆಕ್ಟಿವಿಟಿ 2: ವಿವರಣಾತ್ಮಕ ಹಬ್ (ಎರಡು-ಮೂರು ವಾಕ್ಯದ ಪ್ರಶ್ನೆಗಳು)</h2>
+        <p style="color: #ccc; margin-bottom: 20px;">ಸೂಚನೆ: ಈ ಕೆಳಗಿನ ಪ್ರಮುಖ ಪ್ರಶ್ನೆಗಳಿಗೆ ಉತ್ತರವನ್ನು ನಿಮ್ಮ ನೋಟ್‌ಬುಕ್‌ನಲ್ಲಿ ಬರೆಯಿರಿ. ಉತ್ತರ ತಿಳಿಯದಿದ್ದರೆ ಸಹಾಯ ಪೆಟ್ಟಿಗೆಯನ್ನು ಬಳಸಿ:</p>
+        
+        <div class="question-card" style="border-left-color: var(--neon-purple);">
+            <div style="font-size:1.2rem; font-weight:bold;">೧. ಹಿಲ್ಟನ್ ಹೆಡ್ ದ್ವೀಪವು ಮೊದಲು ಹೇಗಿತ್ತು?</div>
+            <div class="reveal-box" onclick="toggleReveal('rev1')">
+                <span style="color:var(--neon-pink); font-weight:bold;">💡 ಉತ್ತರ ಪರಿಶೀಲಿಸಲು ಇಲ್ಲಿ ಕ್ಲಿಕ್ ಮಾಡಿ</span>
+                <div class="reveal-content" id="rev1">ಹಿಲ್ಟನ್ ಹೆಡ್ ಸುತ್ತಲೂ ಅಟ್ಲಾಂಟಿಕ್ ಸಾಗರ ಹರಡಿರುವ ಒಂದು ಸುಂದರ ಪುಟ್ಟ ದ್ವೀಪವಾಗಿತ್ತು[cite: 1]. ಆರಂಭದ ಕಾಲದಲ್ಲಿ ಈ ದ್ವೀಪದಲ್ಲಿ ದಟ್ಟವಾದ ಕಾಡುಗಳಿದ್ದು, ಸ್ಥಳೀಯ ಮೂಲನಿವಾಸಿಗಳಾದ ಅಮೆರಿಂಡಿಯನ್ನರು ಇಲ್ಲಿ ವಾಸವಾಗಿದ್ದರು[cite: 1]. ವರ್ಷವಿಡೀ ಉತ್ತಮ ಹವೆ ಮತ್ತು ಒಳ್ಳೆಯ ಕಡಲತೀರವನ್ನು ಈ ದ್ವೀಪ ಹೊಂದಿತ್ತು[cite: 1].</div>
+            </div>
+        </div>
+
+        <div class="question-card" style="border-left-color: var(--neon-purple);">
+            <div style="font-size:1.2rem; font-weight:bold;">೨. ಯೂರೋಪ್ ದೇಶದವರು ಬಂದ ಮೇಲೆ ಹಿಲ್ಟನ್ ಹೆಡ್ ದ್ವೀಪದಲ್ಲಿ ಯಾವ ಬದಲಾವಣೆಗಳಾದವು?</div>
+            <div class="reveal-box" onclick="toggleReveal('rev2')">
+                <span style="color:var(--neon-pink); font-weight:bold;">💡 ಉತ್ತರ ಪರಿಶೀಲಿಸಲು ಇಲ್ಲಿ ಕ್ಲಿಕ್ ಮಾಡಿ</span>
+                <div class="reveal-content" id="rev2">ಯೂರೋಪಿಯನ್ನರ ಆಗಮನದ ನಂತರ ಮೂಲನಿವಾಸಿಗಳ ಸಮುದಾಯ ಧೂಳೀಪಟವಾಯಿತು[cite: 1]. ಒಳ್ಳೆಯ ಹವೆ ಇದ್ದ ಈ ದ್ವೀಪದಲ್ಲಿ ಬಿಳಿಯರು ಕಾಡುಗಳನ್ನು ಕಡಿದು ನೀಲಿ ಮತ್ತು ಇನ್ನಿತರ ವಾಣಿಜ್ಯ ಬೆಳೆಗಳನ್ನು ಬೆಳೆಯುವ ದೊಡ್ಡ ತೋಟಗಳನ್ನಾಗಿ ಪರಿವರ್ತಿಸಿದರು[cite: 1].</div>
+            </div>
+        </div>
+
+        <div class="question-card" style="border-left-color: var(--neon-purple);">
+            <div style="font-size:1.2rem; font-weight:bold;">೩. ಹಿಲ್ಟನ್ ಹೆಡ್ ದ್ವೀಪದಲ್ಲಿ ಪರಿಸರ ಹೋರಾಟ ಹೇಗೆ ಪ್ರಾರಂಭವಾಯಿತು?</div>
+            <div class="reveal-box" onclick="toggleReveal('rev3')">
+                <span style="color:var(--neon-pink); font-weight:bold;">💡 ಉತ್ತರ ಪರಿಶೀಲಿಸಲು ಇಲ್ಲಿ ಕ್ಲಿಕ್ ಮಾಡಿ</span>
+                <div class="reveal-content" id="rev3">ದುಡ್ಡುಳ್ಳ ಸಾಹುಕಾರರು ಹೋಟೆಲ್‌ಗಳು ಮತ್ತು ಗಾಲ್ಫ್ ಕೋರ್ಸ್‌ಗಳಿಗಾಗಿ ಕಾಡು ಮತ್ತು ಹೊಂಡಗಳನ್ನು ಕೊಚ್ಚತೊಡಗಿದಾಗ ಪರಿಸರ ನಾಶ ತಡೆಯಲು ಕೆಲವರು ಒಟ್ಟಾದರು[cite: 1]. ಒಬ್ಬ ನೆಲದಳ್ಳಾಳಿಯು ಪರಿಸರ ಆಸಕ್ತರೊಡನೆ ಸೇರಿ ಪುರಾತನ ಓಕ್ ಮರ ತೋಪು ಮತ್ತು ಸಸ್ಯಸಂಪತ್ತನ್ನು ತರಿಯಬಾರದೆಂದು ಹೋರಾಟ ಆರಂಭಿಸಿ ಕೋರ್ಟಿನ ಮೆಟ್ಟಿಲೇರಿದರು[cite: 1].</div>
+            </div>
+        </div>
+
+        <div class="question-card" style="border-left-color: var(--neon-purple);">
+            <div style="font-size:1.2rem; font-weight:bold;">೪. ಹಿಲ್ಟನ್ ಹೆಡ್ ದ್ವೀಪದಲ್ಲಿ ಯಾವ ಯಾವ ಆಧುನಿಕ ಕಟ್ಟಡಗಳು ನಿರ್ಮಾಣಗೊಂಡವು?</div>
+            <div class="reveal-box" onclick="toggleReveal('rev4')">
+                <span style="color:var(--neon-pink); font-weight:bold;">💡 ಉತ್ತರ ಪರಿಶೀಲಿಸಲು ಇಲ್ಲಿ ಕ್ಲಿಕ್ ಮಾಡಿ</span>
+                <div class="reveal-content" id="rev4">ದ್ವೀಪದಲ್ಲಿ ಲಾಭ ಗಳಿಸುವ ಉದ್ದೇಶದಿಂದ ದೊಡ್ಡ ಸೀಬೀಚ್ ಹೋಟೆಲ್‌ಗಳು, ರೆಸಾರ್ಟುಗಳು, ಸ್ಟೇಹೋಂಗಳು, ಸುಂದರ ಗಾಲ್ಫ್ ಕೋರ್ಸುಗಳು, ದೊಡ್ಡ ಕ್ರೀಡಾಮೈದಾನಗಳು ಮತ್ತು ಬೋಟಿಂಗ್ ಕೇಂದ್ರಗಳು ನಿರ್ಮಾಣಗೊಂಡವು[cite: 1].</div>
+            </div>
+        </div>
+
+        <div class="question-card" style="border-left-color: var(--neon-purple);">
+            <div style="font-size:1.2rem; font-weight:bold;">೫. ದ್ವೀಪದ ಸ್ಮಾರಕವಾದ 'ಲಿಬರ್ಟಿ ಓಕ್' ಮರದ ವಿಶೇಷತೆಯೇನು?</div>
+            <div class="reveal-box" onclick="toggleReveal('rev5')">
+                <span style="color:var(--neon-pink); font-weight:bold;">💡 ಉತ್ತರ ಪರಿಶೀಲಿಸಲು ಇಲ್ಲಿ ಕ್ಲಿಕ್ ಮಾಡಿ</span>
+                <div class="reveal-content" id="rev5">ಐವತ್ತರ ದಶಕದಲ್ಲಿ ಪರಿಸರ ರಕ್ಷಣೆಗಾಗಿ ದ್ವೀಪದ ಜನ ಒಗ್ಗೂಡಿ ಪಣತೊಟ್ಟಿದ್ದು ಈ ಲಿಬರ್ಟಿ ಓಕ್ ಮರದಡಿಯಲ್ಲೇ[cite: 1]. ಇದು ಅತ್ಯಂತ ಸಂರಕ್ಷಿತ ಜಾಗವಾಗಿದ್ದು, ಇದರ ಪ್ರಸಿದ್ಧಿಯಿಂದ ಪ್ರೇರಿತರಾದ ಜನ ತಂತಮ್ಮ ಕ್ಷೇತ್ರಗಳಲ್ಲಿ ಪರಿಸರ ರಕ್ಷಣೆಗೆ ಚುರುಕುಗೊಂಡರು ಹಾಗೂ ಇದರ ಸಾನ್ನಿಧ್ಯದಲ್ಲಿ ಎಷ್ಟೋ ವಿವಾಹಗಳೂ ನಡೆದಿವೆ[cite: 1].</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ACT 3: VIBHAKTI PRATYAYA GRAMMAR -->
+    <div id="act3" class="panel" style="border-color: var(--neon-green);">
+        <h2>🧠 ಆಕ್ಟಿವಿಟಿ 3: ಕ್ರಿಯಾತ್ಮಕ ವ್ಯಾಕರಣ (ವಿಭಕ್ತಿ ಪ್ರತ್ಯಯ ಗುರುತಿಸಿ)</h2>
+        <div class="dashboard-hud"><span id="hud-a3-q">ಪ್ರಶ್ನೆ: 1/5</span><span id="hud-a3-s">ಸ್ಕೋರ್: 0</span></div>
+        <div class="question-card">
+            <p style="color: #aaa;">ವಾಕ್ಯದಲ್ಲಿ ಗೆರೆ ಎಳೆದ ಪದದಲ್ಲಿರುವ ಸರಿಯಾದ ವಿಭಕ್ತಿ ಪ್ರತ್ಯಯವನ್ನು ಪತ್ತೆಹಚ್ಚಿ:[cite: 1]</p>
+            <div id="a3-qtext" style="font-size: 1.3rem; margin-bottom: 20px; font-weight: bold;">ಲೋಡ್ ಆಗುತ್ತಿದೆ...</div>
+            <div class="options-grid" id="a3-options"></div>
+        </div>
+    </div>
+
+    <!-- ACT 4: OPPOSITE WORDS SORTER -->
+    <div id="act4" class="panel" style="border-color: var(--neon-yellow);">
+        <h2>🧺 ಆಕ್ಟಿವಿಟಿ 4: ವಿಲೋಮ ಪದಗಳ ಕ್ಲಸ್ಟರ್ (ವಿರುದ್ಧಾರ್ಥಕ ಪದ ಸಾರ್ಟರ್)</h2>
+        <p style="color:#ccc;">ಪದದ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ ಅದನ್ನು ಸರಿಯಾದ ವಿರುದ್ಧಾರ್ಥಕ ಪದದ ಬುಟ್ಟಿಗೆ ವರ್ಗಾಯಿಸಿ:[cite: 1]</p>
+        <div id="word-pool" style="background:rgba(0,0,0,0.3); padding:15px; border-radius:10px; min-height:50px; margin-bottom:20px; text-align:center;"></div>
+        <div class="basket-grid">
+            <div class="cyber-basket" id="bin-nashta"><h3>📉 ನಷ್ಟ (ಲಾಭಕ್ಕೆ ವಿರುದ್ಧ)</h3></div>
+            <div class="cyber-basket" id="bin-no-famous"><h3>🔒 ಅಪ್ರಸಿದ್ಧ (ಪ್ರಸಿದ್ಧಿಗೆ ವಿರುದ್ಧ)</h3></div>
+        </div>
+        <div style="text-align:center; margin-top:20px;"><button class="btn-action" onclick="verifySorting()">ಬುಟ್ಟಿ ಪರಿಶೀಲಿಸಿ ✅</button></div>
+    </div>
+
+    <!-- ACT 5: CHRONOLOGY / SENTENCE BUILDER -->
+    <div id="act5" class="panel" style="border-color: var(--neon-purple);">
+        <h2>🔄 ಆಕ್ಟಿವಿಟಿ 5: ಕಥಾ ಅನುಕ್ರಮ ಮ್ಯಾಟ್ರಿಕ್ಸ್ (ಘಟನೆಗಳ ಮರುಜೋಡಣೆ)</h2>
+        <p style="color:#ccc;">ಪಾಠದಲ್ಲಿ ಪರಿಸರ ಹೋರಾಟ ಮುಂದುವರಿದು ಅಂತಿಮವಾಗಿ ಬದಲಾವಣೆ ತಂದ ಘಟನೆಗಳನ್ನು ಸರಿಯಾದ ಕ್ರಮದಲ್ಲಿ ಎಳೆದು ಜೋಡಿಸಿ:[cite: 1]</p>
+        <div class="flex-drag-layout" id="drag-container"></div>
+        <div style="text-align:center;"><button class="btn-action" onclick="verifyChronology()">ಕ್ರಮ ಲಾಕ್ ಮಾಡಿ 🔐</button></div>
+    </div>
+
+    <!-- ACT 6: WORD MEANINGS MCQ -->
+    <div id="act6" class="panel" style="border-color: var(--neon-pink);">
+        <h2>📚 ಆಕ್ಟಿವಿಟಿ 6: ಶಬ್ದಕೋಶ ಬಹುಬ್ರಹ್ಮಾಂಡ (ಪದಗಳ ನೈಜ ಅರ್ಥ ಗ್ರಹಿಕೆ)</h2>
+        <div class="dashboard-hud"><span id="hud-a6-q">ಪ್ರಶ್ನೆ: 1/5</span><span id="hud-a6-s">ಸ್ಕೋರ್: 0</span></div>
+        <div class="question-card">
+            <div id="a6-qtext" style="font-size: 1.3rem; margin-bottom: 20px; font-weight: bold;">ಲೋಡ್ ಆಗುತ್ತಿದೆ...</div>
+            <div class="options-grid" id="a6-options"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // TAB CORES INTERACTION
+    document.querySelectorAll('.matrix-card').forEach(card => {
+        card.addEventListener('click', () => {
+            document.querySelectorAll('.matrix-card').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+            card.classList.add('active');
+            document.getElementById(card.dataset.target).classList.add('active');
+        });
+    });
+
+    function toggleReveal(id) {
+        const target = document.getElementById(id);
+        target.style.display = target.style.display === 'block' ? 'none' : 'block';
+    }
+
+    // --- ACTIVITY 1: ONE SENTENCE MCQ DATA ---
+    const act1Data = [
+        {q: "೧. ಹಿಲ್ಟನ್ ಹೆಡ್ ದ್ವೀಪವು ಯಾವ ಮಹಾಸಾಗರದಲ್ಲಿದೆ?", o: ["ಪೆಸಿಫಿಕ್ ಸಾಗರ", "ಅಟ್ಲಾಂಟಿಕ್ ಸಾಗರ", "ಹಿಂದೂ ಮಹಾಸಾಗರ"], a: "ಅಟ್ಲಾಂಟಿಕ್ ಸಾಗರ"},
+        {q: "೨. ಅಮೆರಿಕದಲ್ಲಿ ವಾಸವಾಗಿದ್ದ ಮೂಲನಿವಾಸಿಗಳನ್ನು ಏನೆಂದು ಕರೆಯುತ್ತಾರೆ?", o: ["ಯೂರೋಪಿಯನ್ನರು", "ಅಮೆರಿಂಡಿಯನ್ನರು", "ಆಫ್ರಿಕನ್ನರು"], a: "ಅಮೆರಿಂಡಿಯನ್ನರು"},
+        {q: "೩. ಹಿಲ್ಟನ್ ಹೆಡ್ ದ್ವೀಪಕ್ಕೆ ಕಾರು, ಪ್ಲೇನುಗಳಲ್ಲಿ ಬಂದಿಳಿಯುವ ಶ್ರೀಮಂತರ ಉಡುಗೆ ತೊಡುಗೆಯಲ್ಲಿ ಮುಖ್ಯವಾಗಿ ಏನಿರುತ್ತಿತ್ತು?", o: ["ರೇಷ್ಮೆ ಸೀರೆ ಮತ್ತು ದೋತ್ರ", "ಬೂಟು, ಚೆಡ್ಡಿ, ಟೀಶರ್ಟು, ಕೂಲಿಂಗ್ ಗ್ಲಾಸ್ ಮತ್ತು ಸ್ಕಲ್ ಕ್ಯಾಪು", "ಸಾಂಪ್ರದಾಯಿಕ ಕೋಟು ಮತ್ತು ಪೇಟ"], a: "ಬೂಟು, ಚೆಡ್ಡಿ, ಟೀಶರ್ಟು, ಕೂಲಿಂಗ್ ಗ್ಲಾಸ್ ಮತ್ತು ಸ್ಕಲ್ ಕ್ಯಾಪು"},
+        {q: "೪. ಸುಧಾರಣೆಗಳ ಹೆಸರಿನಲ್ಲಿ ಸಾಹುಕಾರರು ಲಾಭಕ್ಕಾಗಿ ಈ ದ್ವೀಪದಲ್ಲಿ ಮುಖ್ಯವಾಗಿ ಯಾವ ಕ್ರೀಡೆಯ ಅಂಕಣ ನಿರ್ಮಿಸಿದರು?", o: ["ಕ್ರಿಕೆಟ್ ಗ್ರೌಂಡ್", "ಗಾಲ್ಫ್ ಕೋರ್ಸ್", "ಫುಟ್ಬಾಲ್ ಸ್ಟೇಡಿಯಂ"], a: "ಗಾಲ್ಫ್ ಕೋರ್ಸ್"},
+        {q: "೫. ದಿನವಿಡೀ ಸುತ್ತಾಡಿ ಸಂತೋಷಪಟ್ಟ ಲೇಖಕರು ಕಡಲತಡಿಯ ಯಾವುದರ ಮೇಲೇರಿ ಆನಂದಿಸಿದರು?", o: ["ದೊಡ್ಡ ಬಿಲ್ಡಿಂಗ್", "ಪುರಾತನ ಲೈಟ್‌ಹೌಸ್", "ದೊಡ್ಡ ಹಡಗು"], a: "ಪುರಾತನ ಲೈಟ್‌ಹೌಸ್"}
+    ];
+    let a1Idx = 0, a1Score = 0;
+    function loadAct1() {
+        if(a1Idx >= act1Data.length) { document.getElementById('a1-qtext').innerText = `🎉 ಮುಕ್ತಾಯ! ನಿಮ್ಮ ಸ್ಕೋರ್: ${a1Score}/5`; document.getElementById('a1-options').innerHTML=''; return; }
+        document.getElementById('hud-a1-q').innerText = `ಪ್ರಶ್ನೆ: ${a1Idx+1}/5`;
+        document.getElementById('hud-a1-s').innerText = `ಸ್ಕೋರ್: ${a1Score}`;
+        const item = act1Data[a1Idx]; document.getElementById('a1-qtext').innerText = item.q;
+        const box = document.getElementById('a1-options'); box.innerHTML = '';
+        item.o.forEach(o => {
+            const btn = document.createElement('button'); btn.className = 'game-btn'; btn.innerText = o;
+            btn.onclick = () => {
+                if(o === item.a) { btn.classList.add('correct'); a1Score++; } else { btn.classList.add('wrong'); }
+                setTimeout(() => { a1Idx++; loadAct1(); }, 700);
+            };
+            box.appendChild(btn);
+        });
+    }
+
+    // --- ACTIVITY 3: VIBHAKTI GRAMMAR DATA ---
+    const act3Data = [
+        {q: "೧. ಅಟ್ಲಾಂಟಿಕ್ 'ಸಾಗರದಲ್ಲಿರುವ' ಹಿಲ್ಟನ್ ಹೆಡ್ ಒಂದು ದ್ವೀಪ.", o: ["ಷಷ್ಠಿ (-ಅ)", "ಚತುರ್ಥಿ (-ಗೆ)", "ಸಪ್ತಮಿ (-ಅಲ್ಲಿ)"], a: "ಸಪ್ತಮಿ (-ಅಲ್ಲಿ)"},
+        {q: "೨. ರಸ್ತೆಯಿಂದ ಅದನ್ನು ತಲುಪಲು ಆರು ಲೇನಿನ ಭಾರಿ 'ಸೇತುವೆ' ಇದೆ.", o: ["ಪ್ರಥಮ (-ಉ)", "ದ್ವಿತೀಯ (-ಅನ್ನು)", "ತೃತೀಯ (-ಇಂದ)"], a: "ಪ್ರಥಮ (-ಉ)"},
+        {q: "೩. ಕೆಲವು ಆಸಕ್ತರು 'ಕೋರ್ಟಿನ' ಮೆಟ್ಟಿಲಿಗೇರುವ ಆಲೋಚನೆ ಮಾಡಿದರು.", o: ["ಷಷ್ಠಿ (-ಅ)", "ಸಪ್ತಮಿ (-ಅಲ್ಲಿ)", "ಪಂಚಮಿ (-ದೆಸೆಯಿಂದ)"], a: "ಷಷ್ಠಿ (-ಅ)"},
+        {q: "೪. ಸಾಹುಕಾರರು ವಿಧಿಯಿಲ್ಲದೆ 'ಕೋರ್ಟು ಕಚೇರಿಗಳ' ಮೆಟ್ಟಿಲೇರಿದರು.", o: ["ಷಷ್ಠಿ (-ಅ)", "ಪ್ರಥಮ (-ಉ)", "ದ್ವಿತೀಯ (-ಅನ್ನು)"], a: "ಪ್ರಥಮ (-ಉ)"},
+        {q: "೫. ರಸ್ತೆ, ಕಟ್ಟಡಗಳಿಗೆ ತೋರುತ್ತಿದ್ದ ಶ್ರದ್ಧೆಯನ್ನು 'ಪರಿಸರಕ್ಕೂ' ತೋರಿಸತೊಡಗಿದರು.", o: ["ಚತುರ್ಥಿ (-ಗೆ / ಇಗೆ / ಕೆ)", "ಷಷ್ಠಿ (-ಅ)", "ತೃತೀಯ (-ಇಂದ)"], a: "ಚತುರ್ಥಿ (-ಗೆ / ಇಗೆ / ಕೆ)"}
+    ];
+    let a3Idx = 0, a3Score = 0;
+    function loadAct3() {
+        if(a3Idx >= act3Data.length) { document.getElementById('a3-qtext').innerText = `📊 ವ್ಯಾಕರಣ ಕ್ವಿಜ್ ಮುಗಿದಿದೆ! ಸ್ಕೋರ್: ${a3Score}/5`; document.getElementById('a3-options').innerHTML=''; return; }
+        document.getElementById('hud-a3-q').innerText = `ಪ್ರಶ್ನೆ: ${a3Idx+1}/5`;
+        document.getElementById('hud-a3-s').innerText = `ಸ್ಕೋರ್: ${a3Score}`;
+        const item = act3Data[a3Idx]; document.getElementById('a3-qtext').innerText = item.q;
+        const box = document.getElementById('a3-options'); box.innerHTML = '';
+        item.o.forEach(o => {
+            const btn = document.createElement('button'); btn.className = 'game-btn'; btn.innerText = o;
+            btn.onclick = () => {
+                if(o === item.a) { btn.classList.add('correct'); a3Score++; } else { btn.classList.add('wrong'); }
+                setTimeout(() => { a3Idx++; loadAct3(); }, 700);
+            };
+            box.appendChild(btn);
+        });
+    }
+
+    // --- ACTIVITY 4: OPPOSITE SORTER ---
+    const poolWords = [
+        {w: "ಲಾಭ", target: "bin-nashta"},
+        {w: "ಪ್ರಸಿದ್ಧ", target: "bin-no-famous"}
+    ];
+    function loadAct4() {
+        const pool = document.getElementById('word-pool'); pool.innerHTML = '';
+        poolWords.forEach((item, i) => {
+            pool.innerHTML += `<span class="item-capsule" id="opp-${i}" onclick="quickMove('opp-${i}')">${item.w}</span>`;
+        });
+    }
+    let currentSelectedWord = null;
+    function quickMove(id) {
+        currentSelectedWord = id;
+        document.getElementById('bin-nashta').onclick = () => dropToBin('bin-nashta');
+        document.getElementById('bin-no-famous').onclick = () => dropToBin('bin-no-famous');
+        alert("ಪದವನ್ನು ಆಯ್ಕೆ ಮಾಡಲಾಗಿದೆ! ಈಗ ಕೆಳಗಿನ ಸೂಕ್ತವಾದ ಬುಟ್ಟಿಯ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ.");
+    }
+    function dropToBin(binId) {
+        if(currentSelectedWord) {
+            document.getElementById(binId).appendChild(document.getElementById(currentSelectedWord));
+            currentSelectedWord = null;
+        }
+    }
+    function verifySorting() {
+        let ok = true;
+        poolWords.forEach((item, i) => {
+            const el = document.getElementById(`opp-${i}`);
+            if(!el || el.parentElement.id !== item.target) ok = false;
+        });
+        alert(ok ? "🥳 ಸರಿಯಾದ ವಿಂಗಡಣೆ! ವಿರುದ್ಧಾರ್ಥಕ ಪದಗಳ ಪರಿಕಲ್ಪನೆ ಅದ್ಭುತವಾಗಿದೆ!" : "❌ ಕೆಲವು ಪದಗಳು ತಪ್ಪು ಬುಟ್ಟಿ ಸೇರಿವೆ, ಪರಿಶೀಲಿಸಿ.");
+    }
+
+    // --- ACTIVITY 5: STORY CHRONOLOGY DRAG LIST ---
+    const chronoCorrect = [
+        "ದುಡ್ಡು ಮತ್ತು ದೌಲತ್ತುಗಳಿಂದ ಪರಾವರಣದ ಚಳುವಳಿಗಳಿಗೆ ಮೊದಲು ಹಿನ್ನಡೆ ಆಗತೊಡಗಿತು[cite: 1].",
+        "ವಿಧಿಯಿಲ್ಲದೆ ಕೆಲವು ಆಸಕ್ತ ಪರಿಸರವಾದಿಗಳು ಒಟ್ಟಾಗಿ ಕೋರ್ಟು ಕಚೇರಿಗಳ ಮೆಟ್ಟಿಲೇರಿದರು[cite: 1].",
+        "ಕ್ರಮೇಣ ಜನರ ಸಮ್ಮತಿಯು ಪರಿಸರ ಸೌಂದರ್ಯ ಮತ್ತು ಕಾಪಾಡುವಿಕೆಯತ್ತ ಒಲಿಯಿತು[cite: 1].",
+        "ನೆಲ ಜಲ ಸಂಪತ್ತನ್ನು ಕಾಪಿಟ್ಟುಕೊಳ್ಳಲು ಎಲ್ಲರೂ ಸೇರಿ ಮಹತ್ವದ ಮಂತ್ರಾಲೋಚನೆ ನಡೆಸಿದರು[cite: 1].",
+        "ಪರಿಣಾಮವಾಗಿ ನಾಲ್ಕಾರು ವರ್ಷಗಳಲ್ಲಿ ಹಿಲ್ಟನ್ ಹೆಡ್ ನಂದನವನದಂತೆ ಕಂಗೊಳಿಸತೊಡಗಿತು[cite: 1]."
+    ];
+    let chronoCurrent = [...chronoCorrect].sort(() => Math.random() - 0.5);
+    function loadAct5() {
+        const container = document.getElementById('drag-container'); container.innerHTML = '';
+        chronoCurrent.forEach((text, i) => {
+            container.innerHTML += `<div class="drag-node" draggable="true" data-idx="${i}" ondragstart="dragS(event)" ondragover="dragO(event)" ondrop="dragD(event)"><div class="num-tag">${i+1}</div><div>${text}</div></div>`;
+        });
+    }
+    let srcIdx;
+    function dragS(e) { srcIdx = +e.currentTarget.dataset.idx; }
+    function dragO(e) { e.preventDefault(); }
+    function dragD(e) {
+        const destIdx = +e.currentTarget.dataset.idx;
+        const temp = chronoCurrent[srcIdx];
+        chronoCurrent[srcIdx] = chronoCurrent[destIdx];
+        chronoCurrent[destIdx] = temp;
+        loadAct5();
+    }
+    function verifyChronology() {
+        let isCorrect = chronoCurrent.every((v, i) => v === chronoCorrect[i]);
+        alert(isCorrect ? "🏆 ಯೆಸ್! ಇತಿಹಾಸದ ಸರಣಿಯನ್ನು ನಿಖರವಾಗಿ ಜೋಡಿಸಿದ್ದೀರಿ!" : "❌ ಕ್ರಮ ತಪ್ಪಿದೆ, ಮತ್ತೊಮ್ಮೆ ಪ್ರಯತ್ನಿಸಿ.");
+    }
+
+    // --- ACTIVITY 6: WORD MEANINGS MCQ ---
+    const act6Data = [
+        {q: "೧. 'ಪರಾವರಣ' ಅಥವಾ 'ಪಠ್ಯಾವರಣ' ಎಂಬ ಪದದ ನೈಜ ಅರ್ಥವೇನು?", o: ["ಆಕಾಶ ಪ್ರಪಂಚ", "ಪರಿಸರ (Environment)", "ನಗರ ಅಭಿವೃದ್ಧಿ"], a: "ಪರಿಸರ (Environment)"},
+        {q: "೨. 'ಧೂಳೀಪಟ' ಎನ್ನುವುದರ ಸರಿಯಾದ ತಾತ್ಪರ್ಯವೇನು?", o: ["ಧೂಳು ಹರಡುವುದು", "ಸಂಪೂರ್ಣ ನಾಶವಾಗುವುದು", "ಹೊಸದಾಗಿ ಸ್ಥಾಪಿಸುವುದು"], a: "ಸಂಪೂರ್ಣ ನಾಶವಾಗುವುದು"},
+        {q: "೩. 'ಅಭಿಯಂತರ' ಎಂದರೆ ಯಾರು?", o: ["ಇಂಜಿನಿಯರ್ (Engineer)", "ನ್ಯಾಯಾಧೀಶರು", "ದೊಡ್ಡ ಸಾಹುಕಾರ"], a: "ಇಂಜಿನಿಯರ್ (Engineer)"},
+        {q: "೪. 'ಭರಾಟೆ' ಎಂಬ ಪದದ ಅರ್ಥವೇನು?", o: ["ನಿಶ್ಯಬ್ದ ಪರಿಸರ", "ಉಪಟಳ / ಭಾರಿ ಗದ್ದಲ ಮತ್ತು ವೇಗ", "ಸಣ್ಣ ಪ್ರವಾಸ"], a: "ಉಪಟಳ / ಭಾರಿ ಗದ್ದಲ ಮತ್ತು ವೇಗ"},
+        {q: "೫. 'ಪಣತೊಡು' ಎಂದರೆ ಏನರ್ಥ?", o: ["ನಿಶ್ಚಯಿಸು / ಪ್ರತಿಜ್ಞೆ ಮಾಡು", "ಆಟವಾಡು", "ಹಣ ಗಳಿಸು"], a: "ನಿಶ್ಚಯಿಸು / ಪ್ರತಿಜ್ಞೆ ಮಾಡು"}
+    ];
+    let a6Idx = 0, a6Score = 0;
+    function loadAct6() {
+        if(a6Idx >= act6Data.length) { document.getElementById('a6-qtext').innerText = `🏆 ಗ್ರ್ಯಾಂಡ್ ಫಿನಾಲೆ ಮುಗಿದಿದೆ! ಸ್ಕೋರ್: ${a6Score}/5`; document.getElementById('a6-options').innerHTML=''; return; }
+        document.getElementById('hud-a6-q').innerText = `ಪ್ರಶ್ನೆ: ${a6Idx+1}/5`;
+        document.getElementById('hud-a6-s').innerText = `ಸ್ಕೋರ್: ${a6Score}`;
+        const item = act6Data[a6Idx]; document.getElementById('a6-qtext').innerText = item.q;
+        const box = document.getElementById('a6-options'); box.innerHTML = '';
+        item.o.forEach(o => {
+            const btn = document.createElement('button'); btn.className = 'game-btn'; btn.innerText = o;
+            btn.style.borderColor = 'var(--neon-pink)';
+            btn.onclick = () => {
+                if(o === item.a) { btn.classList.add('correct'); a6Score++; } else { btn.classList.add('wrong'); }
+                setTimeout(() => { a6Idx++; loadAct6(); }, 700);
+            };
+            box.appendChild(btn);
+        });
+    }
+
+    window.onload = () => {
+        loadAct1();
+        loadAct3();
+        loadAct4();
+        loadAct5();
+        loadAct6();
+    };
+</script>
+</body>
+</html>

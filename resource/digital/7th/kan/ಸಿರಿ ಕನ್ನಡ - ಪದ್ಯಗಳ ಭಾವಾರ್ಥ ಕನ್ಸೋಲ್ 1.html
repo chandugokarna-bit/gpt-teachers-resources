@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಸಿರಿ ಕನ್ನಡ - ಪದ್ಯಗಳ ಭಾವಾರ್ಥ ಕನ್ಸೋಲ್</title>
+    <style>
+        :root {
+            --neon-gold: #ffd700;
+            --neon-cyan: #00f2fe;
+            --neon-green: #39ff14;
+            --neon-pink: #ff007f;
+            --dark-core: #06070a;
+            --panel-bg: rgba(22, 26, 38, 0.98);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: radial-gradient(circle at center, #1b2035 0%, var(--dark-core) 100%);
+            margin: 0;
+            padding: 20px;
+            color: #fff;
+            min-height: 100vh;
+        }
+
+        .ai-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            background: var(--panel-bg);
+            border-radius: 24px;
+            padding: 30px;
+            box-shadow: 0 0 40px rgba(0, 242, 254, 0.15);
+            border: 2px solid rgba(0, 242, 254, 0.2);
+        }
+
+        header {
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 20px;
+            margin-bottom: 25px;
+        }
+
+        h1 {
+            font-size: 2.3rem;
+            background: linear-gradient(90deg, var(--neon-gold), var(--neon-cyan), var(--neon-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 0 0 10px 0;
+            font-weight: 800;
+        }
+
+        /* Poem Selector Tabs */
+        .poem-selector {
+            display: flex;
+            justify-content: space-around;
+            background: rgba(0,0,0,0.4);
+            padding: 8px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            gap: 10px;
+        }
+
+        .poem-tab {
+            flex: 1;
+            background: none;
+            border: 1px solid rgba(255,255,255,0.1);
+            color: #fff;
+            padding: 12px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .poem-tab.active {
+            background: linear-gradient(135deg, var(--neon-cyan) 0%, #4facfe 100%);
+            color: #000;
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 15px rgba(0, 242, 254, 0.4);
+        }
+
+        .split-engine {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 25px;
+            margin-top: 20px;
+        }
+
+        .poem-stream {
+            display: none;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .poem-stream.active {
+            display: flex;
+        }
+
+        .poem-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-left: 5px solid var(--neon-cyan);
+            border-radius: 14px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            line-height: 1.8;
+            font-size: 1.1rem;
+        }
+
+        .poem-card:hover {
+            border-color: var(--neon-gold);
+            background: rgba(255, 215, 0, 0.04);
+            transform: scale(1.01);
+        }
+
+        .poem-card.active {
+            background: rgba(0, 242, 254, 0.08);
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 20px rgba(0, 242, 254, 0.2);
+        }
+
+        .para-tag {
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: var(--neon-gold);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        /* Summary Panel */
+        .summary-display {
+            background: rgba(0, 0, 0, 0.3);
+            border: 2px dashed rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 25px;
+            position: sticky;
+            top: 20px;
+            height: fit-content;
+            min-height: 320px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .summary-title {
+            color: var(--neon-green);
+            font-size: 1.35rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            border-bottom: 1px solid rgba(57, 255, 20, 0.2);
+            padding-bottom: 10px;
+        }
+
+        .summary-body {
+            font-size: 1.15rem;
+            line-height: 1.7;
+            color: #e2e8f0;
+            text-align: justify;
+        }
+
+        .placeholder-text {
+            color: #666;
+            text-align: center;
+            font-size: 1.15rem;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+
+<div class="ai-container">
+    <header>
+        <h1>📖 ಸಿರಿ ಕನ್ನಡ ಪದ್ಯಗಳ ಭಾವಾರ್ಥ ಲೋಕ 📖</h1>
+        <p style="margin: 0; color: #a0aabf;">ಪ್ರತಿ ಪ್ಯಾರಾಗ್ರಾಫ್ ಕ್ಲಿಕ್ ಮಾಡಿ ಸರಳ ವಿವರಣೆಯನ್ನು ತಕ್ಷಣ ಪಡೆಯಿರಿ</p>
+    </header>
+
+    <!-- Main Poem Selector -->
+    <div class="poem-selector">
+        <button class="poem-tab active" onclick="switchPoem('p1', this)">೧. ಹುತ್ತರಿ ಹಾಡು</button>
+        <button class="poem-tab" onclick="switchPoem('p2', this)">೨. ಸ್ವಾತಂತ್ರ್ಯ ಸ್ವರ್ಗ</button>
+        <button class="poem-tab" onclick="switchPoem('p3', this)">೩. ಭಾಗ್ಯದ ಬಳೆಗಾರ</button>
+        <button class="poem-tab" onclick="switchPoem('p4', this)">೪. ವಚನಗಳ ಭಾವಸಂಗಮ</button>
+    </div>
+
+    <div class="split-engine">
+        <!-- LEFT POEM TEXTS CONTAINER -->
+        <div class="left-box">
+            
+            <!-- POEM 1 -->
+            <div id="p1" class="poem-stream active">
+                <div class="poem-card" onclick="displaySummary(0, 0, this)">
+                    <div class="para-tag">ಪ್ಯಾರಾಗ್ರಾಫ್ ೧</div>
+                    ಎಲ್ಲಿ ಭೂರಮೆ ದೇವ ಸನ್ನಿಧಿ ಬಯಸಿ ಬಿಮ್ಮನೆ ಬಂದಳೋ?<br>
+                    ಎಲ್ಲಿ ಮೋಹನ ಗಿರಿಯ ಬೆರಗಿನ ರೂಪಿನಿಂದಲಿ ನಿಂದಳೋ?<br>
+                    ಎಲ್ಲಿ ಮುಗಿಲಲಿ ಮಿಂಚಿನೋಲ್ ಕಾವೇರಿ ಹೊಳೆ ಹೊಳೆ ಹೊಳೆವಳೋ?<br>
+                    ಎಲ್ಲಿ ನೆಲವನು ತಣಿಸಿ ಜನಮನ ಹೊಲದ ಕಳೆಕಳೆ ಕಳೆವಳೋ?<br>
+                    ಅಲ್ಲೆ ಆ ಕಡೆ ನೋಡಲಾ! ಅಲ್ಲೆ ಕೊಡಗರ ನಾಡಲಾ! ಅಲ್ಲೆ ಕೊಡವರ ಬೀಡಲಾ!
+                </div>
+                <div class="poem-card" onclick="displaySummary(0, 1, this)">
+                    <div class="para-tag">ಪ್ಯಾರಾಗ್ರಾಫ್ ೨</div>
+                    ಸವಿದು ಮೆದ್ದರೊ ಯಾರು ಪೂರ್ವದಿ ಹುಲಿಯ ಹಾಲಿನ ಮೇವನು?<br>
+                    ಕವಣೆ ತಿರಿಕಲ್ಲಾಟ ಹಗ್ಗಕೆ ಸೆಳೆದರೋ ಹೆಬ್ಬಾವನು?<br>
+                    ಸವರಿ ಆನೆಯ ಸೊಂಡಲಿನ ರಣಕೊಂಬನಾರ್ ಭೋರ್ಗರೆದರೋ?<br>
+                    ಸವೆದು ಸವೆಯದ ಸಾಹಸತ್ವದ ಕ್ಷಾತ್ರ ಬೇಟೆಯ ಮೆರೆದರೋ?<br>
+                    ಅವರು ಸೋಲ್ ಸಾವರಿಯರು! ಅವರು ಕಡುಗಲಿ ಗರಿಯರು! ಅವರೆ ಕೊಡಗಿನ ಹಿರಿಯರು!
+                </div>
+                <div class="poem-card" onclick="displaySummary(0, 2, this)">
+                    <div class="para-tag">ಪ್ಯಾರಾಗ್ರಾಫ್ ೩</div>
+                    ತಮ್ಮ ನಾಡಿನ ಕೊರಳು ದಾಸ್ಯದ ನೊಗದ ಭಾರಕೆ ಬಗ್ಗದೋಲ್<br>
+                    推 ಹೆಮ್ಮೆಹಗೆಗಳ ಹೊಡೆದು ಹಿರಿಯರು ಹಸಿದು ಹಾರುವ ಬಗ್ಗದೋಲ್<br>
+                    ಬೊಮ್ಮಗಿರಿಯಿಂ ಪುಷ್ಪಗಿರಿ ಪರ್ಯಂತ ಬೆಳೆದೀ ದೇಶವು<br>
+                    ಧರ್ಮದಾನವ ಕಟ್ಟು ಕಟ್ಟಳೆ ರೀತಿ ನೀತಿಯ ಕೋಶವು<br>
+                    ನಮ್ಮ ಕೊಡಗಿದು ಜಮ್ಮ ಕೊಡಗಿದು ನಮ್ಮೊಡಲ್ ಬಿಡಲಮ್ಮದು !
+                </div>
+                <div class="poem-card" onclick="displaySummary(0, 3, this)">
+                    <div class="para-tag">ಪ್ಯಾರಾಗ್ರಾಫ್ ೪</div>
+                    ಇದು ಅಗಸ್ಯನ ತಪದ ಮನೆ, ಕಾವೇರಿ ತಾಯ ತವರ್ಮನೆ,<br>
+                    ಕದನ ಸಿರಿಗುಯ್ಯಾಲೆ ತೂಗಿದನಿಲ್ಲಿ ಚಂದರವರ್ಮನೆ!<br>
+                    ಇದಕೊ! ಚೆಂಗಾಳ್ವರಸರಾಡಂಬರವು ಕುಣಿದ ಶ್ರೀರಂಗವು<br>
+                    ಇದೊ! இதೊ! ಇಲ್ಲರುಳ ಹಾಲೇರಿಯರ ಬಲಗಿರಿಶೃಂಗವು<br>
+                    ವಿಧಿಯ ಮಾಟದ ಕೊಡಗಿದು ಮೊದಲೆ ನಮ್ಮದು, ಕಡೆಗಿದು ಕದಲದೆಮ್ಮನು; ಬೆಡಗಿದು.
+                </div>
+                <div class="poem-card" onclick="displaySummary(0, 4, this)">
+                    <div class="para-tag">ಪ್ಯಾರಾಗ್ರಾಫ್ ೫</div>
+                    ಒಮ್ಮತವು ಒಗ್ಗಟ್ಟು ಒಂದೇ ಮನವು ಎಲ್ಲಿದೆ ಹೇಳಿರಿ?<br>
+                    ಸುಮ್ಮನಿತ್ತರೊ ದಟ್ಟಿಕುಪ್ಪಸ? ಹಾಡುಹುತ್ತರಿಗೇಳಿರಿ!<br>
+                    ಚಿಮ್ಮಿ ಪಾತುರೆಕೋಲ ಹೊಯ್ಲಿಗೆ ಕುಣಿವ ಪದ ಹೊರ ಹೊಮ್ಮಲಿ!<br>
+                    ಅಮ್ಮೆ ಹರಸಿದ ಸೀಮೆ ನಮಗಿದು ಇರಲಿ ನಮ್ಮದೆ ನಮ್ಮಲಿ!<br>
+                    ನೆಮ್ಮದಿಯನಿದು ತಾಳಲಿ ಅಮ್ಮೆಯಾ ಬಲತೋಳಲಿ ನಮ್ಮ ಕೊಡಗಿದು ಬಾಳಲಿ
+                </div>
+            </div>
+
+            <!-- POEM 2 -->
+            <div id="p2" class="poem-stream">
+                <div class="poem-card" onclick="displaySummary(1, 0, this)">
+                    <div class="para-tag">ಪ್ಯಾರಾಗ್ರಾಫ್ ೧</div>
+                    ಅಭಿಮಾನಧನವೆನಿಪ ಮಸ್ತಕವನ್ನು ನಿರ್ಭೀತ ನಿರ್ಮುಕ್ತ ಮನವು ತಾ<br>
+                    ಜಗ್ಗದೆಯೆ ಕುಗ್ಗದೆಯೆ ತಗ್ಗದೆಯೆ ಬಗ್ಗದೆಯೆ ಮೇಲೊಗದಿ ನೀಟಾಗಿ ನಿಂದಿರುವುದು;-<br>
+                    ಅಲ್ಲಿ ಆ ಸ್ವಾತಂತ್ರ್ಯ -ಸ್ವರ್ಗದಲಿ, ಓ ತಂದೆ! ಏಳಲೈ ಬಾಳ ನಾಡೆಮ್ಮದು!
+                </div>
+                <div class="poem-card" onclick="displaySummary(1, 1, this)">
+                    <div class="para-tag">ಪ್ಯಾರಾಗ್ರಾಫ್ ೨</div>
+                    ಅರಿವು ತಾನ್ ಸರ್ವಸ್ವತಂತ್ರವಾಗಲಿಹುದು; ಸಂಕುಚಿತತನ ಮನೋವೃತ್ತಿಯಳಿದು<br>
+                    ವಿಶ್ವವೆಂಬuವುದೆಲ್ಲ ಹೋಳು ಹೋಳಾಗದೆಯೆ ಒಂದಾಗಿ ಚೆಂದಾಗಿ ಬಾಳುತಿಹುದು;-<br>
+                    ಅಲ್ಲಿ ಆ ಸ್ವಾತಂತ್ರ್ಯ - ಸ್ವರ್ಗದಲಿ, ಓ ತಂದೆ! ಏಳಲೈ ಬಾಳ ನಾಡೆಮ್ಮದು!
+                </div>
+                <div class="poem-card" onclick="displaySummary(1, 2, this)">
+                    <div class="para-tag">ಪ್ಯಾರಾಗ್ರಾಫ್ ೩</div>
+                    ನನ್ನಿತನದಾಳದಿಂದೆಲ್ಲಿ ನುಡಿ ಹೊರಬಹುದು; ದುಡಿಮೆಯೆಂಬuವುದೆಲ್ಲಿ ಮುಂದುವರಿದು,<br>
+                    ದಣಿವನ್ನು ಅರಿಯದೆಯೆ ದಣಿವಿಂಗೆ ಮಣಿಯದೆಯೆ, ಪೂರ್ಣತೆಗೆ ತನ್ನ ಕೈಚಾಚುತಿಹುದು;-<br>
+                    ಅಲ್ಲಿ ಆ ಸ್ವಾತಂತ್ರ್ಯ -ಸ್ವರ್ಗದಲಿ, ಓ ತಂದೆ! ಏಳಲೈ ಬಾಳ ನಾಡೆಮ್ಮದು!
+                </div>
+                <div class="poem-card" onclick="displaySummary(1, 3, this)">
+                    <div class="para-tag">ಪ್ಯಾರಾಗ್ರಾಫ್ ೪</div>
+                    ಸಂಪ್ರದಾಯದನಿಷ್ಟ ರೂಢಿ-ನಿಯಮಗಳೆಂಬ ನಿರ್ಜನದ ಮರುಭೂಮಿ ಹರಹಿನಲ್ಲಿ<br>
+                    ಸುವಿಚಾರವೆಂದೆಂಬ ಪರಿಶುದ್ಧ ವಾಹಿನಿಯು ಹರಿಗಡಿಯದೆಯೆ ಮುಂದುವರಿಯುವಲ್ಲಿ;-<br>
+                    ಅಲ್ಲಿ ಆ ಸ್ವಾತಂತ್ರ್ಯ -ಸ್ವರ್ಗದಲಿ, ಓ ತಂದೆ! ಏಳಲೈ ಬಾಳ ನಾಡೆಮ್ಮದು!
+                </div>
+                <div class="poem-card" onclick="displaySummary(1, 4, this)">
+                    <div class="para-tag">ಪ್ಯಾರಾಗ್ರಾಫ್ ೫</div>
+                    ಮನವರಳಿ ತಾನಲ್ಲಿ ಮುಂದರಿವುದು ನಿತ್ಯ ವೈಶಾಲ್ಯವಹ ನಡೆ-ನುಡಿಗಳಿಂದಾಗಿ<br>
+                    ನಿನ್ನೊಲವು, ನಿನ್ನ ದಯೆ, ನಿನ್ನ ಕೃಪೆಯಿಂದಾಗಿ ನಿನ್ನನ್ನೆ ಧ್ರುವತಾರೆಯೆಂದರಿವುದು;-<br>
+                    ಅಲ್ಲಿ ಆ ಸ್ವಾತಂತ್ರ್ಯ -ಸ್ವರ್ಗದಲಿ, ಓ ತಂದೆ! ಏಳಲೈ ಬಾಳ ನಾಡೆಮ್ಮದು!
+                </div>
+            </div>
+
+            <!-- POEM 3 -->
+            <div id="p3" class="poem-stream">
+                <div class="poem-card" onclick="displaySummary(2, 0, this)">
+                    <div class="para-tag">ಪ್ಯಾರಾಗ್ರಾಫ್ ೧</div>
+                    ಭಾಗ್ಯದ ಬಳೆಗಾರ ಹೋಗಿ ಬಾ ನನ್ನವರಿಗೆ ॥ ನಿನ್ನ ತವರೂರ ನಾನೇನು ಬಲ್ಲೆನು<br>
+                    ಗೊತ್ತಿಲ್ಲ ಎನಗೆ ಗುರಿಯಿಲ್ಲ ಎಲೆ ಬಾಲೆ ತೋರಿಸು ಬಾರೇ ತವರೂರ
+                </div>
+                <div class="poem-card" onclick="displaySummary(2, 1, this)">
+                    <div class="para-tag">ಪ್ಯಾರಾಗ್ರಾಫ್ ೨</div>
+                    ಬಾಳೆ ಬಲಕ್ಕೆ ಬಿಡೊ ಸೀಬೆ ಎಡಕ್ಕೆ ಬಿಡಿ ನಟ್ಟನಡುವೇಲಿ ನೀ ಹೋಗೋ ಬಳೆಗಾರ<br>
+                    ಅಲ್ಲಿಹುದೇ ನನ್ನ ತವರೂರು! ಮುತ್ತೈದೆ ಎಲೆ ಹೆಣ್ಣೆ ತೋರುಬಾರೆ ತವರೂರ ॥
+                </div>
+                <div class="poem-card" onclick="displaySummary(2, 2, this)">
+                    <div class="para-tag">ಪ್ಯಾರಾಗ್ರಾಫ್ ೩</div>
+                    ಆಲೆ ಆಡುತಾವೆ ಗಾಣ ತಿರುಗುತಾವೆ ನವಿಲು ಸಾರಂಗ ನಲಿತಾವೆ ಬಳೆಗಾರ<br>
+                    ಅದೇ ಕಾಣೋ ನನ್ನ ತವರೂರು। ಮುತ್ತೈದೆ ಎಲೆ ಹೆಣ್ಣೆ ತೋರುಬಾರೆ ತವರೂರ ॥
+                </div>
+                <div class="poem-card" onclick="displaySummary(2, 3, this)">
+                    <div class="para-tag">ಪ್ಯಾರಾಗ್ರಾಫ್ ೪</div>
+                    ಹಂಚಿನ ಮನೆ ಕಾಣೋ ಕಂಸಿನ ಕದ ಕಾಣೋ ಮಿಂಚಾಡೊವೆರಡು ಗಿಣಿ ಕಾಣೋ ಬಳೆಗಾರ<br>
+                    ಅಲ್ಲಿಹುದೇ ನನ್ನ ತವರೂರು। ಮುತ್ತೈದೆ ಎಲೆ ಹೆಣ್ಣೆ ತೋರುಬಾರೆ ತವರೂರ ॥
+                </div>
+                <div class="poem-card" onclick="displaySummary(2, 4, this)">
+                    <div class="para-tag">ಪ್ಯಾರಾಗ್ರಾಫ್ ೫</div>
+                    ಮುತ್ತೈದೆ ಹಟೀಲಿ ಮುತ್ತೀನ ಚಪ್ಪರ ಹಾಕಿ ನಟ್ಟ ನಡುವೇಲಿ ಪಗಡೆಯ ಆಡುತಾಳೆ<br>
+                    ಅವಳೆ ಕಾಣೋ ಎನ್ನ ಹಡೆದವ್ವಾ। ಮುತ್ತೈದೆ ಎಲೆ ಹೆಣ್ಣೆ ತೋರುಬಾರೆ ತವರೂರ ॥
+                </div>
+                <div class="poem-card" onclick="displaySummary(2, 5, this)">
+                    <div class="para-tag">ಪ್ಯಾರಾಗ್ರಾಫ್ ೬</div>
+                    ಅಚ್ಚ ಕೆಂಪಿನ ಬಳೆ ಹಸಿರು ಗೀರಿನ ಬಳೆ ಎನ್ನ ಹಡೆದದ್ದೆ ಬಲು ಆಸೆ ಬಳೆಗಾರ<br>
+                    ಕೊಂಡೋಗೊ ಎನ್ನ ತವರೀಗೆ। ಭಾಗ್ಯದ ಬಳೆಗಾರ ಹೋಗಿ ಬಾ ನನ್ನವರಿಗೆ ॥
+                </div>
+            </div>
+
+            <!-- POEM 4 -->
+            <div id="p4" class="poem-stream">
+                <div class="poem-card" onclick="displaySummary(3, 0, this)">
+                    <div class="para-tag">ಜೇಡರ ದಾಸಿಮಯ್ಯನವರ ವಚನ</div>
+                    ಹರಿದ ಗೋಣಿಯಲೊಬ್ಬ ಕಳವೆಯ ತುಂಬಿದ ಇರುಳೆಲ್ಲಾ ನಡೆದನಾ ಸುಂಕಕಂಜಿ<br>
+                    ಕಳವೆಯೆಲ್ಲಾ ಹೋಗಿ ಬರಿಗೋಣಿ ಉಳಿಯಿತ್ತು ಅಳಿಮನದವನ ಭಕ್ತಿ ಇಂತಾಯಿತ್ತು ರಾಮನಾಥ
+                </div>
+                <div class="poem-card" onclick="displaySummary(3, 1, this)">
+                    <div class="para-tag">ಮಡಿವಾಳ ಮಾಚಯ್ಯನವರ ವಚನ</div>
+                    ಅಂಧಕಾರದ ದೆಸೆಯಿಂದ ಚಂದ್ರನ ಪ್ರಭೆಯಾಯಿತು ನಿಂದಕರ ನುಡಿಯಿಂದ ಏಡಿಸಲೈ ಶಿವಭಕ್ತಿಯ ಪ್ರಭೆಯಾಯಿತು<br>
+                    ಅಹುದೆಂದಡೆ ಅಲ್ಲವೆಂದತಿಗಳೆವರು ಕುತರ್ಕಶಾಸ್ತ್ರದಿಂದ ಯಮಗತಿಗರ ಕೂಡೆ ನಾನಾ ಜನ್ಮಕ್ಕೇರದೆ, ಶಿವಾಚಾರದ ಪಥವ ತೋರಯ್ಯಾ ಕಲಿದೇವರ ದೇವ
+                </div>
+                <div class="poem-card" onclick="displaySummary(3, 2, this)">
+                    <div class="para-tag">ಮುಕ್ತಾಯಕ್ಕನವರ ವಚನ</div>
+                    ನುಡಿಯಲುಬಾರದು ಕೆಟ್ಟ ನುಡಿಗಳ, ನಡೆಯಲುಬಾರದು ಕೆಟ್ಟ ನಡೆಗಳ<br>
+                    ನುಡಿದಡೇನು, ನಡೆಯದಿರ್ದಡೇನು ಹಿಡಿದ ವ್ರತವ ಬಿಡದಿರಲು ಅದೇ ಮಹಾಜ್ಞಾನದಾಚರಣೆ ಎಂಬೆನು ಅಜಗಣ್ಣ ತಂದೆ
+                </div>
+                <div class="poem-card" onclick="displaySummary(3, 3, this)">
+                    <div class="para-tag">ಸತ್ಯಕ್ಕನವರ ವಚನ</div>
+                    ಲಂಚವಂಚನಕ್ಕೆ ಕೈಯಾನದ ಭಾಷೆ, ಬಟ್ಟೆಯಲ್ಲಿ ಹೊನ್ನುವಸ್ತ್ರ ಬಿದ್ದಿದ್ದರೆ ನಾನು ಕೈಮುಟ್ಟಿ ಎತ್ತಿದೆನಾದರೆ ನಿಮ್ಮಾಣೆ ನಿಮ್ಮ ಪ್ರಮಥರಾಣೆ<br>
+                    ಅದೇನು ಕಾರಣವೆಂದರೆ ನೀವಿಕ್ಕಿದ ಭಿಕ್ಷದಲ್ಲಿಪ್ಪೆನಾಗಿ ಇಂತಲ್ಲದೆ ನಾನು ಅಳಿಮನವ ಮಾಡಿ ಪರದ್ರv್ಯಕ್ಕೆ ಆಸೆ ಮಾಡಿದೆನಾದರೆ ನೀನಾಗಲೆ ಎನ್ನ ನರಕದಲ್ಲಿ ಅದ್ದಿ ನೀನೆದ್ದು ಹೋಗಾ ಶಂಭುಜಕ್ಕೇಶ್ವರಾ.
+                </div>
+            </div>
+
+        </div>
+
+        <!-- RIGHT SIDE: SUMMARY TEXT ENGINE -->
+        <div class="summary-display" id="display-box">
+            <div class="placeholder-text" id="summary-placeholder">👈 ಎಡಭಾಗದ ಯಾವುದೇ ಪ್ಯಾರಾಗ್ರಾಫ್ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿದರೆ ಅದರ ಅತ್ಯಂತ ಸರಳ ಸಾರಾಂಶ ಇಲ್ಲಿ ಮೂಡುತ್ತದೆ.</div>
+            <div id="summary-view" style="display: none;">
+                <div class="summary-title" id="summary-title">ಭಾವರ್ಥ</div>
+                <div class="summary-body" id="summary-body">ಕಂಟೆಂಟ್...</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Pure Database of summaries completely clean from any citation strings
+    const poemDatabase = [
+        // Poem 1: Huttari Haadu
+        [
+            "ಭೂದೇವಿಯು ದೇವರ ಸನ್ನಿಧಿಯನ್ನು ಆಶಿಸಿ ಸೌಂದರ್ಯದ ರೂಪದಿಂದ ಬಂದು ನಿಂತಿರುವ ಜಾಗವೇ ಕೊಡಗು. ಇಲ್ಲಿ ಮುಗಿಲಿನಲ್ಲಿ ಮಿಂಚಿನಂತೆ ಹೊಳೆಯುವ ಕಾವೇರಿ ನದಿಯು ಹರಿದು, ಇಡೀ ಭೂಮಿಯನ್ನು ತಣಿಸಿ ಜನರ ಮನಸ್ಸಿನ ಬೇಸರ ಕಳೆದು ಸಂತೋಷ ನೀಡುತ್ತದೆ. ಅದೇ ಕೊಡಗರ ಸುಂದರ ನಾಡು ಮತ್ತು ವೀರರ ಬೀಡು.",
+            "ಕೊಡಗಿನ ಹಿರಿಯರು ಅತ್ಯಂತ ಸಾಹಸಿಗಳು. ಅವರು ಪೂರ್ವದಲ್ಲಿ ಹುಲಿಯ ಹಾಲನ್ನು ಕುಡಿದು ಬೆಳೆದ ಮಹಾಶೂರರಾಗಿದ್ದು, ಭೀಕರ ಹೆಬ್ಬಾವನ್ನು ಹಗ್ಗದಂತೆ ಸೆಳೆಯುವ ಮತ್ತು ಆನೆಯ ಸೊಂಡಲನ್ನು ಸವರಿ ಯುದ್ಧದ ರಣಕೊಂಬನ್ನು ಊದುವ ಧೀರರಾಗಿದ್ದಾರೆ. ಇವರು ಸೋಲನ್ನೇ ಅರಿಯದ ಕಡುಗಲಿಗಳು.",
+            "ಕೊಡಗಿನ ಹಿರಿಯರು ತಮ್ಮ ನಾಡಿನ ಗೌರವವನ್ನು ಎಂದಿಗೂ ಗುಲಾಮಗಿರಿಯ ನೊಗಕ್ಕೆ ಒಪ್ಪಿಸದವರು. ಹಸಿದ ಹುಲಿಯಂತೆ ಶತ್ರುಗಳನ್ನು ಹೊಡೆದೋಡಿಸಿದವರು. ಬೊಮ್ಮಗಿರಿಯಿಂದ ಪುಷ್ಪಗಿರಿ ತನಕ ಹರಡಿರುವ ಈ ನಾಡು ಧರ್ಮ, ದಾನ ಮತ್ತು ರೀತಿ-ನೀತಿಗಳ ದೊಡ್ಡ ಭಂಡಾರವಾಗಿದೆ. ನಮ್ಮ ಪ್ರಾಣ ಹೋದರೂ ಈ ಜಮ್ಮ ಕೊಡಗನ್ನು ನಾವು ಬಿಟ್ಟುಕೊಡುವುದಿಲ್ಲ.",
+            "ಕೊಡಗು ನಾಡು ಅಗಸ್ತ್ಯ ಮುನಿಗಳು ತಪಸ್ಸು ಮಾಡಿದ ಪವಿತ್ರ ಕ್ಷೇತ್ರ ಮತ್ತು ಕಾವೇರಿ ತಾಯಿಯ ತಾಯ್ಮನೆಯಾಗಿದೆ. ಚಂದರವರ್ಮ, ಚೆಂಗಾಳ್ವರಸರು ಹಾಗೂ ಹಾಲೇರಿ ರಾಜವಂಶಸ್ಥರು ಆಡಳಿತ ನಡೆಸಿ ವೈಭವ ಮೆರೆದ ವೀರಭೂಮಿ ಇದಾಗಿದ್ದು, ಇದು ಪ್ರಕೃತಿ ನಿರ್ಮಿಸಿದ ಕದಲದ ಸುಂದರ ನಾಡಾಗಿದೆ.",
+            "ಕೊಡಗಿನ ಜನರಲ್ಲಿ ಸದಾ ಒಮ್ಮತ, ಒಗ್ಗಟ್ಟು ಮತ್ತು ಒಂದೇ ಮನಸ್ಸು ಇರಬೇಕು. ಸುಗ್ಗಿಯ ಹಬ್ಬವಾದ ಹುತ್ತರಿ ಬಂದಾಗ ಸಾಂಪ್ರದಾಯಿಕ ದಟ್ಟಿಕುಪ್ಪಸ ಧರಿಸಿ, ಪಾತುರೆಕೋಲನ್ನು ಚಿಮ್ಮುತ್ತಾ ಸಂಭ್ರಮದ ಹಾಡುಗಳೊಂದಿಗೆ ಕುಣಿಯಬೇಕು. ತಾಯಿ ಕಾವೇರಿ ಹರಸಿದ ಈ ನಾಡು ಸದಾ ನೆಮ್ಮದಿಯಿಂದ ಬಾಳಲಿ ಎಂದು ಕವಿ ಹಾರೈಸಿದ್ದಾರೆ."
+        ],
+        // Poem 2: Svatantrya Svarga
+        [
+            "ಸ್ವಾತಂತ್ರ್ಯದ ನೈಜ ಸ್ವರ್ಗದಲ್ಲಿ ಪ್ರತಿಯೊಬ್ಬ ಪ್ರಜೆಯೂ ಯಾವುದೇ ಭಯವಿಲ್ಲದೆ, ಸಂಪೂರ್ಣ ಸ್ವತಂತ್ರ ಮನಸ್ಸಿನಿಂದ ಬದುಕಬೇಕು. ನಮ್ಮ ಹೆಮ್ಮೆಯ ಸಂಕೇತವಾದ ತಲೆಯನ್ನು ಯಾವುದೇ ಕಷ್ಟ ಅಥವಾ ಒತ್ತಡಕ್ಕೆ ಜಗ್ಗದಂತೆ, ಕುಗ್ಗದಂತೆ ಮತ್ತು ಬಗ್ಗದಂತೆ ನೇರವಾಗಿ ಎತ್ತಿ ಗೌರವದಿಂದ ಬಾಳುವ ವಾತಾವರಣ ಇರಬೇಕು.",
+            "ನಮ್ಮ ನಾಡಿನಲ್ಲಿ ಜ್ಞಾನವು ಎಲ್ಲರಿಗೂ ಮುಕ್ತವಾಗಿ ಸಿಗುವಂತಾಗಬೇಕು ಮತ್ತು ಅದು ಸರ್ವಸ್ವತಂತ್ರವಾಗಿರಬೇಕು. ಜನರ ಮನಸ್ಸಿನೊಳಗಿನ ಜಾತಿ, ಮತಗಳ ಸಂಕುಚಿತ ಭಾವನೆ ಅಳಿದು ಹೋಗಬೇಕು. ಇಡೀ ಜಗತ್ತು ಪ್ರತ್ಯೇಕ ಭಾಗಗಳಾಗಿ ಛಿನ್ನಭಿನ್ನವಾಗದೆ ಎಲ್ಲರೂ ಒಂದಾಗಿ ಅತ್ಯಂತ ಸುಂದರವಾಗಿ ಬಾಳಬೇಕು.",
+            "ಪ್ರತಿಯೊಬ್ಬ ಮನುಷ್ಯನ ಮನಸ್ಸಿನ ಆಳದಿಂದ ಕೇವಲ ಸತ್ಯದ ನುಡಿಗಳು ಮಾತ್ರ ಹೊರಹೊಮ್ಮಬೇಕು. ದೇಶದಲ್ಲಿ ನಡೆಯುವ ಶ್ರಮ ಅಥವಾ ದುಡಿಮೆಯು ಸದಾ ಮುನ್ನಡೆಯುತ್ತಿರಬೇಕು. ಆ ದುಡಿಮೆಯು ಯಾವುದೇ ಆಲಸ್ಯ ಅಥವಾ ದಣಿವನ್ನು ಅರಿಯದೆ, ದೇಶದ ಸರ್ವಾಂಗೀಣ ಅಭಿವೃದ್ಧಿಯ ಪೂರ್ಣತೆಯ ಕಡೆಗೆ ಸದಾ ಸಾಗುತ್ತಿರಬೇಕು.",
+            "ಕಾಲಹರಣ ಮಾಡುವ ಹಳೆಯ ಅನಿಷ್ಟ ಸಂಪ್ರದಾಯಗಳು ಮತ್ತು ಕೆಟ್ಟ ಮೂಢನಂಬಿಕೆಗಳು ನೀರಿಲ್ಲದ ಬಂಜರು ಮರುಭೂಮಿಯಿದ್ದಂತೆ. ಅಂತಹ ಮರುಭೂಮಿಯಲ್ಲೂ ಸಹ ಉತ್ತಮ ಆಲೋಚನೆ ಹಾಗೂ ಸುವಿಚಾರವೆಂಬ ಪರಿಶುದ್ಧ ನದಿಯ ಹರಿವು ಎಂದಿಗೂ ನಿಲ್ಲದೆ ಸದಾ ಮುಂದುವರಿಯುತ್ತಿರಬೇಕು.",
+            "ಭಗವಂತನ ದಯೆ, ಒಲವು ಮತ್ತು ಕೃಪೆಯಿಂದಾಗಿ ನಮ್ಮ ನಡೆ-ನುಡಿಗಳು ಪ್ರತಿದಿನ ವಿಶಾಲವಾಗುತ್ತಾ ಹೋಗಬೇಕು. ಜನರ ಮನಸ್ಸುಗಳು ಅರಳಿ ಮುನ್ನಡೆಯಬೇಕು. ಜೀವನದ ಗುರಿ ಮುಟ್ಟಲು ಆ ಸ್ವಾತಂತ್ರ್ಯದ ತಂದೆಯನ್ನೇ ಸ್ಥಿರವಾದ ಧ್ರುವನಕ್ಷತ್ರ ಎಂದು ನಂಬಿ ನಮ್ಮ ನಾಡು ಜಾಗೃತಗೊಂಡು ಮೇಲೇಳಬೇಕು."
+        ],
+        // Poem 3: Bhagyada Balegara
+        [
+            "ಹೆಣ್ಣುಮಗಳು ಬಳೆಗಾರನಿಗೆ ತನ್ನ ತವರಿನ ಜನರಿಗೆ ಬಳೆಗಳನ್ನು ತೊಡಿಸಿ ಬರಲು ವಿನಂತಿಸುತ್ತಾಳೆ. ಅದಕ್ಕೆ ಬಳೆಗಾರನು, 'ಎಲೈ ಬಾಲೆಯೇ, ನಿನ್ನ ತವರು ಮನೆ ಎಲ್ಲಿದೆ ಎಂದು ನನಗೆ ಗೊತ್ತಿಲ್ಲ, ಅಲ್ಲಿಗೆ ಹೋಗಲು ನನಗೆ ಯಾವುದೇ ದಾರಿಯ ಗುರುತಿಲ್ಲ, ದಯವಿಟ್ಟು ನಿನ್ನ ತಾಯಿಯ ಊರನ್ನು ತೋರಿಸು' ಎಂದು ಕೇಳುತ್ತಾನೆ.",
+            "ಬಳೆಗಾರನ ಪ್ರಶ್ನೆಗೆ ಹೆಣ್ಣುಮಗಳು ದಾರಿ ತಿಳಿಸುತ್ತಾ, 'ದಾರಿಯಲ್ಲಿ ಹೋಗುವಾಗ ಬಲಭಾಗದಲ್ಲಿರುವ ಬಾಳೆ ತೋಟವನ್ನು ಮತ್ತು ಎಡಭಾಗದಲ್ಲಿರುವ ಸೀಬೆ ಗಿಡಗಳನ್ನು ಬಿಟ್ಟು, ಅದರ ನಟ್ಟ ನಡುವೆ ಇರುವ ಹಾದಿಯಲ್ಲಿ ನೇರವಾಗಿ ಮುನ್ನಡೆ, ಅಲ್ಲಿಯೇ ನನ್ನ ಸುಂದರ ತವರೂರು ಇದೆ' ಎಂದು ಜಾಣ್ಮೆಯಿಂದ ದಾರಿ ವಿವರಿಸುತ್ತಾಳೆ.",
+            "ತನ್ನ ತವರಿನ ಹಳ್ಳಿಯ ಸೊಗಡನ್ನು ವಿವರಿಸುತ್ತಾ, 'ಎಲ್ಲಿ ಕಬ್ಬಿನ ರಸ ತೆಗೆಯುವ ಆಲೆಗಳು ಆಡುತ್ತಿವೆಯೋ, ಗಾಣಗಳು ತಿರುಗುತ್ತಿವೆಯೋ ಹಾಗೂ ನವಿಲು ಮತ್ತು ಸಾರಂಗ ಜಿಂಕೆಗಳು ಪ್ರೀತಿಯಿಂದ ನಲಿಯುತ್ತಿವೆಯೋ, ಅದೇ ನೋಡು ನನ್ನ ಸುಂದರವಾದ ತವರೂರು' ಎಂದು ಪ್ರಕೃತಿಯ ಮೂಲಕ ಗುರುತು ನೀಡುತ್ತಾಳೆ.",
+            "ಹೆಣ್ಣುಮಗಳು ತನ್ನ ತಾಯಿಯ ಮನೆಯ ವೈಭವವನ್ನು ವರ್ಣಿಸುತ್ತಾ, 'ನನ್ನ ತವರು ಮನೆಯು ಸುಂದರವಾದ ಹಂಚಿನ ಮಾಡನ್ನು ಹೊಂದಿದೆ, ಅದರ ಮುಖ್ಯ ಬಾಗಿಲು ಕಂಚಿನ ಕದದಿಂದ ಮಾಡಲ್ಪಟ್ಟಿದೆ ಮತ್ತು ಮನೆಯ ಮುಂಭಾಗದಲ್ಲಿ ಸದಾ ಮಿಂಚಾಡುವ ಎರಡು ಮುದ್ದಾದ ಗಿಣಿಗಳು ಕಾಣಿಸುತ್ತವೆ, ಅಲ್ಲಿಯೇ ನನ್ನ ತವರೂರು ಇರುವುದು' ಎನ್ನುತ್ತಾಳೆ.",
+            "ತನ್ನ ತಾಯಿಯ ಪರಿಚಯ ಮಾಡಿಕೊಡುತ್ತಾ, 'ನನ್ನ ಹೆತ್ತ ತಾಯಿಯು ಮುತ್ತೈದೆಯಾಗಿದ್ದು, ತನ್ನ ಮನೆಯ ಅಂಗಳದಲ್ಲಿ ಮುತ್ತಿನ ಚಪ್ಪರವನ್ನು ಹಾಕಿಕೊಂಡು, ಅದರ ನಟ್ಟ ನಡುವೆ ಕುಳಿತು ಅತ್ಯಂತ ಸಂಭ್ರಮದಿಂದ ಪಗಡೆಯ ಆಟವನ್ನು ಆಡುತ್ತಿದ್ದಾಳೆ, ಅವಳೇ ನೋಡು ನನ್ನನ್ನು ಹಡೆದವ್ವ' ಎಂದು ಹೆಮ್ಮೆಯಿಂದ ಹೇಳುತ್ತಾಳೆ.",
+            "ಕೊನೆಯಲ್ಲಿ ಹೆಣ್ಣುಮಗಳು ತಾಯಿಯ ಆಸೆಯನ್ನು ತಿಳಿಸುತ್ತಾ, 'ನನ್ನ ಹೆತ್ತ ತಾಯಿಗೆ ಅಚ್ಚ ಕೆಂಪಿನ ಬಣ್ಣದ ಹಾಗೂ ಹಸಿರು ಗೀರುಗಳಿರುವ ಬಳೆಗಳೆಂದರೆ ಬಲು ಆಸೆ. ಎಲೈ ಭಾಗ್ಯದ ಬಳೆಗಾರನೇ, ಆ ಬಳೆಗಳನ್ನು ತೆಗೆದುಕೊಂಡು ನನ್ನ ತವರೂರಿಗೆ ಹೋಗಿ ನನ್ನವರಿಗೆ ತೊಡಿಸಿ ಬಾ' ಎಂದು ಪ್ರೀತಿಯಿಂದ ಬೀಳ್ಕೊಡುತ್ತಾಳೆ."
+        ],
+        // Poem 4: Vachanagala Bhavasangama
+        [
+            "ಹರಿದ ಗೋಣಿಚೀಲದಲ್ಲಿ ಭತ್ತವನ್ನು ತುಂಬಿಕೊಂಡು, ತೆರಿಗೆಗೆ (ಸುಂಕಕ್ಕೆ) ಹೆದರಿ ರಾತ್ರಿಯಿಡೀ ನಡೆದ ಕಳ್ಳನ ಧಾನ್ಯವೆಲ್ಲ ದಾರಿಯುದ್ದಕ್ಕೂ ಉದುರಿಹೋಗಿ ಕೊನೆಗೆ ಬರಿ ಚೀಲ ಮಾತ್ರ ಉಳಿಯುತ್ತದೆ. ಅದೇ ರೀತಿ ಕಪಟ ಅಥವಾ ಅಸ್ಥಿರ ಮನಸ್ಸಿನಿಂದ ಮಾಡುವ ಭಕ್ತಿಯು ಯಾವುದೇ ಫಲವನ್ನು ನೀಡದೆ ಸಂಪೂರ್ಣ ವ್ಯರ್ಥವಾಗುತ್ತದೆ ಎಂದು ಜೇಡರ ದಾಸಿಮಯ್ಯನವರು ತಿಳಿಸಿದ್ದಾರೆ.",
+            "ಕತ್ತಲಿರುವುದರಿಂದಲೇ ಚಂದ್ರನ ಬೆಳಕು ಹೇಗೆ ಪ್ರಕಾಶಿಸುತ್ತದೆಯೋ, ಹಾಗೆಯೇ ನಿಂದಿಸುವ ಜನರ ಮಾತುಗಳಿಂದ ಶರಣರ ಶಿವಭಕ್ತಿಯು ಮತ್ತಷ್ಟು ಪ್ರಕಾಶಗೊಂಡು ಶುದ್ಧವಾಗುತ್ತದೆ. ಅನ್ಯಾಯದ ಮಾರ್ಗ ಹಿಡಿದು ಕುತರ್ಕ ನಡೆಸುವ ಸಾಮಾನ್ಯ ಜನರು ನಾನಾ ಜನ್ಮಗಳ ಚಕ್ರದಲ್ಲಿ ಸಿಲುಕಿ ಬಳಲುತ್ತಾರೆ. ಆದ್ದರಿಂದ ಅವರಿಗೆ ಶಿವಾಚಾರದ ಸನ್ಮಾರ್ಗವನ್ನು ತೋರಿಸು ಎಂದು ಮಡಿವಾಳ ಮಾಚಯ್ಯನವರು ಶಿವನಲ್ಲಿ ಪ್ರಾರ್ಥಿಸಿದ್ದಾರೆ.",
+            "ಮನುಷ್ಯನು ತನ್ನ ಜೀವನದಲ್ಲಿ ಎಂದಿಗೂ ಕೆಟ್ಟ ಮಾತುಗಳನ್ನು ಆಡಬಾರದು ಮತ್ತು ಕೆಟ್ಟ ನಡತೆಗಳನ್ನು ಹೊಂದಿರಬಾರದು. ಒಬ್ಬ ವ್ಯಕ್ತಿಯು ಕೇವಲ ಮಾತನಾಡುತ್ತಾ ಕೂರದೆ, ತಾನು ಹಿಡಿದ ಸತ್ನಿಯಮವನ್ನು ಅಥವಾ ವ್ರತವನ್ನು ಯಾವುದೇ ಸಂದರ್ಭದಲ್ಲೂ ಬಿಡದೆ ನಿಷ್ಠೆಯಿಂದ ಪಾಲಿಸುವುದೇ ನಿಜವಾದ ಶ್ರೇಷ್ಠ ಜ್ಞಾನದ ನಡವಳಿಕೆಯಾಗಿದೆ ಎಂದು ಮುಕ್ತಾಯಕ್ಕನವರು ವಿವರಿಸಿದ್ದಾರೆ.",
+            "ಸತ್ಯಕ್ಕನವರು ಲಂಚ ಮತ್ತು ವಂಚನೆಗೆ ಎಂದಿಗೂ ಕೈಯೊಡ್ಡದ ದೃಢ ನಿಯಮ ಹೊಂದಿದ್ದಾರೆ. ಹಾದಿಯಲ್ಲಿ ಚಿನ್ನದ ಒಡವೆ ಅಥವಾ ಬೆಲೆಯುಳ್ಳ ವಸ್ತ್ರ ಬಿದ್ದಿದ್ದರೂ ತಾವು ಕೈಮುಟ್ಟಿ ಎತ್ತುವುದಿಲ್ಲವೆಂದು ಶಿವನ ಭಕ್ತರ ಮೇಲೆ ಆಣೆ ಮಾಡಿದ್ದಾರೆ. ಪ್ರಾಮಾಣಿಕ ದುಡಿಮೆಯ ಭಿಕ್ಷದಲ್ಲೇ ಬದುಕುವ ತಾವು, ಒಂದು ವೇಳೆ ಅಸ್ಥಿರ ಮನಸ್ಸು ಮಾಡಿ ಪರರ ಸೊತ್ತಿಗೆ ಆಸೆ ಪಟ್ಟರೆ ತಕ್ಷಣವೇ ತಮ್ಮನ್ನು ನರಕದಲ್ಲಿ ಮುಳುಗಿಸಿ ನೀನು ದೂರ ಹೋಗು ಎಂದು ಶಿವನಿಗೆ ಸಾರಿದ್ದಾರೆ."
+        ]
+    ];
+
+    // Navigation logic between different poems
+    function switchPoem(poemId, tabButton) {
+        document.querySelectorAll('.poem-stream').forEach(stream => stream.classList.remove('active'));
+        document.querySelectorAll('.poem-tab').forEach(tab => tab.classList.remove('active'));
+        document.querySelectorAll('.poem-card').forEach(card => card.classList.remove('active'));
+        
+        document.getElementById(poemId).classList.add('active');
+        tabButton.classList.add('active');
+        
+        // Reset Right Panel
+        document.getElementById('summary-placeholder').style.display = 'block';
+        document.getElementById('summary-view').style.display = 'none';
+    }
+
+    // Interactive display logic for summaries
+    function displaySummary(poemIndex, paraIndex, cardElement) {
+        document.querySelectorAll('.poem-card').forEach(card => card.classList.remove('active'));
+        cardElement.classList.add('active');
+        
+        document.getElementById('summary-placeholder').style.display = 'none';
+        document.getElementById('summary-view').style.display = 'block';
+        
+        document.getElementById('summary-title').innerText = `📑 ಆಯ್ದ ಭಾಗದ ಸಂಕ್ಷಿಪ್ತ ಭಾವಾರ್ಥ`;
+        document.getElementById('summary-body').innerText = poemDatabase[poemIndex][paraIndex];
+    }
+</script>
+</body>
+</html>

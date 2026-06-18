@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಭಾಗ್ಯದ ಬಳೆಗಾರ - ಕಾವ್ಯ ಭಾವಾರ್ಥ ಕನ್ಸೋಲ್</title>
+    <style>
+        :root {
+            --neon-pink: #ff007f;
+            --neon-cyan: #00f2fe;
+            --neon-green: #39ff14;
+            --neon-purple: #9d4edd;
+            --neon-yellow: #ffee00;
+            --dark-core: #05060a;
+            --panel-bg: rgba(26, 20, 35, 0.98);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: radial-gradient(circle at center, #221430 0%, var(--dark-core) 100%);
+            margin: 0;
+            padding: 20px;
+            color: #fff;
+            min-height: 100vh;
+        }
+
+        .ai-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: var(--panel-bg);
+            border-radius: 24px;
+            padding: 30px;
+            box-shadow: 0 0 40px rgba(255, 0, 127, 0.15);
+            border: 2px solid rgba(255, 0, 127, 0.2);
+        }
+
+        header {
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 2.3rem;
+            background: linear-gradient(90deg, var(--neon-pink), var(--neon-cyan), var(--neon-yellow));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 0 0 10px 0;
+            font-weight: 800;
+        }
+
+        .instruction {
+            color: #a0aabf;
+            font-size: 1.1rem;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        /* Split Screen Engine Layout */
+        .split-engine {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 25px;
+            margin-top: 20px;
+        }
+
+        /* Left Side: Poem Paragraphs */
+        .poem-stream {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .poem-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-left: 5px solid var(--neon-pink);
+            border-radius: 14px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            line-height: 1.8;
+            font-size: 1.15rem;
+        }
+
+        .poem-card:hover {
+            border-color: var(--neon-pink);
+            background: rgba(255, 0, 127, 0.04);
+            transform: scale(1.01);
+        }
+
+        .poem-card.active {
+            background: rgba(255, 0, 127, 0.08);
+            border-color: var(--neon-pink);
+            box-shadow: 0 0 20px rgba(255, 0, 127, 0.2);
+        }
+
+        .para-tag {
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: var(--neon-yellow);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        /* Right Side: Smart Summary Display */
+        .summary-display {
+            background: rgba(0, 0, 0, 0.3);
+            border: 2px dashed rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 25px;
+            position: sticky;
+            top: 40px;
+            height: fit-content;
+            min-height: 300px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .summary-display.highlight {
+            border-color: var(--neon-green);
+            background: rgba(57, 255, 20, 0.02);
+            box-shadow: 0 0 25px rgba(57, 255, 20, 0.1);
+        }
+
+        .summary-title {
+            color: var(--neon-green);
+            font-size: 1.4rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            border-bottom: 1px solid rgba(57, 255, 20, 0.2);
+            padding-bottom: 10px;
+        }
+
+        .summary-body {
+            font-size: 1.2rem;
+            line-height: 1.7;
+            color: #e2e8f0;
+            text-align: justify;
+        }
+
+        .placeholder-text {
+            color: #666;
+            text-align: center;
+            font-size: 1.2rem;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+
+<div class="ai-container">
+    <header>
+        <h1>🛍️ ಭಾಗ್ಯದ ಬಳೆಗಾರ: ಕಾವ್ಯ ಸಾರಾಂಶ ಮ್ಯಾಟ್ರಿಕ್ಸ್ 🛍️</h1>
+        <p style="margin: 0; color: #a0aabf;">ಪ್ರಸಿದ್ಧ ಜನಪದ ಗೀತೆಯ ಸಾಲುಗಳು ಮತ್ತು ಅದರ ಗ್ರಾಮೀಣ ಸೊಗಡಿನ ಒಳಾರ್ಥ</p>
+    </header>
+
+    <div class="instruction">💡 **ಮಕ್ಕಳಿಗಾಗಿ ಸೂಚನೆ:** ಎಡಭಾಗದ ಯಾವುದೇ ಪ್ಯಾರಾಗ್ರಾಫ್ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ, ಬಲಭಾಗದಲ್ಲಿ ಅದರ ಅತ್ಯಂತ ಸರಳ ಸಾರಾಂಶವನ್ನು ತಕ್ಷಣ ನೋಡಿ ತಿಳಿಯಿರಿ!</div>
+
+    <div class="split-engine">
+        <!-- LEFT COLUMN: POEM LINES -->
+        <div class="poem-stream">
+            <div class="poem-card" onclick="showSummary(0, this)">
+                <div class="para-tag">ಪ್ಯಾರಾಗ್ರಾಫ್ ೧</div>
+                ಭಾಗ್ಯದ ಬಳೆಗಾರ ಹೋಗಿ ಬಾ ನನ್ನವರಿಗೆ ॥<br>
+                ನಿನ್ನ ತವರೂರ ನಾನೇನು ಬಲ್ಲೆನು<br>
+                ಗೊತ್ತಿಲ್ಲ ಎನಗೆ ಗುರಿಯಿಲ್ಲ ಎಲೆ ಬಾಲೆ<br>
+                تೋರಿಸು ಬಾರೇ ತವರೂರ
+            </div>
+
+            <div class="poem-card" onclick="showSummary(1, this)">
+                <div class="para-tag">ಪ್ಯಾರಾಗ್ರಾಫ್ ೨</div>
+                ಬಾಳೆ ಬಲಕ್ಕೆ ಬಿಡೊ ಸೀಬೆ ಎಡಕ್ಕೆ ಬಿಡಿ<br>
+                ನಟ್ಟನಡುವೇಲಿ ನೀ ಹೋಗೋ ಬಳೆಗಾರ<br>
+                ಅಲ್ಲಿಹುದೇ ನನ್ನ ತವರೂರು!<br>
+                ಮುತ್ತೈದೆ ಎಲೆ ಹೆಣ್ಣೆ ತೋರುಬಾರೆ ತವರೂರ ॥
+            </div>
+
+            <div class="poem-card" onclick="showSummary(2, this)">
+                <div class="para-tag">ಪ್ಯಾರಾಗ್ರಾಫ್ ೩</div>
+                ಆಲೆ ಆಡುತಾವೆ ಗಾಣ ತಿರುಗುತಾವೆ<br>
+                ನವಿಲು ಸಾರಂಗ ನಲಿತಾವೆ ಬಳೆಗಾರ<br>
+                ಅದೇ ಕಾಣೋ ನನ್ನ ತವರೂರು।<br>
+                ಮುತ್ತೈದೆ ಎಲೆ ಹೆಣ್ಣೆ ತೋರುಬಾರೆ ತವರೂರ ॥
+            </div>
+
+            <div class="poem-card" onclick="showSummary(3, this)">
+                <div class="para-tag">ಪ್ಯಾರಾಗ್ರಾಫ್ ೪</div>
+                ಹಂಚಿನ ಮನೆ ಕಾಣೋ ಕಂಚಿನ ಕದ ಕಾಣೋ<br>
+                ಮಿಂಚಾಡೊವೆರಡು ಗಿಣಿ ಕಾಣೋ ಬಳೆಗಾರ<br>
+                ಅಲ್ಲಿಹುದೇ ನನ್ನ ತವರೂರು।<br>
+                ಮುತ್ತೈದೆ ಎಲೆ ಹೆಣ್ಣೆ ತೋರುಬಾರೆ ತವರೂರ ॥
+            </div>
+
+            <div class="poem-card" onclick="showSummary(4, this)">
+                <div class="para-tag">ಪ್ಯಾರಾಗ್ರಾಫ್ ೫</div>
+                مುತ್ತೈದೆ ಹಟೀಲಿ ಮುತ್ತೀನ ಚಪ್ಪರ ಹಾಕಿ<br>
+                ನಟ್ಟ ನಡುವೇಲಿ ಪಗಡೆಯ ಆಡುತಾಳೆ<br>
+                ಅವಳೆ ಕಾಣೋ ಎನ್ನ ಹಡೆದವ್ವಾ।<br>
+                ಮುತ್ತೈದೆ ಎಲೆ ಹೆಣ್ಣೆ ತೋರುಬಾರೆ ತವರೂರ ॥
+            </div>
+
+            <div class="poem-card" onclick="showSummary(5, this)">
+                <div class="para-tag">ಪ್ಯಾರಾಗ್ರಾಫ್ ೬</div>
+                ಅಚ್ಛ ಕೆಂಪಿನ ಬಳೆ ಹಸಿರು ಗೀರಿನ ಬಳೆ<br>
+                ಎನ್ನ ಹಡೆದದ್ದೆ ಬಲು ಆಸೆ ಬಳೆಗಾರ<br>
+                ಕೊಂಡೋಗೊ ಎನ್ನ ತವರೀಗೆ।<br>
+                ಭಾಗ್ಯದ ಬಳೆಗಾರ ಹೋಗಿ ಬಾ ನನ್ನವರಿಗೆ ॥
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN: SMART DYNAMIC SUMMARY -->
+        <div class="summary-display" id="summary-panel">
+            <div class="placeholder-text" id="placeholder">👈 ಯಾವುದೇ ಪ್ಯಾರಾಗ್ರಾಫ್ ಸಾಲುಗಳನ್ನು ಕ್ಲಿಕ್ ಮಾಡಿದಾಗ ಅದರ ಸರಳ ಭಾವಾರ್ಥ ಇಲ್ಲಿ ಮೂಡುತ್ತದೆ.</div>
+            <div id="summary-content" style="display: none;">
+                <div class="summary-title" id="s-title">ಭಾವಾರ್ಥ</div>
+                <div class="summary-body" id="s-body">ಸಾರಾಂಶ ಕಂಟೆಂಟ್...</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Pure, Short and Crisp Summaries derived directly from the textbook context
+    const summaries = [
+        "ಹೆಣ್ಣುಮಗಳು ಬಳೆಗಾರನಿಗೆ ತನ್ನ ತವರಿನ ಜನರಿಗೆ ಬಳೆಗಳನ್ನು ತೊಡಿಸಿ ಬರಲು ವಿನಂತಿಸುತ್ತಾಳೆ. ಅದಕ್ಕೆ ಬಳೆಗಾರನು, 'ಎಲೈ ಬಾಲೆಯೇ, ನಿನ್ನ ತವರು ಮನೆ ಎಲ್ಲಿದೆ ಎಂದು ನನಗೆ ಗೊತ್ತಿಲ್ಲ, ಅಲ್ಲಿಗೆ ಹೋಗಲು ನನಗೆ ಯಾವುದೇ ದಾರಿಯ ಗುರುತಿಲ್ಲ, ದಯವಿಟ್ಟು ನಿನ್ನ ತಾಯಿಯ ಊರನ್ನು ತೋರಿಸು' ಎಂದು ಕೇಳುತ್ತಾನೆ[cite: 1].",
+        "ಬಳೆಗಾರನ ಪ್ರಶ್ನೆಗೆ ಹೆಣ್ಣುಮಗಳು ದಾರಿ ತಿಳಿಸುತ್ತಾ, 'ದಾರಿಯಲ್ಲಿ ಹೋಗುವಾಗ ಬಲಭಾಗದಲ್ಲಿರುವ ಬಾಳೆ ತೋಟವನ್ನು ಮತ್ತು ಎಡಭಾಗದಲ್ಲಿರುವ ಸೀಬೆ (ಪೇರಳೆ) ಗಿಡಗಳನ್ನು ಬಿಟ್ಟು, ಅದರ ನಟ್ಟ ನಡುವೆ ಇರುವ ಹಾದಿಯಲ್ಲಿ ನೇರವಾಗಿ ಮುನ್ನಡೆ, ಅಲ್ಲಿಯೇ ನನ್ನ ಸುಂದರ ತವರೂರು ಇದೆ' ಎಂದು ಜಾಣ್ಮೆಯಿಂದ ದಾರಿ ವಿವರಿಸುತ್ತಾಳೆ[cite: 1].",
+        "ತನ್ನ ತವರಿನ ಹಳ್ಳಿಯ ಸೊಗಡನ್ನು ವಿವರಿಸುತ್ತಾ, 'ಎಲ್ಲಿ ಕಬ್ಬಿನ ರಸ ತೆಗೆಯುವ ಆಲೆಗಳು ಆಡುತ್ತಿವೆಯೋ, ಗಾಣಗಳು ತಿರುಗುತ್ತಿವೆಯೋ ಹಾಗೂ ನವಿಲು ಮತ್ತು ಸಾರಂಗ ಜಿಂಕೆಗಳು ಪ್ರೀತಿಯಿಂದ ನಲಿಯುತ್ತಿವೆಯೋ, ಅದೇ ನೋಡು ನನ್ನ ಸುಂದರವಾದ ತವರು ಮನೆ' ಎಂದು ಪ್ರಕೃತಿಯ ಮೂಲಕ ಗುರುತು ನೀಡುತ್ತಾಳೆ[cite: 1].",
+        "ಹೆಣ್ಣುಮಗಳು ತನ್ನ ತಾಯಿಯ ಮನೆಯ ವೈಭವವನ್ನು ವರ್ಣಿಸುತ್ತಾ, 'ನನ್ನ ತವರು ಮನೆಯು ಸುಂದರವಾದ ಹಂಚಿನ ಮಾಡನ್ನು ಹೊಂದಿದೆ, ಅದರ ಮುಖ್ಯ ಬಾಗಿಲು ಕಂಚಿನ ಕದದಿಂದ ಮಾಡಲ್ಪಟ್ಟಿದೆ ಮತ್ತು ಮನೆಯ ಮುಂಭಾಗದಲ್ಲಿ ಸದಾ ಮಿಂಚಾಡುವ ಎರಡು ಮುದ್ದಾದ ಗಿಣಿಗಳು ಕಾಣಿಸುತ್ತವೆ, ಅದೇ ನನ್ನ ಮನೆ' ಎನ್ನುತ್ತಾಳೆ[cite: 1].",
+        "ತನ್ನ ತಾಯಿಯ ಪರಿಚಯ ಮಾಡಿಕೊಡುತ್ತಾ, 'ನನ್ನ ಹೆತ್ತ ತಾಯಿಯು ಮುತ್ತೈದೆಯಾಗಿದ್ದು, ತನ್ನ ಮನೆಯ ಅಂಗಳದಲ್ಲಿ ಮುತ್ತಿನ ಚಪ್ಪರವನ್ನು ಹಾಕಿಕೊಂಡು, ಅದರ ನಟ್ಟ ನಡುವೆ ಕುಳಿತು ಅತ್ಯಂತ ಸಂಭ್ರಮದಿಂದ ಪಗಡೆಯ ಆಟವನ್ನು ಆಡುತ್ತಿದ್ದಾಳೆ, ಅವಳೇ ನೋಡು ನನ್ನನ್ನು ಹಡೆದವ್ವ (ಹೆತ್ತ ತಾಯಿ)' ಎಂದು ಹೆಮ್ಮೆಯಿಂದ ಹೇಳುತ್ತಾಳೆ[cite: 1].",
+        "ಕೊನೆಯಲ್ಲಿ ಹೆಣ್ಣುಮಗಳು ತಾಯಿಯ ಆಸೆಯನ್ನು ತಿಳಿಸುತ್ತಾ, 'ನನ್ನ ಹೆತ್ತ ತಾಯಿಗೆ ಅಚ್ಚ ಕೆಂಪಿನ ಬಣ್ಣದ ಹಾಗೂ ಹಸಿರು ಗೀರುಗಳಿರುವ ಬಳೆಗಳೆಂದರೆ ಬಲು ಆಸೆ. ಎಲೈ ಭಾಗ್ಯದ ಬಳೆಗಾರನೇ, ಆ ಬಳೆಗಳನ್ನು ತೆಗೆದುಕೊಂಡು ನನ್ನ ತವರೂರಿಗೆ ಹೋಗಿ ನನ್ನವರಿಗೆ ತೊಡಿಸಿ ಬಾ' ಎಂದು ಪ್ರೀತಿಯಿಂದ ಬೀಳ್ಕೊಡುತ್ತಾಳೆ[cite: 1]."
+    ];
+
+    function showSummary(index, card) {
+        // Highlight active card
+        document.querySelectorAll('.poem-card').forEach(c => c.classList.remove('active'));
+        card.classList.add('active');
+
+        // Configure Summary View
+        document.getElementById('placeholder').style.display = 'none';
+        const content = document.getElementById('summary-content');
+        content.style.display = 'block';
+
+        const panel = document.getElementById('summary-panel');
+        panel.classList.add('highlight');
+        setTimeout(() => panel.classList.remove('highlight'), 400);
+
+        // Load Content
+        document.getElementById('s-title').innerText = ` ಪ್ಯಾರಾಗ್ರಾಫ್ ${index + 1} ರ ಸಂಕ್ಷಿಪ್ತ ಭಾವಾರ್ಥ`;
+        document.getElementById('s-body').innerText = summaries[index];
+    }
+</script>
+
+</body>
+</html>

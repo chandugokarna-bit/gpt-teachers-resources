@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಸೀನಸೆಟ್ಟರು ನಮ್ಮ ಟೀಚರು - ಸ್ಮಾರ್ಟ್ ಕನ್ಸೋಲ್ ಕ್ವಿಜ್</title>
+    <style>
+        :root {
+            --cyber-blue: #00f2fe;
+            --cyber-green: #39ff14;
+            --cyber-pink: #ff007f;
+            --cyber-yellow: #ffee00;
+            --dark-bg: #090a10;
+            --panel-bg: rgba(22, 27, 46, 0.95);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: radial-gradient(circle at center, #1a1f38 0%, var(--dark-bg) 100%);
+            margin: 0;
+            padding: 20px;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .main-container {
+            width: 100%;
+            max-width: 800px;
+            background: var(--panel-bg);
+            border-radius: 24px;
+            padding: 30px;
+            box-shadow: 0 0 35px rgba(0, 242, 254, 0.2);
+            border: 2px solid rgba(0, 242, 254, 0.3);
+        }
+
+        header {
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 20px;
+            margin-bottom: 25px;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            background: linear-gradient(90deg, var(--cyber-blue), var(--cyber-yellow));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 0;
+        }
+
+        .subtitle {
+            color: #8a94b5;
+            margin: 5px 0 0 0;
+            font-size: 1rem;
+        }
+
+        /* Activity Navigation Tabs */
+        .activity-tabs {
+            display: flex;
+            justify-content: space-around;
+            background: rgba(0,0,0,0.3);
+            padding: 8px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            gap: 10px;
+        }
+
+        .tab-button {
+            flex: 1;
+            background: none;
+            border: 1px solid rgba(255,255,255,0.1);
+            color: #fff;
+            padding: 12px;
+            font-size: 0.95rem;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .tab-button.active {
+            background: linear-gradient(135deg, var(--cyber-blue) 0%, #4facfe 100%);
+            color: #000;
+            border-color: var(--cyber-blue);
+            box-shadow: 0 0 15px rgba(0, 242, 254, 0.4);
+        }
+
+        .activity-panel {
+            display: none;
+            animation: slideUp 0.4s ease;
+        }
+
+        .activity-panel.active { display: block; }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* MCQ Card Layout */
+        .question-card {
+            background: rgba(0, 0, 0, 0.3);
+            border-left: 5px solid var(--cyber-blue);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .q-text {
+            font-size: 1.25rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .option-btn {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: #fff;
+            padding: 14px;
+            border-radius: 8px;
+            font-size: 1.05rem;
+            cursor: pointer;
+            text-align: left;
+            transition: 0.2s;
+        }
+
+        .option-btn:hover {
+            border-color: var(--cyber-blue);
+            background: rgba(0, 242, 254, 0.05);
+        }
+
+        .option-btn.correct {
+            background: rgba(57, 255, 20, 0.15) !important;
+            border-color: var(--cyber-green) !important;
+            color: var(--cyber-green);
+        }
+
+        .option-btn.wrong {
+            background: rgba(255, 0, 127, 0.15) !important;
+            border-color: var(--cyber-pink) !important;
+            color: var(--cyber-pink);
+        }
+
+        /* Descriptive Reveal Box System */
+        .descriptive-card {
+            background: rgba(0, 0, 0, 0.3);
+            border-left: 5px solid var(--cyber-yellow);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+        }
+
+        .text-write-info {
+            color: #00f2fe;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+            font-style: italic;
+        }
+
+        .reveal-container {
+            margin-top: 15px;
+        }
+
+        .reveal-trigger {
+            background: rgba(255, 0, 127, 0.08);
+            border: 1px dashed var(--cyber-pink);
+            color: var(--cyber-pink);
+            padding: 10px;
+            border-radius: 6px;
+            text-align: center;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: 0.2s;
+        }
+
+        .reveal-trigger:hover {
+            background: rgba(255, 0, 127, 0.15);
+            box-shadow: 0 0 10px rgba(255, 0, 127, 0.2);
+        }
+
+        .reveal-content {
+            display: none;
+            background: rgba(57, 255, 20, 0.08);
+            border: 1px solid var(--cyber-green);
+            color: #fff;
+            padding: 12px 18px;
+            border-radius: 6px;
+            margin-top: 8px;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        .score-hud {
+            text-align: center;
+            background: rgba(0,0,0,0.4);
+            padding: 10px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: var(--cyber-green);
+            display: inline-block;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="main-container">
+    <header>
+        <h1>🌱 ಸೀನಸೆಟ್ಟರು ನಮ್ಮ ಟೀಚರು 🌱</h1>
+        <p class="subtitle">ಏಳನೆಯ ತರಗತಿ - ದ್ವಿತೀಯ ಗದ್ಯ ಭಾಗದ ಡಿಜಿಟಲ್ ಅಖಾಡ</p>
+    </header>
+
+    <!-- Activity Tabs Navigation -->
+    <div class="activity-tabs">
+        <button class="tab-button active" onclick="switchActivity('act1', this)">ಆಕ್ಟಿವಿಟಿ ೧ (೧ ವಾಕ್ಯ)</button>
+        <button class="tab-button" onclick="switchActivity('act2', this)">ಆಕ್ಟಿವಿಟಿ ೨ (೨-೩ ವಾಕ್ಯ)</button>
+        <button class="tab-button" onclick="switchActivity('act3', this)">ಆಕ್ಟಿವಿಟಿ ೩ (೪ ವಾಕ್ಯ)</button>
+    </div>
+
+    <!-- ACTIVITY 1: ONE SENTENCE QUESTIONS (MCQ MODE) -->
+    <div id="act1" class="activity-panel active">
+        <p style="color: #aaa; margin-bottom: 20px;">🎯 **ಸೂಚನೆ:** ಕೆಳಗಿನ ಒಂದು ವಾಕ್ಯದ ಪ್ರಶ್ನೆಗಳಿಗೆ ಸರಿಯಾದ ಉತ್ತರವನ್ನು ಆರಿಸಿ ಕ್ಲಿಕ್ ಮಾಡಿ:</p>
+        
+        <div class="question-card">
+            <div class="q-text">೧. ಮಾಂಡವಿ ಟೀಚರ್ ಶಾಲೆಯ ಮಕ್ಕಳಿಗೆ ಯಾರನ್ನು ಪರಿಚಯಿಸಿದರು?</div>
+            <div class="options-grid">
+                <button class="option-btn" onclick="checkMcq(this, true)">ಹೊಸ ಬೇಸಾಯದ ಟೀಚರನ್ನು (ಸೀನಸೆಟ್ಟರು)</button>
+                <button class="option-btn" onclick="checkMcq(this, false)">ಗ್ರಾಮದ ಪಂಚಾಯತ್ ಅಧ್ಯಕ್ಷರನ್ನು</button>
+                <button class="option-btn" onclick="checkMcq(this, false)">ಹೊಸ ವಿಜ್ಞಾನದ ಶಿಕ್ಷಕರನ್ನು</button>
+                <button class="option-btn" onclick="checkMcq(this, false)">ಹಳ್ಳದ ಮಾಲೀಕರನ್ನು</button>
+            </div>
+        </div>
+
+        <div class="question-card">
+            <div class="q-text">೨. ಸೀನಸೆಟ್ಟರು ತಮ್ಮ ಮೂರೆಕರೆ ಜಮೀನಿನಲ್ಲಿ ತಪ್ಪದೆ ಏನನ್ನು ಬೆಳೆಯುತ್ತಿದ್ದರು?</div>
+            <div class="options-grid">
+                <button class="option-btn" onclick="checkMcq(this, false)">ಭತ್ತ</button>
+                <button class="option-btn" onclick="checkMcq(this, true)">ಸಾಸಿವೆ</button>
+                <button class="option-btn" onclick="checkMcq(this, false)">ಕಬ್ಬು</button>
+                <button class="option-btn" onclick="checkMcq(this, false)">ತರಕಾರಿ</button>
+            </div>
+        </div>
+
+        <div class="question-card">
+            <div class="q-text">೩. ಜಡಿಮಳೆಯ ನಡುವೆಯೂ ಶಾಲೆಯ ಐವತ್ತೂ ಮಕ್ಕಳು ಏನನ್ನು ಹಾಕಿಕೊಂಡು ಗದ್ದೆಗೆ ಇಳಿದರು?</div>
+            <div class="options-grid">
+                <button class="option-btn" onclick="checkMcq(this, false)">ರೇನ್‌ಕೋಟ್</button>
+                <button class="option-btn" onclick="checkMcq(this, false)">ಛತ್ರಿಗಳನ್ನು ಹಿಡಿದು</button>
+                <button class="option-btn" onclick="checkMcq(this, true)">ಕಂಬಳಿಗೊಪ್ಪೆ</button>
+                <button class="option-btn" onclick="checkMcq(this, false)">ಟೋಪಿಗಳನ್ನು ಧರಿಸಿ</button>
+            </div>
+        </div>
+
+        <div class="question-card">
+            <div class="q-text">೪. ಗದ್ದೆಯಲ್ಲಿ ಕೆಲಸ ಮಾಡುತ್ತಿದ್ದಾಗ ಹಾಲಪ್ಪನ ಕಾಲಿಗೆ ಕಚ್ಚಿದ ಜೀವಿ ಯಾವುದು?</div>
+            <div class="options-grid">
+                <button class="option-btn" onclick="checkMcq(this, false)">ದೊಡ್ಡ ಜಿಗಣೆ</button>
+                <button class="option-btn" onclick="checkMcq(this, false)">ವಿಷದ ನಾಗರಹಾವು</button>
+                <button class="option-btn" onclick="checkMcq(this, true)">ನೀರಾವು (ವಿಷವಿಲ್ಲದ ಹಾವು)</button>
+                <button class="option-btn" onclick="checkMcq(this, false)">ಏಡಿ</button>
+            </div>
+        </div>
+
+        <div class="question-card">
+            <div class="q-text">೫. ಮನೆಯ ಮುಂಭಾಗದ ಅಟ್ಟವು ಮಕ್ಕಳಿಗೆ ಯಾವ ಟವರ್ ಆಗಿ ಪರಿವರ್ತಿತಗೊಂಡಿತು?</div>
+            <div class="options-grid">
+                <button class="option-btn" onclick="checkMcq(this, false)">ಪಕ್ಷಿ ವೀಕ್ಷಣಾ ಟವರ್</button>
+                <button class="option-btn" onclick="checkMcq(this, true)">ಗದ್ದೆ ವೀಕ್ಷಣೆಯ ಟವರ್</button>
+                <button class="option-btn" onclick="checkMcq(this, false)">ಮಳೆ ಅಳೆಯುವ ಟವರ್</button>
+                <button class="option-btn" onclick="checkMcq(this, false)">ಕಾವಲು ಗೋಪುರ ಟವರ್</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ACTIVITY 2: TWO-THREE SENTENCE QUESTIONS (MCQ MODE) -->
+    <div id="act2" class="activity-panel">
+        <p style="color: #aaa; margin-bottom: 20px;">🎯 **ಸೂಚನೆ:** ಎರಡು-ಮೂರು ವಾಕ್ಯದ ಪ್ರಶ್ನೆಗಳಿಗೆ ಅತ್ಯಂತ ಸೂಕ್ತವಾದ ಉತ್ತರ ಸರಣಿಯನ್ನು ಆರಿಸಿ:</p>
+        
+        <div class="question-card" style="border-left-color: var(--cyber-pink);">
+            <div class="q-text">೧. ಹೊಸದಾಗಿ ಬಂದ ಸೀನಸೆಟ್ಟರ ವೇಷಭೂಷಣ ಹೇಗಿತ್ತು?</div>
+            <div class="options-grid">
+                <button class="option-btn" onclick="checkMcq(this, true)">ಹಳೆಯ ಒಗೆದ ಪಂಚೆಯನ್ನು ಸೊಂಟಕ್ಕೆ ಎತ್ತಿ ಕಟ್ಟಿ, ಚೌಕುಳಿಯ ಅಂಗಿ ಧರಿಸಿ, ಹಳೆಯ ಟವಲನ್ನು ತಲೆಗೆ ಲಪ್ಪಟೆಯಂತೆ ಸುತ್ತಿದ್ದರು.</button>
+                <button class="option-btn" onclick="checkMcq(this, false)">ಬಿಳಿಯ ಮುಂಡು ಮತ್ತು ಕೋಟು ಧರಿಸಿ ತಲೆಗೆ ಮೈಸೂರು ಪೇಟ ಧರಿಸಿದ್ದರು.</button>
+            </div>
+        </div>
+
+        <div class="question-card" style="border-left-color: var(--cyber-pink);">
+            <div class="q-text">೨. ಗದ್ದೆಯಲ್ಲಿ ಮಕ್ಕಳು ಸಸಿ ಕೀಳುವಾಗ ಅನುಭವಿಸಿದ ಆರಂಭಿಕ ತೊಂದರೆಗಳೇನು?</div>
+            <div class="options-grid">
+                <button class="option-btn" onclick="checkMcq(this, false)">ಕೆಸರಿನಲ್ಲಿ ಕಾಲು ಹೂತುಹೋಗಿ ಮಕ್ಕಳು ನಡೆಯಲು ಕಷ್ಟಪಟ್ಟರು ಮತ್ತು ಮಳೆಗೆ ಹೆದರಿದರು.</button>
+                <button class="option-btn" onclick="checkMcq(this, true)">ಮೊದಮೊದಲು ಮಕ್ಕಳಿಗೆ ಹಿಡಿ ತುಂಬಾ ಸಸಿಗಳನ್ನು ಬುಡಸಮೇತ ಕೀಳುವುದು ಸುಲಭವಾಗಲಿಲ್ಲ ಮತ್ತು ಅನೇಕ ಸಸಿಗಳನ್ನು ಹಾಳು ಮಾಡಿದರು.</button>
+            </div>
+        </div>
+
+        <div class="question-card" style="border-left-color: var(--cyber-pink);">
+            <div class="q-text">೩. ಹಾಲಪ್ಪನಿಗೆ ಹಾವು ಕಚ್ಚಿದಾಗ ಸೀನಸೆಟ್ಟರು ಅವನನ್ನು ಹೇಗೆ ಸಮಾಧಾನಪಡಿಸಿದರು?</div>
+            <div class="options-grid">
+                <button class="option-btn" onclick="checkMcq(this, true)">“ಹೆದರೇಡಾ ಮಗಾ, ಎಂತಾ ಆಗಲ್ಲ. ಅದು ನೀರಾವು, ವಿಷದ ಹಾವಲ್ಲ. ಒಂದು ಮೀನು ಕಚ್ಚಿದ್ರೆ ಹೆಂಗೋ ಅಷ್ಟೇ” ಎಂದು ತಿಳಿಹೇಳಿ ಸಮಾಧಾನಿಸಿದರು.</button>
+                <button class="option-btn" onclick="checkMcq(this, false)">ತಕ್ಷಣ ಪ್ರಥಮ ಚಿಕಿತ್ಸೆ ನೀಡಿ, ಅವನನ್ನು ಆಸ್ಪತ್ರೆಗೆ ಕರೆದುಕೊಂಡು ಹೋಗಿ ಇಂಜೆಕ್ಷನ್ ಕೊಡಿಸಬೇಕು ಎಂದು ಹೆದರಿಸಿದರು.</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ACTIVITY 3: FOUR SENTENCE DESCRIPTIVE QUESTIONS (REVEAL MODE) -->
+    <div id="act3" class="activity-panel">
+        <p style="color: #aaa; margin-bottom: 20px;">📝 **ಸೂಚನೆ:** ಈ ದೀರ್ಘ ಪ್ರಶ್ನೆಗಳಿಗೆ ಉತ್ತರವನ್ನು ನಿಮ್ಮ ನೋಟ್‌ಬುಕ್‌ನಲ್ಲಿ ಬರೆಯಿರಿ. ಉತ್ತರ ತಿಳಿಯದಿದ್ದರೆ ಕೆಳಗಿನ ಬಾಕ್ಸ್ ಕ್ಲಿಕ್ ಮಾಡಿ ನೋಡಿ ತಿಳಿದುಕೊಳ್ಳಿ:</p>
+
+        <div class="descriptive-card">
+            <div class="text-write-info">✍️ ನೋಟ್‌ಬುಕ್‌ನಲ್ಲಿ ಬರೆಯುವ ಪ್ರಶ್ನೆ ೧</div>
+            <div class="q-text">ಶಾಲಾ ಶಿಕ್ಷಣದಲ್ಲಿ ಬೇಸಾಯವನ್ನು ಅಳವಡಿಸುವ ಮಾಂಡವಿ ಟೀಚರ್ ಅವರ ಮುಖ್ಯ ಉದ್ದೇಶವೇನಾಗಿತ್ತು?</div>
+            <div class="reveal-container">
+                <div class="reveal-trigger" onclick="toggleReveal(this)">👁️ ಉತ್ತರ ನೋಡಲು ಇಲ್ಲಿ ಕ್ಲಿಕ್ ಮಾಡಿ</div>
+                <div class="reveal-content">
+                    ಶಾಲಾ ಶಿಕ್ಷಣವು ನಿಜವಾದ ಬದುಕಿನ ಜೊತೆಗೆ ಹಾಸುಹೊಕ್ಕಿನ ಸಂಬಂಧ ಹೊಂದಿರಬೇಕೆಂಬುದು ಮಾಂಡವಿ ಅವರ ನಂಬಿಕೆಯಾಗಿತ್ತು. ಗದ್ದೆಯ ಕೆಲಸದ ಮೂಲಕ ಸೀನಸೆಟ್ಟರ ಅನುಭವಜನ್ಯ ವಿವರಣೆಯು ಅರ್ಧಪಾಲು ವಿಜ್ಞಾನದ ಪಾಠವನ್ನು ಗದ್ದೆಯಲ್ಲೇ ಕಲಿಸಿಬಿಡುತ್ತಿತ್ತು. ಅಲ್ಲದೆ ಮಕ್ಕಳು ಶಾಲಾ ಗದ್ದೆಯಲ್ಲಿ ಬೇಸಾಯದ ಎಲ್ಲಾ ಹಂತಗಳನ್ನು ತಾವೇ ಸ್ವತಃ ಜವಾಬ್ದಾರಿಯಿಂದ ಮಾಡುವುದರಿಂದ ಅವರಿಗೆ ಕೃಷಿಯ ಇಡಿಯಾದ ನೈಜ ಅನುಭವ ಸಿಗುತ್ತಿತ್ತು.
+                </div>
+            </div>
+        </div>
+
+        <div class="descriptive-card">
+            <div class="text-write-info">✍️ ನೋಟ್‌ಬುಕ್‌ನಲ್ಲಿ ಬರೆಯುವ ಪ್ರಶ್ನೆ ೨</div>
+            <div class="q-text">ನಾಟಿ ಮಾಡುವ ಕಷ್ಟಕರ ಕೆಲಸದಲ್ಲಿ ಸೀನಸೆಟ್ಟರು ಮಕ್ಕಳಿಗೆ ಹೇಗೆ ಉತ್ತೇಜನ ನೀಡಿದರು ಮತ್ತು ಅದರಲ್ಲಿ ಯಶೋದಳ ಪಾತ್ರವೇನು?</div>
+            <div class="reveal-container">
+                <div class="reveal-trigger" onclick="toggleReveal(this)">👁️ ಉತ್ತರ ನೋಡಲು ಇಲ್ಲಿ ಕ್ಲಿಕ್ ಮಾಡಿ</div>
+                <div class="reveal-content">
+                    ನಾಟಿ ಮಾಡುವಾಗ ಸಸಿಗಳನ್ನು ಹೆಬ್ಬೆಟ್ಟಿನಿಂದ ಗಟ್ಟಿಯಾಗಿ ಒತ್ತಿ ಊರಬೇಕಿದ್ದರಿಂದ ಮಕ್ಕಳಿಗೆ ಕಷ್ಟವೆನಿಸಿತು. ಆಗ ಸೀನಸೆಟ್ಟರು “ಹಾಡು ಹೇಳ್ಕೊಂಡು ಕೆಲಸ ಮಾಡಿ, ಆಗ ಕಷ್ಟಾನೇ ತಿಳಿಯಲ್ಲ” ಎಂದು ಅಪಾರ ತಾಳ್ಮೆಯಿಂದ ಉತ್ತೇಜಿಸಿದರು. ಯಶೋದಳು ಇಡೀ ಗದ್ದೆಯ ಮಕ್ಕಳೆಲ್ಲರೂ ಒಟ್ಟಾಗಿ ಭಾಗವಹಿಸುವಂತಹ ‘ಕೈ ಎಲ್ಲಿಗ್ ಹೋತು? ಸಂತೆಗೆ...’ ಎಂಬ ಸಾಂಪ್ರದಾಯಿಕ ಪ್ರಶ್ನೋತ್ತರದ ಶಿಶುಪ್ರಾಸದ ಆಟವನ್ನು ಜೋಡಿಸಿ ಕೆಲಸದ ಆಯಾಸ ತಿಳಿಯದಂತೆ ಮಾಡಿದಳು.
+                </div>
+            </div>
+        </div>
+
+        <div class="descriptive-card">
+            <div class="text-write-info">✍️ ನೋಟ್‌ಬುಕ್‌ನಲ್ಲಿ ಬರೆಯುವ ಪ್ರಶ್ನೆ ೩</div>
+            <div class="q-text">ತುಂಗಾ ಮತ್ತು ಕಿಟ್ಟನ ಅಟ್ಟದ ಮೇಲಿನ ರಹಸ್ಯವು ಹೇಗೆ ಬಯಲಾಗಿ ಗದ್ದೆ ವೀಕ್ಷಣೆಯ ಟವರ್ ಆಗಿ ಬದಲಾಯಿತು?</div>
+            <div class="reveal-container">
+                <div class="reveal-trigger" onclick="toggleReveal(this)">👁️ ಉತ್ತರ ನೋಡಲು ಇಲ್ಲಿ ಕ್ಲಿಕ್ ಮಾಡಿ</div>
+                <div class="reveal-content">
+                    ನಾಟಿ ಮುಗಿದ ನಂತರ ಗದ್ದೆಯಲ್ಲಿ ಯಾವಾಗ ತೆನೆ ಬರುತ್ತದೆ ಎಂದು ಮಕ್ಕಳು ಚಡಪಡಿಸುತ್ತಿದ್ದರು. ತುಂಗಾ ಮತ್ತು ಕಿಟ್ಟನು ತಮ್ಮ ಮನೆಯ ಅಟ್ಟದ ಮೇಲ ಹತ್ತಿ ಕಿಟಕಿ ಕಂಡಿಯಿಂದ ನೋಡಿದರೆ ಗದ್ದೆ ತುಂಬಾ ಚೆನ್ನಾಗಿ ಕಾಣುತ್ತದೆ ಎಂಬುದನ್ನು ಕಂಡುಕೊಂಡಿದ್ದರು. ಈ ರಹಸ್ಯವನ್ನು ಅವರು ಗುಟ್ಟಾಗಿಡಲು ಪ್ರಯತ್ನಿಸಿದಷ್ಟೂ ಅದು ಎಲ್ಲರಿಗೂ ಬಯಲಾಗಿಬಿಟ್ಟು, ಕೊನೆಗೆ ಆ ಅಟ್ಟವು ಶಾಲೆಯ ಮಕ್ಕಳ ಗದ್ದೆ ವೀಕ್ಷಣೆಯ ಅಧಿಕೃತ ಟವರ್ ಆಗಿ ಪರಿವರ್ತಿತಗೊಂಡಿತು.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Tab Switching Logic
+    function switchActivity(panelId, btn) {
+        document.querySelectorAll('.activity-panel').forEach(panel => {
+            panel.classList.remove('active');
+        });
+        document.querySelectorAll('.tab-button').forEach(button => {
+            button.classList.remove('active');
+        });
+        
+        document.getElementById(panelId).classList.add('active');
+        btn.classList.add('active');
+    }
+
+    // MCQ Verification Logic
+    function checkMcq(button, isCorrect) {
+        // Prevent clicking multiple times in the same grid
+        const parent = button.parentElement;
+        const buttons = parent.querySelectorAll('.option-btn');
+        
+        buttons.forEach(btn => {
+            btn.disabled = true;
+            if (btn === button) {
+                if (isCorrect) {
+                    btn.classList.add('correct');
+                } else {
+                    btn.classList.add('wrong');
+                }
+            }
+        });
+    }
+
+    // Descriptive Answer Reveal Box Logic
+    function toggleReveal(trigger) {
+        const content = trigger.nextElementSibling;
+        if (content.style.display === 'block') {
+            content.style.display = 'none';
+            trigger.innerText = '👁️ ಉತ್ತರ ನೋಡಲು ಇಲ್ಲಿ ಕ್ಲಿಕ್ ಮಾಡಿ';
+            trigger.style.background = 'rgba(255, 0, 127, 0.08)';
+        } else {
+            content.style.display = 'block';
+            trigger.innerText = '🔒 ಉತ್ತರವನ್ನು ಮರೆಮಾಡಲು ಕ್ಲಿಕ್ ಮಾಡಿ';
+            trigger.style.background = 'rgba(57, 255, 20, 0.1)';
+        }
+    }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಹುತ್ತರಿ ಹಾಡು - ನೆಕ್ಸ್ಟ್-ಜೆನ್ ವ್ಯಾಕರಣ ಮತ್ತು ಕ್ವಿಜ್ ಕನ್ಸೋಲ್</title>
+    <style>
+        :root {
+            --neon-gold: #ffd700;
+            --neon-cyan: #00f2fe;
+            --neon-green: #39ff14;
+            --neon-magenta: #ff007f;
+            --cyber-purple: #8338ec;
+            --dark-core: #06070a;
+            --panel-bg: rgba(22, 26, 38, 0.98);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: radial-gradient(circle at center, #1b2035 0%, var(--dark-core) 100%);
+            margin: 0;
+            padding: 20px;
+            color: #fff;
+            min-height: 100vh;
+        }
+
+        .ai-container {
+            max-width: 950px;
+            margin: 0 auto;
+            background: var(--panel-bg);
+            border-radius: 24px;
+            padding: 30px;
+            box-shadow: 0 0 40px rgba(255, 215, 0, 0.15);
+            border: 2px solid rgba(255, 215, 0, 0.2);
+        }
+
+        header {
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 2.3rem;
+            background: linear-gradient(90deg, var(--neon-gold), var(--neon-cyan), var(--neon-magenta));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 0 0 10px 0;
+            font-weight: 800;
+        }
+
+        /* 5 Activity Navigation Matrix */
+        .matrix-nav {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 12px;
+            margin-bottom: 35px;
+        }
+
+        .matrix-card {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 14px 8px;
+            border-radius: 12px;
+            cursor: pointer;
+            text-align: center;
+            font-weight: bold;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+
+        .matrix-card:hover {
+            border-color: var(--neon-gold);
+            background: rgba(255, 215, 0, 0.08);
+            transform: translateY(-2px);
+        }
+
+        .matrix-card.active {
+            background: linear-gradient(135deg, var(--neon-gold) 0%, var(--neon-cyan) 100%);
+            color: #000;
+            border-color: var(--neon-gold);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+        }
+
+        .panel {
+            display: none;
+            background: rgba(0, 0, 0, 0.25);
+            border-radius: 16px;
+            padding: 25px;
+            border: 1px solid rgba(255,255,255,0.05);
+            min-height: 400px;
+        }
+
+        .panel.active { display: block; }
+
+        h2 { color: var(--neon-gold); margin-top: 0; margin-bottom: 20px; }
+
+        .dashboard-hud {
+            display: flex; justify-content: space-between; background: rgba(0,0,0,0.4);
+            padding: 12px 20px; border-radius: 10px; margin-bottom: 25px;
+            border-left: 4px solid var(--neon-magenta); font-weight: bold;
+        }
+
+        /* MCQ Grid */
+        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px; }
+        .game-btn {
+            background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1);
+            color: white; padding: 16px; border-radius: 10px; font-size: 1.05rem;
+            cursor: pointer; text-align: left; transition: 0.2s; line-height: 1.4;
+        }
+        .game-btn:hover { border-color: var(--neon-gold); background: rgba(255,255,255,0.08); }
+        .game-btn.correct { background: rgba(57, 255, 20, 0.15) !important; border-color: var(--neon-green) !important; color: var(--neon-green); }
+        .game-btn.wrong { background: rgba(255, 0, 127, 0.15) !important; border-color: var(--neon-magenta) !important; color: var(--neon-magenta); }
+
+        /* Reveal System */
+        .reveal-box {
+            background: rgba(0, 242, 254, 0.04); border: 1px dashed var(--neon-cyan);
+            border-radius: 8px; padding: 12px; margin-top: 15px; cursor: pointer; text-align: center;
+        }
+        .reveal-content { display: none; color: #fff; font-size: 1.1rem; margin-top: 8px; border-top: 1px solid rgba(0,242,254,0.2); padding-top: 8px; line-height: 1.5; }
+    </style>
+</head>
+<body>
+
+<div class="ai-container">
+    <header>
+        <h1>🌾 ಹುತ್ತರಿ ಹಾಡು ಡಿಜಿಟಲ್ ಕನ್ಸೋಲ್ 🌾</h1>
+        <p style="margin: 0; color: #a0aabf;">ಪ್ರಥಮ ಪದ್ಯದ ವಿನೂತನ ವ್ಯಾಕರಣ ಮತ್ತು ಕ್ವಿಜ್ ಅಖಾಡ</p>
+    </header>
+
+    <!-- 5 Navigation Tabs Matrices -->
+    <div class="matrix-nav">
+        <div class="matrix-card active" data-target="act1">೧. ಪದ್ಯದ ರಸಪ್ರಶ್ನೆ</div>
+        <div class="matrix-card" data-target="act2">೨. ವಿವರಣಾತ್ಮಕ ಹಬ್</div>
+        <div class="matrix-card" data-target="act3">೩. ಗುಣಿತಾಕ್ಷರ ವಿಶ್ಲೇಷಣೆ</div>
+        <div class="matrix-card" data-target="act4">೪. ವ್ಯಂಜನ-ಸ್ವರ ಜೋಡಣೆ</div>
+        <div class="matrix-card" data-target="act5">೫. ಶಬ್ದಕೋಶ ಅರ್ಥಲೋಕ</div>
+    </div>
+
+    <!-- ACT 1: COMPREHENSION MCQ -->
+    <div id="act1" class="panel active">
+        <h2>🎯 ಆಕ್ಟಿವಿಟಿ 1: ಕಾವ್ಯ ಗ್ರಹಿಕೆ (ಒಂದು ವಾಕ್ಯದ ಪ್ರಶ್ನೆಗಳು)</h2>
+        <div class="dashboard-hud"><span id="hud-a1-q">ಪ್ರಶ್ನೆ: 1/5</span><span id="hud-a1-s">ಸ್ಕೋರ್: 0</span></div>
+        <div class="question-card">
+            <div id="a1-qtext" style="font-size: 1.3rem; margin-bottom: 20px; font-weight: bold;">ಲೋಡ್ ಆಗುತ್ತಿದೆ...</div>
+            <div class="options-grid" id="a1-options"></div>
+        </div>
+    </div>
+
+    <!-- ACT 2: TWO-THREE SENTENCE REVEAL -->
+    <div id="act2" class="panel">
+        <h2>📝 ಆಕ್ಟಿವಿಟಿ 2: ಕಾವ್ಯ ಸಾರಾಂಶ ಸ್ಪೇಸ್ (ಎರಡು-ಮೂರು ವಾಕ್ಯದ ಪ್ರಶ್ನೆಗಳು)</h2>
+        <p style="color: #ccc; margin-bottom: 20px;">ಸೂಚನೆ: ಕೆಳಗಿನ ಪದ್ಯದ ದೀರ್ಘ ಪ್ರಶ್ನೆಗಳಿಗೆ ಉತ್ತರವನ್ನು ಯೋಚಿಸಿ ನಿಮ್ಮ ನೋಟ್‌ಬುಕ್‌ನಲ್ಲಿ ಬರೆಯಿರಿ. ಉತ್ತರ ತಾಳೆ ನೋಡಲು ಪೆಟ್ಟಿಗೆಯನ್ನು ಕ್ಲಿಕ್ ಮಾಡಿ:</p>
+        
+        <div class="question-card">
+            <div style="font-size:1.2rem; font-weight:bold;">೧. ಕೊಡಗಿನ ಹಿರಿಯರ ಸಾಹಸ ಹಾಗೂ ಕ್ಷಾತ್ರ ಬೇಟೆಯ ಶೌರ್ಯವನ್ನು ಕವಿ ಹೇಗೆ ವರ್ಣಿಸಿದ್ದಾರೆ?</div>
+            <div class="reveal-box" onclick="toggleReveal('rev1')">
+                <span style="color:var(--neon-cyan); font-weight:bold;">💡 ಉತ್ತರ ಪರಿಶೀಲಿಸಲು ಇಲ್ಲಿ ಕ್ಲಿಕ್ ಮಾಡಿ</span>
+                <div class="reveal-content" id="rev1">ಕೊಡಗಿನ ಹಿರಿಯರು ಪೂರ್ವದಲ್ಲಿ ಹುಲಿಯ ಹಾಲಿನ ಮೇವನ್ನು ಸವಿದು ಬೆಳೆದ ಕಡುಗಲಿಗಳು. ಅವರು ಕವಣೆಯಿಂದ ತಿರಿಕಲ್ಲಾಟ ಆಡುತ್ತಾ ಭೀಕರ ಹೆಬ್ಬಾವನ್ನು ಹಗ್ಗದಂತೆ ಸವೆದು ಸೆಳೆದವರು. ಆನೆಯ ಸೊಂಡಲನ್ನು ಸವರಿ ಯುದ್ಧದ ರಣಕೊಂಬನ್ನು ಊದಿ ಭೋರ್ಗರೆದ ವೀರರು ಮತ್ತು ಸಾಹಸತ್ವದ ಕ್ಷಾತ್ರ ಬೇಟೆಯನ್ನು ಮೆರೆದ ಧೀರರು ಎಂದು ಕವಿ ವರ್ಣಿಸಿದ್ದಾರೆ.</div>
+            </div>
+        </div>
+
+        <div class="question-card" style="margin-bottom: 20px; background: rgba(0,0,0,0.3); padding: 20px; border-radius: 12px; border-left: 5px solid var(--cyber-purple);">
+            <div style="font-size:1.2rem; font-weight:bold;">೨. ಕೊಡಗು ದೇಶದ ಧರ್ಮ ಮತ್ತು नीತಿಯ ಬಗ್ಗೆ ಪದ್ಯದಲ್ಲಿ ಏನು ಹೇಳಲಾಗಿದೆ?</div>
+            <div class="reveal-box" onclick="toggleReveal('rev2')">
+                <span style="color:var(--neon-cyan); font-weight:bold;">💡 ಉತ್ತರ ಪರಿಶೀಲಿಸಲು ಇಲ್ಲಿ ಕ್ಲಿಕ್ ಮಾಡಿ</span>
+                <div class="reveal-content" id="rev2">ಕೊಡಗು ದೇಶವು ಬೊಮ್ಮಗಿರಿಯಿಂದ ಪುಷ್ಪಗಿರಿ ಪರ್ಯಂತ ಬೆಳೆದಿದೆ. ಇದು ಧರ್ಮ, ದಾನ, ಕಟ್ಟುಕಟ್ಟಳೆಗಳು ಮತ್ತು ಉತ್ತಮ ರೀತಿ-ನೀತಿಗಳ ಭಂಡಾರವನ್ನು ಹೊಂದಿರುವ ಒಂದು ಜೀವಕೋಶದಂತಿದೆ ಎಂದು ವಿವರಿಸಲಾಗಿದೆ.</div>
+            </div>
+        </div>
+
+        <div class="question-card">
+            <div style="font-size:1.2rem; font-weight:bold;">೩. ಹುತ್ತರಿ ಹಬ್ಬದ ಆಚರಣೆಯ ಸಂದರ್ಭದಲ್ಲಿ ಒಗ್ಗಟ್ಟಿನ ಕುಣಿತ ಹೇಗೆ ಮೂಡಿಬರಬೇಕೆಂದು ಕವಿ ಆಶಿಸಿದ್ದಾರೆ?</div>
+            <div class="reveal-box" onclick="toggleReveal('rev3')">
+                <span style="color:var(--neon-cyan); font-weight:bold;">💡 ಉತ್ತರ ಪರಿಶೀಲಿಸಲು ಇಲ್ಲಿ ಕ್ಲಿಕ್ ಮಾಡಿ</span>
+                <div class="reveal-content" id="rev3">ಕೊಡಗಿನ ಜನರಲ್ಲಿ ಒಮ್ಮತ, ಒಗ್ಗಟ್ಟು ಮತ್ತು ಒಂದೇ ಮನಸ್ಸು ಸದಾ ಇರಬೇಕು. ಹುತ್ತರಿ ಹಬ್ಬದ ಸಮಯದಲ್ಲಿ ಸಾಂಪ್ರದಾಯಿಕ ದಟ್ಟಿಕುಪ್ಪಸ ಧರಿಸಿ, ಪಾತುರೆಕೋಲನ್ನು ಚಿಮ್ಮಿ ಹೊಡೆಯುವ ಹೊಯ್ಲಿಗೆ ಕುಣಿಯುವ ಸುಂದರ ಪದಗಳು ಎಲ್ಲರ ಬಾಯಿಂದ ಹೊರಹೊಮ್ಮಿ ಬರಬೇಕು ಎಂದು ಕವಿ ಆಶಿಸಿದ್ದಾರೆ.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ACT 3: GUNITHAKSHARA SPLITTING (GRAMMAR) -->
+    <div id="act3" class="panel" style="border-color: var(--neon-green);">
+        <h2>🧠 ಆಕ್ಟಿವಿಟಿ 3: ಕ್ರಿಯಾತ್ಮಕ ವ್ಯಾಕರಣ (ಗುಣಿತಾಕ್ಷರಗಳನ್ನು ಬಿಡಿಸಿ ಬರೆಯುವ ಕ್ರಮ)</h2>
+        <div class="dashboard-hud"><span id="hud-a3-q">ಪ್ರಶ್ನೆ: 1/5</span><span id="hud-a3-s">ಸ್ಕೋರ್: 0</span></div>
+        <div class="question-card">
+            <p style="color: #aaa;">ಪಠ್ಯಪುಸ್ತಕದ ವ್ಯಾಕರಣದ ನಿಯಮದಂತೆ ನೀಡಲಾದ ಪದದ ಸರಿಯಾದ ಅಕ್ಷರ ವಿನ್ಯಾಸವನ್ನು ಗುರುತಿಸಿ:</p>
+            <div id="a3-qtext" style="font-size: 1.3rem; margin-bottom: 20px; font-weight: bold;">ಲೋಡ್ ಆಗುತ್ತಿದೆ...</div>
+            <div class="options-grid" id="a3-options"></div>
+        </div>
+    </div>
+
+    <!-- ACT 4: GUNITHAKSHARA COMBINATION MCQ -->
+    <div id="act4" class="panel" style="border-color: var(--cyber-purple);">
+        <h2>🔗 ಆಕ್ಟಿವಿಟಿ 4: ಗುಣಿತಾಕ್ಷರ ಸಿಂಥೆಸಿಸ್ (ವ್ಯಂಜನ + ಸ್ವರ ಕೂಡಿಸಿ ಬರೆಯಿರಿ)</h2>
+        <div class="dashboard-hud"><span id="hud-a4-q">ಪ್ರಶ್ನೆ: 1/5</span><span id="hud-a4-s">ಸ್ಕೋರ್: 0</span></div>
+        <div class="question-card">
+            <p style="color: #aaa;">ವ್ಯಂಜನಾಕ್ಷರಕ್ಕೆ ಸ್ವರಾಕ್ಷರ ಸೇರಿದಾಗ ಮೂಡುವ ಸರಿಯಾದ ಗುಣಿತಾಕ್ಷರ ರೂಪವನ್ನು ಪತ್ತೆಹಚ್ಚಿ:</p>
+            <div id="a4-qtext" style="font-size: 1.3rem; margin-bottom: 20px; font-weight: bold;">ಲೋಡ್ ಆಗುತ್ತಿದೆ...</div>
+            <div class="options-grid" id="a4-options"></div>
+        </div>
+    </div>
+
+    <!-- ACT 5: WORD MEANINGS MCQ -->
+    <div id="act5" class="panel" style="border-color: var(--neon-magenta);">
+        <h2>📚 ಆಕ್ಟಿವಿಟಿ 5: ಕಾವ್ಯ ಶಬ್ದಕೋಶ (ಪದಗಳ ನೈಜ ಜಾನಪದ ಅರ್ಥ)</h2>
+        <div class="dashboard-hud"><span id="hud-a6-q">ಪ್ರಶ್ನೆ: 1/5</span><span id="hud-a6-s">ಸ್ಕೋರ್: 0</span></div>
+        <div class="question-card">
+            <div id="a6-qtext" style="font-size: 1.3rem; margin-bottom: 20px; font-weight: bold;">ಲೋಡ್ ಆಗುತ್ತಿದೆ...</div>
+            <div class="options-grid" id="a6-options"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // MATRIX NAVIGATION SYSTEM
+    document.querySelectorAll('.matrix-card').forEach(card => {
+        card.addEventListener('click', () => {
+            document.querySelectorAll('.matrix-card').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+            card.classList.add('active');
+            document.getElementById(card.dataset.target).classList.add('active');
+        });
+    });
+
+    function toggleReveal(id) {
+        const target = document.getElementById(id);
+        target.style.display = target.style.display === 'block' ? 'none' : 'block';
+    }
+
+    // --- ACTIVITY 1: COMPREHENSION MCQ DATA ---
+    const act1Data = [
+        {q: "೧. ಕರಾವಳಿ ತಾಯಿ ಕಾವೇರಿಯು ಆಕಾಶದಲ್ಲಿ ಹೇಗೆ ಹೊಳೆಯುತ್ತಾಳೆ?", o: ["ಬೆಳ್ಳಿಯ ತಂತಿಯಂತೆ", "ಮುಗಿಲಲ್ಲಿ ಮಿಂಚಿನಂತೆ", "ಸೂರ್ಯನ ಕಿರಣದಂತೆ"], a: "ಮುಗಿಲಲ್ಲಿ ಮಿಂಚಿನಂತೆ"},
+        {q: "೨. ಪದ್ಯದಲ್ಲಿ 'ಸೋಲು ಸಾವರಿಯದವರು' ಎಂದು ಯಾರನ್ನು ಕರೆಯಲಾಗಿದೆ?", o: ["ಕೊಡಗಿನ ಹಿರಿಯರನ್ನು", "ಬ್ರಿಟಿಷ್ ಸೈನಿಕರನ್ನು", "ಕಾಡಿನ ಬೇಟೆಗಾರರನ್ನು"], a: "ಕೊಡಗಿನ ಹಿರಿಯರನ್ನು"},
+        {q: "೩. ಕೊಡಗು ದೇಶವು ಯಾವ ಗಿರಿಯಿಂದ ಯಾವ ಗಿರಿಯ ಪರ್ಯಂತ ಬೆಳೆದಿದೆ?", o: ["ಹಿಮಗಿರಿಯಿಂದ ವಿಂಧ್ಯಗಿರಿ ತನಕ", "ಬೊಮ್ಮಗಿರಿಯಿಂದ ಪುಷ್ಪಗಿರಿ ಪರ್ಯಂತ", "ಚಾಮುಂಡಿಬೆಟ್ಟದಿಂದ ಬಾಬಾಬುಡನ್‌ಗಿರಿ ತನಕ"], a: "ಬೊಮ್ಮಗಿರಿಯಿಂದ ಪುಷ್ಪಗಿರಿ ಪರ್ಯಂತ"},
+        {q: "೪. ಪದ್ಯದ ಸಾಲುಗಳ ಪ್ರಕಾರ ಕಾವೇರಿ ತಾಯಿಯ 'ತವರ್ಮನೆ' ಯಾವುದು?", o: ["ಕೊಡಗು ನಾಡು / ಅಗಸ್ತ್ಯನ ತಪದ ಮನೆ", "ಮೈಸೂರು ಸಂಸ್ಥಾನ", "ಬೆಂಗಳೂರು ಮಹಾನಗರ"], a: "ಕೊಡಗು ನಾಡು / ಅಗಸ್ತ್ಯನ ತಪದ ಮನೆ"},
+        {q: "೫. ಹುತ್ತರಿ ಹಬ್ಬದ ಆಚರಣೆಯ ಸಂದರ್ಭದಲ್ಲಿ ಯಾವ ಕೋಲಿನ ಹೊಯ್ಲಿಗೆ ಪದ ಹೊರಹೊಮ್ಮಬೇಕು?", o: ["ಸಣ್ಣ ಬೆತ್ತದ ಕೋಲು", "ಚಿಮ್ಮಿ ಪಾತುರೆಕೋಲ", "ಲವಲವಿಕೆಯ ಕೋಲಾಟದ ಕೋಲು"], a: "ಚಿಮ್ಮಿ ಪಾತುರೆಕೋಲ"}
+    ];
+    let a1Idx = 0, a1Score = 0;
+    function loadAct1() {
+        if(a1Idx >= act1Data.length) { document.getElementById('a1-qtext').innerText = `🏆 ಕಾವ್ಯ ಕ್ವಿಜ್ ಮುಕ್ತಾಯ! ಸ್ಕೋರ್: ${a1Score}/5`; document.getElementById('a1-options').innerHTML=''; return; }
+        document.getElementById('hud-a1-q').innerText = `ಪ್ರಶ್ನೆ: ${a1Idx+1}/5`;
+        document.getElementById('hud-a1-s').innerText = `ಸ್ಕೋರ್: ${a1Score}`;
+        const item = act1Data[a1Idx]; document.getElementById('a1-qtext').innerText = item.q;
+        const box = document.getElementById('a1-options'); box.innerHTML = '';
+        item.o.forEach(o => {
+            const btn = document.createElement('button'); btn.className = 'game-btn'; btn.innerText = o;
+            btn.onclick = () => {
+                if(o === item.a) { btn.classList.add('correct'); a1Score++; } else { btn.classList.add('wrong'); }
+                setTimeout(() => { a1Idx++; loadAct1(); }, 700);
+            };
+            box.appendChild(btn);
+        });
+    }
+
+    // --- ACTIVITY 3: GUNITHAKSHARA SPLITTING ---
+    const act3Data = [
+        {q: "೧. ಪಠ್ಯಪುಸ್ತಕದ ಮಾದರಿಯಂತೆ 'ರಾ' ಅಕ್ಷರವನ್ನು ಬಿಡಿಸಿ ಬರೆದಾಗ:", o: ["ರ್ + ಆ", "ರ್ + ಅ", "ರ‍್ + ಓ"], a: "ರ್ + ಆ"},
+        {q: "೨. 'ನಿ' ಅಕ್ಷರದ ಸರಿಯಾದ ವರ್ಣ ವಿನ್ಯಾಸ ರೂಪ ಯಾವುದು?", o: ["ನ್ + ಈ", "ನ್ + ಇ", "ನ + ಇ"], a: "ನ್ + ಇ"},
+        {q: "೩. 'ಜ' ಅಕ್ಷರವನ್ನು ಬಿಡಿಸಿ ಬರೆದಾಗ ಮೂಡುವ ಸರಿಯಾದ ರೂಪ:", o: ["ಜ್ + ಅ", "ಜ್ + ಆ", "ಜ + ಅ"], a: "ಜ್ + ಅ"},
+        {q: "೪. 'ಪ' ಅಕ್ಷರದ ಸರಿಯಾದ ವ್ಯಂಜನ ಮತ್ತು ಸ್ವರ ವಿಂಗಡಣೆ:", o: ["ಪ್ + ಆ", "ಪ್ + ಉ", "ಪ್ + ಅ"], a: "ಪ್ + ಅ"},
+        {q: "೫. 'ರಿ' ಅಕ್ಷರವನ್ನು ಬಿಡಿಸಿ ಬರೆಯುವ ಸರಿಯಾದ ಕ್ರಮ:", o: ["ರ್ + ಈ", "ರ್ + ಇ", "ರ + ಇ"], a: "ರ್ + ಇ"}
+    ];
+    let a3Idx = 0, a3Score = 0;
+    function loadAct3() {
+        if(a3Idx >= act3Data.length) { document.getElementById('a3-qtext').innerText = `📊 ವರ್ಣ ವಿನ್ಯಾಸ ಕ್ವಿಜ್ ಮುಗಿದಿದೆ! ಸ್ಕೋರ್: ${a3Score}/5`; document.getElementById('a3-options').innerHTML=''; return; }
+        document.getElementById('hud-a3-q').innerText = `ಪ್ರಶ್ನೆ: ${a3Idx+1}/5`;
+        document.getElementById('hud-a3-s').innerText = `ಸ್ಕೋರ್: ${a3Score}`;
+        const item = act3Data[a3Idx]; document.getElementById('a3-qtext').innerText = item.q;
+        const box = document.getElementById('a3-options'); box.innerHTML = '';
+        item.o.forEach(o => {
+            const btn = document.createElement('button'); btn.className = 'game-btn'; btn.innerText = o;
+            btn.onclick = () => {
+                if(o === item.a) { btn.classList.add('correct'); a3Score++; } else { btn.classList.add('wrong'); }
+                setTimeout(() => { a3Idx++; loadAct3(); }, 700);
+            };
+            box.appendChild(btn);
+        });
+    }
+
+    // --- ACTIVITY 4: GUNITHAKSHARA COMBINATION ---
+    const act4Data = [
+        {q: "೧. ಚ್ + ಇ = ಏನಾಗುತ್ತದೆ?", o: ["ಚೀ", "ಚಿ", "ಚೆ"], a: "ಚಿ"},
+        {q: "೨. ತ್ + ಆ = ಮೂಡುವ ಸರಿಯಾದ ಗುಣಿತಾಕ್ಷರ ಯಾವುದು?", o: ["ತಾ", "ತಿ", "ತು"], a: "ತಾ"},
+        {q: "೩. ಕ್ + ಉ = ಬರೆಯುವ ಸರಿಯಾದ ಕ್ರಮ:", o: ["ಕೌ", "ಕೋ", "ಕು"], a: "ಕು"},
+        {q: "೪. ದ್ + ಈ = ಬರೆಯುವ ಗುಣಿತಾಕ್ಷರ ರೂಪ:", o: ["ದಿ", "ದೀ", "ದೇ"], a: "ದೀ"},
+        {q: "೫. ಹ್ + ಇ = ಏನಾಗುತ್ತದೆ?", o: ["ಹಿ", "ಹೀ", "ಹೇ"], a: "ಹಿ"}
+    ];
+    let a4Idx = 0, a4Score = 0;
+    function loadAct4() {
+        if(a4Idx >= act4Data.length) { document.getElementById('a4-qtext').innerText = `⚡ ಗುಣಿತಾಕ್ಷರ ಜೋಡಣೆ ಮುಗಿದಿದೆ! ಸ್ಕೋರ್: ${a4Score}/5`; document.getElementById('a4-options').innerHTML=''; return; }
+        document.getElementById('hud-a4-q').innerText = `ಪ್ರಶ್ನೆ: ${a4Idx+1}/5`;
+        document.getElementById('hud-a4-s').innerText = `ಸ್ಕೋರ್: ${a4Score}`;
+        const item = act4Data[a4Idx]; document.getElementById('a4-qtext').innerText = item.q;
+        const box = document.getElementById('a4-options'); box.innerHTML = '';
+        item.o.forEach(o => {
+            const btn = document.createElement('button'); btn.className = 'game-btn'; btn.innerText = o;
+            btn.style.borderColor = 'var(--neon-purple)';
+            btn.onclick = () => {
+                if(o === item.a) { btn.classList.add('correct'); a4Score++; } else { btn.classList.add('wrong'); }
+                setTimeout(() => { a4Idx++; loadAct4(); }, 700);
+            };
+            box.appendChild(btn);
+        });
+    }
+
+    // --- ACTIVITY 5: WORD MEANINGS MCQ ---
+    const act5Data = [
+        {q: "೧. ಪದ್ಯದಲ್ಲಿ ಪ್ರಸ್ತಾಪವಾಗಿರುವ 'ಹುತ್ತರಿ' ಪದದ ನೈಜ ಜಾನಪದ ಅರ್ಥವೇನು?", o: ["ದೊಡ್ಡ ಹುತ್ತ", "ಕೊಡಗಿನ ಸಾಂಪ್ರದಾಯಿಕ ಸುಗ್ಗಿ ಹಬ್ಬ (ಹೊಸ ಅಕ್ಕಿ ಮನೆಗೆ ತರುವ ಹಬ್ಬ)", "ಯುದ್ಧ ಭೂಮಿಯ ಆಟ"], a: "ಕೊಡಗಿನ ಸಾಂಪ್ರದಾಯಿಕ ಸುಗ್ಗಿ ಹಬ್ಬ (ಹೊಸ ಅಕ್ಕಿ ಮನೆಗೆ ತರುವ ಹಬ್ಬ)"},
+        {q: "೨. 'ಭೂರಮೆ' ಎಂಬ ಸುಂದರ ಪದದ ನಿಖರವಾದ ಅರ್ಥವೇನು?", o: ["ಆಕಾಶದ ದೇವತೆ", "ಭೂದೇವಿ", "ಕಾಡಿನ ಹಕ್ಕಿ"], a: "ಭೂದೇವಿ"},
+        {q: "೩. ಹುತ್ತರಿ ಹಬ್ಬದ ಕುಣಿತದಲ್ಲಿ ಧರಿಸುವ 'ದಟ್ಟಿಕುಪ್ಪಸ' ಎಂದರೆ ಏನರ್ಥ?", o: ["ಕಾಲಿಗೆ ಧರಿಸುವ ಗೆಜ್ಜೆ", "ಸೊಂಟಕ್ಕೆ ಕಟ್ಟುವ ವಸ್ತ್ರ / ಸಾಂಪ್ರದಾಯಿಕ ಉಡುಪು", "ತಲೆಗೆ ಸುತ್ತುವ ಪೇಟ"], a: "ಸೊಂಟಕ್ಕೆ ಕಟ್ಟುವ ವಸ್ತ್ರ / ಸಾಂಪ್ರದಾಯಿಕ ಉಡುಪು"},
+        {q: "೪. 'ಕಡುಗಲಿ' ಎನ್ನುವುದರ ವೀರಶ್ರೀಯ ತಾತ್ಪರ್ಯವೇನು?", o: ["ಮಹಾಶೂರ", "ಸಾಧಾರಣ ಬೇಟೆಗಾರ", "ಓಡಿಹೋದ ಸೈನಿಕ"], a: "ಮಹಾಶೂರ"},
+        {q: "೫. 'ಒಡಲ್' ಎನ್ನುವ ಪದಕ್ಕೆ ದೇಹದ ಯಾವ ಅರ್ಥ ನೀಡಲಾಗಿದೆ?", o: ["ಕಾಲು", "ತಲೆ", "شರೀರ / ದೇಹ"], a: "شರೀರ / ದೇಹ"}
+    ];
+    let a6Idx = 0, a6Score = 0;
+    function loadAct5() {
+        if(a6Idx >= act5Data.length) { document.getElementById('a6-qtext').innerText = `🏆 ಶಬ್ದಕೋಶ ಸಾಮ್ರಾಟರು! ಒಟ್ಟು ಸ್ಕೋರ್: ${a6Score}/5`; document.getElementById('a6-options').innerHTML=''; return; }
+        document.getElementById('hud-a6-q').innerText = `ಪ್ರಶ್ನೆ: ${a6Idx+1}/5`;
+        document.getElementById('hud-a6-s').innerText = `ಸ್ಕೋರ್: ${a6Score}`;
+        const item = act5Data[a6Idx]; document.getElementById('a6-qtext').innerText = item.q;
+        const box = document.getElementById('a6-options'); box.innerHTML = '';
+        item.o.forEach(o => {
+            const btn = document.createElement('button'); btn.className = 'game-btn'; btn.innerText = o;
+            btn.style.borderColor = 'var(--neon-magenta)';
+            btn.onclick = () => {
+                if(o === item.a) { btn.classList.add('correct'); a6Score++; } else { btn.classList.add('wrong'); }
+                setTimeout(() => { a6Idx++; loadAct5(); }, 700);
+            };
+            box.appendChild(btn);
+        });
+    }
+
+    window.onload = () => {
+        loadAct1();
+        loadAct3();
+        loadAct4();
+        loadAct5();
+    };
+</script>
+</body>
+</html>

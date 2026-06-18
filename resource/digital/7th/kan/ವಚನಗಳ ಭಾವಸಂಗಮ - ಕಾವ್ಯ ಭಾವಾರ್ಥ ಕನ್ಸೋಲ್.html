@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ವಚನಗಳ ಭಾವಸಂಗಮ - ಕಾವ್ಯ ಭಾವಾರ್ಥ ಕನ್ಸೋಲ್</title>
+    <style>
+        :root {
+            --neon-gold: #ffd700;
+            --neon-cyan: #00f2fe;
+            --neon-green: #39ff14;
+            --neon-pink: #ff007f;
+            --cyber-purple: #8338ec;
+            --dark-core: #040508;
+            --panel-bg: rgba(22, 20, 38, 0.98);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: radial-gradient(circle at center, #1b162e 0%, var(--dark-core) 100%);
+            margin: 0;
+            padding: 20px;
+            color: #fff;
+            min-height: 100vh;
+        }
+
+        .ai-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: var(--panel-bg);
+            border-radius: 24px;
+            padding: 30px;
+            box-shadow: 0 0 40px rgba(255, 215, 0, 0.15);
+            border: 2px solid rgba(255, 215, 0, 0.2);
+        }
+
+        header {
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 2.3rem;
+            background: linear-gradient(90deg, var(--neon-gold), var(--neon-cyan), var(--neon-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 0 0 10px 0;
+            font-weight: 800;
+        }
+
+        .instruction {
+            color: #a0aabf;
+            font-size: 1.1rem;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        /* Split Screen Engine Layout */
+        .split-engine {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 25px;
+            margin-top: 20px;
+        }
+
+        /* Left Side: Poem Paragraphs */
+        .poem-stream {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .poem-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-left: 5px solid var(--neon-gold);
+            border-radius: 14px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            line-height: 1.8;
+            font-size: 1.15rem;
+        }
+
+        .poem-card:hover {
+            border-color: var(--neon-gold);
+            background: rgba(255, 215, 0, 0.04);
+            transform: scale(1.01);
+        }
+
+        .poem-card.active {
+            background: rgba(255, 215, 0, 0.08);
+            border-color: var(--neon-gold);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.2);
+        }
+
+        .para-tag {
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: var(--neon-cyan);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        /* Right Side: Smart Summary Display */
+        .summary-display {
+            background: rgba(0, 0, 0, 0.3);
+            border: 2px dashed rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 25px;
+            position: sticky;
+            top: 40px;
+            height: fit-content;
+            min-height: 300px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .summary-display.highlight {
+            border-color: var(--neon-green);
+            background: rgba(57, 255, 20, 0.02);
+            box-shadow: 0 0 25px rgba(57, 255, 20, 0.1);
+        }
+
+        .summary-title {
+            color: var(--neon-green);
+            font-size: 1.4rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            border-bottom: 1px solid rgba(57, 255, 20, 0.2);
+            padding-bottom: 10px;
+        }
+
+        .summary-body {
+            font-size: 1.2rem;
+            line-height: 1.7;
+            color: #e2e8f0;
+            text-align: justify;
+        }
+
+        .placeholder-text {
+            color: #666;
+            text-align: center;
+            font-size: 1.2rem;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+
+<div class="ai-container">
+    <header>
+        <h1>🕉️ ವಚನಗಳ ಭಾವಸಂಗಮ: ಸಾರಾಂಶ ಮ್ಯಾಟ್ರಿಕ್ಸ್ 🕉️</h1>
+        <p style="margin: 0; color: #a0aabf;">ಶಿವಶರಣರ ಪವಿತ್ರ ವಚನಗಳ ಸಾಲುಗಳು ಮತ್ತು ಅವುಗಳ ಅಂತರಂಗದ ಭಾವಾರ್ಥ</p>
+    </header>
+
+    <div class="instruction">💡 **ಮಕ್ಕಳಿಗಾಗಿ ಸೂಚನೆ:** ಎಡಭಾಗದ ಯಾವುದೇ ಶರಣರ ವಚನದ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ, ಬಲಭಾಗದಲ್ಲಿ ಅದರ ಅತ್ಯಂತ ಸರಳ ಸಾರಾಂಶವನ್ನು ತಕ್ಷಣ ನೋಡಿ ತಿಳಿಯಿರಿ!</div>
+
+    <div class="split-engine">
+        <!-- LEFT COLUMN: POEM LINES -->
+        <div class="poem-stream">
+            <div class="poem-card" onclick="showSummary(0, this)">
+                <div class="para-tag">ಜೇಡರ ದಾಸಿಮಯ್ಯನವರ ವಚನ</div>
+                ಹರಿದ ಗೋಣಿಯಲೊಬ್ಬ ಕಳವೆಯ ತುಂಬಿದ<br>
+                ಇರುಳೆಲ್ಲಾ ನಡೆದನಾ ಸುಂಕಕಂಜಿ<br>
+                ಕಳವೆಯೆಲ್ಲಾ ಹೋಗಿ ಬರಿಗೋಣಿ ಉಳಿಯಿತ್ತು<br>
+                ಅಳಿಮನದವನ ಭಕ್ತಿ ಇಂತಾಯಿತ್ತು ರಾಮನಾಥ
+            </div>
+
+            <div class="poem-card" onclick="showSummary(1, this)">
+                <div class="para-tag">ಮಡಿವಾಳ ಮಾಚಯ್ಯನವರ ವಚನ</div>
+                ಅಂಧಕಾರದ ದೆಸೆಯಿಂದ ಚಂದ್ರನ ಪ್ರಭೆಯಾಯಿತು<br>
+                ನಿಂದಕರ ನುಡಿಯಿಂದ ಏಡಿಸಲೈ ಶಿವಭಕ್ತಿಯ ಪ್ರಭೆಯಾಯಿತು<br>
+                ಅಹುದೆಂದಡೆ ಅಲ್ಲವೆಂದತಿಗಳೆವರು ಕುತರ್ಕಶಾಸ್ತ್ರದಿಂದ ಯಮಗತಿಗರ ಕೂಡೆ<br>
+                ನಾನಾ ಜನ್ಮಕ್ಕೇರದೆ, ಶಿವಾಚಾರದ ಪಥವ ತೋರಯ್ಯಾ ಕಲಿದೇವರ ದೇವ
+            </div>
+
+            <div class="poem-card" onclick="showSummary(2, this)">
+                <div class="para-tag">ಮುಕ್ತಾಯಕ್ಕನವರ ವಚನ</div>
+                ನುಡಿಯಲುಬಾರದು ಕೆಟ್ಟ ನುಡಿಗಳ, ನಡೆಯಲುಬಾರದು ಕೆಟ್ಟ ನಡೆಗಳ<br>
+                ನುಡಿದಡೇನು, ನಡೆಯದಿರ್ದಡೇನು ಹಿಡಿದ ವ್ರತವ ಬಿಡದಿರಲು<br>
+                ಅದೇ ಮಹಾಜ್ಞಾನದಾಚರಣೆ ಎಂಬೆನು ಅಜಗಣ್ಣ ತಂದೆ
+            </div>
+
+            <div class="poem-card" onclick="showSummary(3, this)">
+                <div class="para-tag">ಸತ್ಯಕ್ಕನವರ ವಚನ</div>
+                ಲಂಚವಂಚನಕ್ಕೆ ಕೈಯಾನದ ಭಾಷೆ, ಬಟ್ಟೆಯಲ್ಲಿ ಹೊನ್ನುವಸ್ತ್ರ ಬಿದ್ದಿದ್ದರೆ<br>
+                ನಾನು ಕೈಮುಟ್ಟಿ ಎತ್ತಿದೆನಾದರೆ ನಿಮ್ಮಾಣೆ ನಿಮ್ಮ ಪ್ರಮಥರಾಣೆ<br>
+                ಅದೇನು कारणವೆಂದರೆ ನೀವಿಕ್ಕಿದ ಭಿಕ್ಷದಲ್ಲಿಪ್ಪೆನಾಗಿ ಇಂತಲ್ಲದೆ ನಾನು ಅಳಿಮನವ ಮಾಡಿ<br>
+                ಪರದ್ರವ್ಯಕ್ಕೆ ಆಸೆ ಮಾಡಿದೆನಾದರೆ ನೀನಾಗಲೆ ಎನ್ನ ನರಕದಲ್ಲಿ ಅದ್ದಿ ನೀನೆದ್ದು ಹೋಗಾ ಶಂಭುಜಕ್ಕೇಶ್ವರಾ.
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN: SMART DYNAMIC SUMMARY -->
+        <div class="summary-display" id="summary-panel">
+            <div class="placeholder-text" id="placeholder">👈 ಯಾವುದೇ ವಚನವನ್ನು ಕ್ಲಿಕ್ ಮಾಡಿದಾಗ ಅದರ ಸರಳ ಭಾವಾರ್ಥ ಇಲ್ಲಿ ಮೂಡುತ್ತದೆ.</div>
+            <div id="summary-content" style="display: none;">
+                <div class="summary-title" id="s-title">ಭಾವಾರ್ಥ</div>
+                <div class="summary-body" id="s-body">ಸಾರಾಂಶ ಕಂಟೆಂಟ್...</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Pure, Short and Crisp Summaries derived directly from the textbook context
+    const summaries = [
+        "ಚಿತ್ರಾನ್ನ ಅಥವಾ ಧಾನ್ಯವನ್ನು (ಕಳವೆ) ಕಿತ್ತ ಹರಿದ ಚೀಲದಲ್ಲಿ ತುಂಬಿಕೊಂಡು, ತೆರಿಗೆಗೆ (ಸುಂಕಕ್ಕೆ) ಹೆದರಿ ರಾತ್ರಿಯಿಡೀ ನಡೆದ ಕಳ್ಳನ ಧಾನ್ಯವೆಲ್ಲ ದಾರಿಯುದ್ದಕ್ಕೂ ಉದುರಿಹೋಗಿ ಕೊನೆಗೆ ಬರಿ ಚೀಲ ಮಾತ್ರ ಉಳಿಯುತ್ತದೆ[cite: 1]. ಅದೇ ರೀತಿ ಕಪಟ ಅಥವಾ ಅಸ್ಥಿರ ಮನಸ್ಸಿನಿಂದ (ಅಳಿಮನ) ಮಾಡುವ ಭಕ್ತಿಯು ಯಾವುದೇ ಫಲವನ್ನು ನೀಡದೆ ಸಂಪೂರ್ಣ ವ್ಯರ್ಥವಾಗುತ್ತದೆ ಎಂದು ಜೇಡರ ದಾಸಿಮಯ್ಯನವರು ತಿಳಿಸಿದ್ದಾರೆ[cite: 1].",
+        "ಕತ್ತಲಿರುವುದರಿಂದಲೇ ಚಂದ್ರನ ಬೆಳಕು ಹೇಗೆ ಪ್ರಕಾಶಿಸುತ್ತದೆಯೋ, ಹಾಗೆಯೇ ನಿಂದಿಸುವ ಜನರ ಮಾತುಗಳಿಂದ ಶರಣರ ಶಿವಭಕ್ತಿಯು ಮತ್ತಷ್ಟು ಪ್ರಕಾಶಗೊಂಡು ಶುದ್ಧವಾಗುತ್ತದೆ[cite: 1]. ಅನ್ಯಾಯದ ಮಾರ್ಗ ಹಿಡಿದು ಕುತರ್ಕ ನಡೆಸುವ ಸಾಮಾನ್ಯ ಜನರು ನಾನಾ ಜನ್ಮಗಳ ಚಕ್ರದಲ್ಲಿ ಸಿಲುಕಿ ಬಳಲುತ್ತಾರೆ[cite: 1]. ಆದ್ದರಿಂದ ಅಂತಹ ಜನ್ಮಗಳ ದ್ವಂದ್ವಕ್ಕೆ ಸಿಲುಕಿಸದೆ ತನಗೆ ಶಿವಾಚಾರದ ಸನ್ಮಾರ್ಗವನ್ನು ತೋರಿಸು ಎಂದು ಮಡಿವಾಳ ಮಾಚಯ್ಯನವರು ಶಿವನಲ್ಲಿ ಪ್ರಾರ್ಥಿಸಿದ್ದಾರೆ[cite: 1].",
+        "ಮನುಷ್ಯನು ತನ್ನ ಜೀವನದಲ್ಲಿ ಎಂದಿಗೂ ಕೆಟ್ಟ ಮಾತುಗಳನ್ನು ಆಡಬಾರದು ಮತ್ತು ಕೆಟ್ಟ ನಡತೆಗಳನ್ನು ಹೊಂದಿರಬಾರದು[cite: 1]. ಒಬ್ಬ ವ್ಯಕ್ತಿಯು ಕೇವಲ ಮಾತನಾಡುತ್ತಾ ಕೂರದೆ, ತಾನು ಹಿಡಿದ ಸತ್ನಿಯಮವನ್ನು ಅಥವಾ ವ್ರತವನ್ನು ಯಾವುದೇ ಸಂದರ್ಭದಲ್ಲೂ ಬಿಡದೆ ನಿಷ್ಠೆಯಿಂದ ಪಾಲಿಸುವುದೇ ನಿಜವಾದ ಶ್ರೇಷ್ಠ ಜ್ಞಾನದ ನಡವಳಿಕೆಯಾಗಿದೆ (ಮಹಾಜ್ಞಾನದಾಚರಣೆ) ಎಂದು ಮುಕ್ತಾಯಕ್ಕನವರು ವಿವರಿಸಿದ್ದಾರೆ[cite: 1].",
+        "ಸತ್ಯಕ್ಕನವರು ಲಂಚ ಮತ್ತು ವಂಚನೆಗೆ ಎಂದಿಗೂ ಕೈಯೊಡ್ಡದ ದೃಢ ನಿಯಮ ಹೊಂದಿದ್ದಾರೆ[cite: 1]. ಹಾದಿಯಲ್ಲಿ ಚಿನ್ನದ ಒಡವೆ ಅಥವಾ ಬೆಲೆಯುಳ್ಳ ವಸ್ತ್ರ ಬಿದ್ದಿದ್ದರೂ ತಾವು ಕೈಮುಟ್ಟಿ ಎತ್ತುವುದಿಲ್ಲವೆಂದು ಶರಣರ ಮೇಲೆ ಆಣೆ ಮಾಡಿದ್ದಾರೆ[cite: 1]. ಭಗವಂತ ನೀಡಿದ ಪ್ರಾಮಾಣಿಕ ದುಡಿಮೆಯ ಭಿಕ್ಷದಲ್ಲೇ ಬದುಕುವ ತಾವು, ಒಂದು ವೇಳೆ ಅಸ್ಥಿರ ಮನಸ್ಸು ಮಾಡಿ ಪರರ ಸೊತ್ತಿಗೆ (ಪರದ್ರವ್ಯಕ್ಕೆ) ಆಸೆ ಪಟ್ಟರೆ ತಕ್ಷಣವೇ ತಮ್ಮನ್ನು ನರಕದಲ್ಲಿ ಮುಳುಗಿಸಿ ನೀನು ದೂರ ಹೋಗು ಎಂದು ಶಿವನಿಗೆ ಸಾರಿದ್ದಾರೆ[cite: 1]."
+    ];
+
+    function showSummary(index, card) {
+        // Highlight active card
+        document.querySelectorAll('.poem-card').forEach(c => c.classList.remove('active'));
+        card.classList.add('active');
+
+        // Configure Summary View
+        document.getElementById('placeholder').style.display = 'none';
+        const content = document.getElementById('summary-content');
+        content.style.display = 'block';
+
+        const panel = document.getElementById('summary-panel');
+        panel.classList.add('highlight');
+        setTimeout(() => panel.classList.remove('highlight'), 400);
+
+        // Load Content
+        document.getElementById('s-title').innerText = ` ವಚನದ ಸಂಕ್ಷಿಪ್ತ ಭಾವಾರ್ಥ`;
+        document.getElementById('s-body').innerText = summaries[index];
+    }
+</script>
+
+</body>
+</html>
