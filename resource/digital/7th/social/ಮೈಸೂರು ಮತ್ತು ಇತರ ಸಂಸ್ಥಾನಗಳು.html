@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಮೈಸೂರು ಮತ್ತು ಇತರ ಸಂಸ್ಥಾನಗಳು - Interactive Flip Book</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Noto+Serif+Kannada:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #4a0e17, #701c28, #b03a48);
+            --book-bg: #fffdf6;
+            --primary-color: #610c17; /* Royal Silk Red Maroon */
+            --secondary-color: #0b5345; /* Emerald Diwan Green */
+            --accent-color: #d4af37; /* Palace Gold */
+            --text-color: #2c3e50;
+            --success: #196f3d;
+            --error: #922b21;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Poppins', 'Noto Serif Kannada', serif;
+            background: var(--bg-gradient);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-color);
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 20px;
+            text-shadow: 0 3px 6px rgba(0,0,0,0.4);
+        }
+        .header h1 { font-size: 2.2rem; }
+        .header p { font-size: 1.1rem; color: #f9ebea; margin-top: 5px; }
+
+        /* Modern Flip Book Container Layout */
+        .book-container {
+            width: 100%;
+            max-width: 1020px;
+            background: var(--book-bg);
+            border-radius: 24px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.5), inset -15px 0 30px rgba(0,0,0,0.05);
+            border-left: 22px solid var(--primary-color);
+            min-height: 690px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+            border-right: 6px solid var(--accent-color);
+        }
+
+        /* Top Progress Indicator */
+        .progress-container { width: 100%; height: 6px; background: #eaedd0; }
+        .progress-bar { height: 100%; width: 11.11%; background: var(--accent-color); transition: width 0.4s ease; }
+
+        /* Page Flip Effect System */
+        .page { padding: 45px; flex: 1; display: none; animation: flipAnimation 0.5s ease-in-out; }
+        .page.active { display: block; }
+        @keyframes flipAnimation {
+            from { opacity: 0; transform: rotateY(-15deg) translateX(30px); }
+            to { opacity: 1; transform: rotateY(0deg) translateX(0); }
+        }
+
+        .page-title {
+            font-size: 1.55rem;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px dashed var(--accent-color);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+        }
+
+        .instruction { font-size: 1.05rem; margin-bottom: 20px; color: #555; font-style: italic; }
+
+        /* Navigation Buttons */
+        .book-controls {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px 45px;
+            background: #fdf5e2;
+            border-top: 1px solid #eedec4;
+        }
+        .btn {
+            padding: 12px 28px;
+            border: none;
+            border-radius: 40px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: bold;
+        }
+        .btn-prev { background: #d0c4af; color: #333; }
+        .btn-next { background: var(--primary-color); color: white; }
+        .btn:hover:not(:disabled) { transform: translateY(-3px); box-shadow: 0 6px 15px rgba(0,0,0,0.15); }
+        .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+        .feedback { margin-top: 15px; padding: 15px; border-radius: 8px; font-weight: bold; display: none; }
+
+        /* Act 1: MCQ */
+        .quiz-box { display: flex; flex-direction: column; gap: 12px; }
+        .opt-btn { padding: 14px 20px; background: white; border: 2px solid #e2e8f0; border-radius: 10px; cursor: pointer; text-align: left; font-size: 1.05rem; transition: 0.2s; }
+        .opt-btn:hover { background: #f8f9fa; border-color: var(--primary-color); }
+        .opt-btn.correct { background: #c8e6c9; border-color: var(--success); color: #1b5e20; font-weight: bold; }
+        .opt-btn.wrong { background: #ffcdd2; border-color: var(--error); color: #b71c1c; }
+
+        /* Act 2: Accordion Answers Box */
+        .accordion-container { display: flex; flex-direction: column; gap: 12px; }
+        .acc-item { border: 1px solid #eedec4; border-radius: 10px; overflow: hidden; background: white; }
+        .acc-header { background: #fffdf9; padding: 15px; font-weight: bold; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-size: 1.05rem; }
+        .acc-header:hover { background: #fdf5e2; }
+        .acc-body { background: #faf8f2; padding: 15px; display: none; border-top: 1px solid #eee; line-height: 1.7; color: var(--primary-color); font-weight: bold; }
+
+        /* Act 3: Drag & Drop Matching */
+        .matching-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .match-left, .match-right { display: flex; flex-direction: column; gap: 12px; }
+        .match-card { padding: 12px 18px; background: white; border: 2px solid #eedec4; border-radius: 10px; cursor: pointer; transition: 0.2s; font-weight: 600; }
+        .match-card.selected { background: #f5ebd6; border-color: var(--accent-color); }
+        .match-card.correct { background: #c8e6c9; border-color: var(--success); color: #1b5e20; cursor: default; }
+
+        /* Act 4 & 5: Photo Gallery & Video Avatars Framework */
+        .avatar-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+        .avatar-card { background: white; border: 2px solid #eedec4; border-radius: 15px; padding: 15px; text-align: center; box-shadow: 0 4px 8px rgba(0,0,0,0.02); cursor: pointer; transition: 0.3s; }
+        .avatar-card:hover { transform: translateY(-5px); border-color: var(--primary-color); }
+        .avatar-img-placeholder { width: 100px; height: 100px; background: #e2e8f0; border-radius: 50%; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; color: #718096; font-size: 2.2rem; overflow: hidden; border: 3px solid var(--accent-color); }
+        .avatar-img-placeholder img { width: 100%; height: 100%; object-fit: cover; }
+        .avatar-card h4 { font-size: 1.15rem; color: var(--primary-color); margin-bottom: 5px; }
+        .avatar-card p { font-size: 0.9rem; color: #718096; }
+        .video-box { width: 100%; height: 150px; background: #000; border-radius: 10px; margin-top: 10px; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.9rem; }
+
+        /* Act 6: Innovative Blanks Dropdown */
+        .text-passage { background: #fffdf9; border: 2px solid #eedec4; padding: 25px; border-radius: 15px; font-size: 1.2rem; line-height: 2.3; }
+        .blank-select { padding: 4px 8px; border: 2px solid var(--primary-color); border-radius: 6px; font-size: 1.05rem; font-weight: bold; color: var(--primary-color); background: white; cursor: pointer; }
+
+        /* Act 7: Chronology Steps */
+        .v-timeline { display: flex; flex-direction: column; gap: 12px; }
+        .t-row { display: flex; align-items: center; gap: 15px; background: white; padding: 12px; border-radius: 10px; border: 2px dashed #eedec4; }
+        .t-index { width: 35px; height: 35px; background: var(--primary-color); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+        .t-zone { flex: 1; min-height: 45px; background: #fffdf9; border-radius: 6px; display: flex; align-items: center; padding-left: 15px; }
+        .item-bank { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; background: #f3ebd6; padding: 15px; border-radius: 12px; }
+        .drag-chip { padding: 8px 15px; background: white; border: 1px solid #cdc0a8; border-radius: 25px; cursor: grab; font-size: 0.95rem; font-weight: bold; box-shadow: 0 3px 6px rgba(0,0,0,0.05); }
+
+        /* Act 8: Palace Treasure Grid (Ultra Model 1) */
+        .grid-fleet { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
+        .fleet-card { background: white; border: 2px solid #eedec4; padding: 20px; text-align: center; border-radius: 15px; cursor: pointer; transition: 0.3s; }
+        .fleet-card:hover { transform: scale(1.04); background: #fffdf9; }
+        .fleet-card i { font-size: 2.3rem; color: var(--secondary-color); margin-bottom: 10px; }
+
+        /* Act 9: Diwan Strategy Scenario Matrix (Ultra Model 2) */
+        .battle-zone { background: #f9f5eb; border: 1px dashed #d4af37; padding: 25px; border-radius: 12px; text-align: center; font-size: 1.15rem; margin-bottom: 20px; line-height: 1.7; font-weight: 500; }
+        .strategy-btn { width: 100%; text-align: left; padding: 15px; background: white; border: 2px solid #e2d3b5; margin-top: 10px; border-radius: 10px; cursor: pointer; font-size: 1.05rem; transition: 0.2s; }
+        .strategy-btn:hover { background: #fffdf9; border-color: var(--primary-color); }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>ಮೈಸೂರು ಮತ್ತು ಇತರ ಸಂಸ್ಥಾನಗಳು</h1>
+        <p>Innovative Interactive Digital Flip Book</p>
+    </div>
+
+    <div class="book-container">
+        <div class="progress-container">
+            <div class="progress-bar" id="progBar"></div>
+        </div>
+
+        <div class="page active" id="page1">
+            <div class="page-title"><i class="fa-solid fa-square-poll-horizontal"></i> ಆಕ್ಟಿವಿಟಿ 1: ಏಕವಾಕ್ಯ ಪ್ರಶ್ನೋತ್ತರ ಬಹುಆಯ್ಕೆ ಸರಣಿ</div>
+            <p class="instruction">ಮೈಸೂರು ಮತ್ತು ಕರ್ನಾಟಕದ ಪ್ರಮುಖ ಸಂಸ್ಥಾನಗಳ ಇತಿಹಾಸ ಮತ್ತು ಸಾಧನೆಗಳ ಕುರಿತಾದ ಪ್ರಶ್ನೆಗಳಿಗೆ ಸರಿಯಾದ ಉತ್ತರವನ್ನು ಆಯ್ಕೆ ಮಾಡಿ:</p>
+            <p id="q-text" style="font-size:1.25rem; margin-bottom:18px; font-weight:bold; color:var(--primary-color);"></p>
+            <div class="quiz-box" id="q-options"></div>
+            <div style="font-weight: bold; margin-top: 20px; text-align: right; color: #666;" id="q-indicator">ಪ್ರಶ್ನೆ: 1/6</div>
+            <div class="feedback" id="fb1"></div>
+        </div>
+
+        <div class="page" id="page2">
+            <div class="page-title"><i class="fa-solid fa-folder-open"></i> ಆಕ್ಟಿವಿಟಿ 2: ವೈಚಾರಿಕ ಗುಂಪು ಚರ್ಚೆಯ ಪ್ರಶ್ನೆಗಳು (ಕ್ಲಿಕ್ ಬಾಕ್ಸ್ ಆಕ್ಟಿವಿಟಿ)</div>
+            <p class="instruction">ಕೆಳಗಿನ ಪ್ರಮುಖ ಇತಿಹಾಸದ ಪ್ರಶ್ನೆಗಳ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ, ಅವುಗಳ ಅಧಿಕೃತ ಉತ್ತರ ಬಾಕ್ಸ್ ಅನ್ನು ತೆರೆದು ವಿಶ್ಲೇಷಿಸಿ:</p>
+            
+            <div class="accordion-container">
+                <div class="acc-item">
+                    <div class="acc-header" onclick="toggleAcc(this)">1. ಮೈಸೂರಿನ ಇತಿಹಾಸದಲ್ಲಿ 'ಪ್ರಜಾಪ್ರತಿನಿಧಿ ಸಭೆ'ಯ ಸ್ಥಾಪನೆ ಏಕೊಂದು ಮೈಲಿಗಲ್ಲು? <i class="fa-solid fa-plus"></i></div>
+                    <div class="acc-body">ದಿವಾನ್ ರಂಗಾಚಾರ್ಲು ಅವರ ಕಾಲದಲ್ಲಿ 1881 ರಲ್ಲಿ ಸ್ಥಾಪನೆಯಾದ ಪ್ರಜಾಪ್ರತಿನಿಧಿ ಸಭೆಯು ಭಾರತದ ಪ್ರಿನ್ಸಿಲಿ ರಾಜ್ಯಗಳಲ್ಲೇ ಮೊದಲ ಬಾರಿಗೆ ಪ್ರಜೆಗಳಿಗೆ ಆಡಳಿತದಲ್ಲಿ ಧ್ವನಿ ನೀಡಿದ ಪ್ರಜಾಪ್ರಭುತ್ವದ ಮುನ್ಸೂಚನೆಯಾಗಿತ್ತು.</div>
+                </div>
+                <div class="acc-item">
+                    <div class="acc-header" onclick="toggleAcc(this)">2. ಸರ್ ಎಂ. ವಿಶ್ವೇಶ್ವರಯ್ಯನವರ 'ಕೈಗಾರಿಕೀಕರಣ ಇಲ್ಲವೇ ಸರ್ವನಾಶ' ಎಂಬ ಘೋಷಣೆಯ ಮಹತ್ವವೇನು? <i class="fa-solid fa-plus"></i></div>
+                    <div class="acc-body">ಮೈಸೂರು ಕೇವಲ ಕೃಷಿಯನ್ನೇ ನೆಚ್ಚಿಕೊಂಡರೆ ಆರ್ಥಿಕವಾಗಿ ಬೆಳೆಯಲು ಸಾಧ್ಯವಿಲ್ಲ ಎಂದು ಅರಿತ ವಿಶ್ವೇಶ್ವರಯ್ಯನವರು ಭದ್ರಾವತಿ ಕಬ್ಬಿಣ ಕಾರ್ಖಾನೆ, ಮೈಸೂರು ಸ್ಯಾಂಡಲ್ ಸೋಪ್, ಸ್ಟೇಟ್ ಬ್ಯಾಂಕ್ ಆಫ್ ಮೈಸೂರು ಸ್ಥಾಪಿಸುವ ಮೂಲಕ ಮೈಸೂರನ್ನು ಕೈಗಾರಿಕಾ ಹಬ್ ಮಾಡಿದರು.</div>
+                </div>
+                <div class="acc-item">
+                    <div class="acc-header" onclick="toggleAcc(this)">3. ನಾಲ್ವಡಿ ಕೃಷ್ಣರಾಜ ಒಡೆಯರ್ ಅವರನ್ನು ಗಾಂಧೀಜಿಯವರು 'ರಾಜರ್ಷಿ' ಎಂದು ಏಕೆ ಕರೆದರು? <i class="fa-solid fa-plus"></i></div>
+                    <div class="acc-body">ನಾಲ್ವಡಿಯವರು ಹಿಂದುಳಿದ ವರ್ಗಗಳಿಗೆ ಮೀಸಲಾತಿ (ಮಿಲರ್ ವರದಿ), ಕಡ್ಡಾಯ ಉಚಿತ ಪ್ರಾಥಮಿಕ ಶಿಕ್ಷಣ, ದೇವದಾಸಿ ಪದ್ಧತಿ ನಿರ್ಮೂಲನೆ ಮತ್ತು ಸ್ತ್ರೀಯರಿಗೆ ಮತದಾನದ ಹಕ್ಕು ನೀಡುವ ಮೂಲಕ ಮೈಸೂರನ್ನು ಮಾದರಿ ರಾಜ್ಯವನ್ನಾಗಿಸಿದ್ದರಿಂದ ಗಾಂಧೀಜಿ ಹಾಗೆ ಶ್ಲಾಘಿಸಿದರು.</div>
+                </div>
+                <div class="acc-item">
+                    <div class="acc-header" onclick="toggleAcc(this)">4. ಮೈಸೂರಿನ ಆಧುನಿಕ ಬೆಳವಣಿಗೆಯಲ್ಲಿ ದಿವಾನ್ ಸರ್ ಶೇಷಾದ್ರಿ ಅಯ್ಯರ್ ಅವರ ಕೊಡುಗೆಗಳೇನು? <i class="fa-solid fa-plus"></i></div>
+                    <div class="acc-body">ಇವರು ಕಾವೇರಿ ನದಿಗೆ ಶಿವನಸಮುದ್ರದಲ್ಲಿ ಏಷ್ಯಾದಲ್ಲೇ ಮೊದಲ ಜಲವಿದ್ಯುತ್ ಯೋಜನೆಯನ್ನು (1902) ತಂದರು. ಕೋಲಾರ ಚಿನ್ನದ ಗಣಿಗೆ ವಿದ್ಯುತ್ ಒದಗಿಸಿದರು ಹಾಗೂ ಬೆಂಗಳೂರಿನಲ್ಲಿ ಜಿಗಣಿ ಮತ್ತು ಮಲ್ಲೇಶ್ವರಂ ಬಡಾವಣೆಗಳನ್ನು ನಿರ್ಮಿಸಿದರು.</div>
+                </div>
+                <div class="acc-item">
+                    <div class="acc-header" onclick="toggleAcc(this)">5. ಚಿತ್ರದುರ್ಗದ ಪಾಳೆಯಗಾರರಲ್ಲಿ ಮದಕರಿ ನಾಯಕ ಮತ್ತು ಓಬವ್ವಳ ಶೌರ್ಯ ಅಮರವಾಗಿದ್ದು ಹೇಗೆ? <i class="fa-solid fa-plus"></i></div>
+                    <div class="acc-body">ಹೈದರ್ ಅಲಿಯು ಚಿತ್ರದುರ್ಗ ಕೋಟೆಗೆ ಮುತ್ತಿಗೆ ಹಾಕಿದಾಗ ವೀರ ಮದಕರಿ ನಾಯಕ ಧೀರತನದಿಂದ ಹೋರಾಡಿದನು. ಅದೇ ಸಮಯದಲ್ಲಿ ಸಾಮಾನ್ಯ ವನಿತೆ ಓಬವ್ವಳು ಒನಕೆಯನ್ನು ಹಿಡಿದು ರಹಸ್ಯ ಕಿಂಡಿಯ ಮೂಲಕ ನುಗ್ಗುತ್ತಿದ್ದ ಶತ್ರು ಸೈನಿಕರನ್ನು ಸಂಹರಿಸಿ ವೀರಮರಣ ಹೊಂದಿದಳು.</div>
+                </div>
+                <div class="acc-item">
+                    <div class="acc-header" onclick="toggleAcc(this)">6. ದಿವಾನ್ ಮಿರ್ಜಾ ಇಸ್ಮಾಯಿಲ್ ಅವರ ಕಾಲದಲ್ಲಿ ಸೌಂದರ್ಯ ಮತ್ತು ಕೈಗಾರಿಕೆಗಳು ಒಟ್ಟಿಗೆ ಹೇಗೆ ಬೆಳೆದವು? <i class="fa-solid fa-plus"></i></div>
+                    <div class="acc-body">ಮಿರ್ಜಾ ಇಸ್ಮಾಯಿಲ್ ಅವರು ಕೆ.ಆರ್.ಎಸ್ ಅಣೆಕಟ್ಟಿನ ಬಳಿ ವಿಶ್ವಪ್ರಸಿದ್ಧ ಬೃಂದಾವನ ಉದ್ಯಾನವನವನ್ನು ನಿರ್ಮಿಸಿ ಮೈಸೂರನ್ನು ಉದ್ಯಾನ ನಗರಿ ಮಾಡಿದರು. ಜೊತೆಗೆ ಖಾದಿ ಗ್ರಾಮೋದ್ಯೋಗ ಮತ್ತು ಸಕ್ಕರೆ ಕಾರ್ಖಾನೆಗಳನ್ನು ವಿಸ್ತರಿಸಿದರು.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="page" id="page3">
+            <div class="page-title"><i class="fa-solid fa-arrows-turn-to-dots"></i> ಆಕ್ಟಿವಿಟಿ 3: ದಿವಾನರುಗಳು ಮತ್ತು ಐತಿಹಾಸಿಕ ಕೊಡುಗೆಗಳ ಮಿಲನ</div>
+            <p class="instruction">ಎಡಭಾಗದ ಪ್ರಮುಖ ದಿವಾನ್ ಅಥವಾ ಗಣ್ಯರ ಹೆಸರನ್ನು ಕ್ಲಿಕ್ ಮಾಡಿ, ಬಲಭಾಗದಲ್ಲಿರುವ ಅದಕ್ಕೆ ಸೂಕ್ತವಾದ ಸಾಧನೆಗೆ ಮ್ಯಾಚ್ ಮಾಡಿ ಜೋಡಿಸಿ:</p>
+            
+            <div class="matching-grid">
+                <div class="match-left" id="leftContainer">
+                    <div class="match-card" data-id="1">ಸಿ. ರಂಗಾಚಾರ್ಲು</div>
+                    <div class="match-card" data-id="2">ಕೆ. ಶೇಷಾದ್ರಿ ಅಯ್ಯರ್</div>
+                    <div class="match-card" data-id="3">ಸರ್ ಎಂ. ವಿಶ್ವೇಶ್ವರಯ್ಯ</div>
+                    <div class="match-card" data-id="4">ಸರ್ ಮಿರ್ಜಾ ಇಸ್ಮಾಯಿಲ್</div>
+                    <div class="match-card" data-id="5">ಕೆಂಪೇಗೌಡ</div>
+                    <div class="match-card" data-id="6">ಚಿಕ್ಕದೇವರಾಜ ಒಡೆಯರ್</div>
+                </div>
+                <div class="match-right" id="rightContainer">
+                    <div class="match-card" data-match="2">ಶಿವನಸಮುದ್ರ ಜಲವಿದ್ಯುತ್ ಯೋಜನೆ ಮತ್ತು ಕೆ.ಜಿ.ಎಫ್ ಗೆ ವಿದ್ಯುತ್ ಸಂಪರ್ಕ</div>
+                    <div class="match-card" data-match="1">1881 ರಲ್ಲಿ ಮೈಸೂರು ಪ್ರಜಾಪ್ರತಿನಿಧಿ ಸಭೆಯನ್ನು ಸ್ಥಾಪಿಸಿದ ಮೊದಲ ದಿವಾನ್</div>
+                    <div class="match-card" data-match="3">ಕನ್ನಡ ಸಾಹಿತ್ಯ ಪರಿಷತ್ತು ಮತ್ತು ಕೃಷ್ಣರಾಜಸಾಗರ (KRS) ಅಣೆಕಟ್ಟಿನ ಮುಖ್ಯ ಇಂಜಿನಿಯರ್</div>
+                    <div class="match-card" data-match="4">ಬೃಂದಾವನ ಗಾರ್ಡನ್ ನಿರ್ಮಾಣ ಮತ್ತು ಹಿಂದೂಸ್ತಾನ್ ಏರೋನಾಟಿಕ್ಸ್ (HAL) ಗೆ ಅಡಿಪಾಯ</div>
+                    <div class="match-card" data-match="6">'ನವಕೋಟಿ ನಾರಾಯಣ' ಬಿರುದು ಹೊಂದಿದ್ದ ಮತ್ತು ಅಂಚೆ ವ್ಯವಸ್ಥೆ ತಂದ ಮೈಸೂರು ರಾಜ</div>
+                    <div class="match-card" data-match="5">ಬೆಂಗಳೂರು ನಗರವನ್ನು ನಿರ್ಮಿಸಿದ ಪ್ರಸಿದ್ಧ ಮಾಗಡಿ ಪಾಳೆಯಗಾರರು</div>
+                </div>
+            </div>
+            <div class="feedback" id="fb3"></div>
+        </div>
+
+        <div class="page" id="page4">
+            <div class="page-title"><i class="fa-solid fa-image"></i> ಆಕ್ಟಿವಿಟಿ 4: ಮೈಸೂರಿನ ಶಿಲ್ಪಿಗಳ ಡಿಜಿಟಲ್ ಭಾವಚಿತ್ರ ಸಂಶೋಧನೆ</div>
+            <p class="instruction">ಕೆಳಗಿನ ಪ್ರಮುಖ ನಾಯಕರ ಫೋಟೋ ಕಾರ್ಡ್ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ, ಇತಿಹಾಸದಲ್ಲಿ ಅವರ ಪಾತ್ರವೇನೆಂದು ತಿಳಿದುಕೊಳ್ಳಿ (ನಿಮ್ಮ ಗೂಗಲ್ ಡ್ರೈವ್ ಚಿತ್ರಗಳಿಗೆ ಇಲ್ಲಿ ಲಿಂಕ್ ನೀಡಬಹುದು):</p>
+            
+            <div class="avatar-grid">
+                <div class="avatar-card" onclick="showAvatarInfo('ನಾಲ್ವಡಿ ಕೃಷ್ಣರಾಜ ಒಡೆಯರ್', 'ಮೈಸೂರನ್ನು ಸಾಮಾಜಿಕ ಸುಧಾರಣೆಗಳ ಮೂಲಕ \'ಮಾದರಿ ಸಂಸ್ಥಾನ\'ವನ್ನಾಗಿ ಮಾಡಿದ ಪರಮ ದಯಾಳು ರಾಜರ್ಷಿ.')">
+                    <div class="avatar-img-placeholder"><i class="fa-solid fa-crown"></i></div>
+                    <h4>ನಾಲ್ವಡಿ ಕೃಷ್ಣರಾಜ ಒಡೆಯರ್</h4><p>[ಗೂಗಲ್ ಡ್ರೈವ್ ಇಮೇಜ್ ಮಾದರಿ]</p>
+                </div>
+                <div class="avatar-card" onclick="showAvatarInfo('ಸರ್ ಎಂ. ವಿಶ್ವೇಶ್ವರಯ್ಯ', 'ಭಾರತ ರತ್ನ ಪ್ರಶಸ್ತಿ ಪಡೆದ ಆಧುನಿಕ ಮೈಸೂರಿನ ನವನಿರ್ಮಾತೃ ಹಾಗೂ ಶ್ರೇಷ್ಠ ಇಂಜಿನಿಯರ್ ದಿವಾನರು.')">
+                    <div class="avatar-img-placeholder"><i class="fa-solid fa-user-tie"></i></div>
+                    <h4>ಸರ್ ಎಂ. ವಿಶ್ವೇಶ್ವರಯ್ಯ</h4><p>[ಗೂಗಲ್ ಡ್ರೈವ್ ಇಮೇಜ್ ಮಾದರಿ]</p>
+                </div>
+                <div class="avatar-card" onclick="showAvatarInfo('ಸರ್ ಮಿರ್ಜಾ ಇಸ್ಮಾಯಿಲ್', 'ಮೈಸೂರನ್ನು ಸುಂದರ ಉದ್ಯಾನಗಳ ನಗರಿಯನ್ನಾಗಿ ಹಾಗೂ ಸಣ್ಣ ಕೈಗಾರಿಕೆಗಳ ತವರನ್ನಾಗಿ ಮಾಡಿದ ಮುತ್ಸದ್ದಿ ದಿವಾನರು.')">
+                    <div class="avatar-img-placeholder"><i class="fa-solid fa-user-tie"></i></div>
+                    <h4>ಸರ್ ಮಿರ್ಜಾ ಇಸ್ಮಾಯಿಲ್</h4><p>[ಗೂgಲ್ ಡ್ರೈವ್ ಇಮೇಜ್ ಮಾದರಿ]</p>
+                </div>
+                <div class="avatar-card" onclick="showAvatarInfo('ಚಿತ್ರದುರ್ಗದ ಓಬವ್ವ', 'ಒನಕೆಯ ಸಹಾಯದಿಂದ ಹೈದರ್ ಅಲಿಯ ಸೈನಿಕರನ್ನು ಮೆಟ್ಟಿ ನಿಂತ ಚಿತ್ರದುರ್ಗದ ವೀರ ನಾರಿ.')">
+                    <div class="avatar-img-placeholder"><i class="fa-solid fa-user-ninja"></i></div>
+                    <h4>ವೀರಗಾಥೆ ಓಬವ್ವ</h4><p>[ಗೂಗಲ್ ಡ್ರೈವ್ ಇಮೇಜ್ ಮಾದರಿ]</p>
+                </div>
+                <div class="avatar-card" onclick="showAvatarInfo('ಚಿಕ್ಕದೇವರಾಜ ಒಡೆಯರ್', 'ಔರಂಗಜೇಬನೊಂದಿಗೆ ಉತ್ತಮ ಬಾಂಧವ್ಯ ಹೊಂದಿ ರಾಜ್ಯದ ಖಜಾನೆಯನ್ನು ತುಂಬಿಸಿ ನವಕೋಟಿ ನಾರಾಯಣ ಎನಿಸಿಕೊಂಡವರು.')">
+                    <div class="avatar-img-placeholder"><i class="fa-solid fa-crown"></i></div>
+                    <h4>ಚಿಕ್ಕದೇವರಾಜ ಒಡೆಯರ್</h4><p>[ಗೂಗಲ್ ಡ್ರೈವ್ ಇಮೇಜ್ ಮಾದರಿ]</p>
+                </div>
+                <div class="avatar-card" onclick="showAvatarInfo('ದಿವಾನ್ ರಂಗಾಚಾರ್ಲು', 'ಮೈಸೂರು ರಾಜರಿಗೆ ಪುನಃ ಅಧಿಕಾರ ಸಿಕ್ಕ ನಂತರ ಪ್ರಜಾಪ್ರತಿನಿಧಿ ಸಭೆ ಆರಂಭಿಸಿದ ಕ್ರಾಂತಿಕಾರಿ ದಿವಾನರು.')">
+                    <div class="avatar-img-placeholder"><i class="fa-solid fa-user-tie"></i></div>
+                    <h4>ದಿವಾನ್ ರಂಗಾಚಾರ್ಲು</h4><p>[ಗೂಗಲ್ ಡ್ರೈವ್ ಇಮೇಜ್ ಮಾದರಿ]</p>
+                </div>
+            </div>
+            <div class="feedback" id="fb4" style="background:#fff3cd; color:#856404; border:1px solid #ffeeba;"></div>
+        </div>
+
+        <div class="page" id="page5">
+            <div class="page-title"><i class="fa-solid fa-video"></i> ಆಕ್ಟಿವಿಟಿ 5: ಮಾತನಾಡುವ ಇತಿಹಾಸ ಪುಟಗಳು (ವಿಡಿಯೋ ಅಪ್ಲೋಡ್ ಮಾದರಿ)</div>
+            <p class="instruction">ಕೆಳಗಿನ ನಾಯಕರ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ, ಅವರು ತಮ್ಮ ಕೊಡುಗೆಗಳನ್ನು ಲೈವ್ ಆಗಿ ವಿಡಿಯೋ ಮೂಲಕ ಮಾತನಾಡುವುದನ್ನು ವೀಕ್ಷಿಸಿ (ನಿಮ್ಮ ವಿಡಿಯೋಗಳನ್ನು ಇಲ್ಲಿ ಅಪ್ಲೋಡ್ ಮಾಡಬಹುದು):</p>
+            
+            <div class="avatar-grid">
+                <div class="avatar-card" onclick="playVideoAvatar('ವಿಶ್ವೇಶ್ವರಯ್ಯನವರ ಸಂದೇಶ', 'ಕೈಗಾರಿಕೀಕರಣ ಇಲ್ಲವೇ ಸರ್ವನಾಶ! ಶ್ರಮಪಡದೆ ಜ್ಞಾನ ಸಿಗದು, ಮೈಸೂರು ನನ್ನ ಹೆಮ್ಮೆ!')">
+                    <div class="avatar-img-placeholder"><i class="fa-solid fa-circle-play" style="color:var(--accent-color);"></i></div>
+                    <h4>ವಿಶ್ವೇಶ್ವರಯ್ಯ ಟಾಕ್ಸ್</h4><div class="video-box">[ವಿಡಿಯೋ ಪ್ಲೇಯರ್ ಮಾದರಿ]</div>
+                </div>
+                <div class="avatar-card" onclick="playVideoAvatar('ನಾಲ್ವಡಿ ಕೃಷ್ಣರಾಜ ಒಡೆಯರ್ ಅವರ ಧ್ಯೇಯ', 'ನನ್ನ ರಾಜ್ಯದಲ್ಲಿ ಪ್ರತಿಯೊಬ್ಬ ಮಗುವಿಗೂ ಉಚಿತ ಶಿಕ್ಷಣ ಸಿಗಬೇಕು, ಜಾತಿ ಬೇಧವಿಲ್ಲದೆ ಮೀಸಲಾತಿ ತಂದಿದ್ದೇನೆ.')">
+                    <div class="avatar-img-placeholder"><i class="fa-solid fa-circle-play" style="color:var(--accent-color);"></i></div>
+                    <h4>ರಾಜರ್ಷಿ ನಾಲ್ವಡಿ ಸ್ವಗತ</h4><div class="video-box">[ವಿಡಿಯೋ ಪ್ಲೇಯರ್ ಮಾದರಿ]</div>
+                </div>
+                <div class="avatar-card" onclick="playVideoAvatar('ಓಬವ್ವಳ ಸಾಹಸ ಸಂಭಾಷಣೆ', 'ಕೋಟೆಯ ಕಿಂಡಿಯ ಮೂಲಕ ಶತ್ರುಗಳು ನುಗ್ಗುತ್ತಿದ್ದಾರೆ, ಹೆಣ್ಣೆಂದು ಉದಾಸೀನ ಮಾಡದಿರಿ, ಈ ಒನಕೆಯೇ ಅವರಿಗೆ ಮೃತ್ಯು!')">
+                    <div class="avatar-img-placeholder"><i class="fa-solid fa-circle-play" style="color:var(--accent-color);"></i></div>
+                    <h4>ಓಬವ್ವಳ ಗರ್ಜನೆ</h4><div class="video-box">[ವಿಡಿಯೋ ಪ್ಲೇಯರ್ ಮಾದರಿ]</div>
+                </div>
+            </div>
+            <div class="feedback" id="fb5" style="background:#e0f2f1; color:#004d40;"></div>
+        </div>
+
+        <div class="page" id="page6">
+            <div class="page-title"><i class="fa-solid fa-feather-pointed"></i> ಆಕ್ಟಿವಿಟಿ 6: ಮಾದರಿ ಮೈಸೂರು ರಾಜ್ಯದ ಕೈಗಾರಿಕಾ ಕ್ರಾಂತಿ ವಿಶ್ಲೇಷಣೆ</div>
+            <p class="instruction">ಮೈಸೂರಿನ ಸುಧಾರಣೆಗಳ ಕುರಿತಾದ ಕೆಳಗಿನ ಪ್ಯಾರಾಗ್ರಾಫ್ ಅನ್ನು ನಿಖರವಾದ ಪದಗಳನ್ನು ಆರಿಸುವ ಮೂಲಕ ಪೂರ್ಣಗೊಳಿಸಿ:</p>
+            
+            <div class="text-passage">
+                ಮೈಸೂರು ಸಂಸ್ಥಾನಕ್ಕೆ ಕೃಷ್ಣರಾಜಸಾಗರ (KRS) ಅಣೆಕಟ್ಟು ಕಟ್ಟಲು ಕಾರಣರಾದ ಪ್ರಸಿದ್ಧ ಮಹಾರಾಜರು 
+                <select class="blank-select" id="b1" data-ans="ನಾಲ್ವಡಿ ಕೃಷ್ಣರಾಜ ಒಡೆಯರ್"><option value="">--ಆಯ್ಕೆ ಮಾಡಿ--</option><option>ಚಾಮರಾಜ ಒಡೆಯರ್</option><option>ನಾಲ್ವಡಿ ಕೃಷ್ಣರಾಜ ಒಡೆಯರ್</option><option>ಜಯಚಾಮರಾಜ ಒಡೆಯರ್</option></select> 
+                ಆಗಿದ್ದಾರೆ. ಸರ್ ಎಂ. ವಿಶ್ವೇಶ್ವರಯ್ಯನವರು ಉನ್ನತ ಶಿಕ್ಷಣಕ್ಕಾಗಿ ಕ್ರಿ.ಶ. 1916 ರಲ್ಲಿ ಪ್ರಸಿದ್ಧವಾದ 
+                <select class="blank-select" id="b2" data-ans="ಮೈಸೂರು ವಿಶ್ವವಿದ್ಯಾನಿಲಯ"><option value="">--ಆಯ್ಕೆ ಮಾಡಿ--</option><option>ಬೆಂಗಳೂರು ವಿಶ್ವವಿದ್ಯಾನಿಲಯ</option><option>ಮೈಸೂರು ವಿಶ್ವವಿದ್ಯಾನಿಲಯ</option><option>ಕರ್ನಾಟಕ ವಿಶ್ವವಿದ್ಯಾನಿಲಯ</option></select> 
+                ವನ್ನು ಸ್ಥಾಪಿಸಿದರು. ಮೈಸೂರು ರಾಜ್ಯದಲ್ಲಿ ಹಿಂದುಳಿದ ವರ್ಗಗಳಿಗೆ ಉದ್ಯೋಗದಲ್ಲಿ ನ್ಯಾಯ ಒದಗಿಸಲು ನೇಮಕವಾದ ಸಮಿತಿಯೇ 
+                <select class="blank-select" id="b3" data-ans="ಮಿಲರ್ ಸಮಿತಿ"><option value="">--ಆಯ್ಕೆ ಮಾಡಿ--</option><option>ಹಂಟರ್ ಸಮಿತಿ</option><option>ಮಿಲರ್ ಸಮಿತಿ</option><option>ಮೆಕಾಲೆ ಸಮಿತಿ</option></select> 
+                ಆಗಿದೆ. ಇಡೀ ಏಷ್ಯಾ ಖಂಡದಲ್ಲೇ ಮೊದಲ ಬಾರಿಗೆ ಶಿವನಸಮುದ್ರದಲ್ಲಿ ವಿದ್ಯುತ್ ಉತ್ಪಾದನೆ ಆರಂಭವಾದ ವರ್ಷ 
+                <select class="blank-select" id="b4" data-ans="1902"><option value="">--ಆಯ್ಕೆ ಮಾಡಿ--</option><option>1881</option><option>1902</option><option>1947</option></select> 
+                ಆಗಿದೆ. ಸರ್ ಮಿರ್ಜಾ ಇಸ್ಮಾಯಿಲ್ ಅವರು ಶಿವಮೊಗ್ಗ ಜಿಲ್ಲೆಯ ಭದ್ರಾವತಿಯಲ್ಲಿ ಪ್ರಸಿದ್ಧವಾದ 
+                <select class="blank-select" id="b5" data-ans="ಕಾಗದದ ಕಾರ್ಖಾನೆ"><option value="">--ಆಯ್ಕೆ ಮಾಡಿ--</option><option>ಕಾಗದದ ಕಾರ್ಖಾನೆ</option><option>ಚಿನ್ನದ ಗಣಿ</option><option>ಶ್ರೀಗಂಧದ ಎಣ್ಣೆ ಕಾರ್ಖಾನೆ</option></select> 
+                ಯನ್ನು ಆರಂಭಿಸಿದರು. ಕೊನೆಯದಾಗಿ, ಕನ್ನಡ ಭಾಷೆಯ ಬೆಳವಣಿಗೆಗಾಗಿ ಬೆಂಗಳೂರಿನಲ್ಲಿ ವಿಶ್ವೇಶ್ವರಯ್ಯನವರ ಪ್ರೇರಣೆಯಿಂದ ಸ್ಥಾಪಿತವಾದ ಸಂಸ್ಥೆಯೇ 
+                <select class="blank-select" id="b6" data-ans="ಕನ್ನಡ ಸಾಹಿತ್ಯ ಪರಿಷತ್ತು"><option value="">--ಆಯ್ಕೆ ಮಾಡಿ--</option><option>ಕನ್ನಡ ಸಾಹಿತ್ಯ ಪರಿಷತ್ತು</option><option>ಕನ್ನಡ ಸಾಹಿತ್ಯ ಅಕಾಡೆಮಿ</option><option>ಕನ್ನಡ ವಿವಿ</option></select> 
+                ಆಗಿದೆ.
+            </div>
+            <button class="btn" style="background:var(--accent-color); color:white; margin-top:20px;" onclick="checkBlanks()">ಇತಿಹಾಸ ಪಠ್ಯ ಖಚಿತಪಡಿಸಿ</button>
+            <div class="feedback" id="fb6"></div>
+        </div>
+
+        <div class="page" id="page7">
+            <div class="page-title"><i class="fa-solid fa-arrow-down-1-9"></i> ಆಕ್ಟಿವಿಟಿ 7: ಮೈಸೂರು ಪ್ರಗತಿಯ ಕಾಲಾನುಕ್ರಮ ಘಟನಾವಳಿ ಸರಣಿ</div>
+            <p class="instruction">ಮೈಸೂರು ಸಂಸ್ಥಾನದ ಇತಿಹಾಸದ ಅತ್ಯಂತ ಮಹತ್ವದ ಘಟನೆಗಳನ್ನು ಕಾಲದ ಆಧಾರದ ಮೇಲೆ ಹಳೆಯದರಿಂದ ಹೊಸದಕ್ಕೆ ಕ್ರಮಬದ್ಧವಾಗಿ ಜೋಡಿಸಿ:</p>
+            
+            <div class="v-timeline">
+                <div class="t-row"><div class="t-index">1</div><div class="t-zone" id="z1" data-order="ದಿವಾನ್ ರಂಗಾಚಾರ್ಲು ಅವರಿಂದ ಮೈಸೂರು ಪ್ರಜಾಪ್ರತಿನಿಧಿ ಸಭೆಯ ಸ್ಥಾಪನೆ"></div></div>
+                <div class="t-row"><div class="t-index">2</div><div class="t-zone" id="z2" data-order="ಶಿವನಸಮುದ್ರ ಜಲವಿದ್ಯುತ್ ಯೋಜನೆಯಿಂದ ವಿದ್ಯುತ್ ಉತ್ಪಾದನೆ ಆರಂಭ"></div></div>
+                <div class="t-row"><div class="t-index">3</div><div class="t-zone" id="z3" data-order="ನಾಲ್ವಡಿ ಕೃಷ್ಣರಾಜ ಒಡೆಯರ್ ಅವರಿಂದ ಮೈಸೂರಿನ ಆಡಳಿತ ಸೂತ್ರ ಗ್ರಹಣ"></div></div>
+                <div class="t-row"><div class="t-index">4</div><div class="t-zone" id="z4" data-order="ಸರ್ ಎಂ. ವಿಶ್ವೇಶ್ವರಯ್ಯನವರ ಪ್ರೇರಣೆಯಿಂದ ಮೈಸೂರು ವಿಶ್ವವಿದ್ಯಾನಿಲಯದ ಸ್ಥಾಪನೆ"></div></div>
+                <div class="t-row"><div class="t-index">5</div><div class="t-zone" id="z5" data-order="ಹಿಂದುಳಿದ ವರ್ಗಗಳ ಉದ್ಯೋಗ ಮೀಸಲಾತಿಗಾಗಿ ಪ್ರಸಿದ್ಧ ಮಿಲರ್ ವರದಿ ಸಲ್ಲಿಕೆ"></div></div>
+                <div class="t-row"><div class="t-index">6</div><div class="t-zone" id="z6" data-order="ಸರ್ ಮಿರ್ಜಾ ಇಸ್ಮಾಯಿಲ್ ಅವರಿಂದ ಬೆಂಗಳೂರಿನಲ್ಲಿ ಪ್ರಸಿದ್ಧ ಟಿ.ಎಫ್.ಎಲ್ ಕಾರ್ಖಾನೆಗಳ ವಿಸ್ತರಣೆ"></div></div>
+            </div>
+
+            <div class="item-bank" id="dragBank7">
+                <div class="drag-chip" draggable="true" id="t1">ನಾಲ್ವಡಿ ಕೃಷ್ಣರಾಜ ಒಡೆಯರ್ ಅವರಿಂದ ಮೈಸೂರಿನ ಆಡಳಿತ ಸೂತ್ರ ಗ್ರಹಣ</div>
+                <div class="drag-chip" draggable="true" id="t2">ದಿವಾನ್ ರಂಗಾಚಾರ್ಲು ಅವರಿಂದ ಮೈಸೂರು ಪ್ರಜಾಪ್ರತಿನಿಧಿ ಸಭೆಯ ಸ್ಥಾಪನೆ</div>
+                <div class="drag-chip" draggable="true" id="t3">ಸರ್ ಎಂ. ವಿಶ್ವೇಶ್ವರಯ್ಯನವರ ಪ್ರೇರಣೆಯಿಂದ ಮೈಸೂರು ವಿಶ್ವವಿದ್ಯಾನಿಲಯದ ಸ್ಥಾಪನೆ</div>
+                <div class="drag-chip" draggable="true" id="t4">ಶಿವನಸಮುದ್ರ ಜಲವಿದ್ಯುತ್ ಯೋಜನೆಯಿಂದ ವಿದ್ಯುತ್ ಉತ್ಪಾದನೆ ಆರಂಭ</div>
+                <div class="drag-chip" draggable="true" id="t5">ಸರ್ ಮಿರ್ಜಾ ಇಸ್ಮಾಯಿಲ್ ಅವರಿಂದ ಬೆಂಗಳೂರಿನಲ್ಲಿ ಪ್ರಸಿದ್ಧ ಟಿ.ಎಫ್.ಎಲ್ ಕಾರ್ಖಾನೆಗಳ ವಿಸ್ತರಣೆ</div>
+                <div class="drag-chip" draggable="true" id="t6">ಹಿಂದುಳಿದ ವರ್ಗಗಳ ಉದ್ಯೋಗ ಮೀಸಲಾತಿಗಾಗಿ ಪ್ರಸಿದ್ಧ ಮಿಲರ್ ವರದಿ ಸಲ್ಲಿಕೆ</div>
+            </div>
+            <button class="btn" style="background:var(--accent-color); color:white; margin-top:15px;" onclick="checkTimeline()">ಕಾಲಗಣನೆ ಪರಿಶೀಲಿಸಿ</button>
+            <div class="feedback" id="fb7"></div>
+        </div>
+
+        <div class="page" id="page8">
+            <div class="page-title"><i class="fa-solid fa-gopuram"></i> ಆಕ್ಟಿವಿಟಿ 8: ಮೈಸೂರಿನ ಸಾಂಸ್ಕೃತಿಕ ಹಾಗೂ ಆರ್ಥಿಕ ವೈಶಿಷ್ಟ್ಯಗಳ ನಿಧಿ ಶೋಧ</div>
+            <p class="instruction">ಮೈಸೂರು ಒಡೆಯರ್ ಹಾಗೂ ದಿವಾನರುಗಳ ಕಾಲದಲ್ಲಿ ಸ್ಥಾಪನೆಯಾದ ನೈಜ ಸಾಂಸ್ಕೃತಿಕ, ಕಲಾತ್ಮಕ ಹಾಗೂ ಆರ್ಥಿಕ ಯೋಜನೆಗಳ ಪೆಟ್ಟಿಗೆಯನ್ನು ಮಾತ್ರ ತೆರೆಯಿರಿ (ಒಟ್ಟು 4 ಸರಿಯಾದ ನಿಧಿಗಳಿವೆ):</p>
+            
+            <div class="grid-fleet">
+                <div class="fleet-card" data-correct="yes" data-info="ಮೈಸೂರು ಅರಮನೆಯಲ್ಲಿ ಕಲಾಭಿಮಾನಿ ರಾಜರ ಆಶ್ರಯದಲ್ಲಿ \'ಮೈಸೂರು ಶೈಲಿಯ ಚಿತ್ರಕಲೆ\' ಪ್ರಸಿದ್ಧಿ ಪಡೆಯಿತು."><i class="fa-solid fa-palette"></i><h5>ಮೈಸೂರು ಸಾಂಪ್ರದಾಯಿಕ ಚಿತ್ರಕಲೆ</h5></div>
+                <div class="fleet-card" data-correct="no" data-info="ಖಂಡಿತ ತಪ್ಪು, ಅಜಂತಾ ಗುಹೆಗಳು ಮಹಾರಾಷ್ಟ್ರದಲ್ಲಿದ್ದು ಮೈಸೂರು ಸಂಸ್ಥಾನಕ್ಕೆ ಸಂಬಂಧಿಸಿಲ್ಲ."><i class="fa-solid fa-mountain"></i><h5>ಅಜಂತಾ ಗುಹಾಂತರ ಕಲೆ</h5></div>
+                <div class="fleet-card" data-correct="yes" data-info="ವಿಶ್ವೇಶ್ವರಯ್ಯನವರು ವ್ಯಾಪಾರಿಗಳಿಗೆ ನೆರವಾಗಲು 1913 ರಲ್ಲಿ ಸ್ಟೇಟ್ ಬ್ಯಾಂಕ್ ಆಫ್ ಮೈಸೂರು (SBM) ಸ್ಥಾಪಿಸಿದರು."><i class="fa-solid fa-building-columns"></i><h5>ಸ್ಟೇಟ್ ಬ್ಯಾಂಕ್ ಆಫ್ ಮೈಸೂರು</h5></div>
+                <div class="fleet-card" data-correct="yes" data-info="ರಾಜರ ಆಸ್ಥಾನದಲ್ಲಿ ವೀಣೆ ಶೇಷಣ್ಣ ಮುಂತಾದ ಶ್ರೇಷ್ಠ ವಿದ್ವಾಂಸರಿಂದ ಕರ್ನಾಟಕ ಸಂಗೀತ ಭಾರಿ ಉತ್ಕರ್ಷ ಹೊಂದಿತು."><i class="fa-solid fa-music"></i><h5>ಕರ್ನಾಟಕ ಶಾಸ್ತ್ರೀಯ ಸಂಗೀತ</h5></div>
+                <div class="fleet-card" data-correct="no" data-info="ಇಲ್ಲ, ಗೋಲ್ ಗುಂಬಜ್ ಬಿಜಾಪುರದ ಆದಿಲ್ ಶಾಹಿಗಳ ಕೊಡುಗೆಯಾಗಿದೆ."><i class="fa-solid fa-monument"></i><h5>ಗೋಲ್ ಗುಂಬಜ್ ವಾಸ್ತುಶಿಲ್ಪ</h5></div>
+                <div class="fleet-card" data-correct="yes" data-info="ಜಾಗತಿಕವಾಗಿ ಮೈಸೂರಿನ ಹೆಸರು ಹರಡಲು ಕಾರಣವಾದ ಗಂಧದ ಎಣ್ಣೆ ಹಾಗೂ ಪ್ರಸಿದ್ಧ ಮೈಸೂರು ಸ್ಯಾಂಡಲ್ ಸೋಪ್ ಕಾರ್ಖಾನೆ ಸ್ಥಾಪನೆ."><i class="fa-solid fa-soap"></i><h5>ಮೈಸೂರು ಗಂಧದ ಎಣ್ಣೆ ಉದ್ಯಮ</h5></div>
+            </div>
+            <div class="feedback" id="fb8" style="background:#fff3cd; color:#856404;"></div>
+        </div>
+
+        <div class="page" id="page9">
+            <div class="page-title"><i class="fa-solid fa-chess-queen"></i> ಆಕ್ಟಿವಿಟಿ 9: ಮಾದರಿ ಮೈಸೂರು ನಿರ್ಮಾಣದ ರಾಜತಾಂತ್ರಿಕ ತೀರ್ಮಾನ</div>
+            <p class="instruction">ಕೆಳಗಿನ ಅತ್ಯಂತ ಮಹತ್ವದ ಐತಿಹಾಸಿಕ ಸನ್ನಿವೇಶವನ್ನು ಓದಿ ಮೈಸೂರಿನ ಒಬ್ಬ ದೇಶಪ್ರೇಮಿ ದಿವಾನರಾಗಿ ಯಾವ ಮಹತ್ತರ ನಿರ್ಧಾರ ಕೈಗೊಳ್ಳುತ್ತಿದ್ದೀರಿ ಎಂದು ಆಯ್ಕೆ ಮಾಡಿ:</p>
+            
+            <div class="battle-zone">
+                "ಬ್ರಿಟಿಷ್ ಸರ್ಕಾರವು ಭಾರತದ ಪ್ರಿನ್ಸಿಲಿ ರಾಜ್ಯಗಳ ಆರ್ಥಿಕ ಪ್ರಗತಿಯನ್ನು ನಿಯಂತ್ರಿಸಲು ಯತ್ನಿಸುತ್ತಿದೆ. ಮೈಸೂರಿನಲ್ಲಿ ಭೀಕರ ಬರಗಾಲ ಬಂದು ರೈತರು ಕಂಗಾಲಾಗಿದ್ದಾರೆ. ಆದರೆ ಮೈಸೂರನ್ನು ಆಧುನಿಕ ಜಗತ್ತಿಗೆ ತಕ್ಕಂತೆ ಬೆಳೆಸಲು ಕಾವೇರಿ ನದಿಗೆ ಬೃಹತ್ ಅಣೆಕಟ್ಟು (KRS) ಹಾಗೂ ಜಲವಿದ್ಯುತ್ ಯೋಜನೆಗಳ ಅವಶ್ಯಕತೆ ಇದೆ. ಈ ಸವಾಲಿನ ಸಮಯದಲ್ಲಿ ನಿಮ್ಮ ಆದ್ಯತೆ ಏನಾಗಿರಬೇಕು?"
+            </div>
+
+            <button class="strategy-btn" onclick="makeDecision(false, 'ಇದು ಪ್ರಗತಿಯನ್ನು ಕುಂಠಿತಗೊಳಿಸುವ ಹೆಜ್ಜೆಯಾಗಿದೆ. ಕೇವಲ ಸಾಲ ತೀರಿಸುವುದರಿಂದ ರಾಜ್ಯ ನವನಿರ್ಮಾಣವಾಗುವುದಿಲ್ಲ.')">ಆಯ್ಕೆ ಎ: ಬ್ರಿಟಿಷರ ನಿಯಮಗಳಿಗೆ ಹೆದರಿ ಯಾವುದೇ ದೊಡ್ಡ ಯೋಜನೆಗಳನ್ನು ಹಮ್ಮಿಕೊಳ್ಳದಿರುವುದು, ಕೇವಲ ಸಾಂಪ್ರದಾಯಿಕ ಆಡಳಿತ ನಡೆಸುವುದು.</button>
+            <button class="strategy-btn" onclick="makeDecision(true, 'ಅಪ್ರತಿಮ ದೀರ್ಘದೃಷ್ಟಿಯ ದಿವಾನರ ನಿರ್ಧಾರ! ಮೈಸೂರಿನ ದಿವಾನರುಗಳಾದ ಶೇಷಾದ್ರಿ ಅಯ್ಯರ್ ಮತ್ತು ವಿಶ್ವೇಶ್ವರಯ್ಯನವರು ಇದೇ ಹಾದಿ ಹಿಡಿದರು. ಅವರು ಆರ್ಥಿಕ ಶಿಸ್ತನ್ನು ಕಾಪಾಡಿಕೊಂಡು, ಬ್ರಿಟಿಷರ ವಿರೋಧದ ನಡುವೆಯೂ ಕೃಷ್ಣರಾಜಸಾಗರ ಅಣೆಕಟ್ಟು ಹಾಗೂ ಶಿವನಸಮುದ್ರ ವಿದ್ಯುತ್ ಯೋಜನೆಗಳನ್ನು ಜಾರಿಗೆ ತಂದು ಮೈಸೂರನ್ನು ಭಾರತದಲ್ಲೇ ನಂಬರ್ ಒನ್ ಶ್ರೀಮಂತ ಸಂಸ್ಥಾನವನ್ನಾಗಿಸಿದರು.')">ಆಯ್ಕೆ ಬಿ: ಬ್ರಿಟಿಷರ ತಾರತಮ್ಯದ ನೀತಿಗಳನ್ನು ಬುದ್ಧಿವಂತಿಕೆಯಿಂದ ಎದುರಿಸಿ, ರಾಜ್ಯದ ಆರ್ಥಿಕ ಸಂಪನ್ಮೂಲಗಳನ್ನು ಕ್ರೋಢೀಕರಿಸಿ ಕೃಷಿ ಮತ್ತು ಕೈಗಾರಿಕೆಗಳೆರಡಕ್ಕೂ ಸಮಾನ ಒತ್ತು ನೀಡಿ KRS ಅಣೆಕಟ್ಟು ಹಾಗೂ ಉಚಿತ ಶಿಕ್ಷಣ ವ್ಯವಸ್ಥೆಯನ್ನು ಜಾರಿಗೆ ತರುವುದು.</button>
+            <button class="strategy-btn" onclick="makeDecision(false, 'ಇದು ಸಂಸ್ಥಾನದ ಸ್ವಾಯತ್ತತೆಯನ್ನು ಸಂಪೂರ್ಣವಾಗಿ ಬ್ರಿಟಿಷರಿಗೆ ಅಡವಿಟ್ಟಂತೆ ಆಗುತ್ತದೆ.')">ಆಯ್ಕೆ ಸಿ: ರಾಜ್ಯದ ಆಡಳಿತವನ್ನು ಸಂಪೂರ್ಣವಾಗಿ ಬ್ರಿಟಿಷ್ ಕಮಿಷನರ್‌ಗಳ ಕೈಗೆ ಒಪ್ಪಿಸಿ ಜವಾಬ್ದಾರಿಯಿಂದ ನುಣುಚಿಕೊಳ್ಳುವುದು.</button>
+            
+            <div class="feedback" id="fb9"></div>
+        </div>
+
+        <div class="book-controls">
+            <button class="btn btn-prev" id="prevPageBtn" onclick="movePage(-1)" disabled><i class="fa-solid fa-book-open"></i> ಹಿಂದಿನ ಪುಟ</button>
+            <button class="btn btn-next" id="nextPageBtn" onclick="movePage(1)">ಮುಂದಿನ ಪುಟ <i class="fa-solid fa-book"></i></button>
+        </div>
+    </div>
+
+    <script>
+        let pageIdx = 1;
+        const maxPages = 9;
+
+        function movePage(dir) {
+            document.getElementById(`page${pageIdx}`).classList.remove('active');
+            pageIdx += dir;
+            document.getElementById(`page${pageIdx}`).classList.add('active');
+
+            document.getElementById('prevPageBtn').disabled = (pageIdx === 1);
+            document.getElementById('nextPageBtn').disabled = (pageIdx === maxPages);
+
+            document.getElementById('progBar').style.width = `${(pageIdx / maxPages) * 100}%`;
+        }
+
+        // --- Act 1: MCQ Database (6 items) ---
+        const mcqCollection = [
+            { q: "ಮೈಸೂರು ಒಡೆಯರ್ ರಾಜರಿಗೆ ಬ್ರಿಟಿಷರಿಂದ ಪುನಃ ಅಧಿಕಾರ ಲಭಿಸಿದ ನಂತರ 1881 ರಲ್ಲಿ ಮೈಸೂರಿನ ಮೊದಲ ದಿವಾನರಾಗಿ ಅಧಿಕಾರ ವಹಿಸಿಕೊಂಡವರು ಯಾರು?", opts: ["ಸರ್ ಎಂ. ವಿಶ್ವೇಶ್ವರಯ್ಯ", "ಸಿ. ರಂಗಾಚಾರ್ಲು", "ಕೆ. ಶೇಷಾದ್ರಿ ಅಯ್ಯರ್", "ಮಿರ್ಜಾ ಇಸ್ಮಾಯಿಲ್"], ans: 1 },
+            { q: "ಏಷ್ಯಾ ಖಂಡದಲ್ಲೇ ಪ್ರಥಮ ಬಾರಿಗೆ ಕಾವೇರಿ ನದಿಯ ಶಿವನಸಮುದ್ರ ಜಲವಿದ್ಯುತ್ ಯೋಜನೆ ಜಾರಿಗೆ ಬಂದ ವರ್ಷ ಯಾವುದು?", opts: ["ಕ್ರಿ.ಶ. 1881", "ಕ್ರಿ.ಶ. 1902", "ಕ್ರಿ.ಶ. 1913", "ಕ್ರಿ.ಶ. 1947"], ans: 1 },
+            { q: "ಮೈಸೂರು ಸಂಸ್ಥಾನದ ಅತ್ಯಂತ ಪ್ರಸಿದ್ಧ ಕೃಷ್ಣರಾಜಸಾಗರ (KRS) ಅಣೆಕಟ್ಟಿನ ಪ್ರಧಾನ ಇಂಜಿನಿಯರ್ ಹಾಗೂ ದಿವಾನರಾಗಿದ್ದ ಮಹನೀಯರು ಯಾರು?", opts: ["ದಿವಾನ್ ಪೂರ್ಣಯ್ಯ", "ಸರ್ ಶೇಷಾದ್ರಿ ಅಯ್ಯರ್", "ಸರ್ ಎಂ. ವಿಶ್ವೇಶ್ವರಯ್ಯ", "ಮಿರ್ಜಾ ಇಸ್ಮಾಯಿಲ್"], ans: 2 },
+            { q: "ಮೈಸೂರು ರಾಜ್ಯವನ್ನು ಶೈಕ್ಷಣಿಕ, ಆರ್ಥಿಕ ಹಾಗೂ ಸಾಮಾಜಿಕ ಸುಧಾರಣೆಗಳ ಮೂಲಕ 'ಮಾದರಿ ರಾಜ್ಯ' ಎಂದು ರೂಪಿಸಿದ ಮಹಾರಾಜರು ಯಾರು?", opts: ["ಚಿಕ್ಕದೇವರಾಜ ಒಡೆಯರ್", "ನಾಲ್ವಡಿ ಕೃಷ್ಣರಾಜ ಒಡೆಯರ್", "ಚಾಮರಾಜ ಒಡೆಯರ್", "ಯದುರಾಯ ಒಡೆಯರ್"], ans: 1 },
+            { q: "ಹೈದರ್ ಅಲಿಯ ಸೈನ್ಯವನ್ನು ಚಿತ್ರದುರ್ಗ ಕೋಟೆಯ ರಹಸ್ಯ ಕಿಂಡಿಯ ಬಳಿ ಒನಕೆಯಿಂದ ಮಟ್ಟಹಾಕಿದ ಧೀರ ವನಿತೆ ಯಾರು?", opts: ["ಕಿತ್ತೂರು ಚೆನ್ನಮ್ಮ", "ಚಿತ್ರದುರ್ಗದ ಓಬವ್ವ", "ಕೆಳದಿ ಚೆನ್ನಮ್ಮ", "ರಾಣಿ ಅಬ್ಬಕ್ಕ"], ans: 1 },
+            { q: "ಮೈಸೂರಿನಲ್ಲಿ ವಿಶ್ವಪ್ರಸಿದ್ಧ ಬೃಂದಾವನ ಗಾರ್ಡನ್ ಹಾಗೂ ಮಂಡ್ಯದ ಸಕ್ಕರೆ ಕಾರ್ಖಾನೆ ಸ್ಥಾಪನೆಗೆ ಕಾರಣರಾದ ದಿವಾನರು ಯಾರು?", opts: ["ರಂಗಾಚಾರ್ಲು", "ಸರ್ ಶೇಷಾದ್ರಿ ಅಯ್ಯರ್", "ಸರ್ ಮಿರ್ಜಾ ಇಸ್ಮಾಯಿಲ್", "ದಿವಾನ್ ಆರ್ಕೃಟ್ ರಾಮಸ್ವಾಮಿ"], ans: 2 }
+        ];
+
+        let currentQIdx = 0;
+        function loadMCQ() {
+            const data = mcqCollection[currentQIdx];
+            document.getElementById('q-text').innerText = `${currentQIdx + 1}. ${data.q}`;
+            const container = document.getElementById('q-options');
+            container.innerHTML = "";
+            document.getElementById('q-indicator').innerText = `ಪ್ರಶ್ನೆ: ${currentQIdx + 1}/${mcqCollection.length}`;
+
+            data.opts.forEach((opt, idx) => {
+                const b = document.createElement('button');
+                b.className = "opt-btn";
+                b.innerText = opt;
+                b.onclick = () => verifyMCQ(idx, data.ans, b);
+                container.appendChild(b);
+            });
+        }
+
+        function verifyMCQ(sel, right, element) {
+            const fb = document.getElementById('fb1'); fb.style.display = "block";
+            if(sel === right) {
+                element.classList.add('correct');
+                fb.innerHTML = "✓ ಭೇಷ್! ಮಾದರಿ ಮೈಸೂರಿನ ಇತಿಹಾಸ ಜ್ಞಾನ ನಿಮಗಿದೆ.";
+                fb.style.background = "#c8e6c9"; fb.style.color = "#1b5e20";
+                setTimeout(() => {
+                    if(currentQIdx < mcqCollection.length - 1) {
+                        currentQIdx++; loadMCQ(); fb.style.display = "none";
+                    } else { fb.innerHTML = "🎉 ಅಭಿನಂದನೆಗಳು! ಎಲ್ಲಾ 6 ಬಹುಆಯ್ಕೆ ಪ್ರಶ್ನೆಗಳನ್ನು ಯಶಸ್ವಿಯಾಗಿ ಮುಗಿಸಿದ್ದೀರಿ."; }
+                }, 1500);
+            } else {
+                element.classList.add('wrong');
+                fb.innerHTML = "✗ ತಪ್ಪು ಉತ್ತರ, ಸರಿಯಾದ ದಿವಾನರನ್ನು ಮತ್ತೊಮ್ಮೆ ನೆನಪಿಸಿಕೊಳ್ಳಿ.";
+                fb.style.background = "#ffcdd2"; fb.style.color = "#b71c1c";
+            }
+        }
+        loadMCQ();
+
+        // --- Act 2: Accordion Box Toggle ---
+        function toggleAcc(header) {
+            const body = header.nextElementSibling;
+            const icon = header.querySelector('i');
+            if(body.style.display === "block") {
+                body.style.display = "none";
+                icon.className = "fa-solid fa-plus";
+            } else {
+                body.style.display = "block";
+                icon.className = "fa-solid fa-minus";
+            }
+        }
+
+        // --- Act 3: Matching Logic ---
+        let selectedLeft = null;
+        const leftCards = document.querySelectorAll('#leftContainer .match-card');
+        const rightCards = document.querySelectorAll('#rightContainer .match-card');
+
+        leftCards.forEach(card => {
+            card.addEventListener('click', () => {
+                if(card.classList.contains('correct')) return;
+                leftCards.forEach(c => c.classList.remove('selected'));
+                card.classList.add('selected');
+                selectedLeft = card;
+            });
+        });
+
+        rightCards.forEach(card => {
+            card.addEventListener('click', () => {
+                if(card.classList.contains('correct') || !selectedLeft) return;
+                const matchId = card.getAttribute('data-match');
+                const leftId = selectedLeft.getAttribute('data-id');
+
+                if(matchId === leftId) {
+                    card.classList.add('correct');
+                    selectedLeft.classList.add('correct');
+                    selectedLeft.classList.remove('selected');
+                    selectedLeft = null;
+                    checkAct3Progress();
+                } else {
+                    const fb = document.getElementById('fb3');
+                    fb.style.display = "block"; fb.style.background = "#ffcdd2"; fb.style.color = "#b71c1c";
+                    fb.innerText = "✗ ತಪ್ಪು ಜೋಡಿ! ಸರಿಯಾದ ಕೊಡುಗೆಯನ್ನು ಆಲೋಚಿಸಿ ಮ್ಯಾಚ್ ಮಾಡಿ.";
+                }
+            });
+        });
+
+        function checkAct3Progress() {
+            const finished = document.querySelectorAll('#leftContainer .match-card.correct').length;
+            const fb = document.getElementById('fb3'); fb.style.display = "block";
+            if(finished === 6) {
+                fb.style.background = "#c8e6c9"; fb.style.color = "#1b5e20";
+                fb.innerText = "✓ ಪರಿಪೂರ್ಣ! ಎಲ್ಲಾ 6 ದಿವಾನರುಗಳು ಹಾಗೂ ಸಂಸ್ಥಾನಗಳ ಕೊಡುಗೆಗಳು ನಿಖರವಾಗಿ ಹೊಂದಿಸಲಾಗಿದೆ.";
+            } else {
+                fb.style.background = "#fff3cd"; fb.style.color = "#856404";
+                fb.innerText = `ಪ್ರಗತಿ: ${finished}/6 ಜೋಡಿಗಳು ಸರಿಯಾಗಿವೆ.`;
+            }
+        }
+
+        // --- Act 4: Photo Gallery Logic ---
+        function showAvatarInfo(name, text) {
+            const fb = document.getElementById('fb4'); fb.style.display = "block";
+            fb.innerHTML = `<strong><i class="fa-solid fa-circle-info"></i> ${name}:</strong> ${text}`;
+        }
+
+        // --- Act 5: Video Avatar Logic ---
+        function playVideoAvatar(title, dialog) {
+            const fb = document.getElementById('fb5'); fb.style.display = "block";
+            fb.innerHTML = `<strong><i class="fa-solid fa-clapperboard"></i> ${title}:</strong> "${dialog}" (ಗಮನಿಸಿ: ಇಲ್ಲಿ ನಿಮ್ಮ ಶಾಲಾ ಮಕ್ಕಳ ವಿಡಿಯೋ ಲಿಂಕ್ ಅಟ್ಯಾಚ್ ಮಾಡಬಹುದು)`;
+        }
+
+        // --- Drag & Drop Infrastructure for Act 7 Chronology ---
+        let currentDraggingChip = null;
+        document.querySelectorAll('.drag-chip').forEach(chip => {
+            chip.addEventListener('dragstart', () => { currentDraggingChip = chip; });
+        });
+
+        document.querySelectorAll('.t-zone').forEach(zone => {
+            zone.addEventListener('dragover', (e) => e.preventDefault());
+            zone.addEventListener('drop', () => {
+                if(currentDraggingChip) zone.appendChild(currentDraggingChip);
+            });
+        });
+
+        function checkTimeline() {
+            let correct = 0;
+            for(let i=1; i<=6; i++) {
+                const zone = document.getElementById(`z${i}`);
+                if(zone.firstChild && zone.firstChild.innerText.trim() === zone.getAttribute('data-order')) {
+                    correct++;
+                }
+            }
+            const fb = document.getElementById('fb7'); fb.style.display = "block";
+            if(correct === 6) {
+                fb.innerHTML = "✓ ಅದ್ಭುತ! ಮೈಸೂರು ಸಂಸ್ಥಾನದ ಪ್ರಗತಿಯ ಎಲ್ಲಾ 6 ಘಟನೆಗಳನ್ನು ನಿಖರ ಕಾಲಕ್ರಮದಲ್ಲಿ ಜೋಡಿಸಿದ್ದೀರಿ.";
+                fb.style.background = "#c8e6c9"; fb.style.color = "#1b5e20";
+            } else {
+                fb.innerHTML = `✗ ${correct}/6 ಹಂತಗಳು ಸರಿಯಾಗಿವೆ. ಪ್ರಜಾಪ್ರತಿನಿಧಿ ಸಭೆಯಿಂದ ಮಿರ್ಜಾ ಇಸ್ಮಾಯಿಲ್ ವರೆಗಿನ ಇತಿಹಾಸ ಮತ್ತೊಮ್ಮೆ ಯೋಚಿಸಿ ಮರುಜೋಡಿಸಿ.`;
+                fb.style.background = "#ffcdd2"; fb.style.color = "#b71c1c";
+            }
+        }
+
+        // --- Act 6: Blanks Validator ---
+        function checkBlanks() {
+            let miss = 0;
+            const selects = document.querySelectorAll('.blank-select');
+            selects.forEach(sel => {
+                if(sel.value !== sel.getAttribute('data-ans')) {
+                    miss++; sel.style.borderColor = "var(--error)";
+                } else { sel.style.borderColor = "var(--success)"; }
+            });
+            const fb = document.getElementById('fb6'); fb.style.display = "block";
+            if(miss === 0) {
+                fb.innerHTML = "✓ ಸೂಪರ್! ಮೈಸೂರು ಸಂಸ್ಥಾನದ ಶೈಕ್ಷಣಿಕ ಹಾಗೂ ಕೈಗಾರಿಕಾ ಇತಿಹಾಸದ ಪಠ್ಯ ಭಾಗವನ್ನು ಯಶಸ್ವಿಯಾಗಿ ಪೂರ್ಣಗೊಳಿಸಿದ್ದೀರಿ.";
+                fb.style.background = "#c8e6c9"; fb.style.color = "#1b5e20";
+            } else {
+                fb.innerHTML = "✗ ಕೆಲವು ಖಾಲಿ ಜಾಗಗಳಲ್ಲಿ ತಪ್ಪು ವಿಶ್ವವಿದ್ಯಾನಿಲಯ ಅಥವಾ ಇಸವಿಗಳಿವೆ. ದಯವಿಟ್ಟು ಮತ್ತೊಮ್ಮೆ ನೋಡಿ ತಿದ್ದಿ.";
+                fb.style.background = "#ffcdd2"; fb.style.color = "#b71c1c";
+            }
+        }
+
+        // --- Act 8: Fleet Matrix Picker ---
+        document.querySelectorAll('.fleet-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const isCorrect = card.getAttribute('data-correct') === 'yes';
+                const info = card.getAttribute('data-info');
+                const fb = document.getElementById('fb8'); fb.style.display = "block";
+                if(isCorrect) {
+                    card.style.background = "#c8e6c9";
+                    fb.innerHTML = `🎯 ಯೋಜನೆ ಪತ್ತೆಯಾಗಿದೆ! ವಿವರ: ${info}`;
+                    fb.style.backgroundColor = "#c8e6c9"; fb.style.color = "#1b5e20";
+                } else {
+                    card.style.background = "#ffcdd2";
+                    fb.innerHTML = `⚠️ ಇದು ಮೈಸೂರಿನ ಕೊಡುಗೆಯಲ್ಲ! ವಿವರ: ${info}`;
+                    fb.style.backgroundColor = "#ffcdd2"; fb.style.color = "#b71c1c";
+                }
+            });
+        });
+
+        // --- Act 9: Strategy Scenario Logic ---
+        function makeDecision(isRight, txt) {
+            const fb = document.getElementById('fb9'); fb.style.display = "block";
+            fb.innerHTML = txt;
+            if(isRight) {
+                fb.style.background = "#c8e6c9"; fb.style.color = "#1b5e20";
+            } else {
+                fb.style.background = "#ffcdd2"; fb.style.color = "#b71c1c";
+            }
+        }
+    </script>
+</body>
+</html>

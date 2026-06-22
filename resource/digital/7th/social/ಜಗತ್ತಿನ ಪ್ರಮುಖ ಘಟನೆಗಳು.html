@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಜಗತ್ತಿನ ಪ್ರಮುಖ ಘಟನೆಗಳು - Interactive Digital Book</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Noto+Serif+Kannada:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            --book-bg: #ffffff;
+            --primary-color: #4a154b;
+            --secondary-color: #007a78;
+            --accent-color: #ff9800;
+            --text-color: #2d3748;
+            --success-color: #2e7d32;
+            --error-color: #c62828;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Poppins', 'Noto Serif Kannada', serif;
+            background: var(--bg-gradient);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-color);
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 20px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+        .header h1 { font-size: 2rem; margin-bottom: 5px; color: #fff; }
+        .header p { font-size: 1rem; color: #e0e0e0; }
+
+        /* Book Structure */
+        .book-container {
+            width: 100%;
+            max-width: 900px;
+            background: var(--book-bg);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4), inset -10px 0 20px rgba(0,0,0,0.05);
+            border-left: 15px solid var(--primary-color);
+            min-height: 600px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Progress Bar */
+        .progress-bar-container {
+            width: 100%;
+            height: 6px;
+            background: #e0e0e0;
+        }
+        .progress-bar {
+            height: 100%;
+            width: 14.28%;
+            background: var(--accent-color);
+            transition: width 0.5s ease;
+        }
+
+        /* Page Content */
+        .page {
+            padding: 40px;
+            flex: 1;
+            display: none;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        .page.active { display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .page-title {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            border-bottom: 2px dashed #e0e0e0;
+            padding-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Navigation Buttons */
+        .book-controls {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px 40px;
+            background: #f8f9fa;
+            border-top: 1px solid #e0e0e0;
+            border-bottom-right-radius: 20px;
+        }
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 30px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: bold;
+        }
+        .btn-prev { background: #e0e0e0; color: #333; }
+        .btn-next { background: var(--primary-color); color: white; }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.15); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+        /* Activity Elements UI */
+        .feedback {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: bold;
+            display: none;
+            animation: slideIn 0.3s ease;
+        }
+        @keyframes slideIn { from { opacity:0; transform:translateY(-10px); } to { opacity:1; transform:translateY(0); } }
+
+        /* Act 1: Timeline Specifics */
+        .timeline-container { display: flex; flex-direction: column; gap: 15px; margin-top: 20px; }
+        .timeline-item { display: flex; align-items: center; gap: 20px; background: #f1f3f5; padding: 15px; border-radius: 10px; }
+        .time-slot { min-width: 120px; padding: 10px; background: var(--secondary-color); color: white; text-align: center; border-radius: 8px; font-weight: bold; }
+        .drop-zone { flex: 1; min-height: 45px; background: #fff; border: 2px dashed #b2bec3; border-radius: 8px; display: flex; align-items: center; padding: 0 10px; }
+        .drag-pool { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; padding: 15px; background: #e9ecef; border-radius: 10px; }
+        .draggable { padding: 8px 15px; background: white; border: 1px solid #ced4da; border-radius: 20px; cursor: grab; box-shadow: 0 2px 5px rgba(0,0,0,0.1); font-size: 0.95rem; }
+        .draggable:active { cursor: grabbing; }
+
+        /* Act 2: Sorting Specifics */
+        .sorting-matrix { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; }
+        .matrix-box { background: #f8f9fa; border: 2px solid var(--primary-color); border-radius: 12px; padding: 15px; min-height: 200px; }
+        .matrix-box.islam { border-color: var(--secondary-color); }
+        .matrix-box h3 { text-align: center; margin-bottom: 15px; padding-bottom: 5px; border-bottom: 2px solid #ddd; }
+        .sort-item-pool { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
+        .sort-card { padding: 12px; background: #fff; border: 1px solid #ddd; border-radius: 8px; cursor: grab; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+
+        /* Act 3: Map Pins Map layout Simulation */
+        .map-wrapper { position: relative; width: 100%; height: 320px; background: #e0f2f1; border-radius: 12px; margin-top: 20px; border: 2px solid #b2dfdb; }
+        .map-pin { position: absolute; width: 35px; height: 35px; background: #e67e22; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); display: flex; align-items: center; justify-content: center; color: white; cursor: pointer; box-shadow: -2px 2px 4px rgba(0,0,0,0.3); }
+        .map-pin span { transform: rotate(45deg); font-size: 0.8rem; font-weight: bold; }
+        .map-labels-container { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 20px; }
+        .map-label-opt { padding: 8px 15px; background: white; border: 2px solid #007a78; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        .map-label-opt.selected { background: #007a78; color: white; }
+
+        /* Act 4: Quiz Styles */
+        .quiz-container { display: flex; flex-direction: column; gap: 15px; margin-top: 15px; }
+        .quiz-option { padding: 12px 20px; background: #f1f3f5; border: 2px solid #e9ecef; border-radius: 10px; cursor: pointer; transition: all 0.2s; }
+        .quiz-option:hover { background: #e9ecef; border-color: #dee2e6; }
+        .quiz-option.correct { background: #d4edda; border-color: #c3e6cb; color: #155724; }
+        .quiz-option.wrong { background: #f8d7da; border-color: #f5c6cb; color: #721c24; }
+
+        /* Act 5: Treasure Hunt */
+        .grid-hunt { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 20px; }
+        .treasure-chest { background: #fff8e1; border: 2px dashed #ffb300; padding: 25px 15px; text-align: center; border-radius: 12px; cursor: pointer; transition: all 0.3s; }
+        .treasure-chest:hover { transform: scale(1.05); background: #fff1c2; }
+        .treasure-chest i { font-size: 2.5rem; color: #ff9800; margin-bottom: 10px; }
+
+        /* Act 6: Word search wheel style simulation */
+        .word-search-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; max-width: 360px; margin: 20px auto; }
+        .grid-cell { width: 50px; height: 50px; background: #f8f9fa; border: 1px solid #dee2e6; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; font-weight: bold; border-radius: 6px; cursor: pointer; user-select: none; }
+        .grid-cell.selected { background: var(--accent-color); color: white; }
+
+        /* Act 7: Story Choice */
+        .story-box { background: #fdf6e2; border-left: 5px solid #dfb031; padding: 20px; border-radius: 8px; font-style: italic; font-size: 1.1rem; line-height: 1.6; }
+        .choice-btn { width: 100%; text-align: left; padding: 15px; background: white; border: 2px solid #ddd; margin-top: 12px; border-radius: 8px; cursor: pointer; font-size: 1rem; transition: 0.2s; }
+        .choice-btn:hover { background: #f8f9fa; border-color: var(--primary-color); }
+
+        .score-display { font-size: 1.1rem; font-weight: bold; text-align: center; margin-top: 10px; color: var(--secondary-color); }
+        .check-btn { background: var(--accent-color); color: white; margin-top: 15px; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>ಜಗತ್ತಿನ ಪ್ರಮುಖ ಘಟನೆಗಳು</h1>
+        <p>Innovative Interactive Digital Learning Book</p>
+    </div>
+
+    <div class="book-container">
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+
+        <div class="page active" id="page1">
+            <div class="page-title"><i class="fa-solid fa-clock-history"></i> ಆಕ್ಟಿವಿಟಿ 1: ಇಂಟರಾಕ್ಟಿವ್ ಟೈಮ್‌ಲೈನ್ ಅಡ್ವೆಂಚರ್</div>
+            <p>ಕೆಳಗಿನ ಐತಿಹಾಸಿಕ ಘಟನೆಗಳನ್ನು ಅವುಗಳು ಸಂಭವಿಸಿದ ಸರಿಯಾದ ವರ್ಷ ಅಥವಾ ಕಾಲಕ್ಕೆ ಡ್ರಾಗ್ ಮಾಡಿ ಹೊಂದಿಸಿ:</p>
+            
+            <div class="timeline-container">
+                <div class="timeline-item"><div class="time-slot">ಕ್ರಿ.ಪೂ. 4</div><div class="drop-zone" id="zone1" data-match="ಯೇಸುಕ್ರಿಸ್ತನ ಜನನ"></div></div>
+                <div class="timeline-item"><div class="time-slot">ಕ್ರಿ.ಶ. 30</div><div class="drop-zone" id="zone2" data-match="ಯೇಸುಕ್ರಿಸ್ತನ ಶಿಲುಬೆಗೇರಿಸುವಿಕೆ"></div></div>
+                <div class="timeline-item"><div class="time-slot">ಕ್ರಿ.ಶ. 622</div><div class="drop-zone" id="zone3" data-match="ಹಿಜಿರಾ ಶಕೆಯ ಆರಂಭ"></div></div>
+                <div class="timeline-item"><div class="time-slot">ಕ್ರi.ಶ. 1206</div><div class="drop-zone" id="zone4" data-match="ಚಂಗೀಸ್ ಖಾನ್ ಮಂಗೋಲರ ನಾಯಕನಾಗಿದ್ದು"></div></div>
+                <div class="timeline-item"><div class="time-slot">ಕ್ರಿ.ಶ. 1453</div><div class="drop-zone" id="zone5" data-match="ಅಟೋಮನ್ ಟರ್ಕರಿಂದ ಕಾನ್‌ಸ್ಟಂಟಿನೋಪಲ್ ಪತನ"></div></div>
+            </div>
+
+            <div class="drag-pool" id="dragPool1">
+                <div class="draggable" draggable="true" id="drag1">ಹಿಜಿರಾ ಶಕೆಯ ಆರಂಭ</div>
+                <div class="draggable" draggable="true" id="drag2">ಯೇಸುಕ್ರಿಸ್ತನ ಜನನ</div>
+                <div class="draggable" draggable="true" id="drag3">ಅಟೋಮನ್ ಟರ್ಕರಿಂದ ಕಾನ್‌ಸ್ಟಂಟಿನೋಪಲ್ ಪತನ</div>
+                <div class="draggable" draggable="true" id="drag4">ಚಂಗೀಸ್ ಖಾನ್ ಮಂಗೋಲರ ನಾಯಕನಾಗಿದ್ದು</div>
+                <div class="draggable" draggable="true" id="drag5">ಯೇಸುಕ್ರಿಸ್ತನ ಶಿಲುಬೆಗೇರಿಸುವಿಕೆ</div>
+            </div>
+            <button class="btn check-btn" onclick="checkTimeline()">ಉತ್ತರ ಪರಿಶೀಲಿಸಿ</button>
+            <div class="feedback" id="fb1"></div>
+        </div>
+
+        <div class="page" id="page2">
+            <div class="page-title"><i class="fa-solid fa-layer-group"></i> ಆಕ್ಟಿವಿಟಿ 2: ಧರ್ಮಗಳು ಮತ್ತು ಬೋಧನೆಗಳು - ವರ್ಗೀಕರಣ</div>
+            <p>ಕೆಳಗಿನ ಧಾರ್ಮಿಕ ತತ್ವಗಳು ಮತ್ತು ಪವಿತ್ರ ಕಲ್ಪನೆಗಳನ್ನು ಸೂಕ್ತವಾದ ಧರ್ಮದ ಬಾಕ್ಸ್‌ಗಳಿಗೆ ಡ್ರಾಗ್ ಮಾಡಿ ವರ್ಗೀಕರಿಸಿ:</p>
+            
+            <div class="sorting-matrix">
+                <div class="matrix-box christianity" id="boxChristian" data-type="christian">
+                    <h3><i class="fa-solid fa-cross"></i> ಕ್ರೈಸ್ತ ಧರ್ಮ</h3>
+                </div>
+                <div class="matrix-box islam" id="boxIslam" data-type="islam">
+                    <h3><i class="fa-solid fa-crescent-moon"></i> ಇಸ್ಲಾಂ ಧರ್ಮ</h3>
+                </div>
+            </div>
+
+            <div class="drag-pool" id="dragPool2">
+                <div class="sort-card" draggable="true" id="sc1" data-belong="christian">ದೇವರ ರಾಜ್ಯವು ನಿಮ್ಮೊಳಗಿದೆ (ಬೋಧನೆ)</div>
+                <div class="sort-card" draggable="true" id="sc2" data-belong="islam">ದಿನಕ್ಕೆ ಐದು ಬಾರಿ ನಮಾಜ್ ಮಾಡುವುದು (ರೋಜ)</div>
+                <div class="sort-card" draggable="true" id="sc3" data-belong="christian">ನಿಮ್ಮ ವೈರಿಗಳನ್ನೂ ಪ್ರೀತಿಸಿರಿ</div>
+                <div class="sort-card" draggable="true" id="sc4" data-belong="islam">ಆದಾಯದ ನಿಗದಿತ ಪಾಲನ್ನು ಜಕಾತ್ (ದಾನ) ನೀಡುವುದು</div>
+                <div class="sort-card" draggable="true" id="sc5" data-belong="islam">ಅಲ್ಲಾಹನನ್ನು ಬಿಟ್ಟು ಬೇರೆ ದೇವರಿಲ್ಲ (ಕಲೀಮಾ)</div>
+                <div class="sort-card" draggable="true" id="sc6" data-belong="christian">ಮಾನವ ಸೇವೆಗೇ ಮೊದಲ ಆದ್ಯತೆ</div>
+            </div>
+            <button class="btn check-btn" onclick="checkSorting()">ವರ್ಗೀಕರಣ ಪರಿಶೀಲಿಸಿ</button>
+            <div class="feedback" id="fb2"></div>
+        </div>
+
+        <div class="page" id="page3">
+            <div class="page-title"><i class="fa-solid fa-map-marked-alt"></i> ಆಕ್ಟಿವಿಟಿ 3: ಡಿಜಿಟಲ್ ಮ್ಯಾಪ್ ಕ್ವೆಸ್ಟ್ (ಸ್ಥಳ ಗುರುತಿಸುವಿಕೆ)</div>
+            <p>ಮೊದಲು ಕೆಳಗಿನ ಒಂದು ಹೆಸರನ್ನು ಆಯ್ಕೆ ಮಾಡಿ, ನಂತರ ಮ್ಯಾಪ್‌ನಲ್ಲಿರುವ ಸರಿಯಾದ ಲೊಕೇಶನ್ ಪಿನ್ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ ಹೊಂದಿಸಿ:</p>
+            
+            <div class="map-labels-container" id="mapLabels">
+                <div class="map-label-opt" data-place="jerusalem">ಜೆರೂಸಲಮ್</div>
+                <div class="map-label-opt" data-place="mecca">ಮೆಕ್ಕಾ</div>
+                <div class="map-label-opt" data-place="madina">ಮದೀನಾ</div>
+                <div class="map-label-opt" data-place="baghdad">ಬಾಗ್ದಾದ್</div>
+                <div class="map-label-opt" data-place="bethlehem">ಬೆತ್ಲೆಹೆಂ</div>
+            </div>
+
+            <div class="map-wrapper">
+                <div style="position:absolute; top:20px; left:20px; font-weight:bold; color:#777;">[ ಐತಿಹಾಸಿಕ ಭೂಪಟದ ಮಾದರಿ ]</div>
+                <div class="map-pin" style="top: 40%; left: 30%;" data-pin="bethlehem"><span>1</span></div>
+                <div class="map-pin" style="top: 55%; left: 33%;" data-pin="jerusalem"><span>2</span></div>
+                <div class="map-pin" style="top: 75%; left: 45%;" data-pin="mecca"><span>3</span></div>
+                <div class="map-pin" style="top: 65%; left: 47%;" data-pin="madina"><span>4</span></div>
+                <div class="map-pin" style="top: 35%; left: 60%;" data-pin="baghdad"><span>5</span></div>
+            </div>
+            <div class="feedback" id="fb3"></div>
+        </div>
+
+        <div class="page" id="page4">
+            <div class="page-title"><i class="fa-solid fa-user-shield"></i> ಆಕ್ಟಿವಿಟಿ 4: ಹೂ ಈಸ್ ಹೂ? (ಐತಿಹಾಸಿಕ ನಾಯಕರು)</div>
+            <p id="quiz-question">ಪ್ರಶ್ನೆ ಲೋಡ್ ಆಗುತ್ತಿದೆ...</p>
+            <div class="quiz-container" id="quiz-options"></div>
+            <div class="score-display" id="quiz-score-view">ಪ್ರಶ್ನೆ: 1/5</div>
+            <div class="feedback" id="fb4"></div>
+        </div>
+
+        <div class="page" id="page5">
+            <div class="page-title"><i class="fa-solid fa-gem"></i> ಆಕ್ಟಿವಿಟಿ 5: ಅರಬ್ಬರ ಸಾಂಸ್ಕೃತಿಕ ಕೊಡುಗೆಗಳ ನಿಧಿ ಶೋಧ</div>
+            <p>ಕೆಳಗಿರುವ ಜ್ಞಾನದ ಪೆಟ್ಟಿಗೆಗಳನ್ನು ತೆರೆಯಿರಿ ಮತ್ತು ಅರಬ್ಬರ ಜಗತ್ತಿಗೆ ನೀಡಿದ ಸರಿಯಾದ ಕೊಡುಗೆಗಳನ್ನು ಮಾತ್ರ ಪತ್ತೆಹಚ್ಚಿ (ಒಟ್ಟು 4 ಸರಿಯಾದ ನಿಧಿಗಳಿವೆ):</p>
+            
+            <div class="grid-hunt">
+                <div class="treasure-chest" data-correct="yes" data-info="ಗಣಿತದಲ್ಲಿ ಶೂನ್ಯ ಮತ್ತು ದಶಮಾಂಶ ಪದ್ಧತಿಯನ್ನು ಯುರೋಪಿಗೆ ಪರಿಚಯಿಸಿದರು."><i class="fa-solid fa-box"></i><h5>ಗಣಿತ ಪದ್ಧತಿ</h5></div>
+                <div class="treasure-chest" data-correct="no" data-info="ಇದು ರೋಮನ್ನರ ಕೊಡುಗೆಯಾಗಿದೆ."><i class="fa-solid fa-box"></i><h5>ಕೊಲೋಸಿಯಂ ನಿರ್ಮಾಣ</h5></div>
+                <div class="treasure-chest" data-correct="yes" data-info="'ಅರೇಬಿಯನ್ ನೈಟ್ಸ್' (ಸಾವಿರದೊಂದು ರಾತ್ರಿಗಳು) ಜಗತ್ಪ್ರಸಿದ್ಧ ಸಾಹಿತ್ಯ ಕೃತಿ ತಂದರು."><i class="fa-solid fa-box"></i><h5>ಅರೇಬಿಯನ್ ನೈಟ್ಸ್</h5></div>
+                <div class="treasure-chest" data-correct="yes" data-info="ವೈದ್ಯಕೀಯ ಕ್ಷೇತ್ರದಲ್ಲಿ 'ಯುನಾನಿ' ಪದ್ಧತಿಯನ್ನು ಅತ್ಯಂತ ಶ್ರೀಮಂತಗೊಳಿಸಿದರು."><i class="fa-solid fa-box"></i><h5>ಯುನಾನಿ ವೈದ್ಯಕೀಯ</h5></div>
+                <div class="treasure-chest" data-correct="no" data-info="ಇದು ಗ್ರೀಕರ ಕೊಡುಗೆಯಾಗಿದೆ."><i class="fa-solid fa-box"></i><h5>ಒಲಂಪಿಕ್ಸ್ ಪಂದ್ಯಾವಳಿ</h5></div>
+                <div class="treasure-chest" data-correct="yes" data-info="ಅಲ್-ಬೆರೂನಿ ಮತ್ತು ಇಬ್ನ್ ಬಟೂಟಾ ರಂತಹ ಶ್ರೇಷ್ಠ ಭೂಗೋಳಶಾಸ್ತ್ರಜ್ಞರನ್ನು ನೀಡಿದರು."><i class="fa-solid fa-box"></i><h5>ಭೂಗೋಳ ಶಾಸ್ತ್ರಜ್ಞರು</h5></div>
+            </div>
+            <div class="feedback" id="fb5"></div>
+        </div>
+
+        <div class="page" id="page6">
+            <div class="page-title"><i class="fa-solid fa-search"></i> ಆಕ್ಟಿವಿಟಿ 6: ಇತಿಹಾಸದ ಪದಗಳ ಚಕ್ರ (ಪದ ಶೋಧನೆ)</div>
+            <p><strong>ಸುಳಿವು:</strong> ಕ್ರೈಸ್ತರ ಪವಿತ್ರ ಧರ್ಮಗ್ರಂಥ ಯಾವುದು? ಕೆಳಗಿನ ಅಕ್ಷರಗಳ ಗ್ರಿಡ್‌ನಲ್ಲಿ ಆ ಪದವನ್ನು ಅಕ್ಷರಗಳ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ ಕಂಟಿನ್ಯೂಸ್ ಆಗಿ ಸೆಲೆಕ್ಟ್ ಮಾಡಿ:</p>
+            
+            <div class="word-search-grid" id="wordGrid">
+                <div class="grid-cell">M</div><div class="grid-cell">K</div><div class="grid-cell">X</div><div class="grid-cell">P</div><div class="grid-cell">Q</div><div class="grid-cell">R</div>
+                <div class="grid-cell" data-word="B">B</div><div class="grid-cell" data-word="I">I</div><div class="grid-cell" data-word="B">B</div><div class="grid-cell" data-word="L">L</div><div class="grid-cell" data-word="E">E</div><div class="grid-cell">Z</div>
+                <div class="grid-cell">K</div><div class="grid-cell">H</div><div class="grid-cell">U</div><div class="grid-cell">R</div><div class="grid-cell">A</div><div class="grid-cell">N</div>
+                <div class="grid-cell">W</div><div class="grid-cell">O</div><div class="grid-cell">R</div><div class="grid-cell">L</div><div class="grid-cell">D</div><div class="grid-cell">T</div>
+                <div class="grid-cell">C</div><div class="grid-cell">R</div><div class="grid-cell">U</div><div class="grid-cell">S</div><div class="grid-cell">A</div><div class="grid-cell">D</div>
+            </div>
+            <button class="btn check-btn" onclick="checkWordSearch()">ಪದವನ್ನು ಖಚಿತಪಡಿಸಿ</button>
+            <div class="feedback" id="fb6"></div>
+        </div>
+
+        <div class="page" id="page7">
+            <div class="page-title"><i class="fa-solid fa-scroll"></i> ಆಕ್ಟಿವಿಟಿ 7: ಸನ್ನಿವೇಶ ಆಧಾರಿತ ತೀರ್ಮಾನ (Decision Making)</div>
+            <p>ಕೆಳಗಿನ ಐತಿಹಾಸಿಕ ಸನ್ನಿವೇಶವನ್ನು ಓದಿ ಒಬ್ಬ ಆದರ್ಶ ರಾಜನಾಗಿ ಅತ್ಯುತ್ತಮ ನಿರ್ಧಾರವನ್ನು ಆಯ್ಕೆ ಮಾಡಿ:</p>
+            
+            <div class="story-box">
+                "ನೀವು ಮಂಗೋಲರ ದಯಾಳು ಚಕ್ರವರ್ತಿ ಕುಬ್ಲಾಯ್ ಖಾನನ ಆಸ್ಥಾನದಲ್ಲಿದ್ದೀರಿ. ನಿಮ್ಮ ರಾಜ್ಯದ ಒಂದು ಪ್ರಾಂತ್ಯದಲ್ಲಿ ಭೀಕರವಾದ ಕ್ಷಾಮ (ಬರಗಾಲ) ಉಂಟಾಗಿ ಜನರು ಆಹಾರವಿಲ್ಲದೆ ಪರದಾಡುತ್ತಿದ್ದಾರೆ. ಆದರೆ ಯುದ್ಧಕ್ಕಾಗಿ ಸಂಗ್ರಹಿಸಿಟ್ಟ ಧಾನ್ಯದ ಕೋಠಿ ಮಾತ್ರ ಭರ್ತಿಯಾಗಿದೆ. ಈಗ ನಿಮ್ಮ ಮುಂದಿನ ಹೆಜ್ಜೆ ಏನು?"
+            </div>
+
+            <button class="choice-btn" onclick="makeDecision(false, 'ಇದು ತಪ್ಪು ನಿರ್ಧಾರ. ಪ್ರಜೆಗಳನ್ನು ಸಂಕಷ್ಟದಲ್ಲಿ ಇಟ್ಟು ಸಾಮ್ರಾಜ್ಯ ರಕ್ಷಿಸಲಾಗದು.')">ಆಯ್ಕೆ ಎ: ಯುದ್ಧದ ಕೋಠಿ ಮುಟ್ಟಬಾರದು, ಜನರನ್ನು ಅವರ ಹಣೆಬರಹಕ್ಕೆ ಬಿಟ್ಟುಬಿಡುವುದು.</button>
+            <button class="choice-btn" onclick="makeDecision(true, 'ಅತ್ಯುತ್ತಮ ನಿರ್ಧಾರ! ಇತಿಹಾಸದಲ್ಲಿ ಕುಬ್ಲಾಯ್ ಖಾನನು ಹೀಗೆಯೇ ಬರಗಾಲ ಬಂದಾಗ ಪ್ರಜೆಗಳಿಗೆ ಉಚಿತವಾಗಿ ಆಹಾರ ಧಾನ್ಯ ವಿತರಿಸಿದ್ದನು.')">ಆಯ್ಕೆ ಬಿ: ಧಾನ್ಯದ ಕೋಠಿಯನ್ನು ತಕ್ಷಣ ತೆರೆದು ಹಸಿದ ಪ್ರಜೆಗಳಿಗೆ ಉಚಿತವಾಗಿ ಧಾನ್ಯ ವಿತರಿಸುವುದು ಮತ್ತು ತೆರಿಗೆ ವಿನಾಯಿತಿ ನೀಡುವುದು.</button>
+            <button class="choice-btn" onclick="makeDecision(false, 'ಇದು ಕ್ರೂರ ನಿರ್ಧಾರ. ಇದರಿಂದ ದಂಗೆ ಏಳುವ ಸಾಧ್ಯತೆ ಹೆಚ್ಚು.')">ಆಯ್ಕೆ ಸಿ: ಬರಗಾಲ ಪೀಡಿತ ಜನರನ್ನು ರಾಜ್ಯದಿಂದಲೇ ಹೊರಗಟ್ಟುವುದು.</button>
+            
+            <div class="feedback" id="fb7"></div>
+        </div>
+
+        <div class="book-controls">
+            <button class="btn btn-prev" id="prevBtn" onclick="changePage(-1)" disabled><i class="fa-solid fa-arrow-left"></i> ಹಿಂದಿನ ಪುಟ</button>
+            <button class="btn btn-next" id="nextBtn" onclick="changePage(1)">ಮುಂದಿನ ಪುಟ <i class="fa-solid fa-arrow-right"></i></button>
+        </div>
+    </div>
+
+    <script>
+        let currentPage = 1;
+        const totalPages = 7;
+
+        function changePage(direction) {
+            document.getElementById(`page${currentPage}`).classList.remove('active');
+            currentPage += direction;
+            document.getElementById(`page${currentPage}`).classList.add('active');
+
+            // Update Controls
+            document.getElementById('prevBtn').disabled = (currentPage === 1);
+            document.getElementById('nextBtn').disabled = (currentPage === totalPages);
+            
+            // Update Progress Bar
+            const progressPercent = (currentPage / totalPages) * 100;
+            document.getElementById('progressBar').style.width = `${progressPercent}%`;
+        }
+
+        // --- Drag and Drop Common Logic Generator ---
+        const draggables = document.querySelectorAll('.draggable, .sort-card');
+        const dropZones = document.querySelectorAll('.drop-zone, .matrix-box');
+
+        draggables.forEach(draggable => {
+            draggable.addEventListener('dragstart', () => { draggable.classList.add('dragging'); });
+            draggable.addEventListener('dragend', () => { draggable.classList.remove('dragging'); });
+        });
+
+        dropZones.forEach(zone => {
+            zone.addEventListener('dragover', e => {
+                e.preventDefault();
+                zone.classList.add('hovered');
+            });
+            zone.addEventListener('dragleave', () => { zone.classList.remove('hovered'); });
+            zone.addEventListener('drop', e => {
+                e.preventDefault();
+                const draggingItem = document.querySelector('.dragging');
+                zone.appendChild(draggingItem);
+                zone.classList.remove('hovered');
+            });
+        });
+
+        // Act 1 Check
+        function checkTimeline() {
+            let correct = 0;
+            for(let i=1; i<=5; i++){
+                const zone = document.getElementById(`zone${i}`);
+                if(zone.firstChild && zone.firstChild.innerText === zone.getAttribute('data-match')) {
+                    correct++;
+                }
+            }
+            const fb = document.getElementById('fb1');
+            fb.style.display = "block";
+            if(correct === 5) {
+                fb.innerHTML = "✓ ಅದ್ಭುತ! ಎಲ್ಲಾ ಐದು ಐತಿಹಾಸಿಕ ಘಟನೆಗಳನ್ನು ಸರಿಯಾದ ಕಾಲಕ್ಕೆ ಜೋಡಿಸಿದ್ದೀರಿ.";
+                fb.style.backgroundColor = "#d4edda"; fb.style.color = "#155724";
+            } else {
+                fb.innerHTML = `✗ ${correct}/5 ಸರಿಯಾಗಿದೆ. ದಯವಿಟ್ಟು ಮತ್ತೊಮ್ಮೆ ಪ್ರಯತ್ನಿಸಿ!`;
+                fb.style.backgroundColor = "#f8d7da"; fb.style.color = "#721c24";
+            }
+        }
+
+        // Act 2 Check
+        function checkSorting() {
+            let errors = 0;
+            const items = document.querySelectorAll('.sort-card');
+            items.forEach(item => {
+                const parentBox = item.parentElement;
+                if(parentBox.classList.contains('matrix-box')) {
+                    if(item.getAttribute('data-belong') !== parentBox.getAttribute('data-type')) {
+                        errors++;
+                    }
+                } else { errors++; }
+            });
+            const fb = document.getElementById('fb2');
+            fb.style.display = "block";
+            if(errors === 0) {
+                fb.innerHTML = "✓ ಸೂಪರ್! ಎಲ್ಲಾ ಧರ್ಮ ಬೋಧನೆಗಳನ್ನು ನಿಖರವಾಗಿ ವರ್ಗೀಕರಿಸಲಾಗಿದೆ.";
+                fb.style.backgroundColor = "#d4edda"; fb.style.color = "#155724";
+            } else {
+                fb.innerHTML = `✗ ಕೆಲವು ತತ್ವಗಳು ತಪ್ಪಾದ ಬಾಕ್ಸ್‌ನಲ್ಲಿವೆ. ಮರು ಜೋಡಣೆ ಮಾಡಿ.`;
+                fb.style.backgroundColor = "#f8d7da"; fb.style.color = "#721c24";
+            }
+        }
+
+        // Act 3 Map Pin Selection Logic
+        let selectedLabel = null;
+        const labels = document.querySelectorAll('.map-label-opt');
+        labels.forEach(lbl => {
+            lbl.addEventListener('click', () => {
+                labels.forEach(l => l.classList.remove('selected'));
+                lbl.classList.add('selected');
+                selectedLabel = lbl;
+            });
+        });
+
+        const pins = document.querySelectorAll('.map-pin');
+        pins.forEach(pin => {
+            pin.addEventListener('click', () => {
+                const fb = document.getElementById('fb3');
+                fb.style.display = "block";
+                if(!selectedLabel) {
+                    fb.innerHTML = "ದಯವಿಟ್ಟು ಮೊದಲು ಮೇಲಿನ ಯಾವುದಾದರೂ ಒಂದು ಸ್ಥಳದ ಹೆಸರನ್ನು ಕ್ಲಿಕ್ ಮಾಡಿ ಆಯ್ಕೆ ಮಾಡಿ!";
+                    fb.style.backgroundColor = "#fff3cd"; fb.style.color = "#856404";
+                    return;
+                }
+                if(selectedLabel.getAttribute('data-place') === pin.getAttribute('data-pin')) {
+                    pin.style.background = "#2e7d32";
+                    fb.innerHTML = `✓ ಹೌದು! ನೀವು ಆಯ್ಕೆ ಮಾಡಿದ '${selectedLabel.innerText}' ಸ್ಥಳ ಸರಿಯಾಗಿದೆ.`;
+                    fb.style.backgroundColor = "#d4edda"; fb.style.color = "#155724";
+                } else {
+                    fb.innerHTML = "✗ ತಪ್ಪು ಲೊಕೇಶನ್ ಪಿನ್. ಸರಿಯಾದ ಭೌಗೋಳಿಕ ಜಾಗವನ್ನು ಊಹಿಸಿ.";
+                    fb.style.backgroundColor = "#f8d7da"; fb.style.color = "#721c24";
+                }
+            });
+        });
+
+        // Act 4 Quiz Content (5 Multiple Choice questions included)
+        const quizData = [
+            { q: "ಯೇಸುಕ್ರಿಸ್ತರ ಪ್ರಮುಖ 12 ಜನ ಶಿಷ್ಯರನ್ನು ಏನೆಂದು ಕರೆಯಲಾಗುತ್ತಿತ್ತು?", opts: ["ಖಲೀಫರು", "ಅಪೊಸ್ತಲರು", "ಸುಲ್ತಾನರು", "ಮಿಸಲ್"], ಮಿಸಲ್: 1 },
+            { q: "ಪ್ರವಾದಿ ಮಹಮ್ಮದರು ಮೆಕ್ಕಾದಿಂದ ಮದೀನಾಕ್ಕೆ ಪ್ರಯಾಣ ಬೆಳೆಸಿದ ಘಟನೆಯನ್ನು ಏನೆಂದು ಕರೆಯುತ್ತಾರೆ?", opts: ["ಹಿಜಿರಾ", "ರಂಜಾನ್", "ಖುರಾನ್", "ಕ್ರೂಸೇಡ್"], ಮಿಸಲ್: 0 },
+            { q: "ಮಂಗೋಲರ ಸಾಮ್ರಾಜ್ಯವನ್ನು ಜಗತ್ತಿನ ಅತಿ ದೊಡ್ಡ ಸಾಮ್ರಾಜ್ಯವಾಗಿ ವಿಸ್ತರಿಸಿದ ಕ್ರೂರ ನಾಯಕ ಯಾರು?", opts: ["ಕುಬ್ಲಾಯ್ ಖಾನ್", "ಚಂಗೀಸ್ ಖಾನ್", "ತೈಮೂರ್", "ಮೊಹಮ್ಮದ್ ಘೋರಿ"], ಮಿಸಲ್: 1 },
+            { q: "ಯೇಸು ಕ್ರಿಸ್ತರು ಹುಟ್ಟಿದ ಪವಿತ್ರ ಸ್ಥಳ ಯಾವುದು?", opts: ["ಜೆರೂಸಲಮ್", "ಬೆತ್ಲೆಹೆಂ", "ಮೆಕ್ಕಾ", "ಬಾಗ್ದಾದ್"], ಮಿಸಲ್: 1 },
+            { q: "ಜೆರೂಸಲಮ್ ನಗರದ ಹಕ್ಕಿಗಾಗಿ ಕ್ರೈಸ್ತರು ಮತ್ತು ಮುಸ್ಲಿಮರ ನಡುವೆ ನಡೆದ ಯುದ್ಧಗಳ ಹೆಸರೇನು?", opts: ["ಧರ್ಮಯುದ್ಧಗಳು (ಕ್ರೂಸೇಡ್ಸ್)", "ಮಂಗೋಲ್ ಯುದ್ಧಗಳು", "ಟರ್ಕರ ಕದನ", "ಶತಮಾನದ ಯುದ್ಧ"], ಮಿಸಲ್: 0 }
+        ];
+        
+        let currentQuizIdx = 0;
+        function loadQuiz() {
+            const currentQ = quizData[currentQuizIdx];
+            document.getElementById('quiz-question').innerText = `${currentQuizIdx + 1}. ${currentQ.q}`;
+            const optContainer = document.getElementById('quiz-options');
+            optContainer.innerHTML = "";
+            document.getElementById('quiz-score-view').innerText = `ಪ್ರಶ್ನೆ: ${currentQuizIdx + 1}/${quizData.length}`;
+            
+            currentQ.opts.forEach((opt, idx) => {
+                const div = document.createElement('div');
+                div.className = "quiz-option";
+                div.innerText = opt;
+                div.onclick = () => selectQuizOpt(idx, currentQ.ಮಿಸಲ್, div);
+                optContainer.appendChild(div);
+            });
+        }
+
+        function selectQuizOpt(selected, correct, element) {
+            const fb = document.getElementById('fb4');
+            fb.style.display = "block";
+            if(selected === correct) {
+                element.classList.add('correct');
+                fb.innerHTML = "✓ ಅದ್ಭುತ! ಸರಿಯಾದ ಉತ್ತರ.";
+                fb.style.backgroundColor = "#d4edda"; fb.style.color = "#155724";
+                setTimeout(() => {
+                    if(currentQuizIdx < quizData.length - 1) {
+                        currentQuizIdx++;
+                        loadQuiz();
+                        fb.style.display = "none";
+                    } else {
+                        fb.innerHTML = "🎉 ಅಭಿನಂದನೆಗಳು! ಕ್ವಿಜ್‌ನ ಎಲ್ಲಾ 5 ಪ್ರಶ್ನೆಗಳನ್ನು ಯಶಸ್ವಿಯಾಗಿ ಮುಗಿಸಿದ್ದೀರಿ.";
+                    }
+                }, 1500);
+            } else {
+                element.classList.add('wrong');
+                fb.innerHTML = "✗ ತಪ್ಪು ಉತ್ತರ, ಸರಿಯಾದ ಉತ್ತರವನ್ನು ಮತ್ತೊಮ್ಮೆ ಯೋಚಿಸಿ.";
+                fb.style.backgroundColor = "#f8d7da"; fb.style.color = "#721c24";
+            }
+        }
+        loadQuiz();
+
+        // Act 5 Treasure Chest Logic
+        const chests = document.querySelectorAll('.treasure-chest');
+        chests.forEach(chest => {
+            chest.addEventListener('click', () => {
+                const isCorrect = chest.getAttribute('data-correct');
+                const info = chest.getAttribute('data-info');
+                const fb = document.getElementById('fb5');
+                fb.style.display = "block";
+                
+                if(isCorrect === "yes") {
+                    chest.style.background = "#c8e6c9";
+                    chest.querySelector('i').className = "fa-solid fa-box-open";
+                    fb.innerHTML = `🎯 ನಿಧಿ ಸಿಕ್ಕಿತು! ಕೊಡುಗೆ: ${info}`;
+                    fb.style.backgroundColor = "#d4edda"; fb.style.color = "#155724";
+                } else {
+                    chest.style.background = "#ffcdd2";
+                    fb.innerHTML = `⚠️ ಇದು ಅರಬ್ಬರ ಕೊಡುಗೆಯಲ್ಲ! ${info}`;
+                    fb.style.backgroundColor = "#f8d7da"; fb.style.color = "#721c24";
+                }
+            });
+        });
+
+        // Act 6 Word Search
+        const cells = document.querySelectorAll('.grid-cell');
+        cells.forEach(cell => {
+            cell.addEventListener('click', () => {
+                cell.classList.toggle('selected');
+            });
+        });
+
+        function checkWordSearch() {
+            const fb = document.getElementById('fb6');
+            fb.style.display = "block";
+            // Check if B-I-B-L-E elements are selected
+            let win = true;
+            cells.forEach(c => {
+                if(c.getAttribute('data-word')) {
+                    if(!c.classList.contains('selected')) win = false;
+                } else {
+                    if(c.classList.contains('selected')) win = false;
+                }
+            });
+
+            if(win) {
+                fb.innerHTML = "✓ ಗ್ರೇಟ್! 'BIBLE' (ಬೈಬಲ್) ಪದವನ್ನು ಯಶಸ್ವಿಯಾಗಿ ಪತ್ತೆಹಚ್ಚಿದ್ದೀರಿ.";
+                fb.style.backgroundColor = "#d4edda"; fb.style.color = "#155724";
+            } else {
+                fb.innerHTML = "✗ ಇನ್ನು ಕೆಲವು ಅಕ್ಷರಗಳು ಬಾಕಿ ಇವೆ ಅಥವಾ ತಪ್ಪು ಅಕ್ಷರ ಆಯ್ಕೆಯಾಗಿದೆ. ಸರಿಯಾಗಿ ನೋಡಿ.";
+                fb.style.backgroundColor = "#f8d7da"; fb.style.color = "#721c24";
+            }
+        }
+
+        // Act 7 Decision Logic
+        function makeDecision(isCorrect, text) {
+            const fb = document.getElementById('fb7');
+            fb.style.display = "block";
+            fb.innerHTML = text;
+            if(isCorrect) {
+                fb.style.backgroundColor = "#d4edda"; fb.style.color = "#155724";
+            } else {
+                fb.style.backgroundColor = "#f8d7da"; fb.style.color = "#721c24";
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಬ್ರಿಟಿಷ್ ಆಳ್ವಿಕೆಯ ಪರಿಣಾಮಗಳು - Interactive Flip Book</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Noto+Serif+Kannada:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #1f4068, #16a085, #e43f5a);
+            --book-bg: #fffdf9;
+            --primary-color: #5c2575; /* Deep Royal Purple */
+            --secondary-color: #0f3057;
+            --accent-color: #e67e22; /* Warning/Action Orange */
+            --text-color: #2c3e50;
+            --success: #27ae60;
+            --error: #c0392b;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Poppins', 'Noto Serif Kannada', serif;
+            background: var(--bg-gradient);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-color);
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 20px;
+            text-shadow: 0 3px 6px rgba(0,0,0,0.4);
+        }
+        .header h1 { font-size: 2.2rem; }
+        .header p { font-size: 1.1rem; color: #f0fdf4; margin-top: 5px; }
+
+        /* Modern Flip Book Box Structure */
+        .book-container {
+            width: 100%;
+            max-width: 1000px;
+            background: var(--book-bg);
+            border-radius: 24px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.4), inset -15px 0 30px rgba(0,0,0,0.05);
+            border-left: 20px solid var(--primary-color);
+            min-height: 680px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+            border-right: 5px solid var(--accent-color);
+        }
+
+        /* Top Progress Indicator */
+        .progress-container { width: 100%; height: 6px; background: #e0e0e0; }
+        .progress-bar { height: 100%; width: 11.11%; background: var(--accent-color); transition: width 0.4s ease; }
+
+        /* Page Layout with Flip Effect Animation */
+        .page { padding: 45px; flex: 1; display: none; animation: flipAnimation 0.5s ease-in-out; }
+        .page.active { display: block; }
+        @keyframes flipAnimation {
+            from { opacity: 0; transform: rotateY(-15deg) translateX(30px); }
+            to { opacity: 1; transform: rotateY(0deg) translateX(0); }
+        }
+
+        .page-title {
+            font-size: 1.55rem;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px dashed var(--accent-color);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+        }
+
+        .instruction { font-size: 1.05rem; margin-bottom: 20px; color: #555; font-style: italic; }
+
+        /* Navigation Controls */
+        .book-controls {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px 45px;
+            background: #fdf5e2;
+            border-top: 1px solid #eedec4;
+        }
+        .btn {
+            padding: 12px 28px;
+            border: none;
+            border-radius: 40px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: bold;
+        }
+        .btn-prev { background: #d0c4af; color: #333; }
+        .btn-next { background: var(--primary-color); color: white; }
+        .btn:hover:not(:disabled) { transform: translateY(-3px); box-shadow: 0 6px 15px rgba(0,0,0,0.15); }
+        .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+        .feedback { margin-top: 15px; padding: 15px; border-radius: 8px; font-weight: bold; display: none; }
+
+        /* Act 1: MCQ Options */
+        .quiz-box { display: flex; flex-direction: column; gap: 12px; }
+        .opt-btn { padding: 14px 20px; background: white; border: 2px solid #e2e8f0; border-radius: 10px; cursor: pointer; text-align: left; font-size: 1.05rem; transition: 0.2s; }
+        .opt-btn:hover { background: #f8f9fa; border-color: var(--primary-color); }
+        .opt-btn.correct { background: #c8e6c9; border-color: var(--success); color: #1b5e20; font-weight: bold; }
+        .opt-btn.wrong { background: #ffcdd2; border-color: var(--error); color: #b71c1c; }
+
+        /* Act 2: Accordion Answers */
+        .accordion-container { display: flex; flex-direction: column; gap: 12px; }
+        .acc-item { border: 1px solid #eedec4; border-radius: 10px; overflow: hidden; background: white; }
+        .acc-header { background: #fffdf9; padding: 15px; font-weight: bold; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-size: 1.05rem; }
+        .acc-header:hover { background: #fdf5e2; }
+        .acc-body { background: #faf8f2; padding: 15px; display: none; border-top: 1px solid #eee; line-height: 1.7; color: #5c2575; font-weight: bold; }
+
+        /* Act 3: Drag & Drop Matching */
+        .matching-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .match-left, .match-right { display: flex; flex-direction: column; gap: 12px; }
+        .match-card { padding: 12px 18px; background: white; border: 2px solid #eedec4; border-radius: 10px; cursor: pointer; transition: 0.2s; font-weight: 600; }
+        .match-card.selected { background: #f5ebd6; border-color: var(--accent-color); }
+        .match-card.correct { background: #c8e6c9; border-color: var(--success); color: #1b5e20; cursor: default; }
+
+        /* Act 4 & 5: Photo Gallery & Video Avatars Framework */
+        .avatar-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+        .avatar-card { background: white; border: 2px solid #eedec4; border-radius: 15px; padding: 15px; text-align: center; box-shadow: 0 4px 8px rgba(0,0,0,0.02); cursor: pointer; transition: 0.3s; }
+        .avatar-card:hover { transform: translateY(-5px); border-color: var(--primary-color); }
+        .avatar-img-placeholder { width: 100px; height: 100px; background: #e2e8f0; border-radius: 50%; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; color: #718096; font-size: 2.2rem; overflow: hidden; border: 3px solid var(--accent-color); }
+        .avatar-img-placeholder img { width: 100%; height: 100%; object-fit: cover; }
+        .avatar-card h4 { font-size: 1.15rem; color: var(--primary-color); margin-bottom: 5px; }
+        .avatar-card p { font-size: 0.9rem; color: #718096; }
+        .video-box { width: 100%; height: 160px; background: #000; border-radius: 10px; margin-top: 10px; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.9rem; }
+
+        /* Act 6: Innovative Blanks Dropdown */
+        .text-passage { background: #fffdf9; border: 2px solid #eedec4; padding: 25px; border-radius: 15px; font-size: 1.2rem; line-height: 2.3; }
+        .blank-select { padding: 4px 8px; border: 2px solid var(--primary-color); border-radius: 6px; font-size: 1.05rem; font-weight: bold; color: var(--primary-color); background: white; cursor: pointer; }
+
+        /* Act 7: Chronology Steps */
+        .v-timeline { display: flex; flex-direction: column; gap: 12px; }
+        .t-row { display: flex; align-items: center; gap: 15px; background: white; padding: 12px; border-radius: 10px; border: 2px dashed #eedec4; }
+        .t-index { width: 35px; height: 35px; background: var(--primary-color); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+        .t-zone { flex: 1; min-height: 45px; background: #fffdf9; border-radius: 6px; display: flex; align-items: center; padding-left: 15px; }
+        .item-bank { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; background: #f3ebd6; padding: 15px; border-radius: 12px; }
+        .drag-chip { padding: 8px 15px; background: white; border: 1px solid #cdc0a8; border-radius: 25px; cursor: grab; font-size: 0.95rem; font-weight: bold; box-shadow: 0 3px 6px rgba(0,0,0,0.05); }
+
+        /* Act 8: Land System Matrix (Ultra Model 1) */
+        .grid-fleet { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
+        .fleet-card { background: white; border: 2px solid #eedec4; padding: 20px; text-align: center; border-radius: 15px; cursor: pointer; transition: 0.3s; }
+        .fleet-card:hover { transform: scale(1.04); background: #fffdf9; }
+        .fleet-card i { font-size: 2.3rem; color: var(--secondary-color); margin-bottom: 10px; }
+
+        /* Act 9: Education Impact Strategy Matrix (Ultra Model 2) */
+        .battle-zone { background: #f9f5eb; border: 1px dashed #d4af37; padding: 25px; border-radius: 12px; text-align: center; font-size: 1.15rem; margin-bottom: 20px; line-height: 1.7; font-weight: 500; }
+        .strategy-btn { width: 100%; text-align: left; padding: 15px; background: white; border: 2px solid #e2d3b5; margin-top: 10px; border-radius: 10px; cursor: pointer; font-size: 1.05rem; transition: 0.2s; }
+        .strategy-btn:hover { background: #fffdf9; border-color: var(--primary-color); }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>ಬ್ರಿಟಿಷ್ ಆಳ್ವಿಕೆಯ ಪರಿಣಾಮಗಳು</h1>
+        <p>Innovative Interactive Digital Flip Book</p>
+    </div>
+
+    <div class="book-container">
+        <div class="progress-container">
+            <div class="progress-bar" id="progBar"></div>
+        </div>
+
+        <div class="page active" id="page1">
+            <div class="page-title"><i class="fa-solid fa-square-poll-horizontal"></i> ಆಕ್ಟಿವಿಟಿ 1: ಏಕವಾಕ್ಯ ಪ್ರಶ್ನೋತ್ತರ ಬಹುಆಯ್ಕೆ ಸರಣಿ</div>
+            <p class="instruction">ಬ್ರಿಟಿಷ್ ಆಳ್ವಿಕೆಯಿಂದ ಉಂಟಾದ ಆರ್ಥಿಕ ಮತ್ತು ಸಾಮಾಜಿಕ ಪರಿಣಾಮಗಳ ಕುರಿತಾದ ಪ್ರಶ್ನೆಗಳಿಗೆ ಸರಿಯಾದ ಉತ್ತರವನ್ನು ಆಯ್ಕೆ ಮಾಡಿ:</p>
+            <p id="q-text" style="font-size:1.25rem; margin-bottom:18px; font-weight:bold; color:var(--primary-color);"></p>
+            <div class="quiz-box" id="q-options"></div>
+            <div style="font-weight: bold; margin-top: 20px; text-align: right; color: #666;" id="q-indicator">ಪ್ರಶ್ನೆ: 1/6</div>
+            <div class="feedback" id="fb1"></div>
+        </div>
+
+        <div class="page" id="page2">
+            <div class="page-title"><i class="fa-solid fa-folder-open"></i> ಆಕ್ಟಿವಿಟಿ 2: ವೈಚಾರಿಕ ಗುಂಪು ಚರ್ಚೆಯ ಪ್ರಶ್ನೆಗಳು (ಕ್ಲಿಕ್ ಬಾಕ್ಸ್ ಆಕ್ಟಿವಿಟಿ)</div>
+            <p class="instruction">ಕೆಳಗಿನ ಪ್ರಮುಖ ಇತಿಹಾಸದ ಪ್ರಶ್ನೆಗಳ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ, ಅವುಗಳ ಅಧಿಕೃತ ಉತ್ತರ ಬಾಕ್ಸ್ ಅನ್ನು ತೆರೆದು ವಿಶ್ಲೇಷಿಸಿ:</p>
+            
+            <div class="accordion-container">
+                <div class="acc-item">
+                    <div class="acc-header" onclick="toggleAcc(this)">1. ಬ್ರಿಟಿಷರ ಭೂಕಂದಾಯ ನೀತಿಗಳು ಭಾರತದ ರೈತರನ್ನು ಹೇಗೆ ಸಾಲಗಾರರನ್ನಾಗಿ ಮಾಡಿದವು? <i class="fa-solid fa-plus"></i></div>
+                    <div class="acc-body">ಬ್ರಿಟಿಷರು ಕಡ್ಡಾಯವಾಗಿ ನಗದು ರೂಪದಲ್ಲೇ ಅತ್ಯಂತ ಹೆಚ್ಚಿನ ಕಂದಾಯ ವಸೂಲಿ ಮಾಡುತ್ತಿದ್ದರು. ಬರಗಾಲ ಬಂದರೂ ವಿನಾಯಿತಿ ನೀಡುತ್ತಿರಲಿಲ್ಲ. ಕಂದಾಯ ತೀರಿಸಲು ರೈತರು ಲೇವಾದೇವಿದಾರರಿಂದ ಹೆಚ್ಚಿನ ಬಡ್ಡಿಗೆ ಸಾಲ ಪಡೆದು ಜಮೀನು ಕಳೆದುಕೊಂಡು ಸಾಲದ ಸುಳಿಗೆ ಸಿಲುಕಿದರು.</div>
+                </div>
+                <div class="acc-item">
+                    <div class="acc-header" onclick="toggleAcc(this)">2. ಭಾರತದ ಸಾಂಪ್ರದಾಯಿಕ ನೇಯ್ಗೆ ಮತ್ತು ಗುಡಿ ಕೈಗಾರಿಕೆಗಳ ಕುಸಿತಕ್ಕೆ ಕಾರಣವೇನು? <i class="fa-solid fa-plus"></i></div>
+                    <div class="acc-body">ಇಂಗ್ಲೆಂಡಿನ ಕೈಗಾರಿಕಾ ಕ್ರಾಂತಿಯಿಂದಾಗಿ ಅಲ್ಲಿನ ಗಿರಣಿಗಳಲ್ಲಿ ತಯಾರಾದ ಅಗ್ಗದ ಬಟ್ಟೆಗಳು ಭಾರತದ ಮಾರುಕಟ್ಟೆಗೆ ಬಂದವು. ಭಾರತದ ಕೈಮಗ್ಗದ ಬಟ್ಟೆಗಳ ಮೇಲೆ ಬ್ರಿಟಿಷರು ಭಾರಿ ತೆರಿಗೆ ವಿಧಿಸಿದ್ದರಿಂದ ಇವು ಸ್ಪರ್ಧಿಸಲಾಗದೆ ಗುಡಿ ಕೈಗಾರಿಕೆಗಳು ನಾಶವಾದವು.</div>
+                </div>
+                <div class="acc-item">
+                    <div class="acc-header" onclick="toggleAcc(this)">3. ಮೆಕಾಲೆ ವರದಿಯ ಮುಖ್ಯ ಶಿಫಾರಸುಗಳು ಹಾಗೂ ಅದರ ಗುರಿ ಏನಿತ್ತು? <i class="fa-solid fa-plus"></i></div>
+                    <div class="acc-body">ಮೆಕಾಲೆಯು ಭಾರತದಲ್ಲಿ ಇಂಗ್ಲಿಷ್ ಮಾಧ್ಯಮದ ಆಧುನಿಕ ಶಿಕ್ಷಣವನ್ನು ಜಾರಿಗೆ ತರಲು ಶಿಫಾರಸು ಮಾಡಿದನು. ಬ್ರಿಟಿಷ್ ಆಡಳಿತಕ್ಕೆ ನೆರವಾಗುವ ಬರವಣಿಗೆ ಕೆಲಸಗಾರರ (ಕ್ಲರ್ಕ್) ವರ್ಗವನ್ನು ಸೃಷ್ಟಿಸುವುದು ಮತ್ತು ರಕ್ತ-ಬಣ್ಣದಲ್ಲಿ ಭಾರತೀಯರಾಗಿದ್ದರೂ ಆಲೋಚನೆಗಳಲ್ಲಿ ಬ್ರಿಟಿಷರಾಗುವಂತೆ ಮಾಡುವುದು ಇದರ ಗುರಿಯಾಗಿತ್ತು.</div>
+                </div>
+                <div class="acc-item">
+                    <div class="acc-header" onclick="toggleAcc(this)">4. ಬ್ರಿಟಿಷರು ಭಾರತದಲ್ಲಿ ರೈಲ್ವೆ ಮತ್ತು ಟೆಲಿಗ್ರಾಫ್ ಸೌಲಭ್ಯಗಳನ್ನು ಏಕೆ ವಿಸ್ತರಿಸಿದರು? <i class="fa-solid fa-plus"></i></div>
+                    <div class="acc-body">ಭಾರತದ ಗ್ರಾಮೀಣ ಭಾಗಗಳಿಂದ ಕಚ್ಚಾ ವಸ್ತುಗಳನ್ನು ಬಂದರುಗಳಿಗೆ ವೇಗವಾಗಿ ಸಾಗಿಸಲು, ಇಂಗ್ಲೆಂಡಿನ ಸಿದ್ಧ ವಸ್ತುಗಳನ್ನು ದೇಶದ ಮೂಲೆ ಮೂಲೆಗೆ ತಲುಪಿಸಲು ಮತ್ತು ದಂಗೆಗಳು ಉಂಟಾದಾಗ ಬ್ರಿಟಿಷ್ ಸೈನ್ಯವನ್ನು ಶೀಘ್ರವಾಗಿ ಕಳುಹಿಸಲು ಇವುಗಳನ್ನು ಅಭಿವೃದ್ಧಿಪಡಿಸಿದರು.</div>
+                </div>
+                <div class="acc-item">
+                    <div class="acc-header" onclick="toggleAcc(this)">5. ಬ್ರಿಟಿಷ್ ಆಡಳಿತದಿಂದಾಗಿ ಭಾರತದಲ್ಲುಂಟಾದ ಹೊಸ ಸಾಮಾಜಿಕ ವರ್ಗಗಳು ಯಾವುವು? <i class="fa-solid fa-plus"></i></div>
+                    <div class="acc-body">ಬ್ರಿಟಿಷ್ ವ್ಯವಸ್ಥೆಯಿಂದಾಗಿ ಭಾರತದಲ್ಲಿ ಇಂಗ್ಲಿಷ್ ಶಿಕ್ಷಣ ಪಡೆದ ವಕೀಲರು, ವೈದ್ಯರು, ಶಿಕ್ಷಕರು, ಪತ್ರಕರ್ತರು ಮತ್ತು ಸರ್ಕಾರಿ ನೌಕರರನ್ನೊಳಗೊಂಡ ಪ್ರಭಾವಶಾಲಿ 'ಆಧುನಿಕ ಮಧ್ಯಮ ವರ್ಗ' ಹಾಗೂ ಭೂಹೀನ ಕೃಷಿ ಕಾರ್ಮಿಕರ ವರ್ಗ ಸೃಷ್ಟಿಯಾಯಿತು.</div>
+                </div>
+                <div class="acc-item">
+                    <div class="acc-header" onclick="toggleAcc(this)">6. ದಾದಾಬಾಯಿ ನವರೋಜಿ ಅವರ 'ಸಂಪತ್ತಿನ ಸೋರಿಕೆ ಸಿದ್ಧಾಂತ' (Drain Theory) ಏನನ್ನು ವಿವರಿಸುತ್ತದೆ? <i class="fa-solid fa-plus"></i></div>
+                    <div class="acc-body">ಭಾರತದ ಅಪಾರ ಸಂಪತ್ತು ಕಂದಾಯ, ವೇತನ, ನಿವೃತ್ತಿ ವೇತನ ಮತ್ತು ವ್ಯಾಪಾರದ ಲಾಭದ ರೂಪದಲ್ಲಿ ಯಾವುದೇ ಪ್ರತಿಫಲವಿಲ್ಲದೆ ನಿರಂತರವಾಗಿ ಇಂಗ್ಲೆಂಡ್‌ಗೆ ಹರಿದು ಹೋಗುತ್ತಿರುವುದನ್ನು ಮತ್ತು ಇದರಿಂದ ಭಾರತವು ದರಿದ್ರ ದೇಶವಾಗುತ್ತಿರುವುದನ್ನು ಈ ಸಿದ್ಧಾಂತ ವಿವರಿಸುತ್ತದೆ.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="page" id="page3">
+            <div class="page-title"><i class="fa-solid fa-arrows-turn-to-dots"></i> ಆಕ್ಟಿವಿಟಿ 3: ಕಾಯ್ದೆಗಳು, ಸುಧಾರಕರು ಮತ್ತು ಪರಿಣಾಮಗಳ ಜೋಡಣೆ</div>
+            <p class="instruction">ಎಡಭಾಗದ ಪ್ರಮುಖ ನಿಯಮ ಅಥವಾ ವ್ಯಕ್ತಿಯ ಹೆಸರನ್ನು ಕ್ಲಿಕ್ ಮಾಡಿ, ಬಲಭಾಗದಲ್ಲಿರುವ ಅದಕ್ಕೆ ಸೂಕ್ತವಾದ ವಿವರಣೆಗೆ ಮ್ಯಾಚ್ ಮಾಡಿ ಜೋಡಿಸಿ:</p>
+            
+            <div class="matching-grid">
+                <div class="match-left" id="leftContainer">
+                    <div class="match-card" data-id="1">ಲಾರ್ಡ್ ಕಾರ್ನ್ ವಾಲಿಸ್</div>
+                    <div class="match-card" data-id="2">ಥಾಮಸ್ ಮುನ್ರೋ</div>
+                    <div class="match-card" data-id="3">ಲಾರ್ಡ್ ವಿಲಿಯಂ ಬೆಂಟಿಂಕ್</div>
+                    <div class="match-card" data-id="4">ದಾದಾಬಾಯಿ ನವರೋಜಿ</div>
+                    <div class="match-card" data-id="5">ಕಲ್ಕತ್ತಾ, ಮುಂಬೈ, ಮದ್ರಾಸ್</div>
+                    <div class="match-card" data-id="6">ಲಾರ್ಡ್ ಡಾಲ್‌ಹೌಸಿ</div>
+                </div>
+                <div class="match-right" id="rightContainer">
+                    <div class="match-card" data-match="3">ಇಂಗ್ಲಿಷ್ ಶಿಕ್ಷಣ ನೀತಿಯನ್ನು ಅಧಿಕೃತವಾಗಿ ಜಾರಿಗೆ ತಂದ ಗವರ್ನರ್ ಜನರಲ್</div>
+                    <div class="match-card" data-match="1">ಬಂಗಾಳದಲ್ಲಿ 'ಖಾಯಂ ಜಮೀನ್ದಾರಿ ಪದ್ಧತಿ' ಜಾರಿಗೆ ತಂದ ಅಧಿಕಾರಿ</div>
+                    <div class="match-card" data-match="2">ದಕ್ಷಿಣ ಭಾರತದಲ್ಲಿ 'ರೈತವಾರಿ ಪದ್ಧತಿ' ಜಾರಿಗೆ ತಂದ ಮದ್ರಾಸ್ ಗವರ್ನರ್</div>
+                    <div class="match-card" data-match="4">'ಪಾವರ್ಟಿ ಅಂಡ್ ಅನ್-ಬ್ರಿಟಿಷ್ ರೂಲ್ ಇನ್ ಇಂಡಿಯಾ' ಪುಸ್ತಕದ ಲೇಖಕರು</div>
+                    <div class="match-card" data-match="6">ಭಾರತದಲ್ಲಿ ಮೊದಲ ರೈಲ್ವೆ ಮಾರ್ಗ (ಮುಂಬೈ-ಠಾಣೆ) ಆರಂಭಿಸಿದವರು</div>
+                    <div class="match-card" data-match="5">ಕ್ರಿ.ಶ. 1857ರಲ್ಲಿ ಪ್ರಥಮವಾಗಿ ಆಧುನಿಕ ವಿಶ್ವವಿದ್ಯಾಲಯಗಳು ಸ್ಥಾಪನೆಯಾದ ಸ್ಥಳಗಳು</div>
+                </div>
+            </div>
+            <div class="feedback" id="fb3"></div>
+        </div>
+
+        <div class="page" id="page4">
+            <div class="page-title"><i class="fa-solid fa-image"></i> ಆಕ್ಟಿವಿಟಿ 4: ಪ್ರಮುಖ ಐತಿಹಾಸಿಕ ವ್ಯಕ್ತಿಗಳ ಡಿಜಿಟಲ್ ಭಾವಚಿತ್ರ ಸಂಶೋಧನೆ</div>
+            <p class="instruction">ಕೆಳಗಿನ ಪ್ರಮುಖ ವ್ಯಕ್ತಿಗಳ ಫೋಟೋ ಕಾರ್ಡ್ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ, ಇತಿಹಾಸದಲ್ಲಿ ಅವರ ಪಾತ್ರವೇನೆಂದು ತಿಳಿದುಕೊಳ್ಳಿ (ನಿಮ್ಮ ಗೂಗಲ್ ಡ್ರೈವ್ ಚಿತ್ರಗಳಿಗೆ ಇಲ್ಲಿ ಲಿಂಕ್ ನೀಡಬಹುದು):</p>
+            
+            <div class="avatar-grid">
+                <div class="avatar-card" onclick="showAvatarInfo('ಲಾರ್ಡ್ ಕಾರ್ನ್ ವಾಲಿಸ್', 'ಇವರು 1793 ರಲ್ಲಿ ಬಂಗಾಳದಲ್ಲಿ ಖಾಯಂ ಜಮೀನ್ದಾರಿ ಪದ್ಧತಿಯನ್ನು ಜಾರಿಗೆ ತಂದು ಜಮೀನ್ದಾರರನ್ನು ಭೂಮಿಯ ಮಾಲೀಕರನ್ನಾಗಿ ಮಾಡಿದರು.')">
+                    <div class="avatar-img-placeholder"><i class="fa-solid fa-user-tie"></i></div>
+                    <h4>ಲಾರ್ಡ್ ಕಾರ್ನ್ ವಾಲಿಸ್</h4><p>[ಗೂಗಲ್ ಡ್ರೈವ್ ಇಮೇಜ್ ಮಾದರಿ]</p>
+                </div>
+                <div class="avatar-card" onclick="showAvatarInfo('ಥಾಮಸ್ ಮೆಕಾಲೆ', 'ಇವರು 1835 ರಲ್ಲಿ ತಮ್ಮ ಪ್ರಸಿದ್ಧ ವರದಿಯ ಮೂಲಕ ಭಾರತದಲ್ಲಿ ಪಾಶ್ಚಾತ್ಯ ಇಂಗ್ಲಿಷ್ ಶಿಕ್ಷಣಕ್ಕೆ ಬಲವಾದ ಅಡಿಪಾಯ ಹಾಕಿದರು.')">
+                    <div class="avatar-img-placeholder"><i class="fa-solid fa-user-tie"></i></div>
+                    <h4>ಥಾಮಸ್ ಮೆಕಾಲೆ</h4><p>[ಗೂಗಲ್ ಡ್ರೈವ್ ಇಮೇಜ್ ಮಾದರಿ]</p>
+                </div>
+                <div class="avatar-card" onclick="showAvatarInfo('ದಾದಾಬಾಯಿ ನವರೋಜಿ', 'ಇವರು ಭಾರತದ ಅಪಾರ ಸಂಪತ್ತು ಇಂಗ್ಲೆಂಡ್‌ಗೆ ಹರಿದು ಹೋಗುತ್ತಿರುವುದನ್ನು ಸಾಬೀತುಪಡಿಸಿದ ಭಾರತದ ವೃದ್ಧ ಪಿತಾಮಹ.')">
+                    <div class="avatar-img-placeholder"><i class="fa-solid fa-user"></i></div>
+                    <h4>ದಾದಾಬಾಯಿ ನವರೋಜಿ</h4><p>[ಗೂಗಲ್ ಡ್ರೈವ್ ಇಮೇಜ್ ಮಾದರಿ]</p>
+                </div>
+                <div class="avatar-card" onclick="showAvatarInfo('ಲಾರ್ಡ್ ವಿಲಿಯಂ ಬೆಂಟಿಂಕ್', 'ಇವರು ಮೆಕಾಲೆಯ ಶಿಫಾರಸನ್ನು ಒಪ್ಪಿಕೊಂಡು ಇಂಗ್ಲಿಷ್ ಅನ್ನು ಅಧಿಕೃತ ಬೋಧನಾ ಮಾಧ್ಯಮವಾಗಿ ಘೋಷಿಸಿದ ಉದಾರವಾದಿ ಗವರ್ನರ್.')">
+                    <div class="avatar-img-placeholder"><i class="fa-solid fa-user-tie"></i></div>
+                    <h4>ವಿಲಿಯಂ ಬೆಂಟಿಂಕ್</h4><p>[ಗೂಗಲ್ ಡ್ರೈವ್ ಇಮೇಜ್ ಮಾದರಿ]</p>
+                </div>
+                <div class="avatar-card" onclick="showAvatarInfo('ರಾಜಾರಾಮ್ ಮೋಹನ್ ರಾಯ್', 'ಇವರು ಬ್ರಿಟಿಷರ ಆಧುನಿಕ ಪಾಶ್ಚಾತ್ಯ ಶಿಕ್ಷಣ ಹಾಗೂ ವಿಜ್ಞಾನವನ್ನು ಭಾರತೀಯರು ಕಲಿಯಬೇಕು ಎಂದು ಬಲವಾಗಿ ಪ್ರತಿಪಾದಿಸಿದ ಪ್ರಮುಖ ಸಮಾಜ ಸುಧಾರಕರು.')">
+                    <div class="avatar-img-placeholder"><i class="fa-solid fa-user"></i></div>
+                    <h4>ರಾಜಾರಾಮ್ ಮೋಹನ್ ರಾಯ್</h4><p>[ಗೂಗಲ್ ಡ್ರೈವ್ ಇಮೇಜ್ ಮಾದರಿ]</p>
+                </div>
+                <div class="avatar-card" onclick="showAvatarInfo('ಚಾರ್ಲ್ಸ್ ವುಡ್', 'ಇವರು 1854 ರಲ್ಲಿ ಭಾರತದ ಪ್ರಾಥಮಿಕ ಶಿಕ್ಷಣದಿಂದ ವಿಶ್ವವಿದ್ಯಾಲಯದವರೆಗಿನ ಸುಧಾರಣೆಗೆ ವರದಿ ನೀಡಿದರು. ಇದನ್ನು ಇಂಗ್ಲಿಷ್ ಶಿಕ್ಷಣದ ಮ್ಯಾಗ್ನಾಕಾರ್ಟಾ ಎನ್ನಲಾಗುತ್ತದೆ.')">
+                    <div class="avatar-img-placeholder"><i class="fa-solid fa-scroll"></i></div>
+                    <h4>ಚಾರ್ಲ್ಸ್ ವುಡ್</h4><p>[ಗೂಗಲ್ ಡ್ರೈವ್ ಇಮೇಜ್ ಮಾದರಿ]</p>
+                </div>
+            </div>
+            <div class="feedback" id="fb4" style="background:#fff3cd; color:#856404; border:1px solid #ffeeba;"></div>
+        </div>
+
+        <div class="page" id="page5">
+            <div class="page-title"><i class="fa-solid fa-video"></i> ಆಕ್ಟಿವಿಟಿ 5: ಮಾತನಾಡುವ ಇತಿಹಾಸ ಪುಟಗಳು (ವಿಡಿಯೋ ಅಪ್ಲೋಡ್ ಮಾದರಿ)</div>
+            <p class="instruction">ಕೆಳಗಿನ ನಾಯಕರ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ, ಅವರು ತಮ್ಮ ಆಲೋಚನೆಗಳನ್ನು ಲೈವ್ ಆಗಿ ವಿಡಿಯೋ ಮೂಲಕ ಮಾತನಾಡುವುದನ್ನು ವೀಕ್ಷಿಸಿ (ನಿಮ್ಮ ವಿಡಿಯೋಗಳನ್ನು ಇಲ್ಲಿ ಅಪ್ಲೋಡ್ ಮಾಡಬಹುದು):</p>
+            
+            <div class="avatar-grid">
+                <div class="avatar-card" onclick="playVideoAvatar('ಮೆಕಾಲೆಯ ಆತ್ಮವಿಶ್ವಾಸ', 'ನಮಗೆ ಭಾರತದಲ್ಲಿ ಇಂಗ್ಲಿಷ್ ಬಲ್ಲ ನೌಕರರ ವರ್ಗ ಬೇಕು, ಅವರು ನಮಗೆ ನಿಷ್ಠಾವಂತರಾಗಿರುತ್ತಾರೆ!')">
+                    <div class="avatar-img-placeholder"><i class="fa-solid fa-circle-play" style="color:var(--accent-color);"></i></div>
+                    <h4>ಮೆಕಾಲೆ ಮಾತುಗಳು</h4><div class="video-box">[ವಿಡಿಯೋ ಪ್ಲೇಯರ್ ಮಾದರಿ]</div>
+                </div>
+                <div class="avatar-card" onclick="playVideoAvatar('ದಾದಾಬಾಯಿ ನವರೋಜಿ ಆಕ್ರೋಶ', 'ಬ್ರಿಟಿಷರು ಭಾರತದ ರಕ್ತವನ್ನು ಹೀರಲಾರಂಭಿಸಿದ್ದಾರೆ, ನಮ್ಮ ಸಂಪತ್ತು ಲಂಡನ್ ಸೇರುತ್ತಿದೆ!')">
+                    <div class="avatar-img-placeholder"><i class="fa-solid fa-circle-play" style="color:var(--accent-color);"></i></div>
+                    <h4>ನವರೋಜಿ ಜಾಗೃತಿ</h4><div class="video-box">[ವಿಡಿಯೋ ಪ್ಲೇಯರ್ ಮಾದರಿ]</div>
+                </div>
+                <div class="avatar-card" onclick="playVideoAvatar('ಕಾರ್ನ್ ವಾಲಿಸ್ ವಿವರಣೆ', 'ಖಾಯಂ ಜಮೀನ್ದಾರಿ ಪದ್ಧತಿಯಿಂದ ನಮಗೆ ನಿಗದಿತ ಆದಾಯ ಬರುತ್ತದೆ ಹಾಗೂ ಜಮೀನ್ದಾರರು ನಮ್ಮ ಪರವಾಗಿ ನಿಲ್ಲುತ್ತಾರೆ.')">
+                    <div class="avatar-img-placeholder"><i class="fa-solid fa-circle-play" style="color:var(--accent-color);"></i></div>
+                    <h4>ಕಾರ್ನ್ ವಾಲಿಸ್ ವಿವರ</h4><div class="video-box">[ವಿಡಿಯೋ ಪ್ಲೇಯರ್ ಮಾದರಿ]</div>
+                </div>
+            </div>
+            <div class="feedback" id="fb5" style="background:#e0f2f1; color:#004d40;"></div>
+        </div>
+
+        <div class="page" id="page6">
+            <div class="page-title"><i class="fa-solid fa-feather-pointed"></i> ಆಕ್ಟಿವಿಟಿ 6: ಬ್ರಿಟಿಷ್ ಆರ್ಥಿಕ ಶೋಷಣೆಯ ಪಠ್ಯ ವಿಶ್ಲೇಷಣೆ</div>
+            <p class="instruction">ಬ್ರಿಟಿಷ್ ಆಳ್ವಿಕೆಯ ಪ್ರಮುಖ ಪರಿಣಾಮಗಳ ಕುರಿತಾದ ಕೆಳಗಿನ ಪ್ಯಾರಾಗ್ರಾಫ್ ಅನ್ನು ನಿಖರವಾದ ಪದಗಳನ್ನು ಆರಿಸುವ ಮೂಲಕ ಪೂರ್ಣಗೊಳಿಸಿ:</p>
+            
+            <div class="text-passage">
+                ಬ್ರಿಟಿಷರು ಕೃಷಿಯ ವಾಣಿಜ್ಯೀಕರಣಕ್ಕೆ ಒತ್ತು ನೀಡಿ ಆಹಾರ ಬೆಳೆಗಳ ಬದಲಾಗಿ ನೀಲಿ, ಹತ್ತಿ, ಅಫೀಮು ಮುಂತಾದ 
+                <select class="blank-select" id="b1" data-ans="ನಗದು ಬೆಳೆಗಳನ್ನು"><option value="">--ಆಯ್ಕೆ ಮಾಡಿ--</option><option>ನಗದು ಬೆಳೆಗಳನ್ನು</option><option>ಧಾನ್ಯ ಬೆಳೆಗಳನ್ನು</option><option>ಗ್ರಾಮೀಣ ಬೆಳೆಗಳನ್ನು</option></select> 
+                ಬೆಳೆಯಲು ರೈತರನ್ನು ಒತ್ತಾಯಿಸಿದರು. ಇದರಿಂದಾಗಿ ಭಾರತದಲ್ಲಿ 19ನೇ ಶತಮಾನದಲ್ಲಿ ಭೀಕರವಾದ 
+                <select class="blank-select" id="b2" data-ans="ಬರಗಾಲಗಳು"><option value="">--ಆಯ್ಕೆ ಮಾಡಿ--</option><option>ಪ್ರವಾಹಗಳು</option><option>ಬರಗಾಲಗಳು</option><option>ಕೈಗಾರಿಕಾ ಕ್ರಾಂತಿ</option></select> 
+                ಸಂಭವಿಸಿ ಲಕ್ಷಾಂತರ ಜನರು ಮರಣ ಹೊಂದಿದರು. ಪಾಶ್ಚಾತ್ಯ ಶಿಕ್ಷಣದ ಪ್ರಭಾವದಿಂದಾಗಿ ಭಾರತೀಯರಲ್ಲಿ ಮೂಢನಂಬಿಕೆಗಳ ವಿರುದ್ಧ 
+                <select class="blank-select" id="b3" data-ans="ವೈಚಾರಿಕ ಪ್ರಜ್ಞೆ"><option value="">--ಆಯ್ಕೆ ಮಾಡಿ--</option><option>ವೈಚಾರಿಕ ಪ್ರಜ್ಞೆ</option><option>ಮೂಢನಂಬಿಕೆ ಪ್ರಜ್ಞೆ</option><option>ಉದಾಸೀನತೆ</option></select> 
+                ಮತ್ತು ರಾಷ್ಟ್ರೀಯ ಜಾಗೃತಿ ಮೂಡಲು ನೆರವಾಯಿತು. ದೇಶದ ಮೊದಲ ರೈಲ್ವೆ ಮಾರ್ಗವು ಕ್ರಿ.ಶ. 1853 ರಲ್ಲಿ ಮುಂಬೈನಿಂದ 
+                <select class="blank-select" id="b4" data-ans="ಠಾಣೆ"><option value="">--ಆಯ್ಕೆ ಮಾಡಿ--</option><option>ಪುಣೆ</option><option>ಠಾಣೆ</option><option>ಮದ್ರಾಸ್</option></select> 
+                ವರೆಗೆ ಸಂಚಾರ ಆರಂಭಿಸಿತು. ಆಧುನಿಕ ಸಂಪರ್ಕಕ್ಕಾಗಿ ಲಾರ್ಡ್ ಡಾಲ್‌ಹೌಸಿಯು ಜಾರಿಗೆ ತಂದ ಮತ್ತೊಂದು ಪ್ರಮುಖ ವ್ಯವಸ್ಥೆಯೇ 
+                <select class="blank-select" id="b5" data-ans="ತಂತಿ ಸಂದೇಶ (ಟೆಲಿಗ್ರಾಫ್)"><option value="">--ಆಯ್ಕೆ ಮಾಡಿ--</option><option>ತಂತಿ ಸಂದೇಶ (ಟೆಲಿಗ್ರಾಫ್)</option><option>ಆಕಾಶವಾಣಿ</option><option>ದೂರದರ್ಶನ</option></select> 
+                ಆಗಿದೆ. ಬ್ರಿಟಿಷರ ಆಡಳಿತಾತ್ಮಕ ನೀತಿಗಳು ಭಾರತೀಯ ಉದ್ಯಮಗಳನ್ನು ನಾಶಪಡಿಸಿ ಭಾರತವನ್ನು ಕೇವಲ ಇಂಗ್ಲೆಂಡಿನ ಕೈಗಾರಿಕೆಗಳ 
+                <select class="blank-select" id="b6" data-ans="ಮಾರುಕಟ್ಟೆಯನ್ನಾಗಿ"><option value="">--ಆಯ್ಕೆ ಮಾಡಿ--</option><option>ಉತ್ಪಾದನಾ ಕೇಂದ್ರವನ್ನಾಗಿ</option><option>ಮಾರುಕಟ್ಟೆಯನ್ನಾಗಿ</option><option>ಬಂಡವಾಳ ಕೇಂದ್ರವನ್ನಾಗಿ</option></select> 
+                ಬದಲಾಯಿಸಿತು.
+            </div>
+            <button class="btn" style="background:var(--accent-color); color:white; margin-top:20px;" onclick="checkBlanks()">ಇತಿಹಾಸ ಪಠ್ಯ ಖಚಿತಪಡಿಸಿ</button>
+            <div class="feedback" id="fb6"></div>
+        </div>
+
+        <div class="page" id="page7">
+            <div class="page-title"><i class="fa-solid fa-arrow-down-1-9"></i> ಆಕ್ಟಿವಿಟಿ 7: ಬ್ರಿಟಿಷ್ ಪರಿಣಾಮಗಳ ಕಾಲಾನುಕ್ರಮ ಘಟನಾವಳಿ ಸರಣಿ</div>
+            <p class="instruction">ಬ್ರಿಟಿಷ್ ಆಳ್ವಿಕೆಯ ಕಾಲದಲ್ಲಿ ಜಾರಿಗೆ ಬಂದ ಆಡಳಿತಾತ್ಮಕ ಹಾಗೂ ಸಾಮಾಜಿಕ ಸುಧಾರಣೆಗಳನ್ನು ಹಳೆಯದರಿಂದ ಹೊಸದಕ್ಕೆ ಕ್ರಮಬದ್ಧವಾಗಿ ಜೋಡಿಸಿ:</p>
+            
+            <div class="v-timeline">
+                <div class="t-row"><div class="t-index">1</div><div class="t-zone" id="z1" data-order="ಬಂಗಾಳದಲ್ಲಿ ಲಾರ್ಡ್ ಕಾರ್ನ್ ವಾಲಿಸ್ ನಿಂದ ಖಾಯಂ ಜಮೀನ್ದಾರಿ ಪದ್ಧತಿ ಜಾರಿ"></div></div>
+                <div class="t-row"><div class="t-index">2</div><div class="t-zone" id="z2" data-order="ಥ್ಯಾಮಸ್ ಮೆಕಾಲೆ ಭಾರತೀಯ ಶಿಕ್ಷಣ ಕುರಿತು ತನ್ನ ಪ್ರಸಿದ್ಧ ವರದಿ ನೀಡಿದ್ದು"></div></div>
+                <div class="t-row"><div class="t-index">3</div><div class="t-zone" id="z3" data-order="ಭಾರತದ ಪ್ರಥಮ ರೈಲ್ವೆ ಮಾರ್ಗದ ಸಂಚಾರ ಮುಂಬೈ ಮತ್ತು ಠಾಣೆ ನಡುವೆ ಆರಂಭ"></div></div>
+                <div class="t-row"><div class="t-index">4</div><div class="t-zone" id="z4" data-order="ಚಾರ್ಲ್ಸ್ ವುಡ್ ರವರಿಂದ ಭಾರತೀಯ ಶಿಕ್ಷಣದ ಸಮಗ್ರ ಪರಿಶೀಲನಾ ವರದಿ ಸಲ್ಲಿಕೆ"></div></div>
+                <div class="t-row"><div class="t-index">5</div><div class="t-zone" id="z5" data-order="ಕಲ್ಕತ್ತಾ, ಮುಂಬೈ ಮತ್ತು ಮದ್ರಾಸ್ ಗಳಲ್ಲಿ ಆಧುನಿಕ ವಿಶ್ವವಿದ್ಯಾಲಯಗಳ ಸ್ಥಾಪನೆ"></div></div>
+                <div class="t-row"><div class="t-index">6</div><div class="t-zone" id="z6" data-order="ದಾದಾಬಾಯಿ ನವರೋಜಿಯವರಿಂದ ಸಂಪತ್ತಿನ ಸೋರಿಕೆ ಸಿದ್ಧಾಂತದ ಮಂಡನೆ"></div></div>
+            </div>
+
+            <div class="item-bank" id="dragBank7">
+                <div class="drag-chip" draggable="true" id="t1">ಭಾರತದ ಪ್ರಥಮ ರೈಲ್ವೆ ಮಾರ್ಗದ ಸಂಚಾರ ಮುಂಬೈ ಮತ್ತು ಠಾಣೆ ನಡುವೆ ಆರಂಭ</div>
+                <div class="drag-chip" draggable="true" id="t2">ಬಂಗಾಳದಲ್ಲಿ ಲಾರ್ಡ್ ಕಾರ್ನ್ ವಾಲಿಸ್ ನಿಂದ ಖಾಯಂ ಜಮೀನ್ದಾರಿ ಪದ್ಧತಿ ಜಾರಿ</div>
+                <div class="drag-chip" draggable="true" id="t3">ಕಲ್ಕತ್ತಾ, ಮುಂಬೈ ಮತ್ತು ಮದ್ರಾಸ್ ಗಳಲ್ಲಿ ಆಧುನಿಕ ವಿಶ್ವವಿದ್ಯಾಲಯಗಳ ಸ್ಥಾಪನೆ</div>
+                <div class="drag-chip" draggable="true" id="t4">ಥ್ಯಾಮಸ್ ಮೆಕಾಲೆ ಭಾರತೀಯ ಶಿಕ್ಷಣ ಕುರಿತು ತನ್ನ ಪ್ರಸಿದ್ಧ ವರದಿ ನೀಡಿದ್ದು</div>
+                <div class="drag-chip" draggable="true" id="t5">ದಾದಾಬಾಯಿ ನವರೋಜಿಯವರಿಂದ ಸಂಪತ್ತಿನ ಸೋರಿಕೆ ಸಿದ್ಧಾಂತದ ಮಂಡನೆ</div>
+                <div class="drag-chip" draggable="true" id="t6">ಚಾರ್ಲ್ಸ್ ವುಡ್ ರವರಿಂದ ಭಾರತೀಯ ಶಿಕ್ಷಣದ ಸಮಗ್ರ ಪರಿಶೀಲನಾ ವರದಿ ಸಲ್ಲಿಕೆ</div>
+            </div>
+            <button class="btn" style="background:var(--accent-color); color:white; margin-top:15px;" onclick="checkTimeline()">ಕಾಲಗಣನೆ ಪರಿಶೀಲಿಸಿ</button>
+            <div class="feedback" id="fb7"></div>
+        </div>
+
+        <div class="page" id="page8">
+            <div class="page-title"><i class="fa-solid fa-wheat-awn"></i> ಆಕ್ಟಿವಿಟಿ 8: ಬ್ರಿಟಿಷರ ಭೂಕಂದಾಯ ನೀತಿಗಳ ವಿಶಿಷ್ಟ ಲಕ್ಷಣಗಳ ಪತ್ತೆ</div>
+            <p class="instruction">ಬ್ರಿಟಿಷರು ಜಾರಿಗೆ ತಂದ ವಿವಿಧ ಭೂಕಂದಾಯ ಪದ್ಧತಿಗಳ ನೈಜ ಮತ್ತು ಅತ್ಯಂತ ಕಠಿಣ ಲಕ್ಷಣಗಳ ಪೆಟ್ಟಿಗೆಯನ್ನು ಮಾತ್ರ ತೆರೆಯಿರಿ (ಒಟ್ಟು 4 ಸರಿಯಾದ ನಿಧಿಗಳಿವೆ):</p>
+            
+            <div class="grid-fleet">
+                <div class="fleet-card" data-correct="yes" data-info="ಖಾಯಂ ಜಮೀನ್ದಾರಿ ಪದ್ಧತಿಯಲ್ಲಿ ಜಮೀನ್ದಾರರು ನಿಗದಿತ ಕಂದಾಯವನ್ನು ಬ್ರಿಟಿಷರಿಗೆ ಪಾವತಿಸದಿದ್ದರೆ ಅವರ ಜಮೀನ್ದಾರಿ ಹಕ್ಕನ್ನು ಹರಾಜು ಹಾಕಲಾಗುತ್ತಿತ್ತು."><i class="fa-solid fa-gavel"></i><h5>ಜಮೀನ್ದಾರಿ ಹರಾಜು ಪ್ರಕ್ರಿಯೆ</h5></div>
+                <div class="fleet-card" data-correct="no" data-info="ಖಂಡಿತ ತಪ್ಪು, ರೈತವಾರಿ ಪದ್ಧತಿಯಲ್ಲಿ ರೈತನೇ ನೇರವಾಗಿ ಸರ್ಕಾರಕ್ಕೆ ಕಂದಾಯ ಪಾವತಿಸಬೇಕಿತ್ತು, ಯಾವುದೇ ಮಧ್ಯವರ್ತಿ ಇರಲಿಲ್ಲ."><i class="fa-solid fa-user-slash"></i><h5>ರೈತವಾರಿಯಲ್ಲಿ ಮಧ್ಯವರ್ತಿಗಳ ಹಾವಳಿ</h5></div>
+                <div class="fleet-card" data-correct="yes" data-info="ಮಹಲ್ವಾರಿ ಪದ್ಧತಿಯಲ್ಲಿ ಇಡೀ ಹಳ್ಳಿ ಅಥವಾ ಮಹಲ್ ಸಾಮೂಹಿಕವಾಗಿ ಸರ್ಕಾರಕ್ಕೆ ಕಂದಾಯ ಪಾವತಿಸುವ ಜವಾಬ್ದಾರಿ ಹೊಂದಿತ್ತು."><i class="fa-solid fa-people-roof"></i><h5>ಮಹಲ್ ಸಾಮೂಹಿಕ ಜವಾಬ್ದಾರಿ</h5></div>
+                <div class="fleet-card" data-correct="yes" data-info="ಬ್ರಿಟಿಷರ ಎಲ್ಲಾ ಭೂಕಂದಾಯ ನೀತಿಗಳಲ್ಲಿ ಕಂದಾಯದ ದರವು ಅತ್ಯಂತ ಹೆಚ್ಚಾಗಿತ್ತು ಹಾಗೂ ಕಡ್ಡಾಯವಾಗಿ ನಗದು ರೂಪದಲ್ಲೇ ವಸೂಲಿ ಮಾಡಲಾಗುತ್ತಿತ್ತು."><i class="fa-solid fa-money-bill-wave"></i><h5>ಕಡ್ಡಾಯ ನಗದು ಕಂದಾಯ</h5></div>
+                <div class="fleet-card" data-correct="no" data-info="ಇಲ್ಲ, ಬರಗಾಲ ಬಂದರೂ ಬ್ರಿಟಿಷರು ರೈತರಿಗೆ ಯಾವುದೇ ತೆರಿಗೆ ವಿನಾಯಿತಿ ನೀಡುತ್ತಿರಲಿಲ್ಲ, ಕಟ್ಟುನಿಟ್ಟಾಗಿ ವಸೂಲಿ ಮಾಡುತ್ತಿದ್ದರು."><i class="fa-solid fa-hand-holding-hand"></i><h5>ಬರಗಾಲದ ತೆರಿಗೆ ವಿನಾಯಿತಿ</h5></div>
+                <div class="fleet-card" data-correct="yes" data-info="ಕಂದಾಯ ನೀತಿಗಳಿಂದಾಗಿ ಕೃಷಿ ಭೂಮಿಯು ಮಾರಾಟದ ವಸ್ತುವಾಗಿ ಮಾರ್ಪಟ್ಟಿತು, ರೈತರು ಕಂದಾಯಕ್ಕಾಗಿ ತಮ್ಮ ಭೂಮಿಯನ್ನು ಗಿರವಿ ಇಡಲಾರಂಭಿಸಿದರು."><i class="fa-solid fa-file-contract"></i><h5>ಭೂಮಿ ಮಾರಾಟದ ವಸ್ತುವಾಗಿದ್ದು</h5></div>
+            </div>
+            <div class="feedback" id="fb8" style="background:#fff3cd; color:#856404;"></div>
+        </div>
+
+        <div class="page" id="page9">
+            <div class="page-title"><i class="fa-solid fa-brain"></i> ಆಕ್ಟಿವಿಟಿ 9: ಇಂಗ್ಲಿಷ್ ಶಿಕ್ಷಣದ ಪ್ರಭಾವದ ಕುರಿತು ವೈಚಾರಿಕ ತೀರ್ಮಾನ</div>
+            <p class="instruction">ಕೆಳಗಿನ ಸಾಮಾಜಿಕ-ಶೈಕ್ಷಣಿಕ ಸನ್ನಿವೇಶವನ್ನು ಓದಿ 19ನೇ ಶತಮಾನದ ಒಬ್ಬ ಜಾಗೃತ ಭಾರತೀಯ ವಿದ್ವಾಂಸನಾಗಿ ಯಾವ ನಿರ್ಧಾರ ಕೈಗೊಳ್ಳುತ್ತಿದ್ದೀರಿ ಎಂದು ಆಯ್ಕೆ ಮಾಡಿ:</p>
+            
+            <div class="battle-zone">
+                "ಕ್ರಿ.ಶ. 1835. ಬ್ರಿಟಿಷ್ ಸರ್ಕಾರವು ಮೆಕಾಲೆಯ ಶಿಫಾರಸಿನಂತೆ ಭಾರತೀಯ ಸಾಂಪ್ರದಾಯಿಕ ಶಿಕ್ಷಣಕ್ಕೆ ನೀಡುತ್ತಿದ್ದ ಧನಸಹಾಯವನ್ನು ನಿಲ್ಲಿಸಿ ಪಾಶ್ಚಾತ್ಯ ಇಂಗ್ಲಿಷ್ ಶಿಕ್ಷಣವನ್ನು ಕಡ್ಡಾಯವಾಗಿ ಜಾರಿಗೆ ತರುತ್ತಿದೆ. ಬ್ರಿಟಿಷರ ಗುರಿ ಕೇವಲ ಗುಮಾಸ್ತರನ್ನು ಸೃಷ್ಟಿಸುವುದಾಗಿದೆ. ಈ ಸಂದರ್ಭದಲ್ಲಿ ನಿಮ್ಮ ವೈಚಾರಿಕ ನಿಲುವು ಏನಾಗಿರಬೇಕು?"
+            </div>
+
+            <button class="strategy-btn" onclick="makeDecision(false, 'ಇದು ಪ್ರಗತಿವಿರೋಧಿ ನಿರ್ಧಾರ. ಆಧುನಿಕ ವಿಜ್ಞಾನ ಕಲಿಯದಿದ್ದರೆ ದೇಶವು ಜಾಗತಿಕವಾಗಿ ಹಿಂದುಳಿಯುತ್ತದೆ.')">ಆಯ್ಕೆ ಎ: ಹೊಸ ಇಂಗ್ಲಿಷ್ ಶಿಕ್ಷಣವನ್ನು ಸಂಪೂರ್ಣವಾಗಿ ಬಹಿಷ್ಕರಿಸುವುದು, ಕೇವಲ ಹಳೆಯ ಪದ್ಧತಿಯನ್ನೇ ಮುಂದುವರಿಸಲು ಹಠ ಹಿಡಿಯುವುದು.</button>
+            <button class="strategy-btn" onclick="makeDecision(true, 'ಅತ್ಯಂತ ಬುದ್ಧಿವಂತ ಹಾಗೂ ದೀರ್ಘದೃಷ್ಟಿಯ ನಿರ್ಧಾರ! ರಾಜಾರಾಮ್ ಮೋಹನ್ ರಾಯ್ ರಂತಹ ನಾಯಕರು ಇದೇ ನಿಲುವು ತಳೆದರು. ಇಂಗ್ಲಿಷ್ ಶಿಕ್ಷಣದ ಮೂಲಕ ಜಾಗತಿಕ ವಿಜ್ಞಾನ, ಸ್ವಾತಂತ್ರ್ಯ ಮತ್ತು ಸಮಾನತೆಯ ವಿಚಾರಗಳನ್ನು ಕಲಿತು, ಅದೇ ಜ್ಞಾನದಿಂದ ಬ್ರಿಟಿಷರ ಶೋಷಣೆಯನ್ನು ವಿರೋಧಿಸಿ ರಾಷ್ಟ್ರೀಯ ಚಳುವಳಿ ಸಂಘಟಿಸುವುದು.')">ಆಯ್ಕೆ ಬಿ: ಬ್ರಿಟಿಷರ ಗುಮಸ್ತ ಸೃಷ್ಟಿಯ ತಂತ್ರವನ್ನು ಅರಿತೂ, ಪಾಶ್ಚಾತ್ಯ ಶಿಕ್ಷಣದ ಮೂಲಕ ಆಧುನಿಕ ವಿಜ್ಞಾನ, ವಿಚಾರವಾದ ಮತ್ತು ಪ್ರಜಾಪ್ರಭುತ್ವದ ಮೌಲ್ಯಗಳನ್ನು ಕಲಿತು ಅದನ್ನು ಭಾರತದ ಸ್ವಾತಂತ್ರ್ಯ ಜಾಗೃತಿಗೆ ಅಸ್ತ್ರವಾಗಿ ಬಳಸುವುದು.</button>
+            <button class="strategy-btn" onclick="makeDecision(false, 'ಇದು ಸ್ವಂತ ಸಂಸ್ಕೃತಿ ಮತ್ತು ರಾಷ್ಟ್ರೀಯ ಅಸ್ಮಿತೆಯನ್ನು ಕಳೆದುಕೊಳ್ಳುವ ದಾಸ್ಯದ ಮನೋಭಾವವಾಗಿದೆ.')">ಆಯ್ಕೆ ಸಿ: ನಮ್ಮ ಸಂಸ್ಕೃತಿಯನ್ನು ಸಂಪೂರ್ಣವಾಗಿ ಮರೆತು ಬ್ರಿಟಿಷರ ಅಂಧ ಅಭಿಮಾನಿಗಳಾಗಿ ಅವರ ಗುಲಾಮಗಿರಿಯನ್ನು ಒಪ್ಪಿಕೊಳ್ಳುವುದು.</button>
+            
+            <div class="feedback" id="fb9"></div>
+        </div>
+
+        <div class="book-controls">
+            <button class="btn btn-prev" id="prevPageBtn" onclick="movePage(-1)" disabled><i class="fa-solid fa-book-open"></i> ಹಿಂದಿನ ಪುಟ</button>
+            <button class="btn btn-next" id="nextPageBtn" onclick="movePage(1)">ಮುಂದಿನ ಪುಟ <i class="fa-solid fa-book"></i></button>
+        </div>
+    </div>
+
+    <script>
+        let pageIdx = 1;
+        const maxPages = 9;
+
+        function movePage(dir) {
+            document.getElementById(`page${pageIdx}`).classList.remove('active');
+            pageIdx += dir;
+            document.getElementById(`page${pageIdx}`).classList.add('active');
+
+            document.getElementById('prevPageBtn').disabled = (pageIdx === 1);
+            document.getElementById('nextPageBtn').disabled = (pageIdx === maxPages);
+
+            document.getElementById('progBar').style.width = `${(pageIdx / maxPages) * 100}%`;
+        }
+
+        // --- Act 1: MCQ Database (6 items) ---
+        const mcqCollection = [
+            { q: "ಬಂಗಾಳ ಪ್ರಾಂತ್ಯದಲ್ಲಿ ಕೃಷಿಕರನ್ನು ಕಂದಾಯದ ಕಪಿಮುಷ್ಟಿಯಲ್ಲಿ ಸಿಲುಕಿಸಿದ 'ಖಾಯಂ ಜಮೀನ್ದಾರಿ ಪದ್ಧತಿ' ಜಾರಿಗೆ ಬಂದ ವರ್ಷ ಯಾವುದು?", opts: ["ಕ್ರಿ.ಶ. 1757", "ಕ್ರಿ.ಶ. 1773", "ಕ್ರಿ.ಶ. 1793", "Hexa 1853"], ans: 2 },
+            { q: "ದಕ್ಷಿಣ ಭಾರತದ ಮದ್ರಾಸ್ ಮತ್ತು ಮುಂಬೈ ಪ್ರಾಂತ್ಯಗಳಲ್ಲಿ ರೈತನೇ ನೇರವಾಗಿ ಕಂದಾಯ ಕಟ್ಟುವ ಯಾವ ಪದ್ಧತಿ ಜಾರಿಗೆ ಬಂದಿತು?", opts: ["ಮಹಲ್ವಾರಿ ಪದ್ಧತಿ", "ಖಾಯಂ ಜಮೀನ್ದಾರಿ", "ರೈತವಾರಿ ಪದ್ಧತಿ", "ತಾಲ್ಲೂಕುದಾರಿ ವ್ಯವಸ್ಥೆ"], ans: 2 },
+            { q: "ಭಾರತದಲ್ಲಿ ಇಂಗ್ಲಿಷ್ ವಿದ್ಯಾಭ್ಯಾಸ ಕ್ರಮಕ್ಕೆ ಭದ್ರವಾದ ಬುನಾದಿ ಹಾಕಿದ ಬ್ರಿಟಿಷ್ ಅಧಿಕಾರಿ ಯಾರು?", opts: ["ಲಾರ್ಡ್ ಕಾರ್ನ್ ವಾಲಿಸ್", "ಥಾಮಸ್ ಮೆಕಾಲೆ", "ಲಾರ್ಡ್ ವೆಲ್ಲೆಸ್ಲಿ", "ಲಾರ್ಡ್ ವಿಲಿಯಂ ಹಂಟರ್"], ans: 1 },
+            { q: "ಬ್ರಿಟಿಷ್ ಶಿಕ್ಷಣ ನೀತಿಯಿಂದಾಗಿ ಭಾರತೀಯ ಸಮಾಜದಲ್ಲಿ ಉದಯಿಸಿದ ಅತ್ಯಂತ ಪ್ರಭಾವಶಾಲಿ ಹೊಸ ವರ್ಗ ಯಾವುದು?", opts: ["ಸಾಮಂತ ಜಮೀನ್ದಾರರ ವರ್ಗ", "ಆಧುನಿಕ ವಿದ್ಯಾವಂತ ಮಧ್ಯಮ ವರ್ಗ", "ಸಶಸ್ತ್ರ ಸೈನಿಕರ ವರ್ಗ", "ಕಾರ್ಖಾನೆ ಮಾಲೀಕರ ವರ್ಗ"], ans: 1 },
+            { q: "ಭಾರತದ ಮೊದಲ ರೈಲ್ವೆ ಲೈನ್ ಕ್ರಿ.ಶ. 1853ರಲ್ಲಿ ಮುಂಬೈನಿಂದ ಯಾವ ನಗರದವರೆಗೆ ಸಂಚಾರ ಆರಂಭಿಸಿತು?", opts: ["ಪುಣೆ", "ಠಾಣೆ", "ಕಲ್ಕತ್ತಾ", "ಮದ್ರಾಸ್"], ans: 1 },
+            { q: "ಭಾರತದ ಆರ್ಥಿಕ ಸಂಪತ್ತನ್ನು ಬ್ರಿಟಿಷರು ಇಂಗ್ಲೆಂಡ್‌ಗೆ ಸಾಗಿಸುವುದನ್ನು ದಾದಾಬಾಯಿ ನವರೋಜಿ ಏನೆಂದು ಕರೆದರು?", opts: ["ಬಂಡವಾಳ ಹೂಡಿಕೆ ಸಿದ್ಧಾಂತ", "ಸಂಪತ್ತಿನ ಸೋರಿಕೆ ಸಿದ್ಧಾಂತ (Drain Theory)", "ಕೈಗಾರಿಕಾ ಪ್ರಗತಿ", "ಉಚಿತ ವ್ಯಾಪಾರ ನೀತಿ"], ans: 1 }
+        ];
+
+        let currentQIdx = 0;
+        function loadMCQ() {
+            const data = mcqCollection[currentQIdx];
+            document.getElementById('q-text').innerText = `${currentQIdx + 1}. ${data.q}`;
+            const container = document.getElementById('q-options');
+            container.innerHTML = "";
+            document.getElementById('q-indicator').innerText = `ಪ್ರಶ್ನೆ: ${currentQIdx + 1}/${mcqCollection.length}`;
+
+            data.opts.forEach((opt, idx) => {
+                const b = document.createElement('button');
+                b.className = "opt-btn";
+                b.innerText = opt;
+                b.onclick = () => verifyMCQ(idx, data.ans, b);
+                container.appendChild(b);
+            });
+        }
+
+        function verifyMCQ(sel, right, element) {
+            const fb = document.getElementById('fb1'); fb.style.display = "block";
+            if(sel === right) {
+                element.classList.add('correct');
+                fb.innerHTML = "✓ ಭೇಷ್! ಸರಿಯಾದ ಉತ್ತರವನ್ನು ಪತ್ತೆಹಚ್ಚಿದ್ದೀರಿ.";
+                fb.style.background = "#c8e6c9"; fb.style.color = "#1b5e20";
+                setTimeout(() => {
+                    if(currentQIdx < mcqCollection.length - 1) {
+                        currentQIdx++; loadMCQ(); fb.style.display = "none";
+                    } else { fb.innerHTML = "🎉 ಅಭಿನಂದನೆಗಳು! ಎಲ್ಲಾ 6 ಬಹುಆಯ್ಕೆ ಪ್ರಶ್ನೆಗಳನ್ನು ಯಶಸ್ವಿಯಾಗಿ ಮುಗಿಸಿದ್ದೀರಿ."; }
+                }, 1500);
+            } else {
+                element.classList.add('wrong');
+                fb.innerHTML = "✗ ತಪ್ಪು ಉತ್ತರ, ಇತಿಹಾಸದ ಪರಿಣಾಮವನ್ನು ಮತ್ತೊಮ್ಮೆ ನೆನಪಿಸಿಕೊಳ್ಳಿ.";
+                fb.style.background = "#ffcdd2"; fb.style.color = "#b71c1c";
+            }
+        }
+        loadMCQ();
+
+        // --- Act 2: Accordion Box Toggle ---
+        function toggleAcc(header) {
+            const body = header.nextElementSibling;
+            const icon = header.querySelector('i');
+            if(body.style.display === "block") {
+                body.style.display = "none";
+                icon.className = "fa-solid fa-plus";
+            } else {
+                body.style.display = "block";
+                icon.className = "fa-solid fa-minus";
+            }
+        }
+
+        // --- Act 3: Matching Logic ---
+        let selectedLeft = null;
+        const leftCards = document.querySelectorAll('#leftContainer .match-card');
+        const rightCards = document.querySelectorAll('#rightContainer .match-card');
+
+        leftCards.forEach(card => {
+            card.addEventListener('click', () => {
+                if(card.classList.contains('correct')) return;
+                leftCards.forEach(c => c.classList.remove('selected'));
+                card.classList.add('selected');
+                selectedLeft = card;
+            });
+        });
+
+        rightCards.forEach(card => {
+            card.addEventListener('click', () => {
+                if(card.classList.contains('correct') || !selectedLeft) return;
+                const matchId = card.getAttribute('data-match');
+                const leftId = selectedLeft.getAttribute('data-id');
+
+                if(matchId === leftId) {
+                    card.classList.add('correct');
+                    selectedLeft.classList.add('correct');
+                    selectedLeft.classList.remove('selected');
+                    selectedLeft = null;
+                    checkAct3Progress();
+                } else {
+                    const fb = document.getElementById('fb3');
+                    fb.style.display = "block"; fb.style.background = "#ffcdd2"; fb.style.color = "#b71c1c";
+                    fb.innerText = "✗ ತಪ್ಪು ಜೋಡಿ! ಸರಿಯಾದ ಸುಧಾರಣೆ ಅಥವಾ ಲಕ್ಷಣ ಯೋಚಿಸಿ ಹೊಂದಿಸಿ.";
+                }
+            });
+        });
+
+        function checkAct3Progress() {
+            const finished = document.querySelectorAll('#leftContainer .match-card.correct').length;
+            const fb = document.getElementById('fb3'); fb.style.display = "block";
+            if(finished === 6) {
+                fb.style.background = "#c8e6c9"; fb.style.color = "#1b5e20";
+                fb.innerText = "✓ ಪರಿಪೂರ್ಣ! ಎಲ್ಲಾ 6 ಐತಿಹಾಸಿಕ ವ್ಯಕ್ತಿಗಳು ಹಾಗೂ ಶೈಕ್ಷಣಿಕ ಬದಲಾವಣೆಗಳನ್ನು ಹೊಂದಿಸಲಾಗಿದೆ.";
+            } else {
+                fb.style.background = "#fff3cd"; fb.style.color = "#856404";
+                fb.innerText = `ಪ್ರಗತಿ: ${finished}/6 ಜೋಡಿಗಳು ಸರಿಯಾಗಿವೆ.`;
+            }
+        }
+
+        // --- Act 4: Photo Gallery Logic ---
+        function showAvatarInfo(name, text) {
+            const fb = document.getElementById('fb4'); fb.style.display = "block";
+            fb.innerHTML = `<strong><i class="fa-solid fa-circle-info"></i> ${name}:</strong> ${text}`;
+        }
+
+        // --- Act 5: Video Avatar Logic ---
+        function playVideoAvatar(title, dialog) {
+            const fb = document.getElementById('fb5'); fb.style.display = "block";
+            fb.innerHTML = `<strong><i class="fa-solid fa-clapperboard"></i> ${title}:</strong> "${dialog}" (ಗಮನಿಸಿ: ಇಲ್ಲಿ ನಿಮ್ಮ ಶಾಲಾ ಮಕ್ಕಳ ವಿಡಿಯೋ ಲಿಂಕ್ ಅಟ್ಯಾಚ್ ಮಾಡಬಹುದು)`;
+        }
+
+        // --- Drag & Drop Infrastructure for Act 7 ---
+        let currentDraggingChip = null;
+        document.querySelectorAll('.drag-chip').forEach(chip => {
+            chip.addEventListener('dragstart', () => { currentDraggingChip = chip; });
+        });
+
+        document.querySelectorAll('.t-zone').forEach(zone => {
+            zone.addEventListener('dragover', (e) => e.preventDefault());
+            zone.addEventListener('drop', () => {
+                if(currentDraggingChip) zone.appendChild(currentDraggingChip);
+            });
+        });
+
+        function checkTimeline() {
+            let correct = 0;
+            for(let i=1; i<=6; i++) {
+                const zone = document.getElementById(`z${i}`);
+                if(zone.firstChild && zone.firstChild.innerText.trim() === zone.getAttribute('data-order')) {
+                    correct++;
+                }
+            }
+            const fb = document.getElementById('fb7'); fb.style.display = "block";
+            if(correct === 6) {
+                fb.innerHTML = "✓ ಅದ್ಭುತ! ಬ್ರಿಟಿಷ್ ಆಳ್ವಿಕೆಯ ಪರಿಣಾಮಗಳ ಎಲ್ಲಾ 6 ಘಟನೆಗಳನ್ನು ನಿಖರ ಕಾಲಕ್ರಮದಲ್ಲಿ ಜೋಡಿಸಿದ್ದೀರಿ.";
+                fb.style.background = "#c8e6c9"; fb.style.color = "#1b5e20";
+            } else {
+                fb.innerHTML = `✗ ${correct}/6 ಹಂತಗಳು ಸರಿಯಾಗಿವೆ. ಜಮೀನ್ದಾರಿಯಿಂದ ಸೋರಿಕೆ ಸಿದ್ಧಾಂತದವರೆಗಿನ ಇತಿಹಾಸ ಮತ್ತೊಮ್ಮೆ ಯೋಚಿಸಿ.`;
+                fb.style.background = "#ffcdd2"; fb.style.color = "#b71c1c";
+            }
+        }
+
+        // --- Act 6: Blanks Validator ---
+        function checkBlanks() {
+            let miss = 0;
+            const selects = document.querySelectorAll('.blank-select');
+            selects.forEach(sel => {
+                if(sel.value !== sel.getAttribute('data-ans')) {
+                    miss++; sel.style.borderColor = "var(--error)";
+                } else { sel.style.borderColor = "var(--success)"; }
+            });
+            const fb = document.getElementById('fb6'); fb.style.display = "block";
+            if(miss === 0) {
+                fb.innerHTML = "✓ ಸೂಪರ್! ಬ್ರಿಟಿಷ್ ಆರ್ಥಿಕ ನೀತಿಗಳ ಇತಿಹಾಸದ ಪಠ್ಯ ಭಾಗವನ್ನು ಯಶಸ್ವಿಯಾಗಿ ಪೂರ್ಣಗೊಳಿಸಿದ್ದೀರಿ.";
+                fb.style.background = "#c8e6c9"; fb.style.color = "#1b5e20";
+            } else {
+                fb.innerHTML = "✗ ಕೆಲವು ಖಾಲಿ ಜಾಗಗಳಲ್ಲಿ ತಪ್ಪು ಆರ್ಥಿಕ ಅಥವಾ ಸಾಮಾಜಿಕ ಪದಗಳಿವೆ. ದಯವಿಟ್ಟು ಮತ್ತೊಮ್ಮೆ ನೋಡಿ ತಿದ್ದಿ.";
+                fb.style.background = "#ffcdd2"; fb.style.color = "#b71c1c";
+            }
+        }
+
+        // --- Act 8: Land Matrix Picker ---
+        document.querySelectorAll('.fleet-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const isCorrect = card.getAttribute('data-correct') === 'yes';
+                const info = card.getAttribute('data-info');
+                const fb = document.getElementById('fb8'); fb.style.display = "block";
+                if(isCorrect) {
+                    card.style.background = "#c8e6c9";
+                    fb.innerHTML = `🎯 ನಿಬಂಧನೆ ಪತ್ತೆಯಾಗಿದೆ! ವಿವರ: ${info}`;
+                    fb.style.backgroundColor = "#c8e6c9"; fb.style.color = "#1b5e20";
+                } else {
+                    card.style.background = "#ffcdd2";
+                    fb.innerHTML = `⚠️ ಇದು ತಪ್ಪು ಲಕ್ಷಣ! ವಿವರ: ${info}`;
+                    fb.style.backgroundColor = "#ffcdd2"; fb.style.color = "#b71c1c";
+                }
+            });
+        });
+
+        // --- Act 9: Strategy Scenario Logic ---
+        function makeDecision(isRight, txt) {
+            const fb = document.getElementById('fb9'); fb.style.display = "block";
+            fb.innerHTML = txt;
+            if(isRight) {
+                fb.style.background = "#c8e6c9"; fb.style.color = "#1b5e20";
+            } else {
+                fb.style.background = "#ffcdd2"; fb.style.color = "#b71c1c";
+            }
+        }
+    </script>
+</body>
+</html>

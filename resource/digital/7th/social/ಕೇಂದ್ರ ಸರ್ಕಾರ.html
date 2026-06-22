@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಅಧ್ಯಾಯ: ಕೇಂದ್ರ ಸರ್ಕಾರ - Extraordinary Interactive Window Book</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Noto+Serif+Kannada:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #0f172a, #1e293b, #0ea5e9);
+            --window-bg: #ffffff;
+            --primary-color: #1e3a8a; /* Navy Blue Royal Theme */
+            --secondary-color: #0284c7;
+            --accent-color: #f59e0b; /* Palace Gold */
+            --text-color: #1e293b;
+            --success: #16a34a;
+            --error: #dc2626;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Poppins', 'Noto Serif Kannada', serif;
+            background: var(--bg-gradient);
+            min-height: 100vh;
+            color: var(--text-color);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 25px;
+            text-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+        .header h1 { font-size: 2.2rem; }
+        .header p { font-size: 1.1rem; color: #e0f2f1; margin-top: 5px; }
+
+        /* EXTRAORDINARY WINDOW CONTAINER */
+        .main-container {
+            width: 100%;
+            max-width: 1050px;
+            background: var(--window-bg);
+            border-radius: 20px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.4);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 660px;
+            border: 4px solid var(--accent-color);
+            position: relative;
+        }
+
+        /* MAIN BAR MENU SYSTEM */
+        .main-bar-menu {
+            display: flex;
+            background: #0f172a;
+            overflow-x: auto;
+            border-bottom: 4px solid var(--accent-color);
+            scrollbar-width: thin;
+        }
+        .main-bar-menu::-webkit-scrollbar { height: 6px; }
+        .main-bar-menu::-webkit-scrollbar-thumb { background: var(--accent-color); border-radius: 10px; }
+
+        .menu-tab {
+            padding: 18px 22px;
+            color: #94a3b8;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: bold;
+            white-space: nowrap;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-right: 1px solid #334155;
+        }
+        .menu-tab:hover { background: #1e293b; color: white; }
+        .menu-tab.active {
+            background: var(--accent-color);
+            color: #0f172a;
+            box-shadow: inset 0 -4px 0 rgba(0,0,0,0.2);
+        }
+
+        /* WINDOW WINDOWS CONTENT */
+        .window-content { padding: 40px; flex: 1; display: none; }
+        .window-content.active { display: block; animation: windowReveal 0.5s ease; }
+        @keyframes windowReveal {
+            from { opacity: 0; transform: scale(0.97) translateY(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .window-title {
+            font-size: 1.6rem;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid var(--secondary-color);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+        }
+        .instruction { font-size: 1.05rem; margin-bottom: 25px; color: #555; font-style: italic; }
+
+        /* BUTTONS UI */
+        .action-btn {
+            padding: 12px 28px;
+            border: none;
+            border-radius: 30px;
+            font-size: 1rem;
+            cursor: pointer;
+            font-weight: bold;
+            background: var(--secondary-color);
+            color: white;
+            transition: 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .action-btn:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+
+        .feedback-box {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            display: none;
+            animation: popIn 0.3s ease;
+        }
+        @keyframes popIn { from { transform: scale(0.9); opacity:0; } to { transform: scale(1); opacity:1; } }
+
+        /* ACT 1: MCQ STYLE */
+        .mcq-layout { display: flex; flex-direction: column; gap: 12px; margin-top: 15px; }
+        .mcq-opt { padding: 15px 20px; background: #f8fafc; border: 2px solid #cbd5e1; border-radius: 10px; cursor: pointer; text-align: left; font-size: 1.05rem; transition: 0.2s; }
+        .mcq-opt:hover { background: #f1f5f9; border-color: var(--primary-color); }
+        .mcq-opt.correct { background: #d1fae5; border-color: var(--success); color: #065f46; font-weight: bold; }
+        .mcq-opt.wrong { background: #fee2e2; border-color: var(--error); color: #991b1b; }
+
+        /* ACT 2: ACCORDION CLICK SYSTEM */
+        .acc-item { border: 2px solid #e2e8f0; border-radius: 10px; margin-bottom: 12px; background: white; overflow: hidden; }
+        .acc-head { background: #f8fafc; padding: 16px; font-weight: bold; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-size: 1.05rem; color: var(--primary-color); }
+        .acc-head:hover { background: #f1f5f9; }
+        .acc-body { padding: 18px; background: #f0fdfa; display: none; border-top: 2px solid #e2e8f0; line-height: 1.7; font-size: 1.05rem; color: #115e59; font-weight: bold; }
+
+        /* ACT 3: DRAG LOGIC UI */
+        .match-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .match-box { display: flex; flex-direction: column; gap: 12px; }
+        .drag-card { padding: 14px 18px; background: white; border: 2px solid #cbd5e1; border-radius: 10px; cursor: pointer; font-weight: 600; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .drag-card.selected { background: #e0f2fe; border-color: #0284c7; }
+        .drag-card.correct { background: #d1fae5; border-color: var(--success); color: #065f46; cursor: default; }
+
+        /* ACT 4 & 5: GALLERY & VIDEO CARD GRID */
+        .avatar-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+        .avatar-card { background: white; border: 2px solid #e2e8f0; border-radius: 15px; padding: 20px; text-align: center; transition: 0.3s; box-shadow: 0 4px 6px rgba(0,0,0,0.02); cursor: pointer; }
+        .avatar-card:hover { transform: translateY(-5px); border-color: var(--secondary-color); box-shadow: 0 8px 16px rgba(0,0,0,0.1); }
+        .img-slot { width: 100px; height: 100px; background: #e2e8f0; border-radius: 50%; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; color: #64748b; overflow: hidden; border: 3px solid var(--accent-color); }
+        .img-slot img { width: 100%; height: 100%; object-fit: cover; }
+        .avatar-card h4 { font-size: 1.15rem; color: var(--primary-color); margin-bottom: 5px; }
+        .avatar-card p { font-size: 0.85rem; color: #475569; background: #f1f5f9; padding: 4px 8px; border-radius: 10px; display: inline-block; margin-top: 5px; }
+
+        /* EXTRAORDINARY CENTRAL POP-UP MODAL UI */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            opacity: 0; pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .modal-overlay.open { opacity: 1; pointer-events: auto; }
+        
+        .big-pop-box {
+            background: #ffffff;
+            width: 90%;
+            max-width: 600px;
+            border-radius: 24px;
+            border: 5px solid var(--accent-color);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+            padding: 30px;
+            text-align: center;
+            position: relative;
+            transform: scale(0.7);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .modal-overlay.open .big-pop-box { transform: scale(1); }
+
+        .modal-close-btn {
+            position: absolute;
+            top: 15px; right: 20px;
+            font-size: 2rem;
+            color: #94a3b8;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .modal-close-btn:hover { color: var(--error); transform: scale(1.1); }
+
+        .modal-img-frame {
+            width: 100%;
+            height: 240px;
+            background: #f8fafc;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #e2e8f0;
+        }
+        .modal-img-frame img { width: 100%; height: 100%; object-fit: cover; }
+        .modal-img-frame i { font-size: 5rem; color: #94a3b8; }
+
+        .modal-video-frame {
+            width: 100%;
+            height: 240px;
+            background: #000000;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .modal-title { font-size: 1.5rem; color: var(--primary-color); margin-bottom: 12px; font-weight: bold; }
+        .modal-desc { font-size: 1.15rem; line-height: 1.7; color: #334155; text-align: justify; background: #f8fafc; padding: 15px; border-radius: 12px; border-left: 5px solid var(--secondary-color); font-weight: bold; }
+
+        /* ACT 6: BLANKS LAB */
+        .passage-box { background: #fffdf5; border: 2px solid #fef08a; padding: 25px; border-radius: 15px; font-size: 1.2rem; line-height: 2.3; }
+        .lab-select { padding: 4px 8px; border: 2px solid var(--primary-color); border-radius: 6px; font-size: 1.05rem; font-weight: bold; color: var(--primary-color); background: white; cursor: pointer; }
+
+        /* ACT 7: CHRONOLOGY UI */
+        .step-row { display: flex; align-items: center; gap: 15px; background: white; padding: 12px; border-radius: 10px; border: 2px dashed #cbd5e1; margin-bottom: 10px; }
+        .step-idx { width: 36px; height: 36px; background: var(--primary-color); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+        .step-drop { flex: 1; min-height: 45px; display: flex; align-items: center; padding-left: 15px; background: #f8fafc; border-radius: 6px; }
+        .chip-pool { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; background: #f1f5f9; padding: 15px; border-radius: 12px; }
+        .chip { padding: 8px 16px; background: white; border: 1px solid #94a3b8; border-radius: 20px; cursor: grab; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+
+        /* ACT 8 & 9: ULTRA MODELS */
+        .grid-matrix { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
+        .matrix-item { background: white; border: 2px solid #e2e8f0; padding: 25px 15px; text-align: center; border-radius: 15px; cursor: pointer; transition: 0.3s; }
+        .matrix-item:hover { transform: translateY(-4px); border-color: var(--accent-color); }
+        .matrix-item i { font-size: 2.5rem; color: var(--secondary-color); margin-bottom: 12px; }
+        .battle-zone { background: #f8fafc; border: 1px dashed #inf9e0b; padding: 25px; border-radius: 12px; text-align: center; font-size: 1.15rem; margin-bottom: 20px; line-height: 1.7; font-weight: 500; border-left: 5px solid var(--accent-color); }
+        .strategy-btn { width: 100%; text-align: left; padding: 15px; background: white; border: 2px solid #e2d3b5; margin-top: 10px; border-radius: 10px; cursor: pointer; font-size: 1.05rem; transition: 0.2s; font-weight: 600; }
+        .strategy-btn:hover { background: #fffdf9; border-color: var(--primary-color); }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>ಅಧ್ಯಾಯ: ಕೇಂದ್ರ ಸರ್ಕಾರ</h1>
+        <p>Extraordinary Interactive Main-Bar Window Book</p>
+    </div>
+
+    <div class="main-container">
+        <div class="main-bar-menu">
+            <button class="menu-tab active" onclick="switchWindow(1)"><i class="fa-solid fa-list-check"></i> ಆಕ್ಟಿವಿಟಿ 1: ಬಹುಆಯ್ಕೆ</button>
+            <button class="menu-tab" onclick="switchWindow(2)"><i class="fa-solid fa-folder-open"></i> ಆಕ್ಟಿವಿಟಿ 2: ಕ್ಲಿಕ್ ಬಾಕ್ಸ್</button>
+            <button class="menu-tab" onclick="switchWindow(3)"><i class="fa-solid fa-arrows-spin"></i> ಆಕ್ಟಿವಿಟಿ 3: ಹೊಂದಿಸಿ ಬರೆಯಿರಿ</button>
+            <button class="menu-tab" onclick="switchWindow(4)"><i class="fa-solid fa-image"></i> ಆಕ್ಟಿವಿಟಿ 4: ಭಾವಚಿತ್ರ ಗ್ಯಾಲರಿ</button>
+            <button class="menu-tab" onclick="switchWindow(5)"><i class="fa-solid fa-video"></i> ಆಕ್ಟಿವಿಟಿ 5: ವಿಡಿಯೋ ಅವತಾರ</button>
+            <button class="menu-tab" onclick="switchWindow(6)"><i class="fa-solid fa-feather"></i> ಆಕ್ಟಿವಿಟಿ 6: ಬಿಟ್ಟ ಸ್ಥಳ</button>
+            <button class="menu-tab" onclick="switchWindow(7)"><i class="fa-solid fa-clock"></i> ಆಕ್ಟಿವಿಟಿ 7: ರಚನಾ ಕ್ರಮ</button>
+            <button class="menu-tab" onclick="switchWindow(8)"><i class="fa-solid fa-building-shield"></i> ಆಕ್ಟಿವಿಟಿ 8: ಸಂಸತ್ತಿನ ಅಧಿಕಾರ</button>
+            <button class="menu-tab" onclick="switchWindow(9)"><i class="fa-solid fa-scale-balanced"></i> ಆಕ್ಟಿವಿಟಿ 9: ರಾಜತಾಂತ್ರಿಕ ಲ್ಯಾಬ್</button>
+        </div>
+
+        <div class="window-content active" id="win1">
+            <div class="window-title"><i class="fa-solid fa-circle-question"></i> ಆಕ್ಟಿವಿಟಿ 1: ಕೇಂದ್ರ ಸರ್ಕಾರದ ಪ್ರಧಾನ ಪ್ರಶ್ನೆಗಳು</div>
+            <p class="instruction">ಲೋಕಸಭೆ, ರಾಜ್ಯಸಭೆ ಹಾಗೂ ರಾಷ್ಟ್ರಪತಿಗಳ ಅಧಿಕಾರಾವಧಿಯ ಕುರಿತಾದ ಪ್ರಶ್ನೆಗಳಿಗೆ ಸರಿಯಾದ ಉತ್ತರ ನೀಡಿ ಬಲೂನ್ ಬಸ್ಟ್ ಮಾಡಿ:</p>
+            <p id="q-text" style="font-size:1.25rem; margin-bottom:15px; font-weight:bold; color:var(--primary-color);"></p>
+            <div class="mcq-layout" id="q-options"></div>
+            <div style="font-weight:bold; margin-top:15px; text-align:right; color:#666;" id="q-indicator">ಪ್ರಶ್ನೆ: 1/6</div>
+            <div class="feedback-box" id="fb1"></div>
+        </div>
+
+        <div class="window-content" id="win2">
+            <div class="window-title"><i class="fa-solid fa-comments"></i> ಆಕ್ಟಿವಿಟಿ 2: ಸಂಸದೀಯ ಪ್ರಜಾಪ್ರಭುತ್ವದ ಕ್ಲಿಕ್ ಬಾಕ್ಸ್ ಚರ್ಚೆ</div>
+            <p class="instruction">ಕೆಳಗಿನ ಗುಂಪು ಚರ್ಚೆಯ ಪ್ರಶ್ನೆಗಳ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ, ಅವುಗಳ ಅಧಿಕೃತ ಉತ್ತರ ಬಾಕ್ಸ್ ಅನ್ನು ಲೈವ್ ಆಗಿ ಮುಕ್ತಗೊಳಿಸಿ:</p>
+            <div class="accordion-container">
+                <div class="acc-item">
+                    <div class="acc-head" onclick="toggleAcc(this)">1. ಭಾರತದಲ್ಲಿ ಸಂಸದೀಯ ಸರ್ಕಾರದ ಪದ್ಧತಿಯನ್ನು ಅಳವಡಿಸಿಕೊಳ್ಳಲು ಕಾರಣವೇನು? <i class="fa-solid fa-plus"></i></div>
+                    <div class="acc-body">ಭಾರತವು ಬ್ರಿಟಿಷರ ಆಳ್ವಿಕೆಯಲ್ಲಿ ದೀರ್ಘಕಾಲ ಇದ್ದುದರಿಂದ ಸಂಸದೀಯ ಪದ್ಧತಿಯು ಜನರಿಗೆ ಪರಿಚಿತವಾಗಿತ್ತು. ಇದರಲ್ಲಿ ಕಾರ್ಯಾಂಗವು ಶಾಸಕಾಂಗಕ್ಕೆ (ಸಂಸತ್ತಿಗೆ) ಜವಾಬ್ದಾರಿಯಾಗಿರುತ್ತದೆ ಮತ್ತು ಸರ್ವಾಧಿಕಾರಕ್ಕೆ ಇಲ್ಲಿ ಅವಕಾಶವಿರುವುದಿಲ್ಲ.</div>
+                </div>
+                <div class="acc-item">
+                    <div class="acc-head" onclick="toggleAcc(this)">2. ಲೋಕಸಭೆಯ ಸದಸ್ಯರಾಗಲು ಇರಬೇಕಾದ ಕನಿಷ್ಠ ಅರ್ಹತೆಗಳು ಯಾವುವು? <i class="fa-solid fa-plus"></i></div>
+                    <div class="acc-body">ಲೋಕಸಭೆಯ ಸದಸ್ಯರಾಗಲು ಅವರು: 1) ಭಾರತದ ಪ್ರಜೆಯಾಗಿರಬೇಕು. 2) ಕನಿಷ್ಠ 25 ವರ್ಷ ವಯಸ್ಸನ್ನು ಪೂರ್ಣಗೊಳಿಸಿರಬೇಕು. 3) ಯಾವುದೇ ಸರ್ಕಾರಿ ಲಾಭದಾಯಕ ಹುದ್ದೆಯಲ್ಲಿ ಇರಬಾರದು ಮತ್ತು ದಿವಾಳಿಯಾಗಿರಬಾರದು.</div>
+                </div>
+                <div class="acc-item">
+                    <div class="acc-head" onclick="toggleAcc(this)">3. ರಾಜ್ಯಸಭೆಯನ್ನು 'ಕಾಯಂ ಸದನ' ಎಂದು ಏಕೆ ಕರೆಯಲಾಗುತ್ತದೆ? <i class="fa-solid fa-plus"></i></div>
+                    <div class="acc-body">ಏಕೆಂದರೆ ರಾಜ್ಯಸಭೆಯು ಲೋಕಸಭೆಯಂತೆ ಒಟ್ಟಿಗೆ ವಿಸರ್ಜನೆಯಾಗುವುದಿಲ್ಲ. ಇದರ ಸದಸ್ಯರ ಅಧಿಕಾರಾವಧಿ 6 ವರ್ಷಗಳಾಗಿದ್ದು, ಪ್ರತಿ ಎರಡು ವರ್ಷಕ್ಕೊಮ್ಮೆ ಮೂರನೇ ಒಂದು ಭಾಗದಷ್ಟು (1/3) ಸದಸ್ಯರು ನಿವೃತ್ತಿ ಹೊಂದುತ್ತಾರೆ ಮತ್ತು ಅವರ ಜಾಗಕ್ಕೆ ಹೊಸ ಸದಸ್ಯರು ಆಯ್ಕೆಯಾಗುತ್ತಾರೆ.</div>
+                </div>
+                <div class="acc-item">
+                    <div class="acc-head" onclick="toggleAcc(this)">4. ಭಾರತದ ಪ್ರಧಾನಮಂತ್ರಿಯವರ ಪ್ರಮುಖ ಕಾರ್ಯಗಳು ಯಾವುವು? <i class="fa-solid fa-plus"></i></div>
+                    <div class="acc-body">ಪ್ರಧಾನಮಂತ್ರಿಯವರು ಮಂತ್ರಿಗಳನ್ನು ಆಯ್ಕೆ ಮಾಡಿ ರಾಷ್ಟ್ರಪತಿಗಳಿಗೆ ಶಿಫಾರಸು ಮಾಡುತ್ತಾರೆ, ಖಾತೆಗಳನ್ನು ಹಂಚಿಕೆ ಮಾಡುತ್ತಾರೆ ಹಾಗೂ ಮಂತ್ರಿಮಂಡಲದ ಸಭೆಯ ನೇತೃತ್ವ ವಹಿಸಿ ದೇಶದ ಸಮಗ್ರ ಆಡಳಿತ ನೀತಿಗಳನ್ನು ನಿಯಂತ್ರಿಸುತ್ತಾರೆ.</div>
+                </div>
+                <div class="acc-item">
+                    <div class="acc-head" onclick="toggleAcc(this)">5. ರಾಷ್ಟ್ರಪತಿಗಳ 'ತುರ್ತು ಪರಿಸ್ಥಿತಿ' ಘೋಷಿಸುವ ಅಧಿಕಾರಗಳು ಯಾವುವು? <i class="fa-solid fa-plus"></i></div>
+                    <div class="acc-body">ರಾಷ್ಟ್ರಪತಿಗಳಿಗೆ ಮೂರು ರೀತಿಯ ತುರ್ತು ಪರಿಸ್ಥಿತಿ ತರುವ ಹಕ್ಕಿದೆ: 1) ರಾಷ್ಟ್ರೀಯ ತುರ್ತು ಪರಿಸ್ಥಿತಿ (ಕಲಂ 352). 2) ರಾಜ್ಯ ತುರ್ತು ಪರಿಸ್ಥಿತಿ ಅಥವಾ ರಾಷ್ಟ್ರಪತಿ ಆಳ್ವಿಕೆ (ಕಲಂ 356). 3) ಹಣಕಾಸು ತುರ್ತು ಪರಿಸ್ಥಿತಿ (ಕಲಂ 360).</div>
+                </div>
+                <div class="acc-item">
+                    <div class="acc-head" onclick="toggleAcc(this)">6. ಕೇಂದ್ರ ಮಂತ್ರಿಮಂಡಲದ 'ಸಾಮೂಹಿಕ ಜವಾಬ್ದಾರಿ' ಎಂದರೇನು? <i class="fa-solid fa-plus"></i></div>
+                    <div class="acc-body">ಮಂತ್ರಿಮಂಡಲವು ತನ್ನ ಎಲ್ಲಾ ನಿರ್ಧಾರ ಹಾಗೂ ಆಡಳಿತಾತ್ಮಕ ಕಾರ್ಯಗಳಿಗೆ ಜಂಟಿಯಾಗಿ ಲೋಕಸಭೆಗೆ ಜವಾಬ್ದಾರವಾಗಿರುತ್ತದೆ. ಲೋಕಸಭೆಯಲ್ಲಿ ಸರ್ಕಾರದ ವಿರುದ್ಧ 'ಅವಿಶ್ವಾಸ ನಿರ್ಣಯ' ಅಂಗೀಕಾರವಾದರೆ ಇಡೀ ಮಂತ್ರಿಮಂಡಲವೇ ರಾಜೀನಾಮೆ ನೀಡಬೇಕಾಗುತ್ತದೆ.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="window-content" id="win3">
+            <div class="window-title"><i class="fa-solid fa-network-wired"></i> ಆಕ್ಟಿವಿಟಿ 3: ಕೇಂದ್ರ ಸರ್ಕಾರದ ಪರಿಕಲ್ಪನೆಗಳ ಹೊಂದಾಣಿಕೆ</div>
+            <p class="instruction">ಎಡಭಾಗದಲ್ಲಿರುವ ಪ್ರಮುಖ ಹುದ್ದೆ ಅಥವಾ ಸದನವನ್ನು ಕ್ಲಿಕ್ ಮಾಡಿ ಬಲಭಾಗದ ಸೂಕ್ತ ವಿವರಣೆಗೆ ಮ್ಯಾಚ್ ಮಾಡಿ ತಕ್ಷಣ ಜ್ಞಾನದ ಬಣ್ಣ ಚಿಮ್ಮಿಸಿ:</p>
+            <div class="match-grid">
+                <div class="match-box" id="leftContainer">
+                    <div class="drag-card" data-id="1">ಲೋಕಸಭೆಯ ಒಟ್ಟು ಸದಸ್ಯರು</div>
+                    <div class="drag-card" data-id="2">ರಾಜ್ಯಸಭೆಯ ಒಟ್ಟು ಸದಸ್ಯರು</div>
+                    <div class="drag-card" data-id="3">ರಾಷ್ಟ್ರಪತಿ ಹುದ್ದೆಯ ವಯೋಮಿತಿ</div>
+                    <div class="drag-card" data-id="4">ಲೋಕಸಭೆಯ ಸದಸ್ಯತ್ವದ ವಯೋಮಿತಿ</div>
+                    <div class="drag-card" data-id="5">ರಾಷ್ಟ್ರಪತಿಗಳಿಂದ ನಾಮನಿರ್ದೇಶನ</div>
+                    <div class="drag-card" data-id="6">ಕೇಂದ್ರ ಕಾರ್ಯಾಂಗದ ನೈಜ ಮುಖ್ಯಸ್ಥರು</div>
+                </div>
+                <div class="match-box" id="rightContainer">
+                    <div class="drag-card" data-match="2">ಗರಿಷ್ಠ 250 ಸದಸ್ಯರು (ಅದರಲ್ಲಿ 12 ಜನ ಕಲೆ, ಸಾಹಿತ್ಯ ಕ್ಷೇತ್ರದ ಗಣ್ಯರು)</div>
+                    <div class="drag-card" data-match="1">ಗರಿಷ್ಠ 552 ಸದಸ್ಯರು (ಪ್ರಸ್ತುತ 545 ಸದಸ್ಯರು ಇರುವ ಸದನ)</div>
+                    <div class="drag-card" data-match="4">ಚುನಾವಣೆಗೆ ಸ್ಪರ್ಧಿಸಲು ಕನಿಷ್ಠ 25 ವರ್ಷ ತುಂಬಿರಬೇಕು</div>
+                    <div class="drag-card" data-match="3">ಚುನಾವಣೆಗೆ ಸ್ಪರ್ಧಿಸಲು ಕನಿಷ್ಠ 35 ವರ್ಷ ವಯಸ್ಸಾಗಿರಬೇಕು</div>
+                    <div class="drag-card" data-match="6">ದೇಶದ ಪ್ರಧಾನಮಂತ್ರಿ ಮತ್ತು ಅವರ ಸಚಿವ ಸಂಪುಟ</div>
+                    <div class="drag-card" data-match="5">ರಾಜ್ಯಸಭೆಗೆ 12 ಜನ ಹಾಗೂ ಲೋಕಸಭೆಗೆ 2 ಜನ ಆಂಗ್ಲೋ-ಇಂಡಿಯನ್ ಸದಸ್ಯರು</div>
+                </div>
+            </div>
+            <div class="feedback-box" id="fb3"></div>
+        </div>
+
+        <div class="window-content" id="win4">
+            <div class="window-title"><i class="fa-solid fa-users-viewfinder"></i> ಆಕ್ಟಿವಿಟಿ 4: ಕೇಂದ್ರ ಸರ್ಕಾರದ ಮಹೋನ್ನತ ಪೀಠಗಳ ಭಾವಚಿತ್ರ ಗ್ಯಾಲರಿ</div>
+            <p class="instruction">ಕೆಳಗಿನ ಕಾರ್ಡ್‌ಗಳ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ; ತಕ್ಷಣ **ಪರದೆಯ ಮಧ್ಯದಲ್ಲಿ ದೊಡ್ಡ ಬಾಕ್ಸ್ ಪಾಪ್-ಅಪ್ ಆಗಿ** ಚಿತ್ರ ಸಹಿತ ವಿವರ ಪ್ರದರ್ಶನಗೊಳ್ಳುತ್ತದೆ:</p>
+            <div class="avatar-grid">
+                <div class="avatar-card" onclick="openCentralModal('photo', 'ಭಾರತದ ರಾಷ್ಟ್ರಪತಿ ಭವನ', 'ರಾಷ್ಟ್ರಪತಿಗಳು ದೇಶದ ನಾಮಮಾತ್ರ ಕಾರ್ಯಾಂಗದ ಮುಖ್ಯಸ್ಥರು. ಇವರು ಮೂರೂ ಸಶಸ್ತ್ರ ಪಡೆಗಳ (ಸೇನಾ, ನೌಕಾ, ವಾಯು) ಮಹಾ ದಂಡನಾಯಕರಾಗಿದ್ದಾರೆ. ಇವರ ಹೆಸರಿನಲ್ಲೇ ದೇಶದ ಎಲ್ಲಾ ಅಂತರರಾಷ್ಟ್ರೀಯ ಒಪ್ಪಂದಗಳು ನಡೆಯುತ್ತವೆ.', '')">
+                    <div class="img-slot"><i class="fa-solid fa-building-columns"></i></div>
+                    <h4>ರಾಷ್ಟ್ರಪತಿ ಭವನ</h4><p>ಕ್ಲಿಕ್ ಮಾಡಿ ನೋಡಿ</p>
+                </div>
+                <div class="avatar-card" onclick="openCentralModal('photo', 'ಭಾರತದ ಸಂಸತ್ ಭವನ (ಶಾಸಕಾಂಗ)', 'ಹೊಸ ನವದೆಹಲಿಯಲ್ಲಿರುವ ಸಂಸತ್ತು ದೇಶದ ಕಾನೂನು ರಚಿಸುವ ಪರಮೋಚ್ಚ ಕೇಂದ್ರ. ಇದು ಲೋಕಸಭೆ ಮತ್ತು ರಾಜ್ಯಸಭೆಗಳೆಂಬ ಎರಡು ಪ್ರಮುಖ ಸದನಗಳನ್ನು ಹಾಗೂ ರಾಷ್ಟ್ರಪತಿಗಳನ್ನು ಒಳಗೊಂಡಿರುತ್ತದೆ.', '')">
+                    <div class="img-slot"><i class="fa-solid fa-landmark"></i></div>
+                    <h4>ಸಂಸತ್ ಭವನ</h4><p>ಕ್ಲಿಕ್ ಮಾಡಿ ನೋಡಿ</p>
+                </div>
+                <div class="avatar-card" onclick="openCentralModal('photo', 'ಪ್ರಧಾನಮಂತ್ರಿಯವರ ಕಾರ್ಯಾಲಯ', 'ಪ್ರಧಾನಮಂತ್ರಿಯವರು ದೇಶದ ನೈಜ ಕಾರ್ಯಾಂಗದ ನಾಯಕರಾಗಿದ್ದಾರೆ. ಇವರು ಲೋಕಸಭೆಯ ಬಹುಮತ ಪಕ್ಷದ ನಾಯಕರಾಗಿದ್ದು, ಮಂತ್ರಿಮಂಡಲದ ಸಭೆಗಳನ್ನು ನಡೆಸಿ ದೇಶದ ಆಡಳಿತ ಸೂತ್ರ ನಿಯಂತ್ರಿಸುತ್ತಾರೆ.', '')">
+                    <div class="img-slot"><i class="fa-solid fa-user-tie"></i></div>
+                    <h4>ಪ್ರಧಾನಮಂತ್ರಿ ಪೀಠ</h4><p>ಕ್ಲಿಕ್ ಮಾಡಿ ನೋಡಿ</p>
+                </div>
+                <div class="avatar-card" onclick="openCentralModal('photo', 'ಲೋಕಸಭೆಯ ಸ್ಪೀಕರ್ ಆಸನ', 'ಲೋಕಸಭೆಯ ಕಲಾಪಗಳ ಅಧ್ಯಕ್ಷತೆಯನ್ನು ಸ್ಪೀಕರ್ (ಸಭಾಪತಿ) ವಹಿಸುತ್ತಾರೆ. ಸದನದಲ್ಲಿ ಶಿಸ್ತು ಕಾಪಾಡುವುದು, ಸದಸ್ಯರ ನಡವಳಿಕೆಯನ್ನು ನಿಯಂತ್ರಿಸುವುದು ಮತ್ತು ಮಸೂದೆಗಳ ಮೇಲೆ ಮತದಾನ ನಡೆಸುವುದು ಇವರ ಅಧಿಕಾರವಾಗಿದೆ.', '')">
+                    <div class="img-slot"><i class="fa-solid fa-gavel"></i></div>
+                    <h4>ಸ್ಪೀಕರ್ ಪೀಠ</h4><p>ಕ್ಲಿಕ್ ಮಾಡಿ ನೋಡಿ</p>
+                </div>
+                <div class="avatar-card" onclick="openCentralModal('photo', 'ರಾಜ್ಯಸಭೆಯ ಪೀಠ', 'ಸಂಸತ್ತಿನ ಮೇಲ್ಮನೆಯಾದ ರಾಜ್ಯಸಭೆಯ ಅಧ್ಯಕ್ಷತೆಯನ್ನು ದೇಶದ ಉಪರಾಷ್ಟ್ರಪತಿಗಳು ವಹಿಸುತ್ತಾರೆ. ಇವರನ್ನು ರಾಜ್ಯಸಭೆಯ ಪದನಿಮಿತ್ತ ಸಭಾಪತಿ ಎನ್ನಲಾಗುತ್ತದೆ.', '')">
+                    <div class="img-slot"><i class="fa-solid fa-users"></i></div>
+                    <h4>ರಾಜ್ಯಸಭೆಯ ಪೀಠ</h4><p>ಕ್ಲಿಕ್ ಮಾಡಿ ನೋಡಿ</p>
+                </div>
+                <div class="avatar-card" onclick="openCentralModal('photo', 'ಕೇಂದ್ರ ಸಚಿವ ಸಂಪುಟ (Cabinet)', 'ಪ್ರಧಾನಮಂತ್ರಿಯವರ ನೇತೃತ್ವದ ಹಣಕಾಸು, ರಕ್ಷಣೆ, ವಿದೇಶಾಂಗ ಮತ್ತು ಗೃಹ ಮಂತ್ರಿಗಳನ್ನೊಳಗೊಂಡ ಅತ್ಯುನ್ನತ ತೀರ್ಮಾನ ಕೈಗೊಳ್ಳುವ ಮಂತ್ರಿಗಳ ಪ್ರಮುಖ ಗುಂಪು ಇದಾಗಿದೆ.', '')">
+                    <div class="img-slot"><i class="fa-solid fa-users-gear"></i></div>
+                    <h4>ಕೇಂದ್ರ ಸಚಿವ ಸಂಪುಟ</h4><p>ಕ್ಲಿಕ್ ಮಾಡಿ ನೋಡಿ</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="window-content" id="win5">
+            <div class="window-title"><i class="fa-solid fa-clapperboard"></i> ಆಕ್ಟಿವಿಟಿ 5: ಸಂಸತ್ತಿನ ನಾಯಕರ ಲೈವ್ ಧ್ವನಿ (ವಿಡಿಯೋ ಅಪ್ಲೋಡ್ ಮಾದರಿ)</div>
+            <p class="instruction">ಕೆಳಗಿನ ನಾಯಕರ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ; ತಕ್ಷಣ **ವಿಂಡೋ ಮಧ್ಯದಲ್ಲಿ ಪಾಪ್-ಅಪ್ ಓಪನ್ ಆಗಿ ವಿದ್ಯಾರ್ಥಿಗಳ ವಿಡಿಯೋ ಪ್ಲೇ ಆಗುತ್ತದೆ**:</p>
+            <div class="avatar-grid">
+                <div class="avatar-card" onclick="openCentralModal('video', 'ರಾಷ್ಟ್ರಪತಿಗಳ ಪ್ರಮಾಣ ವಚನ ವಿಡಿಯೋ', 'ನಾನು ಭಾರತದ ಸಂವಿಧಾನವನ್ನು ಎತ್ತಿಹಿಡಿಯಲು ಮತ್ತು ಪ್ರಜೆಗಳ ಕಲ್ಯಾಣಕ್ಕಾಗಿ ಶ್ರಮಿಸಲು ದೇಶದ ಪ್ರಥಮ ಪ್ರಜೆಯಾಗಿ ಪ್ರಮಾಣ ವಚನ ಸ್ವೀಕರಿಸುತ್ತಿದ್ದೇನೆ!', 'ರಾಷ್ಟ್ರಪತಿಗಳ ಸಂದೇಶ')">
+                    <div class="img-slot"><i class="fa-solid fa-play" style="color:var(--secondary-color);"></i></div>
+                    <h4>ರಾಷ್ಟ್ರಪತಿಗಳ ಸಂದೇಶ</h4><div class="v-player">[ವಿಡಿಯೋ ಪ್ಲೇಯರ್ ಫ್ರೇಮ್]</div>
+                </div>
+                <div class="avatar-card" onclick="openCentralModal('video', 'ಪ್ರಧಾನಮಂತ್ರಿಯವರ ಆಡಳಿತಾತ್ಮಕ ಭಾಷಣ', 'ನನ್ನ ಮಂತ್ರಿಮಂಡಲವು ಸಂಸತ್ತಿಗೆ ಜಂಟಿಯಾಗಿ ಉತ್ತರದಾಯಿಯಾಗಿದೆ. ದೇಶದ ರಕ್ಷಣೆ ಹಾಗೂ ಅಭಿವೃದ್ಧಿಗಾಗಿ ನಾವು ಬದ್ಧರಾಗಿದ್ದೇವೆ!', 'ಪ್ರಧಾನಮಂತ್ರಿ ಟಾಕ್ಸ್')">
+                    <div class="img-slot"><i class="fa-solid fa-play" style="color:var(--secondary-color);"></i></div>
+                    <h4>ಪ್ರಧಾನಮಂತ್ರಿ ಟಾಕ್ಸ್</h4><div class="v-player">[ವಿಡಿಯೋ ಪ್ಲೇಯರ್ ಫ್ರೇಮ್]</div>
+                </div>
+                <div class="avatar-card" onclick="openCentralModal('video', 'ಸ್ಪೀಕರ್ ಅವರ ಸದನದ ಆದೇಶ ವಿಡಿಯೋ', 'ಸದನದ ಗೌರವಾನ್ವಿತ ಸದಸ್ಯರೇ, ದಯವಿಟ್ಟು ಶಾಂತತೆ ಕಾಪಾಡಿ! ಸಂಸತ್ತಿನ ನಿಯಮಾವಳಿಗಳ ಪ್ರಕಾರ ಕಲಾಪ ನಡೆಸಲು ಸಹಕರಿಸಿ!', 'ಸ್ಪೀಕರ್ ಆಜ್ಞೆ')">
+                    <div class="img-slot"><i class="fa-solid fa-play" style="color:var(--secondary-color);"></i></div>
+                    <h4>ಸ್ಪೀಕರ್ ಆಜ್ಞೆ</h4><div class="v-player">[ವಿಡಿಯೋ ಪ್ಲೇಯರ್ ಫ್ರೇಮ್]</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="window-content" id="win6">
+            <div class="window-title"><i class="fa-solid fa-file-pen"></i> ಆಕ್ಟಿವಿಟಿ 6: ಕೇಂದ್ರ ಕಾರ್ಯಾಂಗದ ಇತಿಹಾಸ ವಿಶ್ಲೇಷಣೆ</div>
+            <p class="instruction">ಕೆಳಗಿನ ಸಾಂವಿಧಾನಿಕ ಪ್ಯಾರಾಗ್ರಾಫ್ ಅನ್ನು ಅತ್ಯಂತ ನಿಖರವಾದ ಪದಗಳನ್ನು ಆರಿಸುವ ಮೂಲಕ ಪೂರ್ಣಗೊಳಿಸಿ ಪರಿಶೀಲಿಸಿ:</p>
+            <div class="passage-box">
+                ಭಾರತದ ಕೇಂದ್ರ ಸರ್ಕಾರದ ಕಾರ್ಯಾಂಗದ ಸೌಧವನ್ನು ನವದೆಹಲಿಯಲ್ಲಿರುವ 
+                <select class="blank-select" id="b1" data-ans="ರಾಷ್ಟ್ರಪತಿ ಭವನ"><option value="">--ಆಯ್ಕೆ ಮಾಡಿ--</option><option>ವಿಧಾನಸೌಧ</option><option>ರಾಷ್ಟ್ರಪತಿ ಭವನ</option><option>ರಾಜ್ ಭವನ</option></select> 
+                ಎಂದು ಗುರುತಿಸಲಾಗುತ್ತದೆ. ಲೋಕಸಭೆಯ ಚುನಾವಣೆಯಲ್ಲಿ ಅತಿ ಹೆಚ್ಚು ಸ್ಥಾನ ಗೆದ್ದ ಬಹುಮತ ಪಕ್ಷದ ನಾಯಕನನ್ನು ರಾಷ್ಟ್ರಪತಿಗಳು 
+                <select class="blank-select" id="b2" data-ans="ಪ್ರಧಾನಮಂತ್ರಿ"><option value="">--ಆಯ್ಕೆ ಮಾಡಿ--</option><option>ಪ್ರಧಾನಮಂತ್ರಿ</option><option>ಸ್ಪೀಕರ್</option><option>ಉಪರಾಷ್ಟ್ರಪತಿ</option></select> 
+                ಯನ್ನಾಗಿ ನೇಮಕ ಮಾಡುತ್ತಾರೆ. ಲೋಕಸಭೆಯ ಕಲಾಪಗಳ ಅಧ್ಯಕ್ಷತೆಯನ್ನು 
+                <select class="blank-select" id="b3" data-ans="ಸ್ಪೀಕರ್"><option value="">--ಆಯ್ಕೆ ಮಾಡಿ--</option><option>ಸ್ಪೀಕರ್</option><option>ರಾಷ್ಟ್ರಪತಿ</option><option>ಪ್ರಧಾನಮಂತ್ರಿ</option></select> 
+                ವಹಿಸಿದರೆ, ರಾಜ್ಯಸಭೆಯ ಕಲಾಪಗಳನ್ನು ದೇಶದ 
+                <select class="blank-select" id="b4" data-ans="ಉಪರಾಷ್ಟ್ರಪತಿಗಳು"><option value="">--ಆಯ್ಕೆ ಮಾಡಿ--</option><option>ಪ್ರಧಾನಮಂತ್ರಿಗಳು</option><option>ಉಪರಾಷ್ಟ್ರಪತಿಗಳು</option><option>ಗವರ್ನರ್</option></select> 
+                ಮುನ್ನಡೆಸುತ್ತಾರೆ. ಹಣಕಾಸಿಗೆ ಸಂಬಂಧಿಸಿದ ಅತ್ಯಂತ ಪ್ರಮುಖವಾದ 'ಹಣಕಾಸು ಮಸೂದೆ'ಯನ್ನು (Money Bill) ಮೊದಲು ಕಡ್ಡಾಯವಾಗಿ 
+                <select class="blank-select" id="b5" data-ans="ಲೋಕಸಭೆಯಲ್ಲೇ"><option value="">--ಆಯ್ಕೆ ಮಾಡಿ--</option><option>ಲೋಕಸಭೆಯಲ್ಲೇ</option><option>ರಾಜ್ಯಸಭೆಯಲ್ಲೇ</option><option>ಸುಪ್ರೀಂ ಕೋರ್ಟ್ ನಲ್ಲೇ</option></select> 
+                ಮಂಡಿಸಬೇಕಾಗುತ್ತದೆ. ಕೊನೆಯದಾಗಿ, ದೇಶದಲ್ಲಿ ಆರ್ಥಿಕ ಬಿಕ್ಕಟ್ಟು ತಲೆದೋರಿದಾಗ ರಾಷ್ಟ್ರಪತಿಗಳು ಸಂವಿಧಾನದ 360ನೇ ವಿಧಿಯ ಪ್ರಕಾರ 
+                <select class="blank-select" id="b6" data-ans="ಹಣಕಾಸು ತುರ್ತು ಪರಿಸ್ಥಿತಿ"><option value="">--ಆಯ್ಕೆ ಮಾಡಿ--</option><option>ರಾಷ್ಟ್ರೀಯ ತುರ್ತು ಪರಿಸ್ಥಿತಿ</option><option>ಹಣಕಾಸು ತುರ್ತು ಪರಿಸ್ಥಿತಿ</option><option>ರಾಜ್ಯ ತುರ್ತು ಪರಿಸ್ಥಿತಿ</option></select> 
+                ಯನ್ನು ಘೋಷಿಸಬಹುದು.
+            </div>
+            <button class="action-btn" onclick="verifyBlanks()"><i class="fa-solid fa-square-check"></i> ಪಠ್ಯವನ್ನು ಖಚಿತಪಡಿಸಿ</button>
+            <div class="feedback-box" id="fb6"></div>
+        </div>
+
+        <div class="window-content" id="win7">
+            <div class="window-title"><i class="fa-solid fa-diagram-next"></i> ಆಕ್ಟಿವಿಟಿ 7: ಪ್ರಧಾನಮಂತ್ರಿ ಮತ್ತು ಮಂತ್ರಿಮಂಡಲ ರಚನೆಯಾಗುವ ಹಂತಗಳು</div>
+            <p class="instruction">ಚುನಾವಣೆ ಮುಗಿದ ನಂತರ ದೇಶದಲ್ಲಿ ಕೇಂದ್ರ ಸರ್ಕಾರ ರಚನೆಯಾಗುವ ಹಂತಗಳನ್ನು ತಾರ್ಕಿಕ ಕ್ರಮದಲ್ಲಿ ಜೋಡಿಸಿ ಕಲರ್ ಚಿಮ್ಮಿಸಿ:</p>
+            <div class="v-timeline">
+                <div class="step-row"><div class="step-idx">1</div><div class="step-drop" id="z1" data-order="ದೇಶದಾದ್ಯಂತ ಸಾರ್ವತ್ರಿಕ ಲೋಕಸಭಾ ಚುನಾವಣೆ ನಡೆಯುವುದು"></div></div>
+                <div class="step-row"><div class="step-idx">2</div><div class="step-drop" id="z2" data-order="ಲೋಕಸಭೆಯಲ್ಲಿ ಅತಿ ಹೆಚ್ಚು ಸ್ಥಾನ ಗೆದ್ದ ಬಹುಮತ ಪಕ್ಷದ ಆಯ್ಕೆ"></div></div>
+                <div class="step-row"><div class="step-idx">3</div><div class="step-drop" id="z3" data-order="ರಾಷ್ಟ್ರಪತಿಗಳಿಂದ ಬಹುಮತ ಪಕ್ಷದ ನಾಯಕನಿಗೆ ಪ್ರಧಾನಮಂತ್ರಿ ಹುದ್ದೆಯ ಆಹ್ವಾನ"></div></div>
+                <div class="step-row"><div class="step-idx">4</div><div class="step-drop" id="z4" data-order="ಪ್ರಧಾನಮಂತ್ರಿಯವರಿಂದ ತಮ್ಮ ಸಚಿವ ಸಂಪುಟದ ಮಂತ್ರಿಗಳ ಪಟ್ಟಿ ಸಿದ್ಧಪಡಿಸುವಿಕೆ"></div></div>
+                <div class="step-row"><div class="step-idx">5</div><div class="step-drop" id="z5" data-order="ರಾಷ್ಟ್ರಪತಿಗಳಿಂದ ಪ್ರಧಾನಮಂತ್ರಿ ಹಾಗೂ ಸಚಿವರಿಗೆ ಅಧಿಕೃತ ಪ್ರಮಾಣ ವಚನ ಬೋಧನೆ"></div></div>
+                <div class="step-row"><div class="step-idx">6</div><div class="step-drop" id="z6" data-order="ಮಂತ್ರಿಗಳಿಗೆ ವಿವಿಧ ಆಡಳಿತಾತ್ಮಕ ಖಾತೆಗಳ (ಹಣಕಾಸು, ರಕ್ಷಣೆ ಇತ್ಯಾದಿ) ಹಂಚಿಕೆ"></div></div>
+            </div>
+            <div class="chip-pool" id="dragBank7">
+                <div class="chip" draggable="true" id="t1">ರಾಷ್ಟ್ರಪತಿಗಳಿಂದ ಬಹುಮತ ಪಕ್ಷದ ನಾಯಕನಿಗೆ ಪ್ರಧಾನಮಂತ್ರಿ ಹುದ್ದೆಯ ಆಹ್ವಾನ</div>
+                <div class="chip" draggable="true" id="t2">ದೇಶದಾದ್ಯಂತ ಸಾರ್ವತ್ರಿಕ ಲೋಕಸಭಾ ಚುನಾವಣೆ ನಡೆಯುವುದು</div>
+                <div class="chip" draggable="true" id="t3">ಮಂತ್ರಿಗಳಿಗೆ ವಿವಿಧ ಆಡಳಿತಾತ್ಮಕ ಖಾತೆಗಳ (ಹಣಕಾಸು, ರಕ್ಷಣೆ ಇತ್ಯಾದಿ) ಹಂಚಿಕೆ</div>
+                <div class="chip" draggable="true" id="t4">ಲೋಕಸಭೆಯಲ್ಲಿ ಅತಿ ಹೆಚ್ಚು ಸ್ಥಾನ ಗೆದ್ದ ಬಹುಮತ ಪಕ್ಷದ ಆಯ್ಕೆ</div>
+                <div class="chip" draggable="true" id="t5">ರಾಷ್ಟ್ರಪತಿಗಳಿಂದ ಪ್ರಧಾನಮಂತ್ರಿ ಹಾಗೂ ಸಚಿವರಿಗೆ ಅಧಿಕೃತ ಪ್ರಮಾಣ ವಚನ ಬೋಧನೆ</div>
+                <div class="chip" draggable="true" id="t6">ಪ್ರಧಾನಮಂತ್ರಿಯವರಿಂದ ತಮ್ಮ ಸಚಿವ ಸಂಪುಟದ ಮಂತ್ರಿಗಳ ಪಟ್ಟಿ ಸಿದ್ಧಪಡಿಸುವಿಕೆ</div>
+            </div>
+            <button class="action-btn" onclick="verifyChronology()"><i class="fa-solid fa-signature"></i> ಹಂತಗಳನ್ನು ಖಚಿತಪಡಿಸಿ</button>
+            <div class="feedback-box" id="fb7"></div>
+        </div>
+
+        <div class="window-content" id="win8">
+            <div class="window-title"><i class="fa-solid fa-fingerprint"></i> ಆಕ್ಟಿವಿಟಿ 8: ಭಾರತ ಸಂಸತ್ತಿನ (Parliament) ನೈಜ ಅಧಿಕಾರಗಳ ಪತ್ತೆ</div>
+            <p class="instruction">ಭಾರತದ ಸಂಸತ್ತಿಗೆ ಸಂವಿಧಾನ ನೀಡಿರುವ ಅಧಿಕಾರಗಳ ರಹಸ್ಯ ಪೆಟ್ಟಿಗೆಯನ್ನು ಮಾತ್ರ ತೆರೆಯಿರಿ (ಒಟ್ಟು 4 ಸರಿಯಾದ ನಿಧಿಗಳಿವೆ):</p>
+            <div class="grid-matrix">
+                <div class="matrix-item" data-correct="yes" data-info="ಸಂಸತ್ತು ದೇಶದ ಕೇಂದ್ರ ಪಟ್ಟಿಯಲ್ಲಿರುವ ವಿಷಯಗಳಿಗೆ ಸಂಬಂಧಿಸಿದಂತೆ ಹೊಸ ಕಾನೂನುಗಳನ್ನು ರಚಿಸುತ್ತದೆ."><i class="fa-solid fa-gavel"></i><h5>ಶಾಸನಾತ್ಮಕ ಅಧಿಕಾರ</h5></div>
+                <div class="matrix-item" data-correct="no" data-info="ತಪ್ಪು, ಸಂಸತ್ತು ನ್ಯಾಯಾಲಯಗಳ ದೈನಂದಿನ ತೀರ್ಪುಗಳಲ್ಲಿ ಹಸ್ತಕ್ಷೇಪ ಮಾಡುವಂತಿಲ್ಲ."><i class="fa-solid fa-ban"></i><h5>ಕೋರ್ಟ್ ತೀರ್ಪು ಬದಲಾವಣೆ</h5></div>
+                <div class="matrix-item" data-correct="yes" data-info="ದೇಶದ ವಾರ್ಷಿಕ ಆಯವ್ಯಯ (Budget) ಹಾಗೂ ಹೊಸ ತೆರಿಗೆಗಳನ್ನು ಅನುಮೋದಿಸುವ ಸಂಸತ್ತಿನ ಸರ್ವೋಚ್ಚ ಹಕ್ಕು."><i class="fa-solid fa-sack-dollar"></i><h5>ಹಣಕಾಸಿನ ಅಧಿಕಾರ</h5></div>
+                <div class="matrix-item" data-correct="yes" data-info="ಸಂವಿಧಾನದ ನಿಯಮಗಳಿಗೆ ತಿದ್ದುಪಡಿ ತರುವ (Amending the Constitution) ಪರಮಾಧಿಕಾರ ಸಂಸತ್ತಿಗಿದೆ."><i class="fa-solid fa-book-bookmark"></i><h5>ಸಂವಿಧಾನ ತಿದ್ದುಪಡಿ ಅಧಿಕಾರ</h5></div>
+                <div class="matrix-item" data-correct="no" data-info="ಇಲ್ಲ, ರಾಜ್ಯಗಳ ಸ್ಥಳೀಯ ಪೋಲಿಸ್ ವರ್ಗಾವಣೆ ಆಯಾ ರಾಜ್ಯ ಸರ್ಕಾರಕ್ಕೆ ಸೇರಿದ್ದು, ಕೇಂದ್ರ ಸಂಸತ್ತಿಗಲ್ಲ."><i class="fa-solid fa-user-shield"></i><h5>ಸ್ಥಳೀಯ ಪೋಲಿಸ್ ವರ್ಗಾವಣೆ</h5></div>
+                <div class="matrix-item" data-correct="yes" data-info="ಲೋಕಸಭೆಯು ಪ್ರಶ್ನೋತ್ತರ ವೇಳೆ ಹಾಗೂ ಅವಿಶ್ವಾಸ ನಿರ್ಣಯದ ಮೂಲಕ ಮಂತ್ರಿಮಂಡಲವನ್ನು ಹತೋಟಿಯಲ್ಲಿಡುತ್ತದೆ."><i class="fa-solid fa-sliders"></i><h5>ಕಾರ್ಯಾಂಗದ ಮೇಲಿನ ನಿಯಂತ್ರಣ</h5></div>
+            </div>
+            <div class="feedback-box" id="fb8" style="background:#fff3cd; color:#856404;"></div>
+        </div>
+
+        <div class="window-content" id="win9">
+            <div class="window-title"><i class="fa-solid fa-user-shield"></i> ಆಕ್ಟಿವಿಟಿ 9: ರಾಷ್ಟ್ರಪತಿಗಳ ಬಿಕ್ಕಟ್ಟಿನ ಸಮಯದ ರಾಜತಾಂತ್ರಿಕ ತೀರ್ಮಾನ</div>
+            <p class="instruction">ಕೆಳಗಿನ ರಾಜತಾಂತ್ರಿಕ ಬಿಕ್ಕಟ್ಟನ್ನು ಓದಿ ಭಾರತದ ರಾಷ್ಟ್ರಪತಿಯಾಗಿ ಯಾವ ಅತ್ಯುನ್ನತ ಸಾಂವಿಧಾನಿಕ ನಿರ್ಧಾರ ಕೈಗೊಳ್ಳುತ್ತಿದ್ದೀರಿ ಎಂದು ಆರಿಸಿ ಕಲರ್ ಚಿಮ್ಮಿಸಿ:</p>
+            <div class="battle-zone">
+                "ದೇಶದಲ್ಲಿ ಸಾರ್ವತ್ರಿಕ ಲೋಕಸಭಾ ಚುನಾವಣೆ ಮುಕ್ತಾಯವಾಗಿದೆ. ಆದರೆ ಯಾವುದೇ ಒಂದು ರಾಜಕೀಯ ಪಕ್ಷಕ್ಕೂ ಸರ್ಕಾರ ರಚಿಸಲು ಬೇಕಾದ ಕನಿಷ್ಠ 273 ಸ್ಥಾನಗಳ (ಸ್ಪಷ್ಟ ಬಹುಮತ) ಬೆಂಬಲ ಸಿಕ್ಕಿಲ್ಲ. ದೇಶದಲ್ಲಿ ರಾಜಕೀಯ ಅಸ್ಥಿರತೆ ಉಂಟಾಗಿದೆ. ಈ ತುರ್ತು ಸಂದರ್ಭದಲ್ಲಿ ಭಾರತದ ರಾಷ್ಟ್ರಪತಿಯಾಗಿ ನಿಮ್ಮ ವಿವೇಚನಾ ಅಧಿಕಾರ ಏನು?"
+            </div>
+            <button class="strategy-btn" onclick="verifyStrategy(false, 'ಇದು ಅಸಂವಿಧಾನಿಕ ನಡೆ. ಪ್ರಜಾಪ್ರಭುತ್ವದಲ್ಲಿ ರಾಜನಂತೆ ಸರ್ವಾಧಿಕಾರ ನಡೆಸಲು ರಾಷ್ಟ್ರಪತಿಗಳಿಗೆ ಅವಕಾಶವಿಲ್ಲ.')">آಯ್ಕೆ ಎ: ಯಾವುದೇ ಪಕ್ಷಕ್ಕೂ ಅಧಿಕಾರ ನೀಡದೆ ಸಂಸತ್ತನ್ನು ರದ್ದುಗೊಳಿಸಿ ತಾವೇ ಸ್ವತಃ ರಾಜನಂತೆ ದೇಶದ ಸಂಪೂರ್ಣ ಆಡಳಿತವನ್ನು ವಶಪಡಿಸಿಕೊಳ್ಳುವುದು.</button>
+            <button class="strategy-btn" onclick="verifyStrategy(true, 'ಅತ್ಯುನ್ನತ ಸಾಂವಿಧಾನಿಕ ವಿವೇಚನಾ ನಿರ್ಧಾರ! ಸಂವಿಧಾನದ ಪ್ರಕಾರ ಇಂತಹ ಸ್ಥಿತಿಯನ್ನು \'ತ್ರಿಶಂಕು ಸಂಸತ್ತು\' ಎನ್ನಲಾಗುತ್ತದೆ. ಈ ಸಂದರ್ಭದಲ್ಲಿ ರಾಷ್ಟ್ರಪತಿಗಳು ತಮ್ಮ ವಿವೇಚನೆಯನ್ನು ಬಳಸಿ ಸಮ್ಮಿಶ್ರ ಸರ್ಕಾರ ರಚಿಸಬಲ್ಲ ಅತಿ ದೊಡ್ಡ ಒಕ್ಕೂಟದ ನಾಯಕನನ್ನು ಪ್ರಧಾನಮಂತ್ರಿಯನ್ನಾಗಿ ಆಹ್ವಾನಿಸುತ್ತಾರೆ ಮತ್ತು ಸದನದಲ್ಲಿ ಬಹುಮತ ಸಾಬೀತುಪಡಿಸಲು ನಿಗದಿತ ಕಾಲಾವಕಾಶ ನೀಡುತ್ತಾರೆ.')">ಆಯ್ಕೆ ಬಿ: ಸಂವಿಧಾನದ ವಿವೇಚನಾ ಅಧಿಕಾರ ಬಳಸಿ, ವಿವಿಧ ಪಕ್ಷಗಳ ಒಕ್ಕೂಟದ (ಸಮ್ಮಿಶ್ರ ಸರ್ಕಾರ) ನಾಯಕನನ್ನು ಅಥವಾ ಲೋಕಸಭೆಯ ಅತಿ ದೊಡ್ಡ ಪಕ್ಷದ ನಾಯಕನನ್ನು ಪ್ರಧಾನಮಂತ್ರಿಯಾಗಲು ಆಹ್ವಾನಿಸುವುದು ಹಾಗೂ ಲೋಕಸಭೆಯಲ್ಲಿ ಬಹುಮತ ಸಾಬೀತುಪಡಿಸಲು ಅವರಿಗೆ ನಿಗದಿತ ಸಮಯ ನೀಡುವುದು.</button>
+            <button class="strategy-btn" onclick="verifyStrategy(false, 'ಇದು ಅತ್ಯಂತ ಬೇಜವಾಬ್ದಾರಿತನದ ನಡೆಯಾಗಿದ್ದು ದೇಶದ ಭದ್ರತೆಗೆ ಅಪಾಯ ತರುತ್ತದೆ.')">ಆಯ್ಕೆ ಸಿ: ದೇಶದ ಆಡಳಿತವನ್ನು ಯಾರಿಗೂ ನೀಡದೆ ಮಿಲಿಟರಿ ಸೇನೆಗೆ ಹಸ್ತಾಂತರಿಸಿ ತಾವು ರಾಜೀನಾಮೆ ನೀಡುವುದು.</button>
+            <div class="feedback-box" id="fb9"></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="customModalOverlay">
+        <div class="big-pop-box">
+            <span class="modal-close-btn" onclick="closeCentralModal()">&times;</span>
+            
+            <div id="modalPhotoSlot" class="modal-img-frame" style="display:none;">
+                <i class="fa-solid fa-landmark-dome" id="modalIcon" style="font-size: 5rem; color:#94a3b8;"></i>
+                <img id="modalLiveImg" src="" style="display:none; width:100%; height:100%;">
+            </div>
+            
+            <div id="modalVideoSlot" class="modal-video-frame" style="display:none;">
+                <i class="fa-solid fa-circle-play" style="font-size:3rem; color:var(--accent-color); margin-right:10px;"></i>
+                <span id="modalVideoText">ವಿದ್ಯಾರ್ಥಿಗಳ ವಿಡಿಯೋ ಅಪ್ಲೋಡ್ ಫ್ರೇಮ್</span>
+            </div>
+
+            <div class="modal-title" id="modalLiveTitle">ಸ್ಥಾನದ ಹೆಸರು</div>
+            <div class="modal-desc" id="modalLiveDesc">ವಿವರಣೆ...</div>
+        </div>
+    </div>
+
+    <script>
+        // WINDOW SWITCHING SYSTEM
+        function switchWindow(windowIdx) {
+            document.querySelectorAll('.window-content').forEach(win => win.classList.remove('active'));
+            document.querySelectorAll('.menu-tab').forEach(tab => tab.classList.remove('active'));
+
+            document.getElementById(`win${windowIdx}`).classList.add('active');
+            document.querySelectorAll('.menu-tab')[windowIdx - 1].classList.add('active');
+        }
+
+        // EXTRAORDINARY EFFECT CHIMMISI ENGINE
+        function celebrateSuccess() {
+            confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
+        }
+
+        // CENTRAL POP-UP MODAL SYSTEM LOGIC
+        function openCentralModal(type, title, description, videoText) {
+            const overlay = document.getElementById('customModalOverlay');
+            const photoSlot = document.getElementById('modalPhotoSlot');
+            const videoSlot = document.getElementById('modalVideoSlot');
+            
+            document.getElementById('modalLiveTitle').innerText = title;
+            document.getElementById('modalLiveDesc').innerText = description;
+
+            if (type === 'photo') {
+                photoSlot.style.display = 'flex';
+                videoSlot.style.display = 'none';
+            } else if (type === 'video') {
+                photoSlot.style.display = 'none';
+                videoSlot.style.display = 'flex';
+                document.getElementById('modalVideoText').innerText = videoText + " (ಲೈವ್ ಪ್ಲೇಯರ್)";
+            }
+
+            overlay.classList.add('open');
+        }
+
+        function closeCentralModal() {
+            document.getElementById('customModalOverlay').classList.remove('open');
+        }
+
+        // --- Act 1: MCQ Logic ---
+        const mcqCollection = [
+            { q: "ಭಾರತದ ಲೋಕಸಭೆಯ ಚುನಾವಣೆಯಲ್ಲಿ ಸ್ಪರ್ಧಿಸಲು ಒಬ್ಬ ಅಭ್ಯರ್ಥಿಗೆ ಕನಿಷ್ಠ ಎಷ್ಟು ವರ್ಷ ವಯಸ್ಸಾಗಿರಬೇಕು?", opts: ["18 ವರ್ಷ", "21 ವರ್ಷ", "25 ವರ್ಷ", "35 ವರ್ಷ"], ans: 2 },
+            { q: "ಸಂಸತ್ತಿನ ಮೇಲ್ಮನೆಯಾದ ರಾಜ್ಯಸಭೆಯ ಸದಸ್ಯರ ಅಧಿಕಾರಾವಧಿ ಎಷ್ಟು ವರ್ಷಗಳು?", opts: ["5 ವರ್ಷಗಳು", "6 ವರ್ಷಗಳು", "2 ವರ್ಷಗಳು", "ಕಾಯಂ ಹುದ್ದೆ"], ans: 1 },
+            { q: "ರಾಜ್ಯಸಭೆಗೆ ಕಲೆ, ಸಾಹಿತ್ಯ ಮತ್ತು ಸಾಮಾಜಿಕ ಸೇವಾ ಕ್ಷೇತ್ರದ ಎಷ್ಟು ಜನ ಗಣ್ಯರನ್ನು ರಾಷ್ಟ್ರಪತಿಗಳು ನಾಮನಿರ್ದೇಶನ ಮಾಡುತ್ತಾರೆ?", opts: ["2 ಜನ", "10 ಜನ", "12 ಜನ", "25 ಜನ"], ans: 2 },
+            { q: "ಕೇಂದ್ರ ಸರ್ಕಾರದ ಬಜೆಟ್ ಅಥವಾ 'ಹಣಕಾಸು ಮಸೂದೆ'ಯನ್ನು ಮೊದಲು ಸಂಸತ್ತಿನ ಯಾವ ಸದನದಲ್ಲಿ ಮಾತ್ರ ಮಂಡಿಸಬೇಕು?", opts: ["ರಾಜ್ಯಸಭೆ", "ಲೋಕಸಭೆ", "ಜಂಟಿ ಅಧಿವೇಶನ", "ಸುಪ್ರೀಂ ಕೋರ್ಟ್"], ans: 1 },
+            { q: "ದೇಶದಲ್ಲಿ ಯುದ್ಧ ಅಥವಾ ಬಾಹ್ಯ ಆಕ್ರಮಣ ಉಂಟಾದಾಗ ಸಂವಿಧಾನದ 352ನೇ ವಿಧಿಯ ಅಡಿಯಲ್ಲಿ ತುರ್ತು ಪರಿಸ್ಥಿತಿ ಘೋಷಿಸುವವರು ಯಾರು?", opts: ["ಪ್ರಧಾನಮಂತ್ರಿ", "ರಕ್ಷಣಾ ಮಂತ್ರಿ", "ರಾಷ್ಟ್ರಪತಿಗಳು", "ಸುಪ್ರೀಂ ಕೋರ್ಟ್ ಮುಖ್ಯಸ್ಥರು"], ans: 2 },
+            { q: "ರಾಷ್ಟ್ರಪತಿಗಳ ಅನುಪಸ್ಥಿತಿಯಲ್ಲಿ ಅವರ ಎಲ್ಲಾ ಅಧಿಕಾರ ಹಾಗೂ ಸಾಂವಿಧಾನಿಕ ಕರ್ತವ್ಯಗಳನ್ನು ನಿರ್ವಹಿಸುವವರು ಯಾರು?", opts: ["ಪ್ರಧಾನಮಂತ್ರಿ", "ಲೋಕಸಭೆಯ ಸ್ಪೀಕರ್", "ಉಪರಾಷ್ಟ್ರಪತಿಗಳು", "ಸುಪ್ರೀಂ ಕೋರ್ಟ್ ಜಡ್ಜ್"], ans: 2 }
+        ];
+
+        let currentQIdx = 0;
+        function loadMCQ() {
+            const data = mcqCollection[currentQIdx];
+            document.getElementById('q-text').innerText = `${currentQIdx + 1}. ${data.q}`;
+            const container = document.getElementById('q-options');
+            container.innerHTML = "";
+            document.getElementById('q-indicator').innerText = `ಪ್ರಶ್ನೆ: ${currentQIdx + 1}/${mcqCollection.length}`;
+
+            data.opts.forEach((opt, idx) => {
+                const b = document.createElement('button');
+                b.className = "mcq-opt";
+                b.innerText = opt;
+                b.onclick = () => verifyMCQ(idx, data.ans, b);
+                container.appendChild(b);
+            });
+        }
+
+        function verifyMCQ(sel, right, element) {
+            const fb = document.getElementById('fb1'); fb.style.display = "block";
+            if(sel === right) {
+                element.classList.add('correct');
+                fb.innerHTML = "🎈 ಬಲೂನ್ ಬಸ್ಟ್! ಅತ್ಯದ್ಭುತ ಉತ್ತರ.";
+                fb.style.background = "#d1fae5"; fb.style.color = "#065f46";
+                celebrateSuccess();
+                setTimeout(() => {
+                    if(currentQIdx < mcqCollection.length - 1) {
+                        currentQIdx++; loadMCQ(); fb.style.display = "none";
+                    } else { fb.innerHTML = "🎉 ಅಭಿನಂದನೆಗಳು! ಎಲ್ಲಾ 6 ಪ್ರಧಾನ ಬಹುಆಯ್ಕೆ ಪ್ರಶ್ನೆಗಳನ್ನು ಯಶಸ್ವಿಯಾಗಿ ಗೆದ್ದಿದ್ದೀರಿ."; }
+                }, 1500);
+            } else {
+                element.classList.add('wrong');
+                fb.innerHTML = "✗ ತಪ್ಪು ಉತ್ತರ, ಕೇಂದ್ರ ಸರ್ಕಾರದ ನಿಯಮಾವಳಿ ನೆನಪಿಸಿಕೊಳ್ಳಿ.";
+                fb.style.background = "#fee2e2"; fb.style.color = "#991b1b";
+            }
+        }
+        loadMCQ();
+
+        // --- Act 2: Accordion Logic ---
+        function toggleAcc(header) {
+            const body = header.nextElementSibling;
+            const icon = header.querySelector('i');
+            if(body.style.display === "block") {
+                body.style.display = "none";
+                icon.className = "fa-solid fa-plus";
+            } else {
+                body.style.display = "block";
+                icon.className = "fa-solid fa-minus";
+            }
+        }
+
+        // --- Act 3: Matching Logic ---
+        let selectedLeft = null;
+        const leftCards = document.querySelectorAll('#leftContainer .drag-card');
+        const rightCards = document.querySelectorAll('#rightContainer .drag-card');
+
+        leftCards.forEach(card => {
+            card.addEventListener('click', () => {
+                if(card.classList.contains('correct')) return;
+                leftCards.forEach(c => c.classList.remove('selected'));
+                card.classList.add('selected');
+                selectedLeft = card;
+            });
+        });
+
+        rightCards.forEach(card => {
+            card.addEventListener('click', () => {
+                if(card.classList.contains('correct') || !selectedLeft) return;
+                const matchId = card.getAttribute('data-match');
+                const leftId = selectedLeft.getAttribute('data-id');
+
+                if(matchId === leftId) {
+                    card.classList.add('correct');
+                    selectedLeft.classList.add('correct');
+                    selectedLeft.classList.remove('selected');
+                    selectedLeft = null;
+                    celebrateSuccess();
+                    checkAct3Progress();
+                } else {
+                    const fb = document.getElementById('fb3');
+                    fb.style.display = "block"; fb.style.background = "#fee2e2"; fb.style.color = "#991b1b";
+                    fb.innerText = "✗ ತಪ್ಪು ಜೋಡಿ! ಸದಸ್ಯ ಬಲ ಹಾಗೂ ವಯೋಮಿತಿಯನ್ನು ಸರಿಯಾಗಿ ಯೋಚಿಸಿ ಹೊಂದಿಸಿ.";
+                }
+            });
+        });
+
+        function checkAct3Progress() {
+            const finished = document.querySelectorAll('#leftContainer .drag-card.correct').length;
+            const fb = document.getElementById('fb3'); fb.style.display = "block";
+            if(finished === 6) {
+                fb.style.background = "#d1fae5"; fb.style.color = "#065f46";
+                fb.innerText = "✓ ಅದ್ಭುತ! ಎಲ್ಲಾ 6 ಸಾಂವಿಧಾನಿಕ ಹೊಂದಾಣಿಕೆಗಳು ಸಂಪೂರ್ಣ ಯಶಸ್ವಿಯಾಗಿವೆ.";
+            } else {
+                fb.style.background = "#f1f5f9"; fb.style.color = "#334155";
+                fb.innerText = `ಪ್ರಗತಿ: ${finished}/6 ಜೋಡಿಗಳು ಸರಿಯಾಗಿವೆ.`;
+            }
+        }
+
+        // --- Act 6: Blanks Validator ---
+        function verifyBlanks() {
+            let miss = 0;
+            const selects = document.querySelectorAll('.blank-select, .lab-select');
+            selects.forEach(sel => {
+                if(sel.value !== sel.getAttribute('data-ans')) {
+                    miss++; sel.style.borderColor = "var(--error)";
+                } else { sel.style.borderColor = "var(--success)"; }
+            });
+            const fb = document.getElementById('fb6'); fb.style.display = "block";
+            if(miss === 0) {
+                fb.innerHTML = "✓ ಪರಿಪೂರ್ಣ! ಕೇಂದ್ರ ಸರ್ಕಾರದ ಕಾರ್ಯಾಂಗ ಮತ್ತು ಶಾಸಕಾಂಗದ ಪಠ್ಯ ವಿಶ್ಲೇಷಣೆ ಸಂಪೂರ್ಣ ಸರಿಯಾಗಿದೆ.";
+                fb.style.background = "#d1fae5"; fb.style.color = "#065f46";
+                celebrateSuccess();
+            } else {
+                fb.innerHTML = "✗ ಕೆಲವು ಖಾಲಿ ಜಾಗಗಳಲ್ಲಿ ತಪ್ಪು ಸಾಂವಿಧಾನಿಕ ಪದಗಳಿವೆ. ದಯವಿಟ್ಟು ಮತ್ತೊಮ್ಮೆ ನೋಡಿ ತಿದ್ದಿ.";
+                fb.style.background = "#fee2e2"; fb.style.color = "#991b1b";
+            }
+        }
+
+        // --- Drag & Drop Infrastructure for Act 7 Chronology ---
+        let currentDraggingChip = null;
+        document.querySelectorAll('.chip').forEach(chip => {
+            chip.addEventListener('dragstart', () => { currentDraggingChip = chip; });
+        });
+
+        document.querySelectorAll('.step-drop').forEach(zone => {
+            zone.addEventListener('dragover', (e) => e.preventDefault());
+            zone.addEventListener('drop', () => {
+                if(currentDraggingChip) zone.appendChild(currentDraggingChip);
+            });
+        });
+
+        function verifyChronology() {
+            let correct = 0;
+            for(let i=1; i<=6; i++) {
+                const zone = document.getElementById(`z${i}`);
+                if(zone.firstChild && zone.firstChild.innerText.trim() === zone.getAttribute('data-order')) {
+                    correct++;
+                }
+            }
+            const fb = document.getElementById('fb7'); fb.style.display = "block";
+            if(correct === 6) {
+                fb.innerHTML = "✓ ಜ್ಞಾನದ ಮಳೆ! ಮಂತ್ರಿಮಂಡಲ ರಚನೆಯಾಗುವ ಎಲ್ಲಾ 6 ಕ್ರಮಗಳನ್ನು ನಿಖರವಾಗಿ ಜೋಡಿಸಿದ್ದೀರಿ.";
+                fb.style.background = "#d1fae5"; fb.style.color = "#065f46";
+                celebrateSuccess();
+            } else {
+                fb.innerHTML = `✗ ${correct}/6 ಹಂತಗಳು ಸರಿಯಾಗಿವೆ. ಲೋಕಸಭಾ ಚುನಾವಣೆಯಿಂದ ಖಾತೆ ಹಂಚಿಕೆಯವರೆಗಿನ ಕ್ರಮ ಯೋಚಿಸಿ ಮರುಜೋಡಿಸಿ.`;
+                fb.style.background = "#fee2e2"; fb.style.color = "#991b1b";
+            }
+        }
+
+        // --- Act 8: Matrix Picker ---
+        document.querySelectorAll('.matrix-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const isCorrect = item.getAttribute('data-correct') === 'yes';
+                const info = item.getAttribute('data-info');
+                const fb = document.getElementById('fb8'); fb.style.display = "block";
+                if(isCorrect) {
+                    item.style.background = "#d1fae5";
+                    fb.innerHTML = `🎯 ಸಂಸತ್ತಿನ ಅಧಿಕಾರ ಪತ್ತೆಯಾಗಿದೆ! ವಿವರ: ${info}`;
+                    fb.style.backgroundColor = "#d1fae5"; fb.style.color = "#065f46";
+                    celebrateSuccess();
+                } else {
+                    item.style.background = "#fee2e2";
+                    fb.innerHTML = `⚠️ ಇದು ಸಂಸತ್ತಿನ ಅಧಿಕಾರವಲ್ಲ! ವಿವರ: ${info}`;
+                    fb.style.backgroundColor = "#fee2e2"; fb.style.color = "#991b1b";
+                }
+            });
+        });
+
+        // --- Act 9: Strategic Scenario Logic ---
+        function verifyStrategy(isRight, txt) {
+            const fb = document.getElementById('fb9'); fb.style.display = "block";
+            fb.innerHTML = txt;
+            if(isRight) {
+                fb.style.background = "#d1fae5"; fb.style.color = "#065f46";
+                celebrateSuccess();
+            } else {
+                fb.style.background = "#fee2e2"; fb.style.color = "#991b1b";
+            }
+        }
+    </script>
+</body>
+</html>

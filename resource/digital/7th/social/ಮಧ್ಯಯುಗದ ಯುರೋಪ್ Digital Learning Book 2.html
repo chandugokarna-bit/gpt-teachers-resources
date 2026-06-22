@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಮಧ್ಯಯುಗದ ಯುರೋಪ್: ಧಾರ್ಮಿಕ ಸುಧಾರಣೆ - Interactive Digital Book</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Noto+Serif+Kannada:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #2c3e50, #2980b9, #27ae60);
+            --book-bg: #ffffff;
+            --primary-color: #1f4068;
+            --secondary-color: #16a085;
+            --accent-color: #e67e22;
+            --text-color: #2c3e50;
+            --success: #27ae60;
+            --error: #c0392b;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Poppins', 'Noto Serif Kannada', serif;
+            background: var(--bg-gradient);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-color);
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 20px;
+            text-shadow: 0 3px 6px rgba(0,0,0,0.4);
+        }
+        .header h1 { font-size: 2.2rem; color: #fff; }
+        .header p { font-size: 1.1rem; color: #e1f5fe; margin-top: 5px; }
+
+        /* Book Design */
+        .book-container {
+            width: 100%;
+            max-width: 950px;
+            background: var(--book-bg);
+            border-radius: 24px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+            border-left: 18px solid var(--primary-color);
+            min-height: 620px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-container { width: 100%; height: 6px; background: #e0e0e0; }
+        .progress-bar { height: 100%; width: 20%; background: var(--accent-color); transition: width 0.4s ease; }
+
+        /* Page Management */
+        .page { padding: 40px; flex: 1; display: none; animation: slidePage 0.4s ease-out; }
+        .page.active { display: block; }
+        @keyframes slidePage { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+
+        .page-title {
+            font-size: 1.6rem;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px dashed #ddd;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .instruction { font-size: 1.05rem; margin-bottom: 20px; color: #555; font-style: italic; }
+
+        /* Navigation */
+        .book-controls {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px 40px;
+            background: #f8f9fa;
+            border-top: 1px solid #ddd;
+        }
+        .btn {
+            padding: 12px 28px;
+            border: none;
+            border-radius: 40px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: bold;
+        }
+        .btn-prev { background: #e0e0e0; color: #333; }
+        .btn-next { background: var(--primary-color); color: white; }
+        .btn:hover:not(:disabled) { transform: translateY(-3px); box-shadow: 0 6px 15px rgba(0,0,0,0.2); }
+        .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+        .feedback { margin-top: 15px; padding: 15px; border-radius: 8px; font-weight: bold; display: none; }
+
+        /* Act 1: True / False Cards */
+        .tf-grid { display: grid; grid-template-columns: 1fr; gap: 15px; margin-top: 15px; }
+        .tf-card { background: #f9f9f9; padding: 18px; border-radius: 12px; border-left: 5px solid #ccc; display: flex; justify-content: space-between; align-items: center; }
+        .tf-statement { font-size: 1.1rem; font-weight: 500; flex: 1; padding-right: 15px; }
+        .tf-actions { display: flex; gap: 10px; }
+        .tf-btn { padding: 8px 16px; border: 2px solid #ddd; border-radius: 20px; background: white; cursor: pointer; font-weight: bold; transition: 0.2s; }
+        .tf-btn.selected-true { background: #d4edda; border-color: var(--success); color: #155724; }
+        .tf-btn.selected-false { background: #f8d7da; border-color: var(--error); color: #721c24; }
+
+        /* Act 2: Matching Grid */
+        .matching-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px; }
+        .match-left, .match-right { display: flex; flex-direction: column; gap: 10px; }
+        .match-card { padding: 12px 18px; background: #f8f9fa; border: 2px solid #e2e8f0; border-radius: 10px; cursor: pointer; text-align: left; transition: 0.2s; }
+        .match-card.selected { background: #d1ecf1; border-color: var(--secondary-color); }
+        .match-card.correct { background: #d4edda; border-color: var(--success); color: #155724; cursor: default; }
+
+        /* Act 3: Modern Flashcards Wheel */
+        .flashcard-box { width: 100%; max-width: 500px; margin: 30px auto; perspective: 1000px; cursor: pointer; }
+        .flashcard { width: 100%; height: 200px; position: relative; transform-style: preserve-3d; transition: transform 0.6s; border-radius: 15px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        .flashcard.flipped { transform: rotateY(180deg); }
+        .card-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; border-radius: 15px; }
+        .card-front { background: #fff3cd; border: 2px solid #ffeeba; color: #856404; font-size: 1.2rem; font-weight: bold; }
+        .card-back { background: #d4edda; border: 2px solid #c3e6cb; color: #155724; font-size: 1.15rem; transform: rotateY(180deg); }
+        .fc-controls { display: flex; justify-content: center; gap: 20px; margin-top: 15px; }
+
+        /* Act 4: Multiple Choice Quiz */
+        .quiz-box { display: flex; flex-direction: column; gap: 12px; margin-top: 15px; }
+        .opt-btn { padding: 14px 20px; background: #f1f3f5; border: 2px solid #e9ecef; border-radius: 10px; cursor: pointer; text-align: left; font-size: 1rem; transition: 0.2s; }
+        .opt-btn:hover { background: #e9ecef; }
+        .opt-btn.correct { background: #d4edda; border-color: var(--success); color: #155724; }
+        .opt-btn.wrong { background: #f8d7da; border-color: var(--error); color: #721c24; }
+        .q-progress { font-weight: bold; margin-top: 10px; text-align: right; color: #666; }
+
+        /* Act 5: Interactive Text Lab Dropdowns */
+        .text-passage { background: #f4f9f4; border: 1px solid #c3e6cb; padding: 25px; border-radius: 12px; font-size: 1.15rem; line-height: 2; margin-top: 15px; }
+        .blank-select { padding: 4px 8px; border: 2px solid var(--secondary-color); border-radius: 6px; font-size: 1rem; font-weight: bold; color: var(--secondary-color); background: white; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>ಪಾಠ 2: ಮಧ್ಯಯುಗದ ಯುರೋಪ್</h1>
+        <p>ಭಾಗ 2: ಧಾರ್ಮಿಕ ಸುಧಾರಣೆ (The Reformation) - Interactive Learning Book</p>
+    </div>
+
+    <div class="book-container">
+        <div class="progress-container">
+            <div class="progress-bar" id="progBar"></div>
+        </div>
+
+        <div class="page active" id="page1">
+            <div class="page-title"><i class="fa-solid fa-circle-check"></i> ಆಕ್ಟಿವಿಟಿ 1: ಚರ್ಚ್‌ನ ಸ್ಥಿತಿಗತಿಗಳು - ಸರಿ ಅಥವಾ ತಪ್ಪು?</div>
+            <p class="instruction">ಮಧ್ಯಯುಗದ ಕೊನೆಯಲ್ಲಿ ರೋಮನ್ ಕ್ಯಾಥೊಲಿಕ್ ಚರ್ಚ್‌ನಲ್ಲಿದ್ದ ಆಚರಣೆಗಳಿಗೆ ಸಂಬಂಧಿಸಿದ ಹೇಳಿಕೆಗಳನ್ನು ಓದಿ 'ಸರಿ' ಅಥವಾ 'ತಪ್ಪು' ಎಂದು ನಿರ್ಧರಿಸಿ:</p>
+            
+            <div class="tf-grid">
+                <div class="tf-card" data-ans="true">
+                    <div class="tf-statement">1. ಮಧ್ಯಯುಗದ ಯುರೋಪಿನಲ್ಲಿ ಸಾಮಾನ್ಯ ಜನರು ಬೈಬಲ್ ಅನ್ನು ಸ್ವತಂತ್ರವಾಗಿ ಓದಲು ಅವಕಾಶವಿರಲಿಲ್ಲ.</div>
+                    <div class="tf-actions"><button class="tf-btn" onclick="checkTF(this, true)">ಸರಿ</button><button class="tf-btn" onclick="checkTF(this, false)">ತಪ್ಪು</button></div>
+                </div>
+                <div class="tf-card" data-ans="true">
+                    <div class="tf-statement">2. 'ಪಾಪಪರಿಹಾರ ಪತ್ರ'ಗಳನ್ನು (Indulgences) ಮಾರಾಟ ಮಾಡುವ ಮೂಲಕ ಚರ್ಚ್ ಹಣ ಸಂಗ್ರಹಿಸುತ್ತಿತ್ತು.</div>
+                    <div class="tf-actions"><button class="tf-btn" onclick="checkTF(this, true)">ಸರಿ</button><button class="tf-btn" onclick="checkTF(this, false)">ತಪ್ಪು</button></div>
+                </div>
+                <div class="tf-card" data-ans="false">
+                    <div class="tf-statement">3. ರೋಮನ್ ಚರ್ಚ್‌ನ ಎಲ್ಲಾ ಪ್ರಾರ್ಥನೆಗಳು ಸಾಮಾನ್ಯ ಜನರಿಗೆ ಅರ್ಥವಾಗುವ ಜರ್ಮನ್ ಭಾಷೆಯಲ್ಲೇ ನಡೆಯುತ್ತಿದ್ದವು.</div>
+                    <div class="tf-actions"><button class="tf-btn" onclick="checkTF(this, true)">ಸರಿ</button><button class="tf-btn" onclick="checkTF(this, false)">ತಪ್ಪು</button></div>
+                </div>
+                <div class="tf-card" data-ans="true">
+                    <div class="tf-statement">4. ಮಾರ್ಟಿನ್ ಲೂಥರ್ ರೋಮನ್ ಪೋಪ್‌ನ ಸರ್ವಾಧಿಕಾರ ಹಾಗೂ ದುಬಾರಿ ಆಚರಣೆಗಳನ್ನು ಬಹಿರಂಗವಾಗಿ ವಿರೋಧಿಸಿದನು.</div>
+                    <div class="tf-actions"><button class="tf-btn" onclick="checkTF(this, true)">ಸರಿ</button><button class="tf-btn" onclick="checkTF(this, false)">ತಪ್ಪು</button></div>
+                </div>
+                <div class="tf-card" data-ans="false">
+                    <div class="tf-statement">5. ಚರ್ಚ್ ವಿರುದ್ಧ ಧ್ವನಿ ಎತ್ತಿದ ಸುಧಾರಕರನ್ನು ಪೋಪ್ ಗೌರವದಿಂದ ಸ್ವಾಗತಿಸಿ ಸುಧಾರಣೆ ಜಾರಿಗೆ ತಂದರು.</div>
+                    <div class="tf-actions"><button class="tf-btn" onclick="checkTF(this, true)">ಸರಿ</button><button class="tf-btn" onclick="checkTF(this, false)">ತಪ್ಪು</button></div>
+                </div>
+                <div class="tf-card" data-ans="true">
+                    <div class="tf-statement">6. ಬೈಬಲ್ ಅನ್ನು ಲ್ಯಾಟಿನ್‌ನಿಂದ ಜರ್ಮನ್ ಭಾಷೆಗೆ ಭಾಷಾಂತರಿಸುವ ಮೂಲಕ ಲೂಥರ್ ಜನಸಾಮಾನ್ಯರಿಗೆ ಜ್ಞಾನ ತಲುಪಿಸಿದನು.</div>
+                    <div class="tf-actions"><button class="tf-btn" onclick="checkTF(this, true)">ಸರಿ</button><button class="tf-btn" onclick="checkTF(this, false)">ತಪ್ಪು</button></div>
+                </div>
+            </div>
+            <div class="feedback" id="fb1"></div>
+        </div>
+
+        <div class="page" id="page2">
+            <div class="page-title"><i class="fa-solid fa-arrows-spin"></i> ಆಕ್ಟಿವಿಟಿ 2: ಸುಧಾರಣೆಯ ನಾಯಕರು ಮತ್ತು ಪ್ರಮುಖ ತತ್ವಗಳು</div>
+            <p class="instruction">ಎಡಭಾಗದಲ್ಲಿರುವ ಸುಧಾರಕರು ಅಥವಾ ಪರಿಕಲ್ಪನೆಗಳನ್ನು ಬಲಭಾಗದಲ್ಲಿರುವ ಅವುಗಳ ನಿಖರ ವಿವರಣೆಯೊಂದಿಗೆ ಕ್ಲಿಕ್ ಮಾಡಿ ಜೋಡಿಸಿ:</p>
+            
+            <div class="matching-grid">
+                <div class="match-left" id="leftContainer">
+                    <div class="match-card" data-id="1">ಮಾರ್ಟಿನ್ ಲೂಥರ್</div>
+                    <div class="match-card" data-id="2">ಪ್ರಾಟೆಸ್ಟಂಟ್ (Protestant)</div>
+                    <div class="match-card" data-id="3">ಜಾನ್ ಕ್ಯಾಲ್ವಿನ್</div>
+                    <div class="match-card" data-id="4">ಪ್ರತಿ ಧರ್ಮಸುಧಾರಣೆ</div>
+                    <div class="match-card" data-id="5">ಎರಡನೇ ಅಲ್ರಿಚ್ ಜ್ವಿಂಗ್ಲಿ</div>
+                    <div class="match-card" data-id="6">ಇಗ್ನೇಷಿಯಸ್ ಲೊಯೋಲಾ</div>
+                </div>
+                <div class="match-right" id="rightContainer">
+                    <div class="match-card" data-match="2">ಚರ್ಚ್ ವಿರುದ್ಧ 'ಪ್ರತಿಭಟಿಸಿದ' ಹೊಸ ಕ್ರಿಶ್ಚಿಯನ್ ಪಂಥ</div>
+                    <div class="match-card" data-match="1">ಜರ್ಮನಿಯ ಪ್ರಸಿದ್ಧ ಧರ್ಮ ಸುಧಾರಣೆಯ ಪಿತಾಮಹ</div>
+                    <div class="match-card" data-match="4">ಕ್ಯಾಥೊಲಿಕ್ ಚರ್ಚ್ ತನ್ನನ್ನು ತಾನು ಸ್ವಚ್ಛಗೊಳಿಸಿಕೊಳ್ಳಲು ತಂದ ಸುಧಾರಣೆ</div>
+                    <div class="match-card" data-match="3">ಸ್ವಿಟ್ಜರ್ಲೆಂಡ್‌ನ ಜಿನೀವಾದಲ್ಲಿ ಸುಧಾರಣೆ ಮುನ್ನಡೆಸಿದ ನಾಯಕ</div>
+                    <div class="match-card" data-match="6">'ಜೇಸುಯಿಟ್ ಪಾದ್ರಿಗಳ ಸಂಘ' (Society of Jesus) ಸ್ಥಾಪಕರು</div>
+                    <div class="match-card" data-match="5">ಸ್ವಿಟ್ಜರ್ಲೆಂಡ್‌ನಲ್ಲಿ ಲೂಥರ್ ತತ್ವಗಳನ್ನು ಪ್ರಚಾರ ಮಾಡಿದ ಮತ್ತೊಬ್ಬ ಸುಧಾರಕ</div>
+                </div>
+            </div>
+            <div class="feedback" id="fb2"></div>
+        </div>
+
+        <div class="page" id="page3">
+            <div class="page-title"><i class="fa-solid fa-id-card"></i> ಆಕ್ಟಿವಿಟಿ 3: ಧಾರ್ಮಿಕ ಸುಧಾರಣೆಯ ಪಾರಿಭಾಷಿಕ ಪದಕೋಶ</div>
+            <p class="instruction">ಕೆಳಗಿನ ಕಾರ್ಡ್‌ನ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿದರೆ ಅದರ ಒಳಗಿನ ಐತಿಹಾಸಿಕ ರಹಸ್ಯ ಅರ್ಥ ಕಾಣಿಸುತ್ತದೆ. ಎಲ್ಲಾ 6 ಕಾರ್ಡ್‌ಗಳನ್ನು ಓದಿ ನೆನಪಿಡಿ:</p>
+            
+            <div class="flashcard-box" onclick="flipCard()">
+                <div class="flashcard" id="fCard">
+                    <div class="card-face card-front" id="fcFront">ಪದ ಲೋಡ್ ಆಗುತ್ತಿದೆ...</div>
+                    <div class="card-face card-back" id="fcBack">ಅರ್ಥ ಲೋಡ್ ಆಗುತ್ತಿದೆ...</div>
+                </div>
+            </div>
+            <div class="fc-controls">
+                <button class="btn btn-prev" id="fcPrev" onclick="navigateFlashcard(-1, event)"><i class="fa-solid fa-chevron-left"></i> ಹಿಂದಿನ ಪದ</button>
+                <button class="btn btn-next" id="fcNext" onclick="navigateFlashcard(1, event)">ಮುಂದಿನ ಪದ <i class="fa-solid fa-chevron-right"></i></button>
+            </div>
+            <div class="score-display" id="fcProgress" style="text-align: center; margin-top: 15px; font-weight: bold;">ಕಾರ್ಡ್: 1/6</div>
+        </div>
+
+        <div class="page" id="page4">
+            <div class="page-title"><i class="fa-solid fa-lightbulb"></i> ಆಕ್ಟಿವಿಟಿ 4: ಪ್ರಾಟೆಸ್ಟಂಟ್ ಧರ್ಮದ ವೈಚಾರಿಕ ಕ್ವಿಜ್</div>
+            <p id="q-text" style="font-size:1.2rem; margin-bottom:15px; font-weight:bold;">ಪ್ರಶ್ನೆ ಲೋಡ್ ಆಗುತ್ತಿದೆ...</p>
+            <div class="quiz-box" id="q-options"></div>
+            <div class="q-progress" id="q-indicator">ಪ್ರಶ್ನೆ: 1/6</div>
+            <div class="feedback" id="fb4"></div>
+        </div>
+
+        <div class="page" id="page5">
+            <div class="page-title"><i class="fa-solid fa-file-pen"></i> ಆಕ್ಟಿವಿಟಿ 5: ಧರ್ಮ ಸುಧಾರಣೆಯ ಜಾಗತಿಕ ಪರಿಣಾಮಗಳ ವಿಶ್ಲೇಷಣೆ</div>
+            <p class="instruction">ಧರ್ಮ ಸುಧಾರಣೆಯಿಂದಾಗಿ ಜಗತ್ತಿನಲ್ಲಿ ಉಂಟಾದ ರಾಜಕೀಯ ಮತ್ತು ಸಾಮಾಜಿಕ ಬದಲಾವಣೆಗಳ ಈ ಪ್ಯಾರಾಗ್ರಾಫ್ ಅನ್ನು ಸೂಕ್ತ ಪದಗಳಿಂದ ಭರ್ತಿ ಮಾಡಿ:</p>
+            
+            <div class="text-passage">
+                ಧರ್ಮ ಸುಧಾರಣಾ ಚಳುವಳಿಯಿಂದಾಗಿ ಯುರೋಪಿನಲ್ಲಿ ಪೋಪ್ ಅವರ ಏಕಸ್ವಾಮ್ಯ ಮುರಿದುಬಿದ್ದು 
+                <select class="blank-select" id="b1" data-ans="ರಾಜರ"><option value="">--ಆಯ್ಕೆ ಮಾಡಿ--</option><option>ರಾಜರ</option><option>ಸಾಮಂತರ</option><option>ಪಾದ್ರಿಗಳ</option></select> 
+                ಮತ್ತು ರಾಷ್ಟ್ರೀಯ ಸರ್ಕಾರಗಳ ಶಕ್ತಿ ಹೆಚ್ಚಾಯಿತು. ಕ್ರಿಶ್ಚಿಯನ್ ಧರ್ಮವು ಮುಖ್ಯವಾಗಿ ಕ್ಯಾಥೊಲಿಕ್ ಮತ್ತು 
+                <select class="blank-select" id="b2" data-ans="ಪ್ರಾಟೆಸ್ಟಂಟ್"><option value="">--ಆಯ್ಕೆ ಮಾಡಿ--</option><option>ಪ್ರಾಟೆಸ್ಟಂಟ್</option><option>ಆರ್ಥೊಡಾಕ್ಸ್</option><option>ಪ್ಯೂರಿಟನ್</option></select> 
+                ಎಂಬ ಎರಡು ಪ್ರಮುಖ ಕವಲುಗಳಾಗಿ ಅಧಿಕೃತವಾಗಿ ಸೀಳಲ್ಪಟ್ಟಿತು. ಈ ಚಳುವಳಿಯು ಯುರೋಪಿನಾದ್ಯಂತ ಜನರು ತಮ್ಮ ಸ್ವಂತ 
+                <select class="blank-select" id="b3" data-ans="ಪ್ರಾದೇಶಿಕ ಭಾಷೆಗಳಲ್ಲಿ"><option value="">--ಆಯ್ಕೆ ಮಾಡಿ--</option><option>ಲ್ಯಾಟಿನ್ ಭಾಷೆಯಲ್ಲಿ</option><option>ಪ್ರಾದೇಶಿಕ ಭಾಷೆಗಳಲ್ಲಿ</option><option>ಗ್ರೀಕ್ ಭಾಷೆಯಲ್ಲಿ</option></select> 
+                ಶಿಕ್ಷಣ ಮತ್ತು ಸಾಹಿತ್ಯವನ್ನು ಬೆಳೆಸಿಕೊಳ್ಳಲು ಮಹತ್ತರ ಪ್ರೇರಣೆ ನೀಡಿತು. ಕ್ಯಾಥೊಲಿಕ್ ಚರ್ಚ್ ತನ್ನ ತಪ್ಪುಗಳನ್ನು ತಿದ್ದಿಕೊಳ್ಳಲು 
+                <select class="blank-select" id="b4" data-ans="ಪ್ರತಿ ಧರ್ಮಸುಧಾರಣೆ"><option value="">--ಆಯ್ಕೆ ಮಾಡಿ--</option><option>ಧರ್ಮಯುದ್ಧ</option><option>ಪ್ರತಿ ಧರ್ಮಸುಧಾರಣೆ</option><option>ವಿಚಾರವಾದ</option></select> 
+                ಯನ್ನು ಆರಂಭಿಸಿತು. ಶಿಕ್ಷಣದ ಪ್ರಚಾರಕ್ಕಾಗಿ ಇಗ್ನೇಷಿಯಸ್ ಲೊಯೋಲಾ ನೇತೃತ್ವದ ತಂಡವು ಜಗತ್ತಿನಾದ್ಯಂತ ಅನೇಕ 
+                <select class="blank-select" id="b5" data-ans="ಶಾಲೆ ಮತ್ತು ಕಾಲೇಜುಗಳನ್ನು"><option value="">--ಆಯ್ಕೆ ಮಾಡಿ--</option><option>ಕೋಟೆ ಕೊತ್ತಲಗಳನ್ನು</option><option>ಶಾಲೆ ಮತ್ತು ಕಾಲೇಜುಗಳನ್ನು</option><option>ಸೈನಿಕ ಶಿಬಿರಗಳನ್ನು</option></select> 
+                ಸ್ಥಾಪಿಸಿತು. ಒಟ್ಟಾರೆ ಈ ಘಟನೆಯು ಯುರೋಪಿಯನ್ ರಾಷ್ಟ್ರಗಳಲ್ಲಿ ಹೊಸದಾದ 
+                <select class="blank-select" id="b6" data-ans="ರಾಷ್ಟ್ರೀಯ ಪ್ರಜ್ಞೆ"><option value="">--ಆಯ್ಕೆ ಮಾಡಿ--</option><option>ಸಾಮಂತಶಾಹಿ ಪ್ರಜ್ಞೆ</option><option>ರಾಷ್ಟ್ರೀಯ ಪ್ರಜ್ಞೆ</option><option>ಪರಾವಲಂಬನೆ</option></select> 
+                ಮತ್ತು ಜಾಗತಿಕ ರಾಜಕೀಯ ಬದಲಾವಣೆಗಳಿಗೆ ಮುನ್ನುಡಿ ಬರೆಯಿತು.
+            </div>
+            <button class="btn" style="background:var(--accent-color); color:white; margin-top:20px;" onclick="checkBlanks()">ಪರಿಣಾಮಗಳನ್ನು ಖಚಿತಪಡಿಸಿ</button>
+            <div class="feedback" id="fb5"></div>
+        </div>
+
+        <div class="book-controls">
+            <button class="btn btn-prev" id="prevPageBtn" onclick="movePage(-1)" disabled><i class="fa-solid fa-book-open"></i> ಹಿಂದಿನ ಪುಟ</button>
+            <button class="btn btn-next" id="nextPageBtn" onclick="movePage(1)">ಮುಂದಿನ ಪುಟ <i class="fa-solid fa-book"></i></button>
+        </div>
+    </div>
+
+    <script>
+        let pageIdx = 1;
+        const maxPages = 5;
+
+        function movePage(dir) {
+            document.getElementById(`page${pageIdx}`).classList.remove('active');
+            pageIdx += dir;
+            document.getElementById(`page${pageIdx}`).classList.add('active');
+
+            document.getElementById('prevPageBtn').disabled = (pageIdx === 1);
+            document.getElementById('nextPageBtn').disabled = (pageIdx === maxPages);
+
+            document.getElementById('progBar').style.width = `${(pageIdx / maxPages) * 100}%`;
+        }
+
+        // --- Act 1: True or False Logic ---
+        function checkTF(btn, choice) {
+            const card = btn.closest('.tf-card');
+            const correctAnswer = card.getAttribute('data-ans') === 'true';
+            
+            // Reset brother button styles
+            const buttons = card.querySelectorAll('.tf-btn');
+            buttons.forEach(b => { b.classList.remove('selected-true', 'selected-false'); });
+
+            if(choice === correctAnswer) {
+                btn.classList.add('selected-true');
+            } else {
+                btn.classList.add('selected-false');
+            }
+            evaluateAllTF();
+        }
+
+        function evaluateAllTF() {
+            const cards = document.querySelectorAll('.tf-card');
+            let totalAnswered = 0;
+            let correctCount = 0;
+
+            cards.forEach(card => {
+                const hasCorrectSelection = card.querySelector('.selected-true');
+                const hasWrongSelection = card.querySelector('.selected-false');
+                if(hasCorrectSelection || hasWrongSelection) totalAnswered++;
+                if(hasCorrectSelection) correctCount++;
+            });
+
+            const fb = document.getElementById('fb1');
+            fb.style.display = "block";
+            if(totalAnswered === cards.length) {
+                if(correctCount === cards.length) {
+                    fb.innerHTML = "✓ ಅದ್ಭುತ! ಮಧ್ಯಯುಗದ ಚರ್ಚ್‌ನ ಸ್ಥಿತಿಗತಿಗಳ ಎಲ್ಲಾ ಹೇಳಿಕೆಗಳನ್ನು ನಿಖರವಾಗಿ ಗುರುತಿಸಿದ್ದೀರಿ.";
+                    fb.style.background = "#d4edda"; fb.style.color = "#155724";
+                } else {
+                    fb.innerHTML = `✗ ನೀವು ${correctCount}/${cards.length} ಹೇಳಿಕೆಗಳನ್ನು ಸರಿಯಾಗಿ ಊಹಿಸಿದ್ದೀರಿ. ತಪ್ಪುಗಳನ್ನು ಸರಿಪಡಿಸಿ.`;
+                    fb.style.background = "#f8d7da"; fb.style.color = "#721c24";
+                }
+            } else {
+                fb.innerHTML = `ಪ್ರಗತಿ: ${totalAnswered}/${cards.length} ಪ್ರಶ್ನೆಗಳಿಗೆ ಉತ್ತರಿಸಲಾಗಿದೆ...`;
+                fb.style.background = "#e2e8f0"; fb.style.color = "#4a5568";
+            }
+        }
+
+        // --- Act 2: Matching Logic ---
+        let selectedLeft = null;
+        const leftCards = document.querySelectorAll('#leftContainer .match-card');
+        const rightCards = document.querySelectorAll('#rightContainer .match-card');
+
+        leftCards.forEach(card => {
+            card.addEventListener('click', () => {
+                if(card.classList.contains('correct')) return;
+                leftCards.forEach(c => c.classList.remove('selected'));
+                card.classList.add('selected');
+                selectedLeft = card;
+            });
+        });
+
+        rightCards.forEach(card => {
+            card.addEventListener('click', () => {
+                if(card.classList.contains('correct') || !selectedLeft) return;
+                const matchId = card.getAttribute('data-match');
+                const leftId = selectedLeft.getAttribute('data-id');
+
+                if(matchId === leftId) {
+                    card.classList.add('correct');
+                    selectedLeft.classList.add('correct');
+                    selectedLeft.classList.remove('selected');
+                    selectedLeft = null;
+                    checkAct2Progress();
+                } else {
+                    const fb = document.getElementById('fb2');
+                    fb.style.display = "block"; fb.style.background = "#f8d7da"; fb.style.color = "#c0392b";
+                    fb.innerText = "✗ ತಪ್ಪು ಜೋಡಿ! ಧರ್ಮ ಸುಧಾರಕರ ಸರಿಯಾದ ಕಾರ್ಯವನ್ನು ಯೋಚಿಸಿ ಹೊಂದಿಸಿ.";
+                }
+            });
+        });
+
+        function checkAct2Progress() {
+            const finished = document.querySelectorAll('#leftContainer .match-card.correct').length;
+            const fb = document.getElementById('fb2');
+            fb.style.display = "block";
+            if(finished === 6) {
+                fb.style.background = "#d4edda"; fb.style.color = "#27ae60";
+                fb.innerText = "✓ ಗ್ರೇಟ್! ಎಲ್ಲಾ 6 ಸುಧಾರಣೆಯ ನಾಯಕರು ಹಾಗೂ ಪ್ರಮುಖ ತತ್ವಗಳನ್ನು ಸರಿಯಾಗಿ ಜೋಡಿಸಿದ್ದೀರಿ.";
+            } else {
+                fb.style.background = "#e2e8f0"; fb.style.color = "#4a5568";
+                fb.innerText = `ಪ್ರಗತಿ: ${finished}/6 ಜೋಡಿಗಳು ಸರಿಯಾಗಿವೆ.`;
+            }
+        }
+
+        // --- Act 3: Flashcards Data (6 Items) ---
+        const flashcardData = [
+            { front: "ಪಾಪಪರಿಹಾರ ಪತ್ರ (Indulgences)", back: "ಕ್ಯಾಥೊಲಿಕ್ ಚರ್ಚ್ ಹಣಕ್ಕಾಗಿ ಜನರ ಪಾಪಗಳನ್ನು ಮನ್ನಿಸುವುದಾಗಿ ನಂಬಿಸಿ ಮಾರುತ್ತಿದ್ದ ಪತ್ರ." },
+            { front: "ಥೆಸಿಸ್ (95 Theses)", back: "ಮಾರ್ಟಿನ್ ಲೂಥರ್ ಚರ್ಚ್‌ನ ಮೂಢನಂಬಿಕೆಗಳ ವಿರುದ್ಧ ವಿಟ್ಟನ್‌ಬರ್ಗ್ ಚರ್ಚ್‌ನ ಬಾಗಿಲಿಗೆ ಅಂಟಿಸಿದ 95 ಖಂಡನಾ ಪ್ರಬಂಧಗಳು." },
+            { front: "ಹರ್ಟಿಕ್ಸ್ (Heretics)", back: "ಚರ್ಚ್ ಅಥವಾ ಪೋಪ್ ತತ್ವಗಳಿಗೆ ವಿರುದ್ಧವಾಗಿ ಮಾತನಾಡುವವರನ್ನು ಚರ್ಚ್ ಕರೆಯುತ್ತಿದ್ದ ಹೆಸರು (ಧರ್ಮದ್ರೋಹಿಗಳು)." },
+            { front: "ಪ್ರಾಟೆಸ್ಟಂಟ್ (Protestants)", back: "ಕ್ಯಾಥೊಲಿಕ್ ರೋಮನ್ ಪೋಪ್ ಅವರ ಸರ್ವಾಧಿಕಾರವನ್ನು ಪ್ರತಿಭಟಿಸಿ ಹುಟ್ಟಿಕೊಂಡ ಜ್ಞಾನಯುಕ್ತ ಹೊಸ ಕ್ರಿಶ್ಚಿಯನ್ ಪಂಥ." },
+            { front: "ಜೇಸುಯಿಟ್ಸ್ (Jesuits)", back: "ಕ್ಯಾಥೊಲಿಕ್ ಧರ್ಮದಲ್ಲಿ ಶಿಸ್ತು ಮತ್ತು ಶಿಕ್ಷಣ ತರಲು ಇಗ್ನೇಷಿಯಸ್ ಲೊಯೋಲಾ ಸ್ಥಾಪಿಸಿದ 'ಸೊಸೈಟಿ ಆಫ್ ಜೀಸಸ್' ಸಂಸ್ಥೆಯ ಸದಸ್ಯರು." },
+            { front: "ಕೌನ್ಸಿಲ್ ಆಫ್ ಟ್ರೆಂಟ್ (Council of Trent)", back: "ಕ್ಯಾಥೊಲಿಕ್ ಚರ್ಚ್‌ನೊಳಗಿನ ಆಚರಣೆಗಳನ್ನು ಶುದ್ಧೀಕರಿಸಲು ಪೋಪ್ ನೇತೃತ್ವದಲ್ಲಿ ನಡೆದ ಐತಿಹಾಸಿಕ ಧಾರ್ಮಿಕ ಸಭೆ." }
+        ];
+
+        let currentFcIdx = 0;
+        function loadFlashcard() {
+            document.getElementById('fCard').classList.remove('flipped');
+            document.getElementById('fcFront').innerText = flashcardData[currentFcIdx].front;
+            document.getElementById('fcBack').innerText = flashcardData[currentFcIdx].back;
+            document.getElementById('fcProgress').innerText = `ಕಾರ್ಡ್: ${currentFcIdx + 1}/${flashcardData.length}`;
+            
+            document.getElementById('fcPrev').disabled = (currentFcIdx === 0);
+            document.getElementById('fcNext').disabled = (currentFcIdx === flashcardData.length - 1);
+        }
+        
+        function flipCard() {
+            document.getElementById('fCard').classList.toggle('flipped');
+        }
+
+        function navigateFlashcard(dir, event) {
+            event.stopPropagation(); // Stop flipping when clicking buttons
+            currentFcIdx += dir;
+            loadFlashcard();
+        }
+        loadFlashcard();
+
+        // --- Act 4: Multiple Choice Quiz Data (6 Questions) ---
+        const mcqCollection = [
+            { q: "ಮಾರ್ಟಿನ್ ಲೂಥರ್ ತನ್ನ ಕ್ರಾಂತಿಕಾರಿ ಧರ್ಮ ಸುಧಾರಣಾ ಚಳುವಳಿಯನ್ನು ಯುರೋಪಿನ ಯಾವ ದೇಶದಲ್ಲಿ ಪ್ರಾರಂಭಿಸಿದನು?", opts: ["ಇಂಗ್ಲೆಂಡ್", "ಇಟಲಿ", "ಜರ್ಮನಿ", "ಫ್ರಾನ್ಸ್"], ans: 2 },
+            { q: "ಲೂಥರ್ ಬೈಬಲ್ ಅನ್ನು ಜರ್ಮನ್ ಭಾಷೆಗೆ ಭಾಷಾಂತರಿಸಲು ಮುಖ್ಯ ಕಾರಣವೇನು?", opts: ["ಲ್ಯಾಟಿನ್ ಭಾಷೆ ನಿಷೇಧವಾಗಿತ್ತು", "ಸಾಮಾನ್ಯ ಜನರಿಗೂ ಬೈಬಲ್ ಜ್ಞಾನ ಸ್ವತಂತ್ರವಾಗಿ ಸಿಗಲಿ ಎಂದು", "ರಾಜನ ಆಜ್ಞೆಯಾಗಿತ್ತು", "ಪೋಪ್ ಅವರ ಆದೇಶವಾಗಿತ್ತು"], ans: 1 },
+            { q: "ಪ್ರಾಟೆಸ್ಟಂಟ್ ಪಂಥದ ಉಗಮಕ್ಕೆ ಕಾರಣವಾದ ಮುಖ್ಯ ಅಂಶ ಯಾವುದು?", opts: ["ಹೊಸ ಭೂಪ್ರದೇಶಗಳ ಶೋಧ", "ಚರ್ಚ್‌ನ ಭ್ರಷ್ಟಾಚಾರ ಮತ್ತು ಮೂಢನಂಬಿಕೆಗಳ ವಿರೋಧ", "ಕೈಗಾರಿಕಾ ಕ್ರಾಂತಿ", "ರೋಮ್ ಸಾಮ್ರಾಜ್ಯದ ಪತನ"], ans: 1 },
+            { q: "ಕ್ಯಾಥೊಲಿಕ್ ಚರ್ಚ್ ತನ್ನನ್ನು ತಾನು ಸುಧಾರಿಸಿಕೊಳ್ಳಲು ಆರಂಭಿಸಿದ ಚಳುವಳಿಯನ್ನು ಏನೆಂದು ಕರೆಯುತ್ತಾರೆ?", opts: ["ಮಾನವತಾವಾದ", "ಪುನರುಜ್ಜೀವನ ಚಳುವಳಿ", "ಪ್ರತಿ ಧರ್ಮಸುಧಾರಣಾ ಚಳುವಳಿ (Counter-Reformation)", "ಫ್ರೆಂಚ್ ಕ್ರಾಂತಿ"], ans: 2 },
+            { q: "ಇಗ್ನೇಷಿಯಸ್ ಲೊಯೋಲಾ ಸ್ಥಾಪಿಸಿದ 'ಸೊಸೈಟಿ ಆಫ್ ಜೀಸಸ್' ಸಂಸ್ಥೆಯ ಮುಖ್ಯ ಉದ್ದೇಶ ಏನಾಗಿತ್ತು?", opts: ["ಹೊಸ ವ್ಯಾಪಾರ ಮಾರ್ಗ ಹುಡುಕುವುದು", "ಕ್ಯಾಥೊಲಿಕ್ ಧರ್ಮದ ರಕ್ಷಣೆ, ಸೌಹಾರ್ದತೆ ಮತ್ತು ಉಚಿತ ಶಿಕ್ಷಣ ನೀಡುವುದು", "ಯುದ್ಧಕ್ಕಾಗಿ ಸೈನ್ಯ ಕಟ್ಟುವುದು", "ರಾಜರನ್ನು ಪದಚ್ಯುತಗೊಳಿಸುವುದು"], ans: 1 },
+            { q: "ಧರ್ಮ ಸುಧಾರಣೆಯಿಂದಾಗಿ ರಾಜಕೀಯವಾಗಿ ಯುರೋಪಿನಲ್ಲಿ ಯಾವ ದೊಡ್ಡ ಬದಲಾವಣೆಯಾಯಿತು?", opts: ["ಪೋಪ್ ಅಧಿಕಾರ ಸಂಪೂರ್ಣ ಹೆಚ್ಚಾಯಿತು", "ಸಾಮಂತಶಾಹಿ ಪದ್ಧತಿ ಬಲವಾಯಿತು", "ರಾಷ್ಟ್ರೀಯ ಪ್ರಜ್ಞೆ ಬೆಳೆದು ರಾಜರ ಮತ್ತು ರಾಷ್ಟ್ರಗಳ ಸ್ವತಂತ್ರ ಶಕ್ತಿ ಹೆಚ್ಚಾಯಿತು", "ಪ್ರಜಾಪ್ರಭುತ್ವ ಸ್ಥಾಪನೆಯಾಯಿತು"], ans: 2 }
+        ];
+
+        let currentQuizIndex = 0;
+        function loadQuizQuestion() {
+            const activeQ = mcqCollection[currentQuizIndex];
+            document.getElementById('q-text').innerText = `${currentQuizIndex + 1}. ${activeQ.q}`;
+            const optWrapper = document.getElementById('q-options');
+            optWrapper.innerHTML = "";
+            document.getElementById('q-indicator').innerText = `ಪ್ರಶ್ನೆ: ${currentQuizIndex + 1}/${mcqCollection.length}`;
+
+            activeQ.opts.forEach((opt, idx) => {
+                const b = document.createElement('button');
+                b.className = "opt-btn";
+                b.innerText = opt;
+                b.onclick = () => verifyMCQ(idx, activeQ.ans, b);
+                optWrapper.appendChild(b);
+            });
+        }
+
+        function verifyMCQ(selected, right, element) {
+            const fb = document.getElementById('fb4'); fb.style.display = "block";
+            if(selected === right) {
+                element.classList.add('correct');
+                fb.innerHTML = "✓ ಅತ್ಯುತ್ತಮ ಉತ್ತರ! ನಿಮ್ಮ ವೈಚಾರಿಕ ಇತಿಹಾಸ ಜ್ಞಾನ ಸರಿಯಾಗಿದೆ.";
+                fb.style.background = "#d4edda"; fb.style.color = "#155724";
+                setTimeout(() => {
+                    if(currentQuizIndex < mcqCollection.length - 1) {
+                        currentQuizIndex++; loadQuizQuestion(); fb.style.display = "none";
+                    } else {
+                        fb.innerHTML = "🎉 ಅಭಿನಂದನೆಗಳು! ಧರ್ಮ ಸುಧಾರಣೆಯ ಎಲ್ಲಾ 6 ವೈಚಾರಿಕ ಕ್ವಿಜ್ ಪ್ರಶ್ನೆಗಳನ್ನು ಯಶಸ್ವಿಯಾಗಿ ಮುಗಿಸಿದ್ದೀರಿ.";
+                    }
+                }, 1500);
+            } else {
+                element.classList.add('wrong');
+                fb.innerHTML = "✗ ತಪ್ಪು ಉತ್ತರ. ಪಾಠದ ಅಂಶವನ್ನು ಮತ್ತೊಮ್ಮೆ ನೆನಪಿಸಿಕೊಳ್ಳಿ.";
+                fb.style.background = "#f8d7da"; fb.style.color = "#721c24";
+            }
+        }
+        loadQuizQuestion();
+
+        // --- Act 5: Blanks Validator (6 Dropdowns) ---
+        function checkBlanks() {
+            let miss = 0;
+            const selects = document.querySelectorAll('.blank-select');
+            selects.forEach(sel => {
+                if(sel.value !== sel.getAttribute('data-ans')) {
+                    miss++;
+                    sel.style.borderColor = "var(--error)";
+                } else {
+                    sel.style.borderColor = "var(--success)";
+                }
+            });
+            const fb = document.getElementById('fb5'); fb.style.display = "block";
+            if(miss === 0) {
+                fb.innerHTML = "✓ ಅದ್ಭುತ! ಧರ್ಮ ಸುಧಾರಣೆಯ ಜಾಗತಿಕ ಇತಿಹಾಸದ ಪರಿಣಾಮಗಳನ್ನು ಸಂಪೂರ್ಣವಾಗಿ ನಿಖರವಾಗಿ ವಿಶ್ಲೇಷಿಸಿದ್ದೀರಿ.";
+                fb.style.background = "#d4edda"; fb.style.color = "#155724";
+            } else {
+                fb.innerHTML = "✗ ಕೆಲವು ಇತಿಹಾಸದ ಪರಿಣಾಮಗಳ ಜಾಗದಲ್ಲಿ ತಪ್ಪು ಪದಗಳಿವೆ. ದಯವಿಟ್ಟು ಮರು ಪರಿಶೀಲಿಸಿ.";
+                fb.style.background = "#f8d7da"; fb.style.color = "#721c24";
+            }
+        }
+    </script>
+</body>
+</html>

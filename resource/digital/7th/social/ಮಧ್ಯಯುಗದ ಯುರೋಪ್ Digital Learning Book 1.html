@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಮಧ್ಯಯುಗದ ಯುರೋಪ್: ಪುನರುಜ್ಜೀವನ - Interactive Digital Book</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Noto+Serif+Kannada:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #1e112a, #3a1c5d, #5c348b);
+            --book-bg: #ffffff;
+            --primary-color: #5c2575;
+            --secondary-color: #0d7068;
+            --accent-color: #ff9f43;
+            --text-color: #2c3e50;
+            --success: #27ae60;
+            --error: #c0392b;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Poppins', 'Noto Serif Kannada', serif;
+            background: var(--bg-gradient);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-color);
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 20px;
+            text-shadow: 0 3px 6px rgba(0,0,0,0.4);
+        }
+        .header h1 { font-size: 2.2rem; color: #fff; }
+        .header p { font-size: 1.1rem; color: #f0e6ff; margin-top: 5px; }
+
+        /* Book Box */
+        .book-container {
+            width: 100%;
+            max-width: 950px;
+            background: var(--book-bg);
+            border-radius: 24px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+            border-left: 18px solid var(--primary-color);
+            min-height: 620px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-container { width: 100%; height: 6px; background: #eaedd0; }
+        .progress-bar { height: 100%; width: 20%; background: var(--accent-color); transition: width 0.4s ease; }
+
+        /* Page System */
+        .page { padding: 40px; flex: 1; display: none; animation: slidePage 0.4s ease-out; }
+        .page.active { display: block; }
+        @keyframes slidePage { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+
+        .page-title {
+            font-size: 1.6rem;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px dashed #ddd;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .instruction { font-size: 1.05rem; margin-bottom: 20px; color: #555; font-style: italic; }
+
+        /* Controls */
+        .book-controls {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px 40px;
+            background: #fdfbf7;
+            border-top: 1px solid #eedec4;
+        }
+        .btn {
+            padding: 12px 28px;
+            border: none;
+            border-radius: 40px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: bold;
+        }
+        .btn-prev { background: #e0e0e0; color: #333; }
+        .btn-next { background: var(--primary-color); color: white; }
+        .btn:hover:not(:disabled) { transform: translateY(-3px); box-shadow: 0 6px 15px rgba(0,0,0,0.2); }
+        .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+        .feedback { margin-top: 15px; padding: 15px; border-radius: 8px; font-weight: bold; display: none; }
+
+        /* Act 1: Matrix Matching */
+        .matching-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px; }
+        .match-left, .match-right { display: flex; flex-direction: column; gap: 10px; }
+        .match-card { padding: 12px 18px; background: #f8f9fa; border: 2px solid #e2e8f0; border-radius: 10px; cursor: pointer; text-align: left; transition: 0.2s; }
+        .match-card.selected { background: #e2d5f0; border-color: var(--primary-color); }
+        .match-card.correct { background: #d4edda; border-color: var(--success); color: #155724; cursor: default; }
+
+        /* Act 2: Classification Columns */
+        .columns-container { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-top: 15px; }
+        .col-box { background: #f7f9fa; border: 2px solid #ddd; border-radius: 12px; padding: 12px; min-height: 220px; }
+        .col-box h3 { text-align: center; margin-bottom: 12px; font-size: 1.1rem; color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; }
+        .col-art { border-color: #e74c3c; } .col-lit { border-color: #3498db; } .col-sci { border-color: #2ecc71; }
+        .item-bank { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 15px; background: #eee; padding: 12px; border-radius: 10px; }
+        .drag-chip { padding: 6px 12px; background: white; border: 1px solid #ccc; border-radius: 20px; cursor: grab; font-size: 0.9rem; }
+
+        /* Act 3: Chronology Timeline */
+        .v-timeline { display: flex; flex-direction: column; gap: 12px; margin-top: 15px; }
+        .t-row { display: flex; align-items: center; gap: 15px; background: #fdfdfd; padding: 10px; border-radius: 8px; border: 1px dashed #ccc; }
+        .t-index { width: 35px; height: 35px; background: var(--secondary-color); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+        .t-zone { flex: 1; min-height: 40px; background: #fff; border-radius: 6px; display: flex; align-items: center; padding-left: 10px; }
+
+        /* Act 4: Modern Multiple Choice Quiz */
+        .quiz-box { display: flex; flex-direction: column; gap: 12px; margin-top: 15px; }
+        .opt-btn { padding: 14px 20px; background: #f1f3f5; border: 2px solid #e9ecef; border-radius: 10px; cursor: pointer; text-align: left; font-size: 1rem; transition: 0.2s; }
+        .opt-btn:hover { background: #e9ecef; }
+        .opt-btn.correct { background: #d4edda; border-color: var(--success); color: #155724; }
+        .opt-btn.wrong { background: #f8d7da; border-color: var(--error); color: #721c24; }
+        .q-progress { font-weight: bold; margin-top: 10px; text-align: right; color: #666; }
+
+        /* Act 5: Interactive Text Lab Fillers */
+        .text-passage { background: #fffdf5; border: 1px solid #f3e5ab; padding: 25px; border-radius: 12px; font-size: 1.15rem; line-height: 2; margin-top: 15px; }
+        .blank-select { padding: 4px 8px; border: 2px solid var(--primary-color); border-radius: 6px; font-size: 1rem; font-weight: bold; color: var(--primary-color); background: white; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>ಪಾಠ 2: ಮಧ್ಯಯುಗದ ಯುರೋಪ್</h1>
+        <p>ಭಾಗ 1: ಪುನರುಜ್ಜೀವನ (The Renaissance) - Innovative Digital Book</p>
+    </div>
+
+    <div class="book-container">
+        <div class="progress-container">
+            <div class="progress-bar" id="progBar"></div>
+        </div>
+
+        <div class="page active" id="page1">
+            <div class="page-title"><i class="fa-solid fa-wand-magic-sparkles"></i> ಆಕ್ಟಿವಿಟಿ 1: ಸೃಷ್ಟಿಕರ್ತರು ಮತ್ತು ಕೃತಿಗಳ ಮಹಾಮಿಲನ</div>
+            <p class="instruction">ಎಡಭಾಗದ ಲೇಖಕರು/ಕಲಾವಿದರ ಹೆಸರನ್ನು ಕ್ಲಿಕ್ ಮಾಡಿ, ನಂತರ ಬಲಭಾಗದಲ್ಲಿರುವ ಅವರ ಸೂಕ್ತವಾದ ಕೃತಿಗೆ ಕ್ಲಿಕ್ ಮಾಡಿ ಜೋಡಿಸಿ (ಒಟ್ಟು 7 ಜೋಡಿಗಳು):</p>
+            
+            <div class="matching-grid">
+                <div class="match-left" id="leftContainer">
+                    <div class="match-card" data-id="1">ಲಿಯೋನಾರ್ಡೊ ಡಾ ವಿಂಚಿ</div>
+                    <div class="match-card" data-id="2">ಮೈಕೆಲ್ಯಾಂಜೆಲೋ</div>
+                    <div class="match-card" data-id="3">ಡಾಂಟೆ</div>
+                    <div class="match-card" data-id="4">ಷೇಕ್ಸ್‌ಪಿಯರ್</div>
+                    <div class="match-card" data-id="5">ಮಕಿಯಾವೆಲ್ಲಿ</div>
+                    <div class="match-card" data-id="6">ಥಾಮಸ್ ಮೂರ್</div>
+                    <div class="match-card" data-id="7">ರಾಫೆಲ್</div>
+                </div>
+                <div class="match-right" id="rightContainer">
+                    <div class="match-card" data-match="3">ಡಿವೈನ್ ಕಾಮೆಡಿ (ಸಾಹಿತ್ಯ)</div>
+                    <div class="match-card" data-match="1">ಮೊನಾಲಿಸಾ / ಕೊನೆಯ ಔತಣ (ಚಿತ್ರಕಲೆ)</div>
+                    <div class="match-card" data-match="5">ದಿ ಪ್ರಿನ್ಸ್ (ರಾಜಕೀಯ ಸಾಹಿತ್ಯ)</div>
+                    <div class="match-card" data-match="2">ಕೊನೆಯ ತೀರ್ಪು / ದ ಮಡೋನಾ (ಶಿಲ್ಪಕಲೆ)</div>
+                    <div class="match-card" data-match="6">ಯುಟೋಪಿಯಾ (ಕೃತಿ)</div>
+                    <div class="match-card" data-match="4">ರೋಮಿಯೋ ಅಂಡ್ ಜೂಲಿಯೆಟ್ (ನಾಟಕ)</div>
+                    <div class="match-card" data-match="7">ಸಿಸ್ಟೈನ್ ಮೆಡೋನಾ (ಚಿತ್ರಕಲೆ)</div>
+                </div>
+            </div>
+            <div class="feedback" id="fb1"></div>
+        </div>
+
+        <div class="page" id="page2">
+            <div class="page-title"><i class="fa-solid fa-grip"></i> ಆಕ್ಟಿವಿಟಿ 2: ಜ್ಞಾನ ಶಾಖೆಗಳ ವರ್ಗೀಕರಣ ಕೋಷ್ಟಕ</div>
+            <p class="instruction">ಕೆಳಗಿರುವ ಮಹನೀಯರ ಸಾಧನೆಗಳನ್ನು ಅವುಗಳಿಗೆ ಸಂಬಂಧಿಸಿದ ಸರಿಯಾದ ಜ್ಞಾನ ಕ್ಷೇತ್ರಕ್ಕೆ (ಕಲೆ, ಸಾಹಿತ್ಯ, ವಿಜ್ಞಾನ) ಡ್ರಾಗ್ ಮಾಡಿ ವರ್ಗೀಕರಿಸಿ:</p>
+            
+            <div class="columns-container">
+                <div class="col-box col-art" id="boxArt" data-cat="art"><h3>ಚಿತ್ರಕಲೆ / ಶಿಲ್ಪಕಲೆ</h3></div>
+                <div class="col-box col-lit" id="boxLit" data-cat="lit"><h3>ಸಾಹಿತ್ಯ ಕ್ಷೇತ್ರ</h3></div>
+                <div class="col-box col-sci" id="boxSci" data-cat="sci"><h3>ಆಧುನಿಕ ವಿಜ್ಞಾನ</h3></div>
+            </div>
+
+            <div class="item-bank" id="dragBank2">
+                <div class="drag-chip" draggable="true" id="c1" data-target="art">ಫ್ರಾನ್ಸಿಸ್ಕೋ ಪೆಟ್ರಾಕ್ (ಚಿತ್ರಗಳು)</div>
+                <div class="drag-chip" draggable="true" id="c2" data-target="lit">ಜಾಫ್ರಿ ಚಾಸರ್ (ಕ್ಯಾಂಟರ್‌ಬರಿ ಟೇಲ್ಸ್)</div>
+                <div class="drag-chip" draggable="true" id="c3" data-target="sci">ಕೋಪರ್ನಿಕಸ್ (ಸೂರ್ಯ ಕೇಂದ್ರ ಸಿದ್ಧಾಂತ)</div>
+                <div class="drag-chip" draggable="true" id="c4" data-target="sci">ಗೆಲಿಲಿಯೋ (ದೂರದರ್ಶಕ ಆವಿಷ್ಕಾರ)</div>
+                <div class="drag-chip" draggable="true" id="c5" data-target="art">ಡೊನಾಟೆಲ್ಲೊ (ಕಂಸದ ಶಿಲ್ಪಕಲೆ)</div>
+                <div class="drag-chip" draggable="true" id="c6" data-target="lit">ಬೊಕಾಸಿಯೋ (ಡಿಕಾಮರಾನ್ ಕಥೆಗಳು)</div>
+            </div>
+            <button class="btn" style="background:var(--accent-color); color:white; margin-top:15px;" onclick="checkColumns()">ವರ್ಗೀಕರಣ ಪರಿಶೀಲಿಸಿ</button>
+            <div class="feedback" id="fb2"></div>
+        </div>
+
+        <div class="page" id="page3">
+            <div class="page-title"><i class="fa-solid fa-arrow-down-1-9"></i> ಆಕ್ಟಿವಿಟಿ 3: ಪುನರುಜ್ಜೀವನದ ವೈಚಾರಿಕ ಬೆಳವಣಿಗೆಯ ಕ್ರಮ</div>
+            <p class="instruction">ವೈಚಾರಿಕ ಜಾಗೃತಿ ಉಂಟಾದ ಹಂತಗಳನ್ನು ಮೊದಲಿನಿಂದ ಕೊನೆಯ ಹಂತದವರೆಗೆ ಸರಿಯಾದ ತಾರ್ಕಿಕ ಕ್ರಮದಲ್ಲಿ ಜೋಡಿಸಿ:</p>
+            
+            <div class="v-timeline">
+                <div class="t-row"><div class="t-index">1</div><div class="t-zone" id="z1" data-order="ಕಾನ್‌ಸ್ಟಂಟಿನೋಪಲ್ ಪತನದಿಂದ ವಿದ್ವಾಂಸರ ವಲಸೆ"></div></div>
+                <div class="t-row"><div class="t-index">2</div><div class="t-zone" id="z2" data-order="ಗ್ರೀಕ್-ರೋಮನ್ ಪ್ರಾಚೀನ ಸಾಹಿತ್ಯದ ಪುನರುತ್ಥಾನ"></div></div>
+                <div class="t-row"><div class="t-index">3</div><div class="t-zone" id="z3" data-order="ಮಾನವತಾವಾದದ (Humanism) ಉಗಮ"></div></div>
+                <div class="t-row"><div class="t-index">4</div><div class="t-zone" id="z4" data-order="ಜಾನ್ ಗುಟೆನ್‌ಬರ್ಗ್‌ನಿಂದ ಮುದ್ರಣ ಯಂತ್ರದ ಶೋಧ"></div></div>
+                <div class="t-row"><div class="t-index">5</div><div class="t-zone" id="z5" data-order="ಪ್ರಾದೇಶಿಕ ಭಾಷೆಗಳಲ್ಲಿ ಸಾಹಿತ್ಯ ರಚನೆ"></div></div>
+                <div class="t-row"><div class="t-index">6</div><div class="t-zone" id="z6" data-order="ಮೂಢನಂಬಿಕೆಗಳ ವಿರೋಧ ಮತ್ತು ವೈಜ್ಞಾನಿಕ ದೃಷ್ಟಿಕೋನ"></div></div>
+            </div>
+
+            <div class="item-bank" id="dragBank3">
+                <div class="drag-chip" draggable="true" id="t1">ಮಾನವತಾವಾದದ (Humanism) ಉಗಮ</div>
+                <div class="drag-chip" draggable="true" id="t2">ಕಾನ್‌ಸ್ಟಂಟಿನೋಪಲ್ ಪತನದಿಂದ ವಿದ್ವಾಂಸರ ವಲಸೆ</div>
+                <div class="drag-chip" draggable="true" id="t3">ಜಾನ್ ಗುಟೆನ್‌ಬರ್ಗ್‌ನಿಂದ ಮುದ್ರಣ ಯಂತ್ರದ ಶೋಧ</div>
+                <div class="drag-chip" draggable="true" id="t4">ಮೂಢನಂಬಿಕೆಗಳ ವಿರೋಧ ಮತ್ತು ವೈಜ್ಞಾನಿಕ ದೃಷ್ಟಿಕೋನ</div>
+                <div class="drag-chip" draggable="true" id="t5">ಗ್ರೀಕ್-ರೋಮನ್ ಪ್ರಾಚೀನ ಸಾಹಿತ್ಯದ ಪುನರುತ್ಥಾನ</div>
+                <div class="drag-chip" draggable="true" id="t6">ಪ್ರಾದೇಶಿಕ ಭಾಷೆಗಳಲ್ಲಿ ಸಾಹಿತ್ಯ ರಚನೆ</div>
+            </div>
+            <button class="btn" style="background:var(--accent-color); color:white; margin-top:15px;" onclick="checkTimeline()">ಕ್ರಮವನ್ನು ಖಚಿತಪಡಿಸಿ</button>
+            <div class="feedback" id="fb3"></div>
+        </div>
+
+        <div class="page" id="page4">
+            <div class="page-title"><i class="fa-solid fa-brain"></i> ಆಕ್ಟಿವಿಟಿ 4: ವಿಚಾರವಾದ ಮತ್ತು ವೈಜ್ಞಾನಿಕ ಮನೋಭಾವ ಕ್ವಿಜ್</div>
+            <p id="q-text" style="font-size:1.2rem; margin-bottom:15px; font-weight:bold;">ಪ್ರಶ್ನೆ ಲೋಡ್ ಆಗುತ್ತಿದೆ...</p>
+            <div class="quiz-box" id="q-options"></div>
+            <div class="q-progress" id="q-indicator">ಪ್ರಶ್ನೆ: 1/6</div>
+            <div class="feedback" id="fb4"></div>
+        </div>
+
+        <div class="page" id="page5">
+            <div class="page-title"><i class="fa-solid fa-feather-pointed"></i> ಆಕ್ಟಿವಿಟಿ 5: ಪುನರುಜ್ಜೀವನದ ಪರಿಣಾಮಗಳ ಇತಿಹಾಸ ಲೇಖನ</div>
+            <p class="instruction">ಪುನರುಜ್ಜೀವನದ ಪ್ರಮುಖ ಲಕ್ಷಣಗಳು ಹಾಗೂ ಪರಿಣಾಮಗಳ ಕುರಿತಾದ ಈ ಕೆಳಗಿನ ಪ್ಯಾರಾಗ್ರಾಫ್ ಅನ್ನು ಸೂಕ್ತವಾದ ಆಯ್ಕೆಗಳ ಮೂಲಕ ಪೂರ್ಣಗೊಳಿಸಿ:</p>
+            
+            <div class="text-passage">
+                ಯುರೋಪಿನಲ್ಲಿ ಪುನರುಜ್ಜೀವನದ ಪಿತಾಮಹ ಎಂದು 
+                <select class="blank-select" id="b1" data-ans="ಪೆಟ್ರಾಕ್"><option value="">--ಆಯ್ಕೆ ಮಾಡಿ--</option><option>ಡಾಂಟೆ</option><option>ಪೆಟ್ರಾಕ್</option><option>ಗೆಲಿಲಿಯೋ</option></select> 
+                ಅವರನ್ನು ಕರೆಯಲಾಗುತ್ತದೆ. ಇವರು ಮಾನವನ ಸ್ವತಂತ್ರ ವಿಚಾರಗಳಿಗೆ ಮಹತ್ವ ನೀಡಿದ 
+                <select class="blank-select" id="b2" data-ans="ಮಾನವತಾವಾದ"><option value="">--ಆಯ್ಕೆ ಮಾಡಿ--</option><option>ಮಾನವತಾವಾದ</option><option>ಧರ್ಮಯುದ್ಧ</option><option>ಸಾಮಂತಶಾಹಿ</option></select> 
+                ಚಿಂತನೆಯನ್ನು ಬೆಳೆಸಿದರು. ಈ ಕಾಲದಲ್ಲಿ ಕೇವಲ ಲ್ಯಾಟಿನ್ ಭಾಷೆಯಲ್ಲದೆ ಇಟಾಲಿಯನ್, ಜರ್ಮನ್ ನಂತಹ 
+                <select class="blank-select" id="b3" data-ans="ಪ್ರಾದೇಶಿಕ ಭಾಷೆ"><option value="">--ಆಯ್ಕೆ ಮಾಡಿ--</option><option>ಪ್ರಾಚೀನ ಭಾಷೆ</option><option>ಪ್ರಾದೇಶಿಕ ಭಾಷೆ</option><option>ದೇವಭಾಷೆ</option></select> 
+                ಸಾಹಿತ್ಯಕ್ಕೆ ಹೆಚ್ಚಿನ ಒತ್ತು ಸಿಕ್ಕಿತು. ವಿಜ್ಞಾನ ಕ್ಷೇತ್ರದಲ್ಲಿ ಐಸಾಕ್ ನ್ಯೂಟನ್ ರವರು 
+                <select class="blank-select" id="b4" data-ans="ಗುರುತ್ವಾಕರ್ಷಣ ನಿಯಮ"><option value="">--ಆಯ್ಕೆ ಮಾಡಿ--</option><option>ರಕ್ತ ಪರಿಚಲನೆ</option><option>ಗುರುತ್ವಾಕರ್ಷಣ ನಿಯಮ</option><option>ದೂರದರ್ಶಕ ನಿಯಮ</option></select> 
+                ಕಂಡುಹಿಡಿದರೆ, ವಿಲಿಯಂ ಹಾರ್ವೆ ಮಾನವನ ದೇಹದ 
+                <select class="blank-select" id="b5" data-ans="ರಕ್ತ ಪರಿಚಲನೆ"><option value="">--ಆಯ್ಕೆ ಮಾಡಿ--</option><option>ಅಸ್ಥಿಪಂಜರ</option><option>ರಕ್ತ ಪರಿಚಲನೆ</option><option>ನರಮಂಡಲ</option></select> 
+                ಪ್ರಕ್ರಿಯೆಯನ್ನು ಜಗತ್ತಿಗೆ ವಿವರಿಸಿದರು. ಒಟ್ಟಾರೆಯಾಗಿ ಪುನರುಜ್ಜೀವನವು ಮಾನವನಲ್ಲಿ ಕುರುಡು ನಂಬಿಕೆಗಳ ಬದಲಾಗಿ 
+                <select class="blank-select" id="b6" data-ans="ವಿಚಾರವಾದ"><option value="">--ಆಯ್ಕೆ ಮಾಡಿ--</option><option>ಮೂಢನಂಬಿಕೆ</option><option>ವಿಚಾರವಾದ</option><option>ರೂಢಿ ಸಂಪ್ರದಾಯ</option></select> 
+                ಮತ್ತು ಜ್ಞಾನದ ಹೊಸ ಹಾದಿಯನ್ನು ಸೃಷ್ಟಿಸಿತು.
+            </div>
+            <button class="btn" style="background:var(--accent-color); color:white; margin-top:20px;" onclick="checkBlanks()">ಇತಿಹಾಸ ಲೇಖನ ಪರಿಶೀಲಿಸಿ</button>
+            <div class="feedback" id="fb5"></div>
+        </div>
+
+        <div class="book-controls">
+            <button class="btn btn-prev" id="prevPageBtn" onclick="movePage(-1)" disabled><i class="fa-solid fa-book-open"></i> ಹಿಂದಿನ ಪುಟ</button>
+            <button class="btn btn-next" id="nextPageBtn" onclick="movePage(1)">ಮುಂದಿನ ಪುಟ <i class="fa-solid fa-book"></i></button>
+        </div>
+    </div>
+
+    <script>
+        let pageIdx = 1;
+        const maxPages = 5;
+
+        function movePage(dir) {
+            document.getElementById(`page${pageIdx}`).classList.remove('active');
+            pageIdx += dir;
+            document.getElementById(`page${pageIdx}`).classList.add('active');
+
+            document.getElementById('prevPageBtn').disabled = (pageIdx === 1);
+            document.getElementById('nextPageBtn').disabled = (pageIdx === maxPages);
+
+            document.getElementById('progBar').style.width = `${(pageIdx / maxPages) * 100}%`;
+        }
+
+        // --- Act 1: Matching Logic ---
+        let selectedLeft = null;
+        const leftCards = document.querySelectorAll('#leftContainer .match-card');
+        const rightCards = document.querySelectorAll('#rightContainer .match-card');
+
+        leftCards.forEach(card => {
+            card.addEventListener('click', () => {
+                if(card.classList.contains('correct')) return;
+                leftCards.forEach(c => c.classList.remove('selected'));
+                card.classList.add('selected');
+                selectedLeft = card;
+            });
+        });
+
+        rightCards.forEach(card => {
+            card.addEventListener('click', () => {
+                if(card.classList.contains('correct') || !selectedLeft) return;
+                const matchId = card.getAttribute('data-match');
+                const leftId = selectedLeft.getAttribute('data-id');
+
+                if(matchId === leftId) {
+                    card.classList.add('correct');
+                    selectedLeft.classList.add('correct');
+                    selectedLeft.classList.remove('selected');
+                    selectedLeft = null;
+                    checkAct1Progress();
+                } else {
+                    const fb = document.getElementById('fb1');
+                    fb.style.display = "block"; fb.style.background = "#f8d7da"; fb.style.color = "#c0392b";
+                    fb.innerText = "✗ ತಪ್ಪು ಜೋಡಿ! ದಯವಿಟ್ಟು ಸರಿಯಾದ ಉತ್ತರವನ್ನು ಆಲೋಚಿಸಿ ಹೊಂದಿಸಿ.";
+                }
+            });
+        });
+
+        function checkAct1Progress() {
+            const finished = document.querySelectorAll('#leftContainer .match-card.correct').length;
+            const fb = document.getElementById('fb1');
+            fb.style.display = "block";
+            if(finished === 7) {
+                fb.style.background = "#d4edda"; fb.style.color = "#27ae60";
+                fb.innerText = "✓ ಅದ್ಭುತ! ನೀವು ಎಲ್ಲಾ 7 ಪುನರುಜ್ಜೀವನದ ಸೃಷ್ಟಿಕರ್ತರು ಮತ್ತು ಕೃತಿಗಳನ್ನು ನಿಖರವಾಗಿ ಜೋಡಿಸಿದ್ದೀರಿ.";
+            } else {
+                fb.style.background = "#e2e8f0"; fb.style.color = "#4a5568";
+                fb.innerText = `ಪ್ರಗತಿ: ${finished}/7 ಜೋಡಿಗಳು ಸರಿಯಾಗಿವೆ.`;
+            }
+        }
+
+        // --- Drag & Drop Generic Infrastructure ---
+        let currentDraggingItem = null;
+        document.querySelectorAll('.drag-chip').forEach(chip => {
+            chip.addEventListener('dragstart', () => { currentDraggingItem = chip; });
+        });
+
+        const dropBoxes = document.querySelectorAll('.col-box, .t-zone');
+        dropBoxes.forEach(box => {
+            box.addEventListener('dragover', (e) => e.preventDefault());
+            box.addEventListener('drop', () => {
+                if(currentDraggingItem) { box.appendChild(currentDraggingItem); }
+            });
+        });
+
+        // Act 2 Validator
+        function checkColumns() {
+            let faults = 0;
+            const chips = document.querySelectorAll('#dragBank2 .drag-chip');
+            chips.forEach(chip => {
+                const currentParent = chip.parentElement;
+                if(currentParent.classList.contains('col-box')) {
+                    if(chip.getAttribute('data-target') !== currentParent.getAttribute('data-cat')) faults++;
+                } else { faults++; }
+            });
+            const fb = document.getElementById('fb2'); fb.style.display = "block";
+            if(faults === 0) {
+                fb.innerHTML = "✓ ಸೂಪರ್! ಕಲೆ, ಸಾಹಿತ್ಯ ಮತ್ತು ವಿಜ್ಞಾನಿಗಳನ್ನು ನಿಖರ ಕೋಷ್ಟಕಕ್ಕೆ ವರ್ಗೀಕರಿಸಲಾಗಿದೆ.";
+                fb.style.background = "#d4edda"; fb.style.color = "#155724";
+            } else {
+                fb.innerHTML = "✗ ಕೆಲವು ಸಾಧಕರು ತಪ್ಪಾದ ಜ್ಞಾನ ಕ್ಷೇತ್ರದಲ್ಲಿದ್ದಾರೆ. ದಯವಿಟ್ಟು ಮರು ಪರಿಶೀಲಿಸಿ.";
+                fb.style.background = "#f8d7da"; fb.style.color = "#721c24";
+            }
+        }
+
+        // Act 3 Validator
+        function checkTimeline() {
+            let correctCount = 0;
+            for(let i=1; i<=6; i++) {
+                const zone = document.getElementById(`z${i}`);
+                if(zone.firstChild && zone.firstChild.innerText.trim() === zone.getAttribute('data-order')) {
+                    correctCount++;
+                }
+            }
+            const fb = document.getElementById('fb3'); fb.style.display = "block";
+            if(correctCount === 6) {
+                fb.innerHTML = "✓ ಪರಿಪೂರ್ಣ! ವೈಚಾರಿಕ ಮತ್ತು ವೈಜ್ಞಾನಿಕ ಬೆಳವಣಿಗೆಯ ಇತಿಹಾಸದ ಕ್ರಮ ಸರಿಯಾಗಿದೆ.";
+                fb.style.background = "#d4edda"; fb.style.color = "#155724";
+            } else {
+                fb.innerHTML = `✗ ${correctCount}/6 ಹಂತಗಳು ಸರಿಯಾಗಿವೆ. ಪುನರುಜ್ಜೀವನದ ಸರಿಯಾದ ತಾರ್ಕಿಕ ಕ್ರಮ ಯೋಚಿಸಿ.`;
+                fb.style.background = "#f8d7da"; fb.style.color = "#721c24";
+            }
+        }
+
+        // --- Act 4: Modern Quiz Data (6 Questions) ---
+        const mcqCollection = [
+            { q: "ಯುರೋಪಿನಲ್ಲಿ 'ಪುನರುಜ್ಜೀವನ' (Renaissance) ಎಂದರೆ ಮುಖ್ಯವಾಗಿ ಏನು?", opts: ["ಹೊಸ ಧರ್ಮ ಸ್ಥಾಪನೆ", "ಮರುಹುಟ್ಟು ಅಥವಾ ನವಜಾಗೃತಿ", "ಕೈಗಾರಿಕೆಗಳ ಸ್ಥಾಪನೆ", "ರಾಜಪ್ರಭುತ್ವದ ವಿಸ್ತರಣೆ"], ans: 1 },
+            { q: "ಪುನರುಜ್ಜೀವನ ಚಳುವಳಿಯು ಮೊಟ್ಟಮೊದಲಿಗೆ ಯುರೋಪಿನ ಯಾವ ದೇಶದಲ್ಲಿ ಆರಂಭವಾಯಿತು?", opts: ["ಇಂಗ್ಲೆಂಡ್", "ಫ್ರಾನ್ಸ್", "ಇಟಲಿ", "ಜರ್ಮನಿ"], ans: 2 },
+            { q: "ವಿಜ್ಞಾನಿ ಗೆಲಿಲಿಯೋ ದೂರದರ್ಶಕ ಯಂತ್ರ ಬಳಸಿ ಯಾವ ಸಿದ್ಧಾಂತವನ್ನು ಸಮರ್ಥಿಸಿದರು?", opts: ["ಭೂ ಕೇಂದ್ರ ಸಿದ್ಧಾಂತ", "ಸೂರ್ಯ ಕೇಂದ್ರ ಸಿದ್ಧಾಂತ", "ಗುರುತ್ವಾಕರ್ಷಣ ಸಿದ್ಧಾಂತ", "ಖಂಡಾಂತರ ಚಲನೆ"], ans: 1 },
+            { q: "ಇಟಲಿಯ ಫ್ಲಾರೆನ್ಸ್ ನಗರದಲ್ಲಿ ಯಾವ ಹೊಸ ಚಿಂತನೆಗೆ ವಿದ್ವಾಂಸರು ಅಡಿಪಾಯ ಹಾಕಿದರು?", opts: ["ಮೂಢನಂಬಿಕೆ ವಾದ", "ಸಾಮಂತಶಾಹಿ ಪದ್ಧತಿ", "ಮಾನವತಾವಾದ", "ವ್ಯಾಪಾರೀಕರಣ"], ans: 2 },
+            { q: "ವೆನಿಸ್ ಮತ್ತು ಜಿನೋವಾ ನಗರಗಳು ಯಾವುದರ ಕೇಂದ್ರಗಳಾಗಿ ಪುನರುಜ್ಜೀವನಕ್ಕೆ ಕಾರಣವಾದವು?", opts: ["ಕೃಷಿ ಕೇಂದ್ರಗಳು", "ವ್ಯಾಪಾರ ಮತ್ತು ಸಾಂಸ್ಕೃತಿಕ ವಿನಿಮಯ ಕೇಂದ್ರಗಳು", "ಯುದ್ಧ ತರಬೇತಿ ಕೇಂದ್ರಗಳು", "ಧಾರ್ಮಿಕ ಪೀಠಗಳು"], ans: 1 },
+            { q: "ಪುನರುಜ್ಜೀವನ ಕಾಲದ ಕಲೆಯ ಮುಖ್ಯ ಲಕ್ಷಣ ಏನಿತ್ತು?", opts: ["ಕೇವಲ ಧಾರ್ಮಿಕ ಚೌಕಟ್ಟು", "ನೈಜತೆ ಹಾಗೂ ಮಾನವ ಭಾವನೆಗಳ ಅಭಿವ್ಯಕ್ತಿ", "ಕಾಲ್ಪನಿಕ ಯುದ್ಧದ ದೃಶ್ಯಗಳು", "ಅಸ್ಪಷ್ಟ ರೇಖಾಚಿತ್ರಗಳು"], ans: 1 }
+        ];
+
+        let currentQuizIndex = 0;
+        function loadQuizQuestion() {
+            const activeQ = mcqCollection[currentQuizIndex];
+            document.getElementById('q-text').innerText = `${currentQuizIndex + 1}. ${activeQ.q}`;
+            const optWrapper = document.getElementById('q-options');
+            optWrapper.innerHTML = "";
+            document.getElementById('q-indicator').innerText = `ಪ್ರಶ್ನೆ: ${currentQuizIndex + 1}/${mcqCollection.length}`;
+
+            activeQ.opts.forEach((opt, idx) => {
+                const b = document.createElement('button');
+                b.className = "opt-btn";
+                b.innerText = opt;
+                b.onclick = () => verifyMCQ(idx, activeQ.ans, b);
+                optWrapper.appendChild(b);
+            });
+        }
+
+        function verifyMCQ(selected, right, element) {
+            const fb = document.getElementById('fb4'); fb.style.display = "block";
+            if(selected === right) {
+                element.classList.add('correct');
+                fb.innerHTML = "✓ ಅತ್ಯುತ್ತಮ! ಸರಿಯಾದ ಜ್ಞಾನಾಧಾರಿತ ಉತ್ತರ.";
+                fb.style.background = "#d4edda"; fb.style.color = "#155724";
+                setTimeout(() => {
+                    if(currentQuizIndex < mcqCollection.length - 1) {
+                        currentQuizIndex++; loadQuizQuestion(); fb.style.display = "none";
+                    } else {
+                        fb.innerHTML = "🎉 ಅದ್ಭುತ! ವಿಚಾರವಾದ ಮತ್ತು ವೈಜ್ಞಾನಿಕ ಮನೋಭಾವದ ಎಲ್ಲಾ 6 ಪ್ರಶ್ನೆಗಳನ್ನು ಗೆದ್ದಿದ್ದೀರಿ.";
+                    }
+                }, 1500);
+            } else {
+                element.classList.add('wrong');
+                fb.innerHTML = "✗ ತಪ್ಪು ಉತ್ತರ. ಸರಿಯಾದ ಐತಿಹಾಸಿಕ ಸಾಕ್ಷ್ಯವನ್ನು ನೆನಪಿಸಿಕೊಳ್ಳಿ.";
+                fb.style.background = "#f8d7da"; fb.style.color = "#721c24";
+            }
+        }
+        loadQuizQuestion();
+
+        // --- Act 5: Interactive Text Lab Fillers ---
+        function checkBlanks() {
+            let miss = 0;
+            const selects = document.querySelectorAll('.blank-select');
+            selects.forEach(sel => {
+                if(sel.value !== sel.getAttribute('data-ans')) {
+                    miss++;
+                    sel.style.borderColor = "var(--error)";
+                } else {
+                    sel.style.borderColor = "var(--success)";
+                }
+            });
+            const fb = document.getElementById('fb5'); fb.style.display = "block";
+            if(miss === 0) {
+                fb.innerHTML = "✓ ಅಭಿನಂದನೆಗಳು! ಪುನರುಜ್ಜೀವನದ ಪರಿಣಾಮಗಳ ಇತಿಹಾಸದ ಪ್ಯಾರಾಗ್ರಾಫ್ ಅನ್ನು ಸಂಪೂರ್ಣವಾಗಿ ಸರಿಯಾಗಿ ಬರೆದಿದ್ದೀರಿ.";
+                fb.style.background = "#d4edda"; fb.style.color = "#155724";
+            } else {
+                fb.innerHTML = "✗ ಕೆಲವು ಖಾಲಿ ಜಾಗಗಳಲ್ಲಿ ತಪ್ಪು ಪದಗಳಿವೆ. ದಯವಿಟ್ಟು ಬದಲಾವಣೆ ಮಾಡಿ ಪರಿಶೀಲಿಸಿ.";
+                fb.style.background = "#f8d7da"; fb.style.color = "#721c24";
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಮಧ್ಯಯುಗದ ಯುರೋಪ್: ಭೌಗೋಳಿಕ ಅನ್ವೇಷಣೆಗಳು - Interactive Digital Book</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght=300;400;600;700&family=Noto+Serif+Kannada:wght=400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #0b1e36, #1f4068, #16a085);
+            --book-bg: #ffffff;
+            --primary-color: #0f3057;
+            --secondary-color: #008891;
+            --accent-color: #e43f5a;
+            --text-color: #1b1b2f;
+            --success: #27ae60;
+            --error: #c0392b;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Poppins', 'Noto Serif Kannada', serif;
+            background: var(--bg-gradient);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-color);
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 20px;
+            text-shadow: 0 3px 6px rgba(0,0,0,0.4);
+        }
+        .header h1 { font-size: 2.2rem; color: #fff; }
+        .header p { font-size: 1.1rem; color: #e1f5fe; margin-top: 5px; }
+
+        /* Book Box */
+        .book-container {
+            width: 100%;
+            max-width: 950px;
+            background: var(--book-bg);
+            border-radius: 24px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+            border-left: 18px solid var(--primary-color);
+            min-height: 630px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-container { width: 100%; height: 6px; background: #e0e0e0; }
+        .progress-bar { height: 100%; width: 20%; background: var(--accent-color); transition: width 0.4s ease; }
+
+        /* Page System */
+        .page { padding: 40px; flex: 1; display: none; animation: slidePage 0.4s ease-out; }
+        .page.active { display: block; }
+        @keyframes slidePage { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+
+        .page-title {
+            font-size: 1.6rem;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px dashed #ddd;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .instruction { font-size: 1.05rem; margin-bottom: 20px; color: #555; font-style: italic; }
+
+        /* Controls Links */
+        .book-controls {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px 40px;
+            background: #f8f9fa;
+            border-top: 1px solid #ddd;
+        }
+        .btn {
+            padding: 12px 28px;
+            border: none;
+            border-radius: 40px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: bold;
+        }
+        .btn-prev { background: #e0e0e0; color: #333; }
+        .btn-next { background: var(--primary-color); color: white; }
+        .btn:hover:not(:disabled) { transform: translateY(-3px); box-shadow: 0 6px 15px rgba(0,0,0,0.2); }
+        .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+        .feedback { margin-top: 15px; padding: 15px; border-radius: 8px; font-weight: bold; display: none; }
+
+        /* Act 1: Drag & Drop Matching (6 Items) */
+        .matching-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px; }
+        .match-left, .match-right { display: flex; flex-direction: column; gap: 10px; }
+        .match-card { padding: 12px 18px; background: #f8f9fa; border: 2px solid #e2e8f0; border-radius: 10px; cursor: pointer; text-align: left; transition: 0.2s; }
+        .match-card.selected { background: #e1f5fe; border-color: var(--secondary-color); }
+        .match-card.correct { background: #d4edda; border-color: var(--success); color: #155724; cursor: default; }
+
+        /* Act 2: Map Labels Explorer Simulation (6 Pins) */
+        .map-wrapper { position: relative; width: 100%; height: 320px; background: #b2dfdb; border-radius: 15px; margin-top: 15px; border: 2px solid #00695c; background-image: radial-gradient(#80cbc4 1px, transparent 1px); background-size: 20px 20px; }
+        .map-pin { position: absolute; width: 35px; height: 35px; background: var(--accent-color); border-radius: 50% 50% 50% 0; transform: rotate(-45deg); display: flex; align-items: center; justify-content: center; color: white; cursor: pointer; box-shadow: -2px 2px 4px rgba(0,0,0,0.3); }
+        .map-pin span { transform: rotate(45deg); font-size: 0.85rem; font-weight: bold; }
+        .map-labels-container { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 15px; }
+        .map-label-opt { padding: 8px 15px; background: white; border: 2px solid var(--secondary-color); border-radius: 6px; cursor: pointer; font-weight: bold; }
+        .map-label-opt.selected { background: var(--secondary-color); color: white; }
+
+        /* Act 3: Discovery Instruments Grid (6 Items) */
+        .inst-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 15px; }
+        .inst-card { background: #fdfbf7; border: 2px solid #eedec4; padding: 20px; text-align: center; border-radius: 15px; cursor: pointer; transition: 0.3s; }
+        .inst-card:hover { transform: scale(1.04); background: #fdf6e2; }
+        .inst-card i { font-size: 2.5rem; color: var(--secondary-color); margin-bottom: 12px; }
+
+        /* Act 4: Modern Intelligence MCQ Quiz (6 Questions) */
+        .quiz-box { display: flex; flex-direction: column; gap: 12px; margin-top: 15px; }
+        .opt-btn { padding: 14px 20px; background: #f1f3f5; border: 2px solid #e9ecef; border-radius: 10px; cursor: pointer; text-align: left; font-size: 1rem; transition: 0.2s; }
+        .opt-btn:hover { background: #e9ecef; }
+        .opt-btn.correct { background: #d4edda; border-color: var(--success); color: #155724; }
+        .opt-btn.wrong { background: #f8d7da; border-color: var(--error); color: #721c24; }
+        .q-progress { font-weight: bold; margin-top: 10px; text-align: right; color: #666; }
+
+        /* Act 5: Interactive Text Lab (6 Dropdowns) */
+        .text-passage { background: #f4fbfc; border: 1px solid #b2ebf2; padding: 25px; border-radius: 12px; font-size: 1.15rem; line-height: 2; margin-top: 15px; }
+        .blank-select { padding: 4px 8px; border: 2px solid var(--secondary-color); border-radius: 6px; font-size: 1rem; font-weight: bold; color: var(--secondary-color); background: white; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>ಪಾಠ 2: ಮಧ್ಯಯುಗದ ಯುರೋಪ್</h1>
+        <p>ಭಾಗ 3: ಭೌಗೋಳಿಕ ಅನ್ವೇಷಣೆಗಳು (Geographical Explorations) - Innovative Digital Book</p>
+    </div>
+
+    <div class="book-container">
+        <div class="progress-container">
+            <div class="progress-bar" id="progBar"></div>
+        </div>
+
+        <div class="page active" id="page1">
+            <div class="page-title"><i class="fa-solid fa-compass"></i> ಆಕ್ಟಿವಿಟಿ 1: ಸಾಹಸಿ ನಾವಿಕರು ಮತ್ತು ಶೋಧಿಸಿದ ಜಲಮಾರ್ಗಗಳು</div>
+            <p class="instruction">ಎಡಭಾಗದಲ್ಲಿರುವ ಪ್ರಸಿದ್ಧ ಯುರೋಪಿಯನ್ ನಾವಿಕರ ಹೆಸರನ್ನು ಕ್ಲಿಕ್ ಮಾಡಿ, ತದನಂತರ ಬಲಭಾಗದಲ್ಲಿರುವ ಅವರ ಸಾಹಸಮಯ ಶೋಧನೆಗೆ ಹೊಂದಿಸಿ ಜೋಡಿಸಿ:</p>
+            
+            <div class="matching-grid">
+                <div class="match-left" id="leftContainer">
+                    <div class="match-card" data-id="1">ಬಾರ್ತಲೋಮಿಯೋ ಡಯಾಸ್</div>
+                    <div class="match-card" data-id="2">ಕೊಲಂಬಸ್</div>
+                    <div class="match-card" data-id="3">ವಾಸ್ಕೋಡಗಾಮಾ</div>
+                    <div class="match-card" data-id="4">ಫರ್ಡಿನೆಂಡ್ ಮೆಗೆಲ್ಲನ್</div>
+                    <div class="match-card" data-id="5">ಅಮೇರಿಗೋ ವೆಸ್ಪುಸಿ</div>
+                    <div class="match-card" data-id="6">ಕ್ಯಾಬ್ರಾಲ್</div>
+                </div>
+                <div class="match-right" id="rightContainer">
+                    <div class="match-card" data-match="2">ವೆಸ್ಟ್ ಇಂಡೀಸ್ (ಅಮೇರಿಕಾ ಖಂಡದ ದ್ವೀಪಗಳು) ಪತ್ತೆ ಹಚ್ಚಿದವನು</div>
+                    <div class="match-card" data-match="1">ಆಫ್ರಿಕಾದ ದಕ್ಷಿಣ ತುದಿ 'ಗುಡ್ ಹೋಪ್ ಭೂಶಿರ' ತಲುಪಿದ ನಾವಿಕ</div>
+                    <div class="match-card" data-match="4">ಜಗತ್ತನ್ನು ಹಡಗಿನ ಮೂಲಕ ಸುತ್ತುಹಾಕಿದ ಮೊದಲ ಸಾಹಸಿ</div>
+                    <div class="match-card" data-match="3">ಭಾರತದ ಕಾಳಿಕಾಟ್ (ಕಪ್ಪಡ್) ಗೆ ಹೊಸ ಜಲಮಾರ್ಗ ಶೋಧಿಸಿದವನು</div>
+                    <div class="match-card" data-match="6">ದಕ್ಷಿಣ ಅಮೇರಿಕಾದ 'ಬ್ರೆಜಿಲ್' ದೇಶವನ್ನು ಆಕಸ್ಮಿಕವಾಗಿ ಪತ್ತೆಹಚ್ಚಿದವನು</div>
+                    <div class="match-card" data-match="5">ಹೊಸ ಭೂಭಾಗವನ್ನು ಕೂಲಂಕಷವಾಗಿ ಪರಿಶೋಧಿಸಿ 'ಅಮೇರಿಕಾ' ಎಂದು ಹೆಸರಿಸಲು ಕಾರಣನಾದವನು</div>
+                </div>
+            </div>
+            <div class="feedback" id="fb1"></div>
+        </div>
+
+        <div class="page" id="page2">
+            <div class="page-title"><i class="fa-solid fa-map-location-dot"></i> ಆಕ್ಟಿವಿಟಿ 2: ಜಾಗತಿಕ ಜಲಮಾರ್ಗದ ಪ್ರಮುಖ ತಂಗುದಾಣಗಳು</div>
+            <p class="instruction">ಮೊದಲು ಕೆಳಗಿನ ಸ್ಥಳದ ಹೆಸರನ್ನು ಆಯ್ಕೆ ಮಾಡಿ, ನಂತರ ಡಿಜಿಟಲ್ ಮ್ಯಾಪ್‌ನಲ್ಲಿರುವ ಸರಿಯಾದ ಲೊಕೇಶನ್ ಪಿನ್ ಕ್ಲಿಕ್ ಮಾಡಿ ಹೊಂದಿಸಿ:</p>
+            
+            <div class="map-labels-container" id="mapLabels">
+                <div class="map-label-opt" data-place="lisbon">ಲಿಸ್ಬನ್ (ಪೋರ್ಚುಗಲ್)</div>
+                <div class="map-label-opt" data-place="constantinople">ಕಾನ್‌ಸ್ಟಂಟಿನೋಪಲ್</div>
+                <div class="map-label-opt" data-place="cape">ಶುಭ ಆಶಾ ಭೂಶಿರ (Cape of Good Hope)</div>
+                <div class="map-label-opt" data-place="calicut">ಕಾಳಿಕಾಟ್ (ಭಾರತ)</div>
+                <div class="map-label-opt" data-place="bahamas">ಬಹಾಮಾಸ್ ದ್ವೀಪಗಳು</div>
+                <div class="map-label-opt" data-place="magellan">ಮೆಗೆಲ್ಲನ್ ಜಲಸಂಧಿ</div>
+            </div>
+
+            <div class="map-wrapper">
+                <div style="position:absolute; top:15px; left:20px; font-weight:bold; color:#004d40;">[ ನಾವಿಕರ ಜಾಗತಿಕ ಭೂಪಟದ ಮಾದರಿ ]</div>
+                <div class="map-pin" style="top: 30%; left: 38%;" data-pin="lisbon"><span>1</span></div>
+                <div class="map-pin" style="top: 35%; left: 50%;" data-pin="constantinople"><span>2</span></div>
+                <div class="map-pin" style="top: 75%; left: 45%;" data-pin="cape"><span>3</span></div>
+                <div class="map-pin" style="top: 52%; left: 68%;" data-pin="calicut"><span>4</span></div>
+                <div class="map-pin" style="top: 45%; left: 18%;" data-pin="bahamas"><span>5</span></div>
+                <div class="map-pin" style="top: 85%; left: 22%;" data-pin="magellan"><span>6</span></div>
+            </div>
+            <div class="feedback" id="fb2"></div>
+        </div>
+
+        <div class="page" id="page3">
+            <div class="page-title"><i class="fa-solid fa-anchor"></i> ಆಕ್ಟಿವಿಟಿ 3: ನಾವಿಕ ತಂತ್ರಜ್ಞಾನ ಮತ್ತು ಉಪಕರಣಗಳು</div>
+            <p class="instruction">ಸಮುದ್ರಯಾನವನ್ನು ಸುಲಭಗೊಳಿಸಿದ ಕೆಳಗಿನ ಉಪಕರಣಗಳ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ, ಅವುಗಳ ಐತಿಹಾಸಿಕ ಕಾರ್ಯವೇನೆಂದು ತಿಳಿದುಕೊಳ್ಳಿ:</p>
+            
+            <div class="inst-grid">
+                <div class="inst-card" onclick="showInstInfo('ದಿಕ್ಸೂಚಿ (Compass)', 'ಹಡಗು ಪ್ರಯಾಣಿಸುವಾಗ ಸಮುದ್ರದ ಮಧ್ಯದಲ್ಲಿ ದಿಕ್ಕನ್ನು ನಿಖರವಾಗಿ ಪತ್ತೆಹಚ್ಚಲು ನೆರವಾದ ಚೀನಾ ಮೂಲದ ಆವಿಷ್ಕಾರ.')">
+                    <i class="fa-solid fa-compass"></i><h5>ಕಾಂತೀಯ ದಿಕ್ಸೂಚಿ</h5>
+                </div>
+                <div class="inst-card" onclick="showInstInfo('ಅಸ್ಟ್ರೋಲೇಬ್ (Astrolabe)', 'ಸಮುದ್ರದಲ್ಲಿ ಸೂರ್ಯ ಮತ್ತು ನಕ್ಷತ್ರಗಳ ಸ್ಥಾನವನ್ನು ಆಧರಿಸಿ ಹಡಗಿನ ಅಕ್ಷಾಂಶವನ್ನು ಕಂಡುಹಿಡಿಯುವ ಸಾಧನ.')">
+                    <i class="fa-solid fa-star-and-crescent"></i><h5>ಅಸ್ಟ್ರೋಲೇಬ್ ಉಪಕರಣ</h5>
+                </div>
+                <div class="inst-card" onclick="showInstInfo('ಕ್ಯಾರಾವೆಲ್ ಹಡಗುಗಳು (Caravel)', 'ಮಧ್ಯಯುಗದ ಕೊನೆಯಲ್ಲಿ ಪೋರ್ಚುಗೀಸರು ಸಿದ್ಧಪಡಿಸಿದ ವೇಗವಾಗಿ ಚಲಿಸುವ ಹಾಗೂ ಚಂಡಮಾರುತ ತಡೆದುಕೊಳ್ಳುವ ಸಣ್ಣ ಹಡಗುಗಳು.')">
+                    <i class="fa-solid fa-ship"></i><h5>ಕ್ಯಾರಾವೆಲ್ ಲಘು ಹಡಗು</h5>
+                </div>
+                <div class="inst-card" onclick="showInstInfo('ಗನ್‌ಪೌಡರ್ (Gunpowder)', 'ಸಮುದ್ರದ ಕಡಲ್ಗಳ್ಳರಿಂದ ಮತ್ತು ಅಪರಿಚಿತ ದ್ವೀಪಗಳ ಆಕ್ರಮಣಕಾರರಿಂದ ರಕ್ಷಿಸಿಕೊಳ್ಳಲು ಹಡಗಿನ ಫಿರಂಗಿಗಳಲ್ಲಿ ಬಳಸಿದ ಮದ್ದುಗುಂಡು.')">
+                    <i class="fa-solid fa-burst"></i><h5>ಮದ್ದುಗುಂಡು ತಂತ್ರಜ್ಞಾನ</h5>
+                </div>
+                <div class="inst-card" onclick="showInstInfo('ನೌಕಾ ನಕ್ಷೆಗಳು (Charts)', 'ವಿವಿಧ ನಾವಿಕರು ಸಮುದ್ರದ ಆಳ, ಗಾಳಿಯ ದಿಕ್ಕು ಮತ್ತು ಬಂಡೆಗಳಿರುವ ಜಾಗವನ್ನು ಗುರುತಿಸಿ ಸಿದ್ಧಪಡಿಸಿದ ಹೊಸ ಭೂಪಟಗಳು.')">
+                    <i class="fa-solid fa-map"></i><h5>ಸಮುದ್ರಯಾನ ಭೂಪಟ</h5>
+                </div>
+                <div class="inst-card" onclick="showInstInfo('ಮುದ್ರಣ ಯಂತ್ರ (Printing Press)', 'ಹೊಸದಾಗಿ ಪತ್ತೆಯಾದ ಭೂಪ್ರದೇಶಗಳ ಮಾಹಿತಿಯು ಇಡೀ ಯುರೋಪಿನಾದ್ಯಂತ ಪುಸ್ತಕಗಳ ರೂಪದಲ್ಲಿ ಶೀಘ್ರವಾಗಿ ಹರಡಲು ಸಹಾಯ ಮಾಡಿತು.')">
+                    <i class="fa-solid fa-print"></i><h5>ಮಾಹಿತಿ ಮುದ್ರಣ</h5>
+                </div>
+            </div>
+            <div class="feedback" id="fb3" style="background:#fff3cd; color:#856404; border:1px solid #ffeeba;"></div>
+        </div>
+
+        <div class="page" id="page4">
+            <div class="page-title"><i class="fa-solid fa-route"></i> ಆಕ್ಟಿವಿಟಿ 4: ಜಲಮಾರ್ಗ ಅನ್ವೇಷಣೆಯ ಕಾರಣಗಳ ವೈಚಾರಿಕ ಕ್ವಿಜ್</div>
+            <p id="q-text" style="font-size:1.2rem; margin-bottom:15px; font-weight:bold;">ಪ್ರಶ್ನೆ ಲೋಡ್ ಆಗುತ್ತಿದೆ...</p>
+            <div class="quiz-box" id="q-options"></div>
+            <div class="q-progress" id="q-indicator">ಪ್ರಶ್ನೆ: 1/6</div>
+            <div class="feedback" id="fb4"></div>
+        </div>
+
+        <div class="page" id="page5">
+            <div class="page-title"><i class="fa-solid fa-globe-americas"></i> ಆಕ್ಟಿವಿಟಿ 5: ಭೌಗೋಳಿಕ ಅನ್ವೇಷಣೆಯ ಜಾಗತಿಕ ಪರಿಣಾಮಗಳು</div>
+            <p class="instruction">ಭೌಗೋಳಿಕ ಅನ್ವೇಷಣೆಗಳಿಂದ ಇಡೀ ಜಗತ್ತಿನ ಇತಿಹಾಸ ಹೇಗೆ ಬದಲಾಯಿತು ಎಂಬುದರ ಈ ಪ್ಯಾರಾಗ್ರಾಫ್ ಅನ್ನು ನಿಖರ ಪದಗಳಿಂದ ಭರ್ತಿ ಮಾಡಿ:</p>
+            
+            <div class="text-passage">
+                ಹೊಸ ಜಲಮಾರ್ಗಗಳ ಅನ್ವೇಷಣೆಯಿಂದಾಗಿ ಯುರೋಪಿಯನ್ ರಾಷ್ಟ್ರಗಳು ಏಷ್ಯಾ ಮತ್ತು ಅಮೇರಿಕಾಗಳಲ್ಲಿ ತಮ್ಮ 
+                <select class="blank-select" id="b1" data-ans="ವಸಾಹತುಗಳನ್ನು"><option value="">--ಆಯ್ಕೆ ಮಾಡಿ--</option><option>ವಸಾಹತುಗಳನ್ನು</option><option>ಸೈನ್ಯಗಳನ್ನು ಮಾತ್ರ</option><option>ವಿಶ್ವವಿದ್ಯಾಲಯಗಳನ್ನು</option></select> 
+                ಸ್ಥಾಪಿಸಿ ಅಪಾರ ಸಂಪತ್ತನ್ನು ಸೂರೆಮಾಡಿದವು. ಇದು ಜಗತ್ತಿನಾದ್ಯಂತ ವಾಣಿಜ್ಯ ವ್ಯಾಪಾರವನ್ನು ವಿಸ್ತರಿಸಿ 
+                <select class="blank-select" id="b2" data-ans="ವಾಣಿಜ್ಯ ಕ್ರಾಂತಿ"><option value="">--ಆಯ್ಕೆ ಮಾಡಿ--</option><option>ಹಸಿರು ಕ್ರಾಂತಿ</option><option>ವಾಣಿಜ್ಯ ಕ್ರಾಂತಿ</option><option>ಫ್ರೆಂಚ್ ಕ್ರಾಂತಿ</option></select> 
+                ಗೆ ಕಾರಣವಾಯಿತು. ಅಮೇರಿಕಾದಿಂದ ಯುರೋಪಿಗೆ ಚಿನ್ನ, ಬೆಳ್ಳಿಯ ಜೊತೆಗೆ ಆಲೂಗಡ್ಡೆ, ಮೆಕ್ಕೆಜೋಳ ಹಾಗೂ 
+                <select class="blank-select" id="b3" data-ans="ತಂಬಾಕು"><option value="">--ಆಯ್ಕೆ ಮಾಡಿ--</option><option>ರೇಷ್ಮೆ</option><option>ಗೋಧಿ</option><option>ತಂಬಾಕು</option></select> 
+                ನಂತಹ ಹೊಸ ಬೆಳೆಗಳು ಪರಿಚಯಿಸಲ್ಪಟ್ಟವು. ಆದರೆ ಅತ್ಯಂತ ದುಃಖಕರ ಸಂಗತಿಯೆಂದರೆ ಆಫ್ರಿಕಾದ ಕಪ್ಪು ಜನರನ್ನು ಹಿಡಿದು ಅಮೇರಿಕಾದಲ್ಲಿ ಮಾರುವ 
+                <select class="blank-select" id="b4" data-ans="ದಾಸ್ಯ ಪದ್ಧತಿ"><option value="">--ಆಯ್ಕೆ ಮಾಡಿ--</option><option>ದಾಸ್ಯ ಪದ್ಧತಿ</option><option>ಸಾಮಂತ ಪದ್ಧತಿ</option><option>ಜಮೀನ್ದಾರಿ ಪದ್ಧತಿ</option></select> 
+                ಅಮಾನವೀಯವಾಗಿ ಆರಂಭವಾಯಿತು. ಯುರೋಪಿನ ನಾವಿಕರು ಜಗತ್ತು 
+                <select class="blank-select" id="b5" data-ans="ಚಪ್ಪಟೆಯಾಗಿರದೆ ಗೋಳಾಕಾರದಲ್ಲಿದೆ"><option value="">--ಆಯ್ಕೆ ಮಾಡಿ--</option><option>ಚಪ್ಪಟೆಯಾಗಿದೆ</option><option>ಚಪ್ಪಟೆಯಾಗಿರದೆ ಗೋಳಾಕಾರದಲ್ಲಿದೆ</option><option>ತ್ರಿಕೋನಾಕಾರದಲ್ಲಿದೆ</option></select> 
+                ಎಂಬ ಭೌಗೋಳಿಕ ಸತ್ಯವನ್ನು ಪ್ರಾಯೋಗಿಕವಾಗಿ ಸಾಬೀತುಪಡಿಸಿದರು. ಅಂತಿಮವಾಗಿ ಈ ಅನ್ವೇಷಣೆಗಳು ಯುರೋಪಿನ ದೇಶಗಳಲ್ಲಿ ಬಂಡವಾಳಶಾಹಿ ವ್ಯವಸ್ಥೆ ಮತ್ತು ಜಾಗತಿಕ 
+                <select class="blank-select" id="b6" data-ans="ಸಾಮ್ರಾಜ್ಯಶಾಹಿ"><option value="">--ಆಯ್ಕೆ ಮಾಡಿ--</option><option>ಸಮತಾವಾದ</option><option>ಸಾಮ್ರಾಜ್ಯಶಾಹಿ</option><option>ಪ್ರಜಾಪ್ರಭುತ್ವ</option></select> 
+                ಬೆಳವಣಿಗೆಗೆ ಬಲವಾದ ಮುನ್ನುಡಿ ಬರೆದವು.
+            </div>
+            <button class="btn" style="background:var(--accent-color); color:white; margin-top:20px;" onclick="checkBlanks()">ಪರಿಣಾಮಗಳನ್ನು ದೃಢೀಕರಿಸಿ</button>
+            <div class="feedback" id="fb5"></div>
+        </div>
+
+        <div class="book-controls">
+            <button class="btn btn-prev" id="prevPageBtn" onclick="movePage(-1)" disabled><i class="fa-solid fa-book-open"></i> ಹಿಂದಿನ ಪುಟ</button>
+            <button class="btn btn-next" id="nextPageBtn" onclick="movePage(1)">ಮುಂದಿನ ಪುಟ <i class="fa-solid fa-book"></i></button>
+        </div>
+    </div>
+
+    <script>
+        let pageIdx = 1;
+        const maxPages = 5;
+
+        function movePage(dir) {
+            document.getElementById(`page${pageIdx}`).classList.remove('active');
+            pageIdx += dir;
+            document.getElementById(`page${pageIdx}`).classList.add('active');
+
+            document.getElementById('prevPageBtn').disabled = (pageIdx === 1);
+            document.getElementById('nextPageBtn').disabled = (pageIdx === maxPages);
+
+            document.getElementById('progBar').style.width = `${(pageIdx / maxPages) * 100}%`;
+        }
+
+        // --- Act 1: Matching Logic ---
+        let selectedLeft = null;
+        const leftCards = document.querySelectorAll('#leftContainer .match-card');
+        const rightCards = document.querySelectorAll('#rightContainer .match-card');
+
+        leftCards.forEach(card => {
+            card.addEventListener('click', () => {
+                if(card.classList.contains('correct')) return;
+                leftCards.forEach(c => c.classList.remove('selected'));
+                card.classList.add('selected');
+                selectedLeft = card;
+            });
+        });
+
+        rightCards.forEach(card => {
+            card.addEventListener('click', () => {
+                if(card.classList.contains('correct') || !selectedLeft) return;
+                const matchId = card.getAttribute('data-match');
+                const leftId = selectedLeft.getAttribute('data-id');
+
+                if(matchId === leftId) {
+                    card.classList.add('correct');
+                    selectedLeft.classList.add('correct');
+                    selectedLeft.classList.remove('selected');
+                    selectedLeft = null;
+                    checkAct1Progress();
+                } else {
+                    const fb = document.getElementById('fb1');
+                    fb.style.display = "block"; fb.style.background = "#f8d7da"; fb.style.color = "#c0392b";
+                    fb.innerText = "✗ ತಪ್ಪು ಜೋಡಿ! ನಾವಿಕನ ಸರಿಯಾದ ಸಾಧನೆಯನ್ನು ನೆನಪಿಸಿಕೊಂಡು ಹೊಂದಿಸಿ.";
+                }
+            });
+        });
+
+        function checkAct1Progress() {
+            const finished = document.querySelectorAll('#leftContainer .match-card.correct').length;
+            const fb = document.getElementById('fb1');
+            fb.style.display = "block";
+            if(finished === 6) {
+                fb.style.background = "#d4edda"; fb.style.color = "#27ae60";
+                fb.innerText = "✓ ಅದ್ಭುತ! ನೀವು ಎಲ್ಲಾ 6 ಸಾಹಸಿ ನಾವಿಕರ ಶೋಧನೆಗಳನ್ನು ನಿಖರವಾಗಿ ಜೋಡಿಸಿದ್ದೀರಿ.";
+            } else {
+                fb.style.background = "#e2e8f0"; fb.style.color = "#4a5568";
+                fb.innerText = `ಪ್ರಗತಿ: ${finished}/6 ಜೋಡಿಗಳು ಸರಿಯಾಗಿವೆ.`;
+            }
+        }
+
+        // --- Act 2: Map Pin Placement Logic ---
+        let selectedLabel = null;
+        const labels = document.querySelectorAll('.map-label-opt');
+        labels.forEach(lbl => {
+            lbl.addEventListener('click', () => {
+                labels.forEach(l => l.classList.remove('selected'));
+                lbl.classList.add('selected');
+                selectedLabel = lbl;
+            });
+        });
+
+        const pins = document.querySelectorAll('.map-pin');
+        pins.forEach(pin => {
+            pin.addEventListener('click', () => {
+                const fb = document.getElementById('fb2');
+                fb.style.display = "block";
+                if(!selectedLabel) {
+                    fb.innerHTML = "⚠️ ದಯವಿಟ್ಟು ಮೊದಲು ಮೇಲಿರುವ ಯಾವುದಾದರೂ ಒಂದು ಸ್ಥಳದ ಹೆಸರನ್ನು ಕ್ಲಿಕ್ ಮಾಡಿ ಸೆಲೆಕ್ಟ್ ಮಾಡಿ!";
+                    fb.style.backgroundColor = "#fff3cd"; fb.style.color = "#856404";
+                    return;
+                }
+                if(selectedLabel.getAttribute('data-place') === pin.getAttribute('data-pin')) {
+                    pin.style.background = "#2e7d32";
+                    fb.innerHTML = `✓ ಹೌದು! '${selectedLabel.innerText}' ಐತಿಹಾಸಿಕ ತಂಗುದಾಣದ ಭೌಗೋಳಿಕ ಪಿನ್ ಸರಿಯಾಗಿದೆ.`;
+                    fb.style.backgroundColor = "#d4edda"; fb.style.color = "#155724";
+                } else {
+                    fb.innerHTML = "✗ ತಪ್ಪು ಲೊಕೇಶನ್ ಪಿನ್. ಜಲಮಾರ್ಗದ ಸರಿಯಾದ ದಿಕ್ಕನ್ನು ಊಹಿಸಿ ಮತ್ತೊಮ್ಮೆ ಪ್ರಯತ್ನಿಸಿ.";
+                    fb.style.backgroundColor = "#f8d7da"; fb.style.color = "#721c24";
+                }
+            });
+        });
+
+        // --- Act 3: Instruments Clicker ---
+        function showInstInfo(title, text) {
+            const fb = document.getElementById('fb3');
+            fb.style.display = "block";
+            fb.innerHTML = `<strong><i class="fa-solid fa-circle-info"></i> ${title}:</strong> ${text}`;
+        }
+
+        // --- Act 4: Multiple Choice Quiz Data (6 Questions) ---
+        const mcqCollection = [
+            { q: "ಕ್ರಿ.ಶ. 1453ರಲ್ಲಿ ಅಟೋಮನ್ ಟರ್ಕರು ಯಾವ ನಗರವನ್ನು ವಶಪಡಿಸಿಕೊಂಡಿದ್ದರಿಂದ ಯುರೋಪಿಯನ್ನರಿಗೆ ಭೂಮಾರ್ಗ ಬಂದ್ ಆಯಿತು?", opts: ["ರೋಮ್", "ಲಿಸ್ಬನ್", "ಕಾನ್‌ಸ್ಟಂಟಿನೋಪಲ್", "ವೆನಿಸ್"], ans: 2 },
+            { q: "ಭಾರತಕ್ಕೆ ಹೊಸ ಜಲಮಾರ್ಗವನ್ನು ಕಂಡುಹಿಡಿದ ಪೋರ್ಚುಗಲ್ ದೇಶದ ನಾವಿಕ ಯಾರು?", opts: ["ಕೊಲಂಬಸ್", "ವಾಸ್ಕೋಡಗಾಮಾ", "ಮೆಗೆಲ್ಲನ್", "ಕ್ಯಾಬ್ರಾಲ್"], ans: 1 },
+            { q: "ವಾಸ್ಕೋಡಗಾಮನು ಕ್ರಿ.ಶ. 1498ರಲ್ಲಿ ಭಾರತದ ಪಶ್ಚಿಮ ಕರಾವಳಿಯ ಯಾವ ಸ್ಥಳಕ್ಕೆ ಬಂದು ತಲುಪಿದನು?", opts: ["ಮುಂಬೈ", "ಗೋವಾ", "ಕಾಳಿಕಾಟ್ (ಕಪ್ಪಡ್)", "ಮಂಗಳೂರು"], ans: 2 },
+            { q: "ಸ್ಪೇನ್ ದೇಶದ ರಾಜನ ನೆರforce ಪಡೆದು ಕೊಲಂಬಸ್ ಯಾವ ಮಹಾಸಾಗರವನ್ನು ದಾಟಿ ಹೊಸ ಭೂಭಾಗ ತಲುಪಿದನು?", opts: ["ಅಟ್ಲಾಂಟಿಕ್ ಮಹಾಸಾಗರ", "ಪೆಸಿಫಿಕ್ ಮಹಾಸಾಗರ", "ಹಿಂದೂ ಮಹಾಸಾಗರ", "ಆರ್ಕ್ಟಿಕ್ ಮಹಾಸಾಗರ"], ans: 0 },
+            { q: "ಜಗತ್ತಿನ ಅತಿ ದೊಡ್ಡ ಸಾಗರಕ್ಕೆ 'ಪೆಸಿಫಿಕ್' (ಶಾಂತ) ಸಾಗರ ಎಂದು ಹೆಸರಿಟ್ಟ ನಾವಿಕ ಯಾರು?", opts: ["ಬಾರ್ತಲೋಮಿಯೋ ಡಯಾಸ್", "ಫರ್ಡಿನೆಂಡ್ ಮೆಗೆಲ್ಲನ್", "ಕ್ಯಾಬ್ರಾಲ್", "ಅಮೇರಿಗೋ"], ans: 1 },
+            { q: "ಯುರೋಪಿನ ದೇಶಗಳು ಹೊಸ ಜಲಮಾರ್ಗಗಳನ್ನು ಹುಡುಕಲು ಪ್ರೇರೇಪಿಸಿದ ಮುಖ್ಯ ಆರ್ಥಿಕ ಕಾರಣ ಯಾವುದು?", opts: ["ಹೊಸ ಧರ್ಮ ಪ್ರಚಾರ ಮಾಡುವುದು", "ಏಷ್ಯಾದ ಸಾಂಬಾರ ಪದಾರ್ಥಗಳ (ಸ್ಪೈಸಸ್) ಮೇಲಿನ ವ್ಯಾಪಾರದ ಏಕಸ್ವಾಮ್ಯ ಸಾಬೀತುಪಡಿಸಲು", "ಪ್ರವಾಸೋದ್ಯಮ ಬೆಳೆಸುವುದು", "ಚಿನ್ನದ ಗಣಿಗಳನ್ನು ಉಡುಕುವುದು"], ans: 1 }
+        ];
+
+        let currentQuizIndex = 0;
+        function loadQuizQuestion() {
+            const activeQ = mcqCollection[currentQuizIndex];
+            document.getElementById('q-text').innerText = `${currentQuizIndex + 1}. ${activeQ.q}`;
+            const optWrapper = document.getElementById('q-options');
+            optWrapper.innerHTML = "";
+            document.getElementById('q-indicator').innerText = `ಪ್ರಶ್ನೆ: ${currentQuizIndex + 1}/${mcqCollection.length}`;
+
+            activeQ.opts.forEach((opt, idx) => {
+                const b = document.createElement('button');
+                b.className = "opt-btn";
+                b.innerText = opt;
+                b.onclick = () => verifyMCQ(idx, activeQ.ans, b);
+                optWrapper.appendChild(b);
+            });
+        }
+
+        function verifyMCQ(selected, right, element) {
+            const fb = document.getElementById('fb4'); fb.style.display = "block";
+            if(selected === right) {
+                element.classList.add('correct');
+                fb.innerHTML = "✓ ನಿಖರವಾದ ಉತ್ತರ! ನಿಮ್ಮ ಜ್ಞಾನದ ಅನ್ವೇಷಣೆ ಅತ್ಯುತ್ತಮವಾಗಿದೆ.";
+                fb.style.background = "#d4edda"; fb.style.color = "#155724";
+                setTimeout(() => {
+                    if(currentQuizIndex < mcqCollection.length - 1) {
+                        currentQuizIndex++; loadQuizQuestion(); fb.style.display = "none";
+                    } else {
+                        fb.innerHTML = "🎉 ಅದ್ಭುತ! ಭೌಗೋಳಿಕ ಅನ್ವೇಷಣೆಯ ಕಾರಣಗಳ ಎಲ್ಲಾ 6 ಕ್ವಿಜ್ ಪ್ರಶ್ನೆಗಳನ್ನು ಯಶಸ್ವಿಯಾಗಿ ಜಯಿಸಿದ್ದೀರಿ.";
+                    }
+                }, 1500);
+            } else {
+                element.classList.add('wrong');
+                fb.innerHTML = "✗ ತಪ್ಪು ಉತ್ತರ. ಸರಿಯಾದ ಐತಿಹಾಸಿಕ ಕಾರಣವನ್ನು ಮತ್ತೊಮ್ಮೆ ನೆನಪಿಸಿಕೊಳ್ಳಿ.";
+                fb.style.background = "#f8d7da"; fb.style.color = "#721c24";
+            }
+        }
+        loadQuizQuestion();
+
+        // --- Act 5: Dropdowns Validator ---
+        function checkBlanks() {
+            let miss = 0;
+            const selects = document.querySelectorAll('.blank-select');
+            selects.forEach(sel => {
+                if(sel.value !== sel.getAttribute('data-ans')) {
+                    miss++;
+                    sel.style.borderColor = "var(--error)";
+                } else {
+                    sel.style.borderColor = "var(--success)";
+                }
+            });
+            const fb = document.getElementById('fb5'); fb.style.display = "block";
+            if(miss === 0) {
+                fb.innerHTML = "✓ ಪರಿಪೂರ್ಣ! ಭೌಗೋಳಿಕ ಅನ್ವೇಷಣೆಗಳಿಂದ ಜಗತ್ತಿನ ಮೇಲೆ ಉಂಟಾದ ಎಲ್ಲಾ 6 ಪರಿಣಾಮಗಳನ್ನು ಅತ್ಯದ್ಭುತವಾಗಿ ವಿಶ್ಲೇಷಿಸಿದ್ದೀರಿ.";
+                fb.style.background = "#d4edda"; fb.style.color = "#155724";
+            } else {
+                fb.innerHTML = "✗ ಕೆಲವು ಐತಿಹಾಸಿಕ ಪರಿಣಾಮಗಳ ಜಾಗದಲ್ಲಿ ತಪ್ಪು ಪರಿಕಲ್ಪನೆ ಆಯ್ಕೆಯಾಗಿದೆ. ದಯವಿಟ್ಟು ಮರು ಪರಿಶೀಲಿಸಿ.";
+                fb.style.background = "#f8d7da"; fb.style.color = "#721c24";
+            }
+        }
+    </script>
+</body>
+</html>
