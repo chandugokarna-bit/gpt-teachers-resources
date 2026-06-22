@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಭಾರತದ ಪ್ರಾಕೃತಿಕ ವಿಭಾಗಗಳು - Extraordinary Learning Window</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Noto+Serif+Kannada:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #0575e6, #00f260);
+            --window-bg: #ffffff;
+            --primary-color: #0575e6;
+            --secondary-color: #00f260;
+            --accent-color: #ff9800;
+            --text-color: #1e293b;
+            --success: #10b981;
+            --error: #ef4444;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Poppins', 'Noto Serif Kannada', serif;
+            background: var(--bg-gradient);
+            min-height: 100vh;
+            color: var(--text-color);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 25px;
+            text-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+        .header h1 { font-size: 2.3rem; font-weight: 700; }
+        .header p { font-size: 1.1rem; color: #f1f5f9; margin-top: 5px; }
+
+        /* MAIN BAR WINDOW CONTAINER */
+        .main-container {
+            width: 100%;
+            max-width: 1060px;
+            background: var(--window-bg);
+            border-radius: 24px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 680px;
+            border: 5px solid var(--accent-color);
+            position: relative;
+        }
+
+        /* NEW MAIN BAR MENU */
+        .main-bar-menu {
+            display: flex;
+            background: #072a4d;
+            overflow-x: auto;
+            border-bottom: 4px solid var(--accent-color);
+            scrollbar-width: thin;
+        }
+        .main-bar-menu::-webkit-scrollbar { height: 6px; }
+        .main-bar-menu::-webkit-scrollbar-thumb { background: var(--accent-color); border-radius: 10px; }
+
+        .menu-tab {
+            padding: 18px 24px;
+            color: #94a3b8;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: bold;
+            white-space: nowrap;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-right: 1px solid #0f3d61;
+        }
+        .menu-tab:hover { background: #0c355e; color: white; }
+        .menu-tab.active {
+            background: var(--accent-color);
+            color: #072a4d;
+            transform: scale(1.01);
+            box-shadow: 0 -4px 10px rgba(0,0,0,0.15);
+        }
+
+        /* WINDOW WINDOWS CONTENT */
+        .window-content { padding: 40px; flex: 1; display: none; }
+        .window-content.active { display: block; animation: windowReveal 0.5s ease; }
+        
+        @keyframes windowReveal { 
+            from { opacity: 0; transform: scale(0.97) translateY(10px); } 
+            to { opacity: 1; transform: scale(1) translateY(0); } 
+        }
+
+        .window-title {
+            font-size: 1.65rem;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid var(--secondary-color);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+        }
+        .instruction { font-size: 1.05rem; margin-bottom: 25px; color: #4a5568; font-style: italic; font-weight: bold; }
+
+        /* MAP GLOW GRID LAYOUT */
+        .map-interactive-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 30px; align-items: center; }
+        .map-frame-box { background: #e0f2fe; border: 3px solid var(--primary-color); border-radius: 20px; padding: 15px; text-align: center; position: relative; box-shadow: 0 8px 16px rgba(0,0,0,0.05); }
+        .map-img-placeholder { width: 100%; height: 350px; background: #fff; border-radius: 12px; display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative; }
+        .map-img-placeholder img { width: 100%; height: 100%; object-fit: contain; }
+        
+        /* MAP REGION HOTSPOTS BUTTONS */
+        .region-list-panel { display: flex; flex-direction: column; gap: 12px; }
+        .region-card-btn { background: #f8fafc; border: 2px solid #cbd5e1; padding: 16px 20px; border-radius: 12px; font-weight: bold; cursor: pointer; text-align: left; transition: 0.3s; font-size: 1.1rem; display: flex; align-items: center; gap: 12px; color: #334155; }
+        .region-card-btn:hover { border-color: var(--primary-color); background: #f0fdf4; transform: translateX(5px); }
+
+        /* EXTRAORDINARY EXTRA-LARGE CENTRAL POP-UP MODAL WINDOW */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(7, 42, 77, 0.85);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            opacity: 0; pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .modal-overlay.open { opacity: 1; pointer-events: auto; }
+        
+        .big-pop-box {
+            background: #ffffff;
+            width: 95%;
+            max-width: 850px; 
+            border-radius: 28px;
+            border: 6px solid var(--accent-color);
+            box-shadow: 0 30px 70px rgba(0,0,0,0.6);
+            padding: 35px;
+            text-align: center;
+            position: relative;
+            transform: scale(0.6);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .modal-overlay.open .big-pop-box { transform: scale(1); }
+        .modal-close-btn { position: absolute; top: 15px; right: 22px; font-size: 2.2rem; color: #94a3b8; cursor: pointer; transition: 0.2s; }
+        .modal-close-btn:hover { color: var(--error); transform: scale(1.1) rotate(90deg); }
+
+        .modal-img-frame { width: 100%; height: 400px; background: #f8fafc; border-radius: 18px; margin-bottom: 22px; overflow: hidden; border: 2px solid #cbd5e1; display: flex; align-items: center; justify-content: center; }
+        .modal-img-frame img { width: 100%; height: 100%; object-fit: cover; }
+        .modal-video-frame { width: 100%; height: 400px; background: #000000; border-radius: 18px; margin-bottom: 22px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 1.4rem; box-shadow: inset 0 0 30px rgba(255,255,255,0.3); overflow: hidden; }
+        .modal-video-frame iframe { width: 100%; height: 100%; border: none; }
+
+        .modal-title { font-size: 1.6rem; color: var(--primary-color); margin-bottom: 15px; font-weight: bold; border-bottom: 2px dashed #cbd5e1; padding-bottom: 5px; }
+        .modal-desc { font-size: 1.2rem; line-height: 1.8; color: #2d3748; text-align: justify; background: #f8fafc; padding: 20px; border-radius: 15px; border-left: 6px solid var(--secondary-color); font-weight: bold; }
+
+        /* ACT 2: SECRET CODE BREAKER LOCK */
+        .code-breaker-layout { display: flex; flex-direction: column; gap: 15px; max-width: 600px; margin: 0 auto; background: #f8fafc; padding: 25px; border-radius: 20px; border: 2px solid #cbd5e1; }
+        .code-row { display: flex; align-items: center; justify-content: space-between; background: white; padding: 12px 18px; border-radius: 12px; }
+        .code-label { font-size: 1.05rem; font-weight: bold; color: #334155; }
+        .code-input { width: 110px; padding: 8px; font-size: 1.1rem; text-align: center; border: 2px solid #cbd5e1; border-radius: 8px; font-weight: bold; color: var(--primary-color); outline: none; }
+        .action-btn { padding: 12px 30px; border: none; border-radius: 50px; font-size: 1.05rem; cursor: pointer; font-weight: bold; background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color: white; transition: 0.3s; display: inline-flex; align-items: center; gap: 10px; margin-top: 15px; box-shadow: 0 4px 12px rgba(5,117,230,0.3); }
+        .action-btn:hover { transform: translateY(-3px); box-shadow: 0 6px 18px rgba(5,117,230,0.5); }
+
+        /* ACT 3: DIGITAL SPIN WHEEL */
+        .wheel-container { display: flex; flex-direction: column; align-items: center; gap: 20px; }
+        .digital-wheel { width: 250px; height: 250px; border-radius: 50%; border: 8px solid #072a4d; position: relative; background: conic-gradient(#0575e6 0deg 90deg, #f12711 90deg 180deg, #ff9800 180deg 270deg, #10b981 270deg 360deg); transition: transform 3s ease-out; box-shadow: 0 10px 20px rgba(0,0,0,0.15); }
+        .wheel-pointer { width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent; border-top: 25px solid #ffd700; position: absolute; top: -12px; z-index: 10; }
+        .wheel-text { font-size: 1.25rem; font-weight: bold; margin-top: 10px; color: var(--primary-color); background: #f1f5f9; padding: 8px 20px; border-radius: 20px; }
+        .mcq-layout { display: flex; flex-direction: column; gap: 10px; margin-top: 15px; width: 100%; }
+        .mcq-opt { padding: 14px 18px; background: #f1f5f9; border: 2px solid #cbd5e1; border-radius: 10px; cursor: pointer; text-align: left; font-size: 1.05rem; transition: 0.2s; }
+        .mcq-opt.correct { background: #d1fae5; border-color: var(--success); color: #065f46; font-weight: bold; }
+        .mcq-opt.wrong { background: #fee2e2; border-color: var(--error); color: #991b1b; }
+
+        /* ACT 4 & 5: AVATAR CARD GRID */
+        .avatar-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+        .avatar-card { background: white; border: 2px solid #e2e8f0; border-radius: 20px; padding: 25px 20px; text-align: center; transition: 0.3s ease; box-shadow: 0 4px 6px rgba(0,0,0,0.02); cursor: pointer; }
+        .avatar-card:hover { transform: translateY(-5px); border-color: var(--primary-color); box-shadow: 0 12px 24px rgba(0,0,0,0.1); }
+        .avatar-card h4 { font-size: 1.2rem; color: #1e293b; font-weight: 700; margin-top: 10px; }
+        .avatar-card p { font-size: 0.85rem; color: #ffffff; background: var(--primary-color); padding: 5px 12px; border-radius: 20px; display: inline-block; margin-top: 10px; font-weight: bold; }
+        .img-slot { width: 90px; height: 90px; background: #e0f2fe; border-radius: 50%; margin: 0 auto; display: flex; align-items: center; justify-content: center; font-size: 2rem; color: var(--primary-color); }
+
+        /* ACT 6: STORY WEAVER LAB */
+        .weaver-passage { background: #fffdf5; border: 2px solid #fef08a; padding: 25px; border-radius: 20px; font-size: 1.25rem; line-height: 2.3; }
+        .weaver-drop { display: inline-block; min-width: 130px; height: 35px; background: #e2e8f0; border: 2px dashed #a0aec0; border-radius: 8px; vertical-align: middle; margin: 0 5px; text-align: center; line-height: 31px; font-weight: bold; color: var(--primary-color); }
+        .weaver-drop.populated { background: #e0f2fe; border: 2px solid #0284c7; }
+        .weaver-pool { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; padding: 15px; background: #f8fafc; border-radius: 12px; }
+        .weaver-chip { padding: 6px 16px; background: white; border: 2px solid #cbd5e1; border-radius: 30px; cursor: grab; font-weight: bold; }
+
+        /* ACT 7: STEP CLIMBER */
+        .climber-layout { display: flex; flex-direction: column; gap: 12px; max-width: 600px; margin: 0 auto; }
+        .climb-step { display: flex; align-items: center; background: #f1f5f9; border: 2px solid #cbd5e1; border-radius: 12px; padding: 12px 18px; cursor: pointer; transition: 0.3s; }
+        .climb-step.active-climb { background: #e0fdf4; border-color: var(--success); transform: translateX(8px); }
+        .climb-badge { width: 38px; height: 38px; background: #64748b; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; margin-right: 15px; }
+        .climb-step.active-climb .climb-badge { background: var(--success); }
+        .climb-text { font-size: 1.05rem; font-weight: bold; }
+        .feedback-box-win { margin-top: 15px; padding: 14px; border-radius: 8px; font-weight: bold; font-size: 1.1rem; display: none; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>ಭಾರತದ ಪ್ರಾಕೃತಿಕ ವಿಭಾಗಗಳು</h1>
+        <p>Extraordinary Main-Bar Interactive Cinematic Window Book</p>
+    </div>
+
+    <div class="main-container">
+        <div class="main-bar-menu">
+            <button class="menu-tab active" onclick="switchWindow(1)"><i class="fa-solid fa-map-location-dot"></i> ಆಕ್ಟಿವಿಟಿ 1: ಲೈವ್ ಮ್ಯಾಪ್</button>
+            <button class="menu-tab" onclick="switchWindow(2)"><i class="fa-solid fa-key"></i> ಆಕ್ಟಿವಿಟಿ 2: ಕೋಡ್ ಬ್ರೇಕರ್</button>
+            <button class="menu-tab" onclick="switchWindow(3)"><i class="fa-solid fa-dharmachakra"></i> ಆಕ್ಟಿವಿಟಿ 3: ಜ್ಞಾನದ ಚಕ್ರ</button>
+            <button class="menu-tab" onclick="switchWindow(4)"><i class="fa-solid fa-images"></i> ಆಕ್ಟಿವಿಟಿ 4: ಭಾವಚಿತ್ರ ಗ್ಯಾಲರಿ</button>
+            <button class="menu-tab" onclick="switchWindow(5)"><i class="fa-solid fa-video"></i> ಆಕ್ಟಿವಿಟಿ 5: ವಿಡಿಯೋ ಅವತಾರ</button>
+            <button class="menu-tab" onclick="switchWindow(6)"><i class="fa-solid fa-scroll"></i> ಆಕ್ಟಿವಿಟಿ 6: ಇತಿಹಾಸದ ಕಥೆಗಾರ</button>
+            <button class="menu-tab" onclick="switchWindow(7)"><i class="fa-solid fa-turn-up"></i> ಆಕ್ಟಿವಿಟಿ 7: ಶಿಖರಾರೋಹಣ</button>
+        </div>
+
+        <div class="window-content active" id="win1">
+            <div class="window-title"><i class="fa-solid fa-earth-asia"></i> ಆಕ್ಟಿವಿಟಿ 1: ಪ್ರಾಕೃತಿಕ ವಿಭಾಗಗಳ ಲೈವ್ ಮ್ಯಾಪ್ ಎಕ್ಸ್‌ಪ್ಲೋರರ್</div>
+            <p class="instruction">ಬಲಭಾಗದ ಪ್ರಾಕೃತಿಕ ವಿಭಾಗಗಳ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ; ತಕ್ಷಣ **ಪರದೆಯ ಮಧ್ಯದಲ್ಲಿ ಬೃಹತ್ ಸಿನಿಮಾ ವಿಂಡೋ ಪಾಪ್-ಅಪ್ ಆಗಿ** ವಿವರ ಮೂಡುತ್ತದೆ:</p>
+            <div class="map-interactive-grid">
+                <div class="map-frame-box">
+                    <div class="map-img-placeholder">
+                        <img id="liveMasterMap" src="https://lh3.googleusercontent.com/d/17IWvgN8nqieynqJiEeEm24fT4eddSpv-" alt="India Physical Master Map">
+                    </div>
+                    <p style="font-weight:bold; margin-top:8px; color:var(--primary-color);">[ ಭಾರತದ ಪ್ರಾಕೃತಿಕ ನಕ್ಷೆ ]</p>
+                </div>
+                <div class="region-list-panel">
+                    <button class="region-card-btn" onclick="openCentralPop('photo', 'ಉತ್ತರದ ಹಿಮಾಲಯ ಪರ್ವತಗಳು', 'ಇದು ಭಾರತದ ಉತ್ತರದ ಗಡಿಯಲ್ಲಿರುವ ಅತಿ ಎತ್ತರವಾದ ಮುಡಿನಾಡು. ಇದರಲ್ಲಿ ಹಿಮಾದ್ರಿ, ಹಿಮಾಚಲ ಮತ್ತು ಶಿವಾಲಿಕ್ ಎಂಬ ಮೂರು ಸರಣಿಗಳಿವೆ. ಪ್ರಪಂಚದ ಅತಿ ಎತ್ತರದ ಮೌಂಟ್ ಎವರೆಸ್ಟ್ ಮತ್ತು ಭಾರತದ ಅತಿ ಎತ್ತರದ K2 ಶಿಖರ ಇಲ್ಲಿದೆ.', '1EJpy8RHHtGKBobI0gmXMZKOmQ0iAkKwQ')"><i class="fa-solid fa-mountain" style="color:#784212;"></i> 1. ಉತ್ತರದ ಪರ್ವತ ಪ್ರಾಂತ್ಯ (ಹಿಮಾಲಯ)</button>
+                    <button class="region-card-btn" onclick="openCentralPop('photo', 'ಉತ್ತರದ ಬೃಹತ್ ಮೈದಾನಗಳು', 'ಸಿಂಧು, ಗಂಗา ಮತ್ತು ಬ್ರಹ್ಮಪುತ್ರ ನದಿಗಳು ತಂದು ಹಾಕಿದ ಫಲವತ್ತಾದ ಕಲಿಲ ಮಣ್ಣಿನಿಂದ ಈ ವಿಶಾಲ ಬಯಲು ನಿರ್ಮಾಣವಾಗಿದೆ. ಇದು ಭಾರತದ ಅತ್ಯಂತ ದಟ್ಟ ಜನಸಂಖ್ಯೆ ಮತ್ತು ಕೃಷಿ ಸಮೃದ್ಧಿಯ ಕಣಜವಾಗಿದೆ.', '10kiePmg7cHFpDdj3MTKFtu_0zdpufvEP')"><i class="fa-solid fa-wheat-awn" style="color:#15803d;"></i> 2. ಉತ್ತರದ ಬೃಹತ್ ಮೈದಾನ ಪ್ರದೇಶ</button>
+                    <button class="region-card-btn" onclick="openCentralPop('photo', 'ಪರ್ಯಾಯ ದ್ವೀಪದ ಪೀಠಭೂಮಿ', 'ಇದು ಭಾರತದ ಅತಿ ಪ್ರಾಚೀನ ಮತ್ತು ವಿಸ್ತಾರವಾದ ಪ್ರಾಕೃತಿಕ ವಿಭಾಗ. ತ್ರಿಕೋನಾಕಾರದಲ್ಲಿರುವ ಈ ದಖನ್ ಪೀಠಭೂಮಿ ಮತ್ತು ಮಾಳ್ವ ಪೀಠಭೂಮಿಗಳು ಖನಿಜಗಳ ಭಂಡಾರವಾಗಿವೆ. ಇಲ್ಲಿ ಪಶ್ಚಿಮ ಮತ್ತು ಪೂರ್ವ ಘಟ್ಟಗಳಿವೆ.', '1Dby80oK0uDbiIysR6qmGafepd1HL0Ju9')"><i class="fa-solid fa-layer-group" style="color:#b45309;"></i> 3. ಪರ್ಯಾಯ ದ್ವೀಪದ ಪೀಠಭೂಮಿ</button>
+                    <button class="region-card-btn" onclick="openCentralPop('photo', 'ಕರಾವಳಿ ಮೈದಾನಗಳು ಮತ್ತು ದ್ವೀಪಗಳು', 'ಭಾರತವು ಪೂರ್ವ ಮತ್ತು ಪಶ್ಚಿಮದಲ್ಲಿ ವಿಶಾಲ ಸಮುದ್ರ ಕಿನಾರೆ ಹೊಂದಿದೆ. ಪಶ್ಚಿಮ ಕರಾವಳಿಯನ್ನು ಕೊಂಕಣ, ಮಲಬಾರ್ ಎನ್ನಲಾಗುತ್ತದೆ. ಸಮುದ್ರದಲ್ಲಿ ಹವಳದ ಲಕ್ಷದ್ವೀಪಗಳು ಮತ್ತು ಅಂಡಮಾನ್ ನಿಕೋಬಾರ್ ದ್ವೀಪ ಸಮೂಹಗಳಿವೆ.', '1snQCIYmCcpxWAKce9F-EL0m9F4I7CQ-m')"><i class="fa-solid fa-umbrella-beach" style="color:#0369a1;"></i> 4. ಕರಾವಳಿ ಮೈದಾನ ಹಾಗೂ ದ್ವೀಪ ಸಮೂಹಗಳು</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="window-content" id="win2">
+            <div class="window-title"><i class="fa-solid fa-unlock-keyhole"></i> ಆಕ್ಟಿವಿಟಿ 2: ಭೂಗೋಳ ಶಾಸ್ತ್ರದ ಸೀಕ್ರೆಟ್ ಕೋಡ್ ಬ್ರೇಕರ್</div>
+            <p class="instruction">ಭಾರತದ ಪ್ರಾಕೃತಿಕ ವಿಭಾಗಗಳ ಪ್ರಮುಖ ಅಂಕಿ-ಅಂಶಗಳನ್ನು ಸರಿಯಾಗಿ ಟೈಪ್ ಮಾಡಿ ರಹಸ್ಯ ಲಾಕ್ ಮುಕ್ತಗೊಳಿಸಿ:</p>
+            <div class="code-breaker-layout">
+                <div class="code-row"><span class="code-label">1. ಭಾರತದ ಪರ್ಯಾಯ ದ್ವೀಪ ಪೀಠಭೂಮಿಯ ದಕ್ಷಿಣದ ಅತಿ ಎತ್ತರದ ಶಿಖರ ಯಾವುದು? (ಪದ ಟೈಪ್ ಮಾಡಿ)</span><input type="text" class="code-input" id="ci1" style="width:130px;" placeholder="ಅನೈಮುಡಿ"></div>
+                <div class="code-row"><span class="code-label">2. ಹಿಮಾಲಯ ಪರ್ವತಗಳ ಒಟ್ಟು ಉದ್ದ ಸುಮಾರು ಎಷ್ಟು ಕಿಲೋಮೀಟರ್? (ಸಂಖ್ಯೆ ಮಾತ್ರ)</span><input type="text" class="code-input" id="ci2" placeholder="2400"></div>
+                <div class="code-row"><span class="code-label">3. ಭಾರತದ ಪೂರ್ವ ಕರಾವಳಿಯಲ್ಲಿರುವ ಪ್ರಸಿದ್ಧ ಉಪ್ಪುನೀರಿನ ಸರೋವರ ಯಾವುದು? (ಪದ ಟೈಪ್ ಮಾಡಿ)</span><input type="text" class="code-input" id="ci3" style="width:130px;" placeholder="ಚಿಲ್ಕಾ"></div>
+                <div class="code-row"><span class="code-label">4. ಭಾರತದ ಪಶ್ಚಿಮ ಭಾಗದಲ್ಲಿರುವ ಪ್ರಸಿದ್ಧ ಮರುಭೂಮಿ ಯಾವುದು? (ಪದ ಟೈಪ್ ಮಾಡಿ)</span><input type="text" class="code-input" id="ci4" style="width:130px;" placeholder="ಥಾರ್"></div>
+                <div class="code-row"><span class="code-label">5. ಭಾರತದ ಮುಖ್ಯ ಭೂಭಾಗದ ಒಟ್ಟು ಕರಾವಳಿ ತೀರದ ಉದ್ದ ಎಷ್ಟು ಕಿಲೋಮೀಟರ್? (ಸಂಖ್ಯೆ ಮಾತ್ರ)</span><input type="text" class="code-input" id="ci5" placeholder="6100"></div>
+                <center><button class="action-btn" onclick="breakPhysicalCode()"><i class="fa-solid fa-key"></i> ಕೋಡ್ ಅನ್‌ಲಾಕ್ ಮಾಡಿ</button></center>
+            </div>
+            <div class="feedback-box-win" id="fb2"></div>
+        </div>
+
+        <div class="window-content" id="win3">
+            <div class="window-title"><i class="fa-solid fa-rotate"></i> ಆಕ್ಟಿವಿಟಿ 3: ಜ್ಞಾನದ ಚಕ್ರ (ಭೌಗೋಳಿಕ ಸತ್ಯ ಶೋಧನೆ)</div>
+            <p class="instruction">'Spin' ಬಟನ್ ಕ್ಲಿಕ್ ಮಾಡಿ ಚಕ್ರವನ್ನು ತಿರುಗಿಸಿ, ನಿಂತ ಜಾಗದ ಹಕ್ಕಿನ ಆಧಾರದ ಮೇಲೆ ಪ್ರಶ್ನೆಗೆ ಸರಿಯಾದ ಉತ್ತರ ನೀಡಿ ಬಲೂನ್ ಬಸ್ಟ್ ಮಾಡಿ:</p>
+            <div class="wheel-container">
+                <div style="position:relative;">
+                    <div class="wheel-pointer"></div>
+                    <div class="digital-wheel" id="mainWheel"></div>
+                </div>
+                <button class="action-btn" onclick="spinPhysicalWheel()"><i class="fa-solid fa-play"></i> ಚಕ್ರ ತಿರುಗಿಸಿ</button>
+                <div class="wheel-text" id="wheelRes">ಚಕ್ರ ತಿರುಗಿಸಲು ಕಾಯಲಾಗುತ್ತಿದೆ...</div>
+                <div id="wheelQuestionArea" style="display:none; width:100%; max-width:600px;">
+                    <p id="wq-text" style="font-size:1.15rem; font-weight:bold; margin-bottom:10px; text-align:center;"></p>
+                    <div class="mcq-layout" id="wq-options"></div>
+                </div>
+            </div>
+            <div class="feedback-box-win" id="fb3"></div>
+        </div>
+
+        <div class="window-content" id="win4">
+            <div class="window-title"><i class="fa-solid fa-panorama"></i> ಆಕ್ಟಿವಿಟಿ 4: ಪ್ರಕೃತಿ ಸೌಂದರ್ಯದ ಡಿಜಿಟಲ್ ಭಾವಚಿತ್ರ ಸಂಶೋಧನೆ</div>
+            <p class="instruction">ಪ್ರಕೃತಿಯ ವಿಸ್ಮಯಗಳ ಕಾರ್ಡ್ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ; ತಕ್ಷಣ **ಪರದೆಯ ಮಧ್ಯದಲ್ಲಿ ಸಿನಿಮಾ ಪರದೆ ಓಪನ್ ಆಗಿ** ಚಿತ್ರ ಮತ್ತು ವಿವರ ಮೂಡುತ್ತದೆ:</p>
+            <div class="avatar-grid">
+                <div class="avatar-card" onclick="openCentralPop('photo', 'ಮೌಂಟ್ ಕೆ2 (ಗಾಡ್ವಿನ್ ಆಸ್ಟಿನ್)', 'ಇದು ಭಾರತದ ಅತ್ಯಂತ ಎತ್ತರವಾದ ಮತ್ತು ಪ್ರಪಂಚದ ಎರಡನೇ ಅತಿ ಎತ್ತರದ ಶಿಖರವಾಗಿದೆ. ಇದರ ಎತ್ತರ 8,611 ಮೀಟರ್ ಆಗಿದ್ದು, ಇದು ಹಿಮಾಲಯದ ಕಾರಾಕೋರಂ ಶ್ರೇಣಿಯಲ್ಲಿದೆ.', '1MIPVvOsdsTgDPlieNXARp6X-TjcCo2cU')">
+                    <div class="img-slot"><i class="fa-solid fa-mountain-sun"></i></div>
+                    <h4>ಮೌಂಟ್ K2 ಶಿಖರ</h4><p>ದೊಡ್ಡ ಪರದೆಯಲ್ಲಿ ವೀಕ್ಷಿಸಿ</p>
+                </div>
+                <div class="avatar-card" onclick="openCentralPop('photo', 'ಸುಂದರಬನ ಮುಖಜ ಭೂಮಿ (Delta)', 'ಗಂಗಾ ಮತ್ತು ಬ್ರಹ್ಮಪುತ್ರ ನದಿಗಳು ಬಂಗಾಳ ಕೊಲ್ಲಿಯನ್ನು ಸೇರುವ ಮುನ್ನ ಪ್ರಪಂಚದ ಅತಿ ದೊಡ್ಡ ಮುಡಿನಾಡಾದ ಸುಂದರಬನವನ್ನು ನಿರ್ಮಿಸುತ್ತವೆ. ಇದು ಸುಂದರಿ ವೃಕ್ಷಗಳು ಮತ್ತು ಬಂಗಾಳದ ಹುಲಿಗಳಿಗೆ ಪ್ರಸಿದ್ಧವಾಗಿದೆ.', '1xnkAGip0nzWw__y-MuKxzJ9-2nCUNYbV')">
+                    <div class="img-slot"><i class="fa-solid fa-tree"></i></div>
+                    <h4>ಸುಂದರಬನ ಡೆಲ್ಟಾ</h4><p>ದೊಡ್ಡ ಪರದೆಯಲ್ಲಿ ವೀಕ್ಷಿಸಿ</p>
+                </div>
+                <div class="avatar-card" onclick="openCentralPop('photo', 'ಪಶ್ಚಿಮ ಘಟ್ಟಗಳು (ಸಹ್ಯಾದ್ರಿ)', 'ಭಾರತದ ಪಶ್ಚಿಮ ಕರಾವಳಿಗೆ ಸಮಾಂತರವಾಗಿ ಹರಡಿರುವ ನಿರಂತರ ಪರ್ವತ ಸರಣಿ. ಇವು ಜೈವಿಕ ವೈವಿಧ್ಯತೆಯ ತಾಣಗಳಾಗಿದ್ದು, ಇಲ್ಲಿ ದಕ್ಷಿಣ ಭಾರತದ ಪ್ರಸಿದ್ಧ ಜಲಪಾತಗಳು ಮತ್ತು ದಟ್ಟ ಕಾಡುಗಳಿವೆ.', '1upQTVmsoKkRzGlEZPFVL9OEBsLtDIxiJ')">
+                    <div class="img-slot"><i class="fa-solid fa-water"></i></div>
+                    <h4>ಪಶ್ಚಿಮ ಘಟ್ಟಗಳು</h4><p>ದೊಡ್ಡ ಪರದೆಯಲ್ಲಿ ವೀಕ್ಷಿಸಿ</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="window-content" id="win5">
+            <div class="window-title"><i class="fa-solid fa-video"></i> ಆಕ್ಟಿವಿಟಿ 5: ಮಾತನಾಡುವ ಭೂಭಾಗಗಳು (ವಿಡಿಯೋ ಅಪ್ಲೋಡ್ ಮಾದರಿ)</div>
+            <p class="instruction">ಭೂಭಾಗಗಳ ಕಾರ್ಡ್ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ; ತಕ್ಷಣ **ವಿಂಡೋ ಮಧ್ಯದಲ್ಲಿ ಬೃಹತ್ ಸಿನಿಮಾ ಪರದೆ ಓಪನ್ ಆಗಿ ವಿದ್ಯಾರ್ಥಿ ರಚಿಸಿದ ಲೈವ್ ವಿಡಿಯೋ ಪ್ಲೇ ಆಗುತ್ತದೆ**:</p>
+            <div class="avatar-grid">
+                <div class="avatar-card" onclick="openCentralPop('video', 'ಹಿಮಾಲಯದ ಆತ್ಮಕಥೆ ವಿಡಿಯೋ', 'ನಾನು ಭಾರತದ ಉತ್ತರ ದಿಕ್ಕಿನಲ್ಲಿ ಕೋಟೆಯಂತೆ ನಿಂತು ಶೀತಲ ಮಾರುತಗಳನ್ನು ತಡೆದು ದೇಶವನ್ನು ರಕ್ಷಿಸುವ ಕಾವಲುಗಾರ ಹಿಮಾಲಯ ಪರ್ವತ ರಾಜ!.', '1Ecu-PSU4nQ75OxGeoshN63uPV5lbJgbZ')">
+                    <div class="img-slot"><i class="fa-solid fa-circle-play" style="color:var(--secondary-color); font-size:3rem;"></i></div>
+                    <h4>ಹಿಮಾಲಯದ ಗರ್ಜನೆ</h4><p>ಭವ್ಯ ಪರದೆಯಲ್ಲಿ ವೀಕ್ಷಿಸಿ</p>
+                </div>
+                <div class="avatar-card" onclick="openCentralPop('video', 'ಲಕ್ಷದ್ವೀಪದ ಸಾಹಸ ಸಮುದ್ರ ವಿಡಿಯೋ', 'ನಾನು ಅರಬ್ಬಿ ಸಮುದ್ರದಲ್ಲಿ ಹವಳದ ಕೀಟಗಳಿಂದ ಸೃಷ್ಟಿಯಾದ ಭಾರತದ ಅತ್ಯಂತ ಸುಂದರ ಪ್ರವಾಸಿ ದ್ವೀಪ ಸಮೂಹ ಲಕ್ಷದ್ವೀಪ!.', '15Fbw3ezXnPgkfk313odz4LKjBgb6jAh9')">
+                    <div class="img-slot"><i class="fa-solid fa-circle-play" style="color:var(--secondary-color); font-size:3rem;"></i></div>
+                    <h4>ಲಕ್ಷದ್ವೀಪದ  ಸ್ವಗತ</h4><p>ಭವ್ಯ ಪರದೆಯಲ್ಲಿ ವೀಕ್ಷಿಸಿ</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="window-content" id="win6">
+            <div class="window-title"><i class="fa-solid fa-feather-pointed"></i> ಆಕ್ಟಿವಿಟಿ 6: ಇತಿಹಾಸದ ಕಥೆಗಾರ (ಭೌಗೋಳಿಕ ಕಥಾ ಸಂಯೋಜನೆ)</div>
+            <p class="instruction">ಕೆಳಗಿರುವ ಜ್ಞಾನದ ಚಿಪ್ಸ್‌ಗಳನ್ನು ಸರಿಯಾದ ಖಾಲಿ ಜಾಗಕ್ಕೆ ಡ್ರಾಗ್ ಮಾಡಿ ಜೋಡಿಸಿ ಇಡೀ ಭೂಗೋಳದ ಕಥೆಯನ್ನು ಪೂರ್ಣಗೊಳಿಸಿ:</p>
+            <div class="weaver-passage">
+                ಭಾರತದ ಪ್ರಾಕೃತಿಕ ವಿಭಾಗಗಳಲ್ಲಿ ಅತ್ಯಂತ ವಿಸ್ತಾರವಾದ ಭೂಭಾಗವೆಂದರೆ ಪರ್ಯಾಯ ದ್ವೀಪದ 
+                <div class="weaver-drop" id="wd1" data-ans="ಪೀಠಭೂಮಿ"></div> 
+                ಆಗಿದೆ. ಇದರ ಪಶ್ಚಿಮ ಗಡಿಯಲ್ಲಿ ನಿರಂತರವಾಗಿ ಹರಡಿರುವ ಪರ್ವತಗಳನ್ನು  
+                <div class="weaver-drop" id="wd2" data-ans="ಪಶ್ಚಿಮ ಘಟ್ಟಗಳು"></div> 
+                ಎಂದು ಕರೆಯುತ್ತಾರೆ. ಭಾರತದ ಪೂರ್ವ ಕರಾವಳಿಯು ಪಶ್ಚಿಮ ಕರಾವಳಿಗಿಂತ ಹೆಚ್ಚು ವಿಸ್ತಾರವಾಗಿದ್ದು, ಇಲ್ಲಿ ನದಿಗಳು ಜಗತ್ಪ್ರಸಿದ್ಧ 
+                <div class="weaver-drop" id="wd3" data-ans="ಮುಖಜ ಭೂಮಿ"></div> 
+                ಗಳನ್ನು ನಿರ್ಮಿಸುತ್ತವೆ. ಭಾರತದ ದಕ್ಷಿಣದ ತುತ್ತತುದಿಯ ಸಾಗರ ಸಂಗಮದ ಸ್ಥಳವೇ 
+                <div class="weaver-drop" id="wd4" data-ans="ಕನ್ಯಾಕುಮಾರಿ"></div> 
+                ಆಗಿದೆ. ಇನ್ನು ಬಂಗಾಳ ಕೊಲ್ಲಿಯಲ್ಲಿ ಭಾರತಕ್ಕೆ ಸೇರಿದ ಸುಂದರ 
+                <div class="weaver-drop" id="wd5" data-ans="ಅಂಡಮಾನ್ ನಿಕೋಬಾರ್"></div> 
+                ದ್ವೀಪ ಸಮೂಹಗಳಿವೆ.
+            </div>
+            <div class="weaver-pool" id="weaverPool">
+                <div class="weaver-chip" draggable="true" id="wc1">ಪಶ್ಚಿಮ ಘಟ್ಟಗಳು</div>
+                <div class="weaver-chip" draggable="true" id="wc2">ಕನ್ಯಾಕುಮಾರಿ</div>
+                <div class="weaver-chip" draggable="true" id="wc3">ಪೀಠಭೂಮಿ</div>
+                <div class="weaver-chip" draggable="true" id="wc4">ಅಂಡಮಾನ್ ನಿಕೋಬಾರ್</div>
+                <div class="weaver-chip" draggable="true" id="wc5">ಮುಖಜ ಭೂಮಿ</div>
+            </div>
+            <center><button class="action-btn" style="margin-top:20px;" onclick="verifyStoryWeaver()"><i class="fa-solid fa-wand-magic-sparkles"></i> ಕಥೆಯನ್ನು ದೃಢೀಕರಿಸಿ</button></center>
+            <div class="feedback-box-win" id="fb6"></div>
+        </div>
+
+        <div class="window-content" id="win7">
+            <div class="window-title"><i class="fa-solid fa-stairs"></i> ಆಕ್ಟಿವಿಟಿ 7: ...ಹಿಮಾಲಯ ಶಿಖರಾರೋಹಣ ಚಾಲೆಂಜ್ (Step Climber Game)</div>
+            <p class="instruction">ಹಿಮಾಲಯದ ಸರಣಿಗಳನ್ನು ದಕ್ಷಿಣದಿಂದ ಉತ್ತರಕ್ಕೆ (ಕೆಳಗಿನಿಂದ ಮೇಲಕ್ಕೆ) ಸರಿಯಾದ ಜೋಡಣೆಯ ಕ್ರಮದಲ್ಲಿ ಕ್ಲಿಕ್ ಮಾಡುತ್ತಾ ಶಿಖರಾರೋಹಣ ಮಾಡಿ:</p>
+            <div class="climber-layout">
+                <div class="climb-step" onclick="climbPhysicalStep(4, 'ಮೌಂಟ್ ಎವರೆಸ್ಟ್ ಮತ್ತು K2 ಅತ್ಯುನ್ನತ ಶಿಖರಗಳ ತುತ್ತತುದಿ')" id="cs4"><div class="climb-badge">4</div><span class="climb-text">ಮೌಂಟ್ ಎವರೆಸ್ಟ್ ಮತ್ತು K2 ಅತ್ಯುನ್ನತ ಶಿಖರಗಳ ತುತ್ತತುದಿ</span></div>
+                <div class="climb-step" onclick="climbPhysicalStep(3, 'ಮಹಾ ಹಿಮಾಲಯ ಅಥವಾ ಹಿಮಾದ್ರಿ ಶ್ರೇಣಿ (ಅತಿ ಎತ್ತರದ ಸರಣಿ)')" id="cs3"><div class="climb-badge">3</div><span class="climb-text">ಮಹಾ ಹಿಮಾಲಯ ಅಥವಾ ಹಿಮಾದ್ರಿ ಶ್ರೇಣಿ (ಅತಿ ಎತ್ತರದ ಸರಣಿ)</span></div>
+                <div class="climb-step" onclick="climbPhysicalStep(2, 'ಒಳ ಹಿಮಾಲಯ ಅಥವಾ ಹಿಮಾಚಲ ಶ್ರೇಣಿ (ಪ್ರವಾಸಿ ತಾಣಗಳ ಸರಣಿ)')" id="cs2"><div class="climb-badge">2</div><span class="climb-text">ಒಳ ಹಿಮಾಲಯ ಅಥವಾ ಹಿಮಾಚಲ ಶ್ರೇಣಿ (ಪ್ರವಾಸಿ ತಾಣಗಳ ಸರಣಿ)</span></div>
+                <div class="climb-step" onclick="climbPhysicalStep(1, 'ಬಾಹ್ಯ ಹಿಮಾಲಯ ಅಥವಾ ಶಿವಾಲಿಕ್ ಬೆಟ್ಟಗಳು (ಪಾದಬೆಟ್ಟಗಳ ಸರಣಿ)')" id="cs1"><div class="climb-badge">1</div><span class="climb-text">ಬಾಹ್ಯ ಹಿಮಾಲಯ ಅಥವಾ ಶಿವಾಲಿಕ್ ಬೆಟ್ಟಗಳು (ಪಾದಬೆಟ್ಟಗಳ ಸರಣಿ)</span></div>
+            </div>
+            <div class="feedback-box-win" id="fb7"></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="centralPopOverlay">
+        <div class="big-pop-box">
+            <span class="modal-close-btn" onclick="closeCentralPop()">×</span>
+            
+            <div id="modalPhotoView" class="modal-img-frame" style="display:none;">
+                <i class="fa-solid fa-map-location" id="defaultIcon" style="font-size: 5rem; color:#94a3b8;"></i>
+                <img id="liveImgElement" src="" style="display:none; width:100%; height:100%;">
+            </div>
+            
+            <div id="modalVideoView" class="modal-video-frame" style="display:none;">
+                <iframe id="liveVideoElement" src="" allow="autoplay"></iframe>
+            </div>
+
+            <div class="modal-title" id="liveTitleElement">ವಿಭಾಗದ ಹೆಸರು</div>
+            <div class="modal-desc" id="liveDescElement">ಭೌಗೋಳಿಕ ವಿವರಣೆ...</div>
+        </div>
+    </div>
+
+    <script>
+        // WINDOW SWITCHING SYSTEM
+        function switchWindow(idx) {
+            document.querySelectorAll('.window-content').forEach(w => w.style.display = 'none');
+            document.querySelectorAll('.menu-tab').forEach(t => t.classList.remove('active'));
+
+            document.getElementById(`win${idx}`).style.display = 'block';
+            document.querySelectorAll('.menu-tab')[idx - 1].classList.add('active');
+            
+            // Close video if running when switching tab
+            closeCentralPop();
+        }
+
+        // CONFETTI CELEBRATION ENGINE
+        function triggerConfetti() {
+            confetti({ particleCount: 160, spread: 85, origin: { y: 0.6 } });
+        }
+
+        // CENTRAL POP-UP MODAL ENGINE (LARGE CINEMATIC VIEW)
+        function openCentralPop(type, title, desc, mediaId) {
+            const overlay = document.getElementById('centralPopOverlay');
+            const photoSlot = document.getElementById('modalPhotoView');
+            const videoSlot = document.getElementById('modalVideoView');
+            const videoIframe = document.getElementById('liveVideoElement');
+            
+            document.getElementById('liveTitleElement').innerText = title;
+            document.getElementById('liveDescElement').innerText = desc;
+
+            if(type === 'photo') {
+                photoSlot.style.display = 'flex';
+                videoSlot.style.display = 'none';
+                videoIframe.src = ""; // stop video if any
+                
+                // Google Drive Direct Image conversion using ID
+                document.getElementById('liveImgElement').src = "https://drive.google.com/thumbnail?id=" + mediaId + "&w=1000&sz=w1000";
+                document.getElementById('liveImgElement').style.display = 'block';
+                document.getElementById('defaultIcon').style.display = 'none';
+            } else if(type === 'video') {
+                photoSlot.style.display = 'none';
+                videoSlot.style.display = 'flex';
+                
+                // Google Drive Video Embed Stream Link Generation
+                videoIframe.src = "https://drive.google.com/file/d/" + mediaId + "/preview";
+            }
+            overlay.classList.add('open');
+        }
+
+        function closeCentralPop() {
+            document.getElementById('centralPopOverlay').classList.remove('open');
+            document.getElementById('liveVideoElement').src = ""; // Stops video playback completely on close
+        }
+
+        // --- Act 2: Code Breaker Logic ---
+        function breakPhysicalCode() {
+            const a1 = document.getElementById('ci1').value.trim();
+            const a2 = document.getElementById('ci2').value.trim();
+            const a3 = document.getElementById('ci3').value.trim();
+            const a4 = document.getElementById('ci4').value.trim();
+            const a5 = document.getElementById('ci5').value.trim();
+
+            const fb = document.getElementById('fb2'); fb.style.display = "block";
+
+            if((a1 === 'ಅನೈಮುಡಿ' || a1 === 'anaimudi') && a2 === '2400' && (a3 === 'ಚಿಲ್ಕಾ' || a3 === 'chilka') && (a4 === 'ಥಾರ್' || a4 === 'thar') && a5 === '6100') {
+                fb.innerHTML = "🔓 ಸೀಕ್ರೆಟ್ ಕೋಡ್ ಬ್ರೇಕ್ ಆಗಿದೆ! ಭಾರತದ ಪ್ರಾಕೃತಿಕ ವಿಭಾಗಗಳ ರಹಸ್ಯ ಲಾಕ್ ಮುಕ್ತಗೊಂಡಿದೆ.";
+                fb.style.background = "#d1fae5"; fb.style.color = "#065f46";
+                triggerConfetti();
+            } else {
+                fb.innerHTML = "🔒 ಕೋಡ್ ತಪ್ಪಾಗಿದೆ! ಕೆಲವು ಅಂಕಿ-ಅಂಶಗಳು ಹೊಂದಿಕೆಯಾಗುತ್ತಿಲ್ಲ, ಮತ್ತೊಮ್ಮೆ ಯೋಚಿಸಿ ತಿದ್ದಿ.";
+                fb.style.background = "#fee2e2"; fb.style.color = "#991b1b";
+            }
+        }
+
+        // --- Act 3: Spin Wheel Logic ---
+        let wheelSpun = false;
+        function spinPhysicalWheel() {
+            if(wheelSpun) return;
+            wheelSpun = true;
+            const wheel = document.getElementById('mainWheel');
+            const randomDeg = Math.floor(Math.random() * 360) + 1440;
+            wheel.style.transform = `rotate(${randomDeg}deg)`;
+            
+            setTimeout(() => {
+                document.getElementById('wheelRes').innerText = "🎯 ಚಕ್ರವು 'ಕರಾವಳಿ ವಿಭಾಗ' ಜಾಗದಲ್ಲಿ ನಿಂತಿದೆ!";
+                document.getElementById('wheelQuestionArea').style.display = 'block';
+                loadWheelQuestion();
+            }, 3000);
+        }
+
+        function loadWheelQuestion() {
+            document.getElementById('wq-text').innerText = "ಪ್ರಶ್ನೆ: ಕರ್ನಾಟಕದ ಸುಂದರ ಕರಾವಳಿ ತೀರವನ್ನು ಏನೆಂದು ಕರೆಯುತ್ತಾರೆ?";
+            const opts = ["ಕೊಂಕಣ ಕರಾವಳಿ", "ಮಲಬಾರ್ ಕರಾವಳಿ", "ಕೆನರಾ ಕರಾವಳಿ", "ಕೋರಮಂಡಲ ಕರಾವಳಿ"];
+            const container = document.getElementById('wq-options'); container.innerHTML = "";
+            opts.forEach((opt, idx) => {
+                const b = document.createElement('button'); b.className = "mcq-opt"; b.innerText = opt;
+                b.onclick = () => {
+                    const fb = document.getElementById('fb3'); fb.style.display = "block";
+                    if(idx === 2) {
+                        b.classList.add('correct'); fb.innerHTML = "🎈 ಬಲೂನ್ ಬಸ್ಟ್! ಜ್ಞಾನದ ಚಕ್ರದ ಉತ್ತರ ನಿಖರವಾಗಿದೆ.";
+                        fb.style.background = "#d1fae5"; fb.style.color = "#065f46"; triggerConfetti();
+                    } else {
+                        b.classList.add('wrong'); fb.innerHTML = "✗ ತಪ್ಪು ಉತ್ತರ, ಮರು ಪ್ರಯತ್ನ ಮಾಡಿ.";
+                        fb.style.background = "#fee2e2"; fb.style.color = "#991b1b";
+                    }
+                };
+                container.appendChild(b);
+            });
+        }
+
+        // --- Act 6: Drag & Drop Story Weaver ---
+        let draggingChip = null;
+        document.querySelectorAll('.weaver-chip').forEach(c => {
+            c.addEventListener('dragstart', () => draggingChip = c);
+        });
+        document.querySelectorAll('.weaver-drop').forEach(zone => {
+            zone.addEventListener('dragover', (e) => e.preventDefault());
+            zone.addEventListener('drop', () => {
+                if(draggingChip) {
+                    zone.innerText = draggingChip.innerText;
+                    zone.classList.add('populated');
+                }
+            });
+        });
+
+        function verifyStoryWeaver() {
+            let faults = 0;
+            for(let i=1; i<=5; i++) {
+                const zone = document.getElementById(`wd${i}`);
+                if(zone.innerText.trim() !== zone.getAttribute('data-ans')) faults++;
+            }
+            const fb = document.getElementById('fb6'); fb.style.display = "block";
+            if(faults === 0) {
+                fb.innerHTML = "✓ ಅದ್ಭುತ ಪ್ರಕೃತಿ ಕಥೆಗಾರ! ಇಡೀ ಪ್ರಾಕೃತಿಕ ವಿಭಾಗಗಳ ಕಥೆಯನ್ನು ನಿಖರವಾಗಿ ಹೆಣೆದಿದ್ದೀರಿ.";
+                fb.style.background = "#d1fae5"; fb.style.color = "#065f46"; triggerConfetti();
+            } else {
+                fb.innerHTML = "✗ ಕೆಲವು ಜಾಗದಲ್ಲಿ ತಪ್ಪು ಭೂಭಾಗ ಜೋಡಣೆಯಾಗಿದೆ. ಕಥೆಯನ್ನು ಮತ್ತೊಮ್ಮೆ ಓದಿ ತಿದ್ದಿ.";
+                fb.style.background = "#fee2e2"; fb.style.color = "#991b1b";
+            }
+        }
+
+        // --- Act 7: Step Climber Logic ---
+        let currentExpectedStep = 1;
+        function climbPhysicalStep(stepNum, text) {
+            const fb = document.getElementById('fb7'); fb.style.display = "block";
+            if(stepNum === currentExpectedStep) {
+                document.getElementById(`cs${stepNum}`).classList.add('active-climb');
+                fb.innerHTML = `🪜 ಹಂತ ${stepNum} ಆರೋಹಣ ಮುಗಿಯಿತು! ಮೇಲಕ್ಕೆ ಸಾಗಿ...`;
+                fb.style.background = "#d1fae5"; fb.style.color = "#065f46";
+                if(stepNum === 4) {
+                    fb.innerHTML = "🎉 ಪರಿಪೂರ್ಣ! ನೀವು ಹಿಮಾಲಯ ಶಿಖರಾರೋಹಣ ಚಾಲೆಂಜ್ ಜಯಿಸಿ ಮೌಂಟ್ ಎವರೆಸ್ಟ್ ತಲುಪಿದ್ದೀರಿ!";
+                    triggerConfetti();
+                }
+                currentExpectedStep++;
+            } else {
+                fb.innerHTML = "✗ ತಪ್ಪು ಹಂತ! ಕೆಳಗಿನ ಶಿವಾಲಿಕ್ ಬೆಟ್ಟಗಳಿಂದ ಹಂತಹಂತವಾಗಿ ಮೇಲಕ್ಕೆ ಏರಿ ಶಿಖರ ತಲುಪಿ.";
+                fb.style.background = "#fee2e2"; fb.style.color = "#991b1b";
+            }
+        }
+    </script>
+</body>
+</html>
