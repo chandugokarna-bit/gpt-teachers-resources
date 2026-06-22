@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>वृक्ष रक्षक: सुनो मेरी कहानी RPG</title>
+    <style>
+        :root {
+            --bg-dark: #05050a;
+            --panel-bg: #0f1123;
+            --neon-green: #39ff14;
+            --neon-blue: #00f0ff;
+            --neon-red: #ff3131;
+            --neon-gold: #ffd700;
+            --text-light: #e2e8f0;
+            --border-glow: #1f2937;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .rpg-container {
+            max-width: 850px;
+            width: 100%;
+            background: var(--panel-bg);
+            border: 2px solid #1e293b;
+            border-radius: 24px;
+            padding: 25px;
+            box-shadow: 0 0 35px rgba(0, 240, 255, 0.15);
+            position: relative;
+        }
+
+        /* RPG Status Bar & Tree HUD */
+        .game-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .game-title {
+            font-size: 2.2rem;
+            color: #fff;
+            text-shadow: 0 0 10px var(--neon-blue);
+            margin: 0;
+        }
+
+        .status-panel {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 15px;
+            border-radius: 16px;
+            margin-top: 15px;
+            border: 1px solid #1e293b;
+        }
+
+        .stat-box {
+            text-align: center;
+            font-size: 1rem;
+        }
+
+        .stat-val {
+            font-size: 1.3rem;
+            font-weight: bold;
+            display: block;
+            margin-top: 4px;
+        }
+
+        /* Interactive Life Gauge */
+        .life-bar-container {
+            background: #222;
+            border-radius: 8px;
+            height: 16px;
+            width: 100%;
+            margin-top: 5px;
+            overflow: hidden;
+            border: 1px solid #444;
+        }
+
+        .life-bar-fill {
+            height: 100%;
+            width: 100%;
+            background: linear-gradient(90deg, var(--neon-red), var(--neon-green));
+            transition: width 0.5s ease;
+        }
+
+        /* Visual Tree Avatar Stage */
+        .stage-box {
+            background: radial-gradient(circle, #1e1b4b 0%, #09090b 100%);
+            border: 2px solid #312e81;
+            height: 160px;
+            border-radius: 16px;
+            margin: 20px 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .tree-avatar {
+            font-size: 4.5rem;
+            transition: transform 0.3s ease;
+        }
+
+        .tree-pulse {
+            animation: pulse 2s infinite alternate;
+        }
+
+        .damage-fx {
+            animation: shake 0.4s ease-in-out;
+            border-color: var(--neon-red) !important;
+        }
+
+        /* Card Mechanics */
+        .quest-card {
+            display: none;
+        }
+
+        .quest-card.active {
+            display: block;
+        }
+
+        .prompt-text {
+            font-size: 1.3rem;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            color: #fff;
+            border-left: 5px solid var(--neon-blue);
+            padding-left: 15px;
+        }
+
+        .grid-choices {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        @media(max-width: 600px) {
+            .grid-choices { grid-template-columns: 1fr; }
+        }
+
+        .choice-node {
+            background: #111428;
+            border: 2px solid #1e293b;
+            color: var(--text-light);
+            padding: 16px;
+            border-radius: 14px;
+            cursor: pointer;
+            text-align: left;
+            font-size: 1.1rem;
+            transition: all 0.2s ease;
+        }
+
+        .choice-node:hover:not([disabled]) {
+            border-color: var(--neon-blue);
+            background: #161b3d;
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .choice-node.success-state {
+            background: rgba(57, 255, 20, 0.1) !important;
+            border-color: var(--neon-green) !important;
+            color: var(--neon-green);
+        }
+
+        .choice-node.fail-state {
+            background: rgba(255, 49, 49, 0.1) !important;
+            border-color: var(--neon-red) !important;
+            color: var(--neon-red);
+        }
+
+        .lore-popup {
+            background: #090d16;
+            border: 1px dashed var(--neon-blue);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            display: none;
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
+        /* Action Footer */
+        .footer-deck {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 25px;
+            align-items: center;
+        }
+
+        .action-btn {
+            background: linear-gradient(135deg, #1e40af, #3b82f6);
+            color: #fff;
+            border: none;
+            padding: 12px 28px;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .action-btn:disabled {
+            background: #1e293b;
+            color: #475569;
+            cursor: not-allowed;
+        }
+
+        .voice-chip {
+            background: none;
+            border: 1px solid #334155;
+            color: #94a3b8;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .voice-chip.on {
+            border-color: var(--neon-gold);
+            color: var(--neon-gold);
+        }
+
+        /* Animations */
+        @keyframes pulse {
+            from { transform: scale(1); }
+            to { transform: scale(1.05); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
+        }
+
+        /* Endgame Screen */
+        .victory-panel {
+            text-align: center;
+            display: none;
+        }
+
+        .rank-glow {
+            font-size: 3rem;
+            color: var(--neon-gold);
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="rpg-container" id="main-board">
+        <div class="game-header">
+            <h1 class="game-title">सुनो मेरी कहानी: स्टोरी क्वेस्ट</h1>
+            
+            <div class="status-panel">
+                <div class="stat-box">क्वेस्ट स्टेज<span class="stat-val" id="stage-txt" style="color:var(--neon-blue);">1/20</span></div>
+                <div class="stat-box">वृक्ष स्कोर<span class="stat-val" id="score-txt" style="color:var(--neon-gold);">0 XP</span></div>
+                <div class="stat-box">पेड़ का स्वास्थ्य (Health)
+                    <div class="life-bar-container"><div class="life-bar-fill" id="health-fill"></div></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dynamic Environment Stage -->
+        <div class="stage-box" id="avatar-frame">
+            <div class="tree-avatar tree-pulse" id="tree-emoji">🌳</div>
+            <div id="status-bubble" style="margin-top:10px; font-weight:bold; color:var(--neon-green);">पेड़ पूरी तरह स्वस्थ है!</div>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; margin-bottom: 15px;">
+            <button class="voice-chip on" id="sound-toggle" onclick="toggleVoiceSetting()">🔊 वॉइस असिस्टेंट: चालू</button>
+        </div>
+
+        <!-- Render Target Area -->
+        <div id="quest-injection-point"></div>
+
+        <!-- Controller Layout -->
+        <div class="footer-deck">
+            <button class="action-btn" style="background:#334155;" onclick="triggerVoiceNarration()">🗣️ संवाद सुनें</button>
+            <button class="action-btn" id="next-stage-btn" onclick="advanceQuestStage()" disabled>अगला पड़ाव ➡️</button>
+        </div>
+
+        <!-- RPG Endgame Screen -->
+        <div class="victory-panel" id="end-panel">
+            <div style="font-size: 5rem;">🏆</div>
+            <h2>महान गाथा समाप्त हुई!</h2>
+            <p>आपने वनों की रक्षा करते हुए पेड़ की आत्मकथा के सभी चरणों को पूरा किया।</p>
+            <div class="rank-glow" id="final-xp">0 XP</div>
+            <div style="font-size: 1.2rem; margin-bottom:25px;">अर्जित पदवी: <span id="title-tag" style="font-weight:bold;">-</span></div>
+            <button class="action-btn" onclick="reviveGame()">🔄 नया अभियान शुरू करें</button>
+        </div>
+    </div>
+
+    <script>
+        const questData = [
+            { q: "१. इस कहानी में अपनी जीवन गाथा सुनाने वाला मुख्य वक्ता कौन है?", dynamicOpts: ["एक राजा", "एक बूढ़ा आदमी", "एक विशाल पेड़", "एक छोटा पक्षी"], rightIdx: 2, note: "पेड़ आत्मकथा शैली में सीधे बच्चों से मुखातिब होकर अपनी कहानी बयां कर रहा है।" },
+            { q: "२. बच्चे जब पेड़ के इर्द-गिर्द खेलते हैं, तो पेड़ को क्या महसूस होता है?", dynamicOpts: ["उसे सिरदर्द होता है", "उसे असीम प्रसन्नता होती है", "उसे बहुत गुस्सा आता है", "वह डर जाता है"], rightIdx: 1, note: "बच्चों की चंचलता देखकर पेड़ अपनी सारी चिंता भूलकर अत्यंत खुश होता है।" },
+            { q: "३. पेड़ अपने शरीर की बनावट के कुल कितने मुख्य हिस्से बताता है?", dynamicOpts: ["दो हिस्से", "तीन हिस्से", "चार हिस्से", "पाँच हिस्से"], rightIdx: 1, note: "पेड़ के ३ मुख्य हिस्से होते हैं: १) जड़ें, २) तना, ३) शाखाएँ व पत्ते।" },
+            { q: "४. पेड़ का वह कौन सा अंग है जो ज़मीन के नीचे छिपा रहता है और पानी चूसता है?", dynamicOpts: ["पत्ते", "फल", "तना", "जड़ें"], rightIdx: 3, note: "जड़ें पेड़ को मिट्टी में मजबूती से पकड़कर रखती हैं और पानी व खनिज खींचती हैं।" },
+            { q: "५. पेड़ इंसानों की तरह ही साँस लेता है, यह कार्य उसके किस अंग द्वारा होता है?", dynamicOpts: ["पत्तों द्वारा", "फूलों द्वारा", "छाल द्वारा", "शाखाओं द्वारा"], rightIdx: 0, note: "पत्तों में छोटे-छोटे छिद्र होते हैं जिनके ज़रिए पेड़ हवा में सांस लेता है।" },
+            { q: "६. इनमें से कौन सा जोड़ा पेड़ ने अपने सगे 'भाई' के रूप में पाठ में बताया है?", dynamicOpts: ["तुलसी और पुदीना", "बरगद और पीपल", "कैक्टस और घास", "गुलाब और गेंदा"], rightIdx: 1, note: "बरगद, पीपल, नीम, आम आदि बड़े वृक्ष होने के कारण उसके भाई कहलाते हैं।" },
+            { q: "७. स्वार्थी मनुष्य अपनी सुख-सुविधाओं के लिए कुल्हाड़ी से किस पर वार करता है?", dynamicOpts: ["पत्थरों पर", "नदियों पर", "पेड़ों के तनों पर", "आसमान पर"], rightIdx: 2, note: "इंसान लकड़ी प्राप्त करने के लिए बिना सोचे-समझे पेड़ों पर कुल्हाड़ी चलाकर उन्हें काट देता है।" },
+            { q: "८. जब बच्चे पेड़ पर पत्थर मारकर उसे चोट पहुँचाते हैं, तब भी पेड़ उन्हें बदले में क्या देता है?", dynamicOpts: ["कांटे चुभाता है", "मीठे-मीठे फल देता है", "पत्ते गिराता है", "छाया छीन लेता है"], rightIdx: 1, note: "पेड़ परम परोपकारी है; वह पत्थर खाने के बाद भी बच्चों को मधुर फल भेंट करता है।" },
+            { q: "९. पेड़ के मुख्य तने पर कुछ शरारती तत्व क्या बुरा काम करते हैं जिससे पेड़ रो पड़ता है?", dynamicOpts: ["पानी डालते हैं", "छाल पर नाम खोदते हैं", "खाद डालते हैं", "दवा लगाते हैं"], rightIdx: 1, note: "नुकीली चीज़ों से तने की त्वचा को खरोंचकर नाम लिखने से पेड़ को असहनीय पीड़ा होती है।" },
+            { q: "१०. लिंग बदलिए (व्याकरण): पाठ के आधार पर बताएं कि 'अध्यापक' का सही स्त्रीलिंग क्या होगा?", dynamicOpts: ["अध्यापकानी", "शिक्षिका", "अध्यापिका", "अध्यापकी"], rightIdx: 2, note: "व्याकरणिक नियमों के अनुसार पुल्लिंग 'अध्यापक' का शुद्ध स्त्रीलिंग 'अध्यापिका' बनता है।" },
+            { q: "११. लिंग बदलिए (व्याकरण): तालिका के अनुसार 'भाई' शब्द का सही अन्य लिंग रूप क्या है?", dynamicOpts: ["माता", "बहन", "चाची", "भाभी"], rightIdx: 1, note: "'भाई' पुल्लिंग शब्द है, जिसका स्त्रीलिंग रूप 'बहन' होता है।" },
+            { q: "१२. वचन बदलिए (व्याकरण): कहानी में प्रयुक्त शब्द 'लकड़ी' का सही बहुवचन रूप क्या बनेगा?", dynamicOpts: ["लकड़ियाँ", "लकड़िएँ", "लकड़ीं", "लकड़ियों"], rightIdx: 0, note: "इकारांत शब्दों के अंत में 'याँ' लगाते समय अंतिम 'ई' की मात्रा छोटी 'इ' में बदल जाती है।" },
+            { q: "१३. वचन बदलिए (व्याकरण): 'कहानी' शब्द का शुद्ध बहुवचन रूप निम्नलिखित में से कौन सा है?", dynamicOpts: ["कहानियाँ", "कहानिए", "कहानीं", "कहानियाँ (बड़ी ई)" ], rightIdx: 0, note: "शुद्ध व्याकरणिक रूप 'कहानियाँ' है।" },
+            { q: "१४. विलोम शब्द (व्याकरण): पेड़ जिस 'प्रसन्न' शब्द का प्रयोग करता है, उसका ठीक उल्टा शब्द क्या है?", dynamicOpts: ["खुश", "अप्रसन्न", "हर्ष", "शांति"], rightIdx: 1, note: "प्रसन्न का विलोम 'अप्रसन्न' या 'दुखी' होता है।" },
+            { q: "१५. विलोम शब्द (व्याकरण): पेड़ इंसानों की 'भलाई' करता है। 'भलाई' का विलोम शब्द क्या होगा?", dynamicOpts: ["बुराई", "सच्चाई", "कमाई", "चतुराई"], rightIdx: 0, note: "भलाई का सटीक विपरीतार्थक शब्द 'बुराई' होता है।" },
+            {
+                q: "१६. वर्ण संयोजन (व्याकरण): 'व् + आ + इ + द् + य् + आ + र् + थ् + ई' अक्षरों को मिलाकर कौन सा सार्थक शब्द बनेगा?",
+                dynamicOpts: ["विद्यालय", "विद्वान", "विद्यार्थी", "वर्णमाला"],
+                rightIdx: 2,
+                note: "इन सभी स्वर और व्यंजनों के मेल से शुद्ध शब्द 'विद्यार्थी' का निर्माण होता है।"
+            },
+            {
+                q: "१७. वर्ण संयोजन (व्याकरण): 'स् + क् + ऊ + ल् + अ' अक्षरों को शुद्ध रूप से जोड़ने पर क्या शब्द बनेगा?",
+                dynamicOpts: ["सकूल", "स्कूल", "सूकल", "स्कूली"],
+                rightIdx: 1,
+                note: "स् और क् के संयुक्त अक्षर योग से 'स्कूल' शब्द निष्पन्न होता है।"
+            },
+            { q: "१८. शब्दार्थ (व्याकरण): कहानी की पंक्ति 'मेरे पत्तों के जरिए...' में 'जरिए' शब्द का शुद्ध अर्थ क्या है?", dynamicOpts: ["रास्ता", "माध्यम / द्वारा", "पानी", "जड़"], rightIdx: 1, note: "'जरिए' एक उर्दू मूल का शब्द है जिसका अर्थ 'माध्यम से' या 'द्वारा' (By means of) होता है।" },
+            { q: "१९. शब्दार्थ (व्याकरण): पेड़ की शाखाओं को पाठ्यपुस्तक की शब्दावली में क्या पुकारा गया है?", dynamicOpts: ["तने", "जड़ें", "टहनियाँ", "अंकुर"], rightIdx: 2, note: "पेड़ की डालियों या शाखाओं को देशज / तद्भव रूप में 'टहनियाँ' कहा जाता है।" },
+            { q: "२०. नैतिक संकल्पना: पेड़ हमें ठंडी छाया और ऑक्सीजन देकर हमारी क्या दूर करता है?", dynamicOpts: ["भूख", "थकावट", "नींद", "बीमारी"], rightIdx: 1, note: "राहगीर और पशु-पक्षी पेड़ के नीचे बैठकर अपनी शारीरिक 'थकावट' और ग्लानि दूर करते हैं।" }
+        ];
+
+        let curIndex = 0;
+        let gameScore = 0;
+        let healthPoints = 100;
+        let stepCompleted = false;
+        let audioVoiceOn = true;
+
+        function buildQuestBoard() {
+            const container = document.getElementById('quest-injection-point');
+            container.innerHTML = "";
+
+            questData.forEach((item, index) => {
+                const node = document.createElement('div');
+                node.className = `quest-card ${index === 0 ? 'active' : ''}`;
+                node.id = `quest-step-${index}`;
+
+                let gridHTML = "";
+                item.dynamicOpts.forEach((opt, oIdx) => {
+                    gridHTML += `<button class="choice-node" onclick="evaluateRpgChoice(${index}, ${oIdx}, this)">${opt}</button>`;
+                });
+
+                node.innerHTML = `
+                    <div class="prompt-text">${item.q}</div>
+                    <div class="grid-choices">${gridHTML}</div>
+                    <div class="lore-popup" id="lore-${index}">🔍 <strong>ज्ञानकोश पाठ-संकेत:</strong> ${item.note}</div>
+                `;
+                container.appendChild(node);
+            });
+            syncHUDElements();
+            setTimeout(triggerVoiceNarration, 600);
+        }
+
+        function syncHUDElements() {
+            document.getElementById('stage-txt').innerText = `${curIndex + 1} / ${questData.length}`;
+            document.getElementById('score-txt').innerText = `${gameScore * 10} XP`;
+            
+            const hBar = document.getElementById('health-fill');
+            hBar.style.width = `${healthPoints}%`;
+            
+            const emojiNode = document.getElementById('tree-emoji');
+            const bubble = document.getElementById('status-bubble');
+
+            if (healthPoints >= 80) {
+                emojiNode.innerText = "🌳";
+                bubble.innerText = "पेड़ पूरी तरह हरा-भरा और स्वस्थ है!";
+                bubble.style.color = "var(--neon-green)";
+            } else if (healthPoints >= 40) {
+                emojiNode.innerText = "🏡";
+                bubble.innerText = "कुल्हाड़ी के प्रहार से पेड़ थोड़ा कमज़ोर है!";
+                bubble.style.color = "var(--neon-gold)";
+            } else {
+                emojiNode.innerText = "🍂";
+                bubble.innerText = "पेड़ अत्यंत संकट में है! बचाएं!";
+                bubble.style.color = "var(--neon-red)";
+            }
+        }
+
+        function evaluateRpgChoice(qIdx, selectedIdx, btnRef) {
+            if (stepCompleted) return;
+            stepCompleted = true;
+
+            const stageData = questData[qIdx];
+            const siblingNodes = document.querySelectorAll(`#quest-step-${qIdx} .choice-node`);
+            const frame = document.getElementById('avatar-frame');
+            let vocalAudio = "";
+
+            if (selectedIdx === stageData.rightIdx) {
+                btnRef.classList.add('success-state');
+                gameScore++;
+                vocalAudio = "उत्कृष्ट प्रहार! सही उत्तर।";
+                generateSynthesizedTone(587.33, 'sine', 0.2); // Success Synth
+            } else {
+                btnRef.classList.add('fail-state');
+                siblingNodes[stageData.rightIdx].classList.add('success-state');
+                healthPoints = Math.max(0, healthPoints - 15);
+                frame.classList.add('damage-fx');
+                vocalAudio = "कुल्हाड़ी का वार लगा! गलत उत्तर।";
+                generateSynthesizedTone(180, 'sawtooth', 0.4); // Damage Synth
+                setTimeout(() => frame.classList.remove('damage-fx'), 400);
+            }
+
+            siblingNodes.forEach(b => b.disabled = true);
+            document.getElementById(`lore-${qIdx}`).style.display = "block";
+            document.getElementById('next-stage-btn').disabled = false;
+            syncHUDElements();
+
+            if (audioVoiceOn) {
+                executeVoiceSynth(vocalAudio);
+            }
+        }
+
+        function advanceQuestStage() {
+            if (curIndex === questData.length - 1) {
+                concludeRpgGame();
+            } else {
+                document.getElementById(`quest-step-${curIndex}`).classList.remove('active');
+                curIndex++;
+                document.getElementById(`quest-step-${curIndex}`).classList.add('active');
+                
+                stepCompleted = false;
+                document.getElementById('next-stage-btn').disabled = true;
+                syncHUDElements();
+                setTimeout(triggerVoiceNarration, 400);
+            }
+        }
+
+        function concludeRpgGame() {
+            // Hide layouts
+            document.getElementById('quest-injection-point').style.display = "none";
+            document.getElementById('avatar-frame').style.display = "none";
+            document.getElementById('sound-toggle').style.display = "none";
+            document.getElementById('.status-panel'); 
+            document.querySelector('.status-panel').style.display = "none";
+            document.querySelector('.footer-deck').style.display = "none";
+
+            const finalScreen = document.getElementById('end-panel');
+            finalScreen.style.display = "block";
+
+            const totalXP = gameScore * 10;
+            document.getElementById('final-xp').innerText = `${totalXP} XP`;
+            const tagNode = document.getElementById('title-tag');
+
+            if (totalXP >= 170 && healthPoints > 50) {
+                tagNode.innerText = "👑 परम वन-रक्षक (Eco Emperor)";
+                tagNode.style.color = "var(--neon-green)";
+            } else if (totalXP >= 110) {
+                tagNode.innerText = "🌱 सजग वृक्ष-मित्र (Tree Guardian)";
+                tagNode.style.color = "var(--neon-blue)";
+            } else {
+                tagNode.innerText = "🍂 नव अंकुर (Nature Learner)";
+                tagNode.style.color = "var(--neon-gold)";
+            }
+
+            if (audioVoiceOn) {
+                executeVoiceSynth(`अभियान समाप्त। आपका स्कोर है ${totalXP} एक्स पी।`);
+            }
+        }
+
+        function reviveGame() {
+            curIndex = 0;
+            gameScore = 0;
+            healthPoints = 100;
+            stepCompleted = false;
+
+            document.getElementById('quest-injection-point').style.display = "block";
+            document.getElementById('avatar-frame').style.display = "flex";
+            document.getElementById('sound-toggle').style.display = "block";
+            document.querySelector('.status-panel').style.display = "grid";
+            document.querySelector('.footer-deck').style.display = "flex";
+            document.getElementById('end-panel').style.display = "none";
+            document.getElementById('next-stage-btn').disabled = true;
+
+            buildQuestBoard();
+        }
+
+        function generateSynthesizedTone(freq, wave, len) {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const amp = ctx.createGain();
+                osc.type = wave;
+                osc.frequency.value = freq;
+                amp.gain.setValueAtTime(0.1, ctx.currentTime);
+                amp.gain.exponentialRampToValueAtTime(0.00001, ctx.currentTime + len);
+                osc.connect(amp);
+                amp.connect(ctx.destination);
+                osc.start();
+                osc.stop(ctx.currentTime + len);
+            } catch(e) {}
+        }
+
+        function executeVoiceSynth(txtStr) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const refinedText = txtStr.replace(/[१२३४५६७८९०।🌳🎯🎮✓✗🗣️➡️🔄👑🌱🍂🔍]/g, '');
+                const utterance = new SpeechSynthesisUtterance(refinedText);
+                utterance.lang = 'hi-IN';
+                utterance.rate = 0.95;
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        function triggerVoiceNarration() {
+            if (!audioVoiceOn) return;
+            executeVoiceSynth(questData[curIndex].q);
+        }
+
+        function toggleVoiceSetting() {
+            audioVoiceOn = !audioVoiceOn;
+            const chip = document.getElementById('sound-toggle');
+            if (audioVoiceOn) {
+                chip.innerText = "🔊 वॉइस असिस्टेंट: चालू";
+                chip.classList.add('on');
+                triggerVoiceNarration();
+            } else {
+                chip.innerText = "🔇 वॉइस असिस्टेंट: बंद";
+                chip.classList.remove('on');
+                window.speechSynthesis.cancel();
+            }
+        }
+
+        window.onload = buildQuestBoard;
+    </script>
+</body>
+</html>

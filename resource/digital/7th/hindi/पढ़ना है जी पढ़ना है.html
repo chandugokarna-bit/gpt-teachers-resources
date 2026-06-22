@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 1 Extended Game: पढ़ना है जी पढ़ना है</title>
+    <style>
+        :root {
+            --bg-color: #0d1117;
+            --card-bg: #161b22;
+            --text-main: #c9d1d9;
+            --text-bright: #f0f6fc;
+            --primary: #58a6ff;
+            --success: #2ea44f;
+            --error: #da3637;
+            --accent: #d29922;
+            --border: #30363d;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .game-container {
+            max-width: 750px;
+            width: 100%;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            margin-top: 20px;
+        }
+
+        h1 {
+            color: var(--text-bright);
+            text-align: center;
+            font-size: 2.2rem;
+            margin-bottom: 5px;
+            text-shadow: 0 0 10px rgba(88, 166, 255, 0.3);
+        }
+
+        .subtitle {
+            text-align: center;
+            color: var(--accent);
+            font-size: 1.1rem;
+            margin-bottom: 25px;
+            font-weight: bold;
+        }
+
+        .dashboard {
+            display: flex;
+            justify-content: space-between;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            font-size: 1rem;
+            border-left: 4px solid var(--primary);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background-color: var(--border);
+            border-radius: 4px;
+            margin-bottom: 25px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--primary), var(--success));
+            transition: width 0.3s ease;
+        }
+
+        .quiz-card {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .quiz-card.active {
+            display: block;
+        }
+
+        .question-text {
+            font-size: 1.3rem;
+            color: var(--text-bright);
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .options-list {
+            list-style: none;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option-btn {
+            background-color: #21262d;
+            color: var(--text-main);
+            border: 2px solid var(--border);
+            padding: 15px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            text-align: left;
+            font-size: 1.1rem;
+            transition: all 0.2s ease;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .option-btn:hover:not([disabled]) {
+            border-color: var(--primary);
+            background-color: #30363d;
+            transform: translateY(-2px);
+        }
+
+        .option-btn.correct {
+            background-color: rgba(46, 164, 79, 0.2) !important;
+            border-color: var(--success) !important;
+            color: #56d364;
+            font-weight: bold;
+        }
+
+        .option-btn.wrong {
+            background-color: rgba(218, 54, 55, 0.2) !important;
+            border-color: var(--error) !important;
+            color: #ff7b72;
+        }
+
+        .explanation-box {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: rgba(210, 153, 34, 0.1);
+            border-left: 4px solid var(--accent);
+            border-radius: 4px;
+            display: none;
+            color: var(--text-bright);
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .controls {
+            margin-top: 25px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .game-btn {
+            background-color: var(--primary);
+            color: #ffffff;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: opacity 0.2s;
+        }
+
+        .game-btn:hover {
+            opacity: 0.9;
+        }
+
+        .game-btn:disabled {
+            background-color: var(--border);
+            color: #8b949e;
+            cursor: not-allowed;
+        }
+
+        .audio-control-btn {
+            background-color: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+        }
+
+        .audio-control-btn:hover {
+            background-color: #21262d;
+            color: var(--primary);
+        }
+
+        .results-screen {
+            text-align: center;
+            display: none;
+            animation: scaleUp 0.4s ease;
+        }
+
+        .score-display {
+            font-size: 4rem;
+            font-weight: bold;
+            color: var(--accent);
+            margin: 20px 0;
+        }
+
+        .badge-icon {
+            font-size: 5rem;
+            margin-bottom: 10px;
+            display: inline-block;
+            animation: bounce 2s infinite alternate;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes scaleUp {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes bounce {
+            from { transform: translateY(0); }
+            to { transform: translateY(-15px); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="game-container">
+        <h1>पाठ १: पढ़ना है जी पढ़ना है</h1>
+        <div class="subtitle">विस्तारित व्याकरण एवं संकल्पना गेम 🎮</div>
+
+        <div style="display: flex; justify-content: flex-end; margin-bottom: 15px;">
+            <button class="audio-control-btn" onclick="toggleAudioSetting()">
+                <span id="audio-icon">🔊</span> <span id="audio-status">Voice Assistance: ON</span>
+            </button>
+        </div>
+
+        <!-- Dashboard Panel -->
+        <div class="dashboard" id="game-dash">
+            <div>प्रश्न संख्या: <span id="current-q-num">1</span>/15</div>
+            <div>स्कोर: <span id="current-score">0</span> XP</div>
+        </div>
+
+        <!-- Progress bar tracking -->
+        <div class="progress-bar" id="game-progress-bar">
+            <div class="progress-fill" id="progress-fill-idx"></div>
+        </div>
+
+        <!-- Quiz Interface Container -->
+        <div id="quiz-box-wrapper"></div>
+
+        <!-- Dynamic Controls -->
+        <div class="controls" id="control-bar">
+            <button class="game-btn" id="speak-btn" onclick="speakCurrentQuestion()" style="background-color: #21262d; border: 1px solid var(--border)">🗣️ सुनिए</button>
+            <button class="game-btn" id="next-btn" onclick="handleNextStep()" disabled>अगला प्रश्न ➡️</button>
+        </div>
+
+        <!-- Results Screen -->
+        <div class="results-screen" id="finish-screen">
+            <div class="badge-icon" id="badge-emoji">🏆</div>
+            <h2 id="feedback-headline">अद्भुत प्रदर्शन!</h2>
+            <p>आपने इस अध्याय के सभी व्याकरण और वैचारिक प्रश्नों को पूर्ण कर लिया है।</p>
+            <div class="score-display"><span id="final-score">0</span> / 150</div>
+            <p style="color: var(--accent); font-weight: bold;">रैंक: <span id="rank-title">ज्ञान सम्राट</span></p>
+            <button class="game-btn" onclick="restartGame()" style="margin-top: 20px;">🔄 फिर से खेलें</button>
+        </div>
+    </div>
+
+    <script>
+        // Expanded Dataset: 15 Questions covering all textbook exercises, vocabulary, and grammar concepts
+        const quizData = [
+            {
+                question: "१. 'पढ़ना है जी पढ़ना है' कविता के मुख्य रचयिता कौन हैं?",
+                options: ["डॉ. टी.जी. प्रभाशंकर प्रेमी", "चन्द्रपाल सिंह यादव 'मयंक'", "प्रो. बरगूरु रामचंद्रप्पा", "नागेंद्र कुमार"],
+                answer: 1,
+                explanation: "सही उत्तर: चन्द्रपाल सिंह यादव 'मयंक'। यह आधुनिक हिंदी साहित्य के विख्यात बाल-साहित्यकार हैं."
+            },
+            {
+                question: "२. कवि चन्द्रपाल सिंह यादव जी का प्रसिद्ध काव्य-नाम (Pen Name) क्या है?",
+                options: ["रश्मी", "दिनकर", "मयंक", "निराला"],
+                answer: 2,
+                explanation: "सही उत्तर: मयंक। चन्द्रपाल सिंह यादव जी का साहित्यिक उपनाम 'मयंक' है."
+            },
+            {
+                question: "३. 'उचित तुक वाले शब्द (Rhyming Words)' का मिलान करें: कविता के अनुसार 'पढ़ना' शब्द का सही जोड़ीदार क्या है?",
+                options: ["लड़ना", "चढ़ना", "हँसना", "करना"],
+                answer: 1,
+                explanation: "सही उत्तर: चढ़ना। कविता की पंक्ति है: 'पढ़ना है जी पढ़ना है, हमको ऊपर चढ़ना है।'"
+            },
+            {
+                question: "४. 'इम्तहान' शब्द का वास्तविक और शुद्ध अर्थ क्या है?",
+                options: ["परीक्षा (Exam)", "परिणाम (Result)", "प्रतियोगिता (Competition)", "पाठशाला (School)"],
+                answer: 0,
+                explanation: "सही उत्तर: परीक्षा। शब्दार्थ अनुभाग के अनुसार 'इम्तहान' का अर्थ 'परीक्षा' होता है."
+            },
+            {
+                question: "५. कविता के आधार पर 'मेहनत करने वालों' की सदा कौन मदद करते हैं?",
+                options: ["माता-पिता", "कवि और मित्र", "भगवान", "शिक्षक"],
+                answer: 2,
+                explanation: "सही उत्तर: भगवान। कविता के अनुसार: 'मेहनत करने वालों की तो, सदा मदद करते भगवान।'"
+            },
+            {
+                question: "६. परीक्षा समाप्त होने के बाद छात्रों को किस ऋतु की छुट्टियाँ मिलती हैं?",
+                options: ["शीत ऋतु", "वर्षा ऋतु", "शरद ऋतु", "गर्मी की छुट्टी"],
+                answer: 3,
+                explanation: "सही उत्तर: गर्मी की छुट्टी। कविता के अनुसार परीक्षा के बाद गर्मी की छुट्टियां मौज-मजे के दिन लाती हैं."
+            },
+            {
+                question: "७. व्याकरण मिलान: 'पथ' शब्द का सही पर्यायवाची (समानार्थक) शब्द क्या है?",
+                options: ["लक्ष्य", "मार्ग / रास्ता", "मंजिल", "सफलता"],
+                answer: 1,
+                explanation: "सही उत्तर: मार्ग / रास्ता। पाठ्यपुस्तक के शब्दार्थ के अनुसार 'पथ' का अर्थ रास्ता या मार्ग है."
+            },
+            {
+                question: "८. कविता की इस पंक्ति को पूरा करें: 'इम्तहान में ______ , कुश्ती खूब लड़ेंगे हम।'",
+                options: ["जीतकर हम", "ताल ठोंककर", "मेहनत करके", "नाम कमाकर"],
+                answer: 1,
+                explanation: "सही उत्तर: ताल ठोंककर। कविता की पंक्ति है: 'इम्तहान में ताल ठोंककर, कुश्ती खूब लड़ेंगे हम।'"
+            },
+            {
+                question: "९. मुहावरे का अर्थ: 'ताल ठोंकना' का सही अर्थ क्या होता है?",
+                options: ["ताली बजाना", "डर जाना", "लड़ने के लिए तैयार होना", "संगीत बजाना"],
+                answer: 2,
+                explanation: "सही उत्तर: लड़ने के लिए तैयार होना। यह मुहावरा परीक्षा का डटकर सामना करने के संदर्भ में प्रयुक्त हुआ है."
+            },
+            {
+                question: "१०. विलोम (Opposite) शब्द: 'मेहनत' शब्द का सही विलोम शब्द क्या होगा?",
+                options: ["परिश्रम", "आलस्य", "मस्ती", "इनाम"],
+                answer: 1,
+                explanation: "सही उत्तर: आलस्य। मेहनत (काम करना) का ठीक विपरीत अर्थ 'आलस्य' या निकम्मापन होता है।"
+            },
+            {
+                question: "११. व्याकरण मिलान: 'इनाम' शब्द का सही अर्थ क्या है?",
+                options: ["सहायता", "रास्ता", "पुरस्कार", "मेहनत"],
+                answer: 2,
+                explanation: "सही उत्तर: पुरस्कार। पाठ्यपुस्तक के अभ्यास मिलान के अनुसार 'इनाम' का अर्थ 'पुरस्कार' है."
+            },
+            {
+                question: "१२. कविता के अनुसार बच्चे किससे इनाम लेने की बात कर रहे हैं?",
+                options: ["गुरुजी से", "पापा-मम्मी से", "दोस्तों से", "भगवान से"],
+                answer: 1,
+                explanation: "सही उत्तर: पापा-मम्मी से। कविता की पंक्ति है: 'पापा-मम्मी से लेने हैं, फिर तो हमको खूब इनाम।'"
+            },
+            {
+                question: "१३. निम्नलिखित में से कौन सी रचना कवि चन्द्रपाल सिंह यादव 'मयंक' द्वारा रचित बालगीत नहीं है?",
+                options: ["स्कूल खुल गये", "दूध मलाई", "खा लो आम", "सुनो मेरी कहानी"],
+                options: ["स्कूल खुल गये", "दूध मलाई", "खा लो आम", "रामू की बुद्धिमानी"],
+                answer: 3,
+                explanation: "सही उत्तर: रामू की बुद्धिमानी। 'स्कूल खुल गये', 'दूध मलाई', 'खा लो आम' आदि मयंक जी की प्रसिद्ध रचनाएँ हैं।"
+            },
+            {
+                question: "१४. तुकबंदी शब्द (Rhyming Words): 'दिन' शब्द का सही तुकबंदी शब्द कविता के अनुसार क्या है?",
+                options: ["नाम", "मन", "इन", "मस्ती"],
+                options: ["नाम", "मन", "मस्ती", "बिन"],
+                answer: 3,
+                explanation: "सही उत्तर: बिन। कविता में 'मौज - मज़े के दिन' के साथ 'होंगे तब मस्ती के दिन' या 'होंगे मौज-मज़े के दिन / होंगे तब मस्ती के दिन' के रूप में तुक बैठता है।"
+            },
+            {
+                question: "१५. विलोम शब्द: 'मदद' (सहायता) का विपरीतार्थक या विलोम शब्द क्या हो सकता है?",
+                options: ["विरोध / बाधा", "सहयोग", "पुरस्कार", "मार्ग"],
+                answer: 0,
+                explanation: "सही उत्तर: विरोध / बाधा। मदद का अर्थ सहायता करना होता है, जबकि उसका विलोम बाधा डालना या विरोध करना है।"
+            }
+        ];
+
+        let currentIndex = 0;
+        let score = 0;
+        let answered = false;
+        let speechEnabled = true;
+
+        // Initialize and setup context
+        function initQuiz() {
+            const wrapper = document.getElementById('quiz-box-wrapper');
+            wrapper.innerHTML = "";
+            
+            quizData.forEach((data, index) => {
+                const card = document.createElement('div');
+                card.className = `quiz-card ${index === 0 ? 'active' : ''}`;
+                card.id = `q-card-${index}`;
+
+                let optionsHTML = "";
+                data.options.forEach((opt, optIdx) => {
+                    optionsHTML += `
+                        <li>
+                            <button class="option-btn" onclick="selectOption(${index}, ${optIdx}, this)">
+                                <span>${opt}</span>
+                                <span class="indicator"></span>
+                            </button>
+                        </li>
+                    `;
+                });
+
+                card.innerHTML = `
+                    <div class="question-text">${data.question}</div>
+                    <ul class="options-list">${optionsHTML}</ul>
+                    <div class="explanation-box" id="explain-${index}">${data.explanation}</div>
+                `;
+                wrapper.appendChild(card);
+            });
+            updateDashboard();
+            setTimeout(speakCurrentQuestion, 600);
+        }
+
+        function updateDashboard() {
+            document.getElementById('current-q-num').innerText = currentIndex + 1;
+            document.getElementById('current-score').innerText = score * 10;
+            const progress = ((currentIndex) / quizData.length) * 100;
+            document.getElementById('progress-fill-idx').style.width = `${progress}%`;
+        }
+
+        function selectOption(qIdx, optIdx, element) {
+            if (answered) return;
+            answered = true;
+
+            const currentQuestion = quizData[qIdx];
+            const allButtons = document.querySelectorAll(`#q-card-${qIdx} .option-btn`);
+            
+            let speechFeedback = "";
+
+            if (optIdx === currentQuestion.answer) {
+                element.classList.add('correct');
+                element.querySelector('.indicator').innerText = "✓";
+                score++;
+                speechFeedback = "उत्कृष्ट! सही उत्तर।";
+                playTone(523.25, 'triangle', 0.2); 
+            } else {
+                element.classList.add('wrong');
+                element.querySelector('.indicator').innerText = "✗";
+                allButtons[currentQuestion.answer].classList.add('correct');
+                speechFeedback = "गलत जवाब। सही विकल्प स्क्रीन पर देखें।";
+                playTone(293.66, 'sawtooth', 0.3); 
+            }
+
+            allButtons.forEach(btn => btn.disabled = true);
+            
+            document.getElementById(`explain-${qIdx}`).style.display = 'block';
+            document.getElementById('next-btn').disabled = false;
+            document.getElementById('current-score').innerText = score * 10;
+
+            if(speechEnabled) {
+                speakText(speechFeedback);
+            }
+        }
+
+        function handleNextStep() {
+            if (currentIndex === quizData.length - 1) {
+                showFinalResults();
+            } else {
+                document.getElementById(`q-card-${currentIndex}`).classList.remove('active');
+                currentIndex++;
+                document.getElementById(`q-card-${currentIndex}`).classList.add('active');
+                
+                answered = false;
+                document.getElementById('next-btn').disabled = true;
+                updateDashboard();
+                setTimeout(speakCurrentQuestion, 400);
+            }
+        }
+
+        function showFinalResults() {
+            document.getElementById('quiz-box-wrapper').style.display = 'none';
+            document.getElementById('game-dash').style.display = 'none';
+            document.getElementById('game-progress-bar').style.display = 'none';
+            document.getElementById('control-bar').style.display = 'none';
+
+            const finalContainer = document.getElementById('finish-screen');
+            finalContainer.style.display = 'block';
+
+            const finalXP = score * 10;
+            document.getElementById('final-score').innerText = finalXP;
+
+            const badge = document.getElementById('badge-emoji');
+            const rank = document.getElementById('rank-title');
+            const headline = document.getElementById('feedback-headline');
+
+            if(finalXP >= 130) {
+                badge.innerText = "👑";
+                rank.innerText = "हिंदी भाषा शिरोमणि (Rank: Gold)";
+                headline.innerText = "सर्वश्रेष्ठ प्रदर्शन! आप इस अध्याय के विशेषज्ञ बन चुके हैं।";
+            } else if(finalXP >= 90) {
+                badge.innerText = "⭐";
+                rank.innerText = "उत्कृष्ट छात्र (Rank: Silver)";
+                headline.innerText = "शानदार प्रयास! थोड़े और अभ्यास से आप शीर्ष पर पहुँच सकते हैं।";
+            } else {
+                badge.innerText = "📚";
+                rank.innerText = "परिश्रमी शिक्षार्थी (Rank: Bronze)";
+                headline.innerText = "पुनः प्रयास करें और अपनी पकड़ मजबूत करें!";
+            }
+
+            if(speechEnabled) {
+                speakText(`खेल समाप्त। आपका कुल स्कोर है ${finalXP} अंक।`);
+            }
+        }
+
+        function restartGame() {
+            currentIndex = 0;
+            score = 0;
+            answered = false;
+            
+            document.getElementById('quiz-box-wrapper').style.display = 'block';
+            document.getElementById('game-dash').style.display = 'flex';
+            document.getElementById('game-progress-bar').style.display = 'block';
+            document.getElementById('control-bar').style.display = 'flex';
+            document.getElementById('finish-screen').style.display = 'none';
+            document.getElementById('next-btn').disabled = true;
+
+            initQuiz();
+        }
+
+        function playTone(freq, type, duration) {
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
+                
+                oscillator.type = type;
+                oscillator.frequency.value = freq;
+                gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + duration);
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+                oscillator.start();
+                oscillator.stop(audioCtx.currentTime + duration);
+            } catch(e) {
+                console.log("Audio API blocked or unsupported.");
+            }
+        }
+
+        function speakText(text) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel(); 
+                const cleanText = text.replace(/🔑|१|२|३|४|५|६|७|८|९|१०|११|१२|१३|१४|१५|🔍|🎮/g, '');
+                const utterance = new SpeechSynthesisUtterance(cleanText);
+                utterance.lang = 'hi-IN'; 
+                utterance.rate = 0.95;
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        function speakCurrentQuestion() {
+            if(!speechEnabled) return;
+            const currentQ = quizData[currentIndex];
+            speakText(currentQ.question);
+        }
+
+        function toggleAudioSetting() {
+            speechEnabled = !speechEnabled;
+            const statusText = document.getElementById('audio-status');
+            const icon = document.getElementById('audio-icon');
+            if(speechEnabled) {
+                statusText.innerText = "Voice Assistance: ON";
+                icon.innerText = "🔊";
+                speakCurrentQuestion();
+            } else {
+                statusText.innerText = "Voice Assistance: OFF";
+                icon.innerText = "🔇";
+                window.speechSynthesis.cancel();
+            }
+        }
+
+        window.onload = initQuiz;
+    </script>
+</body>
+</html>
