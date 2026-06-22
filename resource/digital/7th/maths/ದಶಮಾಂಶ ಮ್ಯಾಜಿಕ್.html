@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಭಿನ್ನರಾಶಿ ↔ ದಶಮಾಂಶ ಆಟ</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Baloo+Tamma+2:wght@400;600;700&display=swap');
+
+        body {
+            font-family: 'Baloo Tamma 2', sans-serif;
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            margin: 0;
+            padding: 20px;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .app-container {
+            background: white;
+            width: 100%;
+            max-width: 600px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            overflow: hidden;
+            text-align: center;
+        }
+
+        /* Header */
+        .header {
+            background: #ff6f91;
+            color: white;
+            padding: 20px;
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        /* Screens */
+        .screen {
+            padding: 30px;
+            display: none;
+        }
+        .screen.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Buttons */
+        .btn {
+            background: #00b894;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 1.2em;
+            border-radius: 50px;
+            cursor: pointer;
+            font-family: 'Baloo Tamma 2', sans-serif;
+            font-weight: bold;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin: 10px;
+            box-shadow: 0 4px 0px #019074;
+        }
+        .btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 0px 0px #019074;
+        }
+        .btn-blue { background: #0984e3; box-shadow: 0 4px 0px #06528d; }
+        .btn-blue:active { box-shadow: 0 0px 0px #06528d; }
+
+        /* Learn Section */
+        .rule-box {
+            background: #fff3cd;
+            border-left: 5px solid #ffc107;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: left;
+            font-size: 1.1em;
+        }
+
+        /* Game Section */
+        .progress-bar {
+            background: #dfe6e9;
+            height: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            background: #00cec9;
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .question-box {
+            font-size: 2.5em;
+            color: #2d3436;
+            background: #f1f2f6;
+            padding: 20px;
+            border-radius: 15px;
+            border: 3px dashed #a4b0be;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .option-btn {
+            background: white;
+            border: 3px solid #74b9ff;
+            color: #0984e3;
+            padding: 15px;
+            font-size: 1.5em;
+            font-weight: bold;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .option-btn:hover {
+            background: #e3f2fd;
+            transform: scale(1.05);
+        }
+        
+        .option-btn.correct {
+            background: #55efc4;
+            border-color: #00b894;
+            color: #000;
+            animation: pop 0.3s ease;
+        }
+        .option-btn.wrong {
+            background: #ff7675;
+            border-color: #d63031;
+            color: #fff;
+            animation: shake 0.4s ease;
+        }
+
+        @keyframes pop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        /* Fraction styling */
+        .fraction {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 0.9em;
+            line-height: 1.2;
+        }
+        .fraction span:first-child {
+            border-bottom: 3px solid #2d3436;
+            padding: 0 5px;
+        }
+
+        #feedback {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-top: 20px;
+            height: 30px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <div class="header">✨ ದಶಮಾಂಶ ಮ್ಯಾಜಿಕ್ ✨</div>
+
+        <div id="homeScreen" class="screen active">
+            <h2>ಸ್ವಾಗತ! ಏನನ್ನು ಕಲಿಯೋಣ?</h2>
+            <img src="https://cdn-icons-png.flaticon.com/512/3750/3750033.png" alt="Math" width="120" style="margin-bottom:20px;">
+            <br>
+            <button class="btn btn-blue" onclick="showScreen('learnScreen')">📖 ಮೊದಲು ಕಲಿಯೋಣ</button>
+            <button class="btn" onclick="startGame()">🎮 ನೇರವಾಗಿ ಆಟವಾಡಿ</button>
+        </div>
+
+        <div id="learnScreen" class="screen">
+            <h2 style="color: #0984e3;">ಹೇಗೆ ಪರಿವರ್ತಿಸುವುದು? 🧠</h2>
+            
+            <div class="rule-box">
+                <strong>🍕 1. ಭಿನ್ನರಾಶಿಯಿಂದ ದಶಮಾಂಶಕ್ಕೆ:</strong><br>
+                ಛೇದದಲ್ಲಿ (ಕೆಳಗಿನ ಸಂಖ್ಯೆ) 10 ಅಥವಾ 100 ಇದ್ದರೆ, ಸೊನ್ನೆಗಳನ್ನು ಎಣಿಸಿ ಬಿಂದು ಇಡಿ.<br>
+                ಉದಾ: <div class="fraction"><span>7</span><span>10</span></div> = <strong>0.7</strong> (ಒಂದು ಸೊನ್ನೆ = ಒಂದು ಸ್ಥಾನ)
+            </div>
+
+            <div class="rule-box" style="background:#e8f8f5; border-color:#20c997;">
+                <strong>🔄 2. ದಶಮಾಂಶದಿಂದ ಭಿನ್ನರಾಶಿಗೆ:</strong><br>
+                ಬಿಂದುವಿನ ನಂತರ ಎಷ್ಟು ಅಂಕಿಗಳಿವೆ ಎಂದು ಎಣಿಸಿ, ಅಷ್ಟು ಸೊನ್ನೆಗಳನ್ನು ಕೆಳಗೆ ಬರೆಯಿರಿ.<br>
+                ಉದಾ: <strong>0.25</strong> = <div class="fraction"><span>25</span><span>100</span></div> (ಎರಡು ಸ್ಥಾನ = ನೂರು)
+            </div>
+
+            <button class="btn" onclick="startGame()">▶️ ಈಗ ಆಟ ಶುರುಮಾಡಿ!</button>
+        </div>
+
+        <div id="gameScreen" class="screen">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            
+            <h3 style="color:#636e72; margin-top:0;" id="questionText">ಇದರ ಸರಿಯಾದ ಉತ್ತರ ಯಾವುದು?</h3>
+            
+            <div class="question-box" id="questionDisplay">
+                </div>
+
+            <div class="options-grid" id="optionsDisplay">
+                </div>
+
+            <div id="feedback"></div>
+        </div>
+
+        <div id="resultScreen" class="screen">
+            <h2>🎉 ಅದ್ಭುತ! 🎉</h2>
+            <p style="font-size: 1.2em;">ನೀವು ಎಲ್ಲಾ ಹಂತಗಳನ್ನು ಪೂರ್ಣಗೊಳಿಸಿದ್ದೀರಿ!</p>
+            <div style="font-size: 4em; margin: 10px 0;">🏆</div>
+            <p style="font-size: 1.5em; color: #d63031; font-weight: bold;">ಅಂಕಗಳು: <span id="finalScore"></span></p>
+            <button class="btn btn-blue" onclick="showScreen('homeScreen')">🏠 ಮುಖ್ಯಪುಟಕ್ಕೆ ಹಿಂತಿರುಗಿ</button>
+        </div>
+    </div>
+
+    <script>
+        // Quiz Data
+        const questions = [
+            { q: '<div class="fraction"><span>1</span><span>2</span></div>', options: ['0.5', '0.2', '1.2', '0.05'], answer: '0.5' },
+            { q: '<div class="fraction"><span>3</span><span>4</span></div>', options: ['0.34', '3.4', '0.75', '0.25'], answer: '0.75' },
+            { q: '<div class="fraction"><span>7</span><span>10</span></div>', options: ['7.10', '0.7', '0.07', '70'], answer: '0.7' },
+            { q: '0.25', options: ['<div class="fraction"><span>1</span><span>4</span></div>', '<div class="fraction"><span>2</span><span>5</span></div>', '<div class="fraction"><span>1</span><span>2</span></div>', '<div class="fraction"><span>25</span><span>10</span></div>'], answer: '<div class="fraction"><span>1</span><span>4</span></div>' },
+            { q: '0.1', options: ['<div class="fraction"><span>1</span><span>100</span></div>', '<div class="fraction"><span>1</span><span>2</span></div>', '<div class="fraction"><span>10</span><span>1</span></div>', '<div class="fraction"><span>1</span><span>10</span></div>'], answer: '<div class="fraction"><span>1</span><span>10</span></div>' }
+        ];
+
+        let currentQIndex = 0;
+        let score = 0;
+
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        function startGame() {
+            currentQIndex = 0;
+            score = 0;
+            showScreen('gameScreen');
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            const feedback = document.getElementById('feedback');
+            feedback.innerHTML = '';
+            
+            const q = questions[currentQIndex];
+            document.getElementById('questionDisplay').innerHTML = q.q;
+            
+            // Update Progress Bar
+            const progress = ((currentQIndex) / questions.length) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+
+            // Change question text based on type
+            if(q.q.includes('fraction')) {
+                document.getElementById('questionText').innerText = "ಇದರ ದಶಮಾಂಶ ರೂಪ ಯಾವುದು?";
+            } else {
+                document.getElementById('questionText').innerText = "ಇದರ ಭಿನ್ನರಾಶಿ ರೂಪ ಯಾವುದು?";
+            }
+
+            const optionsContainer = document.getElementById('optionsDisplay');
+            optionsContainer.innerHTML = '';
+
+            // Shuffle options
+            let shuffledOptions = [...q.options].sort(() => Math.random() - 0.5);
+
+            shuffledOptions.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.innerHTML = opt;
+                btn.onclick = () => checkAnswer(btn, opt, q.answer);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(btn, selected, correct) {
+            // Disable all buttons after click
+            const allBtns = document.querySelectorAll('.option-btn');
+            allBtns.forEach(b => b.style.pointerEvents = 'none');
+
+            const feedback = document.getElementById('feedback');
+
+            if (selected === correct) {
+                btn.classList.add('correct');
+                feedback.innerHTML = '✅ ಸರಿ! (Correct)';
+                feedback.style.color = '#00b894';
+                score += 10;
+                
+                setTimeout(() => {
+                    nextQuestion();
+                }, 1500);
+            } else {
+                btn.classList.add('wrong');
+                feedback.innerHTML = '❌ ತಪ್ಪು, ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ!';
+                feedback.style.color = '#d63031';
+                
+                // Show correct answer
+                allBtns.forEach(b => {
+                    if(b.innerHTML === correct) b.classList.add('correct');
+                });
+
+                setTimeout(() => {
+                    nextQuestion();
+                }, 2000);
+            }
+        }
+
+        function nextQuestion() {
+            currentQIndex++;
+            if (currentQIndex < questions.length) {
+                loadQuestion();
+            } else {
+                // Game Over
+                document.getElementById('progressFill').style.width = '100%';
+                setTimeout(() => {
+                    document.getElementById('finalScore').innerText = score + " / 50";
+                    showScreen('resultScreen');
+                }, 500);
+            }
+        }
+    </script>
+</body>
+</html>

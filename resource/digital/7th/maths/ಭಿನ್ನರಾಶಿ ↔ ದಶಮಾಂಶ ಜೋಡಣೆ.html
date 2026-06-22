@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಭಿನ್ನರಾಶಿ ↔ ದಶಮಾಂಶ: ಮ್ಯಾಜಿಕ್ ಗೇಮ್</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1cb5e0 0%, #000851 100%);
+            margin: 0;
+            padding: 20px;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        header {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            border: 2px solid #00d2ff;
+            backdrop-filter: blur(5px);
+            margin-bottom: 20px;
+        }
+
+        h1 { margin: 0; color: #00d2ff; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
+        p { font-size: 1.2em; margin: 10px 0 0 0; }
+
+        .stats {
+            display: flex;
+            gap: 30px;
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 20px;
+            background: #ff007f;
+            padding: 10px 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        /* Game Board */
+        .memory-game {
+            width: 600px;
+            height: 450px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            perspective: 1000px; /* 3D Effect */
+        }
+
+        .memory-card {
+            width: calc(25% - 15px);
+            height: calc(33.333% - 15px);
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.5s;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            border-radius: 10px;
+        }
+
+        .memory-card:active {
+            transform: scale(0.97);
+            transition: transform 0.2s;
+        }
+
+        .memory-card.flip {
+            transform: rotateY(180deg);
+        }
+
+        .front-face, .back-face {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            border-radius: 10px;
+            backface-visibility: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2em;
+            font-weight: bold;
+            text-align: center;
+            border: 3px solid #fff;
+        }
+
+        /* The hidden side (Question Mark) */
+        .back-face {
+            background: linear-gradient(45deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            font-size: 3em;
+        }
+
+        /* The revealed side (Number) */
+        .front-face {
+            background: white;
+            color: #2c3e50;
+            transform: rotateY(180deg);
+        }
+
+        .fraction {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            line-height: 1.2;
+        }
+        .fraction span:first-child {
+            border-bottom: 3px solid #2c3e50;
+            padding: 0 5px;
+        }
+
+        .btn-restart {
+            margin-top: 30px;
+            padding: 12px 25px;
+            font-size: 1.3em;
+            background: #00d2ff;
+            color: #000851;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 5px 0px #0099cc;
+            transition: all 0.1s;
+        }
+
+        .btn-restart:active {
+            transform: translateY(5px);
+            box-shadow: 0 0px 0px #0099cc;
+        }
+
+        #winMessage {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.95);
+            color: #e84393;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border: 5px solid #e84393;
+            z-index: 100;
+        }
+        #winMessage h2 { font-size: 2.5em; margin: 0 0 10px 0; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>🎮 ಭಿನ್ನರಾಶಿ ↔ ದಶಮಾಂಶ ಜೋಡಣೆ</h1>
+        <p>ಕಾರ್ಡ್ ತಿರುಗಿಸಿ, ಸರಿಯಾದ ಜೋಡಿಯನ್ನು ಹುಡುಕಿ! (ಉದಾ: 1/2 ಮತ್ತು 0.5)</p>
+    </header>
+
+    <div class="stats">
+        <div>ಪ್ರಯತ್ನಗಳು: <span id="moves">0</span></div>
+        <div>ಜೋಡಿಗಳು: <span id="matches">0</span> / 6</div>
+    </div>
+
+    <div class="memory-game" id="gameBoard">
+        </div>
+
+    <button class="btn-restart" onclick="resetGame()">🔄 ಮತ್ತೆ ಆಟವಾಡಿ</button>
+
+    <div id="winMessage">
+        <h2>🎉 ಅಭಿನಂದನೆಗಳು! 🎉</h2>
+        <p style="color:#2c3e50; font-size: 1.5em; font-weight:bold;">ನೀವು ಎಲ್ಲಾ ಜೋಡಿಗಳನ್ನು ಕಂಡುಹಿಡಿದಿದ್ದೀರಿ!</p>
+        <button class="btn-restart" onclick="resetGame()">ಮತ್ತೊಮ್ಮೆ ಆಡಿ</button>
+    </div>
+
+    <script>
+        // Game Data (6 Pairs = 12 Cards)
+        const cardData = [
+            { name: 'pair1', value: '<div class="fraction"><span>1</span><span>2</span></div>' },
+            { name: 'pair1', value: '0.5' },
+            { name: 'pair2', value: '<div class="fraction"><span>1</span><span>4</span></div>' },
+            { name: 'pair2', value: '0.25' },
+            { name: 'pair3', value: '<div class="fraction"><span>3</span><span>4</span></div>' },
+            { name: 'pair3', value: '0.75' },
+            { name: 'pair4', value: '<div class="fraction"><span>1</span><span>10</span></div>' },
+            { name: 'pair4', value: '0.1' },
+            { name: 'pair5', value: '<div class="fraction"><span>1</span><span>5</span></div>' },
+            { name: 'pair5', value: '0.2' },
+            { name: 'pair6', value: '<div class="fraction"><span>7</span><span>10</span></div>' },
+            { name: 'pair6', value: '0.7' }
+        ];
+
+        const gameBoard = document.getElementById('gameBoard');
+        let hasFlippedCard = false;
+        let lockBoard = false;
+        let firstCard, secondCard;
+        let moves = 0;
+        let matchedPairs = 0;
+
+        function createBoard() {
+            gameBoard.innerHTML = '';
+            // Shuffle the cards array
+            cardData.sort(() => 0.5 - Math.random());
+
+            cardData.forEach(item => {
+                const cardElement = document.createElement('div');
+                cardElement.classList.add('memory-card');
+                cardElement.dataset.name = item.name; // pair identifier
+
+                cardElement.innerHTML = `
+                    <div class="front-face">${item.value}</div>
+                    <div class="back-face">❓</div>
+                `;
+
+                cardElement.addEventListener('click', flipCard);
+                gameBoard.appendChild(cardElement);
+            });
+        }
+
+        function flipCard() {
+            if (lockBoard) return;
+            if (this === firstCard) return;
+
+            this.classList.add('flip');
+
+            if (!hasFlippedCard) {
+                // First click
+                hasFlippedCard = true;
+                firstCard = this;
+                return;
+            }
+
+            // Second click
+            secondCard = this;
+            moves++;
+            document.getElementById('moves').innerText = moves;
+            checkForMatch();
+        }
+
+        function checkForMatch() {
+            let isMatch = firstCard.dataset.name === secondCard.dataset.name;
+
+            if (isMatch) {
+                disableCards();
+                matchedPairs++;
+                document.getElementById('matches').innerText = matchedPairs;
+                
+                if(matchedPairs === 6) {
+                    setTimeout(() => {
+                        document.getElementById('winMessage').style.display = 'block';
+                    }, 500);
+                }
+            } else {
+                unflipCards();
+            }
+        }
+
+        function disableCards() {
+            // If matched, they stay flipped and unclickable
+            firstCard.removeEventListener('click', flipCard);
+            secondCard.removeEventListener('click', flipCard);
+            
+            // Give them a green border to show success
+            firstCard.querySelector('.front-face').style.border = "4px solid #2ecc71";
+            secondCard.querySelector('.front-face').style.border = "4px solid #2ecc71";
+
+            resetBoard();
+        }
+
+        function unflipCards() {
+            lockBoard = true;
+            // Not a match, flip them back after 1 second
+            setTimeout(() => {
+                firstCard.classList.remove('flip');
+                secondCard.classList.remove('flip');
+                resetBoard();
+            }, 1000);
+        }
+
+        function resetBoard() {
+            [hasFlippedCard, lockBoard] = [false, false];
+            [firstCard, secondCard] = [null, null];
+        }
+
+        function resetGame() {
+            moves = 0;
+            matchedPairs = 0;
+            document.getElementById('moves').innerText = moves;
+            document.getElementById('matches').innerText = matchedPairs;
+            document.getElementById('winMessage').style.display = 'none';
+            createBoard();
+        }
+
+        // Initialize Game
+        createBoard();
+    </script>
+
+</body>
+</html>

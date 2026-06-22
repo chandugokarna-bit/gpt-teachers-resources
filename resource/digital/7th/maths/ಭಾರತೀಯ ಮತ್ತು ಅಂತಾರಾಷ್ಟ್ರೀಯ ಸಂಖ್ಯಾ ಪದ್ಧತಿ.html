@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಸ್ಥಾನಬೆಲೆ ಕೋಷ್ಟಕ - Place Value Chart</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            margin: 0;
+            padding: 20px;
+            color: #2c3e50;
+        }
+        header {
+            text-align: center;
+            background: #ff6b6b;
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            border: 3px solid #ff4757;
+        }
+        h1 { margin: 0; font-size: 2.2em; text-shadow: 1px 1px 2px rgba(0,0,0,0.2); }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        .input-section {
+            text-align: center;
+            margin-bottom: 30px;
+            background: #eef2f3;
+            padding: 20px;
+            border-radius: 15px;
+            border: 2px dashed #bdc3c7;
+        }
+        input[type=text] {
+            padding: 12px;
+            font-size: 1.5em;
+            border: 3px solid #3498db;
+            border-radius: 10px;
+            width: 250px;
+            text-align: center;
+            letter-spacing: 5px;
+            outline: none;
+            font-weight: bold;
+        }
+        button {
+            background: #2ecc71;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 1.2em;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-left: 10px;
+            box-shadow: 0 4px 0px #27ae60;
+            transition: all 0.1s;
+        }
+        button:active {
+            transform: translateY(4px);
+            box-shadow: 0 0px 0px #27ae60;
+        }
+        h2 { text-align: center; color: #2980b9; margin-top: 30px; }
+        
+        /* Table Styles */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+        }
+        th, td {
+            border: 2px solid #bdc3c7;
+            padding: 12px 5px;
+            font-size: 1.1em;
+        }
+        th { color: white; }
+        
+        /* Indian System Colors */
+        .ind-period { background: #34495e; font-size: 1.2em; }
+        .ind-arab { background: #e74c3c; }
+        .ind-crore { background: #e67e22; }
+        .ind-lakh { background: #f1c40f; color: #333 !important; }
+        .ind-thou { background: #2ecc71; }
+        .ind-unit { background: #3498db; }
+
+        /* International System Colors */
+        .int-period { background: #2c3e50; font-size: 1.2em; }
+        .int-billion { background: #9b59b6; }
+        .int-million { background: #e84393; }
+        .int-thou { background: #00cec9; }
+        .int-unit { background: #0984e3; }
+
+        .digit-row td {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #d35400;
+            background: #fff;
+            height: 50px;
+        }
+        .formatted-number {
+            font-size: 1.4em;
+            color: #16a085;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>🔢 10 ಅಂಕಿಗಳ ಸ್ಥಾನಬೆಲೆ ಕೋಷ್ಟಕ</h1>
+        <p>ಭಾರತೀಯ ಮತ್ತು ಅಂತಾರಾಷ್ಟ್ರೀಯ ಸಂಖ್ಯಾ ಪದ್ಧತಿ (Indian & International System)</p>
+    </header>
+
+    <div class="container">
+        
+        <div class="input-section">
+            <p style="font-size: 1.2em; font-weight: bold; margin-top: 0;">ಯಾವುದಾದರೂ 10 ಅಂಕಿಗಳ ಸಂಖ್ಯೆಯನ್ನು ನಮೂದಿಸಿ:</p>
+            <input type="text" id="numInput" maxlength="10" placeholder="ಉದಾ: 1234567890" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+            <button onclick="generateChart()">ಕೋಷ್ಟಕದಲ್ಲಿ ತೋರಿಸು</button>
+            <p id="errorMsg" style="color: red; font-weight: bold; display: none;">ದಯವಿಟ್ಟು ಕನಿಷ್ಠ 1 ಅಂಕಿಯನ್ನಾದರೂ ನಮೂದಿಸಿ!</p>
+        </div>
+
+        <h2>🇮🇳 ಭಾರತೀಯ ಸಂಖ್ಯಾ ಪದ್ಧತಿ (Indian System)</h2>
+        <div id="indianFormatted" class="formatted-number" style="text-align:center;"></div>
+        <table>
+            <tr>
+                <th class="ind-period" colspan="1">ಅರಬ್ (Arab)</th>
+                <th class="ind-period" colspan="2">ಕೋಟಿಗಳು (Crores)</th>
+                <th class="ind-period" colspan="2">ಲಕ್ಷಗಳು (Lakhs)</th>
+                <th class="ind-period" colspan="2">ಸಾವಿರಗಳು (Thousands)</th>
+                <th class="ind-period" colspan="3">ಬಿಡಿಗಳು (Units)</th>
+            </tr>
+            <tr>
+                <th class="ind-arab">ಶತ ಕೋಟಿ / ಅರಬ್</th>
+                <th class="ind-crore">ಹತ್ತು ಕೋಟಿ</th>
+                <th class="ind-crore">ಕೋಟಿ</th>
+                <th class="ind-lakh">ಹತ್ತು ಲಕ್ಷ</th>
+                <th class="ind-lakh">ಲಕ್ಷ</th>
+                <th class="ind-thou">ಹತ್ತು ಸಾವಿರ</th>
+                <th class="ind-thou">ಸಾವಿರ</th>
+                <th class="ind-unit">ನೂರು</th>
+                <th class="ind-unit">ಹತ್ತು</th>
+                <th class="ind-unit">ಬಿಡಿ</th>
+            </tr>
+            <tr class="digit-row" id="indianRow">
+                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+            </tr>
+        </table>
+
+        <h2>🌍 ಅಂತಾರಾಷ್ಟ್ರೀಯ ಸಂಖ್ಯಾ ಪದ್ಧತಿ (International System)</h2>
+        <div id="intlFormatted" class="formatted-number" style="text-align:center;"></div>
+        <table>
+            <tr>
+                <th class="int-period" colspan="1">ಬಿಲಿಯನ್ (Billion)</th>
+                <th class="int-period" colspan="3">ಮಿಲಿಯನ್ (Millions)</th>
+                <th class="int-period" colspan="3">ಸಾವಿರಗಳು (Thousands)</th>
+                <th class="int-period" colspan="3">ಬಿಡಿಗಳು (Units)</th>
+            </tr>
+            <tr>
+                <th class="int-billion">ಬಿಲಿಯನ್</th>
+                <th class="int-million">ನೂರು ಮಿಲಿಯನ್</th>
+                <th class="int-million">ಹತ್ತು ಮಿಲಿಯನ್</th>
+                <th class="int-million">ಮಿಲಿಯನ್</th>
+                <th class="int-thou">ನೂರು ಸಾವಿರ</th>
+                <th class="int-thou">ಹತ್ತು ಸಾವಿರ</th>
+                <th class="int-thou">ಸಾವಿರ</th>
+                <th class="int-unit">ನೂರು</th>
+                <th class="int-unit">ಹತ್ತು</th>
+                <th class="int-unit">ಬಿಡಿ</th>
+            </tr>
+            <tr class="digit-row" id="intlRow">
+                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+            </tr>
+        </table>
+
+    </div>
+
+    <script>
+        function generateChart() {
+            let numStr = document.getElementById("numInput").value;
+            let errorMsg = document.getElementById("errorMsg");
+            
+            if(numStr === "") {
+                errorMsg.style.display = "block";
+                return;
+            }
+            errorMsg.style.display = "none";
+
+            // ಸಂಖ್ಯೆಯನ್ನು 10 ಅಂಕಿಗಳಿಗೆ ಸರಿಹೊಂದಿಸಲು ಆರಂಭದಲ್ಲಿ ಸೊನ್ನೆಗಳನ್ನು (0) ಸೇರಿಸುವುದು
+            let paddedNum = numStr.padStart(10, '0');
+            
+            // ಭಾರತೀಯ ಮತ್ತು ಅಂತಾರಾಷ್ಟ್ರೀಯ ಟೇಬಲ್ ಸಾಲುಗಳನ್ನು ಪಡೆಯುವುದು
+            let indCells = document.getElementById("indianRow").getElementsByTagName("td");
+            let intlCells = document.getElementById("intlRow").getElementsByTagName("td");
+
+            // ಪ್ರತಿಯೊಂದು ಅಂಕಿಯನ್ನು ಕೋಷ್ಟಕದ ಕಂಬಗಳಿಗೆ ಸೇರಿಸುವುದು
+            for(let i = 0; i < 10; i++) {
+                // ಸಂಖ್ಯೆ ನಮೂದಿಸದ ಜಾಗದಲ್ಲಿ ಮಸುಕಾದ ಸೊನ್ನೆ ತೋರಿಸಲು
+                if(i < 10 - numStr.length) {
+                    indCells[i].innerHTML = `<span style="color:#e0e0e0;">${paddedNum[i]}</span>`;
+                    intlCells[i].innerHTML = `<span style="color:#e0e0e0;">${paddedNum[i]}</span>`;
+                } else {
+                    indCells[i].innerHTML = paddedNum[i];
+                    intlCells[i].innerHTML = paddedNum[i];
+                }
+            }
+
+            // ಭಾರತೀಯ ಪದ್ಧತಿಯಲ್ಲಿ ಅಲ್ಪವಿರಾಮ (Commas) ಹಾಕುವುದು
+            let indFormat = numStr.replace(/\B(?=(?:(\d\d)+(\d)(?!\d))+(?!\d))/g, ',');
+            document.getElementById("indianFormatted").innerHTML = `ಓದುವ ಕ್ರಮ: ${indFormat}`;
+
+            // ಅಂತಾರಾಷ್ಟ್ರೀಯ ಪದ್ಧತಿಯಲ್ಲಿ ಅಲ್ಪವಿರಾಮ (Commas) ಹಾಕುವುದು
+            let intlFormat = numStr.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            document.getElementById("intlFormatted").innerHTML = `ಓದುವ ಕ್ರಮ: ${intlFormat}`;
+        }
+    </script>
+
+</body>
+</html>
