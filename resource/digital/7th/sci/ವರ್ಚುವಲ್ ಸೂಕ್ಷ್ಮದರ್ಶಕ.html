@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಹನಿ-ಸ್ಲೈಡ್ ವೀಕ್ಷಣೆ (Drop-Slide Observation)</title>
+    <style>
+        :root {
+            --primary: #00f2fe;
+            --secondary: #4facfe;
+            --bg-dark: #0a0f1d;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --text-light: #f3f4f6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+
+        body {
+            background: radial-gradient(circle at center, #1a233a 0%, var(--bg-dark) 100%);
+            color: var(--text-light);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        header p {
+            color: #8a99ad;
+            font-size: 1.1rem;
+        }
+
+        .container {
+            display: flex;
+            gap: 3rem;
+            max-width: 1200px;
+            width: 100%;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        /* Controls Panel */
+        .controls {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 2rem;
+            border-radius: 24px;
+            width: 350px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+        }
+
+        .controls h3 {
+            margin-bottom: 1.5rem;
+            color: var(--primary);
+            font-size: 1.3rem;
+        }
+
+        .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        button {
+            background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.01));
+            border: 1px solid rgba(255,255,255,0.1);
+            color: white;
+            padding: 1rem;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        button:hover {
+            background: linear-gradient(135deg, var(--secondary), var(--primary));
+            border-color: transparent;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 242, 254, 0.2);
+        }
+
+        button.active {
+            background: linear-gradient(135deg, var(--secondary), var(--primary));
+            border-color: transparent;
+        }
+
+        /* Microscope Viewport */
+        .microscope-outer {
+            position: relative;
+            width: 450px;
+            height: 450px;
+            background: #111827;
+            border-radius: 50%;
+            padding: 20px;
+            box-shadow: 0 0 0 15px #1f2937, 0 30px 60px rgba(0,0,0,0.8), inset 0 0 30px rgba(0,0,0,0.9);
+            border: 4px solid rgba(255,255,255,0.05);
+            overflow: hidden;
+        }
+
+        .lens {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: #020617;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Light grid effect inside lens */
+        .lens::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at center, rgba(0, 242, 254, 0.15) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        /* Organisms styling */
+        .organism {
+            position: absolute;
+            border-radius: 50%;
+            transition: all 2s linear;
+            opacity: 0;
+            filter: blur(0.5px);
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .lens.active .organism {
+            opacity: 0.8;
+        }
+
+        .organism:hover {
+            opacity: 1 !important;
+            filter: blur(0px);
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+        }
+
+        /* Tooltip style for Kannada Name */
+        .organism::after {
+            content: attr(data-name);
+            position: absolute;
+            bottom: -30px;
+            background: rgba(0, 0, 0, 0.85);
+            color: #fff;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+            border: 1px solid rgba(255,255,255,0.2);
+            z-index: 10;
+        }
+
+        .organism:hover::after {
+            opacity: 1;
+        }
+
+        /* Amoeba Shape */
+        .amoeba {
+            background: rgba(0, 242, 254, 0.35);
+            border: 2px dashed rgba(0, 242, 254, 0.8);
+            border-radius: 43% 57% 41% 59% / 57% 45% 55% 43%;
+            animation: morph 4s ease-in-out infinite alternate;
+        }
+
+        /* Paramecium Shape */
+        .paramecium {
+            background: rgba(168, 85, 247, 0.35);
+            border: 2px solid rgba(168, 85, 247, 0.8);
+            border-radius: 30% 70% 30% 70% / 50% 50% 50% 50%;
+        }
+
+        /* Bacteria Shape */
+        .bacteria {
+            background: rgba(34, 197, 94, 0.45);
+            border: 1px solid rgba(34, 197, 94, 0.8);
+            border-radius: 10px;
+        }
+
+        /* Fungi Spores Shape */
+        .fungi {
+            background: rgba(234, 179, 8, 0.4);
+            border: 2px dotted rgba(234, 179, 8, 0.9);
+            border-radius: 50%;
+        }
+
+        /* Info Display */
+        .info-panel {
+            margin-top: 2rem;
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1.5rem;
+            border-radius: 16px;
+            max-width: 830px;
+            width: 100%;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .info-panel h4 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        @keyframes morph {
+            0% { border-radius: 43% 57% 41% 59% / 57% 45% 55% 43%; }
+            50% { border-radius: 60% 40% 65% 35% / 40% 60% 35% 65%; }
+            100% { border-radius: 43% 57% 41% 59% / 57% 45% 55% 43%; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>ಹನಿ-ಸ್ಲೈಡ್ ವೀಕ್ಷಣೆ (Drop-Slide Observation)</h1>
+        <p>ಅತ್ಯಾಧುನಿಕ ವರ್ಚುವಲ್ ಸೂಕ್ಷ್ಮದರ್ಶಕ ಪ್ರಯೋಗಾಲಯ</p>
+    </header>
+
+    <div class="container">
+        <div class="controls">
+            <h3>ಮಾದರಿಯನ್ನು ಆಯ್ಕೆಮಾಡಿ:</h3>
+            <div class="btn-group">
+                <button onclick="viewSample('pond')">
+                    <span>💧 ಕೊಳದ ನೀರು (Pond Water)</span>
+                    ➔
+                </button>
+                <button onclick="viewSample('soil')">
+                    <span>🌱 ಮಣ್ಣಿನ ಮಿಶ್ರಣ (Soil Solution)</span>
+                    ➔
+                </button>
+                <button onclick="resetLens()" style="margin-top: 1rem; background: rgba(239, 68, 68, 0.2); border-color: rgba(239, 68, 68, 0.3)">
+                    <span>❌ ಸ್ಲೈಡ್ ತೆರವುಗೊಳಿಸು</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="microscope-outer">
+            <div class="lens" id="microscopeLens">
+                </div>
+        </div>
+    </div>
+
+    <div class="info-panel">
+        <h4 id="infoTitle">ಸೂಕ್ಷ್ಮದರ್ಶಕ ಸಿದ್ಧವಾಗಿದೆ</h4>
+        <p id="infoDesc">ವೀಕ್ಷಣೆಯನ್ನು ಪ್ರಾರಂಭಿಸಲು ಎಡಭಾಗದಲ್ಲಿರುವ ಕೊಳದ ನೀರು ಅಥವಾ ಮಣ್ಣಿನ ಮಿಶ್ರಣದ ಬಟನ್ ಕ್ಲಿಕ್ ಮಾಡಿ. ಜೀವಿಗಳ ಹೆಸರನ್ನು ನೋಡಲು ಅವುಗಳ ಮೇಲೆ ಮೌಸ್ ಇಡಿ.</p>
+    </div>
+
+    <script>
+        const lens = document.getElementById('microscopeLens');
+        const infoTitle = document.getElementById('infoTitle');
+        const infoDesc = document.getElementById('infoDesc');
+        let moveInterval;
+
+        const samples = {
+            pond: {
+                title: "ಕೊಳದ ನೀರಿನ ವೀಕ್ಷಣೆ",
+                desc: "ಇಲ್ಲಿ ನೀವು ಅಮೀಬಾ, ಪ್ಯಾರಾಮೀಶಿಯಂನಂತಹ ಏಕಕೋಶ ಜೀವಿಗಳನ್ನು ಕಾಣಬಹುದು. ಹೆಸರನ್ನು ತಿಳಿಯಲು ಜೀವಿಯ ಮೇಲೆ ಮೌಸ್ ಇರಿಸಿ.",
+                organisms: [
+                    { type: 'amoeba', nameKN: 'ಅಮೀಬಾ (Amoeba)', width: '70px', height: '70px', count: 2 },
+                    { type: 'paramecium', nameKN: 'ಪ್ಯಾರಾಮೀಶಿಯಂ (Paramecium)', width: '40px', height: '80px', count: 2 },
+                    { type: 'bacteria', nameKN: 'ಹಸಿರು ಶೈವಲ/ಬ್ಯಾಕ್ಟೀರಿಯಾ', width: '15px', height: '40px', count: 3 }
+                ]
+            },
+            soil: {
+                title: "ಮಣ್ಣಿನ ಮಿಶ್ರಣದ ವೀಕ್ಷಣೆ",
+                desc: "ಮಣ್ಣಿನಲ್ಲಿ ಹೇರಳವಾಗಿರುವ ಬ್ಯಾಕ್ಟೀರಿಯಾಗಳು ಮತ್ತು ಶಿಲೀಂಧ್ರಗಳ ಬೀಜಕಗಳು ಇಲ್ಲಿ ಗೋಚರಿಸುತ್ತವೆ.",
+                organisms: [
+                    { type: 'bacteria', nameKN: 'ಬ್ಯಾಕ್ಟೀರಿಯಾ (Bacteria)', width: '15px', height: '35px', count: 6 },
+                    { type: 'fungi', nameKN: 'ಶಿಲೀಂಧ್ರದ ಬೀಜಕ (Fungal Spore)', width: '30px', height: '30px', count: 4 }
+                ]
+            }
+        };
+
+        function viewSample(sampleType) {
+            clearInterval(moveInterval);
+            lens.innerHTML = '';
+            lens.classList.remove('active');
+            
+            document.querySelectorAll('.btn-group button').forEach(btn => btn.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+
+            const data = samples[sampleType];
+            infoTitle.innerText = data.title;
+            infoDesc.innerText = data.desc;
+
+            setTimeout(() => {
+                lens.classList.add('active');
+                data.organisms.forEach(org => {
+                    for(let i=0; i<org.count; i++) {
+                        createOrganism(org.type, org.nameKN, org.width, org.height);
+                    }
+                });
+                animateOrganisms();
+            }, 200);
+
+            moveInterval = setInterval(animateOrganisms, 3000);
+        }
+
+        function createOrganism(type, nameKN, width, height) {
+            const el = document.createElement('div');
+            el.classList.add('organism', type);
+            el.style.width = width;
+            el.style.height = height;
+            
+            // Set Kannada name as data attribute for tooltip
+            el.setAttribute('data-name', nameKN);
+            
+            const pos = getRandomPosition();
+            el.style.left = pos.x + 'px';
+            el.style.top = pos.y + 'px';
+            
+            // Random initial rotation
+            el.style.transform = `rotate(${Math.random() * 360}deg)`;
+            
+            lens.appendChild(el);
+        }
+
+        function getRandomPosition() {
+            const angle = Math.random() * Math.PI * 2;
+            const radius = Math.random() * 140; // Keeps them safely inside the lens circle
+            const x = 190 + radius * Math.cos(angle);
+            const y = 190 + radius * Math.sin(angle);
+            return { x, y };
+        }
+
+        function animateOrganisms() {
+            const organisms = document.querySelectorAll('.organism');
+            organisms.forEach(org => {
+                const pos = getRandomPosition();
+                org.style.left = pos.x + 'px';
+                org.style.top = pos.y + 'px';
+                // Continuous smooth rotation for realism
+                const currentRotation = Math.random() * 360;
+                org.style.transform = `rotate(${currentRotation}deg)`;
+            });
+        }
+
+        function resetLens() {
+            clearInterval(moveInterval);
+            lens.innerHTML = '';
+            lens.classList.remove('active');
+            infoTitle.innerText = "ಸೂಕ್ಷ್ಮದರ್ಶಕ ಸಿದ್ಧವಾಗಿದೆ";
+            infoDesc.innerText = "ವೀಕ್ಷಣೆಯನ್ನು ಪ್ರಾರಂಭಿಸಲು ಎಡಭಾಗದಲ್ಲಿರುವ ಕೊಳದ ನೀರು ಅಥವಾ ಮಣ್ಣಿನ ಮಿಶ್ರಣದ ಬಟನ್ ಕ್ಲಿಕ್ ಮಾಡಿ.";
+            document.querySelectorAll('.btn-group button').forEach(btn => btn.classList.remove('active'));
+        }
+    </script>
+</body>
+</html>
