@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>कक्षा 7: हमारे राष्ट्रीय प्रतीक - Ultra Modern Interactive Suite</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&family=Yatra+One&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0a0f1d;
+            --card-bg: #141f36;
+            --neon-blue: #00f2fe;
+            --neon-orange: #ff9933;
+            --neon-white: #ffffff;
+            --neon-green: #138808;
+            --neon-pink: #ff007f;
+            --neon-yellow: #fffb00;
+            --text-light: #f1f5f9;
+            --border: #223558;
+        }
+
+        body {
+            font-family: 'Poppins', 'Hind', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%);
+            padding: 2.5rem 1rem;
+            text-align: center;
+            border-bottom: 5px solid var(--neon-orange);
+            box-shadow: 0 5px 25px rgba(255, 153, 51, 0.3);
+        }
+
+        header h1 {
+            font-family: 'Yatra One', cursive;
+            font-size: 3rem;
+            margin: 0;
+            background: linear-gradient(to right, #ff9933, #ffffff, #138808);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 10px rgba(0,242,254,0.5));
+        }
+
+        header p {
+            font-size: 1.2rem;
+            color: var(--neon-blue);
+            margin-top: 0.6rem;
+            font-weight: 500;
+        }
+
+        .container {
+            max-width: 1050px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        /* Navigation Tabs */
+        .tab-navigation {
+            display: flex;
+            gap: 0.5rem;
+            overflow-x: auto;
+            background: #040814;
+            padding: 0.6rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            border: 2px solid var(--border);
+        }
+
+        .tab-btn {
+            flex: 1;
+            min-width: 180px;
+            padding: 0.9rem 1rem;
+            border: none;
+            background: transparent;
+            color: #94a3b8;
+            font-weight: bold;
+            font-size: 1rem;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .tab-btn:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, #ff9933, #138808);
+            color: white;
+            box-shadow: 0 0 15px rgba(255, 153, 51, 0.4);
+        }
+
+        .activity-section {
+            display: none;
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 2.2rem;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.6);
+            border: 1px solid var(--border);
+            animation: fadeIn 0.4s ease;
+        }
+
+        .activity-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Responsive Google Slides Embed Wrapper */
+        .slide-wrapper {
+            position: relative;
+            width: 100%;
+            padding-top: 56.25%; /* 16:9 Aspect Ratio */
+            border-radius: 12px;
+            overflow: hidden;
+            border: 3px solid var(--border);
+            box-shadow: 0 0 20px rgba(0, 242, 254, 0.2);
+        }
+
+        .slide-wrapper iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+
+        h2 {
+            color: var(--neon-blue);
+            border-left: 5px solid var(--neon-orange);
+            padding-left: 12px;
+            margin-top: 0;
+            font-size: 1.7rem;
+            margin-bottom: 1.5rem;
+        }
+
+        h3 {
+            color: var(--neon-yellow);
+            font-size: 1.25rem;
+            margin-top: 0;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Q&A Accordion component */
+        .qa-card {
+            background: #1a263f;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .qa-header {
+            padding: 1.2rem;
+            font-weight: bold;
+            background: #0f182c;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .qa-body {
+            padding: 0;
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            background: #141f36;
+            color: #cbd5e1;
+            line-height: 1.8;
+        }
+
+        .qa-card.open .qa-body {
+            padding: 1.2rem;
+            max-height: 200px;
+            border-top: 1px solid var(--border);
+        }
+
+        /* Interactive Blanks & Dropdowns */
+        .quiz-box {
+            background: #0b1325;
+            padding: 1.5rem;
+            border-radius: 15px;
+            border: 1px solid var(--border);
+            margin-bottom: 1.5rem;
+        }
+
+        .blank-line {
+            margin-bottom: 1.3rem;
+            font-size: 1.15rem;
+            line-height: 2rem;
+        }
+
+        select {
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            background: #1a263f;
+            color: #fff;
+            border: 2px solid var(--border);
+            font-weight: bold;
+            font-size: 1.05rem;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: var(--neon-blue);
+        }
+
+        /* Interactive Flashcards Component for Opposites */
+        .grid-3x {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .flip-box {
+            background-color: transparent;
+            height: 120px;
+            perspective: 1000px;
+            cursor: pointer;
+        }
+
+        .flip-box-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+
+        .flip-box.flipped .flip-box-inner {
+            transform: rotateY(180deg);
+        }
+
+        .flip-front, .flip-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 12px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            border: 2px solid var(--border);
+        }
+
+        .flip-front {
+            background: linear-gradient(135deg, #1a263f, #0f182c);
+            color: var(--neon-blue);
+        }
+
+        .flip-back {
+            background: linear-gradient(135deg, #c2410c, var(--neon-orange));
+            color: #fff;
+            transform: rotateY(180deg);
+        }
+
+        /* Odd One Out Styles */
+        .odd-row {
+            display: flex;
+            gap: 0.8rem;
+            margin: 1rem 0;
+            flex-wrap: wrap;
+        }
+
+        .odd-btn {
+            background: #1a263f;
+            color: white;
+            border: 1px solid var(--border);
+            padding: 0.7rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+
+        .odd-btn.correct {
+            background: var(--neon-green) !important;
+            color: #000 !important;
+            box-shadow: 0 0 10px var(--neon-green);
+            border-color: var(--neon-green);
+        }
+
+        .odd-btn.wrong {
+            background: var(--neon-pink) !important;
+            color: #fff !important;
+            box-shadow: 0 0 10px var(--neon-pink);
+            border-color: var(--neon-pink);
+        }
+
+        button.action-btn {
+            background: linear-gradient(135deg, var(--neon-orange) 0%, #c2410c 100%);
+            color: white;
+            border: none;
+            padding: 0.7rem 1.8rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+
+        button.action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(255, 153, 51, 0.4);
+        }
+
+        .feedback {
+            margin-top: 0.8rem;
+            font-weight: bold;
+            font-size: 1.1rem;
+            min-height: 24px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>पाठ ६: हमारे राष्ट्रीय प्रतीक</h1>
+        <p>स्वतंत्र देश के गौरवशाली चिह्नों का डिजिटल एवं संवादात्मक अभ्यास पोर्टल</p>
+    </header>
+
+    <div class="container">
+        <div class="tab-navigation">
+            <button class="tab-btn active" onclick="switchTab('slides-section')">📺 लाइव प्रेजेंटेशन (Slides)</button>
+            <button class="tab-btn" onclick="switchTab('oneword-section')">🔤 एक शब्द में उत्तर</button>
+            <button class="tab-btn" onclick="switchTab('opposites-section')">🔄 विलोम शब्द अभ्यास</button>
+            <button class="tab-btn" onclick="switchTab('qa-section')">❓ प्रश्नोत्तर अभ्यास</button>
+            <button class="tab-btn" onclick="switchTab('blanks-section')">✏️ रिक्त स्थान पूर्ति</button>
+            <button class="tab-btn" onclick="switchTab('odd-section')">🎮 खेल: बेमेल शब्द</button>
+        </div>
+
+        <section id="slides-section" class="activity-section active">
+            <h2>📺 राष्ट्रीय प्रतीक - लाइव प्रेजेंटेशन गैलरी</h2>
+            <p>नीचे दी गई डिजिटल गूगल स्लाइड्स स्वतः लोड होकर चलेंगी। आप लैपटॉप पर माउस से या मोबाइल पर टच करके सीधे आगे-पीछे कर सकते हैं:</p>
+            
+            <div class="slide-wrapper">
+                <iframe src="https://docs.google.com/presentation/d/1q6AMvMnz2fqCKsv49GVw4qly-tiY1Uu703qErkX1XZE/embed?start=true&loop=false&delayms=5000" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true"></iframe>
+            </div>
+        </section>
+
+        <section id="oneword-section" class="activity-section">
+            <h2>१. एक शब्द में उत्तर दीजिए (Give One Word)</h2>
+            <p>विवरण को पढ़ें और सही उत्तर या विकल्प का चयन करें:</p>
+            
+            <div class="quiz-box">
+                <div class="blank-line">
+                    १) तीन रंगों वाला हमारा राष्ट्रीय ध्वज क्या कहलाता है? 
+                    <select id="ow-1">
+                        <option value="">--चुनें--</option>
+                        <option value="correct">तिरंगा</option>
+                        <option value="wrong">दौरंगा</option>
+                    </select>
+                </div>
+                <div class="blank-line">
+                    २) भारत का राष्ट्रीय पक्षी कौन सा है? 
+                    <select id="ow-2">
+                        <option value="">--चुनें--</option>
+                        <option value="wrong">तोता</option>
+                        <option value="correct">मोर</option>
+                    </select>
+                </div>
+                <div class="blank-line">
+                    ३) सारनाथ के सिंह स्तंभ से क्या लिया गया है? 
+                    <select id="ow-3">
+                        <option value="">--चुनें--</option>
+                        <option value="correct">राष्ट्रीय चिह्न</option>
+                        <option value="wrong">राष्ट्रीय ध्वज</option>
+                    </select>
+                </div>
+                <div class="blank-line">
+                    ४) निरंतर प्रगति का संदेश देने वाला चक्र कौन सा है? 
+                    <select id="ow-4">
+                        <option value="">--चुनें--</option>
+                        <option value="wrong">सुदर्शन चक्र</option>
+                        <option value="correct">अशोक चक्र</option>
+                    </select>
+                </div>
+
+                <button class="action-btn" onclick="verifyOneWord()">उत्तर सत्यापित करें</button>
+                <div id="oneword-feedback" class="feedback"></div>
+            </div>
+        </section>
+
+        <section id="opposites-section" class="activity-section">
+            <h2>२. विलोम शब्द अभ्यास (Opposite Words)</h2>
+            <p>पाठ से लिए गए महत्वपूर्ण शब्दों का विलोम रूप देखने के लिए कार्ड पर क्लिक करें (Click to Flip):</p>
+            
+            <div class="grid-3x">
+                <div class="flip-box" onclick="flipCard(this)">
+                    <div class="flip-box-inner">
+                        <div class="flip-front">सत्य</div>
+                        <div class="flip-back">असत्य</div>
+                    </div>
+                </div>
+                <div class="flip-box" onclick="flipCard(this)">
+                    <div class="flip-box-inner">
+                        <div class="flip-front">स्वतंत्रता</div>
+                        <div class="flip-back">परतंत्रता</div>
+                    </div>
+                </div>
+                <div class="flip-box" onclick="flipCard(this)">
+                    <div class="flip-box-inner">
+                        <div class="flip-front">पवित्र</div>
+                        <div class="flip-back">अपवित्र</div>
+                    </div>
+                </div>
+                <div class="flip-box" onclick="flipCard(this)">
+                    <div class="flip-box-inner">
+                        <div class="flip-front">शांति</div>
+                        <div class="flip-back">अशांति</div>
+                    </div>
+                </div>
+                <div class="flip-box" onclick="flipCard(this)">
+                    <div class="flip-box-inner">
+                        <div class="flip-front">उन्नति</div>
+                        <div class="flip-back">अवनति</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="qa-section" class="activity-section">
+            <h2>३. सोचो और उत्तर लिखो (प्रश्नोत्तर अभ्यास)</h2>
+            <p>नीचे दिए गए मुख्य प्रश्नों पर क्लिक करें और उनके प्रामाणिक उत्तर देखें:</p>
+            
+            <div class="qa-card" onclick="toggleQA(this)">
+                <div class="qa-header">प्रश्न १) हमारे राष्ट्रीय ध्वज के तीन रंग कौन-कौन से हैं? <span>➕</span></div>
+                <div class="qa-body">उत्तर: हमारे राष्ट्रीय ध्वज के तीन रंग <strong>केसरिया, सफेद और हरा</strong> हैं। इसी कारण इसे तिरंगा कहा जाता है।</div>
+            </div>
+
+            <div class="qa-card" onclick="toggleQA(this)">
+                <div class="qa-header">प्रश्न २) अशोक चक्र किसका प्रतीक है और उसमें कितनी तीलियाँ हैं? <span>➕</span></div>
+                <div class="qa-body">उत्तर: अशोक चक्र <strong>गतिशीलता, उन्नति और प्रगति</strong> का प्रतीक है। इस चक्र में कुल <strong>२४ (24) तीलियाँ</strong> होती हैं।</div>
+            </div>
+
+            <div class="qa-card" onclick="toggleQA(this)">
+                <div class="qa-header">प्रश्न ३) राष्ट्रगान किसके द्वारा लिखा गया है और इसे गाने में कितना समय लगता है? <span>➕</span></div>
+                <div class="qa-body">उत्तर: राष्ट्रगान विश्वकवि <strong>रवींद्रनाथ टैगोर</strong> द्वारा लिखा गया है और इसे गाने में <strong>५२ सेकंड</strong> का समय लगता है।</div>
+            </div>
+
+            <div class="qa-card" onclick="toggleQA(this)">
+                <div class="qa-header">प्रश्न ४) हमारे राष्ट्रीय चिह्न के नीचे क्या लिखा हुआ है? <span>➕</span></div>
+                <div class="qa-body">उत्तर: राष्ट्रीय चिह्न के नीचे देवनागरी लिपि में <strong>"सत्यमेव जयते"</strong> लिखा हुआ है।</div>
+            </div>
+        </section>
+
+        <section id="blanks-section" class="activity-section">
+            <h2>४. रिक्त स्थान की पूर्ति करो (Fill in the Blanks)</h2>
+            <p>वाक्यों को ध्यान से पढ़ें और सही विकल्प चुनकर रिक्त स्थान भरें:</p>
+            
+            <div class="quiz-box">
+                <div class="blank-line">
+                    १) हमारे राष्ट्रध्वज के मध्य में स्थित चक्र को <select id="b1">
+                        <option value="">--चुनें--</option>
+                        <option value="correct">अशोक चक्र</option>
+                        <option value="wrong">काल चक्र</option>
+                    </select> कहते हैं।
+                </div>
+                <div class="blank-line">
+                    २) सत्यमेव जयते का अर्थ है कि हमेशा <select id="b2">
+                        <option value="">--चुनें--</option>
+                        <option value="wrong">झूठ</option>
+                        <option value="correct">सत्य</option>
+                    </select> की ही जीत होती है।
+                </div>
+                <div class="blank-line">
+                    ३) हमारा राष्ट्रीय पशु सुंदर और शक्तिशाली <select id="b3">
+                        <option value="">--चुनें--</option>
+                        <option value="correct">बाघ</option>
+                        <option value="wrong">सिंह</option>
+                    </select> है।
+                </div>
+
+                <button class="action-btn" onclick="verifyBlanks()">उत्तर की जांच करें</button>
+                <div id="blanks-feedback" class="feedback"></div>
+            </div>
+        </section>
+
+        <section id="odd-section" class="activity-section">
+            <h2>५. भाषा कौशल खेल: बेमेल शब्द चुनिए (Pick the Odd One Out)</h2>
+            <p>प्रत्येक समूह के शब्दों का अध्ययन करें और उस शब्द पर क्लिक करें जो अन्य तीनों से भिन्न है:</p>
+            
+            <div class="quiz-box" style="margin-bottom:1.5rem;">
+                <h3>लेवल 1: राष्ट्रीय प्रतीक श्रेणियाँ</h3>
+                <div class="odd-row" id="or-1">
+                    <button class="odd-btn" onclick="checkOddWord(1, this, false)">तिरंगा</button>
+                    <button class="odd-btn" onclick="checkOddWord(1, this, false)">बाघ</button>
+                    <button class="odd-btn" onclick="checkOddWord(1, this, true)">हिमालय</button>
+                    <button class="odd-btn" onclick="checkOddWord(1, this, false)">मोर</button>
+                </div>
+                <div id="ofb-1" class="feedback"></div>
+            </div>
+
+            <div class="quiz-box">
+                <h3>लेवल 2: राष्ट्रीय ध्वज के रंग</h3>
+                <div class="odd-row" id="or-2">
+                    <button class="odd-btn" onclick="checkOddWord(2, this, false)">केसरिया</button>
+                    <button class="odd-btn" onclick="checkOddWord(2, this, true)">नीला</button>
+                    <button class="odd-btn" onclick="checkOddWord(2, this, false)">सफेद</button>
+                    <button class="odd-btn" onclick="checkOddWord(2, this, false)">हरा</button>
+                </div>
+                <div id="ofb-2" class="feedback"></div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // Web Audio Context Synthesizer Logic
+        let audioCtx = null;
+        function initAudio() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+        
+        function playSound(freq, type, duration) {
+            initAudio();
+            if(!audioCtx) return;
+            let osc = audioCtx.createOscillator();
+            let gain = audioCtx.createGain();
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + duration);
+        }
+
+        function triggerSuccess() { playSound(523.25, 'sine', 0.1); setTimeout(() => playSound(659.25, 'sine', 0.15), 80); }
+        function triggerError() { playSound(140, 'sawtooth', 0.25); }
+
+        // Tab Switcher Logic
+        function switchTab(tabId) {
+            document.querySelectorAll('.activity-section').forEach(sec => sec.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            event.currentTarget.classList.add('active');
+            playSound(440, 'sine', 0.05);
+        }
+
+        // Card Flipper Logic
+        function flipCard(card) { card.classList.toggle('flipped'); playSound(750, 'sine', 0.06); }
+
+        // Q&A Expandable Accordion System
+        function toggleQA(card) {
+            card.classList.toggle('open');
+            card.querySelector('.qa-header span').innerHTML = card.classList.contains('open') ? '➖' : '➕';
+            playSound(620, 'sine', 0.04);
+        }
+
+        // Verify One Word Activity
+        function verifyOneWord() {
+            const fb = document.getElementById('oneword-feedback');
+            if(document.getElementById('ow-1').value === 'correct' && 
+               document.getElementById('ow-2').value === 'correct' && 
+               document.getElementById('ow-3').value === 'correct' && 
+               document.getElementById('ow-4').value === 'correct') {
+                fb.innerText = "🎉 उत्कृष्ट! आपने सभी एक शब्द वाले प्रश्नों के सही उत्तर दिए हैं।";
+                fb.style.color = "var(--neon-green)";
+                triggerSuccess();
+            } else {
+                fb.innerText = "❌ कुछ उत्तर गलत हैं। वाक्यों को पुनः पढ़कर सही विकल्प चुनें।";
+                fb.style.color = "var(--neon-pink)";
+                triggerError();
+            }
+        }
+
+        // Check Fill in the blanks
+        function verifyBlanks() {
+            const fb = document.getElementById('blanks-feedback');
+            if(document.getElementById('b1').value === 'correct' && 
+               document.getElementById('b2').value === 'correct' && 
+               document.getElementById('b3').value === 'correct') {
+                fb.innerText = "🎉 बहुत बढ़िया! आपके सभी रिक्त स्थान शत-प्रतिशत सही हैं।";
+                fb.style.color = "var(--neon-green)";
+                triggerSuccess();
+            } else {
+                fb.innerText = "❌ कुछ उत्तर गलत हैं। कृपया फिर से प्रयास करें।";
+                fb.style.color = "var(--neon-pink)";
+                triggerError();
+            }
+        }
+
+        // Odd One Out Evaluation
+        const gameHints = {
+            1: "🎯 सही चुना! 'हिमालय' एक पर्वत है, जबकि बाकी तीनों हमारे आधिकारिक राष्ट्रीय प्रतीक हैं।",
+            2: "🎯 सही चुना! 'नीला' रंग हमारे राष्ट्रीय ध्वज की पट्टियों में नहीं होता, बाकी तीनों ध्वज के मुख्य रंग हैं।"
+        };
+
+        function checkOddWord(level, btn, isCorrect) {
+            document.querySelectorAll(`#or-${level} .odd-btn`).forEach(b => b.className = 'odd-btn');
+            const fb = document.getElementById(`ofb-${level}`);
+            if(isCorrect) {
+                btn.classList.add('correct');
+                fb.innerText = gameHints[level];
+                fb.style.color = "var(--neon-green)";
+                triggerSuccess();
+            } else {
+                btn.classList.add('wrong');
+                fb.innerText = "❌ गलत उत्तर! यह शब्द इस समूह का हिस्सा है। दूसरा विकल्प चुनें।";
+                fb.style.color = "var(--neon-pink)";
+                triggerError();
+            }
+        }
+    </script>
+</body>
+</html>

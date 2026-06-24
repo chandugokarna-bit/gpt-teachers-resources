@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>कक्षा 7: पाठ ७ - रसोईघर (Interactive Suite)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&family=Yatra+One&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #070b19;
+            --card-bg: #0f172a;
+            --neon-cyan: #06b6d4;
+            --neon-pink: #ec4899;
+            --neon-yellow: #eab308;
+            --neon-green: #22c55e;
+            --text-light: #f8fafc;
+            --border: #334155;
+        }
+
+        body {
+            font-family: 'Poppins', 'Hind', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%);
+            padding: 2.5rem 1rem;
+            text-align: center;
+            border-bottom: 5px solid var(--neon-pink);
+            box-shadow: 0 5px 25px rgba(236, 72, 153, 0.3);
+        }
+
+        header h1 {
+            font-family: 'Yatra One', cursive;
+            font-size: 3rem;
+            margin: 0;
+            background: linear-gradient(to right, var(--neon-cyan), var(--neon-pink), var(--neon-yellow));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 10px rgba(6,182,212,0.5));
+        }
+
+        header p {
+            font-size: 1.2rem;
+            color: #94a3b8;
+            margin-top: 0.6rem;
+            font-weight: 500;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        /* Modern Navigation Tab Bar Layout */
+        .tab-navigation {
+            display: flex;
+            gap: 0.5rem;
+            overflow-x: auto;
+            background: #020617;
+            padding: 0.8rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            border: 2px solid var(--border);
+        }
+
+        .tab-btn {
+            flex: 1;
+            min-width: 160px;
+            padding: 1rem;
+            border: none;
+            background: transparent;
+            color: #64748b;
+            font-weight: bold;
+            font-size: 0.95rem;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .tab-btn:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-pink));
+            color: white;
+            box-shadow: 0 0 15px rgba(6, 182, 212, 0.4);
+        }
+
+        .activity-section {
+            display: none;
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 2.5rem;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.6);
+            border: 1px solid var(--border);
+            animation: fadeIn 0.4s ease;
+        }
+
+        .activity-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 {
+            color: var(--neon-cyan);
+            border-left: 5px solid var(--neon-pink);
+            padding-left: 12px;
+            margin-top: 0;
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+        }
+
+        h3 {
+            color: var(--neon-yellow);
+            margin-bottom: 1rem;
+        }
+
+        /* Poem Display Box */
+        .poem-box {
+            background: #020617;
+            padding: 2rem;
+            border-radius: 15px;
+            border-inline-start: 4px solid var(--neon-cyan);
+            font-size: 1.25rem;
+            line-height: 2.2rem;
+            text-align: center;
+            color: #cbd5e1;
+        }
+
+        /* Q&A Accordion Style */
+        .qa-card {
+            background: #1e293b;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .qa-header {
+            padding: 1.2rem;
+            font-weight: bold;
+            background: #0f172a;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .qa-body {
+            padding: 0;
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            background: #1e293b;
+            color: #94a3b8;
+        }
+
+        .qa-card.open .qa-body {
+            padding: 1.2rem;
+            max-height: 150px;
+            border-top: 1px solid var(--border);
+            color: #f1f5f9;
+        }
+
+        /* Matching Activity Flex Layout */
+        .match-container {
+            display: flex;
+            justify-content: space-between;
+            gap: 2rem;
+            margin-top: 1.5rem;
+        }
+
+        .match-column {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .match-item {
+            background: #1e293b;
+            padding: 1rem;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            text-align: center;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .match-item.selected {
+            border-color: var(--neon-cyan);
+            background: rgba(6, 182, 212, 0.1);
+            box-shadow: 0 0 10px rgba(6, 182, 212, 0.3);
+        }
+
+        .match-item.matched {
+            background: rgba(34, 197, 94, 0.2);
+            border-color: var(--neon-green);
+            color: #fff;
+            cursor: not-allowed;
+        }
+
+        /* Quiz Select Element Style */
+        .quiz-box {
+            background: #020617;
+            padding: 1.5rem;
+            border-radius: 15px;
+            border: 1px solid var(--border);
+        }
+
+        .quiz-line {
+            margin-bottom: 1.3rem;
+            font-size: 1.15rem;
+        }
+
+        select {
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            background: #1e293b;
+            color: #fff;
+            border: 2px solid var(--border);
+            font-weight: bold;
+        }
+
+        /* Beautiful Flip Flashcards Grid */
+        .grid-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .flip-card {
+            height: 130px;
+            perspective: 1000px;
+            cursor: pointer;
+        }
+
+        .flip-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+
+        .flip-card.flipped .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 12px;
+            font-size: 1.25rem;
+            font-weight: bold;
+            border: 2px solid var(--border);
+        }
+
+        .card-front {
+            background: #1e293b;
+            color: var(--neon-cyan);
+        }
+
+        .card-back {
+            background: linear-gradient(135deg, #db2777, var(--neon-pink));
+            color: #fff;
+            transform: rotateY(180deg);
+        }
+
+        /* Action Buttons */
+        .action-btn {
+            background: linear-gradient(135deg, var(--neon-pink) 0%, #be185d 100%);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.8rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1rem;
+            transition: all 0.2s;
+            margin-top: 1rem;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(236, 72, 153, 0.4);
+        }
+
+        .feedback {
+            margin-top: 1rem;
+            font-weight: bold;
+            font-size: 1.1rem;
+            min-height: 25px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>पाठ ७: रसोईघर </h1>
+        <p>कविता वाचन एवं बहु-आयामी डिजिटल अभ्यास सुइट (पृष्ठ ३९ - ४४)</p>
+    </header>
+
+    <div class="container">
+
+        <div class="tab-navigation">
+            <button class="tab-btn active" onclick="switchTab('poem-section')">📖 १. कविता वाचन</button>
+            <button class="tab-btn" onclick="switchTab('qa-section')">❓ २. उत्तर लिखो</button>
+            <button class="tab-btn" onclick="switchTab('match-section')">🤝 ३. जोड़ी मिलाओ</button>
+            <button class="tab-btn" onclick="switchTab('list-section')">🍳 ४. क्या पसंद है?</button>
+            <button class="tab-btn" onclick="switchTab('lang-section')">🔤 ५. भाषा ज्ञान</button>
+        </div>
+
+        <section id="poem-section" class="activity-section active">
+            <h2>१. कविता वाचन </h2>
+            <div class="poem-box">
+                आज रसोईघर की खिड़की, मुन्ना-मुन्नी खोल रहे हैं।<br>
+                अंदर देखा चकला-बेलन, चाकू-छलनी बोल रहे हैं।<br><br>
+                मैं चाकू सब्‍ज़ी-फल काटूँ, टुकड़ा-टुकड़ा सबको बाँटूँ।<br>
+                गाजर-मूली-प्याज़-टमाटर, छीलो-काटो रखो सजाकर।<br><br>
+                गोल चाँद सी हूँ मैं थाली, बज सकती हूँ बनकर ताली।<br>
+                मुझमें सब्‍ज़ी-दाल मिलाई, और सभी ने झटपट खाई।
+            </div>
+        </section>
+
+        <section id="qa-section" class="activity-section">
+            <h2>२. उत्तर लिखो </h2>
+            <p>प्रश्नों पर क्लिक करके उनके आदर्श उत्तर देखें:</p>
+            
+            <div class="qa-card" onclick="toggleQA(this)">
+                <div class="qa-header">प्रश्न १) खिड़की कौन खोल रहे हैं? <span>➕</span></div>
+                <div class="qa-body">उत्तर: रसोईघर की खिड़की <strong>मुन्ना और मुन्नी</strong> खोल रहे हैं [cite: 1216]।</div>
+            </div>
+
+            <div class="qa-card" onclick="toggleQA(this)">
+                <div class="qa-header">प्रश्न २) रसोईघर के अंदर उन्होंने क्या देखा? <span>➕</span></div>
+                <div class="qa-body">उत्तर: रसोईघर के अंदर उन्होंने <strong>चकला-बेलन, चाकू और छलनी</strong> को बोलते हुए देखा [cite: 1216]।</div>
+            </div>
+
+            <div class="qa-card" onclick="toggleQA(this)">
+                <div class="qa-header">प्रश्न ३) चाकू का क्या काम है? <span>➕</span></div>
+                <div class="qa-body">उत्तर: चाकू का काम <strong>सब्ज़ी और फल काटना</strong> तथा उनके टुकड़े-टुकड़े बाँटना है [cite: 1217]।</div>
+            </div>
+
+            <div class="qa-card" onclick="toggleQA(this)">
+                <div class="qa-header">प्रश्न ४) थाली में किसे सजाकर रखना है? <span>➕</span></div>
+                <div class="qa-body">उत्तर: थाली में <strong>गाजर, मूली, प्याज़ और टमाटर</strong> को छीलकर व काटकर सजाकर रखना है [cite: 1217]।</div>
+            </div>
+
+            <div class="qa-card" onclick="toggleQA(this)">
+                <div class="qa-header">प्रश्न ५) थाली का आकार कैसा है? <span>➕</span></div>
+                <div class="qa-body">उत्तर: थाली का आकार <strong>गोल चाँद जैसा</strong> है [cite: 1217]।</div>
+            </div>
+        </section>
+
+        <section id="match-section" class="activity-section">
+            <h2>३. जोड़ी चुनकर लिखो </h2>
+            <p>पहले बाएँ स्तम्भ (शब्द) के किसी एक कार्ड पर क्लिक करें, फिर दाएँ स्तम्भ के सही अर्थ/सम्बन्धित शब्द पर क्लिक करें:</p>
+            
+            <div class="match-container">
+                <div class="match-column" id="col-left">
+                    <div class="match-item" data-id="1" onclick="selectItem(this, 'left')">चाकू</div>
+                    <div class="match-item" data-id="2" onclick="selectItem(this, 'left')">थाली</div>
+                    <div class="match-item" data-id="3" onclick="selectItem(this, 'left')">छलनी</div>
+                    <div class="match-item" data-id="4" onclick="selectItem(this, 'left')">चकला-बेलन</div>
+                </div>
+                <div class="match-column" id="col-right">
+                    <div class="match-item" data-id="3" onclick="selectItem(this, 'right')">चाय छानना</div>
+                    <div class="match-item" data-id="4" onclick="selectItem(this, 'right')">रोटी बेलना</div>
+                    <div class="match-item" data-id="1" onclick="selectItem(this, 'right')">सब्ज़ी काटना</div>
+                    <div class="match-item" data-id="2" onclick="selectItem(this, 'right')">झटपट खाना</div>
+                </div>
+            </div>
+            <div id="match-feedback" class="feedback"></div>
+        </section>
+
+        <section id="list-section" class="activity-section">
+            <h2>४. क्या पसंद है? क्या पसंद नहीं है? </h2>
+            <p>दी गई खाद्य सामग्रियों के सामने अपनी पसंद के अनुसार सही विकल्प का चयन करें:</p>
+            
+            <div class="quiz-box">
+                <div class="quiz-line">
+                    🍏 आम: 
+                    <select id="pref-1">
+                        <option value="1">बहुत पसंद है</option>
+                        <option value="2">थोड़ा पसंद है</option>
+                        <option value="3">बिल्कुल पसंद नहीं है</option>
+                    </select>
+                </div>
+                <div class="quiz-line">
+                    🍌 केला: 
+                    <select id="pref-2">
+                        <option value="1">बहुत पसंद है</option>
+                        <option value="2">थोड़ा पसंद है</option>
+                        <option value="3">बिल्कुल पसंद नहीं है</option>
+                    </select>
+                </div>
+                <div class="quiz-line">
+                    🍇 अंगूर: 
+                    <select id="pref-3">
+                        <option value="1">बहुत पसंद है</option>
+                        <option value="2">थोड़ा पसंद है</option>
+                        <option value="3">बिल्कुल पसंद नहीं है</option>
+                    </select>
+                </div>
+                <div class="quiz-line">
+                    🪵 करेला: 
+                    <select id="pref-4">
+                        <option value="3">बिल्कुल पसंद नहीं है</option>
+                        <option value="2">थोड़ा पसंद है</option>
+                        <option value="1">बहुत पसंद है</option>
+                    </select>
+                </div>
+                <button class="action-btn" onclick="savePreferences()">अपनी पसंद लॉक करें</button>
+                <div id="pref-feedback" class="feedback"></div>
+            </div>
+        </section>
+
+        <section id="lang-section" class="activity-section">
+            <h2>५. भाषा ज्ञान एवं कन्नड़/अंग्रेज़ी शब्द रूप </h2>
+            <p>रसोईघर के मसालों और बर्तनों के अनुवाद जानने के लिए कार्ड्स पर क्लिक करें (Click to Flip):</p>
+            
+            <div class="grid-cards">
+                <div class="flip-card" onclick="flipCard(this)">
+                    <div class="flip-card-inner">
+                        <div class="card-front">जीरा (Jeera)</div>
+                        <div class="card-back">Cumin Seed / ಜೀರಿಗೆ</div>
+                    </div>
+                </div>
+                <div class="flip-card" onclick="flipCard(this)">
+                    <div class="flip-card-inner">
+                        <div class="card-front">हल्दी (Haldi)</div>
+                        <div class="card-back">Turmeric / ಅರಿಶಿನ</div>
+                    </div>
+                </div>
+                <div class="flip-card" onclick="flipCard(this)">
+                    <div class="flip-card-inner">
+                        <div class="card-front">काली मिर्च</div>
+                        <div class="card-back">Black Pepper / ಮೆಣಸು</div>
+                    </div>
+                </div>
+                <div class="flip-card" onclick="flipCard(this)">
+                    <div class="flip-card-inner">
+                        <div class="card-front">चाकू (Chaku)</div>
+                        <div class="card-back">Knife / ಚಾಕು</div>
+                    </div>
+                </div>
+                <div class="flip-card" onclick="flipCard(this)">
+                    <div class="flip-card-inner">
+                        <div class="card-front">छीलनी (Chilni)</div>
+                        <div class="card-back">Peeler / ಸುಲಿಯುವ ಸಾಧನ</div>
+                    </div>
+                </div>
+                <div class="flip-card" onclick="flipCard(this)">
+                    <div class="flip-card-inner">
+                        <div class="card-front">हींग (Heeng)</div>
+                        <div class="card-back">Asafoetida / ಇಂಗು</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // Audio Synthesis Web API Engine for Sounds
+        let audioCtx = null;
+        function initAudio() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+        
+        function playSound(freq, type, duration) {
+            initAudio();
+            if(!audioCtx) return;
+            let osc = audioCtx.createOscillator();
+            let gain = audioCtx.createGain();
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + duration);
+        }
+
+        function playSuccess() { playSound(587.33, 'sine', 0.12); setTimeout(() => playSound(880, 'sine', 0.15), 100); }
+        function playError() { playSound(180, 'triangle', 0.25); }
+
+        // Core Navigation Tab Switch System
+        function switchTab(tabId) {
+            document.querySelectorAll('.activity-section').forEach(sec => sec.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            event.currentTarget.classList.add('active');
+            playSound(440, 'sine', 0.05);
+        }
+
+        // Q&A Open/Close Accordion Function
+        function toggleQA(card) {
+            card.classList.toggle('open');
+            card.querySelector('.qa-header span').innerHTML = card.classList.contains('open') ? '➖' : '➕';
+            playSound(600, 'sine', 0.04);
+        }
+
+        // 3D Card Flipping System
+        function flipCard(card) { card.classList.toggle('flipped'); playSound(700, 'sine', 0.05); }
+
+        // Interactive Matching Logic Game
+        let selectedLeft = null;
+        let selectedRight = null;
+        let matchesCount = 0;
+
+        function selectItem(element, column) {
+            if (element.classList.contains('matched')) return;
+
+            if (column === 'left') {
+                if (selectedLeft) selectedLeft.classList.remove('selected');
+                selectedLeft = element;
+                selectedLeft.classList.add('selected');
+                playSound(500, 'sine', 0.05);
+            } else {
+                if (selectedRight) selectedRight.classList.remove('selected');
+                selectedRight = element;
+                selectedRight.classList.add('selected');
+                playSound(500, 'sine', 0.05);
+            }
+
+            if (selectedLeft && selectedRight) {
+                const idLeft = selectedLeft.getAttribute('data-id');
+                const idRight = selectedRight.getAttribute('data-id');
+                const fb = document.getElementById('match-feedback');
+
+                if (idLeft === idRight) {
+                    selectedLeft.classList.add('matched');
+                    selectedRight.classList.add('matched');
+                    selectedLeft.classList.remove('selected');
+                    selectedRight.classList.remove('selected');
+                    fb.innerText = "🎯 बिल्कुल सही मिलान!";
+                    fb.style.color = "var(--neon-green)";
+                    playSuccess();
+                    matchesCount++;
+                    selectedLeft = null;
+                    selectedRight = null;
+                    if(matchesCount === 4) {
+                        fb.innerText = "🎉 बधाई हो! आपने सभी बर्तनों और उनके कार्यों का सही मिलान कर लिया है।";
+                    }
+                } else {
+                    selectedLeft.classList.remove('selected');
+                    selectedRight.classList.remove('selected');
+                    fb.innerText = "❌ गलत जोड़ी! पुनः प्रयास करें।";
+                    fb.style.color = "var(--neon-pink)";
+                    playError();
+                    selectedLeft = null;
+                    selectedRight = null;
+                }
+            }
+        }
+
+        // Survey Alert Feedback 
+        function savePreferences() {
+            const fb = document.getElementById('pref-feedback');
+            fb.innerText = "💾 आपकी भोजन प्राथमिकताएँ डिजिटल रूप से दर्ज़ कर ली गई हैं!";
+            fb.style.color = "var(--neon-yellow)";
+            playSuccess();
+        }
+    </script>
+</body>
+</html>

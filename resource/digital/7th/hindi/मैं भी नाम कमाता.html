@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>पाठ 4: मैं भी नाम कमाता - Interactive Learning Suite (Dark Edition)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&family=Yatra+One&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0f172a;
+            --card-bg: #1e293b;
+            --primary: #3b82f6;
+            --accent: #f43f5e;
+            --success: #10b981;
+            --warning: #eab308;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #334155;
+        }
+
+        body {
+            font-family: 'Poppins', 'Hind', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            transition: all 0.3s ease;
+        }
+
+        header {
+            background: linear-gradient(135deg, #1e1b4b 0%, #311042 50%, #1e293b 100%);
+            color: white;
+            padding: 2.5rem 1rem;
+            text-align: center;
+            border-bottom: 4px solid var(--accent);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        header h1 {
+            font-family: 'Yatra One', cursive;
+            font-size: 2.5rem;
+            margin: 0 0 0.5rem 0;
+            letter-spacing: 1px;
+            text-shadow: 0 0 15px var(--accent);
+            color: #fff;
+        }
+
+        header p {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            margin: 0;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .tab-navigation {
+            display: flex;
+            gap: 0.5rem;
+            overflow-x: auto;
+            background: #111827;
+            padding: 0.6rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            border: 1px solid var(--border);
+        }
+
+        .tab-btn {
+            flex: 1;
+            min-width: 140px;
+            padding: 0.8rem 1rem;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            font-weight: 500;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, var(--primary), #a855f7);
+            color: white;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+        }
+
+        .activity-section {
+            display: none;
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+            border: 1px solid var(--border);
+            animation: fadeIn 0.4s ease;
+        }
+
+        .activity-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 {
+            color: #38bdf8;
+            border-left: 5px solid var(--accent);
+            padding-left: 10px;
+            margin-top: 0;
+            font-size: 1.5rem;
+            text-shadow: 0 0 10px rgba(56, 189, 248, 0.2);
+        }
+
+        /* Karaoke Poem Section */
+        .poem-container {
+            background: #0f172a;
+            padding: 1.5rem;
+            border-radius: 15px;
+            text-align: center;
+            font-size: 1.3rem;
+            line-height: 2.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border);
+        }
+
+        .poem-line {
+            padding: 0.4rem 0;
+            transition: all 0.3s ease;
+            border-radius: 8px;
+            color: #cbd5e1;
+        }
+
+        .poem-line.highlight {
+            background: linear-gradient(90deg, transparent, #eab308, transparent);
+            color: #000;
+            transform: scale(1.05);
+            font-weight: bold;
+            box-shadow: 0 0 15px rgba(234, 179, 8, 0.4);
+        }
+
+        .audio-controls {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        /* Q&A Interactive Accordion */
+        .qa-card {
+            background: #1e293b;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .qa-header {
+            padding: 1rem;
+            font-weight: 500;
+            background: #111827;
+            color: #f1f5f9;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .qa-header:hover {
+            background: #1f2937;
+        }
+
+        .qa-body {
+            padding: 0;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease, padding 0.3s ease;
+            background: #1e293b;
+            font-size: 1.1rem;
+            color: #cbd5e1;
+        }
+
+        .qa-card.open .qa-body {
+            padding: 1rem;
+            max-height: 200px;
+            border-top: 1px solid var(--border);
+        }
+
+        /* Interactive Flashcards */
+        .flashcard-wrapper {
+            display: flex;
+            justify-content: center;
+            perspective: 1000px;
+            margin: 2rem 0;
+        }
+
+        .flashcard {
+            width: 320px;
+            height: 200px;
+            transform-style: preserve-3d;
+            transition: transform 0.6s;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .flashcard.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+            font-size: 1.5rem;
+            font-weight: bold;
+            padding: 1rem;
+            box-sizing: border-box;
+            border: 2px solid rgba(255,255,255,0.1);
+        }
+
+        .card-front {
+            background: linear-gradient(45deg, #1d4ed8, #ec4899);
+            color: white;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+
+        .card-back {
+            background: linear-gradient(45deg, #059669, #10b981);
+            color: white;
+            transform: rotateY(180deg);
+        }
+
+        .card-controls {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+            align-items: center;
+        }
+
+        .card-controls button {
+            background: #334155;
+            color: #f1f5f9;
+            border: 1px solid var(--border);
+        }
+
+        .card-controls button:hover {
+            background: #475569;
+        }
+
+        /* Interactive Quiz / Form elements */
+        .interactive-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .quiz-item {
+            background: #0f172a;
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        select, input {
+            width: 100%;
+            padding: 0.7rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background-color: #1e293b;
+            color: white;
+            margin-top: 0.5rem;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+
+        select:focus, input:focus {
+            outline: 2px solid var(--primary);
+        }
+
+        button.action-btn {
+            background: linear-gradient(135deg, var(--primary) 0%, #2563eb 100%);
+            color: white;
+            border: none;
+            padding: 0.7rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        button.action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(37, 99, 235, 0.4);
+        }
+
+        .feedback-msg {
+            margin-top: 1rem;
+            font-weight: bold;
+            font-size: 1.1rem;
+            text-align: center;
+            min-height: 24px;
+        }
+
+        /* Word Game Styles */
+        .word-blocks {
+            display: flex;
+            gap: 0.8rem;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .char-tile {
+            background: linear-gradient(135deg, #a855f7 0%, #6b21a8 100%);
+            color: white;
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            user-select: none;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            transition: all 0.2s;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .char-tile:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 12px #a855f7;
+        }
+
+        /* Responsive Layout fixes */
+        @media(max-width: 600px) {
+            header h1 { font-size: 1.8rem; }
+            .activity-section { padding: 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>पाठ ४: मैं भी नाम कमाता</h1>
+        <p>हिंदी वल्लरी (तृतीय भाषा) - सातवीं कक्षा | डिजिटल लर्निंग सुइट (डार्क मोड)</p>
+    </header>
+
+    <div class="container">
+        <!-- Interactive Nav Bar separating all core structural activities -->
+        <div class="tab-navigation">
+            <button class="tab-btn active" onclick="switchTab('poem-karaoke')">🎵 कविता वाचन</button>
+            <button class="tab-btn" onclick="switchTab('qa-section')">❓ अभ्यास प्रश्नोत्तर</button>
+            <button class="tab-btn" onclick="switchTab('grammar-vocab')">🔄 विलोम और वचन</button>
+            <button class="tab-btn" onclick="switchTab('word-match')">🧩 समानार्थक और द्विरुक्ति</button>
+        </div>
+
+        <!-- ACTIVITY 1: Poem Karaoke Subsystem -->
+        <section id="poem-karaoke" class="activity-section active">
+            <h2>१. कविता और कवि परिचय (स्मार्ट प्लेयर)</h2>
+            <p>पंक्तियों को हाइलाइट करने और लय के साथ पढ़ने के लिए नीचे दिए गए बटनों का उपयोग करें:</p>
+            <div class="poem-container">
+                <div class="poem-line" id="l1">रोज़-रोज़ सीमा की ख़बरें, सुन-सुनकर मन छोटा मेरा,</div>
+                <div class="poem-line" id="l2">मुस-मुसकर रह जाता।</div>
+                <div class="poem-line" id="l3">अगर न होता छोटा बच्चा, तो लेकर बंदूक हाथ में,</div>
+                <div class="poem-line" id="l4">मैं भी नाम कमाता।</div>
+                <div class="poem-line" id="l5">झटपट होकर बड़ा फ़ौज में, एक यही बस मन में आता,</div>
+                <div class="poem-line" id="l6">मैं भर्ती हो जाता।</div>
+            </div>
+            <div class="audio-controls">
+                <button class="action-btn" onclick="playPoemAudio()">▶️ वाचन शुरू करें</button>
+                <button class="action-btn" style="background:#475569;" onclick="resetPoemAudio()">🔄 रीसेट</button>
+            </div>
+            <hr style="margin: 2rem 0; border: 0; border-top: 1px solid var(--border);">
+            <h3>✍️ कवि परिचय</h3>
+            <p><strong>कवि:</strong> डॉ. दिविक रमेश (मूल कविता प्रेरणा: चन्द्रपाल सिंह यादव 'मयंक')</p>
+        </section>
+
+        <!-- ACTIVITY 2: Q&A Interactive Accordion Simulator -->
+        <section id="qa-section" class="activity-section">
+            <h2>२. सोचो और उत्तर लिखो (Interactive Q&A)</h2>
+            <p>प्रश्न पर क्लिक करके उसका सही उत्तर तुरंत देखें:</p>
+            
+            <div class="qa-card" onclick="toggleQA(this)">
+                <div class="qa-header">१) बच्चा रोज़ कहाँ की ख़बरें सुनता है? <span>➕</span></div>
+                <div class="qa-body">उत्तर: बच्चा रोज़ <strong>सीमा (Border)</strong> की ख़बरें सुनता है।</div>
+            </div>
+
+            <div class="qa-card" onclick="toggleQA(this)">
+                <div class="qa-header">२) बच्चा बंदूक लेकर क्या करना चाहता है? <span>➕</span></div>
+                <div class="qa-body">उत्तर: बच्चा बंदूक लेकर देश की सेवा करना और अपना <strong>नाम कमाना</strong> चाहता है।</div>
+            </div>
+
+            <div class="qa-card" onclick="toggleQA(this)">
+                <div class="qa-header">३) बच्चे के मन में क्या इच्छा आती है? <span>➕</span></div>
+                <div class="qa-body">उत्तर: बच्चे के मन में झटपट बड़ा होकर <strong>फ़ौज (Army) में भर्ती</strong> होने की इच्छा आती है।</div>
+            </div>
+        </section>
+
+        <!-- ACTIVITY 3: Live Grammar Assessment System -->
+        <section id="grammar-vocab" class="activity-section">
+            <h2>३. व्याकरण ज्ञान: विलोम शब्द और अन्य वचन</h2>
+            <p>फ़्लैशकार्ड को पलटकर (Click to Flip) उसका विलोम या सही व्याकरण रूप जानें:</p>
+            
+            <div class="flashcard-wrapper">
+                <div class="flashcard" id="main-card" onclick="this.classList.toggle('flipped'); playSound(500, 'sine', 0.1);">
+                    <div class="card-front" id="cf-text">बड़ा</div>
+                    <div class="card-back" id="cb-text">छोटा (विलोम)</div>
+                </div>
+            </div>
+
+            <div class="card-controls">
+                <button class="action-btn" onclick="loadCard(1)">१. बड़ा</button>
+                <button class="action-btn" onclick="loadCard(2)">२. एक</button>
+                <button class="action-btn" onclick="loadCard(3)">३. सुख</button>
+                <button class="action-btn" onclick="loadCard(4)">४. ख़बर (वचन)</button>
+                <button class="action-btn" onclick="loadCard(5)">५. लड़का (वचन)</button>
+            </div>
+        </section>
+
+        <!-- ACTIVITY 4: Ultra-Modern Multi-Interactive Matching Suite -->
+        <section id="word-match" class="activity-section">
+            <h2>४. समानार्थक शब्द और द्विरुक्ति अभ्यास खेल</h2>
+            
+            <div class="quiz-item" style="margin-bottom: 2rem;">
+                <h3>🎯 सही समानार्थक शब्द चुनिए:</h3>
+                <div class="interactive-grid">
+                    <div>
+                        <label>फ़ौज = </label>
+                        <select id="syn-1">
+                            <option value="">--चुनें--</option>
+                            <option value="correct">सेना (Army)</option>
+                            <option value="wrong">हवा</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>ख़बर = </label>
+                        <select id="syn-2">
+                            <option value="">--चुनें--</option>
+                            <option value="wrong">पुरस्कार</option>
+                            <option value="correct">समाचार (News)</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="action-btn" style="margin-top:1rem;" onclick="checkSynonyms()">जांचें</button>
+                <div id="syn-feedback" class="feedback-msg"></div>
+            </div>
+
+            <div class="quiz-item">
+                <h3>🧩 द्विरुक्ति शब्द पहचान (क्रमबद्ध पहेली):</h3>
+                <p>नीचे दिए गए ब्लॉकों पर सही क्रम में क्लिक करके कविता में आए दो मुख्य द्विरुक्ति शब्द (<b>सुन-सुनकर</b> या <b>मुस-मुसकर</b>) बनाएं:</p>
+                <div class="word-blocks">
+                    <div class="char-tile" onclick="appendWord('सुन')">सुन</div>
+                    <div class="char-tile" onclick="appendWord('-सुनकर')">-सुनकर</div>
+                    <div class="char-tile" onclick="appendWord('मुस')">मुस</div>
+                    <div class="char-tile" onclick="appendWord('-मुसकर')">-मुसकर</div>
+                </div>
+                <input type="text" id="puzzle-input" readonly placeholder="आपका बनाया शब्द यहाँ दिखेगा...">
+                <div style="margin-top: 1rem; display: flex; gap: 0.5rem;">
+                    <button class="action-btn" style="background: linear-gradient(135deg, var(--success) 0%, #059669 100%);" onclick="checkPuzzle()">सत्यापित करें</button>
+                    <button class="action-btn" style="background: linear-gradient(135deg, var(--accent) 0%, #e11d48 100%);" onclick="clearPuzzle()">साफ़ करें</button>
+                </div>
+                <div id="puzzle-feedback" class="feedback-msg"></div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // Web Audio API for internal sound generation without external links
+        let audioCtx = null;
+        function playSound(freq, type, duration) {
+            try {
+                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                let osc = audioCtx.createOscillator();
+                let gain = audioCtx.createGain();
+                osc.type = type;
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + duration);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + duration);
+            } catch(e) { console.log("Audio playing not supported yet"); }
+        }
+
+        function playSuccessSound() {
+            playSound(523.25, 'sine', 0.15); // C5 note
+            setTimeout(() => playSound(659.25, 'sine', 0.2), 100); // E5 note
+        }
+
+        function playErrorSound() {
+            playSound(150, 'sawtooth', 0.25); // Buzz sound
+        }
+
+        // Tab system logic
+        function switchTab(tabId) {
+            document.querySelectorAll('.activity-section').forEach(sec => sec.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            event.currentTarget.classList.add('active');
+            playSound(400, 'sine', 0.05);
+        }
+
+        // Q&A accordion action
+        function toggleQA(cardElement) {
+            cardElement.classList.toggle('open');
+            const icon = cardElement.querySelector('.qa-header span');
+            icon.innerHTML = cardElement.classList.contains('open') ? '➖' : '➕';
+            playSound(600, 'sine', 0.05);
+        }
+
+        // Simulated Sound/Karaoke System
+        let karaokeInterval;
+        function playPoemAudio() {
+            resetPoemAudio();
+            let currentLine = 1;
+            const maxLines = 6;
+            
+            document.getElementById(`l${currentLine}`).classList.add('highlight');
+            playSound(300 + (currentLine * 50), 'triangle', 0.3);
+            
+            karaokeInterval = setInterval(() => {
+                document.getElementById(`l${currentLine}`).classList.remove('highlight');
+                currentLine++;
+                if(currentLine <= maxLines) {
+                    document.getElementById(`l${currentLine}`).classList.add('highlight');
+                    playSound(300 + (currentLine * 50), 'triangle', 0.3);
+                } else {
+                    clearInterval(karaokeInterval);
+                }
+            }, 2500);
+        }
+
+        function resetPoemAudio() {
+            clearInterval(karaokeInterval);
+            document.querySelectorAll('.poem-line').forEach(line => line.classList.remove('highlight'));
+        }
+
+        // Grammar dataset mapping
+        const cardData = {
+            1: { front: "बड़ा", back: "छोटा (विलोम)" },
+            2: { front: "एक", back: "अनेक (विलोम)" },
+            3: { front: "सुख", back: "दुख (विलोम)" },
+            4: { front: "ख़बर", back: "ख़बरें (बहुवचन)" },
+            5: { front: "लड़का", back: "लड़के (बहुवचन)" }
+        };
+
+        function loadCard(id) {
+            const card = document.getElementById('main-card');
+            card.classList.remove('flipped');
+            playSound(450, 'sine', 0.08);
+            setTimeout(() => {
+                document.getElementById('cf-text').innerText = cardData[id].front;
+                document.getElementById('cb-text').innerText = cardData[id].back;
+            }, 150);
+        }
+
+        // Dropdown Verification Engine
+        function checkSynonyms() {
+            const s1 = document.getElementById('syn-1').value;
+            const s2 = document.getElementById('syn-2').value;
+            const fb = document.getElementById('syn-feedback');
+            
+            if(s1 === 'correct' && s2 === 'correct') {
+                fb.innerText = "🎉 अद्भुत! सभी समानार्थक शब्द एकदम सही हैं।";
+                fb.style.color = "var(--success)";
+                playSuccessSound();
+            } else {
+                fb.innerText = "❌ कुछ उत्तर गलत हैं, कृपया दोबारा प्रयास करें!";
+                fb.style.color = "var(--accent)";
+                playErrorSound();
+            }
+        }
+
+        // Word builder sandbox mechanics (Correct answers fixed)
+        function appendWord(val) {
+            document.getElementById('puzzle-input').value += val;
+            playSound(700, 'sine', 0.05);
+        }
+
+        function clearPuzzle() {
+            document.getElementById('puzzle-input').value = '';
+            document.getElementById('puzzle-feedback').innerText = '';
+            playSound(250, 'sawtooth', 0.1);
+        }
+
+        function checkPuzzle() {
+            const val = document.getElementById('puzzle-input').value;
+            const fb = document.getElementById('puzzle-feedback');
+            
+            // Correct criteria match checks
+            if (val === 'सुन-सुनकर' || val === 'मुस-मुसकर') {
+                fb.innerText = "🎯 बिल्कुल सही! '" + val + "' कविता का एक सटीक द्विरुक्ति शब्द है।";
+                fb.style.color = "var(--success)";
+                playSuccessSound();
+            } else {
+                fb.innerText = "❌ गलत संयोजन! सही क्रम में चुनें (जैसे: सुन + -सुनकर)।";
+                fb.style.color = "var(--accent)";
+                playErrorSound();
+            }
+        }
+    </script>
+</body>
+</html>

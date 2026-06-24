@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>पाठ ८: गिनती (५१ से ७०) - Interactive Suite with Audio</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght=400;600;800&family=Yatra+One&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #0b0f19;
+            --card-dark: #151f32;
+            --neon-pink: #ff2a74;
+            --neon-cyan: #00f0ff;
+            --neon-green: #39ff14;
+            --neon-orange: #ff9900;
+            --text-white: #ffffff;
+            --text-gray: #94a3b8;
+        }
+
+        body {
+            font-family: 'Poppins', 'Hind', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-white);
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        header {
+            background: linear-gradient(145deg, #1e1b4b, #0f172a);
+            padding: 2.5rem 1rem;
+            text-align: center;
+            border-bottom: 4px solid var(--neon-cyan);
+            box-shadow: 0 0 25px rgba(0, 240, 255, 0.3);
+        }
+
+        header h1 {
+            font-family: 'Yatra One', cursive;
+            font-size: 3.2rem;
+            margin: 0;
+            background: linear-gradient(to right, var(--neon-pink), var(--neon-cyan), var(--neon-orange));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        header p {
+            color: var(--text-gray);
+            font-size: 1.2rem;
+            margin-top: 0.5rem;
+        }
+
+        .container {
+            max-width: 1150px;
+            margin: 2.5rem auto;
+            padding: 0 1.5rem;
+        }
+
+        /* Modern Navigation Dashboard */
+        .nav-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 0.8rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .nav-btn {
+            background: var(--card-dark);
+            border: 2px solid #27354f;
+            color: var(--text-gray);
+            padding: 1.2rem 0.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-align: center;
+        }
+
+        .nav-btn:hover {
+            color: #fff;
+            border-color: var(--neon-cyan);
+            transform: translateY(-3px);
+        }
+
+        .nav-btn.active {
+            background: linear-gradient(135deg, var(--neon-pink), var(--neon-orange));
+            border-color: transparent;
+            color: white;
+            box-shadow: 0 0 15px rgba(255, 42, 116, 0.4);
+        }
+
+        .content-box {
+            display: none;
+            background: var(--card-dark);
+            border-radius: 20px;
+            padding: 2.5rem;
+            border: 1px solid #27354f;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+            animation: slideUp 0.4s ease;
+        }
+
+        .content-box.active {
+            display: block;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            color: var(--neon-cyan);
+            margin-top: 0;
+            border-left: 5px solid var(--neon-pink);
+            padding-left: 15px;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Counting Grid (Abacus Matrix) */
+        .ginti-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 1.2rem;
+        }
+
+        .number-node {
+            background: #1a263d;
+            border: 2px solid #2e3f5e;
+            border-radius: 15px;
+            padding: 1.5rem 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .number-node:hover {
+            transform: scale(1.05);
+            border-color: var(--neon-green);
+            box-shadow: 0 0 12px rgba(57, 255, 20, 0.2);
+        }
+
+        /* Audio Indicator Icon */
+        .audio-icon {
+            position: absolute;
+            top: 8px;
+            right: 12px;
+            font-size: 0.9rem;
+            color: var(--text-gray);
+            opacity: 0.6;
+        }
+        
+        .number-node:hover .audio-icon {
+            color: var(--neon-cyan);
+            opacity: 1;
+        }
+
+        .node-digits {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: var(--neon-orange);
+        }
+
+        .node-words {
+            font-size: 1.2rem;
+            margin-top: 0.5rem;
+            color: var(--text-white);
+            font-weight: 600;
+        }
+
+        /* Match Matrix Layout */
+        .match-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 3rem;
+            margin-top: 1.5rem;
+        }
+
+        .match-list {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .match-pill {
+            background: #1e2d4a;
+            padding: 1.2rem;
+            border: 2px solid #33476a;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .match-pill.selected {
+            border-color: var(--neon-cyan);
+            background: rgba(0, 240, 255, 0.1);
+        }
+
+        .match-pill.passed {
+            background: rgba(57, 255, 20, 0.15);
+            border-color: var(--neon-green);
+            color: #fff;
+            cursor: not-allowed;
+        }
+
+        /* Interactive Selectors */
+        .select-row {
+            background: #0f172a;
+            padding: 1.2rem;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1.2rem;
+        }
+
+        select {
+            background: #1e2d4a;
+            color: white;
+            padding: 0.6rem 1.2rem;
+            border: 2px solid #33476a;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* Unified Action Buttons */
+        .action-btn {
+            background: linear-gradient(135deg, var(--neon-cyan), #00a2ff);
+            color: #000;
+            font-weight: bold;
+            font-size: 1.1rem;
+            padding: 0.8rem 2rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 1rem;
+            transition: all 0.2s;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 240, 255, 0.4);
+        }
+
+        .alert-info {
+            margin-top: 1rem;
+            font-weight: bold;
+            font-size: 1.2rem;
+            min-height: 30px;
+        }
+
+        /* Flip Utility Cards for Languages */
+        .card-rack {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .lang-card {
+            height: 140px;
+            perspective: 1000px;
+            cursor: pointer;
+        }
+
+        .card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+
+        .lang-card.flipped .card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .front-pane, .back-pane {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border-radius: 15px;
+            border: 2px solid #33476a;
+        }
+
+        .front-pane {
+            background: #1e2d4a;
+            color: var(--neon-orange);
+            font-size: 1.4rem;
+            font-weight: bold;
+        }
+
+        .back-pane {
+            background: linear-gradient(135deg, #7c3aed, var(--neon-pink));
+            color: white;
+            transform: rotateY(180deg);
+            padding: 0.5rem;
+            text-align: center;
+        }
+
+        .back-pane h4 { margin: 0; font-size: 1.3rem; }
+        .back-pane p { margin: 5px 0 0 0; font-size: 1rem; color: #e2e8f0; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>पाठ ८: गिनती (५१ - ७०)</h1>
+        <p>नवीनतम डिजिटल इंटरैक्टिव लर्निंग पोर्टल (ऑडियो उच्चारण गाइड के साथ)</p>
+    </header>
+
+    <div class="container">
+
+        <div class="nav-grid">
+            <button class="nav-btn active" onclick="triggerTab('box-chart')">🔢 १. गिनती चार्ट</button>
+            <button class="nav-btn" onclick="triggerTab('box-match')">🤝 २. जोड़ी मिलाओ</button>
+            <button class="nav-btn" onclick="triggerTab('box-fill')">📝 ३. रिक्त स्थान भरो</button>
+            <button class="nav-btn" onclick="triggerTab('box-lang')">🔤 ४. भाषा ज्ञान</button>
+        </div>
+
+        <section id="box-chart" class="content-box active">
+            <h2>१. गिनती वाचन एवं समझ (Interactive Matrix)</h2>
+            <p style="color: var(--text-gray); margin-bottom: 2rem;">संख्याओं का शुद्ध हिंदी उच्चारण (Audio) सुनने के लिए किसी भी कार्ड पर क्लिक करें:</p>
+            <div class="ginti-grid" id="chart-injection"></div>
+        </section>
+
+        <section id="box-match" class="content-box">
+            <h2>२. अक्षरों और अंकों का मिलान करें (Click to Match)</h2>
+            <p style="color: var(--text-gray);">पहले बाएँ स्तम्भ के किसी अंक पर क्लिक करें, फिर दाएँ स्तम्भ के सही हिंदी शब्द रूप पर क्लिक करें:</p>
+            
+            <div class="match-row">
+                <div class="match-list" id="col-digits">
+                    <div class="match-pill" data-val="55" onclick="linkMatch(this, 'digit')">55</div>
+                    <div class="match-pill" data-val="61" onclick="linkMatch(this, 'digit')">61</div>
+                    <div class="match-pill" data-val="65" onclick="linkMatch(this, 'digit')">65</div>
+                    <div class="match-pill" data-val="70" onclick="linkMatch(this, 'digit')">70</div>
+                </div>
+                <div class="match-list" id="col-words">
+                    <div class="match-pill" data-val="61" onclick="linkMatch(this, 'word')">इकसठ</div>
+                    <div class="match-pill" data-val="70" onclick="linkMatch(this, 'word')">सत्तर</div>
+                    <div class="match-pill" data-val="55" onclick="linkMatch(this, 'word')">पचपन</div>
+                    <div class="match-pill" data-val="65" onclick="linkMatch(this, 'word')">पैंसठ</div>
+                </div>
+            </div>
+            <div id="match-log" class="alert-info"></div>
+        </section>
+
+        <section id="box-fill" class="content-box">
+            <h2>३. सही शब्द रूप चुनकर रिक्त स्थान की पूर्ति करें</h2>
+            <p style="color: var(--text-gray); margin-bottom: 2rem;">अंकों के सामने उनके सही हिंदी नाम का चयन करें:</p>
+            
+            <div class="select-row">
+                <span>अंक <strong>५२</strong> को क्या कहते हैं?</span>
+                <select id="sel-52">
+                    <option value="false">चुनें...</option>
+                    <option value="false">तिरेपन</option>
+                    <option value="true">बावन</option>
+                    <option value="false">चौवन</option>
+                </select>
+            </div>
+
+            <div class="select-row">
+                <span>अंक <strong>५८</strong> को क्या कहते हैं?</span>
+                <select id="sel-58">
+                    <option value="false">चुनें...</option>
+                    <option value="true">अट्ठावन</option>
+                    <option value="false">सत्तावन</option>
+                    <option value="false">उनसठ</option>
+                </select>
+            </div>
+
+            <div class="select-row">
+                <span>अंक <strong>६६</strong> को क्या कहते हैं?</span>
+                <select id="sel-66">
+                    <option value="false">चुनें...</option>
+                    <option value="false">बासठ</option>
+                    <option value="false">तीसठ</option>
+                    <option value="true">छियासठ</option>
+                </select>
+            </div>
+
+            <button class="action-btn" onclick="verifySelections()">उत्तरों की जाँच करें</button>
+            <div id="select-log" class="alert-info"></div>
+        </section>
+
+        <section id="box-lang" class="content-box">
+            <h2>४. कन्नड़ और अंग्रेज़ी अनुवाद रूप (Language Integration)</h2>
+            <p style="color: var(--text-gray); margin-bottom: 2rem;">संख्याओं के बहुभाषी अनुवाद (English / Kannada) जानने के लिए कार्ड्स पर क्लिक करें:</p>
+            
+            <div class="card-rack">
+                <div class="lang-card" onclick="flipCard(this)">
+                    <div class="card-inner">
+                        <div class="front-pane">५१ / इक्यावन</div>
+                        <div class="back-pane"><h4>Fifty-One</h4><p>ಐವತ್ತೊಂದು (५१)</p></div>
+                    </div>
+                </div>
+                <div class="lang-card" onclick="flipCard(this)">
+                    <div class="card-inner">
+                        <div class="front-pane">६० / साठ</div>
+                        <div class="back-pane"><h4>Sixty</h4><p>ಅರವತ್ತು (६०)</p></div>
+                    </div>
+                </div>
+                <div class="lang-card" onclick="flipCard(this)">
+                    <div class="card-inner">
+                        <div class="front-pane">६२ / बासठ</div>
+                        <div class="back-pane"><h4>Sixty-Two</h4><p>ಅರವತ್ತೆರಡು (६२)</p></div>
+                    </div>
+                </div>
+                <div class="lang-card" onclick="flipCard(this)">
+                    <div class="card-inner">
+                        <div class="front-pane">७० / सत्तर</div>
+                        <div class="back-pane"><h4>Seventy</h4><p>ಎಪ್ಪತ್ತು (೭೦)</p></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <script>
+        // Core Ginti DataSet Configuration Engine
+        const dataSet = [
+            {n: '५१', e: '51', w: 'इक्यावन'}, {n: '५२', e: '52', w: 'बावन'},
+            {n: '५३', e: '53', w: 'तिरपन'}, {n: '५४', e: '54', w: 'चौवन'},
+            {n: '५५', e: '55', w: 'पचपन'}, {n: '५६', e: '56', w: 'छप्पन'},
+            {n: '५७', e: '57', w: 'सत्तावन'}, {n: '५८', e: '58', w: 'अट्ठावन'},
+            {n: '५९', e: '59', w: 'उनसठ'}, {n: '६०', e: '60', w: 'साठ'},
+            {n: '६१', e: '61', w: 'इकसठ'}, {n: '६२', e: '62', w: 'बासठ'},
+            {n: '६३', e: '63', w: 'तीसठ'}, {n: '६४', e: '64', w: 'चौंसठ'},
+            {n: '६५', e: '65', w: 'पैंसठ'}, {n: '६६', e: '66', w: 'छियासठ'},
+            {n: '६७', e: '67', w: 'सड़सठ'}, {n: '६८', e: '68', w: 'अड़सठ'},
+            {n: '६९', e: '69', w: 'उनहत्तर'}, {n: '७०', e: '70', w: 'सत्तर'}
+        ];
+
+        // UI Grid Builder Routine
+        const chartWrapper = document.getElementById('chart-injection');
+        dataSet.forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'number-node';
+            div.onclick = () => playNodeTone(item.w);
+            div.innerHTML = `<span class="audio-icon">🔊</span>
+                             <div class="node-digits">${item.n}</div>
+                             <div style="font-size:0.9rem; color:#64748b;">(${item.e})</div>
+                             <div class="node-words">${item.w}</div>`;
+            chartWrapper.appendChild(div);
+        });
+
+        // Advanced Web Audio Node Synthesizer Engine
+        let audioContext = null;
+        function setupAudio() { if (!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)(); }
+        
+        function playTone(freq, mode, timeSpan) {
+            setupAudio(); if(!audioContext) return;
+            let osc = audioContext.createOscillator();
+            let vol = audioContext.createGain();
+            osc.type = mode;
+            osc.frequency.setValueAtTime(freq, audioContext.currentTime);
+            vol.gain.setValueAtTime(0.1, audioContext.currentTime);
+            vol.gain.exponentialRampToValueAtTime(0.0001, audioContext.currentTime + timeSpan);
+            osc.connect(vol);
+            vol.connect(audioContext.destination);
+            osc.start();
+            osc.stop(audioContext.currentTime + timeSpan);
+        }
+
+        function triggerSuccessSound() { playTone(523.25, 'sine', 0.1); setTimeout(() => playTone(659.25, 'sine', 0.15), 80); }
+        function triggerErrorSound() { playTone(140, 'sawtooth', 0.2); }
+
+        // AUDIO GENERATION SYSTEM (Synthesizer + Native TTS Speech Engine)
+        function playNodeTone(wordText) {
+            // 1. Play UI Accent Tone
+            playTone(580, 'sine', 0.08);
+            
+            // 2. Play Speech Synthesis Integration for Real Voice Output
+            if ('speechSynthesis' in window) {
+                // Cancel any ongoing speech to avoid overlapping
+                window.speechSynthesis.cancel();
+                
+                let utter = new SpeechSynthesisUtterance(wordText);
+                utter.lang = 'hi-IN'; // Setting Language Accent to Hindi (India)
+                utter.rate = 0.80;    // Slightly slower rate so primary kids can catch the phonetic sound
+                utter.pitch = 1.1;    // Cheerful student-friendly pitch
+                window.speechSynthesis.speak(utter);
+            }
+        }
+
+        // Dashboard Tabs Module Navigation Router
+        function triggerTab(boxId) {
+            document.querySelectorAll('.content-box').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(n => n.classList.remove('active'));
+            document.getElementById(boxId).classList.add('active');
+            event.currentTarget.classList.add('active');
+            playTone(350, 'sine', 0.04);
+        }
+
+        // Logic Grid Engine for Matching Pairs
+        let trackedDigit = null;
+        let trackedWord = null;
+
+        function linkMatch(element, lineMode) {
+            if (element.classList.contains('passed')) return;
+
+            if (lineMode === 'digit') {
+                if (trackedDigit) trackedDigit.classList.remove('selected');
+                trackedDigit = element;
+                trackedDigit.classList.add('selected');
+            } else {
+                if (trackedWord) trackedWord.classList.remove('selected');
+                trackedWord = element;
+                trackedWord.classList.add('selected');
+            }
+            playTone(600, 'sine', 0.03);
+
+            if (trackedDigit && trackedWord) {
+                const dVal = trackedDigit.getAttribute('data-val');
+                const wVal = trackedWord.getAttribute('data-val');
+                const feedback = document.getElementById('match-log');
+
+                if (dVal === wVal) {
+                    trackedDigit.classList.add('passed');
+                    trackedWord.classList.add('passed');
+                    feedback.innerText = "🎯 सही उत्तर! अद्भुत मिलान।";
+                    feedback.style.color = "var(--neon-green)";
+                    triggerSuccessSound();
+                } else {
+                    feedback.innerText = "❌ गलत उत्तर! फिर से सोचें।";
+                    feedback.style.color = "var(--neon-pink)";
+                    triggerErrorSound();
+                }
+                trackedDigit.classList.remove('selected');
+                trackedWord.classList.remove('selected');
+                trackedDigit = null;
+                trackedWord = null;
+            }
+        }
+
+        // Select Input Verification System
+        function verifySelections() {
+            const s1 = document.getElementById('sel-52').value;
+            const s2 = document.getElementById('sel-58').value;
+            const s3 = document.getElementById('sel-66').value;
+            const logBox = document.getElementById('select-log');
+
+            if (s1 === 'true' && s2 === 'true' && s3 === 'true') {
+                logBox.innerText = "🎉 उत्कृष्ट! आपने सभी रिक्त स्थानों की सही पहचान की है।";
+                logBox.style.color = "var(--neon-green)";
+                triggerSuccessSound();
+            } else {
+                logBox.innerText = "⚠️ कुछ उत्तर गलत हैं। कृपया जाँचें और पुनः प्रयास करें।";
+                logBox.style.color = "var(--neon-orange)";
+                triggerErrorSound();
+            }
+        }
+
+        // 3D Card Flipping
+        function flipCard(cardNode) {
+            cardNode.classList.toggle('flipped');
+            playTone(750, 'sine', 0.04);
+        }
+    </script>
+</body>
+</html>
