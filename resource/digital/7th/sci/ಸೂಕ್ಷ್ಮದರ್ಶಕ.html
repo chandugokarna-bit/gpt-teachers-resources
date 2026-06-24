@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ನೈಜ ಮೈಕ್ರೋಸ್ಕೋಪ್ ಲೈವ್ ಸಿಮ್ಯುಲೇಶನ್</title>
+    <style>
+        :root {
+            --primary: #00f2fe;
+            --secondary: #4facfe;
+            --bg-dark: #030712;
+            --card-bg: rgba(255, 255, 255, 0.03);
+            --text-light: #f3f4f6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+
+        body {
+            background: radial-gradient(circle at center, #0f172a 0%, var(--bg-dark) 100%);
+            color: var(--text-light);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem;
+            overflow-x: hidden;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        header h1 {
+            font-size: 2.4rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+            font-weight: 800;
+        }
+
+        header p {
+            color: #64748b;
+            font-size: 1.1rem;
+        }
+
+        .container {
+            display: flex;
+            gap: 3rem;
+            max-width: 1200px;
+            width: 100%;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        /* Controls */
+        .controls {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 2rem;
+            border-radius: 28px;
+            width: 390px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.6);
+        }
+
+        .controls h3 {
+            margin-bottom: 1.2rem;
+            color: var(--primary);
+            font-size: 1.2rem;
+        }
+
+        .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+
+        button {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: #cbd5e1;
+            padding: 1rem;
+            border-radius: 16px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        button:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        button.active {
+            background: linear-gradient(135deg, var(--secondary), var(--primary));
+            border-color: transparent;
+            color: #000;
+            font-weight: 600;
+            box-shadow: 0 12px 25px rgba(0, 242, 254, 0.3);
+        }
+
+        /* Real Lens Viewport Container */
+        .microscope-outer {
+            position: relative;
+            width: 460px;
+            height: 460px;
+            background: #020617;
+            border-radius: 50%;
+            padding: 10px;
+            box-shadow: 0 0 0 18px #1e293b, 0 40px 80px rgba(0,0,0,0.95), inset 0 0 50px rgba(0,0,0,1);
+            overflow: hidden;
+            border: 4px solid rgba(255,255,255,0.03);
+        }
+
+        canvas {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: #000;
+            display: block;
+        }
+
+        /* Glass reflection effect */
+        .microscope-outer::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            background: radial-gradient(circle at 35% 25%, rgba(255,255,255,0.1) 0%, transparent 45%),
+                        radial-gradient(circle at center, transparent 65%, rgba(0,0,0,0.7) 100%);
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        /* Smart Dynamic Tooltip HTML overlay */
+        .live-label {
+            position: absolute;
+            padding: 6px 12px;
+            background: rgba(5, 10, 25, 0.95);
+            border: 1px solid rgba(0, 242, 254, 0.4);
+            color: #fff;
+            font-size: 0.85rem;
+            border-radius: 8px;
+            pointer-events: none;
+            display: none;
+            white-space: nowrap;
+            z-index: 10;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.6);
+        }
+
+        /* Info Display */
+        .info-panel {
+            margin-top: 2.5rem;
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 1.8rem;
+            border-radius: 20px;
+            max-width: 880px;
+            width: 100%;
+            text-align: center;
+            backdrop-filter: blur(20px);
+        }
+
+        .info-panel h4 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            font-size: 1.25rem;
+        }
+
+        .info-panel p {
+            color: #94a3b8;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>ಅಲ್ಟ್ರಾ-ರಿಯಲಿಸ್ಟಿಕ್ ಲೈವ್ ಸೂಕ್ಷ್ಮದರ್ಶಕ</h1>
+        <p>ಜೈವಿಕ ಪ್ರಯೋಗಾಲಯದ ನೈಜ ಚಿತ್ರಣ ಮತ್ತು ಚಲನಶೀಲತೆ</p>
+    </header>
+
+    <div class="container">
+        <div class="controls">
+            <h3>ಪರೀಕ್ಷಾ ಮಾದರಿಗಳು:</h3>
+            <div class="btn-group">
+                <button onclick="loadSlide('pond')">
+                    <span>💧 ಕೊಳದ ನೀರು (Pond Water Live)</span> ➔
+                </button>
+                <button onclick="loadSlide('soil')">
+                    <span>🌱 ಮಣ್ಣಿನ ಸೂಕ್ಷ್ಮಜೀವಿಗಳು (Soil Microbes)</span> ➔
+                </button>
+                <button onclick="loadSlide('leaf')">
+                    <span>🍃 ಎಲೆಯ ಪತ್ರರಂಧ್ರ (True Leaf Stomata)</span> ➔
+                </button>
+                <button onclick="loadSlide('onion')">
+                    <span>🧅 ಈರುಳ್ಳಿ ಸಿಪ್ಪೆ ಕೋಶಗಳು (True Onion Peel)</span> ➔
+                </button>
+                <button onclick="resetLens()" style="margin-top: 0.5rem; background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.2); color: #ef4444;">
+                    <span>❌ ಸ್ಲೈಡ್ ಹೊರತೆಗೆಯಿರಿ</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="microscope-outer">
+            <canvas id="microScopeCanvas" width="440" height="440"></canvas>
+            <div id="tooltip" class="live-label"></div>
+        </div>
+    </div>
+
+    <div class="info-panel">
+        <h4 id="infoTitle">ಸೂಕ್ಷ್ಮದರ್ಶಕ ಸಿದ್ಧವಾಗಿದೆ</h4>
+        <p id="infoDesc">ಯಾವುದೇ ಸ್ಲೈಡ್ ಅನ್ನು ಲೋಡ್ ಮಾಡಲಾಗಿಲ್ಲ. ವೀಕ್ಷಣೆಯನ್ನು ಪ್ರಾರಂಭಿಸಲು ಎಡಭಾಗದಲ್ಲಿರುವ ಬಟನ್‌ಗಳಲ್ಲಿ ಒಂದನ್ನು ಕ್ಲಿಕ್ ಮಾಡಿ. ಸೂಕ್ಷ್ಮದರ್ಶಕದ ಒಳಗೆ ಕಾಣುವ ಕೋಶಗಳ ಮೇಲೆ ಮೌಸ್ ತಂದರೆ ನಿಖರವಾದ ಕನ್ನಡ ವಿವರಣೆ ಸಿಗುತ್ತದೆ.</p>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('microScopeCanvas');
+        const ctx = canvas.getContext('2d');
+        const tooltip = document.getElementById('tooltip');
+        const infoTitle = document.getElementById('infoTitle');
+        const infoDesc = document.getElementById('infoDesc');
+
+        let animationFrameId;
+        let currentMode = 'idle';
+        let entities = [];
+        let hotspots = [];
+
+        const slideSpecs = {
+            pond: {
+                title: "ಕೊಳದ ನೀರಿನ ನಿಖರ ಲೈವ್ ವೀಕ್ಷಣೆ",
+                desc: "10x ಲೈಟ್ ಫೀಲ್ಡ್ ಮೈಕ್ರೋಸ್ಕೋಪಿ. ಇಲ್ಲಿ ಮುಕ್ತವಾಗಿ ಚಲಿಸುವ ಅಮೀಬಾ ತನ್ನ ಮಿಥ್ಯಾಪಾದಗಳೊಂದಿಗೆ ಹಾಗೂ ಪ್ಯಾರಾಮೀಶಿಯಂ ಲೈವ್ ಆಗಿ ಈಜುತ್ತಿರುವುದನ್ನು ಕಾಣಬಹುದು.",
+                bg: '#0a1d30'
+            },
+            soil: {
+                title: "ಮಣ್ಣಿನ ಸೂಕ್ಷ್ಮಜೀವಿಗಳು (Soil Microbes)",
+                desc: "45x ಹೈ-ಕಾಂಟ್ರಾಸ್ಟ್ ವೀಕ್ಷಣೆ. ಮಣ್ಣಿನ ಹ್ಯೂಮಸ್ ಕಣಗಳ ಮಧ್ಯೆ ಇರುವ ದಂಡಾಕಾರದ ಬ್ಯಾಕ್ಟೀರಿಯಾಗಳು ಮತ್ತು ನೈಜವಾಗಿ ಕವಲೊಡೆದ ಶಿಲೀಂಧ್ರಗಳ ತಂತುಗಳು ಇಲ್ಲಿದೆ.",
+                bg: '#16110a'
+            },
+            leaf: {
+                title: "ಎಲೆಯ ನೈಜ ಪತ್ರರಂಧ್ರ (Real Leaf Peel Stomata)",
+                desc: "ಸಸ್ಯದ ಎಲೆಯ ಹೊರಪದರದ (Epidermis) ನೈಜ ಜೈವಿಕ ವೀಕ್ಷಣೆ. ಜಿಗ್-ಜ್ಯಾಗ್ ಆಕಾರದ ಪಾರದರ್ಶಕ ಎಪಿಡರ್ಮಲ್ ಕೋಶಗಳ ಮಧ್ಯೆ, ಹರಿತ್ತು ಕಣಗಳಿಂದ ಕೂಡಿದ ಕಾವಲು ಕೋಶಗಳು (Guard Cells) ಮತ್ತು ನೈಜ ಪತ್ರರಂಧ್ರ ದ್ವಾರ (Stomatal Pore) ಸ್ಪಷ್ಟವಾಗಿ ಕಾಣುತ್ತವೆ.",
+                bg: '#0b1f11'
+            },
+            onion: {
+                title: "ಈರುಳ್ಳಿ ಸಿಪ್ಪೆಯ ನೈಜ ಜೀವಕೋಶಗಳು (Onion Peel Cells)",
+                desc: "ಅಯೋಡಿನ್ ದ್ರಾವಣದಿಂದ ಸಂಸ್ಕರಿಸಿದ ನೈಜ ಈರುಳ್ಳಿ ಸಿಪ್ಪೆಯ ನೋಟ. ಆಯತಾಕಾರದ ದಪ್ಪ ಕೋಶಭಿತ್ತಿ, ಸೈಟೋಪ್ಲಾಸಂನ ತೆಳುವಾದ ಪದರ, ಬೃಹತ್ ರಸದಾನಿ (Vacuole) ಮತ್ತು ಅದರ ಒತ್ತಡದಿಂದಾಗಿ ಪೆರಿಫೆರಲ್ ಅಂದರೆ ಒಂದು ಬದಿಗೆ ವಾಲಿರುವ ಗಾಢವಾದ ಕೋಶಕೇಂದ್ರಗಳು (Nuclei) ಸ್ಪಷ್ಟವಾಗಿ ಗೋಚರಿಸುತ್ತವೆ.",
+                bg: '#2d0f1e'
+            }
+        };
+
+        class Microbe {
+            constructor(type) {
+                this.type = type;
+                this.x = Math.random() * 300 + 70;
+                this.y = Math.random() * 300 + 70;
+                this.vx = (Math.random() - 0.5) * 0.8;
+                this.vy = (Math.random() - 0.5) * 0.8;
+                this.size = type === 'amoeba' ? 45 : 25;
+                this.angle = Math.random() * Math.PI * 2;
+                this.pulse = 0;
+            }
+
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.pulse += 0.03;
+                const dist = Math.hypot(this.x - 220, this.y - 220);
+                if (dist > 160) {
+                    this.vx *= -1;
+                    this.vy *= -1;
+                }
+                this.angle += 0.005;
+            }
+
+            draw() {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.angle);
+
+                if (this.type === 'amoeba') {
+                    ctx.beginPath();
+                    for (let i = 0; i < 8; i++) {
+                        let angle = (i / 8) * Math.PI * 2;
+                        let r = this.size + Math.sin(this.pulse + i) * 8;
+                        let rx = r * Math.cos(angle);
+                        let ry = r * Math.sin(angle);
+                        if (i === 0) ctx.moveTo(rx, ry); else ctx.lineTo(rx, ry);
+                    }
+                    ctx.closePath();
+                    ctx.fillStyle = 'rgba(0, 242, 254, 0.18)';
+                    ctx.strokeStyle = 'rgba(0, 242, 254, 0.7)';
+                    ctx.lineWidth = 2;
+                    ctx.fill();
+                    ctx.stroke();
+
+                    ctx.beginPath();
+                    ctx.arc(-5, -5, 8, 0, Math.PI * 2);
+                    ctx.fillStyle = 'rgba(0, 180, 254, 0.5)';
+                    ctx.fill();
+                } else if (this.type === 'paramecium') {
+                    ctx.beginPath();
+                    ctx.ellipse(0, 0, this.size * 1.6, this.size * 0.7, 0, 0, Math.PI * 2);
+                    ctx.fillStyle = 'rgba(168, 85, 247, 0.15)';
+                    ctx.strokeStyle = 'rgba(168, 85, 247, 0.6)';
+                    ctx.lineWidth = 1.5;
+                    ctx.fill();
+                    ctx.stroke();
+                }
+                ctx.restore();
+            }
+        }
+
+        function loop() {
+            ctx.fillStyle = slideSpecs[currentMode]?.bg || '#020617';
+            ctx.fillRect(0, 0, 440, 440);
+
+            let grad = ctx.createRadialGradient(220, 220, 100, 220, 220, 220);
+            grad.addColorStop(0, 'rgba(255,255,255,0.04)');
+            grad.addColorStop(1, 'rgba(0,0,0,0.5)');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, 440, 440);
+
+            hotspots = [];
+
+            if (currentMode === 'pond') {
+                entities.forEach(e => {
+                    e.update();
+                    e.draw();
+                    hotspots.push({ x: e.x, y: e.y, r: e.size * 1.5, text: e.type === 'amoeba' ? 'ಅಮೀಬಾ (Amoeba)' : 'ಪ್ಯಾರಾಮೀಶಿಯಂ (Paramecium)' });
+                });
+            } 
+            else if (currentMode === 'soil') {
+                ctx.strokeStyle = 'rgba(202, 138, 4, 0.4)';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(60, 360); ctx.quadraticCurveTo(200, 200, 320, 280); ctx.stroke();
+                hotspots.push({ x: 200, y: 250, r: 40, text: 'ಶಿಲೀಂಧ್ರದ ತಂತು (Fungal Hyphae)' });
+
+                ctx.fillStyle = '#ca8a04';
+                [ {x:320, y:280}, {x:332, y:275}, {x:315, y:292} ].forEach(p => {
+                    ctx.beginPath(); ctx.arc(p.x, p.y, 6, 0, Math.PI*2); ctx.fill();
+                });
+                hotspots.push({ x: 325, y: 280, r: 25, text: 'ಶಿಲೀಂಧ್ರದ ಬೀಜಕಗಳು (Spores)' });
+
+                ctx.fillStyle = 'rgba(34, 197, 94, 0.35)';
+                ctx.strokeStyle = '#22c55e';
+                ctx.lineWidth = 1.5;
+                [ {x:120, y:120, rot:0.4}, {x:150, y:132, rot:0.2}, {x:260, y:100, rot:-0.5} ].forEach(b => {
+                    ctx.save(); ctx.translate(b.x, b.y); ctx.rotate(b.rot);
+                    ctx.beginPath(); ctx.rect(-15, -6, 30, 12); ctx.arc(-15,0,6,Math.PI/2,3*Math.PI/2); ctx.arc(15,0,6,3*Math.PI/2,Math.PI/2); ctx.fill(); ctx.stroke();
+                    ctx.restore();
+                    hotspots.push({ x: b.x, y: b.y, r: 20, text: 'ಬ್ಯಾಕ್ಟೀರಿಯಾ (Rod Bacteria)' });
+                });
+            } 
+            else if (currentMode === 'leaf') {
+                // 1. Jigsaw Puzzle-like Epidermal Cells Background
+                ctx.strokeStyle = 'rgba(34, 197, 94, 0.25)'; // Light transparent green walls
+                ctx.lineWidth = 2.5;
+                
+                // Drawing intersecting wavy waves to create natural leaf epidermal cells
+                for (let i = -100; i < 500; i += 75) {
+                    ctx.beginPath();
+                    ctx.moveTo(0, i);
+                    for(let x=0; x<=440; x+=20) {
+                        ctx.lineTo(x, i + Math.sin(x*0.06)*18 + Math.cos((x+i)*0.03)*12);
+                    }
+                    ctx.stroke();
+
+                    ctx.beginPath();
+                    ctx.moveTo(i, 0);
+                    for(let y=0; y<=440; y+=20) {
+                        ctx.lineTo(i + Math.cos(y*0.06)*18 + Math.sin((y+i)*0.03)*12, y);
+                    }
+                    ctx.stroke();
+                }
+
+                hotspots.push({ x: 150, y: 280, r: 35, text: 'ಎಪಿಡರ್ಮಲ್ ಕೋಶ (Epidermal Cell)' });
+
+                // 2. Real Stomata Complex Rendering
+                const renderRealStomata = (cx, cy, angle) => {
+                    ctx.save();
+                    ctx.translate(cx, cy);
+                    ctx.rotate(angle);
+
+                    // Subsidiary Cell Area
+                    ctx.fillStyle = 'rgba(34, 197, 94, 0.08)';
+                    ctx.beginPath(); ctx.ellipse(0, 0, 38, 48, 0, 0, Math.PI*2); ctx.fill();
+
+                    // Left Guard Cell
+                    ctx.fillStyle = 'rgba(74, 222, 128, 0.4)';
+                    ctx.strokeStyle = '#15803d';
+                    ctx.lineWidth = 2.5;
+                    ctx.beginPath();
+                    ctx.ellipse(-14, 0, 14, 34, 0, 0, Math.PI*2);
+                    ctx.fill(); ctx.stroke();
+
+                    // Right Guard Cell
+                    ctx.beginPath();
+                    ctx.ellipse(14, 0, 14, 34, 0, 0, Math.PI*2);
+                    ctx.fill(); ctx.stroke();
+
+                    // Thickened Inner Guard Cell Walls (True anatomical feature)
+                    ctx.strokeStyle = '#064e3b'; // Very dark thick green near the pore
+                    ctx.lineWidth = 4.5;
+                    
+                    ctx.beginPath(); // Left cell inner wall
+                    ctx.arc(-10, 0, 22, -Math.PI/3, Math.PI/3);
+                    ctx.stroke();
+                    
+                    ctx.beginPath(); // Right cell inner wall
+                    ctx.arc(10, 0, 22, Math.PI - Math.PI/3, Math.PI + Math.PI/3);
+                    ctx.stroke();
+
+                    // Stomatal Pore
+                    ctx.fillStyle = '#020617';
+                    ctx.beginPath(); ctx.ellipse(0, 0, 5, 20, 0, 0, Math.PI*2); ctx.fill();
+
+                    // Chloroplasts randomly inside guard cells
+                    ctx.fillStyle = '#16a34a';
+                    const chloros = [
+                        [-14,-18], [-18,-6], [-12,8], [-16,20], [-10,-10], [-14,14],
+                        [14,-18], [18,-6], [12,8], [16,20], [10,-10], [14,14]
+                    ];
+                    chloros.forEach(c => {
+                        ctx.beginPath(); ctx.arc(c[0], c[1], 3, 0, Math.PI*2); ctx.fill();
+                    });
+
+                    ctx.restore();
+                    
+                    // Interaction Hotspots
+                    hotspots.push({ x: cx, y: cy, r: 12, text: 'ಪತ್ರರಂಧ್ರ ದ್ವಾರ (Stomatal Pore)' });
+                    hotspots.push({ x: cx - 20, y: cy, r: 16, text: 'ಕಾವಲು ಕೋಶ (Guard Cell)' });
+                    hotspots.push({ x: cx - 14, y: cy - 12, r: 8, text: 'ಹರಿತ್ತು ಕಣ (Chloroplast)' });
+                };
+
+                // Draw realistic stomata scattered dynamically
+                renderRealStomata(220, 220, 0.2);
+                renderRealStomata(90, 120, -0.6);
+                renderRealStomata(340, 320, 0.9);
+            } 
+            else if (currentMode === 'onion') {
+                ctx.strokeStyle = 'rgba(236, 72, 153, 0.4)';
+                ctx.lineWidth = 3;
+                let rows = [50, 130, 210, 290, 370];
+                rows.forEach((y, rIdx) => {
+                    ctx.beginPath(); ctx.moveTo(30, y); ctx.lineTo(410, y); ctx.stroke();
+                    let offset = (rIdx % 2) * 45;
+                    for (let x = 20 + offset; x < 400; x += 120) {
+                        ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x, y + 80); ctx.stroke();
+                        let vWidth = 95; let vHeight = 60;
+                        if (x + vWidth < 420 && y + 80 < 420) {
+                            ctx.fillStyle = 'rgba(244, 114, 182, 0.04)';
+                            ctx.strokeStyle = 'rgba(244, 114, 182, 0.15)';
+                            ctx.lineWidth = 1;
+                            ctx.beginPath();
+                            ctx.rect(x + 12, y + 10, vWidth, vHeight);
+                            ctx.fill(); ctx.stroke();
+                            hotspots.push({ x: x + 12 + vWidth/2, y: y + 10 + vHeight/2, r: 25, text: 'ದೊಡ್ಡ ರಸದಾನಿ (Large Vacuole)' });
+
+                            ctx.fillStyle = 'rgba(219, 39, 119, 0.1)';
+                            ctx.fillRect(x + 2, y + 2, 8, 76);
+                            ctx.fillRect(x + 2, y + 2, 116, 8);
+                            hotspots.push({ x: x + 6, y: y + 40, r: 10, text: 'ಕೋಶರಸ (Cytoplasm)' });
+
+                            ctx.fillStyle = 'rgba(157, 23, 77, 0.9)';
+                            let nX = x + 10; let nY = y + 20;
+                            if(x % 3 === 0) { nX = x + 105; nY = y + 60; }
+                            ctx.beginPath(); ctx.arc(nX, nY, 6, 0, Math.PI * 2); ctx.fill();
+                            
+                            hotspots.push({ x: nX, y: nY, r: 12, text: 'ಕೋಶಕೇಂದ್ರ (Peripheral Nucleus)' });
+                            hotspots.push({ x: x, y: y, r: 15, text: 'ದಪ್ಪ ಕೋಶಭಿತ್ತಿ (Cell Wall)' });
+                        }
+                    }
+                });
+            }
+
+            animationFrameId = requestAnimationFrame(loop);
+        }
+
+        canvas.addEventListener('mousemove', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const mouseX = (e.clientX - rect.left) * (canvas.width / rect.width);
+            const mouseY = (e.clientY - rect.top) * (canvas.height / rect.height);
+            
+            let matched = false;
+            for (let spot of hotspots) {
+                if (Math.hypot(mouseX - spot.x, mouseY - spot.y) < spot.r) {
+                    tooltip.style.display = 'block';
+                    tooltip.style.left = (e.clientX - rect.left + 25) + 'px';
+                    tooltip.style.top = (e.clientY - rect.top + 25) + 'px';
+                    tooltip.innerText = spot.text;
+                    matched = true;
+                    break;
+                }
+            }
+            if (!matched) tooltip.style.display = 'none';
+        });
+
+        canvas.addEventListener('mouseleave', () => tooltip.style.display = 'none');
+
+        function loadSlide(key) {
+            cancelAnimationFrame(animationFrameId);
+            currentMode = key;
+            
+            document.querySelectorAll('.btn-group button').forEach(btn => btn.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+
+            infoTitle.innerText = slideSpecs[key].title;
+            infoDesc.innerText = slideSpecs[key].desc;
+
+            entities = [];
+            if (key === 'pond') {
+                entities.push(new Microbe('amoeba'));
+                entities.push(new Microbe('amoeba'));
+                entities.push(new Microbe('paramecium'));
+                entities.push(new Microbe('paramecium'));
+            }
+            loop();
+        }
+
+        function resetLens() {
+            cancelAnimationFrame(animationFrameId);
+            currentMode = 'idle';
+            ctx.clearRect(0, 0, 440, 440);
+            ctx.fillStyle = '#020617';
+            ctx.fillRect(0, 0, 440, 440);
+            infoTitle.innerText = "ಸೂಕ್ಷ್ಮದರ್ಶಕ ಸಿದ್ಧವಾಗಿದೆ";
+            infoDesc.innerText = "ಯಾವುದೇ ಸ್ಲೈಡ್ ಅನ್ನು ಲೋಡ್ ಮಾಡಲಾಗಿಲ್ಲ. ವೀಕ್ಷಣೆಯನ್ನು ಪ್ರಾರಂಭಿಸಲು ಎಡಭಾಗದಲ್ಲಿರುವ ಬಟನ್‌ಗಳಲ್ಲಿ ಒಂದನ್ನು ಕ್ಲಿಕ್ ಮಾಡಿ.";
+            document.querySelectorAll('.btn-group button').forEach(btn => btn.classList.remove('active'));
+            tooltip.style.display = 'none';
+        }
+
+        resetLens();
+    </script>
+</body>
+</html>
