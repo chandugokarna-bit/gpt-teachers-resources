@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ವೆದರ್ ಸ್ಟೇಷನ್ ೧೪.೦ - ವಾಯುಗೋಳ ಮತ್ತು ಹವಾಮಾನ ಜ್ಞಾನ</title>
+    <style>
+        :root {
+            --sky-blue: #00d2d3;
+            --thunder-gold: #f1c40f;
+            --aurora-purple: #6c5ce7;
+            --ozone-green: #10ac84;
+            --heat-red: #ff7675;
+            --space-dark: #0b0c10;
+            --panel-glass: rgba(15, 23, 42, 0.96);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Verdana, sans-serif; }
+
+        body {
+            background: var(--space-dark);
+            background-image: linear-gradient(180deg, #0f172a 0%, #020617 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #ffffff;
+        }
+
+        header.weather-header {
+            text-align: center;
+            padding: 25px;
+            background: var(--panel-glass);
+            border: 2px solid var(--sky-blue);
+            border-radius: 24px;
+            box-shadow: 0 0 30px rgba(0, 210, 211, 0.3);
+            margin-bottom: 25px;
+        }
+
+        header.weather-header h1 {
+            color: var(--sky-blue);
+            font-size: 2.4rem;
+            text-shadow: 0 0 12px rgba(0, 210, 211, 0.5);
+            margin-bottom: 5px;
+        }
+
+        header.weather-header p { color: #cbd5e1; font-size: 1.15rem; }
+
+        /* NEW CLASSROOM HUD: OZONE SHIELD HEALTH */
+        .weather-hud {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #1e293b;
+            padding: 15px 25px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            border-left: 5px solid var(--thunder-gold);
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .ozone-shield-container {
+            background: #334155;
+            width: 45%;
+            height: 18px;
+            border-radius: 9px;
+            overflow: hidden;
+            border: 1px solid var(--ozone-green);
+        }
+
+        .ozone-shield-fill {
+            background: linear-gradient(90deg, var(--ozone-green), #55efc4);
+            height: 100%;
+            width: 100%;
+            transition: width 0.4s ease;
+        }
+
+        /* Horizontal Sub-Menu Steppers */
+        .weather-track-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 35px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+
+        .weather-track-row::-webkit-scrollbar { height: 6px; }
+        .weather-track-row::-webkit-scrollbar-thumb { background: var(--sky-blue); border-radius: 3px; }
+
+        .weather-card {
+            background: #1e293b;
+            border: 1px solid #334155;
+            padding: 12px 25px;
+            border-radius: 14px;
+            cursor: pointer;
+            font-weight: bold;
+            white-space: nowrap;
+            transition: all 0.3s;
+        }
+
+        .weather-card:hover, .weather-card.active-mission {
+            background: var(--sky-blue);
+            color: #000000;
+            border-color: #ffffff;
+            box-shadow: 0 0 15px var(--sky-blue);
+            transform: translateY(-3px);
+        }
+
+        /* Game Arena Blocks */
+        .weather-arena {
+            background: var(--panel-glass);
+            border: 2px solid #334155;
+            border-radius: 24px;
+            padding: 35px;
+            min-height: 520px;
+            display: none;
+            box-shadow: 0 20px 45px rgba(0,0,0,0.5);
+        }
+
+        .weather-arena.active-arena { display: block; animation: stormBoot 0.4s ease; }
+
+        @keyframes stormBoot {
+            from { opacity: 0; transform: scale(0.98); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        h2.arena-title {
+            font-size: 1.65rem;
+            color: var(--thunder-gold);
+            margin-bottom: 25px;
+            border-bottom: 1px dashed rgba(241, 196, 15, 0.3);
+            padding-bottom: 12px;
+        }
+
+        /* Grid Connector System */
+        .grid-connector-system {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .weather-node {
+            background: #1e293b;
+            padding: 18px;
+            border-radius: 14px;
+            cursor: pointer;
+            border: 2px solid #334155;
+            font-weight: bold;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .weather-node:hover { border-color: var(--sky-blue); background: #223047; }
+        .weather-node.node-selected { background: var(--sky-blue); color: black; border-color: white; font-weight: bold; box-shadow: 0 0 12px var(--sky-blue); }
+
+        /* Quiz UI Layout */
+        .quiz-box-row {
+            background: #1e293b;
+            border: 2px solid #334155;
+            padding: 16px;
+            margin: 12px 0;
+            border-radius: 14px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+        }
+
+        .quiz-box-row:hover { border-color: var(--sky-blue); transform: translateX(5px); }
+        .quiz-box-row.correct-glow { background: rgba(16, 172, 132, 0.2); border-color: var(--ozone-green); color: #55efc4; }
+        .quiz-box-row.wrong-glow { background: rgba(255, 118, 117, 0.2); border-color: var(--heat-red); color: #ff7675; }
+
+        /* Inputs Box styling */
+        .smart-weather-input {
+            background: #05070c;
+            border: 2px solid #334155;
+            border-radius: 10px;
+            padding: 12px;
+            font-size: 1.1rem;
+            color: var(--thunder-gold);
+            font-weight: bold;
+            outline: none;
+            width: 100%;
+            max-width: 320px;
+            margin-top: 8px;
+        }
+
+        .smart-weather-input:focus { border-color: var(--sky-blue); }
+
+        /* Mining Grid */
+        .mining-card-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+
+        .ore-token {
+            background: #1e293b;
+            border: 2px solid #334155;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .ore-token.active-token { background: var(--ozone-green); border-color: white; }
+
+        /* Buttons */
+        .weather-btn {
+            background: linear-gradient(135deg, var(--sky-blue), #45aaf2);
+            color: black;
+            border: none;
+            padding: 14px 35px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 25px;
+            box-shadow: 0 5px 15px rgba(0, 210, 211, 0.3);
+        }
+
+        .weather-btn:hover { transform: scale(1.02); box-shadow: 0 8px 25px rgba(0, 210, 211, 0.5); }
+
+        .weather-alert-box {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 12px;
+            font-weight: bold;
+            display: none;
+            font-size: 1.1rem;
+            border: 1px solid transparent;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="weather-header">
+        <h1>ವಾಯುಗೋಳ ಕಂಟ್ರೋಲ್ ಲ್ಯಾಬ್</h1>
+        <p>ಸಿಮ್ಯುಲೇಟರ್ ಮಾದರಿ ೧೪.೦ • ವಾಯುಗೋಳದ ಪದರಗಳು ಮತ್ತು ಮಾರುತಗಳ ಡಿಜಿಟಲ್ ಜ್ಞಾನ ಹಬ್</p>
+    </div>
+
+    <!-- LIVE HUD -->
+    <div class="weather-hud">
+        <span>ಓಝೋನ್ ಕವಚದ ರಕ್ಷಣಾ ಮಟ್ಟ (Ozone Shield):</span>
+        <div class="ozone-shield-container"><div class="ozone-shield-fill" id="ozoneFill"></div></div>
+        <span style="color: var(--thunder-gold);" id="liveWeatherXP">ವೆದರ್ ಕಾಯಿನ್ಸ್: 0000 WC</span>
+    </div>
+
+    <!-- HORIZONTAL LEVEL STEPPERS -->
+    <div class="weather-track-row">
+        <div class="weather-card active-mission" id="wBtn1" onclick="shiftWeatherLevel(1)">1. ಅನಿಲಗಳ ಸಂಯೋಜನೆ</div>
+        <div class="weather-card" id="wBtn2" onclick="shiftWeatherLevel(2)">2. ವಾಯುಗೋಳದ ೫ ಪದರಗಳು</div>
+        <div class="weather-card" id="wBtn3" onclick="shiftWeatherLevel(3)">3. ಎಪಿಕ್ 10 ವೆದರ್ ಕ್ವಿಜ್</div>
+        <div class="weather-card" id="wBtn4" onclick="shiftWeatherLevel(4)">4. ಹವಾಮಾನ Vs ವಾಯುಗುಣ</div>
+        <div class="weather-card" id="wBtn5" onclick="shiftWeatherLevel(5)">5. ಜಾಗತಿಕ ಮಾರುತಗಳ ವಿಧಗಳು</div>
+        <div class="weather-card" id="wBtn6" onclick="shiftWeatherLevel(6)">6. ಮೋಡಗಳು ಮತ್ತು ಮಳೆ</div>
+        <div class="weather-card" id="wBtn7" onclick="shiftWeatherLevel(7)">7. ಓಝೋನ್ ರಕ್ಷಣಾ ಮ್ಯಾಟ್ರಿಕ್ಸ್</div>
+    </div>
+
+    <!-- LEVEL 1 SCREEN -->
+    <div id="wArena1" class="weather-arena active-arena">
+        <h2 class="arena-title">ಹಂತ 1: ವಾಯುಗೋಳದ ಪ್ರಮುಖ ಅನಿಲಗಳ ಪ್ರಮಾಣ (Gas Composition Node)</h2>
+        <p style="margin-bottom: 15px;">ಗೆಳೆಯಾ, ವಾಯುಗೋಳದಲ್ಲಿರುವ ಅನಿಲಗಳು ಮತ್ತು ಅವುಗಳ ನಿಖರವಾದ ಶೇಕಡಾವಾರು ಪ್ರಮಾಣವನ್ನು ಜೋಡಿಸು:</p>
+        <div class="grid-connector-system">
+            <div>
+                <div class="weather-node" id="l1_nodeL1" onclick="connectWeatherNodes('L', 'l1_nodeL1', 1)">ಸಾರಜನಕ (Nitrogen)</div>
+                <div class="weather-node" id="l1_nodeL2" style="margin-top:15px;" onclick="connectWeatherNodes('L', 'l1_nodeL2', 2)">ಆಮ್ಲಜನಕ (Oxygen)</div>
+            </div>
+            <div>
+                <div class="weather-node" id="l1_nodeR1" onclick="connectWeatherNodes('R', 'l1_nodeR1', 2)">ಶೇಕಡಾ ೨೧ (21%)</div>
+                <div class="weather-node" id="l1_nodeR2" style="margin-top:15px;" onclick="connectWeatherNodes('R', 'l1_nodeR2', 1)">ಶೇಕಡಾ ೭೮ (78%)</div>
+            </div>
+        </div>
+        <div class="weather-alert-box" id="alert1"></div>
+    </div>
+
+    <!-- LEVEL 2 SCREEN -->
+    <div id="wArena2" class="weather-arena">
+        <h2 class="arena-title">ಹಂತ 2: ವಾಯುಗೋಳದ ಐದು ವಿಶಿಷ್ಟ ಪದರಗಳು (Atmosphere Layers Crypt)</h2>
+        <div style="display:flex; flex-direction:column; gap:20px;">
+            <div class="fib-q">1. ಮೋಡಗಳು, ಮಳೆ, ಮಿಂಚು-ಸಿಡಿಲುಗಳು ಸಂಭವಿಸುವ ವಾಯುಗೋಳದ ಅತ್ಯಂತ ಕೆಳಗಿನ ಮೊದಲ ಪದರ ಯಾವುದು? <br><input type="text" class="smart-weather-input" id="cryptIn1" placeholder="ಪದರದ ಹೆಸರು (ಉದಾ: ಪರಿವರ್ತನ ವಲಯ)"></div>
+            <div class="fib-q">2. ಜೆಟ್ ವಿಮಾನಗಳ ಹಾರಾಟಕ್ಕೆ ಸೂಕ್ತವಾಗಿರುವ ಮತ್ತು ಓಝೋನ್ ಅನಿಲವನ್ನು ಹೊಂದಿರುವ ಎರಡನೇ ಪದರ ಯಾವುದು? <br><input type="text" class="smart-weather-input" id="cryptIn2" placeholder="ಉದಾ: ಸಮತಾಪ ವಲಯ"></div>
+            <div class="fib-q">3. ಉಲ್ಕೆಗಳು ವಾಯುಗೋಳಕ್ಕೆ ಪ್ರವೇಶಿಸಿದಾಗ ಉರಿದು ಬೂದಿಯಾಗುವ ಮೂರನೇ ಪದರ ಯಾವುದು? <br><input type="text" class="smart-weather-input" id="cryptIn3" placeholder="ಉದಾ: ಮಧ್ಯಂತರ ವಲಯ"></div>
+        </div>
+        <button class="weather-btn" onclick="verifyWeatherLevel2()">ಪದರಗಳ ಕೋಡ್ ಕ್ರಾಕ್ ಮಾಡು</button>
+        <div class="weather-alert-box" id="alert2"></div>
+    </div>
+
+    <!-- LEVEL 3 SCREEN (10 QUESTIONS BATTLE) -->
+    <div id="wArena3" class="weather-arena">
+        <h2 class="arena-title">ಹಂತ 3: ಹವಾಮಾನ ಮತ್ತು ಮಾರುತಗಳ ಮಹಾ ಸಂಗ್ರಾಮ (Epic 10 Weather Quiz)</h2>
+        <div class="progress-hud-bar"><div class="progress-bar-fill" id="barFill"></div></div>
+        <div style="font-weight: bold; margin-bottom: 15px; color: var(--thunder-gold);" id="quizCounterText">ಪ್ರಶ್ನೆ ಕೋಡ್: 1 / 10</div>
+        <div id="quizQuestionText" style="font-size: 1.25rem; font-weight: bold; margin-bottom: 20px;">ಲೋಡ್ ಆಗುತ್ತಿದೆ...</div>
+        <div id="quizOptionsContainer"></div>
+        <div style="text-align: center;">
+            <button class="weather-btn" id="nextQuizBtn" style="display:none;" onclick="nextWeatherQuestion()">ಮುಂದಿನ ಹವಾಮಾನ ಸವಾಲು ➔</button>
+        </div>
+        <div class="weather-alert-box" id="alert3"></div>
+    </div>
+
+    <!-- LEVEL 4 SCREEN -->
+    <div id="wArena4" class="weather-arena">
+        <h2 class="arena-title">ಹಂತ 4: ಹವಾಮಾನ ಮತ್ತು ವಾಯುಗುಣದ ವ್ಯತ್ಯಾಸ (Weather Vs Climate)</h2>
+        <div style="display:flex; flex-direction:column; gap:20px;">
+            <div class="fib-q">1. ಒಂದು ಸ್ಥಳದ ಅತ್ಯಂತ ಅಲ್ಪಾವಧಿಯ (ದೈನಂದಿನ) ವಾಯುಗೋಳದ ಸ್ಥಿತಿಯನ್ನು ಏನೆಂದು ಕರೆಯುತ್ತಾರೆ? <br><input type="text" class="smart-weather-input" id="termIn1" placeholder="ಹವಾಮಾನ / ವಾಯುಗುಣ?"></div>
+            <div class="fib-q">2. ಒಂದು ವಿಶಾಲ ಪ್ರದೇಶದ ಸುಮಾರು ೩೦ ಕ್ಕೂ ಹೆಚ್ಚು ವರ್ಷಗಳ ದೀರ್ಘಾವಧಿಯ ಸರಾಸರಿ ಹವಾಮಾನದ ಸ್ಥಿತಿಯನ್ನು ಏನೆನ್ನುತ್ತಾರೆ? <br><input type="text" class="smart-weather-input" id="termIn2" placeholder="ಹವಾಮಾನ / ವಾಯುಗುಣ?"></div>
+        </div>
+        <button class="weather-btn" onclick="verifyWeatherLevel4()">ವ್ಯತ್ಯಾಸ ದೃಢೀಕರಿಸು</button>
+        <div class="weather-alert-box" id="alert4"></div>
+    </div>
+
+    <!-- LEVEL 5 SCREEN -->
+    <div id="wArena5" class="weather-arena">
+        <h2 class="arena-title">ಹಂತ 5: ಜಾಗತಿಕ ನಿಯತಕಾಲಿಕ ಮತ್ತು ಸ್ಥಳೀಯ ಮಾರುತಗಳು (Winds Mining System)</h2>
+        <p style="margin-bottom: 15px;">ಗೆಳೆಯา, ಭಾರತದ ವ್ಯವಸಾಯಕ್ಕೆ ಕಾರಣವಾದ ಪ್ರಮುಖ **ನಿಯತಕಾಲಿಕ ಮಾರುತಗಳನ್ನು (Periodic Winds)** ಮಾತ್ರ ಕ್ಲಿಕ್ ಮಾಡಿ ಗಣಿ ಮಾಡು:</p>
+        <div class="mining-card-grid">
+            <div class="ore-token" id="ore1" onclick="toggleOreToken('ore1', true)">1. ನೈಋತ್ಯ ಮುಂಗಾರು ಮಾರುತಗಳು</div>
+            <div class="ore-token" id="ore2" onclick="toggleOreToken('ore2', false)">2. ಸ್ಥಳೀಯ ಲೂ ಗಾಳಿ</div>
+            <div class="ore-token" id="ore3" onclick="toggleOreToken('ore3', true)">3. ಈಶಾನ್ಯ ಹಿಂಗಾರು ಮಾರುತಗಳು</div>
+            <div class="ore-token" id="ore4" onclick="toggleOreToken('ore4', false)">4. ಪಶ್ಚಿಮ ಮಾರುತಗಳು</div>
+            <div class="ore-token" id="ore5" onclick="toggleOreToken('ore5', false)">5. ವ್ಯಾಪಾರ ಮಾರುತಗಳು</div>
+        </div>
+        <button class="weather-btn" onclick="verifyWeatherLevel5()">ಮಾರುತಗಳನ್ನು ಲಾಕ್ ಮಾಡು</button>
+        <div class="weather-alert-box" id="alert5"></div>
+    </div>
+
+    <!-- LEVEL 6 SCREEN -->
+    <div id="wArena6" class="weather-arena">
+        <h2 class="arena-title">ಹಂತ 6: ಮಳೆಯ ವಿಧಗಳು ಮತ್ತು ಮೋಡಗಳ ಲಕ್ಷಣ (Rainfall Types Sorting)</h2>
+        <p style="margin-bottom: 15px;">ಪರ್ವತಗಳಿಗೆ ಗಾಳಿ ತಡೆದು ಆಗುವ ಮಳೆ ಹಾಗೂ ಭೂಮಿ ಕಾದಾಗ ಆಗುವ ಮಳೆಯ ಸರಿಯಾದ ಪರಿಣಾಮಗಳನ್ನು ಹಂಚು ಗೆಳೆಯಾ:</p>
+        <div style="display:flex; gap:25px;">
+            <div style="flex:1; display:flex; flex-direction:column; gap:10px;" id="rainSource">
+                <div style="background:#1e293b; padding:12px; border-radius:10px; cursor:grab; font-weight:bold; border:1px solid #334155;" draggable="true" id="rn1" ondragstart="startRainDrag(event)">ಪರಿವಹನ ಮಳೆ (Conventional)</div>
+                <div style="background:#1e293b; padding:12px; border-radius:10px; cursor:grab; font-weight:bold; border:1px solid #334155;" draggable="true" id="rn2" ondragstart="startRainDrag(event)">ಪರ್ವತಾರೋಹಣ ಮಳೆ (Orographic)</div>
+            </div>
+            <div style="flex:2; display:flex; flex-direction:column; gap:15px;">
+                <div style="background:rgba(0,0,0,0.3); border:2px dashed var(--sky-blue); padding:15px; border-radius:12px;" ondragover="allowRainDrop(event)" ondrop="handleRainDrop(event, 'heat')">
+                    <h3>ಭೂಮಿ ಅತಿಯಾಗಿ ಕಾದಾಗ ಗಾಳಿ ಮೇಲೇರಿ ಮಧ್ಯಾಹ್ನದ ನಂತರ ಗುಡುಗು ಸಹಿತ ಬರುವ ಮಳೆ</h3>
+                </div>
+                <div style="background:rgba(0,0,0,0.3); border:2px dashed var(--sky-blue); padding:15px; border-radius:12px;" ondragover="allowRainDrop(event)" ondrop="handleRainDrop(event, 'mountain')">
+                    <h3>ತೇವಾಂಶಭರಿತ ಗಾಳಿಯು ಬೆಟ್ಟ ಅಥವಾ ಪರ್ವತಗಳಿಗೆ ತಡೆದು ಪರ್ವತದ ಗಾಳಿಮುಖ ಇಳಿಜಾರಿನಲ್ಲಿ ಕೊಡುವ ಮಳೆ</h3>
+                </div>
+            </div>
+        </div>
+        <button class="weather-btn" onclick="verifyWeatherLevel6()">ಮಳೆಯ ವಿಧ ಪರಿಶೀಲಿಸು</button>
+        <div class="weather-alert-box" id="alert6"></div>
+    </div>
+
+    <!-- LEVEL 7 SCREEN -->
+    <div id="wArena7" class="weather-arena">
+        <h2 class="arena-title">ಹಂತ 7: ಸಿ.ಎಫ್.ಸಿ ಅನಿಲ ತಡೆ ಮತ್ತು ಓಝೋನ್ ರಕ್ಷಣೆ (The Ozone Preservation Matrix)</h2>
+        <p style="margin-bottom: 15px;">ಅಂತಿಮ ಮ್ಯಾಟ್ರಿಕ್ಸ್! ಓಝೋನ್ ಪದರವನ್ನು ಹಾಳು ಮಾಡುವ ವಸ್ತುಗಳು ಮತ್ತು ಅದನ್ನು ರಕ್ಷಿಸುವ ಉಪಕರಣಗಳನ್ನು ಮ್ಯಾಚ್ ಮಾಡಿ ಗೆಳೆಯಾ:</p>
+        <div class="grid-connector-system">
+            <div class="weather-node" id="matL1" onclick="selectFinalWeatherMatrix('L', 'matL1', 'bad')">ಫ್ರಿಡ್ಜ್, ಎಸಿ ಬಿಡುವ ಕ್ಲೋರೋಫ್ಲೋರೋಕಾರ್ಬನ್ (CFC)</div>
+            <div class="weather-node" id="matR1" onclick="selectFinalWeatherMatrix('R', 'matR1', 'bad')">ಓಝೋನ್ ಪದರಕ್ಕೆ ರಂಧ್ರ ಉಂಟುಮಾಡುವ ಮತ್ತು ಅಲ್ಟ್ರಾವೈಲೆಟ್ ಕಿರಣ ತರುವ ಅನಿಲ</div>
+            <div class="weather-node" id="matL2" onclick="selectFinalWeatherMatrix('L', 'matL2', 'good')">ಸೂರ್ಯನ ತೀಕ್ಷ್ಣ ನೇರಳೆ ಕಿರಣಗಳನ್ನು ತಡೆಯುವ ಕವಚ</div>
+            <div class="weather-node" id="matR2" onclick="selectFinalWeatherMatrix('R', 'matR2', 'good')">ಸಮತಾಪ ವಲಯದಲ್ಲಿರುವ ಓಝೋನ್ ಪದರ (Ozone Layer)</div>
+        </div>
+        <button class="weather-btn" onclick="verifyWeatherLevel7()">ಓಝೋನ್ ಮ್ಯಾಟ್ರಿಕ್ಸ್ ಪೂರ್ಣಗೊಳಿಸು</button>
+        <div class="weather-alert-box" id="alert7"></div>
+    </div>
+
+    <script>
+        let weatherXP = 0; let ozoneHealth = 100;
+        function modifyWeatherHUD(wxpChange, ozoneDamage) {
+            weatherXP += wxpChange;
+            ozoneHealth = Math.max(10, ozoneHealth - ozoneDamage);
+            document.getElementById("liveWeatherXP").innerText = `ವೆದರ್ ಕಾಯಿನ್ಸ್: ${weatherXP.toString().padStart(4, '0')} WC`;
+            document.getElementById("ozoneFill").style.width = `${ozoneHealth}%`;
+        }
+
+        function shiftWeatherLevel(levelIdx) {
+            document.querySelectorAll('.weather-arena').forEach(el => el.classList.remove('active-arena'));
+            document.querySelectorAll('.weather-card').forEach(el => el.classList.remove('active-mission'));
+            
+            document.getElementById('wArena' + levelIdx).classList.add('active-arena');
+            document.getElementById('wBtn' + levelIdx).classList.add('active-mission');
+        }
+
+        // Level 1 Logic
+        let nodeL = null; let nodeR = null;
+        function connectWeatherNodes(side, id, matchVal) {
+            if(side === 'L') {
+                if(nodeL) document.getElementById(nodeL.id).classList.remove('node-selected');
+                nodeL = { id: id, match: matchVal };
+            } else {
+                if(nodeR) document.getElementById(nodeR.id).classList.remove('node-selected');
+                nodeR = { id: id, match: matchVal };
+            }
+            document.getElementById(id).classList.add('node-selected');
+
+            if(nodeL && nodeR) {
+                if(nodeL.match === nodeR.match) {
+                    document.getElementById(nodeL.id).style.background = "var(--ozone-green)";
+                    document.getElementById(nodeR.id).style.background = "var(--ozone-green)";
+                    modifyWeatherHUD(100, 0);
+                    showWeatherAlert(1, "ಸರಿಯಾದ ಲಿಂಕ್ ಗೆಳೆಯಾ! ಅನಿಲಗಳ ಪ್ರಮಾಣ ನಿಖರವಾಗಿದೆ.", true);
+                    document.getElementById('wBtn1').style.background = "var(--ozone-green)";
+                } else {
+                    modifyWeatherHUD(0, 10);
+                    showWeatherAlert(1, "ತಪ್ಪಾದ ಲಿಂಕ್, ಓಝೋನ್ ಪದರ ದುರ್ಬಲಗೊಂಡಿದೆ! ಮತ್ತೊಮ್ಮೆ ಯೋಚಿಸು ಗೆಳೆಯಾ.", false);
+                }
+                nodeL = null; nodeR = null;
+            }
+        }
+
+        // Level 2 Logic
+        function verifyWeatherLevel2() {
+            let c1 = document.getElementById("cryptIn1").value.trim();
+            let c2 = document.getElementById("cryptIn2").value.trim();
+            let c3 = document.getElementById("cryptIn3").value.trim();
+
+            if(c1 === "ಪರಿವರ್ತನ ವಲಯ" && c2 === "ಸಮತಾಪ ವಲಯ" && c3 === "ಮಧ್ಯಂತರ ವಲಯ") {
+                modifyWeatherHUD(150, 0);
+                document.getElementById('wBtn2').style.background = "var(--ozone-green)";
+                showWeatherAlert(2, "ಅದ್ಭುತ! ವಾಯುಗೋಳದ ಮೂರೂ ಪದರಗಳ ರಹಸ್ಯ ಸಂಕೇತ ಸರಿಯಾಗಿದೆ ಗೆಳೆಯಾ.", true);
+            } else {
+                modifyWeatherHUD(0, 10);
+                showWeatherAlert(2, "ಉತ್ತರ ತಪ್ಪಾಗಿದೆ! ಸುಳಿವು: ಪರಿವರ್ತನ ವಲಯ, ಸಮತಾಪ ವಲಯ, ಮಧ್ಯಂತರ ವಲಯ ಎಂದು ಬರೆಯಿರಿ.", false);
+            }
+        }
+
+        // Level 3: 10 Questions Matrix Quiz Data
+        const atmosphereQuizPool = [
+            { q: "1. ಭೂಮಿಯ ಸುತ್ತಲೂ ಆವರಿಸಿರುವ ವಿವಿಧ ಅನಿಲಗಳು, ಧೂಳಿನ ಕಣಗಳು ಮತ್ತು ನೀರಾವಿಯ ವಿಶಾಲವಾದ ಪದರವನ್ನು ಏನೆನ್ನುತ್ತಾರೆ?", o: ["ಶಿಲಾಗೋಳ", "ಜಲಗೋಳ", "ವಾಯುಗೋಳ (Atmosphere)"], c: 2 },
+            { q: "2. ಹವಾಮಾನದ ಪ್ರಮುಖ ಅಂಶಗಳಾದ ಉಷ್ಣಾಂಶ, ಮಳೆ ಮತ್ತು ಮಾರುತಗಳನ್ನು ಅಳೆಯುವ ಶಾಸ್ತ್ರಕ್ಕೆ ಏನನ್ನುತ್ತಾರೆ?", o: ["ಹವಾಮಾನ ಶಾಸ್ತ್ರ (Meteorology)", "ಖಗೋಳಶಾಸ್ತ್ರ", "ಸಮೂಹ ಶಾಸ್ತ್ರ"], c: 0 },
+            { q: "3. ರೇಡಿಯೋ ತರಂಗಗಳನ್ನು ಭೂಮಿಗೆ ಮರಳಿ ಪ್ರತಿಫಲಿಸುವ ಮೂಲಕ ಸಂಪರ್ಕಕ್ಕೆ ನೆರವಾಗುವ ವಾಯುಗೋಳದ ವಿಶಿಷ್ಟ ಪದರ ಯಾವುದು?", o: ["ಆಯಾನು ವಲಯ (Ionosphere)", "ಪರಿವರ್ತನ ವಲಯ", "ಬಾಹ್ಯ ವಲಯ"], c: 0 },
+            { q: "4. ಸೂರ್ಯನ ಶಾಖದಿಂದ ಭೂಮಿಯ ಮೇಲ್ಮೈ ಕಾಯುವುದನ್ನು ಮತ್ತು ಉಷ್ಣಾಂಶವನ್ನು ಅಳೆಯುವ ಉಪಕರಣ ಯಾವುದು?", o: ["ಬಾರೋಮೀಟರ್", "ಥರ್ಮಾಮೀಟರ್ / ಉಷ್ಣತಾಮಾಪಕ", "ಅನಿಮೋಮೀಟರ್"], c: 1 },
+            { q: "5. ವಾಯುಗೋಳದ ಗಾಳಿಯು ಭೂಮಿಯ ಮೇಲ್ಮೈ ಮೇಲೆ ಬೀರುವ ತೂಕ ಅಥವಾ ಒತ್ತಡಕ್ಕೆ ಏನೆಂದು ಕರೆಯುತ್ತಾರೆ?", o: ["ವಾಯುಭಾರ (Atmospheric Pressure)", "ವಾಯುಗುಣ", "ಮಾರುತದ ವೇಗ"], c: 0 },
+            { q: "6. ವಾಯುಗೋಳದ ಒತ್ತಡ ಅಥವಾ ವಾಯುಭಾರವನ್ನು ನಿಖರವಾಗಿ ಅಳೆಯಲು ಬಳಸುವ ಜಗತ್ಪ್ರಸಿದ್ಧ ಉಪಕರಣ ಯಾವುದು?", o: ["ಅನಿಮೋಮೀಟರ್", "ರೈನ್‌ಗೇಜ್", "ಬಾರೋಮೀಟರ್ (Barometer)"], c: 2 },
+            { q: "7. ಗಾಳಿಯು ಯಾವಾಗಲೂ ಯಾವ ಒತ್ತಡದ ಪ್ರದೇಶದಿಂದ ಯಾವ ಒತ್ತಡದ ಪ್ರದೇಶದ ಕಡೆಗೆ ಚಲಿಸುತ್ತದೆ?", o: ["ಕಡಿಮೆ ಒತ್ತಡದಿಂದ ಹೆಚ್ಚಿನ ಒತ್ತಡಕ್ಕೆ", "ಹೆಚ್ಚಿನ ಒತ್ತಡದ ಪ್ರದೇಶದಿಂದ ಕಡಿಮೆ ಒತ್ತಡದ ಪ್ರದೇಶಕ್ಕೆ", "ಒಂದೇ ಕಡೆ ನಿಲ್ಲುತ್ತದೆ"], c: 1 },
+            { q: "8. ಇಡೀ ವರ್ಷ ನಿರಂತರವಾಗಿ ಒಂದೇ ದಿಕ್ಕಿನಲ್ಲಿ ನಿಯಮಿತವಾಗಿ ಬೀಸುವ ವ್ಯಾಪಾರ ಮಾರುತಗಳನ್ನು ಯಾವ ವಿಧದ ಮಾರುತ ಎನ್ನಲಾಗುತ್ತದೆ?", o: ["ಸ್ಥಳೀಯ ಮಾರುತಗಳು", "ನಿಯತಕಾಲಿಕ ಮಾರುತಗಳು", "ಪ್ರಾಕೃತಿಕ / ಖಾಯಂ ಮಾರುತಗಳು (Planetary Winds)"], c: 2 },
+            { q: "9. ವಾಯುಗೋಳದಲ್ಲಿರುವ ತೇವಾಂಶವು ಘನೀಕೃತಗೊಂಡು ಆಕಾಶದಲ್ಲಿ ತೇಲುವ ಜಲಕಣಗಳ ಸಮೂಹಕ್ಕೆ ಏನೆನ್ನುತ್ತಾರೆ?", o: ["ಮೋಡಗಳು (Clouds)", "ಹೊಗೆ", "ಹಿಮಗಡ್ಡೆ"], c: 0 },
+            { q: "10. ಚಂಡಮಾರುತದ (Cyclones) ಮಧ್ಯಭಾಗದಲ್ಲಿ ಅತ್ಯಂತ ಕಡಿಮೆ ಒತ್ತಡದ ಶಾಂತ ವಲಯವಿರುತ್ತದೆ, ಇದನ್ನು ಚಂಡಮಾರುತದ ಏನನ್ನುತ್ತಾರೆ?", o: ["ರೆಕ್ಕೆ", "ಕಣ್ಣು (Eye of the Cyclone)", "ಬಾಲ"], c: 1 }
+        ];
+
+        let qIdx = 0; let qScore = 0; let isQuizActive = true;
+        function loadQuizQuestion() {
+            isQuizActive = true;
+            document.getElementById("nextQuizBtn").style.display = "none";
+            document.getElementById("alert3").style.display = "none";
+            let qData = atmosphereQuizPool[qIdx];
+            document.getElementById("quizCounterText").innerText = `ಪ್ರಶ್ನೆ ಕೋಡ್: ${qIdx + 1} / 10`;
+            document.getElementById("barFill").style.width = `${(qIdx + 1) * 10}%`;
+            document.getElementById("quizQuestionText").innerText = qData.q;
+            
+            let container = document.getElementById("quizOptionsContainer");
+            container.innerHTML = "";
+            qData.o.forEach((opt, idx) => {
+                let div = document.createElement("div");
+                div.classList.add("quiz-box-row");
+                div.innerText = opt;
+                div.onclick = function() {
+                    if(!isQuizActive) return;
+                    isQuizActive = false;
+                    if(idx === qData.c) {
+                        this.classList.add("correct-glow");
+                        qScore++; modifyWeatherHUD(30, 0);
+                        showWeatherAlert(3, "ಸರಿಯಾದ ಉತ್ತರ ಗೆಳೆಯಾ! ಹವಾಮಾನ ಪ್ರಜ್ಞೆ ಅದ್ಭುತವಾಗಿದೆ.", true);
+                    } else {
+                        this.classList.add("wrong-glow");
+                        container.children[qData.c].classList.add("correct-glow");
+                        modifyWeatherHUD(0, 10);
+                        showWeatherAlert(3, "ತಪ್ಪು ಉತ್ತರ! ಸರಿಯಾದದ್ದನ್ನು ಹಸಿರು ಬಣ್ಣದಲ್ಲಿ ತೋರಿಸಲಾಗಿದೆ.", false);
+                    }
+                    document.getElementById("nextQuizBtn").style.display = "inline-block";
+                };
+                container.appendChild(div);
+            });
+        }
+        function nextWeatherQuestion() {
+            qIdx++;
+            if(qIdx < atmosphereQuizPool.length) {
+                loadQuizQuestion();
+            } else {
+                document.getElementById("quizCounterText").innerText = "ಮಿಷನ್ ಮುಕ್ತಾಯ!";
+                document.getElementById("quizQuestionText").innerText = `ತರಗತಿಯ ಒಟ್ಟು ಸ್ಕೋರ್: ${qScore} / 10`;
+                document.getElementById("quizOptionsContainer").innerHTML = "";
+                document.getElementById("nextQuizBtn").style.display = "none";
+                document.getElementById('wBtn3').style.background = "var(--ozone-green)";
+                showWeatherAlert(3, qScore >= 7 ? "ಅಪ್ರತಿಮ ಹವಾಮಾನ ತಜ್ಞರು ಮತ್ತು ಓಝೋನ್ ರಕ್ಷಕರು ಗೆಳೆಯಾ!" : "ಉತ್ತಮ ಪ್ರಯತ್ನ, ಮತ್ತೊಮ್ಮೆ ಓದಿ ತಿಳಿಯಿರಿ!", true);
+            }
+        }
+        loadQuizQuestion();
+
+        // Level 4 Logic
+        function verifyWeatherLevel4() {
+            let e1 = document.getElementById("termIn1").value.trim();
+            let e2 = document.getElementById("termIn2").value.trim();
+
+            if(e1 === "ಹವಾಮಾನ" && e2 === "ವಾಯುಗುಣ") {
+                modifyWeatherHUD(150, 0);
+                document.getElementById('wBtn4').style.background = "var(--ozone-green)";
+                showWeatherAlert(4, "ವಾಹ್ ಗೆಳೆಯಾ! ಹವಾಮಾನ ಮತ್ತು ವಾಯುಗುಣದ ವ್ಯತ್ಯಾಸ ನೂರಕ್ಕೆ ನೂರು ಸರಿಯಾಗಿದೆ.", true);
+            } else {
+                modifyWeatherHUD(0, 10);
+                showWeatherAlert(4, "ತಪ್ಪಾಗಿದೆ! ಸುಳಿವು: ಹವಾಮಾನ, ವಾಯುಗುಣ ಎಂದು ಬರೆಯಿರಿ ಗೆಳೆಯಾ.", false);
+            }
+        }
+
+        // Level 5 Logic
+        let minedTokens = {};
+        function toggleOreToken(id, isPeriodicWind) {
+            let node = document.getElementById(id);
+            if(node.classList.contains('active-token')) {
+                node.classList.remove('active-token');
+                delete minedTokens[id];
+            } else {
+                node.classList.add('active-token');
+                minedTokens[id] = isPeriodicWind;
+            }
+        }
+        function verifyWeatherLevel5() {
+            let win = true; let count = 0;
+            for(let id in minedTokens) {
+                if(minedTokens[id] === false) win = false;
+                count++;
+            }
+            if(count !== 2) win = false; // 2 major periodic winds (monsoons)
+
+            if(win) {
+                modifyWeatherHUD(150, 0);
+                document.getElementById('wBtn5').style.background = "var(--ozone-green)";
+                showWeatherAlert(5, "ಅದ್ಭುತ! ಭಾರತದ ಮಾನ್ಸೂನ್ ನಿಯತಕಾಲಿಕ ಮಾರುತಗಳ ಶೋಧ ಯಶಸ್ವಿಯಾಗಿದೆ.", true);
+            } else {
+                modifyWeatherHUD(0, 10);
+                showWeatherAlert(5, "ತಪ್ಪಾಗಿದೆ! ಕೇವಲ ಮುಂಗಾರು ಮತ್ತು ಹಿಂಗಾರು ನಿಯತಕಾಲಿಕ ಮಾರುತಗಳನ್ನು ಮಾತ್ರ ಆರಿಸು ಗೆಳೆಯಾ.", false);
+            }
+        }
+
+        // Level 6 Drag Drop
+        function allowRainDrop(ev) { ev.preventDefault(); }
+        function startRainDrag(ev) { ev.dataTransfer.setData("text", ev.target.id); }
+        function handleRainDrop(ev, cat) {
+            ev.preventDefault();
+            let id = ev.dataTransfer.getData("text");
+            let el = document.getElementById(id);
+            el.dataset.cat = cat;
+            ev.target.appendChild(el);
+        }
+        function verifyWeatherLevel6() {
+            let r1 = document.getElementById("rn1").dataset.cat;
+            let r2 = document.getElementById("rn2").dataset.cat;
+
+            if(r1 === "heat" && r2 === "mountain") {
+                modifyWeatherHUD(200, 0);
+                document.getElementById('wBtn6').style.background = "var(--ozone-green)";
+                showWeatherAlert(6, "ಮಳೆಯ ವಿಧಗಳ ಭೌತಿಕ ವರ್ಗೀಕರಣ ನೂರಕ್ಕೆ ನೂರು ಸರಿಯಾಗಿದೆ!", true);
+            } else {
+                modifyWeatherHUD(0, 10);
+                showWeatherAlert(6, "ತಪ್ಪಾದ ವಿಭಾಗ! ಕಾವಿನಿಂದ ಬರುವುದು ಪರಿವಹನ ಮಳೆ, ಬೆಟ್ಟಕ್ಕೆ ತಡೆದು ಬರುವುದು ಪರ್ವತಾರೋಹಣ ಮಳೆ.", false);
+            }
+        }
+
+        // Level 7 Logic
+        let finalL = null; let finalR = null;
+        function selectFinalWeatherMatrix(side, id, key) {
+            if(side === 'L') {
+                finalL = { id: id, key: key };
+                document.getElementById("matL1").classList.remove('node-selected');
+                document.getElementById("matL2").classList.remove('node-linked');
+            } else {
+                finalR = { id: id, key: key };
+                document.getElementById("matR1").classList.remove('node-selected');
+                document.getElementById("matR2").classList.remove('node-linked');
+            }
+            document.getElementById(id).classList.add('node-selected');
+        }
+        function verifyWeatherLevel7() {
+            if(finalL && finalR && finalL.key === finalR.key) {
+                modifyWeatherHUD(250, 0);
+                document.getElementById('wBtn7').style.background = "var(--ozone-green)";
+                showWeatherAlert(7, "ವಾಹ್ Chandrakant ಗೆಳೆಯಾ! ಇಡೀ 'ವಾಯುಗೋಳ' ಪಾಠದ ಮ್ಯಾಟ್ರಿಕ್ಸ್ ಯಶಸ್ವಿಯಾಗಿದೆ. ಮಕ್ಕಳು ಹವಾಮಾನ ಜಾಣರಾಗಿದ್ದಾರೆ!", true);
+            } else {
+                modifyWeatherHUD(0, 10);
+                showWeatherAlert(7, "ಮ್ಯಾಟ್ರಿಕ್ಸ್ ಲಿಂಕ್ ತಪ್ಪಾಗಿದೆ. ಓಝೋನ್ ಮತ್ತು ಸಿ.ಎಫ್.ಸಿ ಅಂಶಗಳನ್ನು ಮರುಪರಿಶೀಲಿಸು ಗೆಳೆಯಾ.", false);
+            }
+        }
+
+        function showWeatherAlert(lvlNum, text, success) {
+            let box = document.getElementById("alert" + lvlNum);
+            box.style.display = "block";
+            box.innerText = text;
+            box.style.background = success ? "rgba(16, 172, 132, 0.15)" : "rgba(238, 82, 83, 0.1)";
+            box.style.color = success ? "#55efc4" : "#ff7675";
+            box.style.borderColor = success ? "var(--sky-blue)" : "var(--heat-red)";
+        }
+    </script>
+</body>
+</html>

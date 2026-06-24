@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಸಂಸ್ಕೃತಿ ಆರ್ಕ್ ೧೧.೦ - ಮಾನವ ಮತ್ತು ಸಂಸ್ಕೃತಿ ಆಟಗಳು</title>
+    <style>
+        :root {
+            --culture-saffron: #ff9f43;
+            --culture-gold: #f1c40f;
+            --culture-teal: #1dd1a1;
+            --culture-purple: #5f27cd;
+            --ark-dark: #0a0b10;
+            --glass-panel: rgba(26, 21, 44, 0.96);
+            --neon-success: #10ac84;
+            --neon-danger: #ee5253;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Verdana, sans-serif; }
+
+        body {
+            background: var(--ark-dark);
+            background-image: radial-gradient(circle at 50% 50%, #221a3a 0%, #0a0b10 100%);
+            min-height: 100vh;
+            padding: 25px;
+            color: #ffffff;
+        }
+
+        header.ark-banner {
+            text-align: center;
+            padding: 25px;
+            background: var(--glass-panel);
+            border: 2px solid var(--culture-saffron);
+            border-radius: 24px;
+            box-shadow: 0 0 35px rgba(255, 159, 67, 0.25);
+            margin-bottom: 25px;
+        }
+
+        header.ark-banner h1 {
+            color: var(--culture-saffron);
+            font-size: 2.4rem;
+            text-shadow: 0 0 12px rgba(255, 159, 67, 0.4);
+            margin-bottom: 5px;
+        }
+
+        header.ark-banner p { color: #cbd5e1; font-size: 1.15rem; }
+
+        /* NEW CLASSROOM HUD: CULTURAL HARMONY INDEX */
+        .ark-hud {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 15px 25px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            border-left: 5px solid var(--culture-teal);
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .harmony-bar-container {
+            background: #1e1932;
+            width: 45%;
+            height: 16px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--culture-teal);
+        }
+
+        .harmony-bar-fill {
+            background: linear-gradient(90deg, var(--culture-teal), #55efc4);
+            height: 100%;
+            width: 100%;
+            transition: width 0.4s ease;
+        }
+
+        /* Side-Scrolling Horizon Deck Tracks */
+        .horizon-track {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 35px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+
+        .horizon-track::-webkit-scrollbar { height: 6px; }
+        .horizon-track::-webkit-scrollbar-thumb { background: var(--culture-saffron); border-radius: 3px; }
+
+        .horizon-pill {
+            background: #1a1631;
+            border: 1px solid #332b5c;
+            padding: 12px 24px;
+            border-radius: 14px;
+            cursor: pointer;
+            font-weight: bold;
+            color: #ffffff;
+            white-space: nowrap;
+            transition: all 0.3s;
+        }
+
+        .horizon-pill:hover, .horizon-pill.active-mission {
+            background: var(--culture-saffron);
+            color: #000000;
+            border-color: #ffffff;
+            box-shadow: 0 0 15px var(--culture-saffron);
+            transform: translateY(-3px);
+        }
+
+        /* Core Ark Game Arena Screen */
+        .ark-arena {
+            background: var(--glass-panel);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            border-radius: 28px;
+            padding: 35px;
+            min-height: 520px;
+            display: none;
+            box-shadow: 0 25px 55px rgba(0,0,0,0.6);
+        }
+
+        .ark-arena.active-arena { display: block; animation: floatArk 0.4s ease-out; }
+
+        @keyframes floatArk {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2.arena-title {
+            font-size: 1.7rem;
+            color: var(--culture-gold);
+            margin-bottom: 25px;
+            border-left: 6px solid var(--culture-gold);
+            padding-left: 15px;
+        }
+
+        /* Interactive Grid Nodes Connector */
+        .ark-grid-connector {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .ark-node {
+            background: #191530;
+            padding: 18px;
+            border-radius: 14px;
+            cursor: pointer;
+            border: 2px solid #322b5c;
+            font-weight: bold;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .ark-node:hover { border-color: var(--culture-saffron); background: #231d45; }
+        .ark-node.node-linked { background: var(--culture-saffron); color: black; border-color: white; box-shadow: 0 0 12px var(--culture-saffron); }
+
+        /* Quiz UI Layout */
+        .ark-option-block {
+            background: #191530;
+            border: 2px solid #322b5c;
+            padding: 16px;
+            margin: 12px 0;
+            border-radius: 14px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+        }
+
+        .ark-option-block:hover { border-color: var(--culture-gold); transform: translateX(6px); }
+        .ark-option-block.correct-glow { background: rgba(16, 172, 132, 0.2); border-color: var(--neon-success); color: #55efc4; }
+        .ark-option-block.wrong-glow { background: rgba(238, 82, 83, 0.2); border-color: var(--neon-danger); color: #ff7675; }
+
+        /* Smart Inputs */
+        .smart-ark-input {
+            background: rgba(0,0,0,0.4);
+            border: 2px solid #322b5c;
+            border-radius: 10px;
+            padding: 12px;
+            font-size: 1.1rem;
+            color: var(--culture-gold);
+            font-weight: bold;
+            outline: none;
+            width: 100%;
+            max-width: 320px;
+            margin-top: 8px;
+        }
+
+        .smart-ark-input:focus { border-color: var(--culture-saffron); }
+
+        /* Mining Grid Components */
+        .ark-mining-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        .ark-packet {
+            background: #191530;
+            border: 2px solid #322b5c;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .ark-packet.active-packet { background: var(--culture-purple); border-color: white; box-shadow: 0 0 12px var(--culture-purple); }
+
+        /* General Action Buttons */
+        .ark-btn {
+            background: linear-gradient(135deg, var(--culture-saffron), #ff6b6b);
+            color: white;
+            border: none;
+            padding: 14px 35px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 25px;
+            box-shadow: 0 5px 15px rgba(255, 159, 67, 0.3);
+        }
+
+        .ark-btn:hover { transform: scale(1.02); box-shadow: 0 8px 25px rgba(255, 159, 67, 0.5); }
+
+        .ark-status-alert {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 12px;
+            font-weight: bold;
+            display: none;
+            font-size: 1.1rem;
+            border: 1px solid transparent;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="ark-banner">
+        <h1>ಸಮಾಜಶಾಸ್ತ್ರ ವಿಭಾಗ: ಸಾಂಸ್ಕೃತಿಕ ಪರಂಪರೆ</h1>
+        <p>ಆರ್ಕ್ ಮಾಡೆಲ್ ೧೧.೦ • ಮಾನವ ಮತ್ತು ಸಂಸ್ಕೃತಿಯ ಅನನ್ಯ ಸಂಬಂಧದ ಅಲ್ಟ್ರಾ ಮಾಡರ್ನ್ ಆಟಗಳು</p>
+    </div>
+
+    <div class="ark-hud">
+        <span>ಸಾಂಸ್ಕೃತಿಕ ಸಾಮರಸ್ಯ ಸೂಚ್ಯಂಕ (Cultural Harmony):</span>
+        <div class="harmony-bar-container"><div class="harmony-bar-fill" id="harmonyFill"></div></div>
+        <span style="color: var(--culture-gold);" id="liveArkPoints">ಹೆರಿಟೇಜ್ ಕಾಯಿನ್ಸ್: 0000 HC</span>
+    </div>
+
+    <div class="horizon-track">
+        <div class="horizon-pill active-mission" id="horBtn1" onclick="shiftArkLevel(1)">1. ಸಂಸ್ಕೃತಿ ಶಬ್ದದ ಮೂಲ</div>
+        <div class="horizon-pill" id="horBtn2" onclick="shiftArkLevel(2)">2. ಸಾಂಸ್ಕೃತಿಕ ವ್ಯಾಖ್ಯಾನ ಕೋಡ್</div>
+        <div class="horizon-pill" id="horBtn3" onclick="shiftArkLevel(3)">3. ಎಪಿಕ್ 10 ರಸಪ್ರಶ್ನೆ</div>
+        <div class="horizon-pill" id="horBtn4" onclick="shiftArkLevel(4)">4. ಸಂಸ್ಕೃತಿಯ ಮುಖ್ಯ ಲಕ್ಷಣಗಳು</div>
+        <div class="horizon-pill" id="horBtn5" onclick="shiftArkLevel(5)">5. ಭೌತಿಕ ಸಂಸ್ಕೃತಿ ತಾಣ</div>
+        <div class="horizon-pill" id="horBtn6" onclick="shiftArkLevel(6)">6. ಅಭೌತಿಕ ಸಂಸ್ಕೃತಿ ತಾಣ</div>
+        <div class="horizon-pill" id="horBtn7" onclick="shiftArkLevel(7)">7. ಸಾಂಸ್ಕೃತಿಕ ಪರಂಪರೆ ಬಂಧ</div>
+    </div>
+
+    <div id="ark1" class="ark-arena active-arena">
+        <h2 class="arena-title">ಹಂತ 1: ಸಂಸ್ಕೃತಿ ಪದದ ಸಾಂಪ್ರದಾಯಿಕ ಮತ್ತು ಭಾಷಾ ಮೂಲ (Language Node Connector)</h2>
+        <p style="margin-bottom: 15px;">ಗೆಳೆಯಾ, ಇಂಗ್ಲಿಷ್‌ನ 'ಕಲ್ಚರ್' ಪದದ ಮೂಲ ಹಾಗೂ ಸಂಸ್ಕೃತಿಯ ಆಶಯವನ್ನು ಸರಿಯಾಗಿ ಲಿಂಕ್ ಮಾಡು:</p>
+        <div class="ark-grid-connector">
+            <div>
+                <div class="ark-node" id="l1_nodeL1" onclick="connectArkNodes('L', 'l1_nodeL1', 1)">ಲ್ಯಾಟಿನ್ ಭಾಷೆಯ ಮೂಲ ಪದ</div>
+                <div class="ark-node" id="l1_nodeL2" style="margin-top:15px;" onclick="connectArkNodes('L', 'l1_nodeL2', 2)">ಸಂಸ್ಕೃತಿ ಶಬ್ದದ ನೈಜ ಅರ್ಥ</div>
+            </div>
+            <div>
+                <div class="ark-node" id="l1_nodeR1" onclick="connectArkNodes('R', 'l1_nodeR1', 2)">ಶುದ್ಧೀಕರಿಸುವುದು ಅಥವಾ ಸಂಸ್ಕಾರಗೊಳಿಸುವುದು</div>
+                <div class="ark-node" id="l1_nodeR2" style="margin-top:15px;" onclick="connectArkNodes('R', 'l1_nodeR2', 1)">ಕೊಲೋರೆ (Colere - ಭೂಮಿ ಹದಗೊಳಿಸು/ಕೃಷಿ ಮಾಡು)</div>
+            </div>
+        </div>
+        <div class="ark-status-alert" id="alert1"></div>
+    </div>
+
+    <div id="ark2" class="ark-arena">
+        <h2 class="arena-title">ಹಂತ 2: ಸಂಸ್ಕೃತಿ ಮತ್ತು ಮಾನವನ ಜೀವನವಿಧಾನದ ವ್ಯಾಖ್ಯಾನ (The Culture Code)</h2>
+        <div style="display:flex; flex-direction:column; gap:20px;">
+            <div class="fib-q">1. "ನಾವು ಏನಾಗಿದ್ದೇವೆಯೋ ಅದೇ ನಮ್ಮ ಸಂಸ್ಕೃತಿ ಮತ್ತು ನಮ್ಮ ಬಳಿ ಇರುವುದೇ ನಾಗರಿಕತೆ" ಎಂದು ವ್ಯಾಖ್ಯಾನಿಸಿದ ಚಿಂತಕರು ಯಾರು? <br><input type="text" class="smart-ark-input" id="cryptIn1" placeholder="ಚಿಂತಕರ ಹೆಸರು ಬರೆಯಿರಿ"></div>
+            <div class="fib-q">2. ಸಂಸ್ಕೃತಿಯು ಪ್ರಾಣಿ ಪ್ರಪಂಚದಿಂದ ಮಾನವನನ್ನು ಬೇರ್ಪಡಿಸುವ ಅತ್ಯಂತ ಪ್ರಮುಖವಾದ ಯಾವ ವಿಶಿಷ್ಟ ಶಕ್ತಿಯಾಗಿದೆ? <br><input type="text" class="smart-ark-input" id="cryptIn2" placeholder="ಸಾಂಸ್ಕೃತಿಕ ಶಕ್ತಿ / ದೈಹಿಕ ಶಕ್ತಿ?"></div>
+        </div>
+        <button class="ark-btn" onclick="verifyArkLevel2()">ಕೋಡ್ ಪರಿಶೀಲಿಸು</button>
+        <div class="ark-status-alert" id="alert2"></div>
+    </div>
+
+    <div id="ark3" class="ark-arena">
+        <h2 class="arena-title">ಹಂತ 3: ಭವ್ಯ ಪರಂಪರೆಯ ಮಹಾ ಕದನ (Epic 10 Matrix Quiz)</h2>
+        <div style="font-weight: bold; margin-bottom: 15px; color: var(--culture-gold);" id="quizCounterText">ಪ್ರಶ್ನೆ ಕೋಡ್: 1 / 10</div>
+        <div id="quizQuestionText" style="font-size: 1.25rem; font-weight: bold; margin-bottom: 20px;">ಲೋಡ್ ಆಗುತ್ತಿದೆ...</div>
+        <div id="quizOptionsContainer"></div>
+        <button class="ark-btn" id="nextQuizBtn" style="display:none;" onclick="nextArkQuestion()">ಮುಂದಿನ ಸಾಂಸ್ಕೃತಿಕ ಸವಾಲಿಗೆ ಚಲಿಸು ➔</button>
+        <div class="ark-status-alert" id="alert3"></div>
+    </div>
+
+    <div id="ark4" class="ark-arena">
+        <h2 class="arena-title">ಹಂತ 4: ಸಂಸ್ಕೃತಿಯ ಪ್ರಮುಖ ವಿಶಿಷ್ಟ ಲಕ್ಷಣಗಳು (Cultural Traits Quest)</h2>
+        <div style="display:flex; flex-direction:column; gap:20px;">
+            <div class="fib-q">1. ಮಾನವನು ಹುಟ್ಟಿನಿಂದ ಸಂಸ್ಕೃತಿಯನ್ನು ತರುವುದಿಲ್ಲ, ಬದಲಿಗೆ ಸಮಾಜದಲ್ಲಿ ಬೆಳೆಯುತ್ತಾ ಕಲಿಯುತ್ತಾನೆ. ಅಂದರೆ ಸಂಸ್ಕೃತಿಯು ಒಂದು ಹೆಂತ ಗುಣ? <br><input type="text" class="smart-ark-input" id="traitIn1" placeholder="ಗಳಿಸಿದ್ದು / ಹುಟ್ಟಿನಿಂದ ಬಂದದ್ದು?"></div>
+            <div class="fib-q">2. ಸಂಸ್ಕೃತಿಯು ಒಂದು ತಲೆಮಾರಿನಿಂದ ಮತ್ತೊಂದು ತಲೆಮಾರಿಗೆ ಭಾಷೆ ಮತ್ತು ಆಚಾರಗಳ ಮೂಲಕ ಏನಾಗುತ್ತದೆ? <br><input type="text" class="smart-ark-input" id="traitIn2" placeholder="ಹಸ್ತಾಂತರವಾಗುತ್ತದೆ / ನಾಶವಾಗುತ್ತದೆ?"></div>
+        </div>
+        <button class="ark-btn" onclick="verifyArkLevel4()">ಲಕ್ಷಣಗಳ ಡೇಟಾ ದೃಢೀಕರಿಸು</button>
+        <div class="ark-status-alert" id="alert4"></div>
+    </div>
+
+    <div id="ark5" class="ark-arena">
+        <h2 class="arena-title">ಹಂತ 5: ಕಣ್ಣಿಗೆ ಕಾಣುವ ಭೌತಿಕ ಸಂಸ್ಕೃತಿಯ ಅಂಶಗಳು (Material Culture Mining)</h2>
+        <p style="margin-bottom: 15px;">ಗೆಳೆಯಾ, ಮಾನವನು ಸೃಷ್ಟಿಸಿದ ಕಣ್ಣಿಗೆ ಕಾಣುವ ಹಾಗೂ ಮುಟ್ಟಬಹುದಾದ **ಭೌತಿಕ ಸಂಸ್ಕೃತಿಯ ನಾಲ್ಕು ಅಂಶಗಳನ್ನು** ಮಾತ್ರ ಗಣಿ ಮಾಡು:</p>
+        <div class="ark-mining-grid">
+            <div class="ark-packet" id="packet1" onclick="toggleArkPacket('packet1', true)">1. ಕಲ್ಲಿನ ಉಪಕರಣಗಳು / ಆಯುಧ</div>
+            <div class="ark-packet" id="packet2" onclick="toggleArkPacket('packet2', false)">2. ಮೂಢನಂಬಿಕೆಗಳು</div>
+            <div class="ark-packet" id="packet3" onclick="toggleArkPacket('packet3', true)">3. ವಾಸಿಸುವ ಮನೆಗಳು</div>
+            <div class="ark-packet" id="packet4" onclick="toggleArkPacket('packet4', true)">4. ಉಡುವ ಬಟ್ಟೆಗಳು (Clothing)</div>
+            <div class="ark-packet" id="packet5" onclick="toggleArkPacket('packet5', false)">5. ಮೌಖಿಕ ಲಾವಣಿಗಳು</div>
+            <div class="ark-packet" id="packet6" onclick="toggleArkPacket('packet6', true)">6. ಆಧುನಿಕ ಯಂತ್ರೋಪಕರಣಗಳು</div>
+        </div>
+        <button class="ark-btn" onclick="verifyArkLevel5()">ಭೌತಿಕ ಅಂಶಗಳನ್ನು ಲಾಕ್ ಮಾಡು</button>
+        <div class="ark-status-alert" id="alert5"></div>
+    </div>
+
+    <div id="ark6" class="ark-arena">
+        <h2 class="arena-title">ಹಂತ 6: ಕಣ್ಣಿಗೆ ಕಾಣದ ಅಭೌತಿಕ ಸಂಸ್ಕೃತಿಯ ಲಕ್ಷಣಗಳು (Non-Material Culture Sorting)</h2>
+        <p style="margin-bottom: 15px;">ಮಾನವನ ಆಂತರಿಕ ವಿಚಾರಗಳಾದ ಅಭೌತಿಕ ಸಂಸ್ಕೃತಿಯ ಅಂಶಗಳನ್ನು ಸರಿಯಾದ ವಿವರಣೆಯ ಬಾಕ್ಸ್‌ಗಳಿಗೆ ಹಂಚು ಗೆಳೆಯಾ:</p>
+        <div style="display:flex; gap:25px;">
+            <div style="flex:1; display:flex; flex-direction:column; gap:10px;" id="cultureSource">
+                <div style="background:#191530; padding:12px; border-radius:10px; cursor:grab; font-weight:bold; border:1px solid #322b5c;" draggable="true" id="cult1" ondragstart="startCultDrag(event)">ಆಚಾರ-ವಿಚಾರ ಮತ್ತು ನಂಬಿಕೆ</div>
+                <div style="background:#191530; padding:12px; border-radius:10px; cursor:grab; font-weight:bold; border:1px solid #322b5c;" draggable="true" id="cult2" ondragstart="startCultDrag(event)">ಕಲೆ, ಸಾಹಿತ್ಯ ಮತ್ತು ಸಂಗೀತ</div>
+            </div>
+            <div style="flex:2; display:flex; flex-direction:column; gap:15px;">
+                <div style="background:rgba(0,0,0,0.3); border:2px dashed var(--culture-saffron); padding:15px; border-radius:12px;" ondragover="allowCultDrop(event)" ondrop="handleCultDrop(event, 'belief')">
+                    <h3>ಹಿರಿಯರಿಗೆ ಗೌರವ ನೀಡುವುದು ಮತ್ತು ಧಾರ್ಮಿಕ ಆಚರಣೆಗಳನ್ನು ಪಾಲಿಸುವುದು</h3>
+                </div>
+                <div style="background:rgba(0,0,0,0.3); border:2px dashed var(--culture-saffron); padding:15px; border-radius:12px;" ondragover="allowCultDrop(event)" ondrop="handleCultDrop(event, 'art')">
+                    <h3>ಜಾನಪದ ಹಾಡುಗಳು, ನೃತ್ಯ ರೂಪಗಳು ಮತ್ತು ಕಾವ್ಯಗಳನ್ನು ರಚಿಸುವುದು</h3>
+                </div>
+            </div>
+        </div>
+        <button class="ark-btn" onclick="verifyArkLevel6()">ಅಭೌತಿಕ ಬಂಧ ಪರಿಶೀಲಿಸು</button>
+        <div class="ark-status-alert" id="alert6"></div>
+    </div>
+
+    <div id="ark7" class="ark-arena">
+        <h2 class="arena-title">ಹಂತ 7: ನಮ್ಮ ಹೆಮ್ಮೆಯ ಸಾಂಸ್ಕೃತಿಕ ಪರಂಪರೆಯ ರಕ್ಷಣೆ (Cultural Heritage Matrix)</h2>
+        <p style="margin-bottom: 15px;">ಅಂತಿಮ ಹಂತ! ನಮ್ಮ ಪೂರ್ವಜರು ನಮಗೆ ಬಿಟ್ಟು ಹೋಗಿರುವ ಸಾಂಸ್ಕೃತಿಕ ಕೊಡುಗೆಗಳು ಮತ್ತು ಅವುಗಳ ಮಹತ್ವವನ್ನು ಮ್ಯಾಚ್ ಮಾಡಿ ಆರ್ಕ್ ಪೂರ್ಣಗೊಳಿಸು ಗೆಳೆಯಾ:</p>
+        <div class="ark-grid-connector">
+            <div class="ark-node" id="matL1" onclick="selectFinalArkMatrix('L', 'matL1', 'monument')">ಹಂಪಿ, ಬೇಲೂರು, ಪಟ್ಟದಕಲ್ಲು ಮತ್ತು ತಾಜ್ ಮಹಲ್</div>
+            <div class="ark-node" id="matR1" onclick="selectFinalArkMatrix('R', 'matR1', 'monument')">ಭಾರತದ ಪ್ರಸಿದ್ಧ ಭೌತಿಕ ಸಾಂಸ್ಕೃತಿಕ ಸ್ಮಾರಕ ಪರಂಪರೆ</div>
+            <div class="gov-node ark-node" id="matL2" onclick="selectFinalArkMatrix('L', 'matL2', 'protect')">ಐತಿಹಾಸಿಕ ಸ್ಮಾರಕಗಳನ್ನು ಹಾಳು ಮಾಡದಿರುವುದು</div>
+            <div class="ark-node" id="matR2" onclick="selectFinalArkMatrix('R', 'matR2', 'protect')">ಪ್ರತಿಯೊಬ್ಬ ಜವಾಬ್ದಾರಿಯುತ ಪ್ರಜೆಯ ಸಾಂಸ್ಕೃತಿಕ ಕರ್ತವ್ಯ</div>
+        </div>
+        <button class="ark-btn" onclick="verifyArkLevel7()">ಪರಂಪರೆ ಮ್ಯಾಟ್ರಿಕ್ಸ್ ಪೂರ್ಣಗೊಳಿಸು</button>
+        <div class="ark-status-alert" id="alert7"></div>
+    </div>
+
+    <script>
+        let arkPoints = 0; let harmonyIndex = 100;
+        function modifyArkHUD(hcChange, harmonyDamage) {
+            arkPoints += hcChange;
+            harmonyIndex = Math.max(10, harmonyIndex - harmonyDamage);
+            document.getElementById("liveArkPoints").innerText = `ಹೆರಿಟೇಜ್ ಕಾಯಿನ್ಸ್: ${arkPoints.toString().padStart(4, '0')} HC`;
+            document.getElementById("harmonyFill").style.width = `${harmonyIndex}%`;
+        }
+
+        function shiftArkLevel(levelIdx) {
+            document.querySelectorAll('.ark-arena').forEach(el => el.classList.remove('active-arena'));
+            document.querySelectorAll('.horizon-pill').forEach(el => el.classList.remove('active-mission'));
+            
+            document.getElementById('ark' + levelIdx).classList.add('active-arena');
+            document.getElementById('horBtn' + levelIdx).classList.add('active-mission');
+        }
+
+        // Level 1 Logic
+        let nodeL = null; let nodeR = null;
+        function connectArkNodes(side, id, matchVal) {
+            if(side === 'L') {
+                if(nodeL) document.getElementById(nodeL.id).classList.remove('node-linked');
+                nodeL = { id: id, match: matchVal };
+            } else {
+                if(nodeR) document.getElementById(nodeR.id).classList.remove('node-linked');
+                nodeR = { id: id, match: matchVal };
+            }
+            document.getElementById(id).classList.add('node-linked');
+
+            if(nodeL && nodeR) {
+                if(nodeL.match === nodeR.match) {
+                    document.getElementById(nodeL.id).style.background = "var(--neon-success)";
+                    document.getElementById(nodeR.id).style.background = "var(--neon-success)";
+                    modifyArkHUD(100, 0);
+                    showArkAlert(1, "ಸರಿಯಾದ ಲಿಂಕ್ ಗೆಳೆಯಾ! ಭಾಷಾ ಮತ್ತು ಸಾಂಪ್ರದಾಯಿಕ ಮೂಲ ನೂರಕ್ಕೆ ನೂರು ಸರಿ ಇದೆ.", true);
+                    document.getElementById('horBtn1').style.background = "var(--neon-success)";
+                } else {
+                    modifyArkHUD(0, 10);
+                    showArkAlert(1, "ತಪ್ಪಾದ ಲಿಂಕ್, ಸಾಂಸ್ಕೃತಿಕ ಸಾಮರಸ್ಯ ಇಳಿಕೆಯಾಗಿದೆ! ಮತ್ತೊಮ್ಮೆ ಯೋಚಿಸು ಗೆಳೆಯಾ.", false);
+                }
+                nodeL = null; nodeR = null;
+            }
+        }
+
+        // Level 2 Logic
+        function verifyArkLevel2() {
+            let c1 = document.getElementById("cryptIn1").value.trim();
+            let c2 = document.getElementById("cryptIn2").value.trim();
+
+            if((c1 === "ಮೆಕೈವರ್ ಮತ್ತು ಪೇಜ್" || c1 === "ಮೆಕೈವರ್") && (c2 === "ಸಾಂಸ್ಕೃತಿಕ ಶಕ್ತಿ" || c2 === "ಸಾಂಸ್ಕೃತಿಕ")) {
+                modifyArkHUD(150, 0);
+                document.getElementById('horBtn2').style.background = "var(--neon-success)";
+                showArkAlert(2, "ಅದ್ಭುತ! ಸಂಸ್ಕೃತಿಯ ಪ್ರಮುಖ ವ್ಯಾಖ್ಯಾನ ಮತ್ತು ಮಾನವನ ವಿಶಿಷ್ಟ ಶಕ್ತಿಯ ಕೋಡ್ ಸರಿಯಾಗಿದೆ.", true);
+            } else {
+                modifyArkHUD(0, 10);
+                showArkAlert(2, "ಉತ್ತರ ತಪ್ಪಾಗಿದೆ ಗೆಳೆಯಾ! ಸುಳಿವು: ಮೆಕೈವರ್ ಮತ್ತು ಪೇಜ್, ಸಾಂಸ್ಕೃತಿಕ ಶಕ್ತಿ ಎಂದು ಬರೆಯಿರಿ.", false);
+            }
+        }
+
+        // Level 3: 10 Questions Matrix Quiz Data
+        const cultureQuizPool = [
+            { q: "1. ಮಾನವನಿಗೂ ಮತ್ತು ಪ್ರಾಣಿ ಪ್ರಪಂಚಕ್ಕೂ ಇರುವ ಅತ್ಯಂತ ದೊಡ್ಡ ಮತ್ತು ಪ್ರಮುಖ ವ್ಯತ್ಯಾಸವೇನು?", o: ["ಮಾನವನಿಗೆ ದೊಡ್ಡ ಹಲ್ಲುಗಳಿವೆ", "ಮಾನವನಿಗೆ ಸಂಸ್ಕೃತಿಯಿದೆ (Culture)", "ಪ್ರಾಣಿಗಳು ವೇಗವಾಗಿ ಓಡುತ್ತವೆ"], c: 1 },
+            { q: "2. 'ಸಂಸ್ಕೃತಿ' ಎಂಬ ಪದವು ನಮ್ಮ ದೈನಂದಿನ ಜೀವನದಲ್ಲಿ ಪ್ರಮುಖವಾಗಿ ಏನನ್ನು ಸೂಚಿಸುತ್ತದೆ?", o: ["ಕೇವಲ ಹಣ ಗಳಿಸುವುದು", "ಒಂದು ಸಮೂಹದ ಆಚಾರ-ವಿಚಾರ, ನಂಬಿಕೆ ಮತ್ತು ಜೀವನವಿಧಾನ", "ಕೇವಲ ಹೊಸ ಬಟ್ಟೆ ಕೊಳ್ಳುವುದು"], c: 1 },
+            { q: "3. ಈ ಕೆಳಗಿನವುಗಳಲ್ಲಿ ಯಾವುದು ಸಂಸ್ಕೃತಿಯು ಹೊಂದಿರುವ ಅತ್ಯಂತ ಪ್ರಮುಖ ಸಾಮಾಜಿಕ ಲಕ್ಷಣವಾಗಿದೆ?", o: ["ಸಂಸ್ಕೃತಿಯು ಕೇವಲ ಒಬ್ಬ ವ್ಯಕ್ತಿಗೆ ಸೀಮಿತ", "ಸಂಸ್ಕೃತಿಯು ಗಳಿಸಿದ್ದು ಮತ್ತು ಸಮಾಜದಲ್ಲಿ ಹಂಚಿಕೊಂಡದ್ದು", "ಸಂಸ್ಕೃತಿಯು ಬದಲಾಗದ ಜಡ ವಸ್ತು"], c: 1 },
+            { q: "4. ಮಾನವನು ತನ್ನ ಬುದ್ಧಿಶಕ್ತಿಯಿಂದ ನಿರ್ಮಿಸಿದ ಕಣ್ಣಿಗೆ ಕಾಣುವ ಸ್ಮಾರಕಗಳು, ಮನೆ, ಉಪಕರಣಗಳನ್ನು ಯಾವ ಸಂಸ್ಕೃತಿ ಎನ್ನಲಾಗುತ್ತದೆ?", o: ["ಅಭೌತಿಕ ಸಂಸ್ಕೃತಿ", "ಭೌತಿಕ ಸಂಸ್ಕೃತಿ (Material Culture)", "ಲೋಹ ಸಂಸ್ಕೃತಿ"], c: 1 },
+            { q: "5. ಮಾನವನ ಆಲೋಚನೆಗಳು, ನಂಬಿಕೆಗಳು, ಹಾಡುಗಳು ಮತ್ತು ಕಲೆಗಳನ್ನು ಒಳಗೊಂಡ ಕಣ್ಣಿಗೆ ಕಾಣದ ಭಾಗ ಯಾವುದು?", o: ["ಭೌತಿಕ ಸಂಸ್ಕೃತಿ", "ಆಧುನಿಕ ಯಂತ್ರಗಳು", "ಅಭೌತಿಕ ಸಂಸ್ಕೃತಿ (Non-Material Culture)"], c: 2 },
+            { q: "6. ನಮ್ಮ ಪೂರ್ವಜರು ಸಾಂಪ್ರದಾಯಿಕವಾಗಿ ತಲೆಮಾರುಗಳಿಂದ ನಮಗೆ ಬಳುವಳಿಯಾಗಿ ನೀಡಿರುವ ಕೊಡುಗೆಗಳನ್ನು ಏನೆನ್ನುತ್ತಾರೆ?", o: ["ಕೈಗಾರಿಕಾ ತಾಣ", "ಸಾಂಸ್ಕೃತಿಕ ಪರಂಪರೆ (Cultural Heritage)", "ವ್ಯಾಪಾರ ಮಾರುಕಟ್ಟೆ"], c: 1 },
+            { q: "7. ಯುನೆಸ್ಕೋ (UNESCO) ಜಾಗತಿಕ ಸಾಂಸ್ಕೃತಿಕ ಪರಂಪರೆಯ ಪಟ್ಟಿಗೆ ಸೇರಿದ ಕರ್ನಾಟಕದ ಪ್ರಸಿದ್ಧ ವಿಜಯನಗರ ಸಾಮ್ರಾಜ್ಯದ ರಾಜಧಾನಿ ಯಾವುದು?", o: ["ಬಾದಾಮಿ", "ಹಂಪಿ (Hampi)", "ಮೈಸೂರು"], c: 1 },
+            { q: "8. ಸಾಂಸ್ಕೃತಿಕ ಪರಂಪರೆಯು ಒಂದು ದೇಶದ ಜನರಲ್ಲಿ ಯಾವ ಪ್ರಮುಖ ಭಾವನೆಯನ್ನು ಮೂಡಿಸಲು ನೆರವಾಗುತ್ತದೆ?", o: ["ಐಕ್ಯತೆ, ಹೆಮ್ಮೆ ಮತ್ತು ಗೌರವ (Unity & Pride)", "ದ್ವೇಷ ಭಾವನೆ", "ಕೇವಲ ಸ್ವಾರ್ಥ ಚಿಂತನೆ"], c: 0 },
+            { q: "9. ನಮ್ಮ ದೇಶದ ಭವ್ಯ ಐತಿಹಾಸಿಕ ಸ್ಮಾರಕಗಳು ಮತ್ತು ಬಂಡೆ ಬರಹಗಳನ್ನು ಕಾಯಲು ಭಾರತ ಸರ್ಕಾರ ತಂದ ಕಾಯ್ದೆ ಯಾವುದು?", o: ["ಪ್ರಾಚೀನ ಸ್ಮಾರಕಗಳು ಮತ್ತು ಪುರಾತತ್ವ ನಿವೇಶನಗಳ ಕಾಯ್ದೆ (1958)", "ಅರಣ್ಯ ಕಾಯ್ದೆ", "ಬ್ಯಾಂಕಿಂಗ್ ಕಾಯ್ದೆ"], c: 0 },
+            { q: "10. ನಮ್ಮ ಭವ್ಯ ದೇಶದ ಸಂಸ್ಕೃತಿಯ ಉನ್ನತ ಧ್ಯೇಯ ಮತ್ತು ಜಾಗತಿಕ ನಿಲುವು ಯಾವುದಾಗಿದೆ?", o: ["ಕೇವಲ ನಮ್ಮ ದೇಶ ಗೆಲ್ಲುವುದು", "ವೈವಿಧ್ಯತೆಯಲ್ಲಿ ಏಕತೆ ಮತ್ತು ಸಾಮರಸ್ಯ (Unity in Diversity)", "ಇತರ ಸಂಸ್ಕೃತಿ ನಾಶ ಮಾಡುವುದು"], c: 1 }
+        ];
+
+        let qIdx = 0; let qScore = 0; let isQuizActive = true;
+        function loadArkQuestion() {
+            isQuizActive = true;
+            document.getElementById("nextQuizBtn").style.display = "none";
+            document.getElementById("alert3").style.display = "none";
+            let qData = cultureQuizPool[qIdx];
+            document.getElementById("quizCounterText").innerText = `ಪ್ರಶ್ನೆ ಕೋಡ್: ${qIdx + 1} / 10`;
+            document.getElementById("quizQuestionText").innerText = qData.q;
+            
+            let container = document.getElementById("quizOptionsContainer");
+            container.innerHTML = "";
+            qData.o.forEach((opt, idx) => {
+                let div = document.createElement("div");
+                div.classList.add("ark-option-block");
+                div.innerText = opt;
+                div.onclick = function() {
+                    if(!isQuizActive) return;
+                    isQuizActive = false;
+                    if(idx === qData.c) {
+                        this.classList.add("correct-glow");
+                        qScore++; modifyArkHUD(30, 0);
+                        showArkAlert(3, "ಸರಿಯಾದ ಉತ್ತರ ಗೆಳೆಯಾ! ಸಾಂಸ್ಕೃತಿಕ ಪ್ರಜ್ಞೆ ಅದ್ಭುತವಾಗಿದೆ.", true);
+                    } else {
+                        this.classList.add("wrong-glow");
+                        container.children[qData.c].classList.add("correct-glow");
+                        modifyArkHUD(0, 10);
+                        showArkAlert(3, "ತಪ್ಪು ಉತ್ತರ! ಸರಿಯಾದದ್ದನ್ನು ಹಸಿರು ಬಣ್ಣದಲ್ಲಿ ತೋರಿಸಲಾಗಿದೆ.", false);
+                    }
+                    document.getElementById("nextQuizBtn").style.display = "inline-block";
+                };
+                container.appendChild(div);
+            });
+        }
+        function nextArkQuestion() {
+            qIdx++;
+            if(qIdx < cultureQuizPool.length) {
+                loadArkQuestion();
+            } else {
+                document.getElementById("quizCounterText").innerText = "ಮಿಷನ್ ಮುಕ್ತಾಯ!";
+                document.getElementById("quizQuestionText").innerText = `ತರಗತಿಯ ಒಟ್ಟು ಸ್ಕೋರ್: ${qScore} / 10`;
+                document.getElementById("quizOptionsContainer").innerHTML = "";
+                document.getElementById("nextQuizBtn").style.display = "none";
+                document.getElementById('horBtn3').style.background = "var(--neon-success)";
+                showArkAlert(3, qScore >= 7 ? "ಅಪ್ರತಿಮ ಸಾಂಸ್ಕೃತಿಕ ರಕ್ಷಕರು ಗೆಳೆಯಾ!" : "ಉತ್ತಮ ಪ್ರಯತ್ನ, ಮತ್ತೊಮ್ಮೆ ಓದಿ ತಿಳಿಯಿರಿ!", true);
+            }
+        }
+        loadArkQuestion();
+
+        // Level 4 Logic
+        function verifyArkLevel4() {
+            let e1 = document.getElementById("traitIn1").value.trim();
+            let e2 = document.getElementById("traitIn2").value.trim();
+
+            if(e1 === "ಗಳಿಸಿದ್ದು" && e2 === "ಹಸ್ತಾಂತರವಾಗುತ್ತದೆ") {
+                modifyArkHUD(150, 0);
+                document.getElementById('horBtn4').style.background = "var(--neon-success)";
+                showArkAlert(4, "ವಾಹ್ ಗೆಳೆಯಾ! ಸಂಸ್ಕೃತಿಯ ಪ್ರಮುಖ ಲಕ್ಷಣಗಳ ವಿಶ್ಲೇಷಣೆ ಸಂಪೂರ್ಣ ಸರಿಯಾಗಿದೆ.", true);
+            } else {
+                modifyArkHUD(0, 10);
+                showArkAlert(4, "ತಪ್ಪಾಗಿದೆ! ಸುಳಿವು: ಗಳಿಸಿದ್ದು, ಹಸ್ತಾಂತರವಾಗುತ್ತದೆ ಎಂದು ಬರೆಯಿರಿ ಗೆಳೆಯಾ.", false);
+            }
+        }
+
+        // Level 5 Logic
+        let minedPackets = {};
+        function toggleArkPacket(id, isMaterialCulture) {
+            let node = document.getElementById(id);
+            if(node.classList.contains('active-packet')) {
+                node.classList.remove('active-packet');
+                delete minedPackets[id];
+            } else {
+                node.classList.add('active-packet');
+                minedPackets[id] = isMaterialCulture;
+            }
+        }
+        function verifyArkLevel5() {
+            let win = true; let count = 0;
+            for(let id in minedPackets) {
+                if(minedPackets[id] === false) win = false;
+                count++;
+            }
+            if(count !== 4) win = false; // 4 major material traits
+
+            if(win) {
+                modifyArkHUD(150, 0);
+                document.getElementById('horBtn5').style.background = "var(--neon-success)";
+                showArkAlert(5, "ಅದ್ಭುತ! ಭೌತಿಕ ಸಂಸ್ಕೃತಿಯ 4 ಪ್ರಮುಖ ಅಂಶಗಳು (ಉಪಕರಣ, ಮನೆ, ಬಟ್ಟೆ, ಯಂತ್ರಗಳು) ಪಕ್ಕಾ ಸರಿ ಇವೆ.", true);
+            } else {
+                modifyArkHUD(0, 10);
+                showArkAlert(5, "ತಪ್ಪಾಗಿದೆ! ಕೇವಲ ಕಣ್ಣಿಗೆ ಕಾಣುವ ಭೌತಿಕ ವಸ್ತುಗಳನ್ನು ಮಾತ್ರ ಆರಿಸು (ನಂಬಿಕೆ, ಲಾವಣಿ ಬೇಡ).", false);
+            }
+        }
+
+        // Level 6 Logic
+        function allowCultDrop(ev) { ev.preventDefault(); }
+        function startCultDrag(ev) { ev.dataTransfer.setData("text", ev.target.id); }
+        function handleCultDrop(ev, cat) {
+            ev.preventDefault();
+            let id = ev.dataTransfer.getData("text");
+            let el = document.getElementById(id);
+            el.dataset.cat = cat;
+            ev.target.appendChild(el);
+        }
+        function verifyArkLevel6() {
+            let l1 = document.getElementById("cult1").dataset.cat;
+            let l2 = document.getElementById("cult2").dataset.cat;
+
+            if(l1 === "belief" && l2 === "art") {
+                modifyArkHUD(200, 0);
+                document.getElementById('horBtn6').style.background = "var(--neon-success)";
+                showArkAlert(6, "ಅಭೌತಿಕ ಸಂಸ್ಕೃತಿಯ ಲಕ್ಷಣಗಳ ವರ್ಗೀಕರಣ ನೂರಕ್ಕೆ ನೂರು ನಿಖರವಾಗಿದೆ ಗೆಳೆಯಾ!", true);
+            } else {
+                modifyArkHUD(0, 10);
+                showArkAlert(6, "ತಪ್ಪಾದ ವಿಭಾಗ! ಆಚಾರಗಳು ನಂಬಿಕೆಯ ಬಾಕ್ಸ್‌ಗೆ ಹಾಗೂ ಹಾಡುಗಳು ಕಲೆಯ ಬಾಕ್ಸ್‌ಗೆ ಸೇರಬೇಕು.", false);
+            }
+        }
+
+        // Level 7 Logic
+        let finalL = null; let finalR = null;
+        function selectFinalArkMatrix(side, id, key) {
+            if(side === 'L') {
+                finalL = { id: id, key: key };
+                document.getElementById("matL1").classList.remove('node-linked');
+                document.getElementById("matL2").classList.remove('node-linked');
+            } else {
+                finalR = { id: id, key: key };
+                document.getElementById("matR1").classList.remove('node-linked');
+                document.getElementById("matR2").classList.remove('node-linked');
+            }
+            document.getElementById(id).classList.add('node-linked');
+        }
+        function verifyArkLevel7() {
+            if(finalL && finalR && finalL.key === finalR.key) {
+                modifyArkHUD(250, 0);
+                document.getElementById('horBtn7').style.background = "var(--neon-success)";
+                showArkAlert(7, "ವಾಹ್ ಗೆಳೆಯಾ! ಇಡೀ 'ಮಾನವ ಮತ್ತು ಸಂಸ್ಕೃತಿ' ಪಾಠದ ಹೆರಿಟೇಜ್ ಹಬ್ ಯಶಸ್ವಿಯಾಗಿದೆ. ಇಡೀ ಸಮಾಜಶಾಸ್ತ್ರ ವಿಭಾಗದ ಎಲ್ಲ ಪಾಠಗಳು ಪೂರ್ಣಗೊಂಡಿವೆ!", true);
+            } else {
+                modifyArkHUD(0, 10);
+                showArkAlert(7, "ಮ್ಯಾಟ್ರಿಕ್ಸ್ ಲಿಂಕ್ ತಪ್ಪಾಗಿದೆ. ಪರಂಪರೆಯ ಲಕ್ಷಣಗಳನ್ನು ಮತ್ತೊಮ್ಮೆ ಗಮನಿಸು ಗೆಳೆಯಾ.", false);
+            }
+        }
+
+        function showArkAlert(lvlNum, text, success) {
+            let box = document.getElementById("alert" + lvlNum);
+            box.style.display = "block";
+            box.innerText = text;
+            box.style.background = success ? "rgba(16, 172, 132, 0.15)" : "rgba(238, 82, 83, 0.1)";
+            box.style.color = success ? "#55efc4" : "#ff7675";
+            box.style.borderColor = success ? "var(--culture-saffron)" : "var(--neon-danger)";
+        }
+    </script>
+</body>
+</html>

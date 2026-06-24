@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಸನಾತನ ಧರ್ಮ - ಜ್ಞಾನ ಮ್ಯಾಟ್ರಿಕ್ಸ್ ೭.೦</title>
+    <style>
+        :root {
+            --temple-orange: #ff7f50;
+            --sacred-gold: #ffb142;
+            --mystic-indigo: #474787;
+            --vedic-white: #ffffff;
+            --glow-green: #2ed573;
+            --alert-red: #ff5252;
+            --space-dark: #0c0d14;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Verdana, sans-serif; }
+
+        body {
+            background: var(--space-dark);
+            background-image: radial-gradient(circle at 50% 50%, #1b1c2a 0%, #0c0d14 100%);
+            min-height: 100vh;
+            padding: 25px;
+            color: #ffffff;
+        }
+
+        .main-temple-banner {
+            background: rgba(255, 255, 255, 0.02);
+            padding: 30px;
+            border-radius: 24px;
+            text-align: center;
+            border: 2px solid var(--sacred-gold);
+            box-shadow: 0 0 30px rgba(255, 177, 66, 0.2);
+            margin-bottom: 30px;
+        }
+
+        .main-temple-banner h1 {
+            color: var(--sacred-gold);
+            font-size: 2.5rem;
+            margin-bottom: 8px;
+            text-shadow: 0 0 15px rgba(255, 177, 66, 0.4);
+        }
+
+        .main-temple-banner p { color: #a4b0be; font-size: 1.2rem; }
+
+        /* HUD Live Progress */
+        .div-hud {
+            display: flex;
+            justify-content: space-between;
+            background: rgba(71, 71, 135, 0.2);
+            padding: 15px 25px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            border-left: 5px solid var(--temple-orange);
+            font-weight: bold;
+            font-size: 1.15rem;
+        }
+
+        /* 3D Wheel/Menu Grid Track */
+        .matrix-menu-track {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+            margin-bottom: 35px;
+        }
+
+        .matrix-node-btn {
+            background: #1e1f30;
+            border: 2px solid #2c2d4a;
+            padding: 15px 10px;
+            border-radius: 14px;
+            cursor: pointer;
+            font-weight: bold;
+            color: #ffffff;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-align: center;
+        }
+
+        .matrix-node-btn:hover, .matrix-node-btn.active-node {
+            background: linear-gradient(135deg, var(--temple-orange), var(--sacred-gold));
+            color: #000000;
+            border-color: #ffffff;
+            box-shadow: 0 0 20px rgba(255, 127, 80, 0.5);
+            transform: translateY(-5px);
+        }
+
+        /* Content Deck Screen */
+        .deck-screen {
+            background: rgba(30, 31, 49, 0.7);
+            border: 2px solid #2c2d4a;
+            border-radius: 28px;
+            padding: 35px;
+            min-height: 530px;
+            display: none;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+
+        .deck-screen.active-screen { display: block; animation: flashEffect 0.5s ease-in-out; }
+
+        @keyframes flashEffect {
+            from { opacity: 0; transform: scale(0.98); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        h2.deck-heading {
+            font-size: 1.7rem;
+            color: var(--sacred-gold);
+            margin-bottom: 25px;
+            padding-bottom: 10px;
+            border-bottom: 2px dashed rgba(255, 177, 62, 0.2);
+        }
+
+        /* General Custom UI Elements */
+        .submit-btn, .next-btn {
+            background: linear-gradient(135deg, var(--temple-orange), #ff6b6b);
+            color: white;
+            border: none;
+            padding: 14px 35px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 10px 20px rgba(255, 127, 80, 0.3);
+            transition: all 0.3s;
+            margin-top: 25px;
+        }
+
+        .submit-btn:hover, .next-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 25px rgba(255, 127, 80, 0.5);
+        }
+
+        .live-alert-box {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 12px;
+            font-weight: bold;
+            display: none;
+            font-size: 1.1rem;
+        }
+
+        /* Act 1 Node Connector Layout */
+        .node-connector-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+
+        .box-node {
+            background: #1e1f30;
+            padding: 16px;
+            border-radius: 12px;
+            cursor: pointer;
+            border: 2px solid #2c2d4a;
+            font-weight: bold;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .box-node:hover { border-color: var(--sacred-gold); }
+        .box-node.active-node-select { background: var(--sacred-gold); color: black; border-color: white; }
+
+        /* Act 3 Quiz Interface */
+        .progress-hud-bar {
+            background: #2c2d4a;
+            height: 10px;
+            border-radius: 5px;
+            margin-bottom: 25px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            background: var(--glow-green);
+            height: 100%;
+            width: 10%;
+            transition: width 0.3s;
+        }
+
+        .quiz-choice-row {
+            background: #1e1f30;
+            border: 2px solid #2c2d4a;
+            padding: 16px;
+            margin: 12px 0;
+            border-radius: 14px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+        }
+
+        .quiz-choice-row:hover { border-color: var(--temple-orange); transform: translateX(5px); }
+        .quiz-choice-row.win-glow { background: rgba(46, 204, 113, 0.2); border-color: var(--glow-green); color: var(--glow-green); }
+        .quiz-choice-row.lose-glow { background: rgba(255, 82, 82, 0.2); border-color: var(--alert-red); color: var(--alert-red); }
+
+        /* Universal Smart Inputs */
+        .smart-text-input {
+            background: rgba(0,0,0,0.4);
+            border: 2px solid #2c2d4a;
+            border-radius: 10px;
+            padding: 12px;
+            font-size: 1.1rem;
+            color: var(--sacred-gold);
+            font-weight: bold;
+            outline: none;
+            width: 100%;
+            max-width: 325px;
+            margin-top: 8px;
+        }
+
+        .smart-text-input:focus { border-color: var(--sacred-gold); }
+
+        /* Act 5 Switch Styles */
+        .switch-container-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255,255,255,0.02);
+            padding: 16px;
+            border-radius: 14px;
+            margin-bottom: 15px;
+            border: 1px solid #2c2d4a;
+        }
+
+        .switch-toggle-buttons button {
+            padding: 9px 22px;
+            border: 1px solid #2c2d4a;
+            background: #1e1f30;
+            color: white;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
+        .switch-toggle-buttons button.triggered {
+            background: var(--temple-orange);
+            color: white;
+            border-color: #ffffff;
+            box-shadow: 0 0 10px var(--temple-orange);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="main-temple-banner">
+        <h1>ಅಧ್ಯಾಯ-೫: ಸನಾತನ ಧರ್ಮ</h1>
+        <p>ಜ್ಞಾನ ಮ್ಯಾಟ್ರಿಕ್ಸ್ ೭.೦ • ಪಠ್ಯಪುಸ್ತಕದ ಪ್ರತಿಯೊಂದು ಪರಿಕಲ್ಪನೆಯೂ ಈಗ ಒಂದೊಂದು ಪ್ರತ್ಯೇಕ ಆಕ್ಟಿವಿಟಿ!</p>
+    </div>
+
+    <div class="div-hud">
+        <span style="color: var(--sacred-gold);">ಕಲಿಕಾ ಹಂತ: ಸನಾತನ ಜ್ಞಾನದ ಅನ್ವೇಷಣೆ</span>
+        <span style="color: var(--glow-green);" id="liveXPBoard">ಗಳಿಸಿದ ಜ್ಞಾನದ ಅಂಕಗಳು: 0000 XP</span>
+    </div>
+
+    <!-- 3D Matrix Menu Track -->
+    <div class="matrix-menu-track">
+        <button class="matrix-node-btn active-node" onclick="shiftScreen(1)">1. ಶೃತಿಗಳು</button>
+        <button class="matrix-node-btn" onclick="shiftScreen(2)">2. ಸ್ಮೃತಿಗಳು</button>
+        <button class="matrix-node-btn" onclick="shiftScreen(3)">3. ವೇದಾಂಗಗಳು (10 Qs)</button>
+        <button class="matrix-node-btn" onclick="shiftScreen(4)">4. ಇತಿಹಾಸ/ಪುರಾಣ</button>
+        <button class="matrix-node-btn" onclick="shiftScreen(5)">5. ಷಡ್ ದರ್ಶನಗಳು</button>
+        <button class="matrix-node-btn" onclick="shiftScreen(6)">6. ವಿಗ್ರಹಾರಾಧನೆ</button>
+        <button class="matrix-node-btn" onclick="shiftScreen(7)">7. ಮಹೋನ್ನತ ಸಂದೇಶ</button>
+    </div>
+
+    <!-- ACTIVITY 1: ಶೃತಿಗಳು -->
+    <div id="screen1" class="deck-screen active-screen">
+        <h2 class="deck-heading">ಆಕ್ಟಿವಿಟಿ 1: ಶೃತಿಗಳು ಮತ್ತು ವೇದ ಸ್ಕಂದಗಳು (Veda Connect)</h2>
+        <p style="margin-bottom: 20px;">ಗೆಳೆಯಾ, ವೇದಗಳ ನಾಲ್ಕು ಪ್ರಮುಖ ಸ್ಕಂದಗಳನ್ನು (ವಿಭಾಗಗಳನ್ನು) ಅವುಗಳ ತಾತ್ವಿಕ ವಿವರಣೆಯೊಂದಿಗೆ ಜೋಡಿಸು:</p>
+        <div class="node-connector-grid">
+            <div>
+                <div class="box-node" id="s1_l1" onclick="linkNodes(1, 'l1', 'সংಹೀತೆ', 101)">1. ಸಂಹಿತೆ</div>
+                <div class="box-node" id="s1_l2" style="margin-top:15px;" onclick="linkNodes(1, 'l2', 'ಬ್ರಾಹ್ಮಣ', 102)">2. ಬ್ರಾಹ್ಮಣ</div>
+                <div class="box-node" id="s1_l3" style="margin-top:15px;" onclick="linkNodes(1, 'l3', 'ಉಪನಿಷತ್ತು', 103)">3. ಉಪನಿಷತ್ತು</div>
+            </div>
+            <div>
+                <div class="box-node" id="s1_r1" onclick="linkNodes(1, 'r1', 'ವಿಧಾನ', 102)">ಯಜ್ಞ ಆಚರಣೆಯ ವಿಧಿ ವಿಧಾನಗಳನ್ನು ತಿಳಿಸುವ ವೇದ ಭಾಗ</div>
+                <div class="box-node" id="s1_r2" style="margin-top:15px;" onclick="linkNodes(1, 'r2', 'ಮಂತ್ರ', 101)">ವಿವಿಧ ದೇವತೆಗಳ ಸ್ತುತಿ ಮತ್ತು ಮಂತ್ರಗಳು</div>
+                <div class="box-node" id="s1_r3" style="margin-top:15px;" onclick="linkNodes(1, 'r3', 'ಜಿಜ್ಞಾಸೆ', 103)">ವಿಶ್ವಸೃಷ್ಟಿ ಮತ್ತು ಮನುಷ್ಯನ ಇರುವಿಕೆಯ ತಾತ್ವಿಕ ಜಿಜ್ಞಾಸೆ</div>
+            </div>
+        </div>
+        <div class="live-alert-box" id="alert1"></div>
+    </div>
+
+    <!-- ACTIVITY 2: ಸ್ಮೃತಿಗಳು -->
+    <div id="screen2" class="deck-screen">
+        <h2 class="deck-heading">ಆಕ್ಟಿವಿಟಿ 2: ಸ್ಮೃತಿಗಳು ಮತ್ತು ಧರ್ಮಸೂತ್ರಗಳ ವಿಶ್ಲೇಷಣೆ (True or False)</h2>
+        <div class="switch-container-row">
+            <span>1. 'ಸ್ಮೃತಿ' ಎಂದರೆ ಜ್ಞಾಪಿಸಿಕೊಂಡಿದ್ದು ಎಂದು ಅರ್ಥ ಹಾಗೂ ಇವುಗಳನ್ನು ಧರ್ಮಸೂತ್ರಗಳೆಂದೂ ಕರೆಯುತ್ತಾರೆ.</span>
+            <div class="switch-toggle-buttons"><button id="s2_b1_t" onclick="setSwitchAct2(1,true)">ನಿಜ</button><button id="s2_b1_f" onclick="setSwitchAct2(1,false)">ಸುಳ್ಳು</button></div>
+        </div>
+        <div class="switch-container-row">
+            <span>2. ಪ್ರಮುಖವಾದ ಹದಿನೆಂಟು ಸ್ಮೃತಿಗಳಲ್ಲಿ ಅತ್ಯಂತ ಪ್ರಾಚೀನವೂ ಮತ್ತು ಪ್ರಭಾವಶಾಲಿಯೂ ಆದುದು ಮನುಸ್ಮೃತಿಯಾಗಿದೆ.</span>
+            <div class="switch-toggle-buttons"><button id="s2_b2_t" onclick="setSwitchAct2(2,true)">ನಿಜ</button><button id="s2_b2_f" onclick="setSwitchAct2(2,false)">ಸುಳ್ಳು</button></div>
+        </div>
+        <div class="switch-container-row">
+            <span>3. ಇಂದಿನ ಆಧುನಿಕ ಪ್ರಜಾಸತ್ತಾತ್ಮಕ ಸಾಮಾಜಿಕ ಲೋಕದೃಷ್ಟಿಗೆ ನಮ್ಮ ಸಂವಿಧಾನವೇ ಮನನೀಯ ಗ್ರಂಥವಾಗಿದೆ.</span>
+            <div class="switch-toggle-buttons"><button id="s2_b3_t" onclick="setSwitchAct2(3,true)">ನಿಜ</button><button id="s2_b3_f" onclick="setSwitchAct2(3,false)">ಸುಳ್ಳು</button></div>
+        </div>
+        <button class="submit-btn" onclick="verifyAct2()">ಸ್ಮೃತಿ ನಿಯಮ ಪರಿಶೀಲಿಸು</button>
+        <div class="live-alert-box" id="alert2"></div>
+    </div>
+
+    <!-- ACTIVITY 3: ವೇದಾಂಗಗಳು (10 QUESTIONS QUIZ) -->
+    <div id="screen3" class="deck-screen">
+        <h2 class="deck-heading">ಆಕ್ಟಿವಿಟಿ 3: ವೇದಾಂಗಗಳ ಷಡ್ ಚಕ್ರಗಳು (Epic 10 Matrix Quiz)</h2>
+        <div class="progress-hud-bar"><div class="progress-bar-fill" id="barFill"></div></div>
+        <div style="font-weight: bold; margin-bottom: 15px; color: var(--sacred-gold);" id="quizCountText">ಪ್ರಶ್ನೆ ಕೋಡ್: 1 / 10</div>
+        <div id="quizQuestionText" style="font-size: 1.25rem; font-weight: bold; margin-bottom: 20px;">ಲೋಡ್ ಆಗುತ್ತಿದೆ...</div>
+        <div id="quizChoicesContainer"></div>
+        <button class="next-btn" id="nextQuizBtn" style="display:none;" onclick="nextVedicQuestion()">ಮುಂದಿನ ಚಕ್ರಕ್ಕೆ ಚಲಿಸು ➔</button>
+        <div class="live-alert-box" id="alert3"></div>
+    </div>
+
+    <!-- ACTIVITY 4: ಇತಿಹಾಸ ಮತ್ತು ಪುರಾಣಗಳು -->
+    <div id="screen4" class="deck-screen">
+        <h2 class="deck-heading">ಆಕ್ಟಿವಿಟಿ 4: ಮಹಾಕಾವ್ಯಗಳು ಮತ್ತು ಪುರಾಣಗಳ ಶೋಧ (Crypto Input)</h2>
+        <div style="display:flex; flex-direction:column; gap:20px;">
+            <div class="fib-q">1. ಭಾರತದ ಎರಡು ಅತ್ಯಂತ ಶ್ರೇಷ್ಠ ಹಾಗೂ ಧರ್ಮ ಮೌಲ್ಯಗಳ ಮಾರ್ಗದರ್ಶಿಯಾಗಿರುವ ಮಹಾಕಾವ್ಯಗಳು ಯಾವುವು? <br><input type="text" class="smart-text-input" id="act4_in1" placeholder="ರಾಮಾಯಣ ಮತ್ತು ಮಹಾಭಾರತ"></div>
+            <div class="fib-q">2. ಸನಾತನ ಧರ್ಮದ ಆಕರಗಳಲ್ಲಿ ದೇವತೆಗಳ ಕಥೆ ಮತ್ತು ಅರಸರ ವಂಶಾವಳಿಗಳನ್ನು ಒಳಗೊಂಡಿರುವ ಪುರಾಣಗಳ ಒಟ್ಟು ಸಂಖ್ಯೆ ಎಷ್ಟು? <br><input type="text" class="smart-text-input" id="act4_in2" placeholder="ಸಂಖ್ಯೆ ಬರೆಯಿರಿ (ಉದಾ: 18)"></div>
+            <div class="fib-q">3. 'ಅಸತ್ಯದಿಂದ ಶಾಶ್ವತ ಸತ್ಯದೆಡೆಗೆ, ಕತ್ತಲೆಯಿಂದ ಬೆಳಕಿನೆಡೆಗೆ ನಡೆಸು' ಎಂಬ ಪ್ರಾರ್ಥನೆ ಯಾವ ಉಪನಿಷತ್ತಿನಲ್ಲಿದೆ? <br><input type="text" class="smart-text-input" id="act4_in3" placeholder="ಉಪನಿಷತ್ತಿನ ಹೆಸರು ಬರೆಯಿರಿ"></div>
+        </div>
+        <button class="submit-btn" onclick="verifyAct4()">ಮಹಾಕಾವ್ಯ ಕೋಡ್ ಕ್ರಾಕ್ ಮಾಡು</button>
+        <div class="live-alert-box" id="alert4"></div>
+    </div>
+
+    <!-- ACTIVITY 5: ದರ್ಶನಗಳು -->
+    <div id="screen5" class="deck-screen">
+        <h2 class="deck-heading">ಆಕ್ಟಿವಿಟಿ 5: ಆಸ್ತಿಕ ಮತ್ತು ನಾಸ್ತಿಕ ದರ್ಶನಗಳು (Darshana Matrix Gate)</h2>
+        <p style="margin-bottom: 15px;">ವೇದಗಳನ್ನು ಪ್ರಮಾಣವೆಂದು ಒಪ್ಪುವ ದರ್ಶನಗಳನ್ನು **ಆಸ್ತಿಕ** ಎಂದೂ, ಒಪ್ಪದ ದರ್ಶನಗಳನ್ನು **ನಾಸ್ತಿಕ** ಎಂದೂ ಗುರುತಿಸಿ ಗೆಳೆಯಾ:</p>
+        <div class="switch-container-row">
+            <span>1. ನ್ಯಾಯ, ವೈಶೇಷಿಕ, ಯೋಗ, ಸಾಂಖ್ಯ, ಪೂರ್ವ ಮತ್ತು ಉತ್ತರ ಮೀಮಾಂಸಾ ದರ್ಶನಗಳು:</span>
+            <div class="switch-toggle-buttons"><button id="s5_b1_t" onclick="setSwitchAct5(1,'astika')">ಆಸ್ತಿಕ</button><button id="s5_b1_f" onclick="setSwitchAct5(1,'nastika')">ನಾಸ್ತಿಕ</button></div>
+        </div>
+        <div class="switch-container-row">
+            <span>2. ಜೈನ, ಬೌದ್ಧ ಹಾಗೂ ಚಾರ್ವಾಕ ದರ್ಶನಗಳು:</span>
+            <div class="switch-toggle-buttons"><button id="s5_b2_t" onclick="setSwitchAct5(2,'astika')">ಆಸ್ತಿಕ</button><button id="s5_b2_f" onclick="setSwitchAct5(2,'nastika')">ನಾಸ್ತಿಕ</button></div>
+        </div>
+        <div class="switch-container-row">
+            <span>3. ಒಟ್ಟು ಪ್ರಮುಖ ವೈದಿಕ ದರ್ಶನಗಳ (ಆಸ್ತಿಕ ದರ್ಶನಗಳ) ಸಂಖ್ಯೆ ಎಷ್ಟು?</span>
+            <div class="switch-toggle-buttons"><button id="s5_b3_t" onclick="setSwitchAct5(3,'six')">ಆರು (6)</button><button id="s5_b3_f" onclick="setSwitchAct5(3,'four')">ನಾಲ್ಕು (4)</button></div>
+        </div>
+        <button class="submit-btn" onclick="verifyAct5()">ದರ್ಶನ ಮ್ಯಾಟ್ರಿಕ್ಸ್ ಕಳುಹಿಸು</button>
+        <div class="live-alert-box" id="alert5"></div>
+    </div>
+
+    <!-- ACTIVITY 6: ವಿಗ್ರಹಾರಾಧನೆ -->
+    <div id="screen6" class="deck-screen">
+        <h2 class="deck-heading">ಆಕ್ಟಿವಿಟಿ 6: ವಿಗ್ರಹಾರಾಧನೆ ಮತ್ತು ಆಗಮ ಸಾಹಿತ್ಯ (Agama Cipher Deck)</h2>
+        <div style="display:flex; flex-direction:column; gap:20px;">
+            <div class="fib-q">1. ನಾಮ (ಹೆಸರು) ಮತ್ತು ರೂಪ (ಆಕೃತಿ) ಇವೆರಡನ್ನೂ ಹೊಂದಿರುವ ದೇವರ ಆರಾಧನೆಯನ್ನು ಏನೆಂದು ಕರೆಯುತ್ತಾರೆ? <br><input type="text" class="smart-text-input" id="act6_in1" placeholder="ಸಗುಣ / ನಿರ್ಗುಣ?"></div>
+            <div class="fib-q">2. ದೇವರ ವಿಗ್ರಹಾರಾಧನೆಗೆ ಹೆಚ್ಚಿನ ಅವಕಾಶ ಕಲ್ಪಿಸಿಕೊಟ್ಟ ವೈದಿಕ ಶಾಖೆಯ ಸಾಹಿತ್ಯ ಯಾವುದು? <br><input type="text" class="smart-text-input" id="act6_in2" placeholder="ಆಗಮ ಸಾಹಿತ್ಯ / ಶೃತಿ ಸಾಹಿತ್ಯ?"></div>
+            <div class="fib-q">3. ಆಗಮ ಶಾಖೆಗಳಲ್ಲಿ ಶಿವನನ್ನು ಆರಾಧಿಸುವ ಪ್ರಮುಖ ಶಾಖೆಯ ಹೆಸರೇನು? <br><input type="text" class="smart-text-input" id="act6_in3" placeholder="ಶೈವ / ವೈಷ್ಣವ / ಶಾಕ್ತ?"></div>
+        </div>
+        <button class="submit-btn" onclick="verifyAct6()">ಆಗಮ ಕೋಡ್ ದೃಢೀಕರಿಸು</button>
+        <div class="live-alert-box" id="alert6"></div>
+    </div>
+
+    <!-- ACTIVITY 7: ಮಹೋನ್ನತ ಸಂದೇಶ -->
+    <div id="screen7" class="deck-screen">
+        <h2 class="deck-heading">ಆಕ್ಟಿವಿಟಿ 7: ಸನಾತನ ಧರ್ಮದ ಜಾಗತಿಕ ಸಂದೇಶ (Dropdown Connector)</h2>
+        <div class="node-connector-grid">
+            <div>
+                <div class="switch-container-row">1. ಆ ನೋ ಭದ್ರಾಃ ಕ್ರತವೋ ಯನ್ನು ವಿಶ್ವತಃ</div>
+                <div class="switch-container-row">2. ಸ್ವಾಮಿ ವಿವೇಕಾನಂದರ ಚಿಕಾಗೋ ಭಾಷಣ</div>
+                <div class="switch-container-row">3. ಸನಾತನ ಧರ್ಮದ ತಾತ್ವಿಕ ನಿಲುವು</div>
+                <div class="switch-container-row">4. ಸರ್ವೇ ಭವನ್ತು ಸುಖಿನಃ</div>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:20px; justify-content:center;">
+                <select id="dropLink1" class="smart-text-input" style="width:100%; max-width:100%;">
+                    <option value="">ಸರಿಯಾದ ಸಂದೇಶ ಲಿಂಕ್ ಮಾಡಿ</option>
+                    <option value="A">ದಿನಾಂಕ: ೨೭-೯-೧೮೯೩ ರ ಸೌಹಾರ್ದತೆಯ ಸಂದೇಶ</option>
+                    <option value="B">ವಿಶ್ವದ ಎಲ್ಲ ಕಡೆಗಳಿಂದಲೂ ಒಳ್ಳೆಯ ಸಂಗತಿಗಳು ಬರಲಿ</option>
+                    <option value="C">ಎಲ್ಲರೂ ಸುಖ ಮತ್ತು ಚಿಂತೆಗಳಿಂದ ಮುಕ್ತವಾಗಿರಲಿ</option>
+                    <option value="D">ತಾತ್ವಿಕವಾಗಿ ಬಹುತ್ವ ಹಾಗೂ ವೈವಿಧ್ಯತೆಯನ್ನು ಒಪ್ಪುವುದು</option>
+                </select>
+                <select id="dropLink2" class="smart-text-input" style="width:100%; max-width:100%;">
+                    <option value="">ಸರಿಯಾದ ಸಂದೇಶ ಲಿಂಕ್ ಮಾಡಿ</option>
+                    <option value="A">ದಿನಾಂಕ: ೨೭-೯-೧೮೯೩ ರ ಸೌಹಾರ್ದತೆಯ ಸಂದೇಶ</option>
+                    <option value="B">ವಿಶ್ವದ ಎಲ್ಲ ಕಡೆಗಳಿಂದಲೂ ಒಳ್ಳೆಯ ಸಂಗತಿಗಳು ಬರಲಿ</option>
+                    <option value="C">ಎಲ್ಲರೂ ಸುಖ ಮತ್ತು ಚಿಂತೆಗಳಿಂದ ಮುಕ್ತವಾಗಿರಲಿ</option>
+                    <option value="D">ತಾತ್ವಿಕವಾಗಿ ಬಹುತ್ವ ಹಾಗೂ ವೈವಿಧ್ಯತೆಯನ್ನು ಒಪ್ಪುವುದು</option>
+                </select>
+                <select id="dropLink3" class="smart-text-input" style="width:100%; max-width:100%;">
+                    <option value="">ಸರಿಯಾದ ಸಂದೇಶ ಲಿಂಕ್ ಮಾಡಿ</option>
+                    <option value="A">ದಿನಾಂಕ: ೨೭-೯-೧೮೯೩ ರ ಸೌಹಾರ್ದತೆಯ ಸಂದೇಶ</option>
+                    <option value="B">ವಿಶ್ವದ ಎಲ್ಲ ಕಡೆಗಳಿಂದಲೂ ಒಳ್ಳೆಯ ಸಂಗತಿಗಳು ಬರಲಿ</option>
+                    <option value="C">ಎಲ್ಲರೂ ಸುಖ ಮತ್ತು ಚಿಂತೆಗಳಿಂದ ಮುಕ್ತವಾಗಿರಲಿ</option>
+                    <option value="D">ತಾತ್ವಿಕವಾಗಿ ಬಹುತ್ವ ಹಾಗೂ ವೈವಿಧ್ಯತೆಯನ್ನು ಒಪ್ಪುವುದು</option>
+                </select>
+                <select id="dropLink4" class="smart-text-input" style="width:100%; max-width:100%;">
+                    <option value="">ಸರಿಯಾದ ಸಂದೇಶ ಲಿಂಕ್ ಮಾಡಿ</option>
+                    <option value="A">ದಿನಾಂಕ: ೨೭-೯-೧೮೯೩ ರ ಸೌಹಾರ್ದತೆಯ ಸಂದೇಶ</option>
+                    <option value="B">ವಿಶ್ವದ ಎಲ್ಲ ಕಡೆಗಳಿಂದಲೂ ಒಳ್ಳೆಯ ಸಂಗತಿಗಳು ಬರಲಿ</option>
+                    <option value="C">ಎಲ್ಲರೂ ಸುಖ ಮತ್ತು ಚಿಂತೆಗಳಿಂದ ಮುಕ್ತವಾಗಿರಲಿ</option>
+                    <option value="D">ತಾತ್ವಿಕವಾಗಿ ಬಹುತ್ವ ಹಾಗೂ ವೈವಿಧ್ಯತೆಯನ್ನು ಒಪ್ಪುವುದು</option>
+                </select>
+            </div>
+        </div>
+        <button class="submit-btn" onclick="verifyAct7()">ಅಂತಿಮ ಜ್ಞಾನ ಲಿಂಕ್ ಪೂರ್ಣಗೊಳಿಸು</button>
+        <div class="live-alert-box" id="alert7"></div>
+    </div>
+
+    <script>
+        let liveXP = 0;
+        function addXP(value) {
+            liveXP += value;
+            document.getElementById("liveXPBoard").innerText = `ಗಳಿಸಿದ ಜ್ಞಾನದ ಅಂಕಗಳು: ${liveXP.toString().padStart(4, '0')} XP`;
+        }
+
+        function shiftScreen(index) {
+            document.querySelectorAll('.deck-screen').forEach(el => el.classList.remove('active-screen'));
+            document.querySelectorAll('.matrix-node-btn').forEach(el => el.classList.remove('active-node'));
+            document.getElementById('screen' + index).classList.add('active-screen');
+            event.target.classList.add('active-node');
+        }
+
+        // Act 1 Connector Logic
+        let selectedL = null; let selectedR = null;
+        function linkNodes(actNum, side, text, matchId) {
+            let elId = `s${actNum}_${side}`;
+            if(side.startsWith('l')) {
+                if(selectedL) document.getElementById(selectedL.id).classList.remove('active-node-select');
+                selectedL = { id: elId, match: matchId };
+            } else {
+                if(selectedR) document.getElementById(selectedRight) ? document.getElementById(selectedR.id).classList.remove('active-node-select') : null;
+                selectedR = { id: elId, match: matchId };
+            }
+            document.getElementById(elId).classList.add('active-node-select');
+
+            if(selectedL && selectedR) {
+                if(selectedL.match === selectedR.match) {
+                    document.getElementById(selectedL.id).style.background = "var(--glow-green)";
+                    document.getElementById(selectedL.id).style.color = "black";
+                    document.getElementById(selectedR.id).style.background = "var(--glow-green)";
+                    document.getElementById(selectedR.id).style.color = "black";
+                    addXP(100);
+                    triggerAlert(1, "ಸರಿಯಾದ ಹೊಂದಾಣಿಕೆ ಗೆಳೆಯಾ! ಶೃತಿಗಳ ಜ್ಞಾನ ಅದ್ಭುತವಾಗಿದೆ.", true);
+                } else {
+                    triggerAlert(1, "ತಪ್ಪಾದ ಹೊಂದಾಣಿಕೆ, ಮತ್ತೊಮ್ಮೆ ಪ್ರಯತ್ನಿಸು.", false);
+                    document.getElementById(selectedL.id).classList.remove('active-node-select');
+                    document.getElementById(selectedR.id).classList.remove('active-node-select');
+                }
+                selectedL = null; selectedR = null;
+            }
+        }
+
+        // Act 2 Logic
+        let act2Switches = {1: null, 2: null, 3: null};
+        function setSwitchAct2(num, val) {
+            act2Switches[num] = val;
+            document.getElementById(`s2_b${num}_t`).classList.remove('triggered');
+            document.getElementById(`s2_b${num}_f`).classList.remove('triggered');
+            if(val) document.getElementById(`s2_b${num}_t`).classList.add('triggered');
+            else document.getElementById(`s2_b${num}_f`).classList.add('triggered');
+        }
+        function verifyAct2() {
+            if(act2Switches[1] === true && act2Switches[2] === true && act2Switches[3] === true) {
+                addXP(150);
+                triggerAlert(2, "ವಾಹ್ ಗೆಳೆಯಾ! ಸ್ಮೃತಿ ಮತ್ತು ಧರ್ಮಸೂತ್ರಗಳ ಎಲ್ಲಾ ಹೇಳಿಕೆಗಳು ಸರಿಯಾಗಿವೆ!", true);
+            } else {
+                triggerAlert(2, "ದೋಷವಿದೆ ಪರಿಶೀಲಿಸು ಗೆಳೆಯಾ! (ಮನುಸ್ಮೃತಿ ಪ್ರಾಚೀನವಾದುದು ಮತ್ತು ಇಂದು ಸಂವಿಧಾನವೇ ನಮ್ಮ ಮುಖ್ಯ ಗ್ರಂಥ)", false);
+            }
+        }
+
+        // Act 3 Quiz Pool (10 Unique Content Questions on Vedangas)
+        const vedangaQuizPool = [
+            { q: "1. ವೇದಗಳ ಸರಿಯಾದ ಉಚ್ಚಾರಣೆ ಮತ್ತು ಪ್ರಯೋಗಕ್ಕಾಗಿ ರೂಪಿತವಾದ ಸಹಾಯಕ ವಿದ್ಯೆಗಳನ್ನು ಏನೆಂದು ಕರೆಯುತ್ತಾರೆ?", o: ["ಉಪನಿಷತ್ತುಗಳು", "ವೇದಾಂಗಗಳು (Vedangas)", "ದರ್ಶನಗಳು"], c: 1 },
+            { q: "2. ವೇದಗಳ ಭಾಗವಾದ ಒಟ್ಟು ಪ್ರಮುಖ ವೇದಾಂಗಗಳ ಸಂಖ್ಯೆ ಎಷ್ಟು?", o: ["ನಾಲ್ಕು (4)", "ಹದಿನೆಂಟು (18)", "ಆರು (6)"], c: 2 },
+            { q: "3. ವೇದಾಂಗಗಳ ಮೊದಲನೇ ಅಂಗವಾದ 'ಶಿಕ್ಷಾ' ಎಂಬುದು ಯಾವುದಕ್ಕೆ ಸಂಬಂಧಿಸಿದೆ?", o: ["ಯಜ್ಞ ವಿಧಾನ", "ಶಬ್ದಗಳ ಉಚ್ಚಾರಣೆ (Phonetics)", "ಜ್ಯೋತಿಷ್ಯ ಶಾಸ್ತ್ರ"], c: 1 },
+            { q: "4. ಯಜ್ಞ ಯಾಗಾದಿಗಳ ವಿಧಿ ವಿಧಾನಗಳನ್ನು ಕ್ರಮಬದ್ಧವಾಗಿ ತಿಳಿಸುವ ವೇದಾಂಗ ಯಾವುದು?", o: ["ಕಲ್ಪ (Kalpa)", "ವ್ಯಾಕರಣ", "ಛಂದಸ್ಸು"], c: 0 },
+            { q: "5. ವೇದಗಳಲ್ಲಿ ಬರುವ ಕಠಿಣ ಶಬ್ದಗಳ ಅರ್ಥವನ್ನು ನಿರ್ಣಯಿಸುವ ಶಾಸ್ತ್ರಕ್ಕೆ (ನಿರುಕ್ತ) ಏನನ್ನುತ್ತಾರೆ?", o: ["ಶಬ್ದಾರ್ಥ ನಿರ್ಣಯ ಶಾಸ್ತ್ರ", "ಛಂದಶ್ಶಾಸ್ತ್ರ", "ಜ್ಯೋತಿಷ್ಯ"], c: 0 },
+            { q: "6. ಅಪಾರವಾದ ವೇದರಾಶಿಯನ್ನು ವಿಭಜನೆ (ವ್ಯಾಸ) ಮಾಡಿ 'ವೇದವ್ಯಾಸ' ಎಂದು ಪ್ರಸಿದ್ಧರಾದ ಋಷಿಗಳ ಮೂಲ ಹೆಸರೇನು?", o: ["ಶುಕಮುನಿಗಳು", "ಕೃಷ್ಣದೈಪಾಯನರು", "ಕೌಟಿಲ್ಯ"], c: 1 },
+            { q: "7. ವೇದಗಳನ್ನು ಪ್ರಮಾಣವೆಂದು ಒಪ್ಪುವ ದರ್ಶನಗಳನ್ನು ಯಾವ ಗುಂಪಿಗೆ ಸೇರಿಸಲಾಗುತ್ತದೆ?", o: ["ನಾಸ್ತಿಕ ದರ್ಶನಗಳು", "ಅವೈದಿಕ ದರ್ಶನಗಳು", "ಆಸ್ತಿಕ ದರ್ಶನಗಳು"], c: 2 },
+            { q: "8. ವೈದಿಕ ಆಗಮ ಸಾಹಿತ್ಯದಲ್ಲಿ ದೇವರ ಆರಾಧನೆಯು ಪ್ರಮುಖವಾಗಿ ಏನನ್ನು ಪ್ರತಿಪಾದಿಸಿತು?", o: ["ದೇವರ ವಿಗ್ರಹಾರಾಧನೆ (Iconography)", "ನಿರಾಕಾರ ಧ್ಯಾನ", "ಯಜ್ಞಗಳನ್ನು ಮಾತ್ರ ಮಾಡುವುದು"], c: 0 },
+            { q: "9. ಬ್ರಹ್ಮವನ್ನು ಆಕೃತಿ ಮತ್ತು ಹೆಸರುಗಳಿಲ್ಲದೇ ವಿವರಿಸುವ ವೇದಗಳ ಪರಿಕಲ್ಪನೆ ಯಾವುದು?", o: ["ಸಗುಣ ಬ್ರಹ್ಮ", "ನಿರ್ಗುಣ ಬ್ರಹ್ಮ", "ಆಗಮ ಬ್ರಹ್ಮ"], c: 1 },
+            { q: "10. 'ಸಂಘರ್ಷವಲ್ಲ ಸೌಹಾರ್ದ; ವಿನಾಶವಲ್ಲ ಸ್ವೀಕಾರ' ಎಂದು ಚಿಕಾಗೋದಲ್ಲಿ ಘರ್ಜಿಸಿದ ಭಾರತದ ಸಾಂಸ್ಕೃತಿಕ ನಾಯಕ ಯಾರು?", o: ["ಶ್ರೀವಿಜಯ", "ವೇದವ್ಯಾಸರು", "ಸ್ವಾಮಿ ವಿವೇಕಾನಂದರು"], c: 2 }
+        ];
+
+        let quizIdx = 0; let userScore = 0; let quizActive = true;
+        function loadQuizQuestion() {
+            quizActive = true;
+            document.getElementById("nextQuizBtn").style.display = "none";
+            document.getElementById("alert3").style.display = "none";
+            let currentQ = vedangaQuizPool[quizIdx];
+            document.getElementById("quizCountText").innerText = `ಪ್ರಶ್ನೆ ಕೋಡ್: ${quizIdx + 1} / 10`;
+            document.getElementById("barFill").style.width = `${(quizIdx + 1) * 10}%`;
+            document.getElementById("quizQuestionText").innerText = currentQ.q;
+            
+            let optionsDiv = document.getElementById("quizChoicesContainer");
+            optionsDiv.innerHTML = "";
+            currentQ.o.forEach((opt, i) => {
+                let div = document.createElement("div");
+                div.classList.add("quiz-choice-row");
+                div.innerText = opt;
+                div.onclick = function() {
+                    if(!quizActive) return;
+                    quizActive = false;
+                    if(i === currentQ.c) {
+                        this.classList.add("win-glow");
+                        userScore++; addXP(30);
+                        triggerAlert(3, "ಅತ್ಯುತ್ತಮ ಉತ್ತರ! ವೇದಾಂಗಗಳ ಜ್ಞಾನ ಅದ್ಭುತವಾಗಿದೆ.", true);
+                    } else {
+                        this.classList.add("lose-glow");
+                        optionsDiv.children[currentQ.c].classList.add("win-glow");
+                        triggerAlert(3, "ಉತ್ತರ ತಪ್ಪಾಗಿದೆ! ಸರಿಯಾದದ್ದನ್ನು ಹಸಿರು ಬಣ್ಣದಲ್ಲಿ ಗುರುತಿಸಲಾಗಿದೆ.", false);
+                    }
+                    document.getElementById("nextQuizBtn").style.display = "inline-block";
+                };
+                optionsDiv.appendChild(div);
+            });
+        }
+        function nextVedicQuestion() {
+            quizIdx++;
+            if(quizIdx < vedangaQuizPool.length) {
+                loadQuizQuestion();
+            } else {
+                document.getElementById("quizCountText").innerText = "ಚಕ್ರವ್ಯೂಹ ಮುಕ್ತಾಯ!";
+                document.getElementById("quizQuestionText").innerText = `ತರಗತಿಯ ಒಟ್ಟು ಸ್ಕೋರ್: ${userScore} / 10`;
+                document.getElementById("quizChoicesContainer").innerHTML = "";
+                document.getElementById("nextQuizBtn").style.display = "none";
+                triggerAlert(3, userScore >= 7 ? "ಅಪ್ರತಿಮ ವೇದ ಪಂಡಿತರು ಗೆಳೆಯಾ!" : "ಉತ್ತಮ ಪ್ರಯತ್ನ, ಮತ್ತೊಮ್ಮೆ ಓದಿ ತಿಳಿಯಿರಿ!", true);
+            }
+        }
+        loadQuizQuestion();
+
+        // Act 4 Logic
+        function verifyAct4() {
+            let i1 = document.getElementById("act4_in1").value.trim();
+            let i2 = document.getElementById("act4_in2").value.trim();
+            let i3 = document.getElementById("act4_in3").value.trim();
+
+            if((i1 === "ರಾಮಾಯಣ ಮತ್ತು ಮಹಾಭಾರತ" || i1 === "ಮಹಾಭಾವ್ಯಗಳು") && i2 === "18" && (i3 === "ಬೃಹದಾರಣ್ಯಕ ಉಪನಿಷತ್ತು" || i3 === "ಬೃಹದಾರಣ್ಯಕ")) {
+                addXP(150);
+                triggerAlert(4, "ಸರಿಯಾದ ಕೋಡ್! ಕಾವ್ಯ ಮತ್ತು ಪುರಾಣಗಳ ಮಾಹಿತಿ ಅತ್ಯಂತ ನಿಖರವಾಗಿದೆ ಗೆಳೆಯಾ.", true);
+            } else {
+                triggerAlert(4, "ಕೆಲವು ಉತ್ತರಗಳು ತಪ್ಪಾಗಿವೆ. ಸುಳಿವು: ರಾಮಾಯಣ ಮತ್ತು ಮಹಾಭಾರತ, 18, ಬೃಹದಾರಣ್ಯಕ.", false);
+            }
+        }
+
+        // Act 5 Logic
+        let act5Switches = {1: null, 2: null, 3: null};
+        function setSwitchAct5(num, type) {
+            act5Switches[num] = type;
+            document.getElementById(`s5_b${num}_t`).classList.remove('triggered');
+            document.getElementById(`s5_b${num}_f`).classList.remove('triggered');
+            if(type === 'astika' || type === 'six') document.getElementById(`s5_b${num}_t`).classList.add('triggered');
+            else document.getElementById(`s5_b${num}_f`).classList.add('triggered');
+        }
+        function verifyAct5() {
+            if(act5Switches[1] === 'astika' && act5Switches[2] === 'nastika' && act5Switches[3] === 'six') {
+                addXP(150);
+                triggerAlert(5, "ಷಡ್ ದರ್ಶನಗಳ ಮ್ಯಾಟ್ರಿಕ್ಸ್ ಗೇಟ್ ಯಶಸ್ವಿಯಾಗಿ ಅನ್ ಲಾಕ್ ಆಗಿದೆ!", true);
+            } else {
+                triggerAlert(5, "ದರ್ಶನಗಳ ವರ್ಗೀಕರಣದಲ್ಲಿ ದೋಷವಿದೆ ಪರಿಶೀಲಿಸು. (ವೈದಿಕ ದರ್ಶನಗಳು ಆರು ಹಾಗೂ ಜೈನ/ಬೌದ್ಧ ನಾಸ್ತಿಕ ಗುಂಪು)", false);
+            }
+        }
+
+        // Act 6 Logic
+        function verifyAct6() {
+            let i1 = document.getElementById("act6_in1").value.trim();
+            let i2 = document.getElementById("act6_in2").value.trim();
+            let i3 = document.getElementById("act6_in3").value.trim();
+
+            if(i1 === "ಸಗುಣ" && a6_check(i2) && i3 === "ಶೈವ") {
+                addXP(150);
+                triggerAlert(6, "ಪೂಜಾ ಪದ್ಧತಿ ಮತ್ತು ಆಗಮ ಶಾಖೆಗಳ ಕೋಡ್ ಕ್ರಾಕ್ ಆಗಿದೆ! ಪಕ್ಕಾ ಸರಿ.", true);
+            } else {
+                triggerAlert(6, "ಉತ್ತರ ತಪ್ಪಾಗಿದೆ ಗೆಳೆಯಾ! ಸುಳಿವು: ಸಗುಣ, ಆಗಮ ಸಾಹಿತ್ಯ, ಶೈವ.", false);
+            }
+        }
+        function a6_check(val) { return val === "ಆಗಮ ಸಾಹಿತ್ಯ" || val === "ಆಗಮ" || val === "ಆಗಮಗಳು"; }
+
+        // Act 7 Logic
+        function verifyAct7() {
+            let d1 = document.getElementById("dropLink1").value;
+            let d2 = document.getElementById("dropLink2").value;
+            let d3 = document.getElementById("dropLink3").value;
+            let d4 = document.getElementById("dropLink4").value;
+
+            if(d1 === 'B' && d2 === 'A' && d3 === 'D' && d4 === 'C') {
+                addXP(250);
+                triggerAlert(7, "ವಾಹ್ ಗೆಳೆಯಾ! ಅಂತಿಮ ಜ್ಞಾನ ಲಿಂಕ್ ಸಂಪೂರ್ಣ ಯಶಸ್ವಿಯಾಗಿದೆ. ಇಡೀ ಪಾಠದ ಸಿಲಬಸ್ ಕವರ್ ಆಗಿದೆ!", true);
+            } else {
+                triggerAlert(7, "ಜಾಗತಿಕ ಸಂದೇಶದ ಜೋಡಣೆ ತಪ್ಪಾಗಿದೆ, ಮತ್ತೊಮ್ಮೆ ಪರಿಶೀಲಿಸು ಗೆಳೆಯಾ.", false);
+            }
+        }
+
+        function triggerAlert(screenNum, text, success) {
+            let box = document.getElementById("alert" + screenNum);
+            box.style.display = "block";
+            box.innerText = text;
+            box.style.background = success ? "rgba(46, 204, 113, 0.15)" : "rgba(255, 82, 82, 0.1)";
+            box.style.color = success ? "var(--glow-green)" : "var(--alert-red)";
+            box.style.border = success ? "1px solid var(--glow-green)" : "1px solid var(--alert-red)";
+        }
+    </script>
+</body>
+</html>

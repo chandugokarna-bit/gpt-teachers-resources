@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಗ್ಲೋಬಲ್ ಟ್ರೇಡ್ ಹಬ್ ೧೬.೦ - ವ್ಯವಹಾರ ಅಧ್ಯಯನ ಸಿಮ್ಯುಲೇಟರ್</title>
+    <style>
+        :root {
+            --trade-blue: #0fbcf9;
+            --profit-green: #05c46b;
+            --gold-coin: #ffdd59;
+            --neon-pink: #ef5777;
+            --deep-dark: #0f172a;
+            --panel-glass: rgba(30, 41, 59, 0.95);
+            --danger-red: #f53b57;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Verdana, sans-serif; }
+
+        body {
+            background: var(--deep-dark);
+            background-image: linear-gradient(135deg, #0f172a 0%, #030712 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #ffffff;
+        }
+
+        header.trade-header {
+            text-align: center;
+            padding: 25px;
+            background: var(--panel-glass);
+            border: 2px solid var(--trade-blue);
+            border-radius: 24px;
+            box-shadow: 0 0 30px rgba(15, 188, 249, 0.25);
+            margin-bottom: 25px;
+        }
+
+        header.trade-header h1 {
+            color: var(--trade-blue);
+            font-size: 2.4rem;
+            text-shadow: 0 0 12px rgba(15, 188, 249, 0.4);
+            margin-bottom: 5px;
+        }
+
+        header.trade-header p { color: #cbd5e1; font-size: 1.15rem; }
+
+        /* LIVE CLASSROOM HUD: CUSTOMER SATISFACTION INDEX */
+        .trade-hud {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #1e293b;
+            padding: 15px 25px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            border-left: 5px solid var(--gold-coin);
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .satisfaction-bar-container {
+            background: #334155;
+            width: 45%;
+            height: 18px;
+            border-radius: 9px;
+            overflow: hidden;
+            border: 1px solid var(--profit-green);
+        }
+
+        .satisfaction-bar-fill {
+            background: linear-gradient(90deg, var(--profit-green), #4cd137);
+            height: 100%;
+            width: 100%;
+            transition: width 0.4s ease;
+        }
+
+        /* Sub-Menu Slider Steppers */
+        .trade-track-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 35px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+
+        .trade-track-row::-webkit-scrollbar { height: 6px; }
+        .trade-track-row::-webkit-scrollbar-thumb { background: var(--trade-blue); border-radius: 3px; }
+
+        .trade-card {
+            background: #1e293b;
+            border: 1px solid #334155;
+            padding: 12px 25px;
+            border-radius: 14px;
+            cursor: pointer;
+            font-weight: bold;
+            white-space: nowrap;
+            transition: all 0.3s;
+        }
+
+        .trade-card:hover, .trade-card.active-mission {
+            background: var(--trade-blue);
+            color: #000000;
+            border-color: #ffffff;
+            box-shadow: 0 0 15px var(--trade-blue);
+            transform: translateY(-3px);
+        }
+
+        /* Core Screen Box */
+        .trade-arena {
+            background: var(--panel-glass);
+            border: 2px solid #334155;
+            border-radius: 24px;
+            padding: 35px;
+            min-height: 520px;
+            display: none;
+            box-shadow: 0 20px 45px rgba(0,0,0,0.5);
+        }
+
+        .trade-arena.active-arena { display: block; animation: tradeBoot 0.4s ease; }
+
+        @keyframes tradeBoot {
+            from { opacity: 0; transform: scale(0.98); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        h2.arena-title {
+            font-size: 1.65rem;
+            color: var(--gold-coin);
+            margin-bottom: 25px;
+            border-bottom: 1px dashed rgba(255, 221, 89, 0.3);
+            padding-bottom: 12px;
+        }
+
+        /* Grid Connector System */
+        .grid-connector-system {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .trade-node {
+            background: #1e293b;
+            padding: 18px;
+            border-radius: 14px;
+            cursor: pointer;
+            border: 2px solid #334155;
+            font-weight: bold;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .trade-node:hover { border-color: var(--trade-blue); background: #223047; }
+        .trade-node.node-selected { background: var(--trade-blue); color: black; border-color: white; font-weight: bold; box-shadow: 0 0 12px var(--trade-blue); }
+
+        /* Quiz Row Elements */
+        .quiz-box-row {
+            background: #1e293b;
+            border: 2px solid #334155;
+            padding: 16px;
+            margin: 12px 0;
+            border-radius: 14px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+        }
+
+        .quiz-box-row:hover { border-color: var(--trade-blue); transform: translateX(5px); }
+        .quiz-box-row.correct-glow { background: rgba(5, 196, 107, 0.2); border-color: var(--profit-green); color: #55efc4; }
+        .quiz-box-row.wrong-glow { background: rgba(245, 59, 87, 0.2); border-color: var(--danger-red); color: #ff7675; }
+
+        /* Inputs Base styling */
+        .smart-trade-input {
+            background: #030712;
+            border: 2px solid #334155;
+            border-radius: 10px;
+            padding: 12px;
+            font-size: 1.1rem;
+            color: var(--gold-coin);
+            font-weight: bold;
+            outline: none;
+            width: 100%;
+            max-width: 320px;
+            margin-top: 8px;
+        }
+
+        .smart-trade-input:focus { border-color: var(--trade-blue); }
+
+        /* Mining Grid */
+        .mining-card-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        .ore-token {
+            background: #1e293b;
+            border: 2px solid #334155;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .ore-token.active-token { background: #aafd0f; color: black; border-color: white; }
+
+        /* Universal Action Buttons */
+        .action-btn {
+            background: linear-gradient(135deg, var(--trade-blue), #45aaf2);
+            color: black;
+            border: none;
+            padding: 14px 35px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 25px;
+            box-shadow: 0 5px 15px rgba(15, 188, 249, 0.3);
+        }
+
+        .action-btn:hover { transform: scale(1.02); box-shadow: 0 8px 25px rgba(15, 188, 249, 0.5); }
+
+        .trade-alert-box {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 12px;
+            font-weight: bold;
+            display: none;
+            font-size: 1.1rem;
+            border: 1px solid transparent;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="trade-header">
+        <h1>ವ್ಯವಹಾರ ಅಧ್ಯಯನ: ಗ್ಲೋಬಲ್ ಟ್ರೇಡ್ ಲ್ಯಾಬ್</h1>
+        <p>ಸಿಮ್ಯುಲೇಟರ್ ಮಾದರಿ ೧೬.೦ • ಉದ್ಯಮಶೀಲತೆ, ಮಾರುಕಟ್ಟೆ ಮತ್ತು ಗ್ರಾಹಕರ ಹಕ್ಕುಗಳ ಡಿಜಿಟಲ್ ಆಟಗಳು</p>
+    </div>
+
+    <div class="trade-hud">
+        <span>ಗ್ರಾಹಕರ ತೃಪ್ತಿ ಸೂಚ್ಯಂಕ (Customer Satisfaction):</span>
+        <div class="satisfaction-bar-container"><div class="satisfaction-bar-fill" id="satisfactionFill"></div></div>
+        <span style="color: var(--gold-coin);" id="liveXPCount">ಬಿಸಿನೆಸ್ ಕಾಯಿನ್ಸ್: 0000 BC</span>
+    </div>
+
+    <div class="trade-track-row">
+        <div class="trade-card active-mission" id="lvlBtn1" onclick="loadLevel(1)">1. ವ್ಯವಹಾರದ ನೈಜ ಅರ್ಥ</div>
+        <div class="trade-card" id="lvlBtn2" onclick="loadLevel(2)">2. ವಸ್ತು ವಿನಿಮಯ ಪದ್ಧತಿ</div>
+        <div class="trade-card" id="lvlBtn3" onclick="loadLevel(3)">3. ಎಪಿಕ್ 10 ವ್ಯವಹಾರ ಕ್ವಿಜ್</div>
+        <div class="trade-card" id="lvlBtn4" onclick="loadLevel(4)">4. ಆರ್ಥಿಕ ಚಟುವಟಿಕೆಗಳ ವಿಧ</div>
+        <div class="trade-card" id="lvlBtn5" onclick="loadLevel(5)">5. ವ್ಯವಹಾರದ ಮುಖ್ಯ ವಿಧಗಳು</div>
+        <div class="trade-card" id="lvlBtn6" onclick="loadLevel(6)">6. ಉತ್ಪಾದಕ ಮತ್ತು ಗ್ರಾಹಕ ಹಂಚಿಕೆ</div>
+        <div class="trade-card" id="lvlBtn7" onclick="loadLevel(7)">7. ವ್ಯವಹಾರದ ಪ್ರಮುಖ ಧೀಶಕ್ತಿ</div>
+    </div>
+
+    <div id="level1" class="trade-arena active-arena">
+        <h2 class="arena-title">ಹಂತ 1: ವ್ಯವಹಾರ ಪದದ ಉಗಮ ಮತ್ತು ಆಶಯ (Meaning of Business Node)</h2>
+        <p style="margin-bottom: 15px;">ಗೆಳೆಯಾ, ಇಂಗ್ಲಿಷ್‌ನ 'Business' ಪದದ ಮೂಲ ಲಕ್ಷಣ ಮತ್ತು ಅದರ ಆರ್ಥಿಕ ಆಶಯವನ್ನು ಸರಿಯಾಗಿ ಲಿಂಕ್ ಮಾಡು:</p>
+        <div class="grid-connector-system">
+            <div>
+                <div class="trade-node" id="l1_nodeL1" onclick="connectTradeNodes('L', 'l1_nodeL1', 1)">'Business' ಪದದ ಮೂಲ ಅರ್ಥ</div>
+                <div class="trade-node" id="l1_nodeL2" style="margin-top:15px;" onclick="connectTradeNodes('L', 'l1_nodeL2', 2)">ವ್ಯವಹಾರದ ಅಂತಿಮ ಮೂಲ ಧೀಶಕ್ತಿ</div>
+            </div>
+            <div>
+                <div class="trade-node" id="l1_nodeR1" onclick="connectTradeNodes('R', 'l1_nodeR1', 2)">ಲಾಭ ಗಳಿಸುವುದು (Profit Earning)</div>
+                <div class="trade-node" id="l1_nodeR2" style="margin-top:15px;" onclick="connectTradeNodes('R', 'l1_nodeR2', 1)">ಯಾವಾಗಲೂ ಕಾರ್ಯನಿರತನಾಗಿರುವುದು (Being Busy)</div>
+            </div>
+        </div>
+        <div class="trade-alert-box" id="alert1"></div>
+    </div>
+
+    <div id="level2" class="trade-arena">
+        <h2 class="arena-title">ಹಂತ 2: ಹಳೆಯ ವಸ್ತು ವಿನಿಮಯ ಪದ್ಧತಿಯ ಇತಿಹಾಸ (The Barter System Crypt)</h2>
+        <div style="display:flex; flex-direction:column; gap:20px;">
+            <div class="fib-q">1. ಹಣದ ಆವಿಷ್ಕಾರಕ್ಕೆ ಮುಂಚೆ, ಹಳೆಯ ಕಾಲದಲ್ಲಿ ಒಂದು ವಸ್ತುವಿಗೆ ಬದಲಾಗಿ ಮತ್ತೊಂದು ವಸ್ತುವನ್ನು ವಿನಿಮಯ ಮಾಡಿಕೊಳ್ಳುತ್ತಿದ್ದ ಪದ್ಧತಿಯ ಹೆಸರೇನು? <br><input type="text" class="smart-trade-input" id="cryptIn1" placeholder="ಪದ್ಧತಿಯ ಹೆಸರು ಬರೆಯಿರಿ (ಉದಾ: ವಸ್ತು ವಿನಿಮಯ ಪದ್ಧತಿ)"></div>
+            <div class="fib-q">2. ವಸ್ತು ವಿನಿಮಯ ಪದ್ಧತಿಯಲ್ಲಿದ್ದ ಅತಿ ದೊಡ್ಡ ತೊಂದರೆಯೆಂದರೆ ಎರಡು ಕಡೆಯ ಅಗತ್ಯತೆಗಳ ಸಮಾನತೆ ಮತ್ತು ಮೌಲ್ಯದ ಏನಾಗಿತ್ತು? <br><input type="text" class="smart-trade-input" id="cryptIn2" placeholder="ಮಾಪನದ ಕೊರತೆ / ಹೆಚ್ಚಿನ ಹಣ?"></div>
+        </div>
+        <button class="action-btn" onclick="verifyLevel2()">ಇತಿಹಾಸದ ಕೋಡ್ ಕ್ರಾಕ್ ಮಾಡು</button>
+        <div class="trade-alert-box" id="alert2"></div>
+    </div>
+
+    <div id="level3" class="trade-arena">
+        <h2 class="arena-title">ಹಂತ 3: ಮಾರುಕಟ್ಟೆ ಮತ್ತು ಉದ್ಯಮಶೀಲತೆಯ ಮಹಾ ಸಂಗ್ರಾಮ (Epic 10 Business Quiz)</h2>
+        <div class="progress-hud-bar"><div class="progress-bar-fill" id="barFill"></div></div>
+        <div style="font-weight: bold; margin-bottom: 15px; color: var(--gold-coin);" id="quizTrackTxt">ಪ್ರಶ್ನೆ ಕೋಡ್: 1 / 10</div>
+        <div id="quizQuestionText" style="font-size: 1.25rem; font-weight: bold; margin-bottom: 20px;">ಲೋಡ್ ಆಗುತ್ತಿದೆ...</div>
+        <div id="quizOptionsContainer"></div>
+        <button class="action-btn" id="nextQuizBtn" style="display:none;" onclick="nextTradeQuestion()">ಮುಂದಿನ ಮಾರುಕಟ್ಟೆ ಹಂತಕ್ಕೆ ಚಲಿಸು ➔</button>
+        <div class="trade-alert-box" id="alert3"></div>
+    </div>
+
+    <div id="level4" class="trade-arena">
+        <h2 class="arena-title">ಹಂತ 4: ಮಾನವನ ಆರ್ಥಿಕ ಮತ್ತು ಆರ್ಥಿಕೇತರ ಚಟುವಟಿಕೆಗಳು (Human Activities Matrix)</h2>
+        <div style="display:flex; flex-direction:column; gap:20px;">
+            <div class="fib-q">1. ಹಣ ಮತ್ತು ಆದಾಯವನ್ನು ಗಳಿಸುವ ಮುಖ್ಯ ಉದ್ದೇಶದಿಂದ ನಡೆಸುವ ಕೃಷಿ, ವ್ಯಾಪಾರ, ಉದ್ಯೋಗಗಳು ಯಾವ ಚಟುವಟಿಕೆಗಳು? <br><input type="text" class="smart-trade-input" id="thinkIn1" placeholder="ಆರ್ಥಿಕ ಚಟುವಟಿಕೆಗಳು / ಸೇವಾರ್ಥ ಚಟುವಟಿಕೆಗಳು?"></div>
+            <div class="fib-q">2. ಕೇವಲ ಪ್ರೀತಿ, ಕರುಣೆ ಮತ್ತು ಸಮಾಜ ಸೇವೆಯ ದೃಷ್ಟಿಯಿಂದ ತಾಯಿ ಮಗುವಿಗೆ ಉಣಿಸುವುದು ಅಥವಾ ರೋಗಿಗಳಿಗೆ ಉಚಿತ ಸೇವೆ ಮಾಡುವುದು ಯಾವ ಚಟುವಟಿಕೆ? <br><input type="text" class="smart-trade-input" id="thinkIn2" placeholder="ಆರ್ಥಿಕೇತರ ಚಟುವಟಿಕೆಗಳು / ಬ್ಯಾಂಕ್ ಕೆಲಸ?"></div>
+        </div>
+        <button class="action-btn" onclick="verifyLevel4()">ಚಟುವಟಿಕೆ ದೃಢೀಕರಿಸು</button>
+        <div class="trade-alert-box" id="alert4"></div>
+    </div>
+
+    <div id="level5" class="trade-arena">
+        <h2 class="arena-title">ಹಂತ 5: ವ್ಯವಹಾರದ ಪ್ರಮುಖ ಅಂಗಗಳು ಮತ್ತು ವಿಧಗಳ ಶೋಧ (Core Trade Components Mining)</h2>
+        <p style="margin-bottom: 15px;">ಗೆಳೆಯಾ, ದೇಶದ ಒಟ್ಟು ಆಂತರಿಕ ಮತ್ತು ಅಂತರರಾಷ್ಟ್ರೀಯ ವ್ಯವಹಾರದ **ಸರಿಯಾದ ಅಂಗಗಳನ್ನು ಮಾತ್ರ** ಕ್ಲಿಕ್ ಮಾಡಿ ಗಣಿ ಮಾಡು:</p>
+        <div class="mining-card-grid">
+            <div class="ore-token" id="state1" onclick="toggleStateOre('state1', true)">1. ದೇಶೀಯ ವ್ಯಾಪಾರ (Internal Trade)</div>
+            <div class="ore-token" id="state2" onclick="toggleStateOre('state2', false)">2. ಕಪ್ಪು ಮಾರುಕಟ್ಟೆ ನಡೆಸುವುದು</div>
+            <div class="ore-token" id="state3" onclick="toggleStateOre('state3', true)">3. ವಿದೇಶಿ ವ್ಯಾಪಾರ (Foreign Trade)</div>
+            <div class="ore-token" id="state4" onclick="toggleStateOre('state4', true)">4. ಸಗಟು ವ್ಯಾಪಾರ (Wholesale)</div>
+            <div class="ore-token" id="state5" onclick="toggleStateOre('state5', false)">5. ದೂರದರ್ಶನ ಜಾಹೀರಾತು ಮಾತ್ರ</div>
+            <div class="ore-token" id="state6" onclick="toggleStateOre('state6', true)">6. ಚಿಲ್ಲರೆ ವ್ಯಾಪಾರ (Retail Trade)</div>
+        </div>
+        <button class="action-btn" onclick="verifyLevel5()">ವ್ಯಾಪಾರದ ವಿಧಗಳನ್ನು ದೃಢೀಕರಿಸು</button>
+        <div class="trade-alert-box" id="alert5"></div>
+    </div>
+
+    <div id="level6" class="trade-arena">
+        <h2 class="arena-title">ಹಂತ 6: ಉತ್ಪಾದಕ, ಸಗಟು ವರ್ತಕ ಮತ್ತು ಚಿಲ್ಲರೆ ವ್ಯಾಪಾರಿಯ ಕೊಂಡಿ (Supply Chain Sorting)</h2>
+        <p style="margin-bottom: 15px;">ಮಾರುಕಟ್ಟೆಯಲ್ಲಿ ಸರಕುಗಳು ಚಲಿಸುವ ವ್ಯವಸ್ಥಿತ ಸರಬರಾಜು ಸರಪಳಿಯ ಕೊಂಡಿಗಳನ್ನು ಅವುಗಳ ಸರಿಯಾದ ಜವಾಬ್ದಾರಿಗೆ ಹಂಚು:</p>
+        <div style="display:flex; gap:25px;">
+            <div style="flex:1; display:flex; flex-direction:column; gap:10px;" id="organSource">
+                <div style="background:#2c3e50; padding:12px; border-radius:10px; cursor:grab; font-weight:bold;" draggable="true" id="org1" ondragstart="startOrganDrag(event)">ಉತ್ಪಾದಕ (Producer)</div>
+                <div style="background:#2c3e50; padding:12px; border-radius:10px; cursor:grab; font-weight:bold;" draggable="true" id="org2" ondragstart="startOrganDrag(event)">ಸಗಟು ವ್ಯಾಪಾರಿ (Wholesaler)</div>
+                <div style="background:#2c3e50; padding:12px; border-radius:10px; cursor:grab; font-weight:bold;" draggable="true" id="org3" ondragstart="startOrganDrag(event)">ಚಿಲ್ಲರೆ ವ್ಯಾಪಾರಿ (Retailer)</div>
+            </div>
+            <div style="flex:2; display:flex; flex-direction:column; gap:15px;">
+                <div style="background:rgba(0,0,0,0.3); border:2px dashed var(--trade-blue); padding:15px; border-radius:12px;" ondragover="allowOrganDrop(event)" ondrop="handleOrganDrop(event, 'factory')">
+                    <h3>ಕಾರ್ಖಾನೆ ಅಥವಾ ಗದ್ದೆಗಳಲ್ಲಿ ಸರಕುಗಳನ್ನು ನೇರವಾಗಿ ಸಿದ್ಧಪಡಿಸುವವನು</h3>
+                </div>
+                <div style="background:rgba(0,0,0,0.3); border:2px dashed var(--trade-blue); padding:15px; border-radius:12px;" ondragover="allowOrganDrop(event)" ondrop="handleOrganDrop(event, 'bulk')">
+                    <h3>ಉತ್ಪಾದಕರಿಂದ ಬೃಹತ್ ಪ್ರಮಾಣದಲ್ಲಿ ಸರಕುಗಳನ್ನು ಒಟ್ಟಾಗಿ ಕೊಳ್ಳುವ ಮಧ್ಯವರ್ತಿ</h3>
+                </div>
+                <div style="background:rgba(0,0,0,0.3); border:2px dashed var(--trade-blue); padding:15px; border-radius:12px;" ondragover="allowOrganDrop(event)" ondrop="handleOrganDrop(event, 'consumer')">
+                    <h3>ಸಣ್ಣ ಪ್ರಮಾಣದಲ್ಲಿ ಸರಕುಗಳನ್ನು ತಂದು ನೇರವಾಗಿ ಕೊನೆಯ ಗ್ರಾಹಕರಿಗೆ ಮಾರುವವನು</h3>
+                </div>
+            </div>
+        </div>
+        <button class="action-btn" onclick="verifyLevel6()">ಸರಪಳಿ ವಿನ್ಯಾಸ ಪರಿಶೀಲಿಸು</button>
+        <div class="trade-alert-box" id="alert6"></div>
+    </div>
+
+    <div id="level7" class="trade-arena">
+        <h2 class="arena-title">ಹಂತ 7: ವ್ಯವಹಾರದ ಸಾಮಾಜಿಕ ಉದ್ದೇಶ ಮತ್ತು ಗ್ರಾಹಕರ ಹಕ್ಕು (Business Objectives Matrix)</h2>
+        <p style="margin-bottom: 15px;">ಅಂತಿಮ ಹಂತ! ವ್ಯವಹಾರದ ಮಹತ್ವ ಹಾಗೂ ಗ್ರಾಹಕರ ಹಕ್ಕುಗಳ ಮೂಲ ತತ್ವಗಳನ್ನು ಮ್ಯಾಚ್ ಮಾಡಿ ಸಿಮ್ಯುಲೇಶನ್ ಮುಗಿಸು ಗೆಳೆಯಾ:</p>
+        <div class="grid-connector-system">
+            <div class="trade-node" id="matL1" onclick="selectFinalMatrix('L', 'matL1', 'objective')">ನ್ಯಾಯಯುತ ಬೆಲೆಗೆ ಗುಣಮಟ್ಟದ ವಸ್ತು ನೀಡುವುದು</div>
+            <div class="trade-node" id="matR1" onclick="selectFinalMatrix('R', 'matR1', 'objective')">ವ್ಯವಹಾರದ ಅತ್ಯಂತ ಪ್ರಮುಖವಾದ ಸಾಮಾಜಿಕ ಉದ್ದೇಶ</div>
+            <div class="trade-node" id="matL2" onclick="selectFinalMatrix('L', 'matL2', 'right')">ಮೋಸ ಹೋದಾಗ ಗ್ರಾಹಕರ ಹಿತರಕ್ಷಣೆ ಮತ್ತು ದೂರು</div>
+            <div class="trade-node" id="matR2" onclick="selectFinalMatrix('R', 'matR2', 'right')">ಗ್ರಾಹಕರ ವೇದಿಕೆ ಮತ್ತು ಗ್ರಾಹಕರ ಪ್ರಮುಖ ಹಕ್ಕುಗಳು</div>
+        </div>
+        <button class="action-btn" onclick="verifyLevel7()">ಟ್ರೇಡ್ ಮ್ಯಾಟ್ರಿಕ್ಸ್ ಕಂಪ್ಲೀಟ್ ಮಾಡು</button>
+        <div class="trade-alert-box" id="alert7"></div>
+    </div>
+
+    <script>
+        let tradePoints = 0; let customerSatisfaction = 100;
+        function modifyHUDTracker(bcChange, satDamage) {
+            tradePoints += bcChange;
+            customerSatisfaction = Math.max(10, customerSatisfaction - satDamage);
+            document.getElementById("liveXPCount").innerText = `ಬಿಸಿನೆಸ್ ಕಾಯಿನ್ಸ್: ${tradePoints.toString().padStart(4, '0')} BC`;
+            document.getElementById("satisfactionFill").style.width = `${customerSatisfaction}%`;
+        }
+
+        function loadLevel(levelIdx) {
+            document.querySelectorAll('.trade-arena').forEach(el => el.classList.remove('active-arena'));
+            document.querySelectorAll('.trade-card').forEach(el => el.classList.remove('active-mission'));
+            
+            document.getElementById('level' + levelIdx).classList.add('active-arena');
+            document.getElementById('lvlBtn' + levelIdx).classList.add('active-mission');
+        }
+
+        // Level 1 Logic
+        let nodeL = null; let nodeR = null;
+        function connectTradeNodes(side, id, matchVal) {
+            if(side === 'L') {
+                if(nodeL) document.getElementById(nodeL.id).classList.remove('node-selected');
+                nodeL = { id: id, match: matchVal };
+            } else {
+                if(nodeR) document.getElementById(nodeR.id).classList.remove('node-selected');
+                nodeR = { id: id, match: matchVal };
+            }
+            document.getElementById(id).classList.add('node-selected');
+
+            if(nodeL && nodeR) {
+                if(nodeL.match === nodeR.match) {
+                    document.getElementById(nodeL.id).style.background = "var(--profit-green)";
+                    document.getElementById(nodeR.id).style.background = "var(--profit-green)";
+                    modifyHUDTracker(100, 0);
+                    showTradeAlert(1, "ಸರಿಯಾದ ಜೋಡಣೆ ಗೆಳೆಯಾ! ಬಿಸಿನೆಸ್ ಶಬ್ದದ ಮೂಲ ಸರಿಹೊಂದಿದೆ.", true);
+                    document.getElementById('lvlBtn1').style.background = "var(--profit-green)";
+                } else {
+                    modifyHUDTracker(0, 10);
+                    showTradeAlert(1, "ತಪ್ಪಾದ ಜೋಡಣೆ, ಗ್ರಾಹಕರು ಅಸಂತೋಷಗೊಂಡಿದ್ದಾರೆ! ಮತ್ತೊಮ್ಮೆ ಯೋಚಿಸು.", false);
+                }
+                nodeL = null; nodeR = null;
+            }
+        }
+
+        // Level 2 Logic
+        function verifyLevel2() {
+            let c1 = document.getElementById("cryptIn1").value.trim();
+            let c2 = document.getElementById("cryptIn2").value.trim();
+
+            if((c1 === "ವಸ್ತು ವಿನಿಮಯ ಪದ್ಧತಿ" || c1 === "ವಸ್ತು ವಿನಿಮಯ") && c2 === "ಮಾಪನದ ಕೊರತೆ") {
+                modifyHUDTracker(150, 0);
+                document.getElementById('lvlBtn2').style.background = "var(--profit-green)";
+                showTradeAlert(2, "ಅದ್ಭುತ! ಹಳೆಯ ವಸ್ತು ವಿನಿಮಯ ಪದ್ಧತಿಯ ಇತಿಹಾಸ ಕೋಡ್ ಕ್ರಾಕ್ ಆಗಿದೆ.", true);
+            } else {
+                modifyHUDTracker(0, 10);
+                showTradeAlert(2, "ಕೋಡ್ ತಪ್ಪಾಗಿದೆ ಗೆಳೆಯಾ! ಸುಳಿವು: ವಸ್ತು ವಿನಿಮಯ ಪದ್ಧತಿ, ಮಾಪನದ ಕೊರತೆ.", false);
+            }
+        }
+
+        // Level 3: 10 Questions Quiz Data
+        const businessQuizPool = [
+            { q: "1. ಸರಕು ಮತ್ತು ಸೇವೆಗಳ ಉತ್ಪಾದನೆ, ಕೊಳ್ಳುವಿಕೆ ಮತ್ತು ಮಾರಾಟದ ಮೂಲಕ ಹಣ ಗಳಿಸುವ ಪ್ರಮುಖ ಆರ್ಥಿಕ ಕ್ರಿಯೆಗೆ ಏನೆನ್ನುತ್ತಾರೆ?", o: ["ಕೇವಲ ಹವ್ಯಾಸ", "ವ್ಯವಹಾರ (Business)", "ಸಮಾಜ ಸುಧಾರಣೆ"], c: 1 },
+            { q: "2. ಹಿಂದಿನ ಕಾಲದಲ್ಲಿ ವಸ್ತು ವಿನಿಮಯ ಪದ್ಧತಿಯಲ್ಲಿದ್ದ ತೊಂದರೆಗಳನ್ನು ಸಂಪೂರ್ಣವಾಗಿ ನಿವಾರಿಸಿದ ಕ್ರಾಂತಿಕಾರಿ ಆವಿಷ್ಕಾರ ಯಾವುದು?", o: ["ದೊಡ್ಡ ಹಡಗುಗಳು", "ಹಣದ ಆವಿಷ್ಕಾರ (Invention of Money)", "ಹೊಸ ರಸ್ತೆಗಳು"], c: 1 },
+            { q: "3. ಒಂದು ದೇಶದ ಗಡಿಯ ಒಳಗಡೆ ಮಾತ್ರ ನಡೆಯುವ ಆಂತರಿಕ ವ್ಯವಹಾರಕ್ಕೆ ಯಾವ ವ್ಯಾಪಾರ ಎನ್ನಲಾಗುತ್ತದೆ?", o: ["ವಿದೇಶಿ ವ್ಯಾಪಾರ", "ದೇಶೀಯ ವ್ಯಾಪಾರ (Internal Trade)", "ರಫ್ತು ವ್ಯಾಪಾರ"], c: 1 },
+            { q: "4. ನಮ್ಮ ಭಾರತ ದೇಶವು ಅಮೆರಿಕ ಅಥವಾ ದುಬೈ ದೇಶಗಳೊಂದಿಗೆ ನಡೆಸುವ ಜಾಗತಿಕ ವ್ಯವಹಾರಕ್ಕೆ ಯಾವ ವ್ಯಾಪಾರ ಎನ್ನಲಾಗುತ್ತದೆ?", o: ["ಚಿಲ್ಲರೆ ವ್ಯಾಪಾರ", "ಸಗಟು ವ್ಯಾಪಾರ", "ವಿದೇಶಿ ವ್ಯಾಪಾರ (Foreign Trade)"], c: 2 },
+            { q: "5. ಬೇರೆ ದೇಶಗಳಿಂದ ನಮ್ಮ ದೇಶಕ್ಕೆ ಅಗತ್ಯವಿರುವ ಸರಕುಗಳನ್ನು ಕೊಂಡುಕೊಳ್ಳುವ ಪ್ರಕ್ರಿಯೆಯನ್ನು ಏನೆನ್ನುತ್ತಾರೆ?", o: ["ಆಮದು (Import)", "ರಫ್ತು (Export)", "ಮರುರಫ್ತು"], c: 0 },
+            { q: "6. ನಮ್ಮ ದೇಶದಲ್ಲಿ ಹೆಚ್ಚುವರಿಯಾಗಿ ಉತ್ಪಾದನೆಯಾದ ಸರಕುಗಳನ್ನು ವಿದೇಶಗಳಿಗೆ ಮಾರಾಟ ಮಾಡುವ ಪ್ರಕ್ರಿಯೆ ಯಾವುದು?", o: ["ರಫ್ತು (Export)", "ಆಮದು", "ಸ್ಥಳೀಯ ವ್ಯಾಪಾರ"], c: 0 },
+            { q: "7. ವ್ಯಾಪಾರಿಗಳು ಗ್ರಾಹಕರಿಗೆ ಕಲಬೆರಕೆ ಮಾಡುವುದು, ತೂಕದಲ್ಲಿ ಮೋಸ ಮಾಡುವುದನ್ನು ತಡೆಯಲು ಭಾರತ ಸರ್ಕಾರ ತಂದಿರುವ ಕಾಯ್ದೆ ಯಾವುದು?", o: ["ಬ್ಯಾಂಕಿಂಗ್ ಕಾಯ್ದೆ", "ಗ್ರಾಹಕರ ಸಂರಕ್ಷಣಾ ಕಾಯ್ದೆ (Consumer Protection Act)", "ಅರಣ್ಯ ಕಾಯ್ದೆ"], c: 1 },
+            { q: "8. ಸರಕುಗಳ ವಿತರಣೆಯಲ್ಲಿ ಉತ್ಪಾದಕರಿಂದ ಚಿಲ್ಲರೆ ವ್ಯಾಪಾರಿಗೆ ಕೊಂಡಿಯಾಗಿ ಕೆಲಸ ಮಾಡುವ ವರ್ತಕ ಯಾರು?", o: ["ಸಗಟು ವ್ಯಾಪಾರಿ (Wholesaler)", "ಗ್ರಾಹಕ", "ಕಾರ್ಖಾನೆ ಮಾಲೀಕ"], c: 0 },
+            { q: "9. ವ್ಯವಹಾರದ ಮುಖ್ಯ ಆರ್ಥಿಕ ಉದ್ದೇಶ ಯಾವುದು? ಇದರ ಹೊರತಾಗಿ ವ್ಯವಹಾರ ಹೆಚ್ಚು ದಿನ ಬದುಕಲು ಸಾಧ್ಯವಿಲ್ಲ?", o: ["ಕೇವಲ ಉಚಿತವಾಗಿ ಕೊಡುವುದು", "ನ್ಯಾಯಸಮ್ಮತ ಲಾಭ ಗಳಿಸುವುದು (Earning Profit)", "ನಷ್ಟ ಅನುಭವಿಸುವುದು"], c: 1 },
+            { q: "10. ಪ್ರತಿ ವರ್ಷ ಜಾಗತಿಕ ಮಟ್ಟದಲ್ಲಿ ಗ್ರಾಹಕರ ಹಕ್ಕುಗಳ ಜಾಗೃತಿಗಾಗಿ 'ವಿಶ್ವ ಗ್ರಾಹಕರ ದಿನ'ವನ್ನು ಯಾವಾಗ ಆಚರಿಸಲಾಗುತ್ತದೆ?", o: ["ಜನವರಿ ೨೬ ರಂದು", "ಮಾರ್ಚ್ ೧೫ ರಂದು (March 15th)", "ಡಿಸೆಂಬರ್ ೫ ರಂದು"], c: 1 }
+        ];
+
+        let qIdx = 0; let qScore = 0; let isQuizActive = true;
+        function loadQuizQuestion() {
+            isQuizActive = true;
+            document.getElementById("nextQuizBtn").style.display = "none";
+            document.getElementById("alert3").style.display = "none";
+            let qData = businessQuizPool[qIdx];
+            document.getElementById("quizTrackTxt").innerText = `ಪ್ರಶ್ನೆ ಕೋಡ್: ${qIdx + 1} / 10`;
+            document.getElementById("barFill").style.width = `${(qIdx + 1) * 10}%`;
+            document.getElementById("quizQuestionText").innerText = qData.q;
+            
+            let container = document.getElementById("quizOptionsContainer");
+            container.innerHTML = "";
+            qData.o.forEach((opt, idx) => {
+                let div = document.createElement("div");
+                div.classList.add("quiz-box-row");
+                div.innerText = opt;
+                div.onclick = function() {
+                    if(!isQuizActive) return;
+                    isQuizActive = false;
+                    if(idx === qData.c) {
+                        this.classList.add("correct-glow");
+                        qScore++; modifyHUDTracker(30, 0);
+                        showTradeAlert(3, "ಸರಿಯಾದ ನಿರ್ಧಾರ! ಮಾರುಕಟ್ಟೆಯಲ್ಲಿ ನಿನ್ನ ಕಂಪನಿಯ ಶೇರು ಹೆಚ್ಚಾಗಿದೆ.", true);
+                    } else {
+                        this.classList.add("wrong-glow");
+                        container.children[qData.c].classList.add("correct-glow");
+                        modifyHUDTracker(0, 10);
+                        showTradeAlert(3, "ತಪ್ಪು ನಿರ್ಧಾರ! ಗ್ರಾಹಕರು ಬೇಸರಗೊಂಡಿದ್ದಾರೆ ಮತ್ತು ನಷ್ಟ ಸಂಭವಿಸಿದೆ.", false);
+                    }
+                    document.getElementById("nextQuizBtn").style.display = "inline-block";
+                };
+                container.appendChild(div);
+            });
+        }
+        function nextTradeQuestion() {
+            qIdx++;
+            if(qIdx < businessQuizPool.length) {
+                loadQuizQuestion();
+            } else {
+                document.getElementById("quizTrackTxt").innerText = "ಸಿಮ್ಯುಲೇಶನ್ ಮುಕ್ತಾಯ!";
+                document.getElementById("quizQuestionText").innerText = `ತರಗತಿಯ ಒಟ್ಟು ಸ್ಕೋರ್: ${qScore} / 10`;
+                document.getElementById("quizOptionsContainer").innerHTML = "";
+                document.getElementById("nextQuizBtn").style.display = "none";
+                document.getElementById('lvlBtn3').style.background = "var(--profit-green)";
+                showTradeAlert(3, qScore >= 7 ? "ಅಪ್ರತಿಮ ವ್ಯವಹಾರ ಸಾಮ್ರಾಜ್ಯದ ಚಕ್ರವರ್ತಿಗಳು ಗೆಳೆಯಾ!" : "ಉತ್ತಮ ಪ್ರಯತ್ನ!", true);
+            }
+        }
+        loadQuizQuestion();
+
+        // Level 4 Logic
+        function verifyLevel4() {
+            let t1 = document.getElementById("thinkIn1").value.trim();
+            let t2 = document.getElementById("thinkIn2").value.trim();
+
+            if(t1 === "ಆರ್ಥಿಕ ಚಟುವಟಿಕೆಗಳು" && t2 === "ಆರ್ಥಿಕೇತರ ಚಟುವಟಿಕೆಗಳು") {
+                modifyHUDTracker(150, 0);
+                document.getElementById('lvlBtn4').style.background = "var(--profit-green)";
+                showTradeAlert(4, "ವಾಹ್ ಗೆಳೆಯಾ! ಆರ್ಥಿಕ ಮತ್ತು ಆರ್ಥಿಕೇತರ ವ್ಯತ್ಯಾಸ ಪಕ್ಕಾ ಸರಿಯಾಗಿದೆ.", true);
+            } else {
+                modifyHUDTracker(0, 10);
+                showTradeAlert(4, "ತಪ್ಪಾಗಿದೆ! ಸುಳಿವು: ಆರ್ಥಿಕ ಚಟುವಟಿಕೆಗಳು, ಆರ್ಥಿಕೇತರ ಚಟುವಟಿಕೆಗಳು ಎಂದು ಬರೆಯಿರಿ.", false);
+            }
+        }
+
+        // Level 5 Logic
+        let selectedOres = {};
+        function toggleStateOre(id, isCoreComponent) {
+            let node = document.getElementById(id);
+            if(node.classList.contains('activated')) {
+                node.classList.remove('activated');
+                delete selectedOres[id];
+            } else {
+                node.classList.add('activated');
+                selectedOres[id] = isCoreComponent;
+            }
+        }
+        function verifyLevel5() {
+            let win = true; let count = 0;
+            for(let id in selectedOres) {
+                if(selectedOres[id] === false) win = false;
+                count++;
+            }
+            if(count !== 4) win = false; // 4 essential types in grid
+
+            if(win) {
+                modifyHUDTracker(150, 0);
+                document.getElementById('lvlBtn5').style.background = "var(--profit-green)";
+                showTradeAlert(5, "ಅದ್ಭುತ! ವ್ಯವಹಾರದ ನಾಲ್ಕೂ ಮುಖ್ಯ ಅಂಗಗಳು ಪಕ್ಕಾ ಸರಿ ಇವೆ.", true);
+            } else {
+                modifyHUDTracker(0, 10);
+                showTradeAlert(5, "ತಪ್ಪಾಗಿದೆ! ಕೇವಲ ನಾಲ್ಕು ಪ್ರಮುಖ ವ್ಯವಹಾರದ ಪ್ರಕಾರಗಳನ್ನು ಮಾತ್ರ ಆರಿಸು ಗೆಳೆಯಾ.", false);
+            }
+        }
+
+        // Level 6 Logic
+        function allowOrganDrop(ev) { ev.preventDefault(); }
+        function startOrganDrag(ev) { ev.dataTransfer.setData("text", ev.target.id); }
+        function handleOrganDrop(ev, cat) {
+            ev.preventDefault();
+            let id = ev.dataTransfer.getData("text");
+            let el = document.getElementById(id);
+            el.dataset.cat = cat;
+            ev.target.appendChild(el);
+        }
+        function verifyLevel6() {
+            let o1 = document.getElementById("org1").dataset.cat;
+            let o2 = document.getElementById("org2").dataset.cat;
+            let o3 = document.getElementById("org3").dataset.cat;
+
+            if(o1 === "factory" && o2 === "bulk" && o3 === "consumer") {
+                modifyHUDTracker(200, 0);
+                document.getElementById('lvlBtn6').style.background = "var(--profit-green)";
+                showTradeAlert(6, "ಮಾರುಕಟ್ಟೆಯ ವಿತರಣಾ ಸರಪಳಿಯ ಕೊಂಡಿಗಳು ನೂರಕ್ಕೆ ನೂರು ಬುದ್ಧಿವಂತಿಕೆಯಿಂದ ಕೂಡಿವೆ ಗೆಳೆಯಾ!", true);
+            } else {
+                modifyHUDTracker(0, 10);
+                showTradeAlert(6, "ತಪ್ಪಾದ ವಿಭಾಗ! ಉತ್ಪಾದಕ ವಸ್ತು ಮಾಡುತ್ತಾನೆ, ಸಗಟು ವರ್ತಕ ಬೃಹತ್ ಕೊಳ್ಳುತ್ತಾನೆ, ಚಿಲ್ಲರೆ ವ್ಯಾಪಾರಿ ಗ್ರಾಹಕನಿಗೆ ಮಾರುತ್ತಾನೆ.", false);
+            }
+        }
+
+        // Level 7 Logic
+        let finalL = null; let finalR = null;
+        function selectFinalMatrix(side, id, key) {
+            if(side === 'L') {
+                finalL = { id: id, key: key };
+                document.getElementById("matL1").classList.remove('node-selected');
+                document.getElementById("matL2").classList.remove('node-selected');
+            } else {
+                finalR = { id: id, key: key };
+                document.getElementById("matR1").classList.remove('node-selected');
+                document.getElementById("matR2").classList.remove('node-selected');
+            }
+            document.getElementById(id).classList.add('node-selected');
+        }
+        function verifyLevel7() {
+            if(finalL && finalR && finalL.key === finalR.key) {
+                modifyHUDTracker(250, 0);
+                document.getElementById('lvlBtn7').style.background = "var(--profit-green)";
+                showTradeAlert(7, "ವಾಹ್ Chandrakant ಗೆಳೆಯಾ! ಇಡೀ 'ವ್ಯವಹಾರದ ಅರ್ಥ ಮತ್ತು ಪ್ರಾಮುಖ್ಯತೆ' ಪಾಠದ ಸಿಮ್ಯುಲೇಶನ್ ಯಶಸ್ವಿಯಾಗಿದೆ. ಇಡೀ ಪಠ್ಯಪುಸ್ತಕದ ಭಾಗ-1 ಪೂರ್ಣಗೊಂಡಿದೆ!", true);
+            } else {
+                modifyHUDTracker(0, 10);
+                showTradeAlert(7, "ಮ್ಯಾಟ್ರಿಕ್ಸ್ ಲಿಂಕ್ ತಪ್ಪಾಗಿದೆ. ವ್ಯವಹಾರದ ಸಾಮಾಜಿಕ ಉದ್ದೇಶಗಳನ್ನು ಮತ್ತೊಮ್ಮೆ ಗಮನಿಸು ಗೆಳೆಯಾ.", false);
+            }
+        }
+
+        function showTradeAlert(lvlNum, text, success) {
+            let box = document.getElementById("alert" + lvlNum);
+            box.style.display = "block";
+            box.innerText = text;
+            box.style.background = success ? "rgba(5, 196, 107, 0.15)" : "rgba(245, 59, 87, 0.1)";
+            box.style.color = success ? "#05c46b" : "#f53b57";
+            box.style.borderColor = success ? "var(--profit-green)" : "var(--danger-red)";
+        }
+    </script>
+</body>
+</html>

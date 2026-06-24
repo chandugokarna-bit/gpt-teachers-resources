@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಹೊಸ ಧರ್ಮಗಳ ಉದಯ - ಸೈಬರ್ ಪಂಕ್ ಆರ್ಕೇಡ್ ೪.೦</title>
+    <style>
+        :root {
+            --cyber-yellow: #f1c40f;
+            --cyber-neon: #39ff14;
+            --cyber-pink: #ff007f;
+            --cyber-blue: #00f0ff;
+            --dark-matrix: #0a0a12;
+            --panel-bg: rgba(20, 20, 35, 0.9);
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: var(--dark-matrix);
+            background-image: radial-gradient(circle at 50% 50%, #1e1e38 0%, #0a0a12 100%);
+            min-height: 100vh;
+            padding: 25px;
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+
+        /* Cyberpunk Header */
+        .mission-control {
+            background: var(--panel-bg);
+            padding: 25px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 0 25px rgba(0, 240, 255, 0.2);
+            margin-bottom: 30px;
+            border-bottom: 4px solid var(--cyber-blue);
+        }
+
+        .mission-control h1 {
+            color: var(--cyber-blue);
+            font-size: 2.5rem;
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+            text-shadow: 0 0 10px rgba(0, 240, 255, 0.6);
+        }
+
+        .mission-control p {
+            color: #a4b0be;
+            font-size: 1.2rem;
+        }
+
+        /* Interactive Health & Energy Status HUD */
+        .status-hud {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            border-left: 5px solid var(--cyber-pink);
+        }
+
+        .health-bar-container {
+            background: #2f3542;
+            width: 60%;
+            height: 16px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--cyber-pink);
+        }
+
+        .health-bar-fill {
+            background: linear-gradient(90deg, var(--cyber-pink), #ff6b81);
+            height: 100%;
+            width: 100%;
+            transition: width 0.3s ease;
+        }
+
+        .score-patch {
+            color: var(--cyber-neon);
+            font-size: 1.3rem;
+            font-weight: bold;
+            text-shadow: 0 0 8px rgba(57, 255, 20, 0.4);
+        }
+
+        /* Side-Scrolling Cyber Grid Menu */
+        .quest-dock {
+            display: flex;
+            gap: 15px;
+            overflow-x: auto;
+            padding-bottom: 15px;
+            margin-bottom: 35px;
+        }
+
+        .quest-dock::-webkit-scrollbar {
+            height: 8px;
+        } Bonn
+        .quest-dock::-webkit-scrollbar-thumb {
+            background: var(--cyber-blue);
+            border-radius: 4px;
+        }
+
+        .dock-card {
+            background: #1e1e30;
+            border: 2px solid #341f97;
+            padding: 15px 25px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: bold;
+            color: #ffffff;
+            white-space: nowrap;
+            transition: all 0.3s;
+        }
+
+        .dock-card:hover, .dock-card.active-dock {
+            background: var(--cyber-blue);
+            color: #000000;
+            border-color: #ffffff;
+            box-shadow: 0 0 15px var(--cyber-blue);
+            transform: translateY(-4px);
+        }
+
+        /* Cyber Portal Game Arena */
+        .portal-arena {
+            background: var(--panel-bg);
+            border-radius: 25px;
+            padding: 35px;
+            box-shadow: 0 20px 45px rgba(0,0,0,0.5);
+            min-height: 520px;
+            display: none;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .portal-arena.active-portal {
+            display: block;
+            animation: glitchView 0.4s ease;
+        }
+
+        @keyframes glitchView {
+            0% { transform: opacity(0); }
+            100% { transform: opacity(1); }
+        }
+
+        h2.portal-title {
+            font-size: 1.8rem;
+            color: var(--cyber-yellow);
+            margin-bottom: 25px;
+            border-left: 6px solid var(--cyber-yellow);
+            padding-left: 15px;
+        }
+
+        /* Modern Nodes & Input Boxes */
+        .cyber-input {
+            background: rgba(0,0,0,0.4);
+            border: 2px solid #57606f;
+            border-radius: 10px;
+            padding: 12px 18px;
+            font-size: 1.1rem;
+            outline: none;
+            color: var(--cyber-blue);
+            font-weight: bold;
+            width: 280px;
+            margin-top: 10px;
+        }
+
+        .cyber-input:focus {
+            border-color: var(--cyber-blue);
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.3);
+        }
+
+        /* Act 1: Cyber Flip Grid */
+        .cyber-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        .cyber-node {
+            background: #2f3542;
+            height: 110px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.1rem;
+            cursor: pointer;
+            border: 1px solid #747d8c;
+            transition: all 0.3s;
+            text-align: center;
+            padding: 10px;
+        }
+
+        .cyber-node.active-flip {
+            background: var(--cyber-purple);
+            background: #5f27cd;
+            color: white;
+            box-shadow: 0 0 15px #5f27cd;
+        }
+
+        .cyber-node.done-flip {
+            background: linear-gradient(135deg, #10ac84, var(--cyber-neon));
+            color: #0a0a12;
+            box-shadow: 0 0 15px var(--cyber-neon);
+            font-weight: 900;
+        }
+
+        /* Act 2: Interactive Sorting Base */
+        .sorting-deck {
+            display: flex;
+            gap: 25px;
+        }
+
+        .cyber-bin {
+            flex: 1;
+            background: rgba(0,0,0,0.3);
+            border: 2px dashed var(--cyber-blue);
+            padding: 20px;
+            border-radius: 20px;
+            min-height: 180px;
+        }
+
+        .cyber-bin h3 { margin-bottom: 15px; color: var(--cyber-blue); text-align: center; }
+
+        .pill-packet {
+            background: #2f3542;
+            padding: 14px;
+            border-radius: 10px;
+            cursor: grab;
+            font-weight: bold;
+            text-align: center;
+            border: 1px solid #747d8c;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        /* Act 3: Cyber Quiz Block */
+        .cyber-choice {
+            background: #2f3542;
+            padding: 16px;
+            margin: 12px 0;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1.1rem;
+            border: 1px solid #747d8c;
+            transition: all 0.2s;
+        }
+
+        .cyber-choice:hover {
+            border-color: var(--cyber-yellow);
+            background: #3e4453;
+            transform: translateX(6px);
+        }
+
+        .cyber-choice.cyber-correct {
+            background: rgba(57, 255, 20, 0.2);
+            border-color: var(--cyber-neon);
+            color: var(--cyber-neon);
+        }
+
+        .cyber-choice.cyber-wrong {
+            background: rgba(255, 0, 127, 0.2);
+            border-color: var(--cyber-pink);
+            color: var(--cyber-pink);
+        }
+
+        /* Cyber Action Button */
+        .laser-btn {
+            background: linear-gradient(135deg, var(--cyber-blue), #54a0ff);
+            color: #0a0a12;
+            border: none;
+            padding: 14px 35px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
+            transition: all 0.3s;
+            margin-top: 25px;
+        }
+
+        .laser-btn:hover {
+            transform: scale(1.03);
+            box-shadow: 0 0 25px var(--cyber-blue);
+        }
+
+        .cyber-alert {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: bold;
+            display: none;
+            font-size: 1.1rem;
+            border: 1px solid transparent;
+        }
+
+        /* Act 5: Toggles */
+        .switch-board-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255,255,255,0.03);
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #353b48;
+        }
+
+        .matrix-toggle button {
+            padding: 9px 22px;
+            border: 1px solid #747d8c;
+            background: #2f3542;
+            color: white;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
+        .matrix-toggle button.switch-trigger {
+            background: var(--cyber-pink);
+            color: white;
+            border-color: #ffffff;
+            box-shadow: 0 0 10px var(--cyber-pink);
+        }
+
+        /* Act 6: Decode Box */
+        .decode-capsule {
+            background: rgba(0,0,0,0.4);
+            padding: 25px;
+            border-radius: 16px;
+            text-align: center;
+            margin-bottom: 20px;
+            border: 1px solid var(--cyber-yellow);
+        }
+
+        .glitch-code-txt {
+            font-size: 2.2rem;
+            color: var(--cyber-yellow);
+            font-weight: 800;
+            letter-spacing: 5px;
+            margin-bottom: 15px;
+            text-shadow: 0 0 8px rgba(241, 196, 15, 0.5);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="mission-control">
+        <h1>ಅಧ್ಯಾಯ-೫: ಹೊಸ ಧರ್ಮಗಳ ಉದಯ</h1>
+        <p>ಸೈಬರ್ ಪಂಕ್ ಕ್ವೆಸ್ಟ್ ಆರ್ಕಿಟೆಕ್ಚರ್ ೪.೦ • ಇಂಟರಾಕ್ಟಿವ್ ಕಂಟೆಂಟ್ ಹಬ್</p>
+    </div>
+
+    <div class="status-hud">
+        <span>ಮಿಷನ್ ಹೆಲ್ತ್ ಡೇಟಾ:</span>
+        <div class="health-bar-container"><div class="health-bar-fill" id="healthFill"></div></div>
+        <div class="score-patch" id="cyberScore">0000 DATA XP</div>
+    </div>
+
+    <div class="quest-dock">
+        <button class="dock-card active-dock" onclick="enterPortal(1)">1. ಜ್ಞಾನೋದಯ ಜೋಡಿ</button>
+        <button class="dock-card" onclick="enterPortal(2)">2. ತತ್ತ್ವಗಳ ವರ್ಗೀಕರಣ</button>
+        <button class="dock-card" onclick="enterPortal(3)">3. ಹತ್ತು ಎಪಿಕ್ ಕ್ವಿಜ್</button>
+        <button class="dock-card" onclick="enterPortal(4)">4. ಪವಿತ್ರ ಕ್ಷೇತ್ರಗಳು</button>
+        <button class="dock-card" onclick="enterPortal(5)">5. ಧರ್ಮ ಪ್ರಸಾರದ ಸತ್ಯ</button>
+        <button class="dock-card" onclick="enterPortal(6)">6. ಸೈಫರ್ ಪದಗಳ ಶೋಧ</button>
+        <button class="dock-card" onclick="enterPortal(7)">7. ಅಷ್ಟಾಂಗ ಮಾರ್ಗ ಲಿಂಕ್</button>
+    </div>
+
+    <div id="portal1" class="portal-arena active-portal">
+        <h2 class="portal-title">ಆಕ್ಟಿವಿಟಿ 1: ವರ್ಧಮಾನ ಮಹಾವೀರ ಮತ್ತು ಗೌತಮ ಬುದ್ಧ (Core Match)</h2>
+        <p style="margin-bottom: 20px; font-weight: bold; color: var(--cyber-blue);">ಮಹಾವೀರ ಮತ್ತು ಬುದ್ಧನ ಜೀವನದ ಪ್ರಮುಖ ಸಂಗತಿಗಳ ಡೇಟಾವನ್ನು ಮ್ಯಾಚ್ ಮಾಡಿ:</p>
+        <div class="cyber-grid" id="cyberGridZone"></div>
+        <div class="cyber-alert" id="alert1"></div>
+    </div>
+
+    <div id="portal2" class="portal-arena">
+        <h2 class="portal-title">ಆಕ್ಟಿವಿಟಿ 2: ಜೈನ ಮತ್ತು ಬೌದ್ಧ ಧರ್ಮದ ತತ್ತ್ವಗಳು (Data Sorting)</h2>
+        <p style="margin-bottom: 15px;">ಕೆಳಗಿನ ಪ್ರಮುಖ ಬೋಧನೆಗಳನ್ನು ಆಯಾ ಧರ್ಮದ ಬಾಕ್ಸ್‌ಗೆ ವರ್ಗೀಕರಿಸಿ ಗೆಳೆಯಾ:</p>
+        <div class="sorting-deck">
+            <div style="flex:1; display:flex; flex-direction:column; gap:12px;" id="sourceDeck">
+                <div class="pill-packet" draggable="true" id="p1" ondragstart="startPacketDrag(event)">ತ್ರಿರತ್ನಗಳು</div>
+                <div class="pill-packet" draggable="true" id="p2" ondragstart="startPacketDrag(event)">ಅಷ್ಟಾಂಗ ಮಾರ್ಗಗಳು</div>
+                <div class="pill-packet" draggable="true" id="p3" ondragstart="startPacketDrag(event)">ಪಂಚ ಶೀಲಗಳು</div>
+                <div class="pill-packet" draggable="true" id="p4" ondragstart="startPacketDrag(event)">ದಿಗಂಬರ ಮತ್ತು ಶ್ವೇತಾಂಬರ</div>
+                <div class="pill-packet" draggable="true" id="p5" ondragstart="startPacketDrag(event)">ಹೀನಯಾನ ಮತ್ತು ಮಹಾಯಾನ</div>
+                <div class="pill-packet" draggable="true" id="p6" ondragstart="startPacketDrag(event)">ಕಾಯಕ್ಲೇಶ ಮತ್ತು ಉಪವಾಸ</div>
+            </div>
+            <div style="flex:2; display:flex; flex-direction:column; gap:15px;">
+                <div class="cyber-bin" ondragover="allowPacketDrop(event)" ondrop="handlePacketDrop(event, 'jaina')">
+                    <h3>ಜೈನ ಧರ್ಮ (Jainism Data)</h3>
+                </div>
+                <div class="cyber-bin" ondragover="allowPacketDrop(event)" ondrop="handlePacketDrop(event, 'boudha')">
+                    <h3>ಬೌದ್ಧ ಧರ್ಮ (Buddhism Data)</h3>
+                </div>
+            </div>
+        </div>
+        <button class="laser-btn" onclick="verifyPortal2()">ವರ್ಗೀಕರಣ ಕಳುಹಿಸು</button>
+        <div class="cyber-alert" id="alert2"></div>
+    </div>
+
+    <div id="portal3" class="portal-arena">
+        <h2 class="portal-title">ಆಕ್ಟಿವಿಟಿ 3: ಹೊಸ ಧರ್ಮಗಳ ಕ್ರಾಂತಿ (Epic 10 Matrix Quiz)</h2>
+        <div style="font-weight: bold; margin-bottom: 15px; color: var(--cyber-yellow);" id="quizCounterTxt">ಪ್ರಶ್ನೆ ಕೋಡ್: 1 / 10</div>
+        <div id="quizQuestionTxt" style="font-size: 1.3rem; font-weight: bold; margin-bottom: 20px;">ಲೋಡ್ ಆಗುತ್ತಿದೆ...</div>
+        <div id="quizChoicesZone"></div>
+        <button class="laser-btn" id="nextPortalBtn" style="display:none;" onclick="shiftPortalQuestion()">ಮುಂದಿನ ಹಂತ ➔</button>
+        <div class="cyber-alert" id="alert3"></div>
+    </div>
+
+    <div id="portal4" class="portal-arena">
+        <h2 class="portal-title">ಆಕ್ಟಿವಿಟಿ 4: ಪವಿತ್ರ ಜ್ಞಾನದ ಕ್ಷೇತ್ರಗಳು (Crypto Field Nodes)</h2>
+        <div style="display:flex; flex-direction:column; gap:20px;">
+            <div class="fib-q">1. ಗೌತಮ ಬುದ್ಧನು ತನ್ನ ಮೊದಲ ಬೋಧನೆಯನ್ನು ಧರ್ಮಚಕ್ರ ಪ್ರವರ್ತನ ಮಾಡಿದ ಜಾಗ ಯಾವುದು? <br><input type="text" class="cyber-input" id="cyIn1" placeholder="ಸಾರನಾಥ / ಲುಂಬಿನಿ?"></div>
+            <div class="fib-q">2. ವರ್ಧಮಾನ ಮಹಾವೀರನು ನಿರ್ವಾಣ ಹೊಂದಿದ ಪ್ರಸಿದ್ಧ ಕ್ಷೇತ್ರ ಯಾವುದು? <br><input type="text" class="cyber-input" id="cyIn2" placeholder="ಪಾವಾಪುರಿ / ಕುಂದಗ್ರಾಮ?"></div>
+            <div class="fib-q">3. ಬುದ್ಧನಿಗೆ ಜ್ಞಾನೋದಯವಾದ ಬಿಹಾರದ ಪವಿತ್ರ ಬೋಧಿ ವೃಕ್ಷವಿರುವ ಸ್ಥಳ ಯಾವುದು? <br><input type="text" class="cyber-input" id="cyIn3" placeholder="ಬೋಧಗಯಾ / ಕಪಿಲವಸ್ತು?"></div>
+            <div class="fib-q">4. ಶ್ರವಣಬೆಳಗೊಳದಲ್ಲಿರುವ ಗೋಮಟೇಶ್ವರನ ಭವ್ಯ ಮೂರ್ತಿಯು ಯಾವ ಧರ್ಮಕ್ಕೆ ಸೇರಿದ್ದಾಗಿದೆ? <br><input type="text" class="cyber-input" id="cyIn4" placeholder="ಜೈನ ಧರ್ಮ / ಬೌದ್ಧ ಧರ್ಮ?"></div>
+        </div>
+        <button class="laser-btn" onclick="verifyPortal4()">ಕ್ಷೇತ್ರಗಳನ್ನು ದೃಢೀಕರಿಸು</button>
+        <div class="cyber-alert" id="alert4"></div>
+    </div>
+
+    <div id="portal5" class="portal-arena">
+        <h2 class="portal-title">ಆಕ್ಟಿವಿಟಿ 5: ಧರ್ಮ ಪ್ರಸಾರ ಮತ್ತು ರಾಜಾಶ್ರಯ (Binary Matrix Status)</h2>
+        <div class="switch-board-row">
+            <span>1. ಮೌರ್ಯ ಸಾಮ್ರಾಜ್ಯದ ಚಕ್ರವರ್ತಿ ಅಶೋಕನು ಬೌದ್ಧ ಧರ್ಮದ ಪ್ರಸಾರಕ್ಕಾಗಿ ತನ್ನ ಮಕ್ಕಳನ್ನು ಸಿಂಹಳಕ್ಕೆ ಕಳುಹಿಸಿದನು.</span>
+            <div class="matrix-toggle"><button id="pb1_t" onclick="triggerToggle(1,true)">ನಿಜ</button><button id="pb1_f" onclick="triggerToggle(1,false)">ಸುಳ್ಳು</button></div>
+        </div>
+        <div class="switch-board-row">
+            <span>2. ಬೌದ್ಧ ಧರ್ಮದ ಪವಿತ್ರ ಗ್ರಂಥಗಳನ್ನು 'ತ್ರಿಪಿಟಕಗಳು' (ಸುತ್ತ, ವಿನಯ, ಅಭಿಧಮ್ಮ) ಎಂದು ಕರೆಯುತ್ತಾರೆ.</span>
+            <div class="matrix-toggle"><button id="pb2_t" onclick="triggerToggle(2,true)">ನಿಜ</button><button id="pb2_f" onclick="triggerToggle(2,false)">ಸುಳ್ಳು</button></div>
+        </div>
+        <div class="switch-board-row">
+            <span>3. ವರ್ಧಮಾನ ಮಹಾವೀರನು ಜೈನ ಧರ್ಮದ ಪ್ರಥಮ ಅಥವಾ ಒಂದನೇ ತೀರ್ಥಂಕರನಾಗಿದ್ದನು.</span>
+            <div class="matrix-toggle"><button id="pb3_t" onclick="triggerToggle(3,true)">ನಿಜ</button><button id="pb3_f" onclick="triggerToggle(3,false)">ಸುಳ್ಳು</button></div>
+        </div>
+        <div class="switch-board-row">
+            <span>4. ಬುದ್ಧನು ಬೋಧಿಸಿದ ನಾಲ್ಕು ಆರ್ಯ ಸತ್ಯಗಳಲ್ಲಿ 'ಆಸೆಯೇ ದುಃಖಕ್ಕೆ ಮೂಲ' ಎಂಬುದು ಪ್ರಮುಖ ಸತ್ಯವಾಗಿದೆ.</span>
+            <div class="matrix-toggle"><button id="pb4_t" onclick="triggerToggle(4,true)">ನಿಜ</button><button id="pb4_f" onclick="triggerToggle(4,false)">ಸುಳ್ಳು</button></div>
+        </div>
+        <button class="laser-btn" onclick="verifyPortal5()">ಡೇಟಾ ಸಬ್ಮಿಟ್ ಮಾಡು</button>
+        <div class="cyber-alert" id="alert5"></div>
+    </div>
+
+    <div id="portal6" class="portal-arena">
+        <h2 class="portal-title">ಆಕ್ಟಿವಿಟಿ 6: ಭಾಷೆ ಮತ್ತು ಸಾಹಿತ್ಯ ಮೂಲ ಶೋಧ (Cipher Capsule)</h2>
+        <div class="decode-capsule">
+            <div class="glitch-code-txt">ಕೃ ತ ಪ್ರಾ ಕೃ </div>
+            <input type="text" class="cyber-input" id="capsInput1" placeholder="ಮಹಾವೀರ ಬೋಧಿಸಿದ ಭಾಷೆ ಬರೆಯಿರಿ">
+        </div>
+        <div class="decode-capsule">
+            <div class="glitch-code-txt">ಲಿ ಪಾ ಭಾ ಷೆ </div>
+            <input type="text" class="cyber-input" id="capsInput2" placeholder="ಬೌದ್ಧ ಧರ್ಮದ ಪ್ರಮುಖ ಭಾಷೆ ಬರೆಯಿರಿ">
+        </div>
+        <div class="decode-capsule">
+            <div class="glitch-code-txt">ಣ ರ್ವಾ ನಿ </div>
+            <input type="text" class="cyber-input" id="capsInput3" placeholder="ದೀಪ ಆರಿಹೋಗುವ ಸ್ಥಿತಿ ಬರೆಯಿರಿ">
+        </div>
+        <button class="laser-btn" onclick="verifyPortal6()">ಕ್ಯಾಪ್ಸುಲ್ ಡಿಕೋಡ್ ಮಾಡು</button>
+        <div class="cyber-alert" id="alert6"></div>
+    </div>
+
+    <div id="portal7" class="portal-arena">
+        <h2 class="portal-title">ಆಕ್ಟಿವಿಟಿ 7: ತತ್ತ್ವಗಳ ಮಹಾ ಮ್ಯಾಟ್ರಿಕ್ಸ್ (Dropdown Connector)</h2>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div>
+                <div class="switch-board-row">1. ಪಾರ್ಶ್ವನಾಥ</div>
+                <div class="switch-board-row">2. ಸಿದ್ದಾರ್ಥ</div>
+                <div class="switch-board-row">3. ಜಿನ</div>
+                <div class="switch-board-row">4. ಅಹಿಂಸೆ</div>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:20px; justify-content:center;">
+                <select id="dropSel1" class="cyber-input" style="width:100%;">
+                    <option value="">ಡೇಟಾ ಲಿಂಕ್ ಮಾಡಿ</option>
+                    <option value="A">ಇಂದ್ರಿಯಗಳನ್ನು ಗೆದ್ದವನು</option>
+                    <option value="B">23ನೇ ಜೈನ ತೀರ್ಥಂಕರ</option>
+                    <option value="C">ಯಾವ ಜೀವಿಗೆ ನೋಯಿಸದಿರುವುದು</option>
+                    <option value="D">ಗೌತಮ ಬುದ್ಧನ ಬಾಲ್ಯದ ಹೆಸರು</option>
+                </select>
+                <select id="dropSel2" class="cyber-input" style="width:100%;">
+                    <option value="">ಡೇಟಾ ಲಿಂಕ್ ಮಾಡಿ</option>
+                    <option value="A">ಇಂದ್ರಿಯಗಳನ್ನು ಗೆದ್ದವನು</option>
+                    <option value="B">23ನೇ ಜೈನ ತೀರ್ಥಂಕರ</option>
+                    <option value="C">ಯಾವ ಜೀವಿಗೆ ನೋಯಿಸದಿರುವುದು</option>
+                    <option value="D">ಗೌತಮ ಬುದ್ಧನ ಬಾಲ್ಯದ ಹೆಸರು</option>
+                </select>
+                <select id="dropSel3" class="cyber-input" style="width:100%;">
+                    <option value="">ಡೇಟಾ ಲಿಂಕ್ ಮಾಡಿ</option>
+                    <option value="A">ಇಂದ್ರಿಯಗಳನ್ನು ಗೆದ್ದವನು</option>
+                    <option value="B">23ನೇ ಜೈನ ತೀರ್ಥಂಕರ</option>
+                    <option value="C">ಯಾವ ಜೀವಿಗೆ ನೋಯಿಸದಿರುವುದು</option>
+                    <option value="D">ಗೌತಮ ಬುದ್ಧನ ಬಾಲ್ಯದ ಹೆಸರು</option>
+                </select>
+                <select id="dropSel4" class="cyber-input" style="width:100%;">
+                    <option value="">ಡೇಟಾ ಲಿಂಕ್ ಮಾಡಿ</option>
+                    <option value="A">ಇಂದ್ರಿಯಗಳನ್ನು ಗೆದ್ದವನು</option>
+                    <option value="B">23ನೇ ಜೈನ ತೀರ್ಥಂಕರ</option>
+                    <option value="C">ಯಾವ ಜೀವಿಗೆ ನೋಯಿಸದಿರುವುದು</option>
+                    <option value="D">ಗೌತಮ ಬುದ್ಧನ ಬಾಲ್ಯದ ಹೆಸರು</option>
+                </select>
+            </div>
+        </div>
+        <button class="laser-btn" onclick="verifyPortal7()">ಮ್ಯಾಟ್ರಿಕ್ಸ್ ಕನೆಕ್ಟ್ ಮಾಡು</button>
+        <div class="cyber-alert" id="alert7"></div>
+    </div>
+
+    <script>
+        let dataXP = 0; let studentHealth = 100;
+        function modifyHUD(xpChange, healthDamage) {
+            dataXP += xpChange;
+            studentHealth = Math.max(0, studentHealth - healthDamage);
+            document.getElementById("cyberScore").innerText = `${dataXP.toString().padStart(4, '0')} DATA XP`;
+            document.getElementById("healthFill").style.width = `${studentHealth}%`;
+        }
+
+        function enterPortal(idx) {
+            document.querySelectorAll('.portal-arena').forEach(el => el.classList.remove('active-portal'));
+            document.querySelectorAll('.dock-card').forEach(el => el.classList.remove('active-dock'));
+            document.getElementById('portal' + idx).classList.add('active-portal');
+            event.target.classList.add('active-dock');
+        }
+
+        // Portal 1: Grid Logic
+        const gridMasterData = [
+            {t: "ಬುದ್ಧನ ತಂದೆ", m: 1}, {t: "ಶುದ್ಧೋದನ", m: 1},
+            {t: "ಬುದ್ಧನ ತಾಯಿ", m: 2}, {t: "ಮಾಯಾದೇವಿ", m: 2},
+            {t: "ಮಹಾವೀರನ ತಂದೆ", m: 3}, {t: "ಸಿದ್ಧಾರ್ಥ", m: 3},
+            {t: "ಮಹಾವೀರನ ತಾಯಿ", m: 4}, {t: "ತ್ರಿಶಲಾದೇವಿ", m: 4}
+        ];
+        let flippedNodes = [];
+        function initCyberGrid() {
+            let zone = document.getElementById("cyberGridZone");
+            zone.innerHTML = "";
+            gridMasterData.sort(() => Math.random() - 0.5);
+            gridMasterData.forEach((item, index) => {
+                let div = document.createElement("div");
+                div.classList.add("cyber-node");
+                div.dataset.index = index;
+                div.dataset.m = item.m;
+                div.innerText = "⎋";
+                div.onclick = function() {
+                    if(flippedNodes.length < 2 && !this.classList.contains('active-flip') && !this.classList.contains('done-flip')) {
+                        this.classList.add('active-flip');
+                        this.innerText = gridMasterData[this.dataset.index].t;
+                        flippedNodes.push(this);
+                        if(flippedNodes.length === 2) {
+                            if(flippedNodes[0].dataset.m === flippedNodes[1].dataset.m) {
+                                flippedNodes[0].classList.add('done-flip');
+                                flippedNodes[1].classList.add('done-flip');
+                                flippedNodes = [];
+                                modifyHUD(100, 0);
+                            } else {
+                                setTimeout(() => {
+                                    flippedNodes[0].classList.remove('active-flip'); flippedNodes[0].innerText = "⎋";
+                                    flippedNodes[1].classList.remove('active-flip'); flippedNodes[1].innerText = "⎋";
+                                    flippedNodes = [];
+                                    modifyHUD(0, 5);
+                                }, 1000);
+                            }
+                        }
+                    }
+                };
+                zone.appendChild(div);
+            });
+        }
+        initCyberGrid();
+
+        // Portal 2: Sorting Logic
+        function allowPacketDrop(ev) { ev.preventDefault(); }
+        function startPacketDrag(ev) { ev.dataTransfer.setData("text", ev.target.id); }
+        function handlePacketDrop(ev, section) {
+            ev.preventDefault();
+            let id = ev.dataTransfer.getData("text");
+            let element = document.getElementById(id);
+            element.dataset.section = section;
+            ev.target.appendChild(element);
+        }
+        function verifyPortal2() {
+            let passed = true;
+            const keymap = {p1:'jaina', p2:'boudha', p3:'boudha', p4:'jaina', p5:'boudha', p6:'jaina'};
+            for(let id in keymap) {
+                let node = document.getElementById(id);
+                if(!node || node.dataset.section !== keymap[id]) passed = false;
+            }
+            if(passed) modifyHUD(200, 0); else modifyHUD(0, 10);
+            popAlert(2, passed ? "ಅದ್ಭುತ! ತತ್ತ್ವಗಳ ವರ್ಗೀಕರಣ ಯಶಸ್ವಿಯಾಗಿದೆ ಗೆಳೆಯಾ!" : "ಡೇಟಾ ಮ್ಯಾಚಿಂಗ್ ತಪ್ಪಾಗಿದೆ, ಮರುಪರಿಶೀಲಿಸಿ.", passed);
+        }
+
+        // Portal 3: 10 Questions Data & Logic
+        const dynamicQuizPool = [
+            { q: "1. ಉತ್ತರ ವೈದಿಕ ಕಾಲದ ಕೊನೆಯಲ್ಲಿ ಸಮಾಜದಲ್ಲಿದ್ದ ಯಾಗ, ಯಜ್ಞಗಳ ಕರ್ಮಕಾಂಡಗಳನ್ನು ವಿರೋಧಿಸಿ ಹುಟ್ಟಿದ ಹೊಸ ಧರ್ಮಗಳ ಸಂಖ್ಯೆ ಎಷ್ಟು?", o: ["62 ಧರ್ಮಗಳು", "24 ಧರ್ಮಗಳು", "4 ಧರ್ಮಗಳು"], c: 0 },
+            { q: "2. ಜೈನ ಧರ್ಮದ 24ನೇ ಹಾಗೂ ಕೊನೆಯ ತೀರ್ಥಂಕರರಾಗಿ ಪ್ರಸಿದ್ಧಿ ಪಡೆದವರು ಯಾರು?", o: ["ಪಾರ್ಶ್ವನಾಥ", "ವರ್ಧಮಾನ ಮಹಾವೀರ", "ವೃಷಭನಾಥ"], c: 1 },
+            { q: "3. ವರ್ಧಮಾನ ಮಹಾವೀರನಿಗೆ 12 ವರ್ಷಗಳ ಕಠಿಣ ತಪಸ್ಸಿನ ನಂತರ ಸಿಕ್ಕ ಜ್ಞಾನೋದಯವನ್ನು ಏನೆಂದು ಕರೆಯುತ್ತಾರೆ?", o: ["ಕೈವಲ್ಯ ಜ್ಞಾನ", "ನಿರ್ವಾಣ", "ಬೋಧಿ ಜ್ಞಾನ"], c: 0 },
+            { q: "4. ಜೈನ ಧರ್ಮದ ಐದು ಮಹಾ ವ್ರತಗಳಲ್ಲಿ ಮಹಾವೀರನು ಸೇರಿಸಿದ 5ನೇ ಪ್ರಮುಖ ವ್ರತ ಯಾವುದು?", o: ["ಅಸ್ತೇಯ", "ಅಪರಿಗ್ರಹ", "ಬ್ರಹ್ಮಚರ್ಯ"], c: 2 },
+            { q: "5. ಬೌದ್ಧ ಧರ್ಮದ ಸಂಸ್ಥಾಪಕರಾದ ಗೌತಮ ಬುದ್ಧನು ಎಲ್ಲಿ ಜನಿಸಿದನು?", o: ["ಕಪಿಲವಸ್ತುವಿನ ಲುಂಬಿನಿ ವನ", "ಕುಂದಗ್ರಾಮ", "ಗಯಾ"], c: 0 },
+            { q: "6. ಗೌತಮ ಬುದ್ಧನು ಜಗತ್ತಿನ ಕಷ್ಟಗಳನ್ನು ನೋಡಿ ವೈರಾಗ್ಯ ಹೊಂದಿ ಮನೆ ಬಿಟ್ಟು ಹೊರಟ ಘಟನೆಯನ್ನು ಏನೆನ್ನುತ್ತಾರೆ?", o: ["ಮಹಾಭಿನಿಷ್ಕ್ರಮಣ", "ಧರ್ಮಚಕ್ರ ಪ್ರವರ್ತನ", "ಮಹಾಪರಿನಿರ್ವಾಣ"], c: 0 },
+            { q: "7. ಬುದ್ಧನು ದುಃಖದ ನಿವಾರಣೆಗಾಗಿ ಪ್ರತಿಪಾದಿಸಿದ ಮಾರ್ಗಗಳ ಹೆಸರೇನು?", o: ["ತ್ರಿರತ್ನಗಳು", "ಅಷ್ಟಾಂಗ ಮಾರ್ಗಗಳು", "ಪಂಚಶೀಲಗಳು"], c: 1 },
+            { q: "8. ಕಲ್ಕತ್ತಾದ ಹತ್ತಿರ ಕನಿಷ್ಕನ ಕಾಲದಲ್ಲಿ ನಡೆದ 4ನೇ ಬೌದ್ಧ ಮಹಾಸಭೆಯಲ್ಲಿ ಬೌದ್ಧ ಧರ್ಮವು ಯಾವ ಎರಡು ಪಂಗಡಗಳಾಯಿತು?", o: ["ಶ್ವೇತಾಂಬರ-ದಿಗಂಬರ", "ಹೀನಯಾನ-ಮಹಾಯಾನ", "ಸಭಾ-ಸಮಿತಿ"], c: 1 },
+            { q: "9. ಜೈನ ಧರ್ಮದ ಪವಿತ್ರ ಧಾರ್ಮಿಕ ಗ್ರಂಥಗಳನ್ನು ಒಟ್ಟಾಗಿ ಏನೆಂದು ಕರೆಯುತ್ತಾರೆ?", o: ["ಅಂಗಗಳು / ಸಿದ್ಧಾಂತಗಳು", "ತ್ರಿಪಿಟಕಗಳು", "ವೇದಗಳು"], c: 0 },
+            { q: "10. ಕರ್ನಾಟಕದ ಯಾವ ಪ್ರಸಿದ್ಧ ಸ್ಥಳದಲ್ಲಿ ಮೌರ್ಯ ಚಕ್ರವರ್ತಿ ಚಂದ್ರಗುಪ್ತನು ಸಲ್ಲೇಖನ ವ್ರತ ಆಚರಿಸಿ ತೀರಿಕೊಂಡನು?", o: ["ಶ್ರವಣಬೆಳಗೊಳ", "ಬಾದಾಮಿ", "ಹಂಪಿ"], c: 0 }
+        ];
+
+        let pQIdx = 0; let pQuizScore = 0; let activeStatus = true;
+        function loadPortalQuestion() {
+            activeStatus = true;
+            document.getElementById("nextPortalBtn").style.display = "none";
+            document.getElementById("alert3").style.display = "none";
+            let qData = dynamicQuizPool[pQIdx];
+            document.getElementById("quizCounterTxt").innerText = `ಪ್ರಶ್ನೆ ಕೋಡ್: ${pQIdx + 1} / 10`;
+            document.getElementById("quizQuestionTxt").innerText = qData.q;
+            
+            let zone = document.getElementById("quizChoicesZone");
+            zone.innerHTML = "";
+            qData.o.forEach((choice, idx) => {
+                let div = document.createElement("div");
+                div.classList.add("cyber-choice");
+                div.innerText = choice;
+                div.onclick = function() {
+                    if(!activeStatus) return;
+                    activeStatus = false;
+                    if(idx === qData.c) {
+                        this.classList.add("cyber-correct");
+                        pQuizScore++;
+                        modifyHUD(50, 0);
+                        popAlert(3, "ಕೋಡ್ ಮ್ಯಾಚ್ ಆಯಿತು! ಸರಿಯಾದ ಉತ್ತರ.", true);
+                    } else {
+                        this.classList.add("cyber-wrong");
+                        zone.children[qData.c].classList.add("cyber-correct");
+                        modifyHUD(0, 10);
+                        popAlert(3, "ಡೇಟಾ ಕರಪ್ಟ್ ಆಗಿದೆ! ಸರಿಯಾದ ಉತ್ತರ ಹಸಿರು ಬಣ್ಣದಲ್ಲಿದೆ.", false);
+                    }
+                    document.getElementById("nextPortalBtn").style.display = "inline-block";
+                };
+                zone.appendChild(div);
+            });
+        }
+        function shiftPortalQuestion() {
+            pQIdx++;
+            if(pQIdx < dynamicQuizPool.length) {
+                loadPortalQuestion();
+            } else {
+                document.getElementById("quizCounterTxt").innerText = "ಮಿಷನ್ ಫಲಿತಾಂಶ ಸಿದ್ಧ!";
+                document.getElementById("quizQuestionTxt").innerText = `ವಿದ್ಯಾರ್ಥಿಗಳು ಗಳಿಸಿದ ಅಂಕಗಳು: ${pQuizScore} / 10`;
+                document.getElementById("quizChoicesZone").innerHTML = "";
+                document.getElementById("nextPortalBtn").style.display = "none";
+                popAlert(3, pQuizScore >= 7 ? "ಅಪ್ರತಿಮ ಸೈಬರ್ ಇತಿಹಾಸಕಾರರು!" : "ಮತ್ತೊಮ್ಮೆ ಪ್ರಯತ್ನಿಸಿ ಗೆಳೆಯಾ!", true);
+            }
+        }
+        loadPortalQuestion();
+
+        // Portal 4: Inputs Field
+        function verifyPortal4() {
+            let i1 = document.getElementById("cyIn1").value.trim();
+            let i2 = document.getElementById("cyIn2").value.trim();
+            let i3 = document.getElementById("cyIn3").value.trim();
+            let i4 = document.getElementById("cyIn4").value.trim();
+
+            if(i1 === "ಸಾರನಾಥ" && i2 === "ಪಾವಾಪುರಿ" && i3 === "ಬೋಧಗಯಾ" && i4 === "ಜೈನ ಧರ್ಮ") {
+                modifyHUD(150, 0);
+                popAlert(4, "ವಾಹ್ ಗೆಳೆಯಾ! ಎಲ್ಲಾ ಧಾರ್ಮಿಕ ಕ್ಷೇತ್ರಗಳು ಸರಿಯಾಗಿವೆ!", true);
+            } else {
+                modifyHUD(0, 5);
+                popAlert(4, "ಕೆಲವು ಉತ್ತರಗಳು ತಪ್ಪಾಗಿವೆ. ಸುಳಿವು: ಸಾರನಾಥ, ಪಾವಾಪುರಿ, ಬೋಧಗಯಾ, ಜೈನ ಧರ್ಮ.", false);
+            }
+        }
+
+        // Portal 5: Toggle Switchboard
+        let pbStatus = {1:null, 2:null, 3:null, 4:null};
+        function triggerToggle(num, flag) {
+            pbStatus[num] = flag;
+            document.getElementById(`pb${num}_t`).classList.remove('switch-trigger');
+            document.getElementById(`pb${num}_f`).classList.remove('switch-trigger');
+            if(flag) document.getElementById(`pb${num}_t`).classList.add('switch-trigger');
+            else document.getElementById(`pb${num}_f`).classList.add('switch-trigger');
+        }
+        function verifyPortal5() {
+            if(pbStatus[1] === true && pbStatus[2] === true && pbStatus[3] === false && pbStatus[4] === true) {
+                modifyHUD(100, 0);
+                popAlert(5, "ಬೈನರಿ ಸ್ವಿಚ್ ಬೋರ್ಡ್ ಯಶಸ್ವಿಯಾಗಿದೆ! ಎಲ್ಲಾ ಮಾಹಿತಿಗಳು ಸರಿ.", true);
+            } else {
+                modifyHUD(0, 10);
+                popAlert(5, "ದೋಷವಿದೆ ಪರಿಶೀಲಿಸಿ! (ಮಹಾವೀರನು 24ನೇ ತೀರ್ಥಂಕರ, ಪ್ರಥಮ ವೃಷಭನಾಥ)", false);
+            }
+        }
+
+        // Portal 6: Decode Logic
+        function verifyPortal6() {
+            let c1 = document.getElementById("capsInput1").value.trim();
+            let c2 = document.getElementById("capsInput2").value.trim();
+            let c3 = document.getElementById("capsInput3").value.trim();
+
+            if(c1 === "ಪ್ರಾಕೃತ" && c2 === "ಪಾಲಿ" && c3 === "ನಿರ್ವಾಣ") {
+                modifyHUD(150, 0);
+                popAlert(6, "ಭಾಷಾ ಮೂಲದ ಕ್ಯಾಪ್ಸುಲ್ ಅನ್ನು ಯಶಸ್ವಿಯಾಗಿ ಡಿಕೋಡ್ ಮಾಡಿದ್ದೀರಿ!", true);
+            } else {
+                modifyHUD(0, 5);
+                popAlert(6, "ಡಿಕೋಡಿಂಗ್ ವಿಫಲವಾಗಿದೆ (ಸುಳಿವು: ಪ್ರಾಕೃತ, ಪಾಲಿ, ನಿರ್ವಾಣ).", false);
+            }
+        }
+
+        // Portal 7: Matrix Dropdowns
+        function verifyPortal7() {
+            let s1 = document.getElementById("dropSel1").value;
+            let s2 = document.getElementById("dropSel2").value;
+            let s3 = document.getElementById("dropSel3").value;
+            let s4 = document.getElementById("dropSel4").value;
+
+            if(s1 === 'B' && s2 === 'D' && s3 === 'A' && s4 === 'C') {
+                modifyHUD(250, 0);
+                popAlert(7, "ಅದ್ಭುತ ಗೆಳೆಯಾ! ಮ್ಯಾಟ್ರಿಕ್ಸ್ ಕನೆಕ್ಟರ್ ಸಂಪೂರ್ಣ ಯಶಸ್ವಿಯಾಗಿದೆ. 5ನೇ ಪಾಠ ಪೂರ್ಣಗೊಂಡಿದೆ!", true);
+            } else {
+                modifyHUD(0, 10);
+                popAlert(7, "ತಪ್ಪಾದ ಜೋಡಣೆ, ಗುಣಲಕ್ಷಣಗಳು ಮತ್ತು ಹೆಸರುಗಳನ್ನು ಮತ್ತೊಮ್ಮೆ ಗಮನಿಸಿ.", false);
+            }
+        }
+
+        function popAlert(pNum, text, success) {
+            let box = document.getElementById("alert" + pNum);
+            box.style.display = "block";
+            box.innerText = text;
+            box.style.background = success ? "rgba(57, 255, 20, 0.1)" : "rgba(255, 0, 127, 0.1)";
+            box.style.color = success ? "var(--cyber-neon)" : "var(--cyber-pink)";
+            box.style.borderColor = success ? "var(--cyber-neon)" : "var(--cyber-pink)";
+        }
+    </script>
+</body>
+</html>

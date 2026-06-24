@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಇಕೋ-ಆರ್ಕೇಡ್ ೧೨.೦ - ನಮ್ಮ ಭೂಮಿ ಮತ್ತು ಪರಿಸರ</title>
+    <style>
+        :root {
+            --eco-green: #10ac84;
+            --ocean-blue: #0984e3;
+            --earth-gold: #f1c40f;
+            --space-black: #05070c;
+            --neon-pink: #ff007f;
+            --panel-bg: rgba(15, 23, 42, 0.95);
+            --danger-red: #ee5253;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Verdana, sans-serif; }
+
+        body {
+            background: var(--space-black);
+            background-image: radial-gradient(circle at 50% 50%, #1e293b 0%, #05070c 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #ffffff;
+        }
+
+        header.eco-header {
+            text-align: center;
+            padding: 25px;
+            background: var(--panel-bg);
+            border: 2px solid var(--eco-green);
+            border-radius: 24px;
+            box-shadow: 0 0 30px rgba(16, 172, 132, 0.3);
+            margin-bottom: 25px;
+        }
+
+        header.eco-header h1 {
+            color: var(--eco-green);
+            font-size: 2.4rem;
+            text-shadow: 0 0 12px rgba(16, 172, 132, 0.5);
+            margin-bottom: 5px;
+        }
+
+        header.eco-header p { color: #cbd5e1; font-size: 1.15rem; }
+
+        /* NEW HUD: ECO-SYSTEM HEALTH INDEX */
+        .eco-hud-display {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #1e293b;
+            padding: 15px 25px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            border-left: 5px solid var(--ocean-blue);
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .health-bar-container {
+            background: #334155;
+            width: 45%;
+            height: 18px;
+            border-radius: 9px;
+            overflow: hidden;
+            border: 1px solid var(--eco-green);
+        }
+
+        .health-bar-fill {
+            background: linear-gradient(90deg, var(--eco-green), #55efc4);
+            height: 100%;
+            width: 100%;
+            transition: width 0.4s ease;
+        }
+
+        /* Side Scrolling Level Steppers */
+        .eco-track-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 35px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+
+        .eco-track-row::-webkit-scrollbar { height: 6px; }
+        .eco-track-row::-webkit-scrollbar-thumb { background: var(--eco-green); border-radius: 3px; }
+
+        .eco-card {
+            background: #1e293b;
+            border: 1px solid #334155;
+            padding: 12px 25px;
+            border-radius: 14px;
+            cursor: pointer;
+            font-weight: bold;
+            white-space: nowrap;
+            transition: all 0.3s;
+        }
+
+        .eco-card:hover, .eco-card.active-mission {
+            background: var(--eco-green);
+            color: #000000;
+            border-color: #ffffff;
+            box-shadow: 0 0 15px var(--eco-green);
+            transform: translateY(-3px);
+        }
+
+        /* Game Arena Boxes */
+        .eco-arena {
+            background: var(--panel-bg);
+            border: 2px solid #334155;
+            border-radius: 24px;
+            padding: 35px;
+            min-height: 520px;
+            display: none;
+            box-shadow: 0 20px 45px rgba(0,0,0,0.5);
+        }
+
+        .eco-arena.active-arena { display: block; animation: ecoPowerOn 0.4s ease-in-out; }
+
+        @keyframes ecoPowerOn {
+            from { opacity: 0; transform: scale(0.98); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        h2.arena-title {
+            font-size: 1.65rem;
+            color: var(--earth-gold);
+            margin-bottom: 25px;
+            border-bottom: 1px dashed rgba(241, 196, 15, 0.3);
+            padding-bottom: 12px;
+        }
+
+        /* Nodes Connector System */
+        .grid-connector-system {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .eco-node {
+            background: #1e293b;
+            padding: 18px;
+            border-radius: 14px;
+            cursor: pointer;
+            border: 2px solid #334155;
+            font-weight: bold;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .eco-node:hover { border-color: var(--ocean-blue); background: #223047; }
+        .eco-node.node-selected { background: var(--ocean-blue); color: white; border-color: white; }
+
+        /* Quiz UI Elements */
+        .quiz-box-row {
+            background: #1e293b;
+            border: 2px solid #334155;
+            padding: 16px;
+            margin: 12px 0;
+            border-radius: 14px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+        }
+
+        .quiz-box-row:hover { border-color: var(--eco-green); transform: translateX(5px); }
+        .quiz-box-row.correct-glow { background: rgba(16, 172, 132, 0.2); border-color: var(--eco-green); color: #55efc4; }
+        .quiz-box-row.wrong-glow { background: rgba(238, 82, 83, 0.2); border-color: var(--neon-pink); color: #ff7675; }
+
+        /* Input Deck styling */
+        .smart-eco-input {
+            background: #05070c;
+            border: 2px solid #334155;
+            border-radius: 10px;
+            padding: 12px;
+            font-size: 1.1rem;
+            color: var(--earth-gold);
+            font-weight: bold;
+            outline: none;
+            width: 100%;
+            max-width: 320px;
+            margin-top: 8px;
+        }
+
+        .smart-eco-input:focus { border-color: var(--eco-green); }
+
+        /* Mining Grid */
+        .mining-card-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        .ore-token {
+            background: #1e293b;
+            border: 2px solid #334155;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .ore-token.active-token { background: var(--eco-green); border-color: white; }
+
+        /* Universal Action Buttons */
+        .eco-btn {
+            background: linear-gradient(135deg, var(--eco-green), #00b894);
+            color: white;
+            border: none;
+            padding: 14px 35px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 25px;
+            box-shadow: 0 5px 15px rgba(16, 172, 132, 0.3);
+        }
+
+        .eco-btn:hover { transform: scale(1.02); box-shadow: 0 8px 25px rgba(16, 172, 132, 0.5); }
+
+        .eco-alert-box {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 12px;
+            font-weight: bold;
+            display: none;
+            font-size: 1.1rem;
+            border: 1px solid transparent;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="eco-header">
+        <h1>ಭೂಗೋಳ ಶಾಸ್ತ್ರ ವಿಭಾಗ: ಇಕೋ-ಆರ್ಕೇಡ್</h1>
+        <p>ಸಿಮ್ಯುಲೇಟರ್ ಮಾದರಿ ೧೨.೦ • ನಮ್ಮ ಅದ್ಭುತ ಭೂಮಿ ಮತ್ತು ಪರಿಸರ ಸಂರಕ್ಷಣೆ ಆಟಗಳು</p>
+    </div>
+
+    <div class="eco-hud-display">
+        <span>ಪರಿಸರ ಮತ್ತು ಓಝೋನ್ ಆರೋಗ್ಯದ ಮಟ್ಟ:</span>
+        <div class="health-bar-container"><div class="health-bar-fill" id="healthFill"></div></div>
+        <span style="color: var(--earth-gold);" id="livePlanetXP">ಪ್ಲಾನೆಟ್ ಪಾಯಿಂಟ್ಸ್: 0000 PXP</span>
+    </div>
+
+    <div class="eco-track-row">
+        <div class="eco-card active-mission" id="ecoBtn1" onclick="shiftEcoLevel(1)">1. ಬ್ರಹ್ಮಾಂಡದಲ್ಲಿ ಭೂಮಿ</div>
+        <div class="eco-card" id="ecoBtn2" onclick="shiftEcoLevel(2)">2. ಭೂಮಿಯ ಅಪೂರ್ವ ಆಕಾರ</div>
+        <div class="eco-card" id="ecoBtn3" onclick="shiftEcoLevel(3)">3. ಎಪಿಕ್ 10 ಇಕೋ ಕ್ವಿಜ್</div>
+        <div class="eco-card" id="ecoBtn4" onclick="shiftEcoLevel(4)">4. ಅಕ್ಷಾಂಶ ಮತ್ತು ರೇಖಾಂಶ</div>
+        <div class="eco-card" id="ecoBtn5" onclick="shiftEcoLevel(5)">5. ಖಂಡಗಳು ಮತ್ತು ಸಾಗರಗಳು</div>
+        <div class="eco-card" id="ecoBtn6" onclick="shiftEcoLevel(6)">6. ಭೂಮಿಯ ಎರಡು ಚಲನೆಗಳು</div>
+        <div class="eco-card" id="ecoBtn7" onclick="shiftEcoLevel(7)">7. ಪರಿಸರ ಸಂರಕ್ಷಣೆ ಬಂಧ</div>
+    </div>
+
+    <div id="ecoArena1" class="eco-arena active-arena">
+        <h2 class="arena-title">ಹಂತ 1: ಸೌರವ್ಯೂಹದಲ್ಲಿ ನಮ್ಮ ಭೂಮಿಯ ಸ್ಥಾನ (Space Node Connector)</h2>
+        <p style="margin-bottom: 15px;">ಗೆಳೆಯಾ, ಸೂರ್ಯನಿಂದ ನಮ್ಮ ಭೂಮಿಗಿರುವ ದೂರ ಮತ್ತು ಅದರ ವಿಶಿಷ್ಟ ಸ್ಥಾನವನ್ನು ಸರಿಯಾಗಿ ಜೋಡಿಸು:</p>
+        <div class="grid-connector-system">
+            <div>
+                <div class="eco-node" id="l1_nodeL1" onclick="connectEcoNodes('L', 'l1_nodeL1', 1)">ಭೂಮಿಯ ಸ್ಥಾನ</div>
+                <div class="eco-node" id="l1_nodeL2" style="margin-top:15px;" onclick="connectEcoNodes('L', 'l1_nodeL2', 2)">ಸೂರ್ಯನಿಂದಿರುವ ಸರಾಸರಿ ದೂರ</div>
+            </div>
+            <div>
+                <div class="eco-node" id="l1_nodeR1" onclick="connectEcoNodes('R', 'l1_nodeR1', 2)">ಸುಮಾರು ೧೪೯.೬ ಮಿಲಿಯನ್ ಕಿಲೋಮೀಟರ್</div>
+                <div class="eco-node" id="l1_nodeR2" style="margin-top:15px;" onclick="connectEcoNodes('R', 'l1_nodeR2', 1)">ಸೂರ್ಯನಿಂದ ೩ ನೇ ಗ್ರಹ ಮತ್ತು ಗಾತ್ರದಲ್ಲಿ ೫ ನೇ ದೊಡ್ಡ ಗ್ರಹ</div>
+            </div>
+        </div>
+        <div class="eco-alert-box" id="alert1"></div>
+    </div>
+
+    <div id="ecoArena2" class="eco-arena">
+        <h2 class="arena-title">ಹಂತ 2: ಜಲಾವೃತ ಗ್ರಹ ಮತ್ತು ಅದರ ನೈಜ ಆಕಾರ (The Earth Shape Crypt)</h2>
+        <div style="display:flex; flex-direction:column; gap:20px;">
+            <div class="fib-q">1. ಭೂಮಿಯು ಧ್ರುವಗಳಲ್ಲಿ ಸ್ವಲ್ಪ ಚಪ್ಪಟೆಯಾಗಿದ್ದು, ಸಮಭಾಜಕ ವೃತ್ತದ ಬಳಿ ಉಬ್ಬಿರುವುದರಿಂದ ಅದರ ವಿಶಿಷ್ಟ ಆಕಾರವನ್ನು ಏನೆಂದು ಕರೆಯುತ್ತಾರೆ? <br><input type="text" class="smart-eco-input" id="cryptIn1" placeholder="ಆಕಾರದ ಹೆಸರು (ಉದಾ: ಜಿಯೋಯ್ಡ್)"></div>
+            <div class="fib-q">2. ಭೂಮಿಯ ಮೇಲ್ಮೈ ಭಾಗದಲ್ಲಿ ಶೇಕಡಾ ೭೦.೮ ರಷ್ಟು ನೀರಿರುವುದರಿಂದ ಇದನ್ನು ಯಾವ ಗ್ರಹ ಎನ್ನುತ್ತಾರೆ? <br><input type="text" class="smart-eco-input" id="cryptIn2" placeholder="ಜಲಾವೃತ ಗ್ರಹ / ಒಣ ಗ್ರಹ?"></div>
+        </div>
+        <button class="eco-btn" onclick="verifyEcoLevel2()">ಭೂಮಿಯ ರಹಸ್ಯ ಕ್ರಾಕ್ ಮಾಡು</button>
+        <div class="eco-alert-box" id="alert2"></div>
+    </div>
+
+    <div id="ecoArena3" class="eco-arena">
+        <h2 class="arena-title">ಹಂತ 3: ಭೂಗೋಳ ಮತ್ತು ಪರಿಸರ ಜಾಗೃತಿಯ ಮಹಾ ಕದನ (Epic 10 Eco Quiz)</h2>
+        <div style="font-weight: bold; margin-bottom: 15px; color: var(--earth-gold);" id="quizCounterText">ಪ್ರಶ್ನೆ ಕೋಡ್: 1 / 10</div>
+        <div id="quizQuestionText" style="font-size: 1.25rem; font-weight: bold; margin-bottom: 20px;">ಲೋಡ್ ಆಗುತ್ತಿದೆ...</div>
+        <div id="quizOptionsContainer"></div>
+        <button class="eco-btn" id="nextQuizBtn" style="display:none;" onclick="nextGeoQuestion()">ಮುಂದಿನ ಜ್ಞಾನ ಸವಾಲಿಗೆ ಚಲಿಸು ➔</button>
+        <div class="eco-alert-box" id="alert3"></div>
+    </div>
+
+    <div id="ecoArena4" class="eco-arena">
+        <h2 class="arena-title">ಹಂತ 4: ಅಕ್ಷಾಂಶ ಮತ್ತು ರೇಖಾಂಶಗಳ ಕಾಲ್ಪನಿಕ ಜಾಲ (Global Geo-Grid Lines)</h2>
+        <div style="display:flex; flex-direction:column; gap:20px;">
+            <div class="fib-q">1. ಭೂಮಿಯ ಮಧ್ಯಭಾಗದಲ್ಲಿ ಪೂರ್ವ ಪಶ್ಚಿಮವಾಗಿ ಹಾದು ಹೋಗಿರುವ ೦ ಡಿಗ್ರಿ ಅತ್ಯಂತ ದೊಡ್ಡ ಅಕ್ಷಾಂಶ ರೇಖೆ ಯಾವುದು? <br><input type="text" class="smart-eco-input" id="lineIn1" placeholder="ಸಮಭಾಜಕ ವೃತ್ತ / ಕರ್ಕಾಟಕ ಸಂಕ್ರಾಂತಿ ವೃತ್ತ?"></div>
+            <div class="fib-q">2. ಜಗತ್ತಿನ ಪ್ರಮಾಣStandard ಕಾಲವನ್ನು ನಿಗದಿಪಡಿಸುವ ಇಂಗ್ಲೆಂಡಿನ ಗ್ರೀನ್‌ವಿಚ್ ಮೇಲಿರುವ ೦ ಡಿಗ್ರಿ ರೇಖಾಂಶದ ಹೆಸರೇನು? <br><input type="text" class="smart-eco-input" id="lineIn2" placeholder="ಮುಖ್ಯ ರೇಖಾಂಶ / ದಿನರೇಖೆ?"></div>
+        </div>
+        <button class="eco-btn" onclick="verifyEcoLevel4()">ರೇಖೆಗಳ ಕೋಡ್ ದೃಢೀಕರಿಸು</button>
+        <div class="eco-alert-box" id="alert4"></div>
+    </div>
+
+    <div id="ecoArena5" class="eco-arena">
+        <h2 class="arena-title">ಹಂತ 5: ಜಗತ್ತಿನ ಖಂಡಗಳು ಮತ್ತು ಮಹಾಸಾಗರಗಳ ಶೋಧ (Continents & Oceans Mining)</h2>
+        <p style="margin-bottom: 15px;">ಗೆಳೆಯಾ, ನಮ್ಮ ಭೂಮಿಯ ಮೇಲಿರುವ ಅತ್ಯಂತ ದೊಡ್ಡ ವಿಸ್ತಾರವಾದ **ಖಂಡಗಳನ್ನು ಮಾತ್ರ** ಕ್ಲಿಕ್ ಮಾಡಿ ಗಣಿ ಮಾಡು:</p>
+        <div class="mining-card-grid">
+            <div class="ore-token" id="ore1" onclick="toggleOreToken('ore1', true)">1. ಏಷ್ಯಾ ಖಂಡ (Asia)</div>
+            <div class="ore-token" id="ore2" onclick="toggleOreToken('ore2', false)">2. ಪೆಸಿಫಿಕ್ ಸಾಗರ</div>
+            <div class="ore-token" id="ore3" onclick="toggleOreToken('ore3', true)">3. ಆಫ್ರಿಕಾ ಖಂಡ</div>
+            <div class="ore-token" id="ore4" onclick="toggleOreToken('ore4', true)">4. ಯುರೋಪ್ ಖಂಡ</div>
+            <div class="ore-token" id="ore5" onclick="toggleOreToken('ore5', false)">5. ಹಿಂದೂ ಮಹಾಸಾಗರ</div>
+            <div class="ore-token" id="ore6" onclick="toggleOreToken('ore6', true)">6. ಆಸ್ಟ್ರೇಲಿಯಾ ಖಂಡ</div>
+        </div>
+        <button class="eco-btn" onclick="verifyEcoLevel5()">ಖಂಡಗಳನ್ನು ಲಾಕ್ ಮಾಡು</button>
+        <div class="eco-alert-box" id="alert5"></div>
+    </div>
+
+    <div id="ecoArena6" class="eco-arena">
+        <h2 class="arena-title">ಹಂತ 6: ಭೂಮಿಯ ಎರಡು ಪ್ರಮುಖ ಚಲನೆಗಳ ಪರಿಣಾಮ (Earth Motions Sorting)</h2>
+        <p style="margin-bottom: 15px;">ಭೂಮಿಯ ಭ್ರಮಣೆ (ತನ್ನ ಅಕ್ಷದಲ್ಲಿ ಸುತ್ತುವುದು) ಮತ್ತು ಪರಿಭ್ರಮಣೆಯ (ಸೂರ್ಯನ ಸುತ್ತ ಸುತ್ತುವುದು) ಸರಿಯಾದ ಪರಿಣಾಮಗಳನ್ನು ಹಂಚು ಗೆಳೆಯಾ:</p>
+        <div style="display:flex; gap:25px;">
+            <div style="flex:1; display:flex; flex-direction:column; gap:10px;" id="motionSource">
+                <div style="background:#1e293b; padding:12px; border-radius:10px; cursor:grab; font-weight:bold; border:1px solid #334155;" draggable="true" id="mot1" ondragstart="startMotionDrag(event)">ಭೂಮಿಯ ದೈನಂದಿನ ಚಲನೆ (ಭ್ರಮಣೆ)</div>
+                <div style="background:#1e293b; padding:12px; border-radius:10px; cursor:grab; font-weight:bold; border:1px solid #334155;" draggable="true" id="mot2" ondragstart="startMotionDrag(event)">ಭೂಮಿಯ ವಾರ್ಷಿಕ ಚಲನೆ (ಪರಿಭ್ರಮಣೆ)</div>
+            </div>
+            <div style="flex:2; display:flex; flex-direction:column; gap:15px;">
+                <div style="background:rgba(0,0,0,0.3); border:2px dashed var(--eco-green); padding:15px; border-radius:12px;" ondragover="allowMotionDrop(event)" ondrop="handleMotionDrop(event, 'daynight')">
+                    <h3>ಹಗಲು ಮತ್ತು ರಾತ್ರಿಗಳು ಸಂಭವಿಸಲು ಕಾರಣವಾದ ಚಲನೆ</h3>
+                </div>
+                <div style="background:rgba(0,0,0,0.3); border:2px dashed var(--eco-green); padding:15px; border-radius:12px;" ondragover="allowMotionDrop(event)" ondrop="handleMotionDrop(event, 'seasons')">
+                    <h3>ವರ್ಷದ ವಿವಿಧ ಋತುಮಾನಗಳು (ಚಳಿಗಾಲ, ಬೇಸಿಗೆಕಾಲ) ಬದಲಾಗಲು ಕಾರಣ</h3>
+                </div>
+            </div>
+        </div>
+        <button class="eco-btn" onclick="verifyEcoLevel6()">ಚಲನೆಯ ಫಲಿತಾಂಶ ಪರಿಶೀಲಿಸು</button>
+        <div class="eco-alert-box" id="alert6"></div>
+    </div>
+
+    <div id="ecoArena7" class="eco-arena">
+        <h2 class="arena-title">ಹಂತ 7: ಗ್ಲೋಬಲ್ ವಾರ್ಮಿಂಗ್ ಮತ್ತು ಪರಿಸರ ಸಂರಕ್ಷಣೆ (The Eco Preservation Matrix)</h2>
+        <p style="margin-bottom: 15px;">ಅಂತಿಮ ಹಂತ! ಪರಿಸರವನ್ನು ಹಾಳು ಮಾಡುವ ಅಂಶಗಳು ಮತ್ತು ಅದನ್ನು ರಕ್ಷಿಸುವ ಜವಾಬ್ದಾರಿಯನ್ನು ಮ್ಯಾಚ್ ಮಾಡಿ ಆರ್ಕೇಡ್ ಗೆಲ್ಲು ಗೆಳೆಯಾ:</p>
+        <div class="grid-connector-system">
+            <div class="eco-node" id="matL1" onclick="selectFinalEcoMatrix('L', 'matL1', 'bad')">ಕಾಡು ಕಡಿಯುವುದು ಮತ್ತು ಪ್ಲಾಸ್ಟಿಕ್ ಬಳಕೆ</div>
+            <div class="eco-node" id="matR1" onclick="selectFinalEcoMatrix('R', 'matR1', 'bad')">ಜಾಗತಿಕ ತಾಪಮಾನ (Global Warming) ಮತ್ತು ಪರಿಸರ ವಿನಾಶಕ್ಕೆ ಕಾರಣ</div>
+            <div class="eco-node" id="matL2" onclick="selectFinalEcoMatrix('L', 'matL2', 'good')">ಮರಗಳನ್ನು ನೆಡುವುದು ಮತ್ತು ಪ್ರಕೃತಿ ಕಾಯುವುದು</div>
+            <div class="eco-node" id="matR2" onclick="selectFinalEcoMatrix('R', 'matR2', 'good')">ಭೂಮಿಯ ಓಝೋನ್ ಪದರ ಮತ್ತು ಜೀವರಾಶಿಯನ್ನು ರಕ್ಷಿಸುವ ಏಕೈಕ ಮಾರ್ಗ</div>
+        </div>
+        <button class="eco-btn" onclick="verifyEcoLevel7()">ಇಕೋ ಮ್ಯಾಟ್ರಿಕ್ಸ್ ಪೂರ್ಣಗೊಳಿಸು</button>
+        <div class="eco-alert-box" id="alert7"></div>
+    </div>
+
+    <script>
+        let planetXP = 0; let ecoHealth = 100;
+        function modifyEcoHUD(pxpChange, healthDamage) {
+            planetXP += pxpChange;
+            ecoHealth = Math.max(10, ecoHealth - healthDamage);
+            document.getElementById("livePlanetXP").innerText = `ಪ್ಲಾನೆಟ್ ಪಾಯಿಂಟ್ಸ್: ${planetXP.toString().padStart(4, '0')} PXP`;
+            document.getElementById("healthFill").style.width = `${ecoHealth}%`;
+        }
+
+        function shiftEcoLevel(levelIdx) {
+            document.querySelectorAll('.eco-arena').forEach(el => el.classList.remove('active-arena'));
+            document.querySelectorAll('.eco-card').forEach(el => el.classList.remove('active-mission'));
+            
+            document.getElementById('ecoArena' + levelIdx).classList.add('active-arena');
+            document.getElementById('ecoBtn' + levelIdx).classList.add('active-mission');
+        }
+
+        // Level 1 Logic
+        let nodeL = null; let nodeR = null;
+        function connectEcoNodes(side, id, matchVal) {
+            if(side === 'L') {
+                if(nodeL) document.getElementById(nodeL.id).classList.remove('node-selected');
+                nodeL = { id: id, match: matchVal };
+            } else {
+                if(nodeR) document.getElementById(nodeR.id).classList.remove('node-selected');
+                nodeR = { id: id, match: matchVal };
+            }
+            document.getElementById(id).classList.add('node-selected');
+
+            if(nodeL && nodeR) {
+                if(nodeL.match === nodeR.match) {
+                    document.getElementById(nodeL.id).style.background = "var(--eco-green)";
+                    document.getElementById(nodeR.id).style.background = "var(--eco-green)";
+                    modifyEcoHUD(100, 0);
+                    showEcoAlert(1, "ಸರಿಯಾದ ಲಿಂಕ್ ಗೆಳೆಯಾ! ಸೌರವ್ಯೂಹದಲ್ಲಿ ಭೂಮಿಯ ಸ್ಥಾನ ಪಕ್ಕಾ ಸರಿ ಇದೆ.", true);
+                    document.getElementById('ecoBtn1').style.background = "var(--eco-green)";
+                } else {
+                    modifyEcoHUD(0, 10);
+                    showEcoAlert(1, "ತಪ್ಪಾದ ಲಿಂಕ್, ಓಝೋನ್ ಆರೋಗ್ಯ ಕ್ಷೀಣಿಸಿದೆ! ಮತ್ತೊಮ್ಮೆ ಯೋಚಿಸು ಗೆಳೆಯಾ.", false);
+                }
+                nodeL = null; nodeR = null;
+            }
+        }
+
+        // Level 2 Logic
+        function verifyEcoLevel2() {
+            let c1 = document.getElementById("cryptIn1").value.trim();
+            let c2 = document.getElementById("cryptIn2").value.trim();
+
+            if((c1 === "ಜಿಯೋಯ್ಡ್" || c1 === "ಜಿಯೋಯಿಡ್") && (c2 === "ಜಲಾವೃತ ಗ್ರಹ" || c2 === "ಜಲಾವೃತ")) {
+                modifyEcoHUD(150, 0);
+                document.getElementById('ecoBtn2').style.background = "var(--eco-green)";
+                showEcoAlert(2, "ಅದ್ಭುತ! ಭೂಮಿಯ ಜಿಯೋಯ್ಡ್ ಆಕಾರ ಮತ್ತು ಜಲಾವೃತ ಗ್ರಹದ ಪರಿಕಲ್ಪನೆ ನೂರಕ್ಕೆ ನೂರು ಸರಿ ಇದೆ.", true);
+            } else {
+                modifyEcoHUD(0, 10);
+                showEcoAlert(2, "ಉತ್ತರ ತಪ್ಪಾಗಿದೆ ಗೆಳೆಯಾ! ಸುಳಿವು: ಜಿಯೋಯ್ಡ್, ಜಲಾವೃತ ಗ್ರಹ ಎಂದು ಬರೆಯಿರಿ.", false);
+            }
+        }
+
+        // Level 3: 10 Questions Matrix Quiz Data
+        const geographyQuizPool = [
+            { q: "1. ನಾವು ವಾಸಿಸುವ ನಮ್ಮ ಭವ್ಯ ಭೂಮಿಯನ್ನು ಸೌರವ್ಯೂಹದಲ್ಲಿ ಯಾವ ಹೆಸರಿನಿಂದ ವಿಶೇಷವಾಗಿ ಕರೆಯಲಾಗುತ್ತದೆ?", o: ["ಅನಿಲ ಗ್ರಹ", "ಜೀವಂತ ಗ್ರಹ (Living Planet)", "ಬಿಸಿ ಗ್ರಹ"], c: 1 },
+            { q: "2. ಭೂಮಿಯ ಒಟ್ಟು ಭೌಗೋಳಿಕ ವಿಸ್ತೀರ್ಣ ಎಷ್ಟು ಚದರ ಕಿಲೋಮೀಟರ್‌ಗಳಾಗಿದೆ?", o: ["೫೧೦.೦೭ ಮಿಲಿಯನ್ ಚ.ಕಿ.ಮೀ", "೧೦೦ ಮಿಲಿಯನ್ ಚ.ಕಿ.ಮೀ", "೮೦೦ ಮಿಲಿಯನ್ ಚ.ಕಿ.ಮೀ"], c: 0 },
+            { q: "3. ಭೂಮಿಯ ಮೇಲ್ಮೈ ಭಾಗದಲ್ಲಿ ಹರಡಿರುವ ಒಟ್ಟು ನೀರಿನ ಶೇಕಡಾವಾರು ಪ್ರಮಾಣ ಎಷ್ಟು?", o: ["ಶೇಕಡಾ ೫೦", "ಶೇಕಡಾ ೨೯.೨", "ಶೇಕಡಾ ೭೦.೮ (70.8%)"], c: 2 },
+            { q: "4. ಜಗತ್ತಿನಲ್ಲೇ ವಿಸ್ತೀರ್ಣದಲ್ಲಿ ಅತ್ಯಂತ ದೊಡ್ಡದಾದ ಹಾಗೂ ಅತಿ ಹೆಚ್ಚು ಜನಸಂಖ್ಯೆ ಹೊಂದಿರುವ ಖಂಡ ಯಾವುದು?", o: ["ಆಫ್ರಿಕಾ ಖಂಡ", "ಏಷ್ಯಾ ಖಂಡ (Asia)", "ಯುರೋಪ್ ಖಂಡ"], c: 1 },
+            { q: "5. ಭೂಗೋಳದ ಮೇಲೆ ಉತ್ತರ ಧ್ರುವ ಮತ್ತು ದಕ್ಷಿಣ ಧ್ರುವಗಳನ್ನು ಜೋಡಿಸುವ ಕಾಲ್ಪನಿಕ ಲಂಬ ರೇಖೆಗಳನ್ನು ಏನೆನ್ನುತ್ತಾರೆ?", o: ["ಅಕ್ಷಾಂಶಗಳು", "ರೇಖಾಂಶಗಳು (Longitude)", "ಸಮಭಾಜಕ ರೇಖೆ"], c: 1 },
+            { q: "6. ಎರಡು ರೇಖಾಂಶಗಳ ನಡುವೆ ಇರುವ ದೂರ ಅಥವಾ ಸಮಯದ ವ್ಯತ್ಯಾಸ ಪ್ರತಿ ಒಂದು ಡಿಗ್ರಿಗೆ ಎಷ್ಟು ನಿಮಿಷಗಳು?", o: ["೪ ನಿಮಿಷಗಳು (4 Minutes)", "೧0 ನಿಮಿಷಗಳು", "೬0 ನಿಮಿಷಗಳು"], c: 0 },
+            { q: "7. ಇಡೀ ಭೂಮಿಯ ಮೇಲೆ ಅತ್ಯಂತ ಆಳವಾದ 'ಮರಿಯಾನಾ ಕಂದಕ' (Mariana Trench) ಯಾವ ಮಹಾಸಾಗರದಲ್ಲಿದೆ?", o: ["ಹಿಂದೂ ಮಹಾಸಾಗರ", "ಪೆಸಿಫಿಕ್ ಮಹಾಸಾಗರ (Pacific Ocean)", "ಅಟ್ಲಾಂಟಿಕ್ ಸಾಗರ"], c: 1 },
+            { q: "8. ಭೂಮಿಯು ತನ್ನ ಅಕ್ಷದಲ್ಲಿ ತಾನೇ ಪಶ್ಚಿಮದಿಂದ ಪೂರ್ವಕ್ಕೆ ತಿರುಗುವ ವೇಗ ಸಮಭಾಜಕ ವೃತ್ತದ ಬಳಿ ಎಷ್ಟಿರುತ್ತದೆ?", o: ["ಗಂಟೆಗೆ ೧೬೭೦ ಕಿ.ಮೀ", "ಗಂಟೆಗೆ ೫೦೦ ಕಿ.ಮೀ", "ಗಂಟೆಗೆ ೧೦೦ ಕಿ.ಮೀ"], c: 0 },
+            { q: "9. ಇಂದಿನ ಆಧುನಿಕ ಯುಗದಲ್ಲಿ ಮನುಷ್ಯನು ಹೆಚ್ಚಾಗಿ ಬಳಸುತ್ತಿರುವ ಕಾರ್ಬನ್ ಡೈಆಕ್ಸೈಡ್ ಅನಿಲದಿಂದ ಭೂಮಿಗೆ ಉಂಟಾಗುತ್ತಿರುವ ದೊಡ್ಡ ಕಾಯಿಲೆ ಯಾವುದು?", o: ["ಹಿಮಪಾತ", "ಜಾಗತಿಕ ತಾಪಮಾನ ಏರಿಕೆ (Global Warming)", "ಓಝೋನ್ ಹೆಚ್ಚಳ"], c: 1 },
+            { q: "10. ಪರಿಸರವನ್ನು ಕಾಪಾಡಲು ಮತ್ತು ಜಾಗತಿಕ ತಾಪಮಾನ ತಡೆಯಲು ಜೂನ್ ೫ ರಂದು ಜಗತ್ತಿನಾದ್ಯಂತ ಯಾವ ದಿನ ಆಚರಿಸಲಾಗುತ್ತದೆ?", o: ["ವಿಶ್ವ ಜಲ ದಿನ", "ವಿಶ್ವ ಪರಿಸರ ದಿನ (World Environment Day)", "ವಿಶ್ವ ಭೂ ದಿನ"], c: 1 }
+        ];
+
+        let qIdx = 0; let qScore = 0; let isQuizActive = true;
+        function loadArkQuestion() {
+            isQuizActive = true;
+            document.getElementById("nextQuizBtn").style.display = "none";
+            document.getElementById("alert3").style.display = "none";
+            let qData = geographyQuizPool[qIdx];
+            document.getElementById("quizCounterText").innerText = `ಪ್ರಶ್ನೆ ಕೋಡ್: ${qIdx + 1} / 10`;
+            document.getElementById("quizQuestionText").innerText = qData.q;
+            
+            let container = document.getElementById("quizOptionsContainer");
+            container.innerHTML = "";
+            qData.o.forEach((opt, idx) => {
+                let div = document.createElement("div");
+                div.classList.add("quiz-box-row");
+                div.innerText = opt;
+                div.onclick = function() {
+                    if(!isQuizActive) return;
+                    isQuizActive = false;
+                    if(idx === qData.c) {
+                        this.classList.add("correct-glow");
+                        qScore++; modifyEcoHUD(30, 0);
+                        showEcoAlert(3, "ಸರಿಯಾದ ನಿರ್ಧಾರ! ಭೂಮಿಯ ಓಝೋನ್ ಪದರ ಸುರಕ್ಷಿತವಾಗಿದೆ.", true);
+                    } else {
+                        this.classList.add("wrong-glow");
+                        container.children[qData.c].classList.add("correct-glow");
+                        modifyEcoHUD(0, 10);
+                        showEcoAlert(3, "ತಪ್ಪು ನಿರ್ಧಾರ! ಜಾಗತಿಕ ತಾಪಮಾನದ ಮಟ್ಟ ಏರಿಕೆಯಾಗಿದೆ.", false);
+                    }
+                    document.getElementById("nextQuizBtn").style.display = "inline-block";
+                };
+                container.appendChild(div);
+            });
+        }
+        function nextGeoQuestion() {
+            qIdx++;
+            if(qIdx < geographyQuizPool.length) {
+                loadArkQuestion();
+            } else {
+                document.getElementById("quizCounterText").innerText = "ಮಿಷನ್ ಮುಕ್ತಾಯ!";
+                document.getElementById("quizQuestionText").innerText = `ತರಗತಿಯ ಒಟ್ಟು ಸ್ಕೋರ್: ${qScore} / 10`;
+                document.getElementById("quizOptionsContainer").innerHTML = "";
+                document.getElementById("nextQuizBtn").style.display = "none";
+                document.getElementById('ecoBtn3').style.background = "var(--eco-green)";
+                showEcoAlert(3, qScore >= 7 ? "ಅಪ್ರತಿಮ ಭೂಗೋಳ ಮತ್ತು ಪರಿಸರ ರಕ್ಷಕರು ಗೆಳೆಯಾ!" : "ಉತ್ತಮ ಪ್ರಯತ್ನ, ಮತ್ತೊಮ್ಮೆ ಓದಿ ತಿಳಿಯಿರಿ!", true);
+            }
+        }
+        loadArkQuestion();
+
+        // Level 4 Logic
+        function verifyEcoLevel4() {
+            let e1 = document.getElementById("lineIn1").value.trim();
+            let e2 = document.getElementById("lineIn2").value.trim();
+
+            if((e1 === "ಸಮಭಾಜಕ ವೃತ್ತ" || e1 === "ಸಮಭಾಜಕ ರೇಖೆ") && (e2 === "ಮುಖ್ಯ ರೇಖಾಂಶ" || e2 === "ಗ್ರೀನ್‌ವಿಚ್ ರೇಖಾಂಶ" || e2 === "ಗ್ರೀನವಿಚ್ ರೇಖಾಂಶ")) {
+                modifyEcoHUD(150, 0);
+                document.getElementById('ecoBtn4').style.background = "var(--eco-green)";
+                showEcoAlert(4, "ವಾಹ್ ಗೆಳೆಯಾ! ಕಾಲ್ಪನಿಕ ರೇಖೆಗಳ ಜಾಲ ಸಂಪೂರ್ಣ ಸರಿಯಾಗಿದೆ.", true);
+            } else {
+                modifyEcoHUD(0, 10);
+                showEcoAlert(4, "ತಪ್ಪಾಗಿದೆ! ಸುಳಿವು: ಸಮಭಾಜಕ ವೃತ್ತ, ಮುಖ್ಯ ರೇಖಾಂಶ ಎಂದು ಬರೆಯಿರಿ ಗೆಳೆಯಾ.", false);
+            }
+        }
+
+        // Level 5 Logic
+        let minedTokens = {};
+        function toggleOreToken(id, isContinent) {
+            let node = document.getElementById(id);
+            if(node.classList.contains('active-token')) {
+                node.classList.remove('active-token');
+                delete minedTokens[id];
+            } else {
+                node.classList.add('active-token');
+                minedTokens[id] = isContinent;
+            }
+        }
+        function verifyEcoLevel5() {
+            let win = true; let count = 0;
+            for(let id in minedTokens) {
+                if(minedTokens[id] === false) win = false;
+                count++;
+            }
+            if(count !== 4) win = false; // 4 major continents in grid
+
+            if(win) {
+                modifyEcoHUD(150, 0);
+                document.getElementById('ecoBtn5').style.background = "var(--eco-green)";
+                showEcoAlert(5, "ಅದ್ಭುತ! ಜಗತ್ತಿನ ಖಂಡಗಳ ಶೋಧನೆ ಸಂಪೂರ್ಣ ಯಶಸ್ವಿಯಾಗಿದೆ.", true);
+            } else {
+                modifyEcoHUD(0, 10);
+                showEcoAlert(5, "ತಪ್ಪಾಗಿದೆ! ಕೇವಲ ಭೂಭಾಗದ ದೊಡ್ಡ ಖಂಡಗಳನ್ನು ಮಾತ್ರ ಆರಿಸು (ಸಾಗರಗಳನ್ನು ಆರಿಸಬೇಡ).", false);
+            }
+        }
+
+        // Level 6 Logic
+        function allowMotionDrop(ev) { ev.preventDefault(); }
+        function startMotionDrag(ev) { ev.dataTransfer.setData("text", ev.target.id); }
+        function handleMotionDrop(ev, cat) {
+            ev.preventDefault();
+            let id = ev.dataTransfer.getData("text");
+            let el = document.getElementById(id);
+            el.dataset.cat = cat;
+            ev.target.appendChild(el);
+        }
+        function verifyEcoLevel6() {
+            let m1 = document.getElementById("mot1").dataset.cat;
+            let m2 = document.getElementById("mot2").dataset.cat;
+
+            if(m1 === "daynight" && m2 === "seasons") {
+                modifyEcoHUD(200, 0);
+                document.getElementById('ecoBtn6').style.background = "var(--eco-green)";
+                showEcoAlert(6, "ಭೂಮಿಯ ಚಲನೆಗಳು ಮತ್ತು ಅವುಗಳ ಪರಿಣಾಮ ನೂರಕ್ಕೆ ನೂರು ನಿಖರವಾಗಿದೆ ಗೆಳೆಯಾ!", true);
+            } else {
+                modifyEcoHUD(0, 10);
+                showEcoAlert(6, "ತಪ್ಪಾದ ವಿಭಾಗ! ಭ್ರಮಣೆಯಿಂದ ಹಗಲು-ರಾತ್ರಿ ಆಗುತ್ತದೆ, ಪರಿಭ್ರಮಣೆಯಿಂದ ಋತುಗಳು ಬದಲಾಗುತ್ತವೆ.", false);
+            }
+        }
+
+        // Level 7 Logic
+        let finalL = null; let finalR = null;
+        function selectFinalEcoMatrix(side, id, key) {
+            if(side === 'L') {
+                finalL = { id: id, key: key };
+                document.getElementById("matL1").classList.remove('node-linked');
+                document.getElementById("matL2").classList.remove('node-linked');
+            } else {
+                finalR = { id: id, key: key };
+                document.getElementById("matR1").classList.remove('node-linked');
+                document.getElementById("matR2").classList.remove('node-linked');
+            }
+            document.getElementById(id).classList.add('node-linked');
+        }
+        function verifyEcoLevel7() {
+            if(finalL && finalR && finalL.key === finalR.key) {
+                modifyEcoHUD(250, 0);
+                document.getElementById('ecoBtn7').style.background = "var(--eco-green)";
+                showEcoAlert(7, "ವಾಹ್ ಗೆಳೆಯಾ! ಇಡೀ 'ನಮ್ಮ ಭೂಮಿ' ಪಾಠದ ಇಕೋ-ಆರ್ಕೇಡ್ ಯಶಸ್ವಿಯಾಗಿದೆ. ತರಗತಿಯಲ್ಲಿ ಮಕ್ಕಳಿಗೆ ಅತ್ಯುತ್ತಮ ಪರಿಸರ ಪ್ರಜ್ಞೆ ಮೂಡುತ್ತದೆ!", true);
+            } else {
+                modifyEcoHUD(0, 10);
+                showEcoAlert(7, "ಮ್ಯಾಟ್ರಿಕ್ಸ್ ಲಿಂಕ್ ತಪ್ಪಾಗಿದೆ. ಪರಿಸರ ಸಂರಕ್ಷಣೆಯ ನಿಯಮಗಳನ್ನು ಮತ್ತೊಮ್ಮೆ ಗಮನಿಸು ಗೆಳೆಯಾ.", false);
+            }
+        }
+
+        function showEcoAlert(lvlNum, text, success) {
+            let box = document.getElementById("alert" + lvlNum);
+            box.style.display = "block";
+            box.innerText = text;
+            box.style.background = success ? "rgba(16, 172, 132, 0.15)" : "rgba(238, 82, 83, 0.1)";
+            box.style.color = success ? "#55efc4" : "#ff7675";
+            box.style.borderColor = success ? "var(--eco-green)" : "var(--neon-pink)";
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಸಮಾಜಶಾಸ್ತ್ರ ನೆಟ್‌ವರ್ಕ್ ೧೦.೦ - ಮಾನವ ಮತ್ತು ಸಮಾಜ ಆಟಗಳು</title>
+    <style>
+        :root {
+            --socio-teal: #00d2d3;
+            --socio-purple: #341f97;
+            --socio-pink: #ff007f;
+            --gold-star: #f1c40f;
+            --dark-web: #090a14;
+            --panel-glass: rgba(24, 24, 43, 0.95);
+            --neon-green: #10ac84;
+            --neon-red: #ee5253;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Verdana, sans-serif; }
+
+        body {
+            background: var(--dark-web);
+            background-image: radial-gradient(circle at 50% 50%, #1e1b4b 0%, #090a14 100%);
+            min-height: 100vh;
+            padding: 25px;
+            color: #ffffff;
+        }
+
+        header.socio-banner {
+            text-align: center;
+            padding: 25px;
+            background: var(--panel-glass);
+            border: 2px solid var(--socio-teal);
+            border-radius: 24px;
+            box-shadow: 0 0 30px rgba(0, 210, 211, 0.25);
+            margin-bottom: 25px;
+        }
+
+        header.socio-banner h1 {
+            color: var(--socio-teal);
+            font-size: 2.4rem;
+            text-shadow: 0 0 12px rgba(0, 210, 211, 0.4);
+            margin-bottom: 5px;
+        }
+
+        header.socio-banner p { color: #cbd5e1; font-size: 1.15rem; }
+
+        /* NEW CLASSROOM HUD: COMMUNITY BOND INDEX */
+        .socio-hud {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 15px 25px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            border-left: 5px solid var(--socio-pink);
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .bond-bar-container {
+            background: #222538;
+            width: 45%;
+            height: 16px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--socio-pink);
+        }
+
+        .bond-bar-fill {
+            background: linear-gradient(90deg, var(--socio-pink), #ff6b81);
+            height: 100%;
+            width: 100%;
+            transition: width 0.4s ease;
+        }
+
+        /* Side-Scrolling Matrix Dock */
+        .network-dock {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 35px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+
+        .network-dock::-webkit-scrollbar { height: 6px; }
+        .network-dock::-webkit-scrollbar-thumb { background: var(--socio-teal); border-radius: 3px; }
+
+        .dock-pill {
+            background: #18192b;
+            border: 1px solid #2c2d4a;
+            padding: 12px 24px;
+            border-radius: 14px;
+            cursor: pointer;
+            font-weight: bold;
+            color: #ffffff;
+            white-space: nowrap;
+            transition: all 0.3s;
+        }
+
+        .dock-pill:hover, .dock-pill.active-mission {
+            background: var(--socio-teal);
+            color: #000000;
+            border-color: #ffffff;
+            box-shadow: 0 0 15px var(--socio-teal);
+            transform: translateY(-3px);
+        }
+
+        /* Core Game Arena Screen */
+        .socio-arena {
+            background: var(--panel-glass);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 28px;
+            padding: 35px;
+            min-height: 520px;
+            display: none;
+            box-shadow: 0 25px 55px rgba(0,0,0,0.6);
+        }
+
+        .socio-arena.active-arena { display: block; animation: scaleNetwork 0.4s cubic-bezier(0.1, 0.8, 0.3, 1); }
+
+        @keyframes scaleNetwork {
+            from { opacity: 0; transform: scale(0.97); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        h2.arena-title {
+            font-size: 1.7rem;
+            color: var(--gold-star);
+            margin-bottom: 25px;
+            border-left: 6px solid var(--gold-star);
+            padding-left: 15px;
+        }
+
+        /* Interactive Grid Nodes */
+        .network-grid-connector {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .network-node {
+            background: #18192b;
+            padding: 18px;
+            border-radius: 14px;
+            cursor: pointer;
+            border: 2px solid #2c2d4a;
+            font-weight: bold;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .network-node:hover { border-color: var(--socio-teal); background: #1e203b; }
+        .network-node.node-linked { background: var(--socio-teal); color: black; border-color: white; box-shadow: 0 0 10px var(--socio-teal); }
+
+        /* Quiz UI Layout */
+        .quiz-option-block {
+            background: #18192b;
+            border: 2px solid #2c2d4a;
+            padding: 16px;
+            margin: 12px 0;
+            border-radius: 14px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+        }
+
+        .quiz-option-block:hover { border-color: var(--gold-star); transform: translateX(6px); }
+        .quiz-option-block.correct-glow { background: rgba(16, 172, 132, 0.2); border-color: var(--neon-green); color: #55efc4; }
+        .quiz-option-block.wrong-glow { background: rgba(238, 82, 83, 0.2); border-color: var(--neon-red); color: #ff7675; }
+
+        /* Smart Inputs */
+        .smart-socio-input {
+            background: rgba(0,0,0,0.4);
+            border: 2px solid #2c2d4a;
+            border-radius: 10px;
+            padding: 12px;
+            font-size: 1.1rem;
+            color: var(--gold-star);
+            font-weight: bold;
+            outline: none;
+            width: 100%;
+            max-width: 320px;
+            margin-top: 8px;
+        }
+
+        .smart-socio-input:focus { border-color: var(--socio-teal); }
+
+        /* Mining Grid Components */
+        .mining-deck-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        .mining-packet {
+            background: #18192b;
+            border: 2px solid #2c2d4a;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .mining-packet.active-packet { background: var(--socio-pink); border-color: white; box-shadow: 0 0 10px var(--socio-pink); }
+
+        /* General Action Buttons */
+        .socio-btn {
+            background: linear-gradient(135deg, var(--socio-teal), #48dbfb);
+            color: black;
+            border: none;
+            padding: 14px 35px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 25px;
+            box-shadow: 0 5px 15px rgba(0, 210, 211, 0.3);
+        }
+
+        .socio-btn:hover { transform: scale(1.02); box-shadow: 0 8px 25px rgba(0, 210, 211, 0.5); }
+
+        .socio-status-alert {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 12px;
+            font-weight: bold;
+            display: none;
+            font-size: 1.1rem;
+            border: 1px solid transparent;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="socio-banner">
+        <h1>ಸಮಾಜಶಾಸ್ತ್ರ ವಿಭಾಗ: ಕಮ್ಯುನಿಟಿ ಹಬ್</h1>
+        <p>ನೆಟ್‌ವರ್ಕ್ ಮಾಡೆಲ್ ೧೦.೦ • ಮಾನವ ಮತ್ತು ಸಮಾಜದ ಅನನ್ಯ ಬಾಂಧವ್ಯದ ಡಿಜಿಟಲ್ ಆಟಗಳು</p>
+    </div>
+
+    <!-- LIVE INDEX HUD -->
+    <div class="socio-hud">
+        <span>ಸಾಮಾಜಿಕ ಬಾಂಧವ್ಯದ ಸೂಚ್ಯಂಕ (Community Bond):</span>
+        <div class="bond-bar-container"><div class="bond-bar-fill" id="bondFill"></div></div>
+        <span style="color: var(--gold-star);" id="liveSocioPoints">ಸೋಶಿಯಲ್ ಎಂಪತಿ: 0000 SEP</span>
+    </div>
+
+    <!-- HORIZONTAL MATRIX MENU DOCK -->
+    <div class="network-dock">
+        <div class="dock-pill active-mission" id="pillBtn1" onclick="shiftSocioLevel(1)">1. ಶಬ್ದದ ಮೂಲ ಜೋಡಿ</div>
+        <div class="dock-pill" id="pillBtn2" onclick="shiftSocioLevel(2)">2. ಸಮಾಜದ ವ್ಯಾಖ್ಯಾನ ಕೋಡ್</div>
+        <div class="dock-pill" id="pillBtn3" onclick="shiftSocioLevel(3)">3. ಎಪಿಕ್ 10 ರಸಪ್ರಶ್ನೆ</div>
+        <div class="dock-pill" id="pillBtn4" onclick="shiftSocioLevel(4)">4. ಕಮಲಾಳ ನೈಜ ಇತಿಹಾಸ</div>
+        <div class="dock-pill" id="pillBtn5" onclick="shiftSocioLevel(5)">5. ಸಾಮಾಜೀಕರಣದ ಮೂಲಗಳು</div>
+        <div class="dock-pill" id="pillBtn6" onclick="shiftSocioLevel(6)">6. ಮಾನವ ಮತ್ತು ಭಾಷಾ ಬಂಧ</div>
+        <div class="dock-pill" id="pillBtn7" onclick="shiftSocioLevel(7)">7. ಭಾರತದ ಸಮಾಜಶಾಸ್ತ್ರಜ್ಞರು</div>
+    </div>
+
+    <!-- LEVEL 1 SCREEN -->
+    <div id="socio1" class="socio-arena active-arena">
+        <h2 class="arena-title">ಹಂತ 1: ಸಮಾಜಶಾಸ್ತ್ರ ಶಬ್ದದ ಭಾಷಾ ಮೂಲ (Language Node Connector)</h2>
+        <p style="margin-bottom: 15px;">ಗೆಳೆಯಾ, 'ಸೋಶಿಯಾಲಜಿ' ಪದವು ಉಗಮವಾದ ಭಾಷೆ ಮತ್ತು ಅವುಗಳ ಮೂಲ ಪದಗಳನ್ನು ಸರಿಯಾಗಿ ಲಿಂಕ್ ಮಾಡು:</p>
+        <div class="network-grid-connector">
+            <div>
+                <div class="network-node" id="l1_nodeL1" onclick="connectSocioNodes('L', 'l1_nodeL1', 1)">ಲ್ಯಾಟಿನ್ ಭಾಷೆಯ ಪದ</div>
+                <div class="network-node" id="l1_nodeL2" style="margin-top:15px;" onclick="connectSocioNodes('L', 'l1_nodeL2', 2)">ಗ್ರೀಕ್ ಭಾಷೆಯ ಪದ</div>
+            </div>
+            <div>
+                <div class="network-node" id="l1_nodeR1" onclick="connectSocioNodes('R', 'l1_nodeR1', 2)">ಲೋಗೋಸ್ (Logos - ಅಧ್ಯಯನ/ಶಾಸ್ತ್ರ)</div>
+                <div class="network-node" id="l1_nodeR2" style="margin-top:15px;" onclick="connectSocioNodes('R', 'l1_nodeR2', 1)">ಸೋಶಿಯಸ್ (Socius - ಸಮಾಜ/ಸಹಚರ)</div>
+            </div>
+        </div>
+        <div class="socio-status-alert" id="alert1"></div>
+    </div>
+
+    <!-- LEVEL 2 SCREEN -->
+    <div id="socio2" class="socio-arena">
+        <h2 class="arena-title">ಹಂತ 2: ಸಮಾಜಶಾಸ್ತ್ರದ ಪಿತಾಮಹ ಮತ್ತು ವ್ಯಾಖ್ಯಾನ (The Sociology Code)</h2>
+        <div style="display:flex; flex-direction:column; gap:20px;">
+            <div class="fib-q">1. ಪ್ರಪಂಚದಲ್ಲೇ ಮೊದಲ ಬಾರಿಗೆ ಸಮಾಜವನ್ನು ಅಧ್ಯಯನ ಮಾಡುವ ವಿಜ್ಞಾನಕ್ಕೆ 'ಸಮಾಜಶಾಸ್ತ್ರ' ಎಂದು ಹೆಸರಿಟ್ಟ ಪಿತಾಮಹ ಯಾರು? <br><input type="text" class="smart-socio-input" id="cryptIn1" placeholder="ವಿಜ್ಞಾನಿಯ ಹೆಸರು ಬರೆಯಿರಿ"></div>
+            <div class="fib-q">2. "ಸಾಮಾಜಿಕ ಸಂಬಂಧಗಳ ಬಲೆಯನ್ನು ಸಮಾಜ ಎನ್ನಲಾಗುತ್ತದೆ" ಹಾಗೂ ಸಮಾಜಶಾಸ್ತ್ರವು ಸಾಮಾಜಿಕ ಸಂಬಂಧಗಳ ವಿಜ್ಞಾನ ಎಂದವರು ಯಾರು? <br><input type="text" class="smart-socio-input" id="cryptIn2" placeholder="ಮೆಕೈವರ್ ಮತ್ತು ಪೇಜ್ / ಆಗಸ್ಟ್ ಕಾಮ್ಟೆ?"></div>
+        </div>
+        <button class="socio-btn" onclick="verifySocioLevel2()">ನೆಟ್‌ವರ್ಕ್ ಕೋಡ್ ಪರಿಶೀಲಿಸು</button>
+        <div class="socio-status-alert" id="alert2"></div>
+    </div>
+
+    <!-- LEVEL 3 SCREEN (10 QUESTIONS BATTLE) -->
+    <div id="socio3" class="socio-arena">
+        <h2 class="arena-title">ಹಂತ 3: ಮಾನವ ಸಂಬಂಧಗಳ ಮಹಾ ಕದನ (Epic 10 Matrix Quiz)</h2>
+        <div style="font-weight: bold; margin-bottom: 15px; color: var(--gold-star);" id="quizCounterText">ಪ್ರಶ್ನೆ ಕೋಡ್: 1 / 10</div>
+        <div id="quizQuestionText" style="font-size: 1.25rem; font-weight: bold; margin-bottom: 20px;">ಲೋಡ್ ಆಗುತ್ತಿದೆ...</div>
+        <div id="quizOptionsContainer"></div>
+        <button class="socio-btn" id="nextQuizBtn" style="display:none;" onclick="nextSocioQuestion()">ಮುಂದಿನ ಸಾಮಾಜಿಕ ಸವಾಲಿಗೆ ಚಲಿಸು ➔</button>
+        <div class="socio-status-alert" id="alert3"></div>
+    </div>
+
+    <!-- LEVEL 4 SCREEN -->
+    <div id="socio4" class="socio-arena">
+        <h2 class="arena-title">ಹಂತ 4: ಮಿಡ್ನಾಪುರದ ಕಮಲಾಳ ನೈಜ ಇತಿಹಾಸ ವಿಶ್ಲೇಷಣೆ (The Human Environment Quest)</h2>
+        <div style="display:flex; flex-direction:column; gap:20px;">
+            <div class="fib-q">1. 1920ರಲ್ಲಿ ಮಿಡ್ನಾಪುರದಲ್ಲಿ ಸಿಕ್ಕ, 9 ವರ್ಷಗಳ ಕಾಲ ಕಾಡಿನಲ್ಲಿ ಪ್ರಾಣಿಗಳೊಂದಿಗೆ ಬೆಳೆದು ಪಶುಗಳಂತೆ ವರ್ತಿಸುತ್ತಿದ್ದ ಹುಡುಗಿಯ ಹೆಸರೇನು? <br><input type="text" class="smart-socio-input" id="envIn1" placeholder="ಹುಡುಗಿಯ ಹೆಸರು ಬರೆಯಿರಿ"></div>
+            <div class="fib-q">2. ಕಮಲಾಳ ನೈಜ ಇತಿಹಾಸದಿಂದ ಸಾಬೀತಾದ ಸತ್ಯವೇನು? "ಮಾನವನು ಸಮಾಜ ಮತ್ತು ಸಮೂಹದ ಹೊರತಾಗಿ ಬೆಳೆದರೆ ಅವನು ಏನಾಗುತ್ತಾನೆ?" <br><input type="text" class="smart-socio-input" id="envIn2" placeholder="ಪ್ರಾಣಿಯಂತೆ / ದೇವತೆಯಂತೆ?"></div>
+        </div>
+        <button class="socio-btn" onclick="verifySocioLevel4()">ಇತಿಹಾಸ ಡೇಟಾ ದೃಢೀಕರಿಸು</button>
+        <div class="socio-status-alert" id="alert4"></div>
+    </div>
+
+    <!-- LEVEL 5 SCREEN -->
+    <div id="socio5" class="socio-arena">
+        <h2 class="arena-title">ಹಂತ 5: ಸಾಮಾಜೀಕರಣದ ಪ್ರಮುಖ ಮೂಲಗಳು ಮತ್ತು ಸಂಸ್ಥೆಗಳು (Socialization Mining)</h2>
+        <p style="margin-bottom: 15px;">ಗೆಳೆಯಾ, ಮಗುವೊಂದು ಹುಟ್ಟಿ ಬೆಳೆದು ಸಮಾಜದ ನಿಯಮಗಳನ್ನು ಕಲಿಯುವ **ಸಾಮಾಜೀಕರಣದ ಪ್ರಮುಖ ನಾಲ್ಕು ಸಂಸ್ಥೆಗಳನ್ನು** ಮಾತ್ರ ಗಣಿ ಮಾಡು:</p>
+        <div class="mining-deck-grid">
+            <div class="mining-packet" id="packet1" onclick="toggleMiningPacket('packet1', true)">1. ಕುಟುಂಬ (Family)</div>
+            <div class="mining-packet" id="packet2" onclick="toggleMiningPacket('packet2', false)">2. ರೈಲ್ವೆ ಸ್ಟೇಷನ್</div>
+            <div class="mining-packet" id="packet3" onclick="toggleMiningPacket('packet3', true)">3. ಶಾಲೆ (School)</div>
+            <div class="mining-packet" id="packet4" onclick="toggleMiningPacket('packet4', true)">4. ಸ್ನೇಹಿತರ ಗುಂಪು (Peer Group)</div>
+            <div class="mining-packet" id="packet5" onclick="toggleMiningPacket('packet5', false)">5. ದೊಡ್ಡ ಬಜಾರ್</div>
+            <div class="mining-packet" id="packet6" onclick="toggleMiningPacket('packet6', true)">6. ಸಮೂಹ ಮಾಧ್ಯಮಗಳು</div>
+        </div>
+        <button class="socio-btn" onclick="verifySocioLevel5()">ಸಂಸ್ಥೆಗಳನ್ನು ಲಾಕ್ ಮಾಡು</button>
+        <div class="socio-status-alert" id="alert5"></div>
+    </div>
+
+    <!-- LEVEL 6 SCREEN -->
+    <div id="socio6" class="socio-arena">
+        <h2 class="arena-title">ಹಂತ 6: ಮಾನವ ಮತ್ತು ಭಾಷಾ ಬಾಂಧವ್ಯದ ಸಂಬಂಧ (Language Connection Sorting)</h2>
+        <p style="margin-bottom: 15px;">ಮಾನವನಿಗೆ ಭಾಷೆ ಎಷ್ಟು ಪ್ರಮುಖ ಎಂಬುದರ ಸತ್ಯಾಂಶಗಳನ್ನು ಸರಿಯಾದ ವಿವರಣೆಯ ಬಾಕ್ಸ್‌ಗಳಿಗೆ ಹಂಚು ಗೆಳೆಯಾ:</p>
+        <div style="display:flex; gap:25px;">
+            <div style="flex:1; display:flex; flex-direction:column; gap:10px;" id="langSource">
+                <div style="background:#1e203b; padding:12px; border-radius:10px; cursor:grab; font-weight:bold; border:1px solid #2c2d4a;" draggable="true" id="lang1" ondragstart="startLangDrag(event)">ಮಾತು ಮತ್ತು ಪದಗಳ ಬಳಕೆ</div>
+                <div style="background:#1e203b; padding:12px; border-radius:10px; cursor:grab; font-weight:bold; border:1px solid #2c2d4a;" draggable="true" id="lang2" ondragstart="startLangDrag(event)">ಆಂಗಿಕ ಮತ್ತು ದೈಹಿಕ ಸಂಜ್ಞೆಗಳು</div>
+            </div>
+            <div style="flex:2; display:flex; flex-direction:column; gap:15px;">
+                <div style="background:rgba(0,0,0,0.3); border:2px dashed var(--socio-teal); padding:15px; border-radius:12px;" ondragover="allowLangDrop(event)" ondrop="handleLangDrop(event, 'spoken')">
+                    <h3>ಅಪ್ಪ, ಅಮ್ಮ, ಅಣ್ಣ ಎಂಬ ಪದಗಳ ಮೂಲಕ ಭಾವನೆ ವ್ಯಕ್ತಪಡಿಸುವುದು</h3>
+                </div>
+                <div style="background:rgba(0,0,0,0.3); border:2px dashed var(--socio-teal); padding:15px; border-radius:12px;" ondragover="allowLangDrop(event)" ondrop="handleLangDrop(event, 'body')">
+                    <h3>ಹಸಿವು, ನಿದ್ರೆ, ಬಾಯಾರಿಕೆಯನ್ನು ಸಣ್ಣ ಸಂಜ್ಞೆಗಳಿಂದ ತೋರಿಸುವುದು</h3>
+                </div>
+            </div>
+        </div>
+        <button class="socio-btn" onclick="verifySocioLevel6()">ಭಾಷಾ ಬಂಧ ಪರಿಶೀಲಿಸು</button>
+        <div class="socio-status-alert" id="alert6"></div>
+    </div>
+
+    <!-- LEVEL 7 SCREEN -->
+    <div id="socio7" class="socio-arena">
+        <h2 class="arena-title">ಹಂತ 7: ಭಾರತದ ಪ್ರಮುಖ ಸಮಾಜಶಾಸ್ತ್ರಜ್ಞರ ಕೊಡುಗೆ (Indian Sociologists Matrix)</h2>
+        <p style="margin-bottom: 15px;">ಅಂತಿಮ ಹಂತ! ಭಾರತದ ಪ್ರಖ್ಯಾತ ಆರಂಭಿಕ ಸಮಾಜವಿಜ್ಞಾನಿಗಳನ್ನು ಮತ್ತು ಜಾಗತಿಕ ಚಿಂತಕರನ್ನು ಮ್ಯಾಚ್ ಮಾಡಿ ಹಬ್ ಕಂಪ್ಲೀಟ್ ಮಾಡು ಗೆಳೆಯಾ:</p>
+        <div class="network-grid-connector">
+            <div class="network-node" id="matL1" onclick="selectFinalSocioMatrix('L', 'matL1', 'world')">ಆಗಸ್ಟ್ ಕಾಮ್ಟೆ, ಹರ್ಬಟ್ ಸ್ಪೆನ್ಸರ್, ಮ್ಯಾಕ್ಸ್ ವೆಬರ್</div>
+            <div class="network-node" id="matR1" onclick="selectFinalSocioMatrix('R', 'matR1', 'world')">ಜಾಗತಿಕ ಮಟ್ಟದ ಪ್ರಮುಖ ಆರಂಭಿಕ ಸಮಾಜಶಾಸ್ತ್ರಜ್ಞರು</div>
+            <div class="network-node" id="matL2" onclick="selectFinalSocioMatrix('L', 'matL2', 'india')">ಜಿ.ಎಸ್. ಘುರ್ಯೆ, ಎಂ.ಎನ್. ಶ್ರೀನಿವಾಸ್, ಇರಾವತಿ ಕರ್ವೆ</div>
+            <div class="network-node" id="matR2" onclick="selectFinalSocioMatrix('R', 'matR2', 'india')">ಭಾರತ ದೇಶದ ಪ್ರಮುಖ ಹೆಸರಾಂತ ಸಮಾಜಶಾಸ್ತ್ರಜ್ಞರು</div>
+        </div>
+        <button class="socio-btn" onclick="verifySocioLevel7()">ಸಮಾಜಶಾಸ್ತ್ರ ಮ್ಯಾಟ್ರಿಕ್ಸ್ ಪೂರ್ಣಗೊಳಿಸು</button>
+        <div class="socio-status-alert" id="alert7"></div>
+    </div>
+
+    <script>
+        let empathyPoints = 0; let communityBond = 100;
+        function modifySocioHUD(sepChange, bondDamage) {
+            empathyPoints += sepChange;
+            communityBond = Math.max(10, communityBond - bondDamage);
+            document.getElementById("liveSocioPoints").innerText = `ಸೋಶಿಯಲ್ ಎಂಪತಿ: ${empathyPoints.toString().padStart(4, '0')} SEP`;
+            document.getElementById("bondFill").style.width = `${communityBond}%`;
+        }
+
+        function shiftSocioLevel(levelIdx) {
+            document.querySelectorAll('.socio-arena').forEach(el => el.classList.remove('active-arena'));
+            document.querySelectorAll('.dock-pill').forEach(el => el.classList.remove('active-mission'));
+            
+            document.getElementById('socio' + levelIdx).classList.add('active-arena');
+            document.getElementById('pillBtn' + levelIdx).classList.add('active-mission');
+        }
+
+        // Level 1 Logic
+        let nodeL = null; let nodeR = null;
+        function connectSocioNodes(side, id, matchVal) {
+            if(side === 'L') {
+                if(nodeL) document.getElementById(nodeL.id).classList.remove('node-linked');
+                nodeL = { id: id, match: matchVal };
+            } else {
+                if(nodeR) document.getElementById(nodeR.id).classList.remove('node-linked');
+                nodeR = { id: id, match: matchVal };
+            }
+            document.getElementById(id).classList.add('node-linked');
+
+            if(nodeL && nodeR) {
+                if(nodeL.match === nodeR.match) {
+                    document.getElementById(nodeL.id).style.background = "var(--neon-green)";
+                    document.getElementById(nodeR.id).style.background = "var(--neon-green)";
+                    modifySocioHUD(100, 0);
+                    showSocioAlert(1, "ಸರಿಯಾದ ಲಿಂಕ್ ಗೆಳೆಯಾ! ಶಬ್ದದ ಭಾಷಾ ಮೂಲ ನೂರಕ್ಕೆ ನೂರು ಸರಿ ಇದೆ.", true);
+                    document.getElementById('pillBtn1').style.background = "var(--neon-green)";
+                } else {
+                    modifySocioHUD(0, 10);
+                    showSocioAlert(1, "ತಪ್ಪಾದ ಲಿಂಕ್, ಸಾಮಾಜಿಕ ಬಾಂಧವ್ಯ ಇಳಿಕೆಯಾಗಿದೆ! ಮತ್ತೊಮ್ಮೆ ಯೋಚಿಸು.", false);
+                }
+                nodeL = null; nodeR = null;
+            }
+        }
+
+        // Level 2 Logic
+        function verifySocioLevel2() {
+            let c1 = document.getElementById("cryptIn1").value.trim();
+            let c2 = document.getElementById("cryptIn2").value.trim();
+
+            if((c1 === "ಆಗಸ್ಟ್ ಕಾಮ್ಟೆ" || c1 === "ಆಗಸ್ಟ್ ಕಾಮ್ಟೆ") && (c2 === "ಮೆಕೈವರ್ ಮತ್ತು ಪೇಜ್" || c2 === "ಮೆಕೈವರ್")) {
+                modifySocioHUD(150, 0);
+                document.getElementById('pillBtn2').style.background = "var(--neon-green)";
+                showSocioAlert(2, "ಅದ್ಭುತ! ಸಮಾಜಶಾಸ್ತ್ರದ ಪಿತಾಮಹ ಮತ್ತು ಸಾಮಾಜಿಕ ಸಂಬಂಧಗಳ ವ್ಯಾಖ್ಯಾನ ಸರಿಯಾಗಿದೆ.", true);
+            } else {
+                modifySocioHUD(0, 10);
+                showSocioAlert(2, "ಉತ್ತರ ತಪ್ಪಾಗಿದೆ ಗೆಳೆಯಾ! ಸುಳಿವು: ಆಗಸ್ಟ್ ಕಾಮ್ಟೆ, ಮೆಕೈವರ್ ಮತ್ತು ಪೇಜ್ ಎಂದು ಬರೆಯಿರಿ.", false);
+            }
+        }
+
+        // Level 3: 10 Questions Matrix Quiz Data
+        const sociologyQuizPool = [
+            { q: "1. ಸಮಾಜಶಾಸ್ತ್ರ (Sociology) ಎಂಬ ಸ್ವತಂತ್ರ ಜ್ಞಾನ ಶಾಖೆಯು ಪ್ರಮುಖವಾಗಿ ಯಾವ ವಿಜ್ಞಾನದ ಭಾಗವಾಗಿದೆ?", o: ["ನೈಸರ್ಗಿಕ ವಿಜ್ಞಾನ", "ಸಮಾಜ ವಿಜ್ಞಾನ (Social Science)", "ಗಣಿತ ವಿಜ್ಞಾನ"], c: 1 },
+            { q: "2. ಜಗತ್ತಿನಲ್ಲಿ ಮಾನವರನ್ನು ಮಾತ್ರ 'ಸಂಘಜೀವಿ' ಅಥವಾ 'ಸಮಾಜಜೀವಿ' ಎಂದು ಕರೆಯಲು ಮುಖ್ಯ ಕಾರಣವೇನು?", o: ["ಅವರು ದೊಡ್ಡ ಮನೆ ಕಟ್ಟುತ್ತಾರೆ", "ಅವರು ತಮ್ಮ ಇರುವಿಕೆಯ ಅರಿವು ಮತ್ತು ಜೀವನದ ಉದ್ದೇಶದ ಚಿಂತನೆ ಮಾಡುತ್ತಾರೆ", "ಅವರು ವೇಗವಾಗಿ ಓಡುತ್ತಾರೆ"], c: 1 },
+            { q: "3. 'ವ್ಯಕ್ತಿಯಿಲ್ಲದೆ ಸಮಾಜವಿಲ್ಲ, ಸಮಾಜವಿಲ್ಲದೆ ವ್ಯಕ್ತಿಯಿಲ್ಲ' ಎನ್ನುವ ಅನನ್ಯ ಸಂಬಂಧವನ್ನು ಪ್ರತಿಪಾದಿಸಿದ ಶಾಸ್ತ್ರ ಯಾವುದು?", o: ["ಅರ್ಥಶಾಸ್ತ್ರ", "ಭೂಗೋಳಶಾಸ್ತ್ರ", "ಸಮಾಜಶಾಸ್ತ್ರ (Sociology)"], c: 2 },
+            { q: "4. ಮಗುವೊಂದು ಹುಟ್ಟಿದ ನಂತರ ಸಮಾಜದ ಸದಸ್ಯನಾಗಲು ಸಮಾಜದ ನಿಯಮ ಮತ್ತು ಭಾಷೆ ಕಲಿಯುವ ಕ್ರಿಯೆಯನ್ನು ಏನೆನ್ನುತ್ತಾರೆ?", o: ["ಸಾಮಾಜೀಕರಣ (Socialization)", "ನಗರೀಕರಣ", "ಕೈಗಾರಿಕೀಕರಣ"], c: 0 },
+            { q: "5. ಮಗುವಿನ ಅತ್ಯಂತ ಮೊದಲ ಮತ್ತು ಪ್ರಾಥಮಿಕ ಸಾಮಾಜೀಕರಣದ ನೆರವಾಗುವ ಮುಖ್ಯ ಸಂಸ್ಥೆ ಯಾವುದು?", o: ["ಶಾಲೆ", "ಕುಟುಂಬ (Family)", "ಸ್ನೇಹಿತರ ಬಳಗ"], c: 1 },
+            { q: "6. ಮಗುವಿಗೆ ತನ್ನ ಹೊರಜಗತ್ತಿನ ತಿಳಿವಳಿಕೆಯನ್ನು ನೀಡಿ ಅದಕ್ಕೆ ಹೊಂದಿಕೊಂಡು ಹೋಗಲು ನೆರವಾಗುವ ಔಪಚಾರಿಕ ಶಿಕ್ಷಣ ಸಿಗುವ ಸ್ಥಳ ಯಾವುದು?", o: ["ಬ್ಯಾಂಕ್", "ಶಾಲೆ (School)", "ಕಾಡು"], c: 1 },
+            { q: "7. ಹತ್ತೊಂಬತ್ತನೇ ಶತಮಾನದಲ್ಲಿ ಸಮಾಜದ ವಿಕಾಸ ಮತ್ತು ಪ್ರಗತಿಯನ್ನು ವೈಜ್ಞಾನಿಕವಾಗಿ ಅಧ್ಯಯನ ಮಾಡಿದ ಬ್ರಿಟಿಷ್ ಸಮಾಜಶಾಸ್ತ್ರಜ್ಞ ಯಾರು?", o: ["ಹರ್ಬಟ್ ಸ್ಪೆನ್ಸರ್ (Herbert Spencer)", "ಮ್ಯಾಕ್ಸ್ ವೆಬರ್", "ಕಾರ್ಲ್ ಮಾರ್ಕ್ಸ್"], c: 0 },
+            { q: "8. ಜರ್ಮನಿಯ ಪ್ರಸಿದ್ಧ ತತ್ತ್ವಜ್ಞಾನಿ ಹಾಗೂ ಸಮಾಜಶಾಸ್ತ್ರದ ವ್ಯಾಪ್ತಿಯನ್ನು ಜಾಗತಿಕವಾಗಿ ವಿಸ್ತರಿಸಿದ ಪ್ರಮುಖ ಚಿಂತಕ ಯಾರು?", o: ["ಎಮಿಲಿ ಡರ್ಕಿಮ್", "ಜಿ.ಎಸ್. ಘುರ್ಯೆ", "ಕಾರ್ಲ್ ಮಾರ್ಕ್ಸ್ (Karl Marx)"], c: 2 },
+            { q: "9. ಭಾರತ ದೇಶಕ್ಕೆ ಬ್ರಿಟಿಷರು ಬಂದ ನಂತರ ಮೊದಲ ಬಾರಿಗೆ ಯಾವ ವಿಶ್ವವಿದ್ಯಾಲಯದಲ್ಲಿ ಸಮಾಜಶಾಸ್ತ್ರವನ್ನು ಪರಿಚಯಿಸಲಾಯಿತು?", o: ["ಮುಂಬೈ ವಿಶ್ವವಿದ್ಯಾಲಯ (1914)", "ಮೈಸೂರು ವಿಶ್ವವಿದ್ಯಾಲಯ", "ಕಲ್ಕತ್ತಾ ವಿಶ್ವವಿದ್ಯಾಲಯ"], c: 0 },
+            { q: "10. ಈ ಕೆಳಗಿನವರಲ್ಲಿ ಯಾರು ಸಮಾಜಶಾಸ್ತ್ರಕ್ಕೆ ಅತ್ಯುನ್ನತ ಕೊಡುಗೆ ನೀಡಿದ ಪ್ರಮುಖ ಭಾರತೀಯ ಮಹಿಳಾ ಸಮಾಜಶಾಸ್ತ್ರಜ್ಞರಾಗಿದ್ದಾರೆ?", o: ["ಎಂ.ಎನ್. ಶ್ರೀನಿವಾಸ್", "ಇರಾವತಿ ಕರ್ವೆ (Irawati Karve)", "ಎ.ಆರ್. ದೇಸಾಯಿ"], c: 1 }
+        ];
+
+        let qIdx = 0; let qScore = 0; let isQuizActive = true;
+        function loadSocioQuestion() {
+            isQuizActive = true;
+            document.getElementById("nextQuizBtn").style.display = "none";
+            document.getElementById("alert3").style.display = "none";
+            let qData = sociologyQuizPool[qIdx];
+            document.getElementById("quizCounterText").innerText = `ಪ್ರಶ್ನೆ ಕೋಡ್: ${qIdx + 1} / 10`;
+            document.getElementById("quizQuestionText").innerText = qData.q;
+            
+            let container = document.getElementById("quizOptionsContainer");
+            container.innerHTML = "";
+            qData.o.forEach((opt, idx) => {
+                let div = document.createElement("div");
+                div.classList.add("quiz-option-block");
+                div.innerText = opt;
+                div.onclick = function() {
+                    if(!isQuizActive) return;
+                    isQuizActive = false;
+                    if(idx === qData.c) {
+                        this.classList.add("correct-glow");
+                        qScore++; modifySocioHUD(30, 0);
+                        showSocioAlert(3, "ಸರಿಯಾದ ಉತ್ತರ ಗೆಳೆಯಾ! ಸಾಮಾಜಿಕ ಪ್ರಜ್ಞೆ ಅದ್ಭುತವಾಗಿದೆ.", true);
+                    } else {
+                        this.classList.add("wrong-glow");
+                        container.children[qData.c].classList.add("correct-glow");
+                        modifySocioHUD(0, 10);
+                        showSocioAlert(3, "ತಪ್ಪು ಉತ್ತರ! ಸರಿಯಾದದ್ದನ್ನು ಹಸಿರು ಬಣ್ಣದಲ್ಲಿ ತೋರಿಸಲಾಗಿದೆ.", false);
+                    }
+                    document.getElementById("nextQuizBtn").style.display = "inline-block";
+                };
+                container.appendChild(div);
+            });
+        }
+        function nextSocioQuestion() {
+            qIdx++;
+            if(qIdx < sociologyQuizPool.length) {
+                loadSocioQuestion();
+            } else {
+                document.getElementById("quizCounterText").innerText = "ಮಿಷನ್ ಮುಕ್ತಾಯ!";
+                document.getElementById("quizQuestionText").innerText = `ತರಗತಿಯ ಒಟ್ಟು ಸ್ಕೋರ್: ${qScore} / 10`;
+                document.getElementById("quizOptionsContainer").innerHTML = "";
+                document.getElementById("nextQuizBtn").style.display = "none";
+                document.getElementById('pillBtn3').style.background = "var(--neon-green)";
+                showSocioAlert(3, qScore >= 7 ? "ಅಪ್ರತಿಮ ಕಮ್ಯುನಿಟಿ ಮಾಸ್ಟರ್ಸ್ ಗೆಳೆಯಾ!" : "ಉತ್ತಮ ಪ್ರಯತ್ನ, ಮತ್ತೊಮ್ಮೆ ಓದಿ ತಿಳಿಯಿರಿ!", true);
+            }
+        }
+        loadSocioQuestion();
+
+        // Level 4 Logic
+        function verifySocioLevel4() {
+            let e1 = document.getElementById("envIn1").value.trim();
+            let e2 = document.getElementById("envIn2").value.trim();
+
+            if(e1 === "ಕಮಲಾ" || e1 === "ಕಮಲ") {
+                if(e2 === "ಪ್ರಾಣಿಯಂತೆ" || e2 === "ಪ್ರಾಣಿಗಳಂತೆ") {
+                    modifySocioHUD(150, 0);
+                    document.getElementById('pillBtn4').style.background = "var(--neon-green)";
+                    showSocioAlert(4, "ವಾಹ್ ಗೆಳೆಯಾ! ಕಮಲಾಳ ನೈಜ ಇತಿಹಾಸದ ವಿಶ್ಲೇಷಣೆ ಸಂಪೂರ್ಣ ಸರಿಯಾಗಿದೆ.", true);
+                    return;
+                }
+            }
+            modifySocioHUD(0, 10);
+            showSocioAlert(4, "ತಪ್ಪಾಗಿದೆ! ಸುಳಿವು: ಕಮಲ, ಪ್ರಾಣಿಯಂತೆ ಎಂದು ಬರೆಯಿರಿ.", false);
+        }
+
+        // Level 5 Logic
+        let minedPackets = {};
+        function toggleMiningPacket(id, isSocializationAgency) {
+            let node = document.getElementById(id);
+            if(node.classList.contains('active-packet')) {
+                node.classList.remove('active-packet');
+                delete minedPackets[id];
+            } else {
+                node.classList.add('active-packet');
+                minedPackets[id] = isSocializationAgency;
+            }
+        }
+        function verifySocioLevel5() {
+            let win = true; let count = 0;
+            for(let id in minedPackets) {
+                if(minedPackets[id] === false) win = false;
+                count++;
+            }
+            if(count !== 4) win = false; // 4 major agencies
+
+            if(win) {
+                modifySocioHUD(150, 0);
+                document.getElementById('pillBtn5').style.background = "var(--neon-green)";
+                showSocioAlert(5, "ಅದ್ಭುತ! ಸಾಮಾಜೀಕರಣದ 4 ಪ್ರಮುಖ ಮೂಲಗಳು (ಕುಟುಂಬ, ಶಾಲೆ, ಸ್ನೇಹಿತರು, ಸಮೂಹ ಮಾಧ್ಯಮ) ಪಕ್ಕಾ ಸರಿ ಇವೆ.", true);
+            } else {
+                modifySocioHUD(0, 10);
+                showSocioAlert(5, "ತಪ್ಪಾಗಿದೆ! ಕೇವಲ ಸಾಮಾಜೀಕರಣಕ್ಕೆ ನೆರವಾಗುವ 4 ಸರಿಯಾದ ಸಂಸ್ಥೆಗಳನ್ನು ಮಾತ್ರ ಆರಿಸು (ರೈಲ್ವೆ ಸ್ಟೇಷನ್ ಬೇಡ).", false);
+            }
+        }
+
+        // Level 6 Logic
+        function allowLangDrop(ev) { ev.preventDefault(); }
+        function startLangDrag(ev) { ev.dataTransfer.setData("text", ev.target.id); }
+        function handleLangDrop(ev, cat) {
+            ev.preventDefault();
+            let id = ev.dataTransfer.getData("text");
+            let el = document.getElementById(id);
+            el.dataset.cat = cat;
+            ev.target.appendChild(el);
+        }
+        function verifySocioLevel6() {
+            let l1 = document.getElementById("lang1").dataset.cat;
+            let l2 = document.getElementById("lang2").dataset.cat;
+
+            if(l1 === "spoken" && l2 === "body") {
+                modifySocioHUD(200, 0);
+                document.getElementById('pillBtn6').style.background = "var(--neon-green)";
+                showSocioAlert(6, "ಮಾನವ ಮತ್ತು ಭಾಷೆಯ ಬಾಂಧವ್ಯದ ಸಂಬಂಧ ನೂರಕ್ಕೆ ನೂರು ನಿಖರವಾಗಿದೆ ಗೆಳೆಯಾ!", true);
+            } else {
+                modifySocioHUD(0, 10);
+                showSocioAlert(6, "ತಪ್ಪಾದ ವಿಭಾಗ! ಪದಗಳ ಬಳಕೆ ಮಾತನಾಡುವ ಭಾಷೆ, ಸಂಜ್ಞೆಗಳು ಆಂಗಿಕ ಭಾಷೆಗೆ ಸೇರುತ್ತವೆ.", false);
+            }
+        }
+
+        // Level 7 Logic
+        let finalL = null; let finalR = null;
+        function selectFinalSocioMatrix(side, id, key) {
+            if(side === 'L') {
+                finalL = { id: id, key: key };
+                document.getElementById("matL1").classList.remove('node-linked');
+                document.getElementById("matL2").classList.remove('node-linked');
+            } else {
+                finalR = { id: id, key: key };
+                document.getElementById("matR1").classList.remove('node-linked');
+                document.getElementById("matR2").classList.remove('node-linked');
+            }
+            document.getElementById(id).classList.add('node-linked');
+        }
+        function verifySocioLevel7() {
+            if(finalL && finalR && finalL.key === finalR.key) {
+                modifySocioHUD(250, 0);
+                document.getElementById('pillBtn7').style.background = "var(--neon-green)";
+                showSocioAlert(7, "ವಾಹ್ ಗೆಳೆಯಾ! ಇಡೀ 'ಮಾನವ ಮತ್ತು ಸಮಾಜ' ಪಾಠದ ಕಮ್ಯುನಿಟಿ ಹಬ್ ಯಶಸ್ವಿಯಾಗಿದೆ. ತರಗತಿಯಲ್ಲಿ ಮಕ್ಕಳು ಸಖತ್ ಎಂಜಾಯ್ ಮಾಡುತ್ತಾರೆ!", true);
+            } else {
+                modifySocioHUD(0, 10);
+                showSocioAlert(7, "ಮ್ಯಾಟ್ರಿಕ್ಸ್ ಲಿಂಕ್ ತಪ್ಪಾಗಿದೆ. ಸಮಾಜಶಾಸ್ತ್ರಜ್ಞರನ್ನು ಮತ್ತೊಮ್ಮೆ ಗಮನಿಸು ಗೆಳೆಯಾ.", false);
+            }
+        }
+
+        function showSocioAlert(lvlNum, text, success) {
+            let box = document.getElementById("alert" + lvlNum);
+            box.style.display = "block";
+            box.innerText = text;
+            box.style.background = success ? "rgba(16, 172, 132, 0.15)" : "rgba(238, 82, 83, 0.1)";
+            box.style.color = success ? "#55efc4" : "#ff7675";
+            box.style.borderColor = success ? "var(--socio-teal)" : "var(--neon-red)";
+        }
+    </script>
+</body>
+</html>

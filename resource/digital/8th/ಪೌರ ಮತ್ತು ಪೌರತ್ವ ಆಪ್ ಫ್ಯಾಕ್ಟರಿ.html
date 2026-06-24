@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಪೌರತ್ವ ಆಪ್ ಫ್ಯಾಕ್ಟರಿ ೯.೦ - ಜವಾಬ್ದಾರಿಯುತ ನಾಗರಿಕ ಆಟಗಳು</title>
+    <style>
+        :root {
+            --citizen-blue: #0984e3;
+            --saffron-bright: #ff9f43;
+            --white-glow: #ffffff;
+            --flag-green: #10ac84;
+            --cyber-dark: #0f172a;
+            --panel-bg: rgba(30, 41, 59, 0.9);
+            --danger-red: #ee5253;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Verdana, sans-serif; }
+
+        body {
+            background: var(--cyber-dark);
+            background-image: radial-gradient(circle at 50% 50%, #1e1b4b 0%, #0f172a 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #ffffff;
+        }
+
+        header.citizen-header {
+            text-align: center;
+            padding: 25px;
+            background: var(--panel-bg);
+            border: 2px solid var(--saffron-bright);
+            border-radius: 20px;
+            box-shadow: 0 0 25px rgba(255, 159, 67, 0.2);
+            margin-bottom: 25px;
+        }
+
+        header.citizen-header h1 {
+            color: var(--saffron-bright);
+            font-size: 2.3rem;
+            text-shadow: 0 0 10px rgba(255, 159, 67, 0.4);
+            margin-bottom: 5px;
+        }
+
+        header.citizen-header p { color: #cbd5e1; font-size: 1.2rem; }
+
+        /* NEW HUD: NATIONAL PRIDE INDEX */
+        .citizen-hud-display {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #1e293b;
+            padding: 15px 25px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            border-left: 5px solid var(--flag-green);
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .pride-bar-container {
+            background: #334155;
+            width: 45%;
+            height: 18px;
+            border-radius: 9px;
+            overflow: hidden;
+            border: 1px solid var(--flag-green);
+        }
+
+        .pride-bar-fill {
+            background: linear-gradient(90deg, var(--flag-green), #55efc4);
+            height: 100%;
+            width: 100%;
+            transition: width 0.4s ease;
+        }
+
+        /* Factory Level Selector Cards */
+        .factory-menu-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 35px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+
+        .factory-menu-row::-webkit-scrollbar { height: 6px; }
+        .factory-menu-row::-webkit-scrollbar-thumb { background: var(--saffron-bright); border-radius: 3px; }
+
+        .factory-card {
+            background: #1e293b;
+            border: 1px solid #334155;
+            padding: 12px 25px;
+            border-radius: 14px;
+            cursor: pointer;
+            font-weight: bold;
+            white-space: nowrap;
+            transition: all 0.3s;
+        }
+
+        .factory-card:hover, .factory-card.active-mission {
+            background: var(--saffron-bright);
+            color: #000000;
+            border-color: #ffffff;
+            box-shadow: 0 0 15px var(--saffron-bright);
+            transform: translateY(-3px);
+        }
+
+        /* Game Core Factory Arena */
+        .factory-arena {
+            background: var(--panel-bg);
+            border: 2px solid #334155;
+            border-radius: 24px;
+            padding: 35px;
+            min-height: 520px;
+            display: none;
+            box-shadow: 0 20px 45px rgba(0,0,0,0.5);
+        }
+
+        .factory-arena.active-arena { display: block; animation: powerOn 0.4s ease-in-out; }
+
+        @keyframes powerOn {
+            from { opacity: 0; transform: scale(0.98); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        h2.arena-title {
+            font-size: 1.65rem;
+            color: var(--saffron-bright);
+            margin-bottom: 25px;
+            border-bottom: 1px dashed rgba(255, 159, 67, 0.3);
+            padding-bottom: 12px;
+        }
+
+        /* Interactive Connecting Grid Nodes */
+        .connector-grid-system {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .citizen-node {
+            background: #1e293b;
+            padding: 18px;
+            border-radius: 14px;
+            cursor: pointer;
+            border: 2px solid #334155;
+            font-weight: bold;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .citizen-node:hover { border-color: var(--citizen-blue); background: #223047; }
+        .citizen-node.node-selected { background: var(--citizen-blue); color: white; border-color: white; }
+
+        /* Quiz UI Elements */
+        .choice-box-row {
+            background: #1e293b;
+            border: 2px solid #334155;
+            padding: 16px;
+            margin: 12px 0;
+            border-radius: 14px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+        }
+
+        .choice-box-row:hover { border-color: var(--saffron-bright); transform: translateX(5px); }
+        .choice-box-row.correct-glow { background: rgba(16, 172, 132, 0.2); border-color: var(--flag-green); color: #55efc4; }
+        .choice-box-row.wrong-glow { background: rgba(238, 82, 83, 0.2); border-color: var(--danger-red); color: #ff7675; }
+
+        /* Text Input Styling */
+        .smart-citizen-input {
+            background: #0f172a;
+            border: 2px solid #334155;
+            border-radius: 10px;
+            padding: 12px;
+            font-size: 1.1rem;
+            color: var(--saffron-bright);
+            font-weight: bold;
+            outline: none;
+            width: 100%;
+            max-width: 320px;
+            margin-top: 8px;
+        }
+
+        .smart-citizen-input:focus { border-color: var(--saffron-bright); }
+
+        /* Mining Elements */
+        .mining-card-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        .ore-token {
+            background: #1e293b;
+            border: 2px solid #334155;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .ore-token.active-token { background: var(--flag-green); border-color: white; }
+
+        /* Universal Action Buttons */
+        .factory-btn {
+            background: linear-gradient(135deg, var(--saffron-bright), #e67e22);
+            color: black;
+            border: none;
+            padding: 14px 35px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 25px;
+            box-shadow: 0 5px 15px rgba(255, 159, 67, 0.3);
+        }
+
+        .factory-btn:hover { transform: scale(1.02); box-shadow: 0 8px 25px rgba(255, 159, 67, 0.5); }
+
+        .factory-alert-box {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 12px;
+            font-weight: bold;
+            display: none;
+            font-size: 1.1rem;
+            border: 1px solid transparent;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="citizen-header">
+        <h1>ಪೌರ ಮತ್ತು ಪೌರತ್ವ ಆಪ್ ಫ್ಯಾಕ್ಟರಿ</h1>
+        <p>ಸಿಮ್ಯುಲೇಟರ್ ಮಾದರಿ ೯.೦ • ದೇಶದ ಉತ್ತಮ ನಾಗರಿಕರನ್ನು ರೂಪಿಸುವ ಡಿಜಿಟಲ್ ಆಟಗಳು</p>
+    </div>
+
+    <div class="citizen-hud-display">
+        <span>ರಾಷ್ಟ್ರೀಯ ಹೆಮ್ಮೆಯ ಸೂಚ್ಯಂಕ (Pride Index):</span>
+        <div class="pride-bar-container"><div class="pride-bar-fill" id="prideFill"></div></div>
+        <span style="color: var(--saffron-bright);" id="livePassportPoints">ಪಾಸ್‌ಪೋರ್ಟ್ ಪಾಯಿಂಟ್ಸ್: 0000 PP</span>
+    </div>
+
+    <div class="factory-menu-row">
+        <div class="factory-card active-mission" id="facBtn1" onclick="shiftFactoryLevel(1)">1. ಪೌರ ಮತ್ತು ರಾಜ್ಯ ಲಿಂಕ್</div>
+        <div class="factory-card" id="facBtn2" onclick="shiftFactoryLevel(2)">2. ಪೌರತ್ವದ ಅರ್ಥ ಕೋಡ್</div>
+        <div class="factory-card" id="facBtn3" onclick="shiftFactoryLevel(3)">3. ಎಪಿಕ್ 10 ರಸಪ್ರಶ್ನೆ</div>
+        <div class="factory-card" id="facBtn4" onclick="shiftFactoryLevel(4)">4. ಪೌರತ್ವದ ಪ್ರಮುಖ ವಿಧಗಳು</div>
+        <div class="factory-card" id="facBtn5" onclick="shiftFactoryLevel(5)">5. ಪೌರತ್ವ ಪಡೆಯುವ 4 ಹಾದಿ</div>
+        <div class="factory-card" id="facBtn6" onclick="shiftFactoryLevel(6)">6. ಪೌರತ್ವ ಕಳೆದುಕೊಳ್ಳುವ 3 ಹಾದಿ</div>
+        <div class="factory-card" id="facBtn7" onclick="shiftFactoryLevel(7)">7. ಉತ್ತಮ ಪೌರನ ಲಕ್ಷಣಗಳು</div>
+    </div>
+
+    <div id="factory1" class="factory-arena active-arena">
+        <h2 class="arena-title">ಹಂತ 1: ಪೌರ ಮತ್ತು ರಾಜ್ಯದ ಅವಿನಾಭಾವ ಸಂಬಂಧ (Core Relation Node)</h2>
+        <p style="margin-bottom: 15px;">ಗೆಳೆಯಾ, ಪೌರ ಎಂದರೆ ಯಾರು ಮತ್ತು ಯಾರಿಗೆ ನಿಷ್ಠೆ ಹೊಂದಿರಬೇಕು ಎಂಬುದನ್ನು ಸರಿಯಾಗಿ ಕನೆಕ್ಟ್ ಮಾಡು:</p>
+        <div class="connector-grid-system">
+            <div>
+                <div class="citizen-node" id="l1_nodeL1" onclick="connectCitizenNodes('L', 'l1_nodeL1', 1)">ಪೌರ (Citizen)</div>
+                <div class="citizen-node" id="l1_nodeL2" style="margin-top:15px;" onclick="connectCitizenNodes('L', 'l1_nodeL2', 2)">ವಿದೇಶಿ ನಿವಾಸಿ</div>
+            </div>
+            <div>
+                <div class="citizen-node" id="l1_nodeR1" onclick="connectCitizenNodes('R', 'l1_nodeR1', 2)">ತಾತ್ಕಾಲಿಕವಾಗಿ ದೇಶಕ್ಕೆ ಬಂದು ಹಕ್ಕುಗಳಿಲ್ಲದವನು</div>
+                <div class="citizen-node" id="l1_nodeR2" style="margin-top:15px;" onclick="connectCitizenNodes('R', 'l1_nodeR2', 1)">ರಾಜ್ಯದ ಸದಸ್ಯತ್ವ ಪಡೆದು ಹಕ್ಕು ಚಲಾಯಿಸುವವನು</div>
+            </div>
+        </div>
+        <div class="factory-alert-box" id="alert1"></div>
+    </div>
+
+    <div id="factory2" class="factory-arena">
+        <h2 class="arena-title">ಹಂತ 2: ಪೌರತ್ವದ ಪ್ರಾಮುಖ್ಯತೆ ಮತ್ತು ಭಾಷಾ ಮೂಲ (Language Crypt)</h2>
+        <div style="display:flex; flex-direction:column; gap:20px;">
+            <div class="fib-q">1. ಒಬ್ಬ ವ್ಯಕ್ತಿಗೆ ತನ್ನ ದೇಶದಲ್ಲಿ ಅತ್ಯುನ್ನತ ಸ್ಥಾನಮಾನ ನೀಡುವ ಮತ್ತು ಕಾನೂನುಬದ್ಧ ರಕ್ಷಣೆ ಕೊಡುವ ವ್ಯವಸ್ಥೆಯನ್ನು ಏನೆನ್ನುತ್ತಾರೆ? <br><input type="text" class="smart-citizen-input" id="cryptIn1" placeholder="ಉತ್ತರ ಬರೆಯಿರಿ (ಉದಾ: ಪೌರತ್ವ)"></div>
+            <div class="fib-q">2. ಪೌರತ್ವ ಹೊಂದಿದ ಪ್ರಜೆಗಳಿಗೆ ದೇಶದ ಸರ್ವೋಚ್ಚ ನ್ಯಾಯಾಲಯ ಮತ್ತು ಸಂವಿಧಾನವು ಯಾವ ಹಕ್ಕುಗಳನ್ನು ಗ್ಯಾರಂಟಿ ನೀಡುತ್ತದೆ? <br><input type="text" class="smart-citizen-input" id="cryptIn2" placeholder="ಮೂಲಭೂತ ಹಕ್ಕುಗಳು / ಕೇವಲ ತೆರಿಗೆ?"></div>
+        </div>
+        <button class="factory-btn" onclick="verifyFactoryLevel2()">ಪೌರತ್ವ ಕೋಡ್ ಕ್ರಾಕ್ ಮಾಡು</button>
+        <div class="factory-alert-box" id="alert2"></div>
+    </div>
+
+    <div id="factory3" class="factory-arena">
+        <h2 class="arena-title">ಹಂತ 3: ಸಂವಿಧಾನ ಮತ್ತು ನಾಗರಿಕ ಹಕ್ಕುಗಳ ಮಹಾ ಸಂಗ್ರಾಮ (Epic 10 Battle Quiz)</h2>
+        <div style="font-weight: bold; margin-bottom: 15px; color: var(--saffron-bright);" id="quizCounterText">ಪ್ರಶ್ನೆ ಕೋಡ್: 1 / 10</div>
+        <div id="quizQuestionText" style="font-size: 1.25rem; font-weight: bold; margin-bottom: 20px;">ಲೋಡ್ ಆಗುತ್ತಿದೆ...</div>
+        <div id="quizOptionsContainer"></div>
+        <button class="factory-btn" id="nextQuizBtn" style="display:none;" onclick="nextCitizenQuestion()">ಮುಂದಿನ ನಾಗರಿಕ ಸವಾಲಿಗೆ ಚಲಿಸು ➔</button>
+        <div class="factory-alert-box" id="alert3"></div>
+    </div>
+
+    <div id="factory4" class="factory-arena">
+        <h2 class="arena-title">ಹಂತ 4: ಪೌರತ್ವದ ವಿಧಗಳು - ಏಕ ಮತ್ತು ದ್ವಿಪೌರತ್ವ (Global Citizenship Rules)</h2>
+        <div style="display:flex; flex-direction:column; gap:20px;">
+            <div class="fib-q">1. ನಮ್ಮ ಭಾರತ ದೇಶದಲ್ಲಿ ಇಡೀ ದೇಶಕ್ಕೆ ಒಂದೇ ಸಮಾನವಾದ ಪೌರತ್ವವಿದೆ, ಇದನ್ನು ಯಾವ ಪೌರತ್ವ ಎನ್ನಲಾಗುತ್ತದೆ? <br><input type="text" class="smart-citizen-input" id="typeIn1" placeholder="ಏಕ ಪೌರತ್ವ / ದ್ವಿಪೌರತ್ವ?"></div>
+            <div class="fib-q">2. ಅಮೆರಿಕ ಸಂಯುಕ್ತ ಸಂಸ್ಥಾನದಲ್ಲಿ (USA) ಪ್ರಜೆಗಳಿಗೆ ರಾಜ್ಯದ ಪೌರತ್ವ ಮತ್ತು ದೇಶದ ಪೌರತ್ವ ಎರಡೂ ಇರುತ್ತದೆ, ಅದು ಯಾವ ಪೌರತ್ವ? <br><input type="text" class="smart-citizen-input" id="typeIn2" placeholder="ಏಕ ಪೌರತ್ವ / ದ್ವಿಪೌರತ್ವ?"></div>
+        </div>
+        <button class="factory-btn" onclick="verifyFactoryLevel4()">ವಿಧಗಳ ಕೋಡ್ ದೃಢೀಕರಿಸು</button>
+        <div class="factory-alert-box" id="alert4"></div>
+    </div>
+
+    <div id="factory5" class="factory-arena">
+        <h2 class="arena-title">ಹಂತ 5: ಪೌರತ್ವ ಪಡೆಯುವ 4 ಪ್ರಮುಖ ಹಾದಿಗಳು (Citizenship Acquisition Mining)</h2>
+        <p style="margin-bottom: 15px;">ಗೆಳೆಯಾ, ನಮ್ಮ ದೇಶದ ಕಾನೂನಿನ ಪ್ರಕಾರ ಪೌರತ್ವವನ್ನು **ಪಡೆಯಲು ಇರುವ ನಾಲ್ಕು ಸರಿಯಾದ ಮಾರ್ಗಗಳನ್ನು** ಮಾತ್ರ ಗಣಿ ಮಾಡು:</p>
+        <div class="mining-card-grid">
+            <div class="ore-token" id="ore1" onclick="toggleOreToken('ore1', true)">1. ಜನನದಿಂದ (By Birth)</div>
+            <div class="ore-token" id="ore2" onclick="toggleOreToken('ore2', false)">2. ಕಳ್ಳಮಾರ್ಗದಿಂದ ಬರುವುದು</div>
+            <div class="ore-token" id="ore3" onclick="toggleOreToken('ore3', true)">3. ವಂಶಪಾರಂಪರ್ಯವಾಗಿ</div>
+            <div class="ore-token" id="ore4" onclick="toggleOreToken('ore4', true)">4. ನೋಂದಣಿ ಮೂಲಕ (Registration)</div>
+            <div class="ore-token" id="ore5" onclick="toggleOreToken('ore5', false)">5. ಸುಳ್ಳು ದಾಖಲೆ ನೀಡುವುದು</div>
+            <div class="ore-token" id="ore6" onclick="toggleOreToken('ore6', true)">6. ಭೂಭಾಗದ ಸೇರ್ಪಡೆಯಿಂದ</div>
+        </div>
+        <button class="factory-btn" onclick="verifyFactoryLevel5()">ಮಾರ್ಗಗಳನ್ನು ದೃಢೀಕರಿಸು</button>
+        <div class="factory-alert-box" id="alert5"></div>
+    </div>
+
+    <div id="factory6" class="factory-arena">
+        <h2 class="arena-title">ಹಂತ 6: ಪೌರತ್ವ ಕಳೆದುಕೊಳ್ಳುವ 3 ಪ್ರಮುಖ ಹಾದಿಗಳು (Loss of Citizenship Sorting)</h2>
+        <p style="margin-bottom: 15px;">ನಾಗರಿಕನೊಬ್ಬ ತನ್ನ ದೇಶದ ಪೌರತ್ವವನ್ನು ಕಳೆದುಕೊಳ್ಳುವ 3 ವಿಧಾನಗಳನ್ನು ಸರಿಯಾದ ಅರ್ಥದ ಬಾಕ್ಸ್‌ಗಳಿಗೆ ಹಂಚು:</p>
+        <div style="display:flex; gap:25px;">
+            <div style="flex:1; display:flex; flex-direction:column; gap:10px;" id="lossSource">
+                <div style="background:#2c3e50; padding:12px; border-radius:10px; cursor:grab; font-weight:bold;" draggable="true" id="loss1" ondragstart="startLossDrag(event)">ಪರಿತ್ಯಾಗ (Renunciation)</div>
+                <div style="background:#2c3e50; padding:12px; border-radius:10px; cursor:grab; font-weight:bold;" draggable="true" id="loss2" ondragstart="startLossDrag(event)">ಮುಕ್ತಾಯ (Termination)</div>
+                <div style="background:#2c3e50; padding:12px; border-radius:10px; cursor:grab; font-weight:bold;" draggable="true" id="loss3" ondragstart="startLossDrag(event)">ವಜಾ (Deprivation)</div>
+            </div>
+            <div style="flex:2; display:flex; flex-direction:column; gap:15px;">
+                <div style="background:rgba(0,0,0,0.3); border:2px dashed var(--saffron-bright); padding:15px; border-radius:12px;" ondragover="allowLossDrop(event)" ondrop="handleLossDrop(event, 'self')">
+                    <h3>ಸ್ವಇಚ್ಛೆಯಿಂದ ಬೇರೆ ದೇಶದ ಪೌರತ್ವ ಪಡೆದು ಇದನ್ನು ಬಿಡುವುದು</h3>
+                </div>
+                <div style="background:rgba(0,0,0,0.3); border:2px dashed var(--saffron-bright); padding:15px; border-radius:12px;" ondragover="allowLossDrop(event)" ondrop="handleLossDrop(event, 'auto')">
+                    <h3>ಮತ್ತೊಂದು ದೇಶದ ಪೌರತ್ವ ಪಡೆದಾಗ ತಾನಾಗಿಯೇ ಇದು ರದ್ದಾಗುವುದು</h3>
+                </div>
+                <div style="background:rgba(0,0,0,0.3); border:2px dashed var(--saffron-bright); padding:15px; border-radius:12px;" ondragover="allowLossDrop(event)" ondrop="handleLossDrop(event, 'force')">
+                    <h3>ದೇಶದ್ರೋಹ ಅಥವಾ ನಕಲಿ ದಾಖಲೆ ತಂದಾಗ ಸರ್ಕಾರವೇ ವಜಾ ಮಾಡುವುದು</h3>
+                </div>
+            </div>
+        </div>
+        <button class="factory-btn" onclick="verifyFactoryLevel6()">ನಷ್ಟದ ಹಾದಿ ಪರಿಶೀಲಿಸು</button>
+        <div class="factory-alert-box" id="alert6"></div>
+    </div>
+
+    <div id="factory7" class="factory-arena">
+        <h2 class="arena-title">ಹಂತ 7: ಒಬ್ಬ ಉತ್ತಮ ಪೌರನ ಅತ್ಯುನ್ನತ ಲಕ್ಷಣಗಳು (The Ideal Citizen Matrix)</h2>
+        <p style="margin-bottom: 15px;">ಅಂತಿಮ ಹಂತ! ಒಬ್ಬ ಆದರ್ಶ ಉತ್ತಮ ಪೌರನಿಗೆ ಇರಬೇಕಾದ ಗುಣಗಳು ಮತ್ತು ಜವಾಬ್ದಾರಿಗಳನ್ನು ಮ್ಯಾಚ್ ಮಾಡಿ ಫ್ಯಾಕ್ಟರಿ ಕಂಪ್ಲೀಟ್ ಮಾಡು ಗೆಳೆಯಾ:</p>
+        <div class="connector-grid-system">
+            <div class="citizen-node" id="matL1" onclick="selectFinalCitizenMatrix('L', 'matL1', 'duty')">ದೇಶದ ಕಾನೂನು ಗೌರವಿಸುವುದು</div>
+            <div class="citizen-node" id="matR1" onclick="selectFinalCitizenMatrix('R', 'matR1', 'duty')">ಒಬ್ಬ ಜವಾಬ್ದಾರಿಯುತ ಉತ್ತಮ ಪೌರನ ಪ್ರಮುಖ ಲಕ್ಷಣ</div>
+            <div class="citizen-node" id="matL2" onclick="selectFinalCitizenMatrix('L', 'matL2', 'bad')">ಲಂಚ ಕೊಡುವುದು ಮತ್ತು ಸಾರ್ವಜನಿಕ ಆಸ್ತಿ ನಾಶ</div>
+            <div class="citizen-node" id="matR2" onclick="selectFinalCitizenMatrix('R', 'matR2', 'bad')">ಒಬ್ಬ ಕೆಟ್ಟ ಪೌರನ ಅಥವಾ ಕಾನೂನು ವಿರೋಧಿ ಲಕ್ಷಣ</div>
+        </div>
+        <button class="factory-btn" onclick="verifyFactoryLevel7()">ನಾಗರಿಕ ಮ್ಯಾಟ್ರಿಕ್ಸ್ ಪೂರ್ಣಗೊಳಿಸು</button>
+        <div class="factory-alert-box" id="alert7"></div>
+    </div>
+
+    <script>
+        let passportPoints = 0; let nationalPride = 100;
+        function modifyCitizenHUD(ppChange, prideDamage) {
+            passportPoints += ppChange;
+            nationalPride = Math.max(10, nationalPride - prideDamage);
+            document.getElementById("livePassportPoints").innerText = `ಪಾಸ್‌ಪೋರ್ಟ್ ಪಾಯಿಂಟ್ಸ್: ${passportPoints.toString().padStart(4, '0')} PP`;
+            document.getElementById("prideFill").style.width = `${nationalPride}%`;
+        }
+
+        function shiftFactoryLevel(levelIdx) {
+            document.querySelectorAll('.factory-arena').forEach(el => el.classList.remove('active-arena'));
+            document.querySelectorAll('.factory-card').forEach(el => el.classList.remove('active-mission'));
+            
+            document.getElementById('factory' + levelIdx).classList.add('active-arena');
+            document.getElementById('facBtn' + levelIdx).classList.add('active-mission');
+        }
+
+        // Level 1 Logic
+        let nodeL = null; let nodeR = null;
+        function connectCitizenNodes(side, id, matchVal) {
+            if(side === 'L') {
+                if(nodeL) document.getElementById(nodeL.id).classList.remove('node-selected');
+                nodeL = { id: id, match: matchVal };
+            } else {
+                if(nodeR) document.getElementById(nodeR.id).classList.remove('node-selected');
+                nodeR = { id: id, match: matchVal };
+            }
+            document.getElementById(id).classList.add('node-selected');
+
+            if(nodeL && nodeR) {
+                if(nodeL.match === nodeR.match) {
+                    document.getElementById(nodeL.id).style.background = "var(--flag-green)";
+                    document.getElementById(nodeR.id).style.background = "var(--flag-green)";
+                    modifyCitizenHUD(100, 0);
+                    showCitizenAlert(1, "ಸರಿಯಾದ ಜೋಡಣೆ ಗೆಳೆಯಾ! ದೇಶದ ಮೊದಲ ನಾಗರಿಕ ನಿಯಮ ಸರಿಹೊಂದಿದೆ.", true);
+                    document.getElementById('facBtn1').style.background = "var(--flag-green)";
+                } else {
+                    modifyCitizenHUD(0, 10);
+                    showCitizenAlert(1, "ತಪ್ಪಾದ ಜೋಡಣೆ, ದೇಶದ ಗೌರವದ ಮಟ್ಟ ಇಳಿಕೆಯಾಗಿದೆ! ಮತ್ತೊಮ್ಮೆ ಯೋಚಿಸು.", false);
+                }
+                nodeL = null; nodeR = null;
+            }
+        }
+
+        // Level 2 Logic
+        function verifyFactoryLevel2() {
+            let c1 = document.getElementById("cryptIn1").value.trim();
+            let c2 = document.getElementById("cryptIn2").value.trim();
+
+            if(c1 === "ಪೌರತ್ವ" && (c2 === "ಮೂಲಭೂತ ಹಕ್ಕುಗಳು" || c2 === "ಮೂಲಭೂತ ಹಕ್ಕು")) {
+                modifyCitizenHUD(150, 0);
+                document.getElementById('facBtn2').style.background = "var(--flag-green)";
+                showCitizenAlert(2, "ಅದ್ಭುತ! ಪೌರತ್ವದ ಮೂಲ ವ್ಯಾಖ್ಯಾನ ಮತ್ತು ಹಕ್ಕುಗಳ ಕೋಡ್ ಸರಿಯಾಗಿದೆ.", true);
+            } else {
+                modifyCitizenHUD(0, 10);
+                showCitizenAlert(2, "ಕೋಡ್ ತಪ್ಪಾಗಿದೆ ಗೆಳೆಯಾ! ಸುಳಿವು: ಪೌರತ್ವ, ಮೂಲಭೂತ ಹಕ್ಕುಗಳು ಎಂದು ಬರೆಯಿರಿ.", false);
+            }
+        }
+
+        // Level 3: 10 Questions Grid Quiz Data
+        const citizenshipQuiz = [
+            { q: "1. ಭಾರತದ ಪೌರತ್ವ ಕಾಯ್ದೆಯನ್ನು ಮೊಟ್ಟಮೊದಲ ಬಾರಿಗೆ ದೇಶದ ಸಂಸತ್ತು ಯಾವ ವರ್ಷದಲ್ಲಿ ಜಾರಿಗೆ ತಂದಿತು?", o: ["1947 ರ ಕಾಯ್ದೆ", "1955 ರ ಪೌರತ್ವ ಕಾಯ್ದೆ", "2020 ರ ಕಾಯ್ದೆ"], c: 1 },
+            { q: "2. ಯಾವುದೇ ವ್ಯಕ್ತಿ ಭಾರತದ ಭೂಭಾಗದಲ್ಲಿ ಜನಿಸಿದ ಕಾರಣದಿಂದ ಪಡೆಯುವ ಪೌರತ್ವವನ್ನು ಏನೆನ್ನುತ್ತಾರೆ?", o: ["ನೋಂದಣಿ ಮೂಲಕ", "ಜನನದಿಂದ ಪಡೆಯುವ ಪೌರತ್ವ", "ವಜಾ ವಿಧಾನ"], c: 1 },
+            { q: "3. ಭಾರತೀಯ ಮೂಲದ ಪೋಷಕರ ಮಕ್ಕಳು ವಿದೇಶದಲ್ಲಿ ಜನಿಸಿದರೂ ಅವರಿಗೆ ಸಿಗುವ ಪೌರತ್ವದ ಮಾರ್ಗ ಯಾವುದು?", o: ["ವಂಶಪಾರಂಪರ್ಯ ಪೌರತ್ವ", "ಭೂಭಾಗದ ಸೇರ್ಪಡೆ", "ಕಳ್ಳಮಾರ್ಗ"], c: 0 },
+            { q: "4. ಭಾರತದ ಸಂವಿಧಾನದ ಎಷ್ಟನೇ ಭಾಗವು ದೇಶದ ಪೌರತ್ವದ ನಿಯಮಗಳ ಬಗ್ಗೆ ಸಂಪೂರ್ಣವಾಗಿ ವಿವರಿಸುತ್ತದೆ?", o: ["ಒಂದನೇ ಭಾಗ", "ಮೂರನೇ ಭಾಗ", "ಎರಡನೇ ಭಾಗ (ಭಾಗ 2)"], c: 2 },
+            { q: "5. ನಮ್ಮ ದೇಶದ ಯಾವುದೇ ನಾಗರಿಕನು ದೇಶದ ಭದ್ರತೆಗೆ ದ್ರೋಹ ಬಗೆದಾಗ ಸರ್ಕಾರವು ಅವನ ಪೌರತ್ವವನ್ನು ಏನು ಮಾಡುತ್ತದೆ?", o: ["ಬಹುಮಾನ ನೀಡುತ್ತದೆ", "ವಜಾ ಮಾಡುತ್ತದೆ (Deprivation)", "ವರ್ಗಾವಣೆ ಮಾಡುತ್ತದೆ"], c: 1 },
+            { q: "6. ಬ್ರಿಟಿಷ್ ಭಾರತದಲ್ಲಿ ಸ್ವಾತಂತ್ರ್ಯ ಸಿಗುವುದಕ್ಕೆ ಮುಂಚೆ ಪ್ರಜೆಗಳನ್ನು ಪೌರರ ಬದಲಿಗೆ ಏನೆಂದು ಕರೆಯಲಾಗುತ್ತಿತ್ತು?", o: ["ರಾಜರು", "ಬ್ರಿಟಿಷ್ ಸಾಮ್ರಾಜ್ಯದ ಪ್ರಜೆಗಳು / ದಾಸರು", "ಸ್ವತಂತ್ರ ನಾಗರಿಕರು"], c: 1 },
+            { q: "7. ಈ ಕೆಳಗಿನ ಯಾವ ದೇಶದಲ್ಲಿ ಇಂದಿಗೂ ದ್ವಿಪೌರತ್ವ (Dual Citizenship) ಪದ್ಧತಿ ಜಾರಿಯಲ್ಲಿದೆ?", o: ["ಭಾರತ", "ಸ್ವಿಟ್ಜರ್ಲೆಂಡ್ ಮತ್ತು ಅಮೆರಿಕ (USA)", "ಶ್ರೀಲಂಕಾ"], c: 1 },
+            { q: "8. ಗೋವಾ ಅಥವಾ ಪಾಂಡಿಚೇರಿ ಭಾರತದ ಒಕ್ಕೂಟಕ್ಕೆ ಸೇರಿದಾಗ ಅಲ್ಲಿನ ಜನರಿಗೆ ಸಿಕ್ಕ ಪೌರತ್ವದ ವಿಧಾನ ಯಾವುದು?", o: ["ಭೂಭಾಗದ ಸೇರ್ಪಡೆಯಿಂದ (Incorp of Territory)", "ಜನನದ ಮೂಲಕ", "ನೋಂದಣಿ ಮೂಲಕ"], c: 0 },
+            { q: "9. ಒಬ್ಬ ವಿದೇಶಿ ಪ್ರಜೆಯು ಭಾರತದ ಪೌರತ್ವ ಬೇಕೆಂದು ನಿಯಮಾವಳಿಗಳ ಪ್ರಕಾರ ಸಲ್ಲಿಸುವ ಅರ್ಜಿ ವಿಧಾನ ಯಾವುದು?", o: ["ಪರಿತ್ಯಾಗ ವಿಧಾನ", "ವಂಶಪಾರಂಪರ್ಯ", "ನೋಂದಣಿ ಮೂಲಕ ಪೌರತ್ವ"], c: 2 },
+            { q: "10. ಜಾಗತಿಕ ಮಟ್ಟದಲ್ಲಿ ವಿಶ್ವದ ಎಲ್ಲ ಮಾನವರೂ ಸಮಾನರು ಎಂಬ ಉನ್ನತ ಚಿಂತನೆಯನ್ನು ಏನನ್ನಲಾಗುತ್ತದೆ?", o: ["ವಿಶ್ವ ಪೌರತ್ವ (Global Citizenship)", "ಏಕ ಪೌರತ್ವ", "ರಾಷ್ಟ್ರೀಯತೆ"], c: 0 }
+        ];
+
+        let qIdx = 0; let qScore = 0; let isQuizActive = true;
+        function loadCitizenQuestion() {
+            isQuizActive = true;
+            document.getElementById("nextQuizBtn").style.display = "none";
+            document.getElementById("alert3").style.display = "none";
+            let qData = citizenshipQuiz[qIdx];
+            document.getElementById("quizCounterText").innerText = `ಪ್ರಶ್ನೆ ಕೋಡ್: ${qIdx + 1} / 10`;
+            document.getElementById("quizQuestionText").innerText = qData.q;
+            
+            let container = document.getElementById("quizOptionsContainer");
+            container.innerHTML = "";
+            qData.o.forEach((opt, idx) => {
+                let div = document.createElement("div");
+                div.classList.add("choice-box-row");
+                div.innerText = opt;
+                div.onclick = function() {
+                    if(!isQuizActive) return;
+                    isQuizActive = false;
+                    if(idx === qData.c) {
+                        this.classList.add("correct-glow");
+                        qScore++; modifyCitizenHUD(30, 0);
+                        showCitizenAlert(3, "ಸರಿಯಾದ ನಾಗರಿಕ ನಿರ್ಧಾರ! ದೇಶದ ಹೆಮ್ಮೆ ಹೆಚ್ಚಾಗಿದೆ.", true);
+                    } else {
+                        this.classList.add("wrong-glow");
+                        container.children[qData.c].classList.add("correct-glow");
+                        modifyCitizenHUD(0, 10);
+                        showCitizenAlert(3, "ತಪ್ಪು ನಿರ್ಧಾರ! ದೇಶದ ಹೆಮ್ಮೆಯ ಸೂಚ್ಯಂಕ ಇಳಿಕೆಯಾಗಿದೆ.", false);
+                    }
+                    document.getElementById("nextQuizBtn").style.display = "inline-block";
+                };
+                container.appendChild(div);
+            });
+        }
+        function nextCitizenQuestion() {
+            qIdx++;
+            if(qIdx < citizenshipQuiz.length) {
+                loadCitizenQuestion();
+            } else {
+                document.getElementById("quizCounterText").innerText = "ಫ್ಯಾಕ್ಟರಿ ಫಲಿತಾಂಶ ಸಿದ್ಧ!";
+                document.getElementById("quizQuestionText").innerText = `ತರಗತಿಯ ಒಟ್ಟು ಸ್ಕೋರ್: ${qScore} / 10`;
+                document.getElementById("quizOptionsContainer").innerHTML = "";
+                document.getElementById("nextQuizBtn").style.display = "none";
+                document.getElementById('facBtn3').style.background = "var(--flag-green)";
+                showCitizenAlert(3, qScore >= 7 ? "ಅಪ್ರತಿಮ ದೇಶಭಕ್ತರು ಮತ್ತು ಜವಾಬ್ದಾರಿಯುತ ನಾಗರಿಕರು ಗೆಳೆಯಾ!" : "ಉತ್ತಮ ಪ್ರಯತ್ನ!", true);
+            }
+        }
+        loadCitizenQuestion();
+
+        // Level 4 Logic
+        function verifyFactoryLevel4() {
+            let t1 = document.getElementById("typeIn1").value.trim();
+            let t2 = document.getElementById("typeIn2").value.trim();
+
+            if(t1 === "ಏಕ ಪೌರತ್ವ" && t2 === "ದ್ವಿಪೌರತ್ವ") {
+                modifyCitizenHUD(150, 0);
+                document.getElementById('facBtn4').style.background = "var(--flag-green)";
+                showCitizenAlert(4, "ವಾಹ್ ಗೆಳೆಯಾ! ಏಕ ಮತ್ತು ದ್ವಿಪೌರತ್ವದ ಕಲ್ಪನೆ ಸಂಪೂರ್ಣ ಸರಿ ಇದೆ.", true);
+            } else {
+                modifyCitizenHUD(0, 10);
+                showCitizenAlert(4, "ತಪ್ಪಾಗಿದೆ! ಸುಳಿವು: ಏಕ ಪೌರತ್ವ, ದ್ವಿಪೌರತ್ವ ಎಂದು ಬರೆಯಿರಿ.", false);
+            }
+        }
+
+        // Level 5 Logic
+        let minedTokens = {};
+        function toggleOreToken(id, isAcquisitionMethod) {
+            let node = document.getElementById(id);
+            if(node.classList.contains('active-token')) {
+                node.classList.remove('active-token');
+                delete minedTokens[id];
+            } else {
+                node.classList.add('active-token');
+                minedTokens[id] = isAcquisitionMethod;
+            }
+        }
+        function verifyFactoryLevel5() {
+            let win = true; let count = 0;
+            for(let id in minedTokens) {
+                if(minedTokens[id] === false) win = false;
+                count++;
+            }
+            if(count !== 4) win = false; // 4 acquisition methods
+
+            if(win) {
+                modifyCitizenHUD(150, 0);
+                document.getElementById('facBtn5').style.background = "var(--flag-green)";
+                showCitizenAlert(5, "ಅದ್ಭುತ! ಪೌರತ್ವ ಪಡೆಯುವ 4 ಹಾದಿಗಳು (ಜನನ, ವಂಶಪಾರಂಪರ್ಯ, ನೋಂದಣಿ, ಭೂಭಾಗದ ಸೇರ್ಪಡೆ) ಪಕ್ಕಾ ಸರಿ ಇವೆ.", true);
+            } else {
+                modifyCitizenHUD(0, 10);
+                showCitizenAlert(5, "ತಪ್ಪಾಗಿದೆ! ಕೇವಲ ಪೌರತ್ವ ಪಡೆಯುವ 4 ಸರಿಯಾದ ಮಾರ್ಗಗಳನ್ನು ಮಾತ್ರ ಆರಿಸು (ಕಳ್ಳಮಾರ್ಗ ಬೇಡ).", false);
+            }
+        }
+
+        // Level 6 Logic
+        function allowLossDrop(ev) { ev.preventDefault(); }
+        function startLossDrag(ev) { ev.dataTransfer.setData("text", ev.target.id); }
+        function handleLossDrop(ev, cat) {
+            ev.preventDefault();
+            let id = ev.dataTransfer.getData("text");
+            let el = document.getElementById(id);
+            el.dataset.cat = cat;
+            ev.target.appendChild(el);
+        }
+        function verifyFactoryLevel6() {
+            let l1 = document.getElementById("loss1").dataset.cat;
+            let l2 = document.getElementById("loss2").dataset.cat;
+            let l3 = document.getElementById("loss3").dataset.cat;
+
+            if(l1 === "self" && l2 === "auto" && l3 === "force") {
+                modifyCitizenHUD(200, 0);
+                document.getElementById('facBtn6').style.background = "var(--flag-green)";
+                showCitizenAlert(6, "ಪೌರತ್ವ ಕಳೆದುಕೊಳ್ಳುವ ಮೂರೂ ವಿಧಾನಗಳ ವ್ಯಾಖ್ಯಾನ ನೂರಕ್ಕೆ ನೂರು ನಿಖರವಾಗಿದೆ ಗೆಳೆಯಾ!", true);
+            } else {
+                modifyCitizenHUD(0, 10);
+                showCitizenAlert(6, "ತಪ್ಪಾದ ವಿಭಾಗ! ಪರಿತ್ಯಾಗ ಎಂದರೆ ಸ್ವಇಚ್ಛೆ, ಮುಕ್ತಾಯ ಎಂದರೆ ತಾನಾಗಿಯೇ ರದ್ದು, ವಜಾ ಎಂದರೆ ಸರ್ಕಾರ ಕಿತ್ತುಕೊಳ್ಳುವುದು.", false);
+            }
+        }
+
+        // Level 7 Logic
+        let finalL = null; let finalR = null;
+        function selectFinalCitizenMatrix(side, id, key) {
+            if(side === 'L') {
+                finalL = { id: id, key: key };
+                document.getElementById("matL1").classList.remove('node-selected');
+                document.getElementById("matL2").classList.remove('node-selected');
+            } else {
+                finalR = { id: id, key: key };
+                document.getElementById("matR1").classList.remove('node-selected');
+                document.getElementById("matR2").classList.remove('node-selected');
+            }
+            document.getElementById(id).classList.add('node-selected');
+        }
+        function verifyFactoryLevel7() {
+            if(finalL && finalR && finalL.key === finalR.key) {
+                modifyCitizenHUD(250, 0);
+                document.getElementById('facBtn7').style.background = "var(--flag-green)";
+                showCitizenAlert(7, "ವಾಹ್ ಗೆಳೆಯಾ! ಇಡೀ ಪೌರ ಮತ್ತು ಪೌರತ್ವ ಪಾಠದ ಆಪ್ ಫ್ಯಾಕ್ಟರಿ ಯಶಸ್ವಿಯಾಗಿದೆ. ಅತ್ಯುತ್ತಮ ಡಿಜಿಟಲ್ ಕ್ಲಾಸ್ ರೂಮ್ ಕೊಡುಗೆ ಇದು!", true);
+            } else {
+                modifyCitizenHUD(0, 10);
+                showCitizenAlert(7, "ಮ್ಯಾಟ್ರಿಕ್ಸ್ ಲಿಂಕ್ ತಪ್ಪಾಗಿದೆ. ನಾಗರಿಕನ ಗುಣಗಳನ್ನು ಮತ್ತೊಮ್ಮೆ ಗಮನಿಸು.", false);
+            }
+        }
+
+        function showCitizenAlert(lvlNum, text, success) {
+            let box = document.getElementById("alert" + lvlNum);
+            box.style.display = "block";
+            box.innerText = text;
+            box.style.background = success ? "rgba(16, 172, 132, 0.15)" : "rgba(238, 82, 83, 0.1)";
+            box.style.color = success ? "#55efc4" : "#ff7675";
+            box.style.borderColor = success ? "var(--flag-green)" : "var(--danger-red)";
+        }
+    </script>
+</body>
+</html>

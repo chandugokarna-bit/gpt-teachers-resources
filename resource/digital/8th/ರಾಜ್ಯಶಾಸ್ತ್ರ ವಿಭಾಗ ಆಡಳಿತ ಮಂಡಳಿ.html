@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ರಾಜ್ಯಶಾಸ್ತ್ರ ಸಿಮ್ಯುಲೇಟರ್ ೮.೦ - ಪ್ರಜಾಪ್ರಭುತ್ವದ ಜ್ಞಾನ ಹಬ್</title>
+    <style>
+        :root {
+            --gov-blue: #0984e3;
+            --gov-navy: #2c3e50;
+            --democracy-gold: #fdcb6e;
+            --neon-green: #00b894;
+            --neon-red: #d63031;
+            --card-dark: #1e272e;
+            --bg-space: #0f172a;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Verdana, sans-serif; }
+
+        body {
+            background: var(--bg-space);
+            background-image: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #ffffff;
+        }
+
+        header.gov-panel-header {
+            text-align: center;
+            padding: 25px;
+            background: rgba(30, 41, 59, 0.7);
+            border: 2px solid var(--gov-blue);
+            border-radius: 20px;
+            box-shadow: 0 0 25px rgba(9, 132, 227, 0.3);
+            margin-bottom: 25px;
+        }
+
+        header.gov-panel-header h1 {
+            color: var(--gov-blue);
+            font-size: 2.3rem;
+            text-shadow: 0 0 10px rgba(9, 132, 227, 0.5);
+            margin-bottom: 5px;
+        }
+
+        header.gov-panel-header p { color: #cbd5e1; font-size: 1.2rem; }
+
+        /* NEW HUD: CITIZEN HAPPINESS INDEX */
+        .gov-hud-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #1e293b;
+            padding: 15px 25px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            border-left: 5px solid var(--democracy-gold);
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .happiness-container {
+            background: #334155;
+            width: 45%;
+            height: 18px;
+            border-radius: 9px;
+            overflow: hidden;
+            border: 1px solid var(--democracy-gold);
+        }
+
+        .happiness-fill {
+            background: linear-gradient(90deg, var(--democracy-gold), var(--neon-green));
+            height: 100%;
+            width: 100%;
+            transition: width 0.4s ease;
+        }
+
+        /* Simulator Level Steppers */
+        .gov-stepper-track {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 35px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .gov-badge {
+            padding: 12px 20px;
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .gov-badge.passed {
+            background: var(--gov-blue);
+            color: white;
+            box-shadow: 0 0 12px rgba(9, 132, 227, 0.4);
+        }
+
+        .gov-badge.active-law {
+            background: var(--democracy-gold);
+            color: #000000;
+            border-color: #ffffff;
+            transform: scale(1.04);
+            box-shadow: 0 0 15px var(--democracy-gold);
+        }
+
+        /* Simulator Screen Arena */
+        .gov-arena-box {
+            background: rgba(30, 41, 59, 0.85);
+            border: 2px solid #334155;
+            border-radius: 24px;
+            padding: 35px;
+            min-height: 520px;
+            display: none;
+            box-shadow: 0 20px 45px rgba(0,0,0,0.5);
+        }
+
+        .gov-arena-box.active-arena { display: block; animation: bootGlow 0.4s ease; }
+
+        @keyframes bootGlow {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2.arena-heading {
+            font-size: 1.65rem;
+            color: var(--democracy-gold);
+            margin-bottom: 25px;
+            border-bottom: 1px dashed rgba(253, 203, 110, 0.3);
+            padding-bottom: 12px;
+        }
+
+        /* Interactive Grid Nodes */
+        .node-selection-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .gov-node {
+            background: #1e293b;
+            padding: 18px;
+            border-radius: 14px;
+            cursor: pointer;
+            border: 2px solid #334155;
+            font-weight: bold;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .gov-node:hover { border-color: var(--gov-blue); background: #223047; }
+        .gov-node.selected { background: var(--gov-blue); color: white; border-color: white; }
+
+        /* Quiz Buttons */
+        .gov-quiz-row {
+            background: #1e293b;
+            border: 2px solid #334155;
+            padding: 16px;
+            margin: 12px 0;
+            border-radius: 14px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+        }
+
+        .gov-quiz-row:hover { border-color: var(--gov-blue); transform: translateX(5px); }
+        .gov-quiz-row.correct-glow { background: rgba(0, 184, 148, 0.2); border-color: var(--neon-green); color: var(--neon-green); }
+        .gov-quiz-row.wrong-glow { background: rgba(214, 48, 49, 0.2); border-color: var(--neon-red); color: var(--neon-red); }
+
+        /* Custom Inputs */
+        .gov-smart-input {
+            background: #0f172a;
+            border: 2px solid #334155;
+            border-radius: 10px;
+            padding: 12px;
+            font-size: 1.1rem;
+            color: var(--democracy-gold);
+            font-weight: bold;
+            outline: none;
+            width: 100%;
+            max-width: 320px;
+            margin-top: 8px;
+        }
+
+        .gov-smart-input:focus { border-color: var(--gov-blue); }
+
+        /* Level 5 State Elements */
+        .state-mining-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        .state-ore-card {
+            background: #1e293b;
+            border: 2px solid #334155;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .state-ore-card.activated { background: #6c5ce7; border-color: white; }
+
+        .gov-btn {
+            background: linear-gradient(135deg, var(--democracy-gold), #e67e22);
+            color: black;
+            border: none;
+            padding: 14px 35px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 25px;
+            box-shadow: 0 5px 15px rgba(253, 203, 110, 0.3);
+        }
+
+        .gov-btn:hover { transform: scale(1.02); box-shadow: 0 8px 25px rgba(253, 203, 110, 0.5); }
+
+        .gov-alert-status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 12px;
+            font-weight: bold;
+            display: none;
+            font-size: 1.1rem;
+            border: 1px solid transparent;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="gov-panel-header">
+        <h1>ರಾಜ್ಯಶಾಸ್ತ್ರ ವಿಭಾಗ: ಆಡಳಿತ ಮಂಡಳಿ</h1>
+        <p>ಸಿಮ್ಯುಲೇಟರ್ ಮಾದರಿ ೮.೦ • ಪ್ರಜಾಪ್ರಭುತ್ವದ ಮೂಲತತ್ತ್ವಗಳ ಡಿಜಿಟಲ್ ಆಟಗಳು</p>
+    </div>
+
+    <div class="gov-hud-bar">
+        <span>ಪ್ರಜೆಗಳ ಸಂತೋಷದ ಸೂಚ್ಯಂಕ:</span>
+        <div class="happiness-container"><div class="happiness-fill" id="happyFill"></div></div>
+        <span style="color: var(--democracy-gold);" id="liveXPCount">ಡೆಮಾಕ್ರೆಸಿ ಪಾಯಿಂಟ್ಸ್: 0000 DP</span>
+    </div>
+
+    <div class="gov-stepper-track">
+        <div class="gov-badge active-law" id="lvlBtn1" onclick="loadLevel(1)">ಲೆವೆಲ್ 1</div>
+        <div class="gov-badge" id="lvlBtn2" onclick="loadLevel(2)">ಲೆವೆಲ್ 2</div>
+        <div class="gov-badge" id="lvlBtn3" onclick="loadLevel(3)">ಲೆವೆಲ್ 3 (10 Qs)</div>
+        <div class="gov-badge" id="lvlBtn4" onclick="loadLevel(4)">ಲೆವೆಲ್ 4</div>
+        <div class="gov-badge" id="lvlBtn5" onclick="loadLevel(5)">ಲೆವೆಲ್ 5</div>
+        <div class="gov-badge" id="lvlBtn6" onclick="loadLevel(6)">ಲೆವೆಲ್ 6</div>
+        <div class="gov-badge" id="lvlBtn7" onclick="loadLevel(7)">ಲೆವೆಲ್ 7</div>
+    </div>
+
+    <div id="level1" class="gov-arena-box active-arena">
+        <h2 class="arena-heading">ಲೆವೆಲ್ 1: ರಾಜ್ಯಶಾಸ್ತ್ರದ ಉಗಮ ಮತ್ತು ಗ್ರಿಡ್ (Origins of Politics)</h2>
+        <p style="margin-bottom: 15px;">ಗೆಳೆಯಾ, ರಾಜ್ಯಶಾಸ್ತ್ರದ ಪಿತಾಮಹ ಮತ್ತು ಅವರ ಪ್ರಸಿದ್ಧ ಕೃತಿಯನ್ನು ಸರಿಯಾಗಿ ಜೋಡಿ ಮಾಡಿ ಆಡಳಿತ ಆರಂಭಿಸು:</p>
+        <div class="node-selection-grid">
+            <div>
+                <div class="gov-node" id="l1_nodeL1" onclick="connectLaws('L', 'l1_nodeL1', 1)">ಅರಿಸ್ಟಾಟಲ್ (Aristotle)</div>
+                <div class="gov-node" id="l1_nodeL2" style="margin-top:15px;" onclick="connectLaws('L', 'l1_nodeL2', 2)">ಪ್ಲೇಟೋ (Plato)</div>
+            </div>
+            <div>
+                <div class="gov-node" id="l1_nodeR1" onclick="connectLaws('R', 'l1_nodeR1', 2)">ದಿ ರಿಪಬ್ಲಿಕ್ (The Republic)</div>
+                <div class="gov-node" id="l1_nodeR2" style="margin-top:15px;" onclick="connectLaws('R', 'l1_nodeR2', 1)">ಪಾಲಿಟಿಕ್ಸ್ (Politics)</div>
+            </div>
+        </div>
+        <div class="gov-alert-status" id="alert1"></div>
+    </div>
+
+    <div id="level2" class="gov-arena-box">
+        <h2 class="arena-heading">ಲೆವೆಲ್ 2: ಭಾರತೀಯ ರಾಜನೀತಿಗೆ ಕೌಟಿಲ್ಯನ ಕೊಡುಗೆ (Kautilya's Crypt)</h2>
+        <div style="display:flex; flex-direction:column; gap:20px;">
+            <div class="fib-q">1. ಮೌರ್ಯರ ಕಾಲದಲ್ಲಿ ಭಾರತೀಯ ರಾಜನೀತಿಗೆ ಅಡಿಪಾಯ ಹಾಕಿದ ಕೌಟಿಲ್ಯನ (ಚಾಣಕ್ಯನ) ಜಗತ್ಪ್ರಸಿದ್ಧ ಕೃತಿ ಯಾವುದು? <br><input type="text" class="gov-smart-input" id="cryptIn1" placeholder="ಕೃತಿಯ ಹೆಸರು ಬರೆಯಿರಿ"></div>
+            <div class="fib-q">2. ರಾಜ್ಯಶಾಸ್ತ್ರ ಎಂಬ ಪದವು ಗ್ರೀಕ್ ಭಾಷೆಯ ಯಾವ ಮೂಲ ಪದದಿಂದ ಬಂದಿದೆ? <br><input type="text" class="gov-smart-input" id="cryptIn2" placeholder="ಗ್ರೀಕ್ ಪದ ಬರೆಯಿರಿ (ಉದಾ: ಪೋಲಿಸ್)"></div>
+            <div class="fib-q">3. ಗ್ರೀಕ್ ನಗರ ರಾಜ್ಯಗಳಾದ 'ಪೋಲಿಸ್' ಎಂದರೆ ಇಂದಿನ ಅರ್ಥದಲ್ಲಿ ಏನರ್ಥ? <br><input type="text" class="gov-smart-input" id="cryptIn3" placeholder="ನಗರ-ರಾಜ್ಯ / ದೊಡ್ಡ ದೇಶ?"></div>
+        </div>
+        <button class="gov-btn" onclick="verifyLevel2()">ರಾಜನೀತಿ ಕೋಡ್ ಕ್ರಾಕ್ ಮಾಡು</button>
+        <div class="gov-alert-status" id="alert2"></div>
+    </div>
+
+    <div id="level3" class="gov-arena-box">
+        <h2 class="arena-heading">ಲೆವೆಲ್ 3: ಪ್ರಜಾಪ್ರಭುತ್ವದ ಮಹಾ ಯುದ್ಧ (Epic 10 Democracy Quiz)</h2>
+        <div style="font-weight: bold; margin-bottom: 15px; color: var(--democracy-gold);" id="quizTrackTxt">ಪ್ರಶ್ನೆ ಕೋಡ್: 1 / 10</div>
+        <div id="quizQuestionText" style="font-size: 1.25rem; font-weight: bold; margin-bottom: 20px;">ಲೋಡ್ ಆಗುತ್ತಿದೆ...</div>
+        <div id="quizOptionsContainer"></div>
+        <button class="gov-btn" id="nextQuizBtn" style="display:none;" onclick="nextGovQuestion()">ಮುಂದಿನ ಶಾಸನಕ್ಕೆ ಚಲಿಸು ➔</button>
+        <div class="gov-alert-status" id="alert3"></div>
+    </div>
+
+    <div id="level4" class="gov-arena-box">
+        <h2 class="arena-heading">ಲೆವೆಲ್ 4: ರಾಜ್ಯಶಾಸ್ತ್ರದ ಅಗತ್ಯತೆ ಮತ್ತು ವ್ಯಾಖ್ಯಾನ (Thinkers Statements)</h2>
+        <div style="display:flex; flex-direction:column; gap:20px;">
+            <div class="fib-q">1. "ರಾಜ್ಯದ ಉಗಮ ಮತ್ತು ಬೆಳವಣಿಗೆಯನ್ನು ಕುರಿತು ಅಧ್ಯಯನ ಮಾಡುವ ಶಾಸ್ತ್ರವೇ ರಾಜ್ಯಶಾಸ್ತ್ರ" ಎಂದು ವ್ಯಾಖ್ಯಾನಿಸಿದವರು ಯಾರು? <br><input type="text" class="gov-smart-input" id="thinkIn1" placeholder="ಗಾರ್ನರ್ / ಬ್ಲಂಟ್‌ಶಲಿ?"></div>
+            <div class="fib-q">2. "ಮಾನವನು ಒಂದು ಸಾಮಾಜಿಕ ಮತ್ತು ರಾಜಕೀಯ ಜೀವಿ" ಎಂದು ಸಾರಿದ ಜಗತ್ತಿನ ಮೊದಲ ತತ್ವಜ್ಞಾನಿ ಯಾರು? <br><input type="text" class="gov-smart-input" id="thinkIn2" placeholder="ಅರಿಸ್ಟಾಟಲ್ / ಸಾಕ್ರಟೀಸ್?"></div>
+        </div>
+        <button class="gov-btn" onclick="verifyLevel4()">ವ್ಯಾಖ್ಯಾನ ದೃಢೀಕರಿಸು</button>
+        <div class="gov-alert-status" id="alert4"></div>
+    </div>
+
+    <div id="level5" class="gov-arena-box">
+        <h2 class="arena-heading">ಲೆವೆಲ್ 5: ರಾಜ್ಯದ ಅತ್ಯಗತ್ಯ ನಾಲ್ಕು ಮೂಲ ಅಂಗಗಳ ಶೋಧ (State Elements Mining)</h2>
+        <p style="margin-bottom: 15px;">ಗೆಳೆಯಾ, ರಾಜ್ಯವೊಂದು ಅಸ್ತಿತ್ವಕ್ಕೆ ಬರಲು ಪಠ್ಯಪುಸ್ತಕದಲ್ಲಿ ತಿಳಿಸಿರುವ **ನಾಲ್ಕು ಅತ್ಯಗತ್ಯ ಮೂಲ ಅಂಗಗಳನ್ನು** ಮಾತ್ರ ಕ್ಲಿಕ್ ಮಾಡಿ ಆರಿಸು:</p>
+        <div class="state-mining-grid">
+            <div class="state-ore-card" id="state1" onclick="toggleStateOre('state1', true)">1. ಜನಸಂಖ್ಯೆ</div>
+            <div class="state-ore-card" id="state2" onclick="toggleStateOre('state2', false)">2. ದೊಡ್ಡ ಬ್ಯಾಂಕ್</div>
+            <div class="state-ore-card" id="state3" onclick="toggleStateOre('state3', true)">3. ನಿರ್ದಿಷ್ಟ ಭೂಭಾಗ</div>
+            <div class="state-ore-card" id="state4" onclick="toggleStateOre('state4', true)">4. ಸರ್ಕಾರ</div>
+            <div class="state-ore-card" id="state5" onclick="toggleStateOre('state5', false)">5. ದೂರದರ್ಶನ</div>
+            <div class="state-ore-card" id="state6" onclick="toggleStateOre('state6', true)">6. ಸಾರ್ವಭೌಮಾಧಿಕಾರ</div>
+            <div class="state-ore-card" id="state7" onclick="toggleStateOre('state7', false)">7. ಮಿಲಿಟರಿ ವಾಹನ</div>
+        </div>
+        <button class="gov-btn" onclick="verifyLevel5()">ಅಂಗಗಳನ್ನು ದೃಢೀಕರಿಸು</button>
+        <div class="gov-alert-status" id="alert5"></div>
+    </div>
+
+    <div id="level6" class="gov-arena-box">
+        <h2 class="arena-heading">ಲೆವೆಲ್ 6: ಸರ್ಕಾರದ ಮೂರು ಪ್ರಮುಖ ಅಂಗಗಳ ವಿನ್ಯಾಸ (Organs of Government)</h2>
+        <p style="margin-bottom: 15px;">ಕಾನೂನುಗಳನ್ನು ಮಾಡುವ, ಜಾರಿಗೊಳಿಸುವ ಮತ್ತು ನ್ಯಾಯ ನೀಡುವ ಅಂಗಗಳನ್ನು ಸರಿಯಾದ ಬಾಕ್ಸ್‌ಗೆ ಹಂಚು:</p>
+        <div style="display:flex; gap:25px;">
+            <div style="flex:1; display:flex; flex-direction:column; gap:10px;" id="organSource">
+                <div style="background:#2c3e50; padding:12px; border-radius:10px; cursor:grab; font-weight:bold;" draggable="true" id="org1" ondragstart="startOrganDrag(event)">ಶಾಸಕಾಂಗ (Legislature)</div>
+                <div style="background:#2c3e50; padding:12px; border-radius:10px; cursor:grab; font-weight:bold;" draggable="true" id="org2" ondragstart="startOrganDrag(event)">ಕಾರ್ಯಾಂಗ (Executive)</div>
+                <div style="background:#2c3e50; padding:12px; border-radius:10px; cursor:grab; font-weight:bold;" draggable="true" id="org3" ondragstart="startOrganDrag(event)">ನ್ಯಾಯಾಂಗ (Judiciary)</div>
+            </div>
+            <div style="flex:2; display:flex; flex-direction:column; gap:15px;">
+                <div style="background:rgba(0,0,0,0.3); border:2px dashed var(--gov-blue); padding:15px; border-radius:12px;" ondragover="allowOrganDrop(event)" ondrop="handleOrganDrop(event, 'make')">
+                    <h3>ಕಾನೂನುಗಳನ್ನು ರೂಪಿಸುವ ಅಂಗ</h3>
+                </div>
+                <div style="background:rgba(0,0,0,0.3); border:2px dashed var(--gov-blue); padding:15px; border-radius:12px;" ondragover="allowOrganDrop(event)" ondrop="handleOrganDrop(event, 'run')">
+                    <h3>ಕಾನೂನುಗಳನ್ನು ಜಾರಿಗೆ ತರುವ ಅಂಗ</h3>
+                </div>
+                <div style="background:rgba(0,0,0,0.3); border:2px dashed var(--gov-blue); padding:15px; border-radius:12px;" ondragover="allowOrganDrop(event)" ondrop="handleOrganDrop(event, 'judge')">
+                    <h3>ತಪ್ಪು ಮಾಡಿದವರಿಗೆ ಶಿಕ್ಷೆ ನೀಡಿ ನ್ಯಾಯ ಕಾಯುವ ಅಂಗ</h3>
+                </div>
+            </div>
+        </div>
+        <button class="gov-btn" onclick="verifyLevel6()">ಸರ್ಕಾರದ ರಚನೆ ಪರಿಶೀಲಿಸು</button>
+        <div class="gov-alert-status" id="alert6"></div>
+    </div>
+
+    <div id="level7" class="gov-arena-box">
+        <h2 class="arena-heading">ಲೆವೆಲ್ 7: ಜಾಗತಿಕ ರಾಜಕೀಯ ಚಿಂತಕರು ಮತ್ತು ದೇಶಗಳು (Global Matrix Map)</h2>
+        <p style="margin-bottom: 15px;">ಅಂತಿಮ ಹಂತ! ಪ್ರಸಿದ್ಧ ರಾಜಕೀಯ ತತ್ವಜ್ಞಾನಿಗಳು ಮತ್ತು ಅವರು ಯಾವ ದೇಶಕ್ಕೆ ಸೇರಿದವರು ಎಂಬುದನ್ನು ಮ್ಯಾಚ್ ಮಾಡಿ ಸಿಮ್ಯುಲೇಶನ್ ಮುಗಿಸಿ ಗೆಳೆಯಾ:</p>
+        <div class="node-selection-grid">
+            <div class="gov-node" id="matL1" onclick="selectFinalMatrix('L', 'matL1', 'greeko')">ಸಾಕ್ರಟೀಸ್, ಪ್ಲೇಟೋ, ಅರಿಸ್ಟಾಟಲ್</div>
+            <div class="gov-node" id="matR1" onclick="selectFinalMatrix('R', 'matR1', 'greeko')">ಪ್ರಾಚೀನ ಗ್ರೀಸ್ ದೇಶದ ತತ್ವಜ್ಞಾನಿಗಳು</div>
+            <div class="gov-node" id="matL2" onclick="selectFinalMatrix('L', 'matL2', 'indiano')">ಕೌಟಿಲ್ಯ ಮತ್ತು ಕಮಂದಕ</div>
+            <div class="gov-node" id="matR2" onclick="selectFinalMatrix('R', 'matR2', 'indiano')">ಪ್ರಾಚೀನ ಭಾರತದ ರಾಜನೀತಿ ತಜ್ಞರು</div>
+        </div>
+        <button class="gov-btn" onclick="verifyLevel7()">ಗವರ್ನೆನ್ಸ್ ಮ್ಯಾಟ್ರಿಕ್ಸ್ ಕಂಪ್ಲೀಟ್ ಮಾಡು</button>
+        <div class="gov-alert-status" id="alert7"></div>
+    </div>
+
+    <script>
+        let democracyPoints = 0; let citizenHappiness = 100;
+        function modifyHUDTracker(dpChange, happyDamage) {
+            democracyPoints += dpChange;
+            citizenHappiness = Math.max(10, citizenHappiness - happyDamage);
+            document.getElementById("liveXPCount").innerText = `ಡೆಮಾಕ್ರೆಸಿ ಪಾಯಿಂಟ್ಸ್: ${democracyPoints.toString().padStart(4, '0')} DP`;
+            document.getElementById("happyFill").style.width = `${citizenHappiness}%`;
+        }
+
+        function loadLevel(levelIdx) {
+            document.querySelectorAll('.gov-arena-box').forEach(el => el.classList.remove('active-arena'));
+            document.querySelectorAll('.gov-badge').forEach(el => el.classList.remove('active-law'));
+            
+            document.getElementById('level' + levelIdx).classList.add('active-arena');
+            document.getElementById('lvlBtn' + levelIdx).classList.add('active-law');
+        }
+
+        // Level 1 Logic
+        let nodeL = null; let nodeR = null;
+        function connectLaws(side, id, matchVal) {
+            if(side === 'L') {
+                if(nodeL) document.getElementById(nodeL.id).classList.remove('selected');
+                nodeL = { id: id, match: matchVal };
+            } else {
+                if(nodeR) document.getElementById(nodeR.id).classList.remove('selected');
+                nodeR = { id: id, match: matchVal };
+            }
+            document.getElementById(id).classList.add('selected');
+
+            if(nodeL && nodeR) {
+                if(nodeL.match === nodeR.match) {
+                    document.getElementById(nodeL.id).style.background = "var(--neon-green)";
+                    document.getElementById(nodeR.id).style.background = "var(--neon-green)";
+                    modifyHUDTracker(100, 0);
+                    showGovAlert(1, "ಸರಿಯಾದ ಜೋಡಣೆ ಗೆಳೆಯಾ! ಮೊದಲ ಹಂತದ ಕಾನೂನು ಪಾಸ್ ಆಯಿತು.", true);
+                    document.getElementById('lvlBtn1').classList.add('passed');
+                } else {
+                    modifyHUDTracker(0, 10);
+                    showGovAlert(1, "ತಪ್ಪಾದ ಜೋಡಣೆ, ಪ್ರಜೆಗಳು ಬೇಸರಗೊಂಡಿದ್ದಾರೆ! ಮತ್ತೊಮ್ಮೆ ಯೋಚಿಸು.", false);
+                }
+                nodeL = null; nodeR = null;
+            }
+        }
+
+        // Level 2 Logic
+        function verifyLevel2() {
+            let c1 = document.getElementById("cryptIn1").value.trim();
+            let c2 = document.getElementById("cryptIn2").value.trim();
+            let c3 = document.getElementById("cryptIn3").value.trim();
+
+            if(c1 === "ಅರ್ಥಶಾಸ್ತ್ರ" && (c2 === "ಪೋಲಿಸ್" || c2 === "ಪೋಲಿಸ್ ಪದ") && (c3 === "ನಗರಾಷ್ಟ್ರ" || c3 === "ನಗರ-ರಾಜ್ಯ" || c3 === "ನಗರ ರಾಜ್ಯ")) {
+                modifyHUDTracker(150, 0);
+                document.getElementById('lvlBtn2').classList.add('passed');
+                showGovAlert(2, "ಅದ್ಭುತ! ಕೌಟಿಲ್ಯನ ಅರ್ಥಶಾಸ್ತ್ರದ ಕೋಡ್ ಯಶಸ್ವಿಯಾಗಿ ಅನ್ಲಾಕ್ ಆಗಿದೆ.", true);
+            } else {
+                modifyHUDTracker(0, 10);
+                showGovAlert(2, "ಕೋಡ್ ತಪ್ಪಾಗಿದೆ ಗೆಳೆಯಾ! ಸುಳಿವು: ಅರ್ಥಶಾಸ್ತ್ರ, ಪೋಲಿಸ್, ನಗರ-ರಾಜ್ಯ.", false);
+            }
+        }
+
+        // Level 3: 10 Questions Grid Quiz Data
+        const politicalQuiz = [
+            { q: "1. 'ರಾಜ್ಯಶಾಸ್ತ್ರ' (Political Science) ಎಂಬ ಜ್ಞಾನ ಶಾಖೆಯನ್ನು ಸ್ವತಂತ್ರ ವಿಜ್ಞಾನವಾಗಿ ಮೊದಲು ಬೆಳೆಸಿದ ದೇಶ ಯಾವುದು?", o: ["ಭಾರತ", "ರೋಮ್", "ಪ್ರಾಚೀನ ಗ್ರೀಸ್"], c: 2 },
+            { q: "2. ಇಡೀ ಜಗತ್ತಿನಲ್ಲಿ ಮೊಟ್ಟಮೊದಲ ಬಾರಿಗೆ ರಾಜ್ಯಶಾಸ್ತ್ರವನ್ನು ವ್ಯವಸ್ಥಿತವಾಗಿ ಅಧ್ಯಯನ ಮಾಡಿ 'ರಾಜ್ಯಶಾಸ್ತ್ರದ ಪಿತಾಮಹ' ಎನಿಸಿಕೊಂಡವರು ಯಾರು?", o: ["ಸಾಕ್ರಟೀಸ್", "ಅರಿಸ್ಟಾಟಲ್", "ಪ್ಲೇಟೋ"], c: 1 },
+            { q: "3. ಅರಿಸ್ಟಾಟಲ್ ನು ಗ್ರೀಸ್ ದೇಶದ ಯಾವ ಪ್ರಸಿದ್ಧ ವಿಶ್ವವಿದ್ಯಾಲಯದ ವಿದ್ಯಾರ್ಥಿಯಾಗಿದ್ದನು?", o: ["ಪ್ಲೇಟೋನ ಅಕಾಡೆಮಿ (Academy)", "ಲೈಸಿಯಂ", "ನಲಂದಾ"], c: 0 },
+            { q: "4. ರಾಜ್ಯಶಾಸ್ತ್ರವು ಪ್ರಮುಖವಾಗಿ ಯಾವುದರ ಉಗಮ, ವಿಕಾಸ ಮತ್ತು ಆಡಳಿತ ವಿಧಾನವನ್ನು ಕುರಿತು ಅಧ್ಯಯನ ಮಾಡುತ್ತದೆ?", o: ["ಕೇವಲ ಬ್ಯಾಂಕುಗಳು", "ರಾಜ್ಯ ಮತ್ತು ಸರ್ಕಾರ (State & Govt)", "ಕೇವಲ ಕಾಡುಗಳು"], c: 1 },
+            { q: "5. ಪ್ರಜಾಪ್ರಭುತ್ವದ ಆಡಳಿತದಲ್ಲಿ ಅಂತಿಮ ಮತ್ತು ಅತ್ಯುನ್ನತ ಅಧಿಕಾರ ಯಾರ ಕೈಯಲ್ಲಿರುತ್ತದೆ?", o: ["ಮಿಲಿಟರಿ ಜನರಲ್", "ಪ್ರಜೆಗಳು (People)", "ರಾಜಕುಮಾರ"], c: 1 },
+            { q: "6. ರಾಜ್ಯಶಾಸ್ತ್ರದ ಅಧ್ಯಯನದಿಂದ ನಾಗರಿಕರಲ್ಲಿ ಯಾವ ಪ್ರಮುಖ ಭಾವನೆ ಮತ್ತು ಪ್ರಜ್ಞೆ ಜಾಗೃತವಾಗುತ್ತದೆ?", o: ["ಉತ್ತಮ ದೇಶಭಕ್ತಿ ಮತ್ತು ನಾಗರಿಕ ಪ್ರಜ್ಞೆ", "ಸ್ವಾರ್ಥ ಭಾವನೆ", "ಕಾನೂನು ಮುರಿಯುವ ಆಲೋಚನೆ"], c: 0 },
+            { q: "7. ಅರಿಸ್ಟಾಟಲ್ ನು ತಾನೇ ಸ್ವತಂತ್ರವಾಗಿ ಸ್ಥಾಪಿಸಿದ ಪ್ರಸಿದ್ಧ ಸಂಶೋಧನಾ ಸಂಸ್ಥೆ ಅಥವಾ ಶಾಲೆಯ ಹೆಸರೇನು?", o: ["ಲೈಸಿಯಂ (Lyceum)", "ಅಕಾಡೆಮಿ", "ವೇದಪಾಠಶಾಲೆ"], c: 0 },
+            { q: "8. ರೋಮನ್ ಸಾಮ್ರಾಜ್ಯದಲ್ಲಿ ಕಾನೂನು ಮತ್ತು ಆಡಳಿತ ವ್ಯವಸ್ಥೆಯನ್ನು ಬಲಪಡಿಸಲು ಕೊಡುಗೆ ನೀಡಿದ ಪ್ರಮುಖ ಭಾಷೆ ಯಾವುದು?", o: ["ಲ್ಯಾಟಿನ್ (Latin)", "ಗ್ರೀಕ್", "ಕನ್ನಡ"], c: 0 },
+            { q: "9. ನಮ್ಮ ದೇಶದ ಆಡಳಿತದ ಸರ್ವೋಚ್ಚ ಚೌಕಟ್ಟನ್ನು ಮತ್ತು ಪ್ರಜೆಗಳ ಮೂಲಭೂತ ಹಕ್ಕುಗಳನ್ನು ಕಾಯುವ ಲಿಖಿತ ಗ್ರಂಥ ಯಾವುದು?", o: ["ನಾಲ್ಕನೇ ವೇದ", "ಭಾರತದ ಸಂವಿಧಾನ (Constitution)", "ಅರ್ಥಶಾಸ್ತ್ರ ಗ್ರಂಥ"], c: 1 },
+            { q: "10. ರಾಜ್ಯಶಾಸ್ತ್ರಜ್ಞರ ಪ್ರಕಾರ, ಆಧುನಿಕ ಜಗತ್ತಿನ ಕಲ್ಯಾಣ ರಾಜ್ಯದ (Welfare State) ಮುಖ್ಯ ಧ್ಯೇಯ ಯಾವುದಾಗಿರಬೇಕು?", o: ["ಯುದ್ಧ ಮಾಡುವುದು", "ಜನರ ಸರ್ವತೋಮುಖ ಕಲ್ಯಾಣ ಸಾಧಿಸುವುದು", "ಹೆಚ್ಚಿನ ತೆರಿಗೆ ಹಾಕುವುದು"], c: 1 }
+        ];
+
+        let qIdx = 0; let qScore = 0; let isQuizActive = true;
+        function loadGovQuestion() {
+            isQuizActive = true;
+            document.getElementById("nextQuizBtn").style.display = "none";
+            document.getElementById("alert3").style.display = "none";
+            let qData = politicalQuiz[qIdx];
+            document.getElementById("quizTrackTxt").innerText = `ಪ್ರಶ್ನೆ ಕೋಡ್: ${qIdx + 1} / 10`;
+            document.getElementById("quizQuestionText").innerText = qData.q;
+            
+            let container = document.getElementById("quizOptionsContainer");
+            container.innerHTML = "";
+            qData.o.forEach((opt, idx) => {
+                let div = document.createElement("div");
+                div.classList.add("gov-quiz-row");
+                div.innerText = opt;
+                div.onclick = function() {
+                    if(!isQuizActive) return;
+                    isQuizActive = false;
+                    if(idx === qData.c) {
+                        this.classList.add("correct-glow");
+                        qScore++; modifyHUDTracker(30, 0);
+                        showGovAlert(3, "ಸರಿಯಾದ ಶಾಸನ! ಪ್ರಜೆಗಳು ಸಂತೋಷಗೊಂಡಿದ್ದಾರೆ.", true);
+                    } else {
+                        this.classList.add("wrong-glow");
+                        container.children[qData.c].classList.add("correct-glow");
+                        modifyHUDTracker(0, 10);
+                        showGovAlert(3, "ತಪ್ಪು ಶಾಸನ! ಪ್ರಜೆಗಳ ಸಂತೋಷದ ಮಟ್ಟ ಇಳಿಕೆಯಾಗಿದೆ.", false);
+                    }
+                    document.getElementById("nextQuizBtn").style.display = "inline-block";
+                };
+                container.appendChild(div);
+            });
+        }
+        function nextGovQuestion() {
+            qIdx++;
+            if(qIdx < politicalQuiz.length) {
+                loadGovQuestion();
+            } else {
+                document.getElementById("quizTrackTxt").innerText = "ಸಿಮ್ಯುಲೇಶನ್ ಮುಕ್ತಾಯ!";
+                document.getElementById("quizQuestionText").innerText = `ತರಗತಿಯ ಒಟ್ಟು ಸ್ಕೋರ್: ${qScore} / 10`;
+                document.getElementById("quizOptionsContainer").innerHTML = "";
+                document.getElementById("nextQuizBtn").style.display = "none";
+                document.getElementById('lvlBtn3').classList.add('passed');
+                showGovAlert(3, qScore >= 7 ? "ಅಪ್ರತಿಮ ಪ್ರಜಾಪ್ರಭುತ್ವದ ರಕ್ಷಕರು ಗೆಳೆಯಾ!" : "ಉತ್ತಮ ಪ್ರಯತ್ನ!", true);
+            }
+        }
+        loadGovQuestion();
+
+        // Level 4 Logic
+        function verifyLevel4() {
+            let t1 = document.getElementById("thinkIn1").value.trim();
+            let t2 = document.getElementById("thinkIn2").value.trim();
+
+            if(t1 === "ಗಾರ್ನರ್" && t2 === "ಅರಿಸ್ಟಾಟಲ್") {
+                modifyHUDTracker(150, 0);
+                document.getElementById('lvlBtn4').classList.add('passed');
+                showGovAlert(4, "ವಾಹ್ ಗೆಳೆಯಾ! ಚಿಂತಕರ ವ್ಯಾಖ್ಯಾನಗಳು ಪಕ್ಕಾ ಸರಿಯಾಗಿವೆ.", true);
+            } else {
+                modifyHUDTracker(0, 10);
+                showGovAlert(4, "ವ್ಯಾಖ್ಯಾನ ತಪ್ಪಾಗಿದೆ. ಸುಳಿವು: ಗಾರ್ನರ್, ಅರಿಸ್ಟಾಟಲ್ ಎಂದು ಬರೆಯಿರಿ.", false);
+            }
+        }
+
+        // Level 5 Logic
+        let selectedOres = {};
+        function toggleStateOre(id, isCoreElement) {
+            let node = document.getElementById(id);
+            if(node.classList.contains('activated')) {
+                node.classList.remove('activated');
+                delete selectedOres[id];
+            } else {
+                node.classList.add('activated');
+                selectedOres[id] = isCoreElement;
+            }
+        }
+        function verifyLevel5() {
+            let win = true; let count = 0;
+            for(let id in selectedOres) {
+                if(selectedOres[id] === false) win = false;
+                count++;
+            }
+            if(count !== 4) win = false; // 4 essential elements
+
+            if(win) {
+                modifyHUDTracker(150, 0);
+                document.getElementById('lvlBtn5').classList.add('passed');
+                showGovAlert(5, "ಅದ್ಭುತ! ರಾಜ್ಯದ 4 ಅತ್ಯಗತ್ಯ ಮೂಲ ಅಂಗಗಳು (ಜನಸಂಖ್ಯೆ, ಭೂಭಾಗ, ಸರ್ಕಾರ, ಸಾರ್ವಭೌಮಾಧಿಕಾರ) ಸರಿ ಇವೆ.", true);
+            } else {
+                modifyHUDTracker(0, 10);
+                showGovAlert(5, "ತಪ್ಪಾಗಿದೆ! ಕೇವಲ ನಾಲ್ಕು ಪ್ರಮುಖ ಮೂಲ ಅಂಗಗಳನ್ನು ಮಾತ್ರ ಆರಿಸು (ಮಿಲಿಟರಿ, ಬ್ಯಾಂಕ್ ಬೇಡ).", false);
+            }
+        }
+
+        // Level 6 Logic
+        function allowOrganDrop(ev) { ev.preventDefault(); }
+        function startOrganDrag(ev) { ev.dataTransfer.setData("text", ev.target.id); }
+        function handleOrganDrop(ev, cat) {
+            ev.preventDefault();
+            let id = ev.dataTransfer.getData("text");
+            let el = document.getElementById(id);
+            el.dataset.cat = cat;
+            ev.target.appendChild(el);
+        }
+        function verifyLevel6() {
+            let o1 = document.getElementById("org1").dataset.cat;
+            let o2 = document.getElementById("org2").dataset.cat;
+            let o3 = document.getElementById("org3").dataset.cat;
+
+            if(o1 === "make" && o2 === "run" && o3 === "judge") {
+                modifyHUDTracker(200, 0);
+                document.getElementById('lvlBtn6').classList.add('passed');
+                showGovAlert(6, "ಸರ್ಕಾರದ ಮೂರೂ ಅಂಗಗಳ ಕಾರ್ಯಗಳು ನೂರಕ್ಕೆ ನೂರು ನಿಖರವಾಗಿವೆ ಗೆಳೆಯಾ!", true);
+            } else {
+                modifyHUDTracker(0, 10);
+                showGovAlert(6, "ತಪ್ಪಾದ ವಿಭಾಗ! ಶಾಸಕಾಂಗ ಕಾನೂನು ಮಾಡುತ್ತದೆ, ಕಾರ್ಯಾಂಗ ಜಾರಿ ಮಾಡುತ್ತದೆ, ನ್ಯಾಯಾಂಗ ಶಿಕ್ಷೆ ನೀಡುತ್ತದೆ.", false);
+            }
+        }
+
+        // Level 7 Logic
+        let finalL = null; let finalR = null;
+        function selectFinalMatrix(side, id, key) {
+            if(side === 'L') {
+                finalL = { id: id, key: key };
+                document.getElementById("matL1").classList.remove('selected');
+                document.getElementById("matL2").classList.remove('selected');
+            } else {
+                finalR = { id: id, key: key };
+                document.getElementById("matR1").classList.remove('selected');
+                document.getElementById("matR2").classList.remove('selected');
+            }
+            document.getElementById(id).classList.add('selected');
+        }
+        function verifyLevel7() {
+            if(finalL && finalR && finalL.key === finalR.key) {
+                modifyHUDTracker(250, 0);
+                document.getElementById('lvlBtn7').classList.add('passed');
+                showGovAlert(7, "ವಾಹ್ Chandrakant ಗೆಳೆಯಾ! ಇಡೀ ರಾಜ್ಯಶಾಸ್ತ್ರದ ಮೊದಲ ಪಾಠದ ಸಿಮ್ಯುಲೇಶನ್ ಯಶಸ್ವಿಯಾಗಿದೆ. ಗೆಲುವು ನಿಮ್ಮದೇ!", true);
+            } else {
+                modifyHUDTracker(0, 10);
+                showGovAlert(7, "ಮ್ಯಾಟ್ರಿಕ್ಸ್ ಲಿಂಕ್ ತಪ್ಪಾಗಿದೆ. ಚಿಂತಕರು ಮತ್ತು ದೇಶವನ್ನು ಮತ್ತೊಮ್ಮೆ ಗಮನಿಸು.", false);
+            }
+        }
+
+        function showGovAlert(lvlNum, text, success) {
+            let box = document.getElementById("alert" + lvlNum);
+            box.style.display = "block";
+            box.innerText = text;
+            box.style.background = success ? "rgba(0, 184, 148, 0.15)" : "rgba(214, 48, 49, 0.1)";
+            box.style.color = success ? "var(--neon-green)" : "var(--neon-red)";
+            box.style.borderColor = success ? "var(--neon-green)" : "var(--neon-red)";
+        }
+    </script>
+</body>
+</html>

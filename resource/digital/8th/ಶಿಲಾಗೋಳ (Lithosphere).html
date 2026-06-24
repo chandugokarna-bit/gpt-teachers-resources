@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಶಿಲಾಗೋಳ ಜಿಯೋ-ವಿಷುಯಲ್ ಎಕ್ಸ್‌ಪ್ಲೋರರ್ - ಸಮಾಜವಿಜ್ಞಾನ</title>
+    <style>
+        :root {
+            --magma-orange: #ff4757;
+            --crust-brown: #ffb142;
+            --mantle-gold: #f1c40f;
+            --space-dark: #0c0d14;
+            --neon-green: #2ed573;
+            --neon-blue: #1e90ff;
+            --panel-glass: rgba(24, 28, 43, 0.96);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Verdana, sans-serif; }
+
+        body {
+            background: var(--space-dark);
+            background-image: radial-gradient(circle at 50% 50%, #1e1f35 0%, #0c0d14 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #ffffff;
+        }
+
+        .main-geo-banner {
+            background: var(--panel-glass);
+            padding: 25px;
+            border-radius: 24px;
+            text-align: center;
+            border: 2px solid var(--magma-orange);
+            box-shadow: 0 0 30px rgba(255, 71, 87, 0.25);
+            margin-bottom: 25px;
+        }
+
+        .main-geo-banner h1 {
+            color: var(--magma-orange);
+            font-size: 2.3rem;
+            text-shadow: 0 0 12px rgba(255, 71, 87, 0.4);
+            margin-bottom: 5px;
+        }
+
+        /* LIVE HUD */
+        .geo-hud {
+            display: flex;
+            justify-content: space-between;
+            background: rgba(30, 31, 49, 0.6);
+            padding: 15px 25px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            border-left: 5px solid var(--neon-blue);
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        /* Horizontal Track Steppers */
+        .geo-track {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 35px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+
+        .geo-track::-webkit-scrollbar { height: 6px; }
+        .geo-track::-webkit-scrollbar-thumb { background: var(--magma-orange); border-radius: 3px; }
+
+        .geo-pill {
+            background: #1e1f30;
+            border: 1px solid #2c2d4a;
+            padding: 12px 22px;
+            border-radius: 14px;
+            cursor: pointer;
+            font-weight: bold;
+            white-space: nowrap;
+            transition: all 0.3s;
+        }
+
+        .geo-pill:hover, .geo-pill.active-mission {
+            background: var(--magma-orange);
+            color: white;
+            border-color: #ffffff;
+            box-shadow: 0 0 15px var(--magma-orange);
+            transform: translateY(-3px);
+        }
+
+        /* Screen Boxes */
+        .geo-arena {
+            background: var(--panel-glass);
+            border: 2px solid #2c2d4a;
+            border-radius: 28px;
+            padding: 35px;
+            min-height: 530px;
+            display: none;
+            box-shadow: 0 25px 55px rgba(0,0,0,0.6);
+        }
+
+        .geo-arena.active-arena { display: block; animation: flashIn 0.4s ease; }
+
+        @keyframes flashIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2.arena-title {
+            font-size: 1.65rem;
+            color: var(--crust-brown);
+            margin-bottom: 25px;
+            border-left: 6px solid var(--crust-brown);
+            padding-left: 15px;
+        }
+
+        /* IMAGE BASED ACTIVITIES STYLE */
+        .visual-display-box {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .geo-image-frame {
+            flex: 1;
+            background: #000;
+            border: 3px solid var(--crust-brown);
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            max-width: 400px;
+        }
+
+        .geo-image-frame img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .geo-interactive-options {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        /* Inputs and Buttons */
+        .geo-btn {
+            background: linear-gradient(135deg, var(--magma-orange), #ff6b81);
+            color: white;
+            border: none;
+            padding: 14px 35px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 25px;
+        }
+
+        .geo-btn:hover { transform: scale(1.02); box-shadow: 0 8px 25px rgba(255, 71, 87, 0.5); }
+
+        .smart-geo-input {
+            background: rgba(0,0,0,0.4);
+            border: 2px solid #2c2d4a;
+            border-radius: 10px;
+            padding: 12px;
+            font-size: 1.1rem;
+            color: var(--crust-brown);
+            font-weight: bold;
+            outline: none;
+            width: 100%;
+            max-width: 320px;
+            margin-top: 8px;
+        }
+
+        .smart-geo-input:focus { border-color: var(--magma-orange); }
+
+        /* Act 5 Mining */
+        .mining-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+
+        .ore-packet {
+            background: #1e1f30;
+            border: 2px solid #2c2d4a;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .ore-packet.active-packet { background: var(--magma-orange); border-color: white; }
+
+        .geo-status-alert {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 12px;
+            font-weight: bold;
+            display: none;
+            font-size: 1.1rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="main-geo-banner">
+        <h1>ಅಧ್ಯಾಯ: ಶಿಲಾಗೋಳ (Lithosphere)</h1>
+        <p>ವಿಷುಯಲ್ ಮಾಡೆಲ್ ೧೩.೦ • ನೈಜ ಚಿತ್ರಗಳ ಆಧಾರಿತ ಅಲ್ಟ್ರಾ ಮಾಡರ್ನ್ ಡಿಜಿಟಲ್ ತರಗತಿ</p>
+    </div>
+
+    <div class="geo-hud">
+        <span style="color: var(--crust-brown);">ಕಲಿಕಾ ಮೋಡ್: ಚಿತ್ರ ಸಂಶೋಧನೆ</span>
+        <span style="color: var(--neon-green);" id="liveXPCount">ಶಿಲಾಗೋಳ ಪಾಯಿಂಟ್ಸ್: 0000 LXP</span>
+    </div>
+
+    <div class="geo-track">
+        <div class="geo-pill active-mission" id="pill1" onclick="shiftGeoScreen(1)">1. ಭೂಮಿಯ ಆಂತರಿಕ ಪದರ (IMAGE)</div>
+        <div class="geo-pill" id="pill2" onclick="shiftGeoScreen(2)">2. ಮೂರು ಮುಖ್ಯ ಶಿಲೆಗಳು (IMAGE)</div>
+        <div class="geo-pill" id="pill3" onclick="shiftGeoScreen(3)">3. ಎಪಿಕ್ 10 ಜಿಯೋ ಕ್ವಿಜ್</div>
+        <div class="geo-pill" id="pill4" onclick="shiftGeoScreen(4)">4. ಬಾಹ್ಯ ಶಕ್ತಿಗಳ ಒಗಟು</div>
+        <div class="geo-pill" id="pill5" onclick="shiftGeoScreen(5)">5. ಅಂತರ್ರಾಷ್ಟ್ರೀಯ ಭೂಫಲಕಗಳು</div>
+        <div class="geo-pill" id="pill6" onclick="shiftGeoScreen(6)">6. ಅಂತರ್ಜಲದ ವಿಶಿಷ್ಟ ಕಾರಕಗಳು</div>
+        <div class="geo-pill" id="pill7" onclick="shiftGeoScreen(7)">7. ಜ್ವಾಲಾಮುಖಿ ಮ್ಯಾಟ್ರಿಕ್ಸ್</div>
+    </div>
+
+    <div id="geoArena1" class="geo-arena active-arena">
+        <h2 class="arena-title">ಹಂತ 1: ನೈಜ ಚಿತ್ರ ನೋಡಿ ಭೂಮಿಯ ಪದರಗಳನ್ನು ಗುರುತಿಸು (Earth's Crust Core)</h2>
+        <p style="margin-bottom: 20px;">ಗೆಳೆಯಾ, ಎಡಭಾಗದಲ್ಲಿರುವ ಭೂಮಿಯ ಆಂತರಾಳದ ನೈಜ ಚಿತ್ರವನ್ನು ಗಮನಿಸಿ, ಸೂಕ್ತವಾದ ಪದರವನ್ನು ಬಲಭಾಗದಲ್ಲಿ ಕ್ಲಿಕ್ ಮಾಡಿ ಹೊಂದಿಸು:</p>
+        <div class="visual-display-box">
+            <div class="geo-image-frame">
+                <img src="https://images.unsplash.com/photo-1614730321146-b6fa6a46bcb4?auto=format&fit=crop&w=500&q=80" alt="Earth Core Layer">
+            </div>
+            <div class="geo-interactive-options">
+                <div class="box-node" id="l1_opt1" onclick="checkVisualAct1('l1_opt1', true)">೧. ಭೂಕವಚ (Crust - ಅತ್ಯಂತ ಮೇಲಿನ ತೆಳುವಾದ ಪದರ)</div>
+                <div class="box-node" id="l1_opt2" style="margin-top:15px;" onclick="checkVisualAct1('l1_opt2', false)">೨. ಕೇಂದ್ರಗೋಳ (Core - ಅತಿ ಕಡು ಬಿಸಿ ಭಾಗ)</div>
+                <div class="box-node" id="l1_opt3" style="margin-top:15px;" onclick="checkVisualAct1('l1_opt3', false)">೩. ಮ್ಯಾಂಟಲ್ (Mantle - ಮಧ್ಯದ ಪದರ)</div>
+            </div>
+        </div>
+        <div class="geo-status-alert" id="alert1"></div>
+    </div>
+
+    <div id="geoArena2" class="geo-arena">
+        <h2 class="arena-title">ಹಂತ 2: ಶಿಲೆಗಳ ನೈಜ ವಿನ್ಯಾಸದ ಶೋಧನೆ (Rock Classification Visual)</h2>
+        <p style="margin-bottom: 20px;">ಕೆಳಗಿನ ಚಿತ್ರವು ಜ್ವಾಲಾಮುಖಿಯ ಶಿಲಾರಸ (ಮ್ಯಾಗ್ಮಾ) ತಣ್ಣಗಾಗಿ ಉಂಟಾದ ಅತ್ಯಂತ ಗಟ್ಟಿಯಾದ ಬಸಾಲ್ಟ್ ಮತ್ತು ಗ್ರಾನೈಟ್ ಕಲ್ಲುಗಳನ್ನು ತೋರಿಸುತ್ತದೆ. ಇದು ಯಾವ ಶಿಲೆಯಾಗಿದೆ ಗೆಳೆಯಾ?</p>
+        <div class="visual-display-box">
+            <div class="geo-image-frame">
+                <img src="https://images.unsplash.com/photo-1590055531615-f16d36faa8ec?auto=format&fit=crop&w=500&q=80" alt="Volcanic Igneous Rock">
+            </div>
+            <div class="geo-interactive-options">
+                <div class="box-node" id="l2_opt1" onclick="checkVisualAct2('l2_opt1', false)">ಎ) ಪ್ರಸ್ತರ ಶಿಲೆ (Sedimentary)</div>
+                <div class="box-node" id="l2_opt2" style="margin-top:15px;" onclick="checkVisualAct2('l2_opt2', true)">ಬಿ) ಅಗ್ನಿಶಿಲೆ (Igneous Rock - ಪ್ರಾಥಮಿಕ ಶಿಲೆಗಳು)</div>
+                <div class="box-node" id="l2_opt3" style="margin-top:15px;" onclick="checkVisualAct2('l2_opt3', false)">ಸಿ) ರೂಪಾಂತರಿತ ಶಿಲೆ (Metamorphic)</div>
+            </div>
+        </div>
+        <div class="geo-status-alert" id="alert2"></div>
+    </div>
+
+    <div id="geoArena3" class="geo-arena">
+        <h2 class="arena-title">ಹಂತ 3: ಶಿಲಾಗೋಳದ ಮಹಾ ಕದನ ರಸಪ್ರಶ್ನೆ (Epic 10 Quiz Arena)</h2>
+        <div class="progress-hud-bar"><div class="progress-bar-fill" id="barFill"></div></div>
+        <div style="font-weight: bold; margin-bottom: 15px; color: var(--crust-brown);" id="quizCounterText">ಪ್ರಶ್ನೆ ಕೋಡ್: 1 / 10</div>
+        <div id="quizQuestionText" style="font-size: 1.25rem; font-weight: bold; margin-bottom: 20px;">ಲೋಡ್ ಆಗುತ್ತಿದೆ...</div>
+        <div id="quizOptionsContainer"></div>
+        <button class="geo-btn" id="nextQuizBtn" style="display:none;" onclick="nextLithoQuestion()">ಮುಂದಿನ ಹಂತಕ್ಕೆ ಚಲಿಸು ➔</button>
+        <div class="geo-status-alert" id="alert3"></div>
+    </div>
+
+    <div id="geoArena4" class="geo-arena">
+        <h2 class="arena-title">ಹಂತ 4: ಬಾಹ್ಯ ಶಕ್ತಿಗಳ ಶೈಲ ಶೋಧನೆ (Denudation Cipher)</h2>
+        <div style="display:flex; flex-direction:column; gap:20px;">
+            <div class="fib-q">1. ಉಷ್ಣಾಂಶ, ಮಳೆ ಮತ್ತು ಗಾಳಿಯ ಪ್ರಭಾವದಿಂದ ಶಿಲೆಗಳು ಪುಡಿಯಾಗುವ ನೈಸರ್ಗಿಕ ಕ್ರಿಯೆಯನ್ನು ಏನೆನ್ನುತ್ತಾರೆ? <br><input type="text" class="smart-geo-input" id="cipherIn1" placeholder="ಶಿಲಾಶೈಥಿಲ್ಯ / ನದೀಕಾರ್ಯ?"></div>
+            <div class="fib-q">2. ನದಿಯು ಹರಿಯುವಾಗ ದಾರಿಯಲ್ಲಿರುವ ಕಲ್ಲುಗಳನ್ನು ಕೊರೆದು ಕಣಿವೆಯನ್ನು ಆಳವಾಗಿಸುವ ಕ್ರಿಯೆಗೆ ಏನೆನ್ನುತ್ತಾರೆ? <br><input type="text" class="smart-geo-input" id="cipherIn2" placeholder="ಘರ್ಷಣೆ / ಸವೆತ (Erosion)?"></div>
+        </div>
+        <button class="geo-btn" onclick="verifyLevel4()">ಶಕ್ತಿಗಳ ಕೋಡ್ ಕ್ರಾಕ್ ಮಾಡು</button>
+        <div class="geo-status-alert" id="alert4"></div>
+    </div>
+
+    <div id="geoArena5" class="geo-arena">
+        <h2 class="arena-title">ಹಂತ 5: ಅಂತರ್ರಾಷ್ಟ್ರೀಯ ಪ್ರಮುಖ ಭೂಫಲಕಗಳ ಶೋಧ (Tectonic Plates Mining)</h2>
+        <p style="margin-bottom: 15px;">ಜಗತ್ತಿನ ಭೂಕಂಪ ಮತ್ತು ಪರ್ವತಗಳ ಸೃಷ್ಟಿಗೆ ಕಾರಣವಾದ **ಮುಖ್ಯ ಭೂಫಲಕಗಳನ್ನು (Major Plates)** ಮಾತ್ರ ಗಣಿ ಮಾಡು ಗೆಳೆಯಾ:</p>
+        <div class="mining-grid">
+            <div class="ore-packet" id="ore1" onclick="toggleOreToken('ore1', true)">1. ಪೆಸಿಫಿಕ್ ಫಲಕ (Pacific Plate)</div>
+            <div class="ore-packet" id="ore2" onclick="toggleOreToken('ore2', false)">2. ಸಣ್ಣ ಕೆರೆ ನಿವಾಸಿ</div>
+            <div class="ore-packet" id="ore3" onclick="toggleOreToken('ore3', true)">3. ಯುರೇಷಿಯಾ ಫಲಕ</div>
+            <div class="ore-packet" id="ore4" onclick="toggleOreToken('ore4', true)">4. ಆಫ್ರಿಕಾ ಫಲಕ</div>
+            <div class="ore-packet" id="ore5" onclick="toggleOreToken('ore5', false)">5. ಸಾಮಾನ್ಯ ಕಲ್ಲು ಬಂಡೆ</div>
+            <div class="ore-packet" id="ore6" onclick="toggleOreToken('ore6', true)">6. ಉತ್ತರ ಅಮೆರಿಕ ಫಲಕ</div>
+        </div>
+        <button class="geo-btn" onclick="verifyLevel5()">ಫಲಕಗಳನ್ನು ದೃಢೀಕರಿಸು</button>
+        <div class="geo-status-alert" id="alert5"></div>
+    </div>
+
+    <div id="geoArena6" class="geo-arena">
+        <h2 class="arena-title">ಹಂತ 6: ಅಂತರ್ಜಲದ ವಿಶಿಷ್ಟ ಸುಣ್ಣದಕಲ್ಲಿನ ಸೃಷ್ಟಿ (Karst Topography Sorting)</h2>
+        <p style="margin-bottom: 15px;">ಅಂತರ್ಜಲದ ರಾಸಾಯನಿಕ ಕ್ರಿಯೆಯಿಂದ ಸುಣ್ಣದಕಲ್ಲಿನ ಗುಹೆಗಳಲ್ಲಿ ಸೃಷ್ಟಿಯಾಗುವ ವಿಶಿಷ್ಟ ಸ್ವರೂಪಗಳನ್ನು ಸರಿಯಾದ ಬಾಕ್ಸ್‌ಗೆ ಹಂಚು:</p>
+        <div style="display:flex; gap:25px;">
+            <div style="flex:1; display:flex; flex-direction:column; gap:10px;" id="motionSource">
+                <div style="background:#1e1f30; padding:12px; border-radius:10px; cursor:grab; font-weight:bold; border:1px solid #2c2d4a;" draggable="true" id="kar1" ondragstart="startDrag(event)">ಸ್ಟೆಲಕ್ಟೈಟ್ (Stalactite)</div>
+                <div style="background:#1e1f30; padding:12px; border-radius:10px; cursor:grab; font-weight:bold; border:1px solid #2c2d4a;" draggable="true" id="kar2" ondragstart="startDrag(event)">ಸ್ಟೆಲಗ್ಮೈಟ್ (Stalagmite)</div>
+            </div>
+            <div style="flex:2; display:flex; flex-direction:column; gap:15px;">
+                <div style="background:rgba(0,0,0,0.3); border:2px dashed var(--magma-orange); padding:15px; border-radius:12px;" ondragover="allowDrop(event)" ondrop="handleDrop(event, 'roof')">
+                    <h3>ಗುಹೆಯ ಮೇಲ್ಛಾವಣಿಯಿಂದ ಕೆಳಮುಖವಾಗಿ ನೇತಾಡುವ ಸುಣ್ಣದ ಕಂಬ</h3>
+                </div>
+                <div style="background:rgba(0,0,0,0.3); border:2px dashed var(--magma-orange); padding:15px; border-radius:12px;" ondragover="allowDrop(event)" ondrop="handleDrop(event, 'floor')">
+                    <h3>ಗುಹೆಯ ನೆಲಭಾಗದಿಂದ ಮೇಲ್ಮುಖವಾಗಿ ಬೆಳೆದ ಸುಣ್ಣದ ಕಂಬ</h3>
+                </div>
+            </div>
+        </div>
+        <button class="geo-btn" onclick="verifyLevel6()">ಗುಹೆಯ ವಿನ್ಯಾಸ ಪರಿಶೀಲಿಸು</button>
+        <div class="geo-status-alert" id="alert6"></div>
+    </div>
+
+    <div id="geoArena7" class="geo-arena">
+        <h2 class="arena-title">ಹಂತ 7: ಜ್ವಾಲಾಮುಖಿಯ ವಿಧಗಳು ಮತ್ತು ಜಾಗತಿಕ ಹಂಚಿಕೆ (Volcano Matrix Connection)</h2>
+        <p style="margin-bottom: 15px;">ಅಂತಿಮ ಮ್ಯಾಟ್ರಿಕ್ಸ್! ಜ್ವಾಲಾಮುಖಿಯ ವಿಧಗಳು ಮತ್ತು ಅವುಗಳ ಜಗತ್ಪ್ರಸಿದ್ಧ ಉದಾಹರಣೆಗಳನ್ನು ಜೋಡಿಸಿ ಆಟ ಮುಗಿಸು ಗೆಳೆಯಾ:</p>
+        <div class="grid-connector-system">
+            <div class="box-node" id="matL1" onclick="selectFinalMatrix('L', 'matL1', 'active')">ಜಾಗೃತ ಜ್ವಾಲಾಮುಖಿ (Active)</div>
+            <div class="box-node" id="matR1" onclick="selectFinalMatrix('R', 'matR1', 'active')">ಇಟಲಿಯ ಸ್ಟ್ರಂಬೋಲಿ ಮತ್ತು ಮೌಂಟ್ ಎಟ್ನಾ</div>
+            <div class="box-node" id="matL2" onclick="selectFinalMatrix('L', 'matL2', 'extinct')">ಸುಪ್ತ / ವಿಲುಪ್ತ ಜ್ವಾಲಾಮುಖಿ</div>
+            <div class="box-node" id="matR2" onclick="selectFinalMatrix('R', 'matR2', 'extinct')">ಆಫ್ರಿಕಾದ ಕಿಲಿಮಂಜಾರೋ ಪರ್ವತ</div>
+        </div>
+        <button class="geo-btn" onclick="verifyLevel7()">ಶಿಲಾಗೋಳ ಮ್ಯಾಟ್ರಿಕ್ಸ್ ಕಂಪ್ಲೀಟ್ ಮಾಡು</button>
+        <div class="geo-status-alert" id="alert7"></div>
+    </div>
+
+    <script>
+        let lithoXP = 0;
+        function addLithoXP(val) {
+            lithoXP += val;
+            document.getElementById("liveXPCount").innerText = `ಶಿಲಾಗೋಳ ಪಾಯಿಂಟ್ಸ್: ${lithoXP.toString().padStart(4, '0')} LXP`;
+        }
+
+        function shiftGeoScreen(idx) {
+            document.querySelectorAll('.geo-arena').forEach(el => el.classList.remove('active-arena'));
+            document.querySelectorAll('.geo-pill').forEach(el => el.classList.remove('active-mission'));
+            
+            document.getElementById('geoArena' + idx).classList.add('active-arena');
+            document.getElementById('pill' + idx).classList.add('active-mission');
+        }
+
+        // Level 1 Visual Check
+        function checkVisualAct1(id, isCorrect) {
+            document.querySelectorAll('#geoArena1 .box-node').forEach(el => el.style.background = "#1e1f30");
+            let target = document.getElementById(id);
+            if(isCorrect) {
+                target.style.background = "var(--neon-green)";
+                target.style.color = "black";
+                addLithoXP(100);
+                showAlertBox(1, "ವಾಹ್ ಗೆಳೆಯಾ! ಭೂಕವಚದ ನೈಜ ಚಿತ್ರದ ಗುರುತಿಸುವಿಕೆ ಪಕ್ಕಾ ಸರಿ ಇದೆ!", true);
+                document.getElementById('pill1').style.background = "var(--neon-green)";
+            } else {
+                target.style.background = "var(--danger-red)";
+                showAlertBox(1, "ತಪ್ಪಾದ ಪದರ! ಚಿತ್ರವನ್ನು ಮತ್ತೊಮ್ಮೆ ಗಮನಿಸು ಗೆಳೆಯಾ.", false);
+            }
+        }
+
+        // Level 2 Visual Check
+        function checkVisualAct2(id, isCorrect) {
+            document.querySelectorAll('#geoArena2 .box-node').forEach(el => el.style.background = "#1e1f30");
+            let target = document.getElementById(id);
+            if(isCorrect) {
+                target.style.background = "var(--neon-green)";
+                target.style.color = "black";
+                addLithoXP(100);
+                showAlertBox(2, "ಅದ್ಭುತ! ಜ್ವಾಲಾಮುಖಿ ಲಾವಾದಿಂದಾದ ಅಗ್ನಿಶಿಲೆಯ ನೈಜ ಚಿತ್ರದ ಶೋಧ ಯಶಸ್ವಿಯಾಗಿದೆ.", true);
+                document.getElementById('pill2').style.background = "var(--neon-green)";
+            } else {
+                target.style.background = "var(--danger-red)";
+                showAlertBox(2, "ತಪ್ಪಾದ ಶಿಲೆ! ಲಾವಾ ರಸದಿಂದ ಉಂಟಾದ ಕಲ್ಲುಗಳನ್ನು ನೆನಪಿಸಿಕೊ ಗೆಳೆಯಾ.", false);
+            }
+        }
+
+        // Level 3 Quiz Pool
+        const lithoQuizPool = [
+            { q: "1. ಭೂಮಿಯ ಮೇಲ್ಭಾಗದ ಘನರೂಪದ ಕಲ್ಲು ಮತ್ತು ಮಣ್ಣಿನಿಂದ ಕೂಡಿದ ಪದರವನ್ನು ಏನೆಂದು ಕರೆಯುತ್ತಾರೆ?", o: ["ವಾತಾವರಣ", "ಜಲಗೋಳ", "ಶಿಲಾಗೋಳ (Lithosphere)"], c: 2 },
+            { q: "2. ಭೂಕವಚದ ಮೇಲ್ಭಾಗವನ್ನು 'ಗ್ರಾನೈಟ್' ಶಿಲೆಗಳು ಆವರಿಸಿದ್ದು, ಇದು ಯಾವ ಪ್ರಮುಖ ಖನಿಜಗಳಿಂದ ಕೂಡಿದೆ?", o: ["ಸಿಲಿಕಾ ಮತ್ತು ಅಲ್ಯೂಮಿನಿಯಂ (SIAL)", "ಸಿಲಿಕಾ ಮತ್ತು ಮೆಗ್ನೀಸಿಯಂ (SIMA)", "ಕಬ್ಬಿಣ ಮತ್ತು ನಿಕ್ಕಲ್"], c: 0 },
+            { q: "3. ಭೂಮಿಯ ಅತ್ಯಂತ ಒಳಗಿನ ಕಡು ಬಿಸಿಯಾದ ಕೇಂದ್ರ ಭಾಗವನ್ನು (Core) ಯಾವ ಹೆಸರಿನಿಂದ ಕರೆಯಲಾಗುತ್ತದೆ?", o: ["ಸಿಯಾಲ್ (SIAL)", "ನಿಫೆ (NIFE - ನಿಕ್ಕಲ್ ಮತ್ತು ಫೆರ್ರಂ)", "ಸಿಮಾ"], c: 1 },
+            { q: "4. ಜಗತ್ತಿನ ಪ್ರಸಿದ್ಧ ಐತಿಹಾಸಿಕ ತಾಣವಾದ ಆಗ್ರಾದ ತಾಜ್ ಮಹಲ್ ಅನ್ನು ಯಾವ ರೂಪಾಂತರಿತ ಶಿಲೆಯಿಂದ ನಿರ್ಮಿಸಲಾಗಿದೆ?", o: ["ಸುಣ್ಣದ ಕಲ್ಲು", "ಮಾರ್ಬಲ್ (ಗೊರಟು ಶಿಲೆ / ಅಮೃತಶಿಲೆ)", "ಬಸಾಲ್ಟ್"], c: 1 },
+            { q: "5. ಭೂಮಿಯ ಒಳಭಾಗದಿಂದ ಹಠಾತ್ ಆಗಿ ಉಂಟಾಗುವ ಕಂಪನ ಅಥವಾ ಅದಿರುವಿಕೆಯನ್ನು ಏನೆಂದು ಕರೆಯುತ್ತಾರೆ?", o: ["ಸುನಾಮಿ", "ಭೂಕಂಪ (Earthquake)", "ಶಿಲಾಶೈಥಿಲ್ಯ"], c: 1 },
+            { q: "6. ಭೂಕಂಪಗಳು ಉಂಟಾಗುವ ತೀವ್ರತೆಯನ್ನು ಅಳೆಯಲು ಬಳಸುವ ಜಗತ್ಪ್ರಸಿದ್ಧ ಮಾನದಂಡ ಉಪಕರಣ ಯಾವುದು?", o: ["ರೆಕ್ಟರ್ ಮಾಪಕ (Seismograph)", "ಬಾರೋಮೀಟರ್", "ಥರ್ಮಾಮೀಟರ್"], c: 0 },
+            { q: "7. ಮಳೆಯ ನೀರು, ನದಿ ಮತ್ತು ಗಾಳಿಯು ಭೂಮಿಯ ಮೇಲ್ಮೈಯನ್ನು ಕೊಚ್ಚಿಕೊಂಡು ಹೋಗುವ ಭೌತಿಕ ಕ್ರಿಯೆಗೆ ಏನನ್ನುತ್ತಾರೆ?", o: ["ಕೊಚ್ಚಣೆ / ನಗ್ನೀಕರಣ (Denudation)", "ಜ್ವಾಲಾಮುಖಿ ಸ್ಫೋಟ", "ಭೂಕಂಪನ"], c: 0 },
+            { q: "8. ನದಿಯು ಸಮುದ್ರವನ್ನು ಸೇರುವ ಮುನ್ನ ಮುಖಜ ಭಾಗದಲ್ಲಿ ಸೃಷ್ಟಿಸುವ ತ್ರಿಕೋನಾಕಾರದ ಫಲವತ್ತಾದ ಭೂಸ್ವರೂಪ ಯಾವುದು?", o: ["ಗಿರಿಕಂದರ", "ವಿ-ಆಕಾರದ ಕಣಿವೆ", "ಡೆಲ್ಟಾ / ಮುಖಜ ಭೂಮಿ (Delta)"], c: 2 },
+            { q: "9. ಮರುಭೂಮಿ ಪ್ರದೇಶಗಳಲ್ಲಿ ಬೀಸುವ ಬಲವಾದ ಗಾಳಿಯ ಸವೆತದ ಕಾರ್ಯದಿಂದ ಸೃಷ್ಟಿಯಾಗುವ ವಿಶಿಷ್ಟ ಸಾಂಸ್ಕೃತಿಕ ಕಲ್ಲು ಯಾವುದು?", o: ["ಸುಣ್ಣದ ಕಂಬ", "ಅಣಬೆ ಶಿಲೆ (Mushroom Rock)", "ಕಣಿವೆ ಜಾಲ"], c: 1 },
+            { q: "10. ಸಮುದ್ರದ ಅಲೆಗಳು ಕರಾವಳಿಯ ಬಂಡೆಗಳಿಗೆ ನಿರಂತರವಾಗಿ ಬಡಿಯುವುದರಿಂದ ಸೃಷ್ಟಿಯಾಗುವ ಸುರಂಗದಂತಹ ಸ್ವರೂಪ ಯಾವುದು?", o: ["ಸಮುದ್ರದ ಗುಹೆ (Sea Cave)", "ಬಳುಕು ಕಲ್ಲು", "ಮರಳು ದಿಣ್ಣೆ"], c: 0 }
+        ];
+
+        let qIdx = 0; let qScore = 0; let isQuizActive = true;
+        function loadQuizQuestion() {
+            isQuizActive = true;
+            document.getElementById("nextQuizBtn").style.display = "none";
+            document.getElementById("alert3").style.display = "none";
+            let qData = lithoQuizPool[qIdx];
+            document.getElementById("quizCounterText").innerText = `ಪ್ರಶ್ನೆ ಕೋಡ್: ${qIdx + 1} / 10`;
+            document.getElementById("barFill").style.width = `${(qIdx + 1) * 10}%`;
+            document.getElementById("quizQuestionText").innerText = qData.q;
+            
+            let container = document.getElementById("quizOptionsContainer");
+            container.innerHTML = "";
+            qData.o.forEach((opt, idx) => {
+                let div = document.createElement("div");
+                div.classList.add("quiz-choice-row");
+                div.innerText = opt;
+                div.onclick = function() {
+                    if(!isQuizActive) return;
+                    isQuizActive = false;
+                    if(idx === qData.c) {
+                        this.classList.add("win-glow");
+                        qScore++; addLithoXP(30);
+                        showAlertBox(3, "ಸರಿಯಾದ ಉತ್ತರ ಗೆಳೆಯಾ! ಭೂವಿಜ್ಞಾನ ಜ್ಞಾನ ಸೂಪರ್ ಆಗಿದೆ.", true);
+                    } else {
+                        this.classList.add("lose-glow");
+                        container.children[qData.c].classList.add("win-glow");
+                        showAlertBox(3, "ಉತ್ತರ ತಪ್ಪಾಗಿದೆ! ಸರಿಯಾದದ್ದನ್ನು ಹಸಿರು ಬಣ್ಣದಲ್ಲಿ ತೋರಿಸಲಾಗಿದೆ.", false);
+                    }
+                    document.getElementById("nextQuizBtn").style.display = "inline-block";
+                };
+                container.appendChild(div);
+            });
+        }
+        function nextLithoQuestion() {
+            qIdx++;
+            if(qIdx < lithoQuizPool.length) {
+                loadQuizQuestion();
+            } else {
+                document.getElementById("quizCounterText").innerText = "ಮಿಷನ್ ಮುಕ್ತಾಯ!";
+                document.getElementById("quizQuestionText").innerText = `ತರಗತಿಯ ಒಟ್ಟು ಸ್ಕೋರ್: ${qScore} / 10`;
+                document.getElementById("quizOptionsContainer").innerHTML = "";
+                document.getElementById("nextQuizBtn").style.display = "none";
+                document.getElementById('pill3').style.background = "var(--neon-green)";
+                showAlertBox(3, qScore >= 7 ? "ಅಪ್ರತಿಮ ಶಿಲಾಗೋಳದ ವಿಜೇತರು ಗೆಳೆಯಾ!" : "ಉತ್ತಮ ಪ್ರಯತ್ನ!", true);
+            }
+        }
+        loadQuizQuestion();
+
+        // Level 4 Logic
+        function verifyLevel4() {
+            let c1 = document.getElementById("cipherIn1").value.trim();
+            let c2 = document.getElementById("cipherIn2").value.trim();
+
+            if(c1 === "ಶಿಲಾಶೈಥಿಲ್ಯ" && (c2 === "ಸವೆತ" || c2 === "ನದಿ ಸವೆತ")) {
+                addLithoXP(150);
+                document.getElementById('pill4').style.background = "var(--neon-green)";
+                showAlertBox(4, "ವಾಹ್ ಗೆಳೆಯಾ! ಬಾಹ್ಯ ಶಕ್ತಿಗಳ ರಹಸ್ಯ ಕೋಡ್ ಸಂಪೂರ್ಣ ಸರಿಯಾಗಿದೆ.", true);
+            } else {
+                showAlertBox(4, "ತಪ್ಪಾಗಿದೆ! ಸುಳಿವು: ಶಿಲಾಶೈಥಿಲ್ಯ, ಸವೆತ ಎಂದು ಬರೆಯಿರಿ ಗೆಳೆಯಾ.", false);
+            }
+        }
+
+        // Level 5 Logic
+        let minedOres = {};
+        function toggleOreToken(id, isMajorPlate) {
+            let node = document.getElementById(id);
+            if(node.classList.contains('active-packet')) {
+                node.classList.remove('active-packet');
+                delete minedOres[id];
+            } else {
+                node.classList.add('active-packet');
+                minedOres[id] = isMajorPlate;
+            }
+        }
+        function verifyLevel5() {
+            let win = true; let count = 0;
+            for(let id in minedOres) {
+                if(minedOres[id] === false) win = false;
+                count++;
+            }
+            if(count !== 4) win = false;
+
+            if(win) {
+                addLithoXP(150);
+                document.getElementById('pill5').style.background = "var(--neon-green)";
+                showAlertBox(5, "ಅದ್ಭುತ! ಜಗತ್ತಿನ ನಾಲ್ಕು ಪ್ರಮುಖ ಭೂಫಲಕಗಳ ಶೋಧ ಯಶಸ್ವಿಯಾಗಿದೆ.", true);
+            } else {
+                showAlertBox(5, "ತಪ್ಪಾಗಿದೆ! ಕೇವಲ ಜಗತ್ತಿನ ನಾಲ್ಕು ಪ್ರಮುಖ ಫಲಕಗಳನ್ನು ಮಾತ್ರ ಆರಿಸು ಗೆಳೆಯಾ.", false);
+            }
+        }
+
+        // Level 6 Drag Drop
+        function allowDrop(ev) { ev.preventDefault(); }
+        function startDrag(ev) { ev.dataTransfer.setData("text", ev.target.id); }
+        function handleDrop(ev, cat) {
+            ev.preventDefault();
+            let id = ev.dataTransfer.getData("text");
+            let el = document.getElementById(id);
+            el.dataset.cat = cat;
+            ev.target.appendChild(el);
+        }
+        function verifyLevel6() {
+            let k1 = document.getElementById("kar1").dataset.cat;
+            let k2 = document.getElementById("kar2").dataset.cat;
+
+            if(k1 === "roof" && k2 === "floor") {
+                addLithoXP(200);
+                document.getElementById('pill6').style.background = "var(--neon-green)";
+                showAlertBox(6, "ಸುಣ್ಣದಕಲ್ಲಿನ ಗುಹೆಯ ಸ್ವರೂಪಗಳ ಜೋಡಣೆ ನೂರಕ್ಕೆ ನೂರು ಸರಿಯಾಗಿದೆ!", true);
+            } else {
+                showAlertBox(6, "ತಪ್ಪಾದ ವಿಭಾಗ! ಸ್ಟೆಲಕ್ಟೈಟ್ ಮೇಲ್ಛಾವಣಿಯಿಂದ ನೇತಾಡುತ್ತದೆ, ಸ್ಟೆಲಗ್ಮೈಟ್ ನೆಲದಿಂದ ಬೆಳೆಯುತ್ತದೆ.", false);
+            }
+        }
+
+        // Level 7 Logic
+        let finalL = null; let finalR = null;
+        function selectFinalMatrix(side, id, key) {
+            if(side === 'L') {
+                finalL = { id: id, key: key };
+                document.getElementById("matL1").classList.remove('active-node-select');
+                document.getElementById("matL2").classList.remove('active-node-select');
+            } else {
+                finalR = { id: id, key: key };
+                document.getElementById("matR1").classList.remove('active-node-select');
+                document.getElementById("matR2").classList.remove('active-node-select');
+            }
+            document.getElementById(id).classList.add('active-node-select');
+        }
+        function verifyLevel7() {
+            if(finalL && finalR && finalL.key === finalR.key) {
+                addLithoXP(250);
+                document.getElementById('pill7').style.background = "var(--neon-green)";
+                showAlertBox(7, "ವಾಹ್ ಗೆಳೆಯಾ! ಇಡೀ 'ಶಿಲಾಗೋಳ' ಪಾಠದ ಮ್ಯಾಟ್ರಿಕ್ಸ್ ಪೂರ್ಣಗೊಂಡಿದೆ. ನಿಮ್ಮ ತರಗತಿಯ ಮಕ್ಕಳು ಇನ್ನು ಜಿಯೋ-ಜಾಣರು!", true);
+            } else {
+                showAlertBox(7, "ಮ್ಯಾಟ್ರಿಕ್ಸ್ ಲಿಂಕ್ ತಪ್ಪಾಗಿದೆ. ಜ್ವಾಲಾಮುಖಿಯ ವಿಧಗಳನ್ನು ಮರುಪರಿಶೀಲಿಸು ಗೆಳೆಯಾ.", false);
+            }
+        }
+
+        function showAlertBox(lvlNum, text, success) {
+            let box = document.getElementById("alert" + lvlNum);
+            box.style.display = "block";
+            box.innerText = text;
+            box.style.background = success ? "rgba(46, 204, 113, 0.15)" : "rgba(231, 76, 60, 0.1)";
+            box.style.color = success ? "var(--neon-green)" : "var(--danger-red)";
+            box.style.border = success ? "1px solid var(--neon-green)" : "1px solid var(--danger-red)";
+        }
+    </script>
+</body>
+</html>

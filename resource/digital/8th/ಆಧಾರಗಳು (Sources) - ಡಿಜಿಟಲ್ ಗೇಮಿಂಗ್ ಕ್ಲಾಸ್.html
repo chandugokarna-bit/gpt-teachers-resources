@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಇತಿಹಾಸದ ಆಧಾರಗಳು - ಅಲ್ಟ್ರಾ ಮಾಡರ್ನ್ ಇಂಟರಾಕ್ಟಿವ್ ಆಕ್ಟಿವಿಟಿ</title>
+    <style>
+        :root {
+            --primary: #6c5ce7;
+            --secondary: #a29bfe;
+            --accent: #fd79a8;
+            --bg-grad: linear-gradient(135deg, #74b9ff, #81ecec);
+            --card-bg: #ffffff;
+            --success: #00b894;
+            --danger: #d63031;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: var(--bg-grad);
+            min-height: 100vh;
+            padding: 20px;
+            color: #2d3436;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            color: var(--primary);
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            font-size: 1.1rem;
+            color: #636e72;
+        }
+
+        /* Navigation Grid */
+        .nav-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .nav-btn {
+            background: var(--card-bg);
+            color: #2d3436;
+            border: 3px solid var(--primary);
+            padding: 15px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 10px rgba(0,0,0,0.05);
+            text-align: center;
+        }
+
+        .nav-btn:hover, .nav-btn.active {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(108, 92, 231, 0.4);
+        }
+
+        /* Activity Container */
+        .activity-container {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 25px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+            min-height: 500px;
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .activity-container.active-zone {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 {
+            color: var(--primary);
+            margin-bottom: 20px;
+            border-bottom: 3px solid var(--secondary);
+            padding-bottom: 10px;
+            font-size: 1.6rem;
+        }
+
+        /* Game Elements Styling */
+        .btn-check, .btn-next {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-top: 25px;
+            transition: background 0.2s;
+        }
+
+        .btn-check:hover, .btn-next:hover {
+            opacity: 0.9;
+        }
+
+        .feedback {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: bold;
+            display: none;
+        }
+
+        /* Act 1: Memory Game */
+        .memory-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .memory-card {
+            background: var(--secondary);
+            height: 100px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 1.1rem;
+            text-align: center;
+            padding: 10px;
+            transition: transform 0.3s;
+        }
+
+        .memory-card.flipped {
+            background: var(--primary);
+            transform: rotateY(180deg);
+        }
+
+        .memory-card.matched {
+            background: var(--success);
+            cursor: default;
+        }
+
+        /* Act 2: Drag and Drop */
+        .drag-drop-zone {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .drag-items {
+            flex: 1;
+            background: #f1f2f6;
+            padding: 15px;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .drag-item {
+            background: var(--card-bg);
+            padding: 12px;
+            border-radius: 8px;
+            cursor: grab;
+            border: 2px solid var(--secondary);
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .drop-targets {
+            flex: 2;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .drop-box {
+            background: #f1f2f6;
+            border: 3px dashed var(--primary);
+            padding: 20px;
+            border-radius: 15px;
+            min-height: 100px;
+        }
+
+        .drop-box h3 { margin-bottom: 10px; color: var(--primary); }
+
+        /* Act 3: Quiz Ultra Style */
+        .quiz-option {
+            background: #f1f2f6;
+            padding: 15px;
+            margin: 12px 0;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+            border-left: 5px solid var(--secondary);
+            font-size: 1.1rem;
+        }
+
+        .quiz-option:hover {
+            background: var(--secondary);
+            color: white;
+            transform: translateX(5px);
+        }
+
+        .quiz-option.correct-choice {
+            background: #e8f5e9;
+            border-left: 5px solid var(--success);
+            color: #2e7d32;
+        }
+
+        .quiz-option.wrong-choice {
+            background: #ffe9e9;
+            border-left: 5px solid var(--danger);
+            color: #c62828;
+        }
+
+        .quiz-progress {
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        /* Act 4: Fill in blanks */
+        .fib-q {
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+
+        .fib-input {
+            border: 2px solid var(--primary);
+            border-radius: 8px;
+            padding: 5px 10px;
+            font-size: 1.1rem;
+            width: 200px;
+            outline: none;
+            color: var(--primary);
+            font-weight: bold;
+        }
+
+        /* Act 5: True/False */
+        .tf-row {
+            background: #f1f2f6;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .tf-btn {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 8px;
+            margin-left: 10px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .tf-true { background: #ffeaa7; color: #d35400; }
+        .tf-false { background: #fab1a0; color: #c0392b; }
+        .tf-btn.selected { background: var(--primary); color: white; }
+
+        /* Act 6: Scramble */
+        .scramble-box {
+            background: #f1f2f6;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .scrambled-word {
+            font-size: 2rem;
+            letter-spacing: 5px;
+            color: var(--accent);
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        /* Act 7: Matching */
+        .match-container {
+            display: flex;
+            gap: 40px;
+            justify-content: center;
+        }
+
+        .match-col {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .match-select {
+            padding: 10px;
+            border-radius: 8px;
+            border: 2px solid var(--primary);
+            outline: none;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>ಆಧಾರಗಳು (Sources) - ಡಿಜಿಟಲ್ ಗೇಮಿಂಗ್ ಕ್ಲಾಸ್</h1>
+        <p>8ನೇ ತರಗತಿ ಸಮಾಜ ವಿಜ್ಞಾನ - ಅತ್ಯಂತ ಆಕರ್ಷಕ ಅಲ್ಟ್ರಾ ಮಾಡರ್ನ್ ಕಲಿಕಾ ಚಟುವಟಿಕೆಗಳು</p>
+    </header>
+
+    <div class="nav-grid">
+        <button class="nav-btn active" onclick="switchTab(1)">1. ಜೋಡಿ ಕಾರ್ಡ್ ಆಟ</button>
+        <button class="nav-btn" onclick="switchTab(2)">2. ವರ್ಗೀಕರಣ ಸಾಮ್ರಾಜ್ಯ</button>
+        <button class="nav-btn" onclick="switchTab(3)">3. ಇತಿಹಾಸ ರಸಪ್ರಶ್ನೆ (10 Qs)</button>
+        <button class="nav-btn" onclick="switchTab(4)">4. ಖಾಲಿ ಜಾಗ ತುಂಬು</button>
+        <button class="nav-btn" onclick="switchTab(5)">5. ನಿಜ/ಸುಳ್ಳು ಗೇಟ್</button>
+        <button class="nav-btn" onclick="switchTab(6)">6. ಪದಗಳ ಯುದ್ಧ</button>
+        <button class="nav-btn" onclick="switchTab(7)">7. ಹೊಂದಿಸಿ ಬರೆಯಿರಿ</button>
+    </div>
+
+    <div id="act1" class="activity-container active-zone">
+        <h2>ಆಕ್ಟಿವಿಟಿ 1: ಸಾಹಿತ್ಯಕ ಕೃತಿಗಳು ಮತ್ತು ಕರ್ತೃಗಳು (Memory Card Game)</h2>
+        <p style="margin-bottom: 15px; font-weight: bold; color: var(--primary);">ಕಾರ್ಡ್‌ಗಳನ್ನು ಕ್ಲಿಕ್ ಮಾಡಿ ಸರಿಯಾದ ಕೃತಿ ಮತ್ತು ಅದರ ಲೇಖಕರನ್ನು ಜೋಡಿ ಮಾಡಿ!</p>
+        <div class="memory-grid" id="memoryGrid"></div>
+        <div class="feedback" id="feedback1"></div>
+    </div>
+
+    <div id="act2" class="activity-container">
+        <h2>ಆಕ್TIವಿಟಿ 2: ಆಧಾರಗಳ ವರ್ಗೀಕರಣ (Drag & Drop Category)</h2>
+        <p>ಕೆಳಗಿನ ಆಧಾರಗಳನ್ನು ಅವುಗಳ ಸರಿಯಾದ ವಿಭಾಗಕ್ಕೆ ಸೇರಿಸಿ:</p>
+        <div class="drag-drop-zone">
+            <div class="drag-items" id="dragItems">
+                <div class="drag-item" draggable="true" id="item1" ondragstart="drag(event)">ಕವಿರಾಜಮಾರ್ಗ</div>
+                <div class="drag-item" draggable="true" id="item2" ondragstart="drag(event)">ಹಲ್ಮಡಿ ಶಾಸನ</div>
+                <div class="drag-item" draggable="true" id="item3" ondragstart="drag(event)">ಲಾವಣಿ ಹಾಡುಗಳು</div>
+                <div class="drag-item" draggable="true" id="item4" ondragstart="drag(event)">ರೋಮನ್ ನಾಣ್ಯಗಳು</div>
+                <div class="drag-item" draggable="true" id="item5" ondragstart="drag(event)">ಕಿತ್ತೂರು ಚೆನ್ನಮ್ಮ ಕಥೆ</div>
+                <div class="drag-item" draggable="true" id="item6" ondragstart="drag(event)">ಮೆಗಸ್ತನೀಸನ ಇಂಡಿಕಾ</div>
+            </div>
+            <div class="drop-targets">
+                <div class="drop-box" ondragover="allowDrop(event)" ondrop="drop(event, 'sahitya')">
+                    <h3>ಸಾಹಿತ್ಯಕ ಆಧಾರಗಳು</h3>
+                </div>
+                <div class="drop-box" ondragover="allowDrop(event)" ondrop="drop(event, 'praktana')">
+                    <h3>ಪ್ರಾಕ್ತನ ಆಧಾರಗಳು</h3>
+                </div>
+                <div class="drop-box" ondragover="allowDrop(event)" ondrop="drop(event, 'moukhika')">
+                    <h3>ಮೌಖಿಕ ಆಧಾರಗಳು</h3>
+                </div>
+            </div>
+        </div>
+        <button class="btn-check" onclick="checkAct2()">ಉತ್ತರ ಪರಿಶೀಲಿಸು</button>
+        <div class="feedback" id="feedback2"></div>
+    </div>
+
+    <div id="act3" class="activity-container">
+        <h2>ಆಕ್ಟಿವಿಟಿ 3: ಇತಿಹಾಸ ಸಂಶೋಧನೆ ರಸಪ್ರಶ್ನೆ (Epic 10 Quiz Challenge)</h2>
+        <div class="quiz-progress" id="quizProgress">ಪ್ರಶ್ನೆ: 1 / 10</div>
+        <div id="quizZone">
+            <div class="fib-q" id="quizQuestion" style="font-weight: bold; margin-bottom: 20px;">ಪ್ರಶ್ನೆ ಲೋಡ್ ಆಗುತ್ತಿದೆ...</div>
+            <div id="quizOptions">
+                </div>
+        </div>
+        <button class="btn-next" id="nextQuizBtn" style="display:none;" onclick="nextQuestion()">ಮುಂದಿನ ಪ್ರಶ್ನೆ ➔</button>
+        <div class="feedback" id="feedback3"></div>
+    </div>
+
+    <div id="act4" class="activity-container">
+        <h2>ಆಕ್ಟಿವಿಟಿ 4: ಶಾಸನಗಳು ಮತ್ತು ನಾಣ್ಯಗಳ ಇತಿಹಾಸ (Fill in the Blanks)</h2>
+        <div class="fib-q">1. ಕನ್ನಡ ಭಾಷೆಯಲ್ಲಿ ದೊರೆತಿರುವ ಅತ್ಯಂತ ಮೊದಲ ಶಾಸನ <input type="text" class="fib-input" id="fib1"> ಶಾಸನವಾಗಿದೆ.</div>
+        <div class="fib-q">2. ನಾಣ್ಯಗಳ ಸ್ವರೂಪ ಮತ್ತು ವಿಕಾಸದ ಬಗ್ಗೆ ತಿಳಿಸುವ ಅಧ್ಯಯನವೇ <input type="text" class="fib-input" id="fib2">.</div>
+        <div class="fib-q">3. ನಮ್ಮ ದೇಶದಲ್ಲಿ ದೊರೆತಿರುವ ಅತ್ಯಂತ ಪ್ರಾಚೀನ ಶಾಸನಗಳು ಮೌರ್ಯ ಚಕ್ರವರ್ತಿ <input type="text" class="fib-input" id="fib3"> ಹೊರಡಿಸಿದ್ದಾಗಿದೆ.</div>
+        <div class="fib-q">4. ಸಮುದ್ರಗುಪ್ತನು <input type="text" class="fib-input" id="fib4"> ಪ್ರಕಾರದ ಚಿನ್ನದ ನಾಣ್ಯಗಳನ್ನು ಹೊರಡಿಸಿದ್ದನು.</div>
+        <div class="fib-q">5. ಕರ್ನಾಟಕದ ಮಸ್ಕಿ ಶಾಸನವು ಯಾರಿಗೆ ಸಂಬಂಧಿಸಿದೆ? <input type="text" class="fib-input" id="fib5">.</div>
+        <button class="btn-check" onclick="checkAct4()">ಉತ್ತರ ಪರಿಶೀಲಿಸು</button>
+        <div class="feedback" id="feedback4"></div>
+    </div>
+
+    <div id="act5" class="activity-container">
+        <h2>ಆಕ್ಟಿವಿಟಿ 5: ಇಂಗಾಲ-14 ಕಾಲನಿರ್ಣಯ ಪದ್ಧತಿ (True or False)</h2>
+        <div class="tf-row">
+            <span>1. ಸಿ-14 ಎಂಬುದು ಕಾಲ ನಿಷ್ಕರ್ಷೆಯ ಒಂದು ವೈಜ್ಞಾನಿಕ ವಿಧಾನವಾಗಿದೆ.</span>
+            <div>
+                <button class="tf-btn tf-true" id="tf1_t" onclick="setTF(1, true)">ನಿಜ</button>
+                <button class="tf-btn tf-false" id="tf1_f" onclick="setTF(1, false)">ಸುಳ್ಳು</button>
+            </div>
+        </div>
+        <div class="tf-row">
+            <span>2. ಜೀವಿಯು ಸತ್ತ ನಂತರವೂ ಇಂಗಾಲ-14 ರ ಪ್ರಮಾಣವು ಹೆಚ್ಚಾಗುತ್ತಾ ಹೋಗುತ್ತದೆ.</span>
+            <div>
+                <button class="tf-btn tf-true" id="tf2_t" onclick="setTF(2, true)">ನಿಜ</button>
+                <button class="tf-btn tf-false" id="tf2_f" onclick="setTF(2, false)">ಸುಳ್ಳು</button>
+            </div>
+        </div>
+        <div class="tf-row">
+            <span>3. ಇಂಗಾಲ-14 ವಿಧಾನದ ಮೂಲಕ 10,000 ವರ್ಷಗಳ ಹಿಂದಿನವರೆಗಿನ ಪಳೆಯುಳಿಕೆಗಳನ್ನು ಪತ್ತೆ ಮಾಡಬಹುದು.</span>
+            <div>
+                <button class="tf-btn tf-true" id="tf3_t" onclick="setTF(3, true)">ನಿಜ</button>
+                <button class="tf-btn tf-false" id="tf3_f" onclick="setTF(3, false)">ಸುಳ್ಳು</button>
+            </div>
+        </div>
+        <div class="tf-row">
+            <span>4. ಈ ವಿಧಾನಕ್ಕೆ ಒಳಪಡಿಸುವ ಅವಶೇಷಗಳು ಕೇವಲ ಕಲ್ಲು ಮತ್ತು ಕಬ್ಬಿಣದ ಆಯುಧಗಳಾಗಿರಬೇಕು.</span>
+            <div>
+                <button class="tf-btn tf-true" id="tf4_t" onclick="setTF(4, true)">ನಿಜ</button>
+                <button class="tf-btn tf-false" id="tf4_f" onclick="setTF(4, false)">ಸುಳ್ಳು</button>
+            </div>
+        </div>
+        <button class="btn-check" onclick="checkAct5()">ಉತ್ತರ ಪರಿಶೀಲಿಸು</button>
+        <div class="feedback" id="feedback5"></div>
+    </div>
+
+    <div id="act6" class="activity-container">
+        <h2>ಆಕ್ಟಿವಿಟಿ 6: ಮೌಖಿಕ ಪರಂಪರೆಯ ನಾಯಕರು (Word Scramble Battle)</h2>
+        <p>ಅಸ್ತವ್ಯಸ್ತವಾಗಿರುವ ಅಕ್ಷರಗಳನ್ನು ಜೋಡಿಸಿ ಸರಿಯಾದ ಐತಿಹಾಸಿಕ ವ್ಯಕ್ತಿಯ ಹೆಸರನ್ನು ಬರೆಯಿರಿ:</p>
+        <div class="scramble-box">
+            <div class="scrambled-word">ರಾಂ ಗ ಸ ನೊ ಣ್ಣ ಳ್ಳ ಯ</div>
+            <input type="text" class="fib-input" id="scramble1" placeholder="ನಿಮ್ಮ ಉತ್ತರ">
+        </div>
+        <div class="scramble-box">
+            <div class="scrambled-word">ತು ರ್ಮ ಚಿ ದು ರ್ಗ ದ ನಾ ಯ ಕ ರು</div>
+            <input type="text" class="fib-input" id="scramble2" placeholder="ನಿಮ್ಮ ಉತ್ತರ">
+        </div>
+        <div class="scramble-box">
+            <div class="scrambled-word">রী ಫ ಷ ನಾ ಳ ಶು ಶಿ</div>
+            <input type="text" class="fib-input" id="scramble3" placeholder="ನಿಮ್ಮ ಉತ್ತರ">
+        </div>
+        <button class="btn-check" onclick="checkAct6()">ಉತ್ತರ ಪರಿಶೀಲಿಸು</button>
+        <div class="feedback" id="feedback6"></div>
+    </div>
+
+    <div id="act7" class="activity-container">
+        <h2>ಆಕ್ಟಿವಿಟಿ 7: ಭವ್ಯ ಸ್ಮಾರಕಗಳು ಮತ್ತು ತಾಂತ್ರಿಕತೆ (Match the Following)</h2>
+        <div class="match-container">
+            <div class="match-col">
+                <div class="tf-row" style="width: 350px;">1. ವಿಜಯಪುರದ ಗೋಲಗುಮ್ಮಟ</div>
+                <div class="tf-row" style="width: 350px;">2. ಮೆಹರೂಲಿಯ ಸ್ತಂಭ</div>
+                <div class="tf-row" style="width: 350px;">3. ಹರಪ್ಪ ನಾಗರಿಕತೆ</div>
+                <div class="tf-row" style="width: 350px;">4. ಐತಿಹ್ಯಗಳು / ಸ್ಥಳ ಪುರಾಣ</div>
+            </div>
+            <div class="match-col">
+                <select id="m1" class="match-select">
+                    <option value="">ಆಯ್ಕೆ ಮಾಡಿ</option>
+                    <option value="A">ಭೂ-ಉತ್ಪನನದಿಂದ ಬೆಳಕಿಗೆ ಬಂದಿದ್ದು</option>
+                    <option value="B">ಪಿಸುಮಾತಿನ ಮೊಗಸಾಲೆ</option>
+                    <option value="C">ಸ್ಥಳದ😭ಮಹಿಮೆಯನ್ನು ಸೂಚಿಸುವುದು</option>
+                    <option value="D">ಉಕ್ಕಿನ ಸ್ತಂಭ (ವಿಜ್ಞಾನದ ಪ್ರಬುದ್ಧತೆ)</option>
+                </select>
+                <select id="m2" class="match-select">
+                    <option value="">ಆಯ್ಕೆ ಮಾಡಿ</option>
+                    <option value="A">ಭೂ-ಉತ್ಪನನದಿಂದ ಬೆಳಕಿಗೆ ಬಂದಿದ್ದು</option>
+                    <option value="B">ಪಿಸುಮಾತಿನ ಮೊಗಸಾಲೆ</option>
+                    <option value="C">ಸ್ಥಳದ ಮಹಿಮೆಯನ್ನು ಸೂಚಿಸುವುದು</option>
+                    <option value="D">ಉಕ್ಕಿನ ಸ್ತಂಭ (ವಿಜ್ಞಾನದ ಪ್ರಬುದ್ಧತೆ)</option>
+                </select>
+                <select id="m3" class="match-select">
+                    <option value="">ಆಯ್ಕೆ ಮಾಡಿ</option>
+                    <option value="A">ಭೂ-ಉತ್ಪನನದಿಂದ ಬೆಳಕಿಗೆ ಬಂದಿದ್ದು</option>
+                    <option value="B">ಪಿಸುಮಾತಿನ ಮೊಗಸಾಲೆ</option>
+                    <option value="C">ಸ್ಥಳದ ಮಹಿಮೆಯನ್ನು ಸೂಚಿಸುವುದು</option>
+                    <option value="D">ಉಕ್ಕಿನ ಸ್ತಂಭ (ವಿಜ್ಞಾನದ ಪ್ರಬುದ್ಧತೆ)</option>
+                </select>
+                <select id="m4" class="match-select">
+                    <option value="">ಆಯ್ಕೆ ಮಾಡಿ</option>
+                    <option value="A">ಭೂ-ಉತ್ಪನನದಿಂದ ಬೆಳಕಿಗೆ ಬಂದಿದ್ದು</option>
+                    <option value="B">ಪಿಸುಮಾತಿನ ಮೊಗಸಾಲೆ</option>
+                    <option value="C">ಸ್ಥಳದ ಮಹಿಮೆಯನ್ನು ಸೂಚಿಸುವುದು</option>
+                    <option value="D">ಉಕ್ಕಿನ ಸ್ತಂಭ (ವಿಜ್ಞಾನದ ಪ್ರಬುದ್ಧತೆ)</option>
+                </select>
+            </div>
+        </div>
+        <button class="btn-check" onclick="checkAct7()">ಉತ್ತರ ಪರಿಶೀಲಿಸು</button>
+        <div class="feedback" id="feedback7"></div>
+    </div>
+
+    <script>
+        // Tab Switcher
+        function switchTab(tabIndex) {
+            document.querySelectorAll('.activity-container').forEach(el => el.classList.remove('active-zone'));
+            document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById('act' + tabIndex).classList.add('active-zone');
+            event.target.classList.add('active');
+        }
+
+        // Act 1: Memory Game Logic
+        const cardsData = [
+            {text: "ಕೌಟಿಲ್ಯ", match: 1}, {text: "ಅರ್ಥಶಾಸ್ತ್ರ", match: 1},
+            {text: "ಕಲ್ಹಣ", match: 2}, {text: "ರಾಜತರಂಗಿಣಿ", match: 2},
+            {text: "ಮೆಗಸ್ತನೀಸ್", match: 3}, {text: "ಇಂಡಿಕಾ", match: 3},
+            {text: "ಹೂಯೆನ್ ತ್ಸಾಂಗ್", match: 4}, {text: "ಸಿ-ಯುಕಿ", match: 4}
+        ];
+        
+        let flippedCards = [];
+        function initMemoryGame() {
+            const grid = document.getElementById('memoryGrid');
+            grid.innerHTML = '';
+            cardsData.sort(() => Math.random() - 0.5);
+            cardsData.forEach((data, index) => {
+                const card = document.createElement('div');
+                card.classList.add('memory-card');
+                card.dataset.index = index;
+                card.dataset.match = data.match;
+                card.innerText = "?";
+                card.addEventListener('click', flipCard);
+                grid.appendChild(card);
+            });
+        }
+        
+        function flipCard() {
+            if (flippedCards.length < 2 && !this.classList.contains('flipped') && !this.classList.contains('matched')) {
+                this.classList.add('flipped');
+                this.innerText = cardsData[this.dataset.index].text;
+                flippedCards.push(this);
+                
+                if (flippedCards.length === 2) {
+                    if (flippedCards[0].dataset.match === flippedCards[1].dataset.match) {
+                        flippedCards[0].classList.add('matched');
+                        flippedCards[1].classList.add('matched');
+                        flippedCards = [];
+                    } else {
+                        setTimeout(() => {
+                            flippedCards[0].classList.remove('flipped');
+                            flippedCards[0].innerText = "?";
+                            flippedCards[1].classList.remove('flipped');
+                            flippedCards[1].innerText = "?";
+                            flippedCards = [];
+                        }, 1000);
+                    }
+                }
+            }
+        }
+        initMemoryGame();
+
+        // Act 2: Drag and Drop Logic
+        function allowDrop(ev) { ev.preventDefault(); }
+        function drag(ev) { ev.dataTransfer.setData("text", ev.target.id); }
+        function drop(ev, cat) {
+            ev.preventDefault();
+            var data = ev.dataTransfer.getData("text");
+            var item = document.getElementById(data);
+            item.dataset.category = cat;
+            ev.target.appendChild(item);
+        }
+        function checkAct2() {
+            let correct = true;
+            const answers = {item1: 'sahitya', item2: 'praktana', item3: 'moukhika', item4: 'praktana', item5: 'moukhika', item6: 'sahitya'};
+            for (let id in answers) {
+                let el = document.getElementById(id);
+                if (!el || el.dataset.category !== answers[id]) correct = false;
+            }
+            showFeedback(2, correct ? "ಅದ್ಭುತ! ಸರಿಯಾದ ವರ್ಗೀಕರಣ!" : "ಕೆಲವು ತಪ್ಪುಗಳಿವೆ, ಮತ್ತೊಮ್ಮೆ ಪ್ರಯತ್ನಿಸಿ.", correct);
+        }
+
+        // ==========================================
+        // NEW ACT 3: 10 QUESTIONS QUIZ DATA & LOGIC
+        // ==========================================
+        const quizQuestions = [
+            { q: "1. ಮಾನವನ ಗತಕಾಲದ ಚರಿತ್ರೆಯ ರಚನೆಗೆ ಬೇಕಾದ ಮೂಲ ಸಾಮಗ್ರಿಗಳನ್ನು ಏನೆಂದು ಕರೆಯುತ್ತಾರೆ?", options: ["ಊಹೆಗಳು", "ಆಧಾರಗಳು", "ನಿಯಮಗಳು"], correct: 1 },
+            { q: "2. ಇತಿಹಾಸ ರಚನೆಯಲ್ಲಿ ಆಧಾರಗಳನ್ನು ಪ್ರಮುಖವಾಗಿ ಎಷ್ಟು ಭಾಗಗಳಾಗಿ ವಿಂಗಡಿಸಲಾಗಿದೆ?", options: ["ಎರಡು (ಸಾಹಿತ್ಯಕ ಮತ್ತು ಪ್ರಾಕ್ತನ)", "ನಾಲ್ಕು", "ಮೂರು"], correct: 0 },
+            { q: "3. ಈ ಕೆಳಗಿನವುಗಳಲ್ಲಿ ಯಾವುದು ವಿದೇಶಿ ಸಾಹಿತ್ಯಕ್ಕೆ ಉದಾಹರಣೆಯಾಗಿದೆ?", options: ["ಕವಿರಾಜಮಾರ್ಗ", "ಇಂಡಿಕಾ", "ವಿಕ್ರಮಾರ್ಜುನ ವಿಜಯ"], correct: 1 },
+            { q: "4. ಭಾರತಕ್ಕೆ ಭೇಟಿ ನೀಡಿ 'ಸಿ-ಯು-ಕಿ' ಎಂಬ ಗ್ರಂಥವನ್ನು ಬರೆದ ಚೀನಿ ಪ್ರವಾಸಿ ಯಾರು?", options: ["ಫಾಹಿಯಾನ್", "ಮೆಗಸ್ತನೀಸ್", "ಹೂಯೆನ್ ತ್ಸಾಂಗ್"], correct: 2 },
+            { q: "5. ಕೆತ್ತಲ್ಪಟ್ಟ ಬರಹಗಳನ್ನು ಹೊಂದಿರುವ ಅತ್ಯಂತ ನಂಬಲರ್ಹವಾದ ಪ್ರಾಕ್ತನ ಆಧಾರ ಯಾವುದು?", options: ["ನಾಣ್ಯಗಳು", "ಶಾಸನಗಳು", "ಸ್ಮಾರಕಗಳು"], correct: 1 },
+            { q: "6. ಶಾಸನಗಳ ಅಧ್ಯಯನವನ್ನು ಏನೆಂದು ಕರೆಯಲಾಗುತ್ತದೆ?", options: ["ಶಾಸನಶಾಸ್ತ್ರ (Epigraphy)", "ನಾಣ್ಯಶಾಸ್ತ್ರ", "ಪುರಾತತ್ವಶಾಸ್ತ್ರ"], correct: 0 },
+            { q: "7. ಇತಿಹಾಸದಲ್ಲಿ ಯಾವುದೇ ವಸ್ತು ಎಷ್ಟು ಹಳೆಯದು ಎಂದು ತಿಳಿಯಲು ಬಳಸುವ ವೈಜ್ಞಾನಿಕ ವಿಧಾನ ಯಾವುದು?", options: ["ಸಿ-14 ಇಂಗಾಲ ಪದ್ಧತಿ", "ಯುರೇನಿಯಂ ಪದ್ಧತಿ", "ಡಿಎನ್ಎ ಪದ್ಧತಿ"], correct: 0 },
+            { q: "8. ಬಾಯಿಂದ ಬಾಯಿಗೆ ಹರಿದು ಬಂದಿರುವ ಲಾವಣಿಗಳು, ಜಾನಪದ ಕಥೆಗಳನ್ನು ಯಾವ ಆಧಾರ ಎನ್ನಲಾಗುತ್ತದೆ?", options: ["ಲಿಖಿತ ಸಾಹಿತ್ಯ", "ಮೌಖಿಕ ಆಧಾರಗಳು", "ಪ್ರಾಕ್ತನ ಆಧಾರಗಳು"], correct: 1 },
+            { q: "9. ಮೊಘಲ್ ರಾಜರ ಚರಿತ್ರೆಯನ್ನು ತಿಳಿಸುವ ಪ್ರಸಿದ್ಧ ಕೃತಿ 'ಅಕ್ಬರ್ ನಾಮಾ' ಬರೆದವರು ಯಾರು?", options: ["ಅಬುಲ್ ಫಜಲ್", "ಬಾಬರ್", "ಬದೌನಿ"], correct: 0 },
+            { q: "10. 'ಇತಿಹಾಸಕಾರನು ಆಧಾರಗಳಿಲ್ಲದೆ ಏನನ್ನೂ ಬರೆಯಬಾರದು' ಎಂದು ಖಡಾಖಂಡಿತವಾಗಿ ಹೇಳಿದ ಗ್ರೀಕ್ ಇತಿಹಾಸಕಾರ ಯಾರು?", options: ["ಅರಿಸ್ಟಾಟಲ್", "ಹಿರೋಡೋಟಸ್", "ಥುಸಿಡೈಡಿಸ್"], correct: 1 }
+        ];
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let canAnswer = true;
+
+        function loadQuestion() {
+            canAnswer = true;
+            document.getElementById("nextQuizBtn").style.display = "none";
+            document.getElementById("feedback3").style.display = "none";
+            
+            let qData = quizQuestions[currentQuestionIndex];
+            document.getElementById("quizProgress").innerText = `ಪ್ರಶ್ನೆ: ${currentQuestionIndex + 1} / 10`;
+            document.getElementById("quizQuestion").innerText = qData.q;
+            
+            let optionsDiv = document.getElementById("quizOptions");
+            optionsDiv.innerHTML = "";
+            
+            qData.options.forEach((opt, idx) => {
+                let optBtn = document.createElement("div");
+                optBtn.classList.add("quiz-option");
+                optBtn.innerText = opt;
+                optBtn.onclick = function() { checkQuizAnswer(idx, optBtn); };
+                optionsDiv.appendChild(optBtn);
+            });
+        }
+
+        function checkQuizAnswer(selectedIdx, element) {
+            if (!canAnswer) return;
+            canAnswer = false;
+            
+            let qData = quizQuestions[currentQuestionIndex];
+            let allOptions = document.getElementById("quizOptions").children;
+            
+            if (selectedIdx === qData.correct) {
+                element.classList.add("correct-choice");
+                score++;
+                showFeedback(3, "ಸರಿಯಾದ ಉತ್ತರ! ಅದ್ಭುತ.", true);
+            } else {
+                element.classList.add("wrong-choice");
+                allOptions[qData.correct].classList.add("correct-choice");
+                showFeedback(3, "ತಪ್ಪು ಉತ್ತರ! ಸರಿಯಾದ ಉತ್ತರವನ್ನು ಹಸಿರು ಬಣ್ಣದಲ್ಲಿ ತೋರಿಸಲಾಗಿದೆ.", false);
+            }
+            
+            document.getElementById("nextQuizBtn").style.display = "inline-block";
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < quizQuestions.length) {
+                loadQuestion();
+            } else {
+                // Quiz Over
+                document.getElementById("quizProgress").innerText = "ರಸಪ್ರಶ್ನೆ ಮುಕ್ತಾಯ!";
+                document.getElementById("quizZone").innerHTML = `<h3 style='color:var(--primary); text-align:center; margin-top:20px;'>ನಿಮ್ಮ ಒಟ್ಟು ಸ್ಕೋರ್: ${score} / 10</h3>`;
+                document.getElementById("nextQuizBtn").style.display = "none";
+                showFeedback(3, score >= 7 ? "ಅಪ್ರತಿಮ ಸಾಧನೆ! ಇತಿಹಾಸದ ಜ್ಞಾನ ತುಂಬಾ ಚೆನ್ನಾಗಿದೆ ಸರ್!" : "ಉತ್ತಮ ಪ್ರಯತ್ನ, ಮತ್ತೊಮ್ಮೆ ಪ್ರಯತ್ನಿಸಿ!", true);
+            }
+        }
+        
+        // Load first quiz question on start
+        loadQuestion();
+
+        // ==========================================
+
+        // Act 4: FIB
+        function checkAct4() {
+            let f1 = document.getElementById('fib1').value.trim();
+            let f2 = document.getElementById('fib2').value.trim();
+            let f3 = document.getElementById('fib3').value.trim();
+            let f4 = document.getElementById('fib4').value.trim();
+            let f5 = document.getElementById('fib5').value.trim();
+
+            if(f1 === "ಹಲ್ಮಡಿ" && (f2 === "ನಾಣ್ಯಶಾಸ್ತ್ರ" || f2 === "ನಾಣ್ಯ ಶಾಸ್ತ್ರ") && (f3 === "ಅಶೋಕ" || f3 === "ಚಕ್ರವರ್ತಿ ಅಶೋಕ") && f4 === "ಏಳು" && f5 === "ಅಶೋಕ") {
+                showFeedback(4, "ಎಲ್ಲಾ ಉತ್ತರಗಳು ಶೇಕಡಾ 100 ರಷ್ಟು ಸರಿಯಾಗಿವೆ! ಸೂಪರ್!", true);
+            } else {
+                showFeedback(4, "ಕೆಲವು ಉತ್ತರಗಳು ತಪ್ಪಾಗಿವೆ. ಸುಳಿವು: ಹಲ್ಮಡಿ, ನಾಣ್ಯಶಾಸ್ತ್ರ, ಅಶೋಕ, ಏಳು.", false);
+            }
+        }
+
+        // Act 5: True/False
+        let tf_answers = {1: null, 2: null, 3: null, 4: null};
+        function setTF(q, val) {
+            tf_answers[q] = val;
+            document.getElementById(`tf${q}_t`).classList.remove('selected');
+            document.getElementById(`tf${q}_f`).classList.remove('selected');
+            if(val) document.getElementById(`tf${q}_t`).classList.add('selected');
+            else document.getElementById(`tf${q}_f`).classList.add('selected');
+        }
+        function checkAct5() {
+            if(tf_answers[1] === true && tf_answers[2] === false && tf_answers[3] === true && tf_answers[4] === false) {
+                showFeedback(5, "ಅದ್ಭುತ ಜ್ಞಾನ! ವೈಜ್ಞಾನಿಕ ವಿಧಾನದ ಪ್ರಶ್ನೆಗಳು ಸರಿಯಾಗಿವೆ.", true);
+            } else {
+                showFeedback(5, "ತಪ್ಪು ಹೇಳಿಕೆಗಳಿವೆ ಪರಿಶೀಲಿಸಿ! (ಇಂಗಾಲ-14 ಸತ್ತ ನಂತರ ಕ್ಷೀಣಿಸುತ್ತದೆ, ಹೆಚ್ಚಾಗುವುದಿಲ್ಲ)", false);
+            }
+        }
+
+        // Act 6: Scramble
+        function checkAct6() {
+            let s1 = document.getElementById('scramble1').value.replace(/\s+/g, '');
+            let s2 = document.getElementById('scramble2').value.replace(/\s+/g, '');
+            let s3 = document.getElementById('scramble3').value.replace(/\s+/g, '');
+
+            if(s1 === "ಸಂಗೊಳ್ಳಿರಾಯಣ್ಣ" && s2 === "ಚಿತ್ರದುರ್ಗದನಾಯಕರು" && s3 === "ಶಿಶುನಾಳಷರೀಫ್") {
+                showFeedback(6, "ಪದಗಳ ಯುದ್ಧದಲ್ಲಿ ನೀವು ಗೆದ್ದಿದ್ದೀರಿ! ಅತ್ಯುತ್ತಮ!", true);
+            } else {
+                showFeedback(6, "ಅಕ್ಷರಗಳನ್ನು ಸರಿಯಾಗಿ ಗಮನಿಸಿ ಜೋಡಿಸಿ (ಉದಾ: ಸಂಗೊಳ್ಳಿ ರಾಯಣ್ಣ).", false);
+            }
+        }
+
+        // Act 7: Match
+        function checkAct7() {
+            let m1 = document.getElementById('m1').value;
+            let m2 = document.getElementById('m2').value;
+            let m3 = document.getElementById('m3').value;
+            let m4 = document.getElementById('m4').value;
+
+            if(m1 === 'B' && m2 === 'D' && m3 === 'A' && m4 === 'C') {
+                showFeedback(7, "ವಾಹ್! ಹೊಂದಿಸಿ ಬರೆಯಿರಿ ಸಂಪೂರ್ಣ ಸರಿಯಾಗಿದೆ! ಪಾಠ ಮುಕ್ತಾಯವಾಯಿತು.", true);
+            } else {
+                showFeedback(7, "ತಪ್ಪಾಗಿದೆ, ಸರಿಯಾದ ಹೊಂದಾಣಿಕೆ ಮಾಡಿ.", false);
+            }
+        }
+
+        // Helper Feedback Function
+        function showFeedback(actNum, text, isSuccess) {
+            const fb = document.getElementById('feedback' + actNum);
+            fb.style.display = "block";
+            fb.innerText = text;
+            fb.style.background = isSuccess ? "rgba(0, 184, 148, 0.2)" : "rgba(214, 48, 49, 0.2)";
+            fb.style.color = isSuccess ? varName('--success') : varName('--danger');
+        }
+        function varName(name) { return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
+    </script>
+</body>
+</html>

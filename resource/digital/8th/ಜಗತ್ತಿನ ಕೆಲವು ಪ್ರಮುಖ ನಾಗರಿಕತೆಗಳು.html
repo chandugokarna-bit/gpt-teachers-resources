@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಜಗತ್ತಿನ ಪ್ರಮುಖ ನಾಗರಿಕತೆಗಳು - ನಿಯಾನ್ ಆರ್ಕೇಡ್ ೩.೦</title>
+    <style>
+        :root {
+            --neon-cyan: #00cec9;
+            --neon-pink: #e84393;
+            --neon-yellow: #fdcb6e;
+            --neon-purple: #6c5ce7;
+            --dark-glass: rgba(255, 255, 255, 0.95);
+            --arcade-dark: #2d3436;
+            --bg-grad: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: var(--bg-grad);
+            min-height: 100vh;
+            padding: 25px;
+            color: #ffffff;
+        }
+
+        /* Arcade Dashboard Header */
+        .arcade-header {
+            background: rgba(30, 41, 59, 0.8);
+            padding: 25px;
+            border-radius: 24px;
+            text-align: center;
+            box-shadow: 0 0 30px rgba(0, 206, 201, 0.3);
+            margin-bottom: 30px;
+            border: 2px solid var(--neon-cyan);
+        }
+
+        .arcade-header h1 {
+            color: var(--neon-cyan);
+            font-size: 2.4rem;
+            text-shadow: 0 0 10px rgba(0, 206, 201, 0.5);
+            margin-bottom: 8px;
+        }
+
+        .arcade-header p {
+            color: #cbd5e1;
+            font-size: 1.2rem;
+        }
+
+        /* Score & Tracker HUD */
+        .hud-display {
+            display: flex;
+            justify-content: space-around;
+            background: #1e293b;
+            padding: 15px;
+            border-radius: 16px;
+            margin-bottom: 25px;
+            border: 1px solid var(--neon-pink);
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: var(--neon-yellow);
+        }
+
+        /* Navigation Grid */
+        .arcade-menu {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 15px;
+            margin-bottom: 35px;
+        }
+
+        .arcade-card {
+            background: #1e293b;
+            border: 2px solid #334155;
+            padding: 18px;
+            border-radius: 18px;
+            cursor: pointer;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1rem;
+            color: #ffffff;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .arcade-card:hover, .arcade-card.active-zone {
+            background: var(--neon-pink);
+            border-color: #ffffff;
+            transform: translateY(-8px) scale(1.03);
+            box-shadow: 0 0 20px rgba(232, 67, 147, 0.6);
+        }
+
+        /* Game Screen Arena */
+        .game-screen {
+            background: var(--dark-glass);
+            color: var(--arcade-dark);
+            border-radius: 30px;
+            padding: 35px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+            min-height: 550px;
+            display: none;
+        }
+
+        .game-screen.active-screen {
+            display: block;
+            animation: bootUp 0.4s ease-out;
+        }
+
+        @keyframes bootUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2.screen-title {
+            font-size: 1.8rem;
+            color: var(--neon-purple);
+            margin-bottom: 25px;
+            border-bottom: 3px double #6c5ce7;
+            padding-bottom: 10px;
+        }
+
+        /* UI Elements */
+        .fire-btn {
+            background: linear-gradient(135deg, var(--neon-pink), #fd79a8);
+            color: white;
+            border: none;
+            padding: 14px 35px;
+            border-radius: 14px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 10px 20px rgba(232, 67, 147, 0.3);
+            transition: all 0.3s;
+            margin-top: 25px;
+        }
+
+        .fire-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 25px rgba(232, 67, 147, 0.5);
+        }
+
+        .game-status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 12px;
+            font-weight: bold;
+            display: none;
+            font-size: 1.1rem;
+        }
+
+        /* Act 1: Cards Grid */
+        .cards-3d-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        .arcade-flip-card {
+            background: #dfe6e9;
+            height: 110px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.1rem;
+            cursor: pointer;
+            box-shadow: 0 6px #b2bec3;
+            transition: all 0.2s;
+            text-align: center;
+            padding: 10px;
+        }
+
+        .arcade-flip-card.flipped {
+            background: linear-gradient(135deg, #a29bfe, var(--neon-purple));
+            color: white;
+            box-shadow: 0 6px #4834d4;
+        }
+
+        .arcade-flip-card.matched {
+            background: linear-gradient(135deg, #55efc4, #00b894);
+            color: white;
+            box-shadow: 0 6px #009432;
+        }
+
+        /* Act 2: Sorting Layout */
+        .sorting-arena {
+            display: flex;
+            gap: 25px;
+        }
+
+        .pool-shelf {
+            flex: 1;
+            background: #f1f2f6;
+            padding: 15px;
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            border: 2px solid #cbd5e1;
+        }
+
+        .pool-token {
+            background: white;
+            padding: 12px;
+            border-radius: 10px;
+            cursor: grab;
+            border-left: 5px solid var(--neon-cyan);
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        .arcade-drop-zone {
+            flex: 1;
+            background: #f1f2f6;
+            border: 3px dashed var(--neon-purple);
+            padding: 20px;
+            border-radius: 20px;
+            min-height: 150px;
+        }
+
+        .arcade-drop-zone h3 { margin-bottom: 15px; color: var(--neon-purple); }
+
+        /* Act 3: Modern Quiz Interface */
+        .progress-hud {
+            background: #dfe6e9;
+            height: 12px;
+            border-radius: 6px;
+            margin-bottom: 25px;
+            overflow: hidden;
+        }
+
+        .progress-hud-fill {
+            background: linear-gradient(90deg, var(--neon-cyan), #00b894);
+            height: 100%;
+            width: 10%;
+            transition: width 0.4s;
+        }
+
+        .quiz-arcade-row {
+            background: #f8f9fa;
+            padding: 16px;
+            margin: 12px 0;
+            border-radius: 14px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+            border: 2px solid #dfe6e9;
+        }
+
+        .quiz-arcade-row:hover {
+            border-color: var(--neon-purple);
+            background: #f1f0ff;
+            transform: translateX(5px);
+        }
+
+        .quiz-arcade-row.correct-glow {
+            background: #e8f5e9;
+            border-color: #00b894;
+            color: #2e7d32;
+        }
+
+        .quiz-arcade-row.wrong-glow {
+            background: #ffe9e9;
+            border-color: #d63031;
+            color: #c62828;
+        }
+
+        /* Act 4: Grid Input */
+        .crypto-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .arcade-input {
+            border: 2px solid #b2bec3;
+            border-radius: 12px;
+            padding: 10px 15px;
+            font-size: 1.1rem;
+            outline: none;
+            width: 260px;
+            font-weight: bold;
+            color: var(--neon-purple);
+            transition: border 0.3s;
+        }
+
+        .arcade-input:focus {
+            border-color: var(--neon-pink);
+        }
+
+        /* Act 5: Binary Switches */
+        .binary-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f8f9fa;
+            padding: 18px;
+            border-radius: 14px;
+            margin-bottom: 15px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .switch-group button {
+            padding: 10px 22px;
+            border: 2px solid #dfe6e9;
+            background: white;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-left: 10px;
+            transition: all 0.2s;
+        }
+
+        .switch-group button.switch-on {
+            background: var(--neon-cyan);
+            color: white;
+            border-color: var(--neon-cyan);
+        }
+
+        /* Act 6: Cipher Block */
+        .cipher-arcade-box {
+            background: #f1f2f6;
+            padding: 25px;
+            border-radius: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+            border: 2px dashed var(--neon-pink);
+        }
+
+        .cipher-big-txt {
+            font-size: 2.2rem;
+            color: var(--neon-pink);
+            font-weight: 800;
+            letter-spacing: 6px;
+            margin-bottom: 15px;
+        }
+
+        /* Act 7: Connect Matrix */
+        .matrix-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .arcade-select {
+            padding: 12px;
+            border-radius: 12px;
+            border: 2px solid var(--neon-purple);
+            width: 100%;
+            font-weight: 600;
+            outline: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="arcade-header">
+        <h1>ಅಧ್ಯಾಯ-೪: ಜಗತ್ತಿನ ಕೆಲವು ಪ್ರಮುಖ ನಾಗರಿಕತೆಗಳು</h1>
+        <p>ನಿಯಾನ್ ಗೇಮಿಂಗ್ ಆರ್ಕೇಡ್ ೩.೦ - ಅತ್ಯಂತ ಆಕರ್ಷಕ ಅಲ್ಟ್ರಾ ಮಾಡರ್ನ್ ಡಿಜಿಟಲ್ ಕ್ಲಾಸ್ ರೂಮ್</p>
+    </div>
+
+    <!-- Live HUD -->
+    <div class="hud-display">
+        <span id="hudMission">ಮಿಷನ್: ಜಗತ್ತಿನ ಸೌಂದರ್ಯ ಶೋಧನೆ</span>
+        <span id="hudScore">ಆರ್ಕೇಡ್ ಅಂಕಗಳು: 0XP</span>
+    </div>
+
+    <!-- Navigation Architecture -->
+    <div class="arcade-menu">
+        <button class="arcade-card active-zone" onclick="launchScreen(1)">1. ಈಜಿಪ್ಟ್ ಮಮ್ಮಿ</button>
+        <button class="arcade-card" onclick="launchScreen(2)">2. ಬ್ಯಾಬಿಲೋನ್ ಗೇಟ್ಸ್</button>
+        <button class="arcade-card" onclick="launchScreen(3)">3. ಎಪಿಕ್ 10 ಕ್ವಿಜ್</button>
+        <button class="arcade-card" onclick="launchScreen(4)">4. ಚೀನಾ ಗೋಡೆ</button>
+        <button class="arcade-card" onclick="launchScreen(5)">5. ಗ್ಲಾಡಿಯೇಟರ್ ಯುದ್ಧ</button>
+        <button class="arcade-card" onclick="launchScreen(6)">6. ಹೊಸ ಜಗತ್ತಿನ ಶೋಧನೆ</button>
+        <button class="arcade-card" onclick="launchScreen(7)">7. ಕೊಡುಗೆಗಳ ಕನೆಕ್ಟರ್</button>
+    </div>
+
+    <!-- SCREEN 1 -->
+    <div id="screen1" class="game-screen active-screen">
+        <h2 class="screen-title">ಆಕ್ಟಿವಿಟಿ 1: ನೈಲ್ ನದಿಯ ವೈಭವ (Mummy Flip Quest)</h2>
+        <p style="margin-bottom: 20px; font-weight: bold; color: var(--neon-purple);">ಈಜಿಪ್ಟ್ ನಾಗರಿಕತೆಯ ಪ್ರಮುಖ ಲಕ್ಷಣಗಳನ್ನು ಜೋಡಿ ಮಾಡಿ ಮಮ್ಮಿಯ ರಹಸ್ಯ ಬಿಡಿಸಿ:</p>
+        <div class="cards-3d-grid" id="mummyGrid"></div>
+        <div class="game-status" id="status1"></div>
+    </div>
+
+    <!-- SCREEN 2 -->
+    <div id="screen2" class="game-screen">
+        <h2 class="screen-title">ಆಕ್ಟಿವಿಟಿ 2: ಮೆಸಪಟೊಮಿಯ ಕಣಿವೆ ವಿಂಗಡಣೆ (Babylon Gates)</h2>
+        <p style="margin-bottom: 15px;">ಮೆಸಪಟೊಮಿಯಾದ ಐತಿಹಾಸಿಕ ತಾಣಗಳನ್ನು ಮತ್ತು ಕೃತಿಗಳನ್ನು ಅವುಗಳ ಸರಿಯಾದ ದೊರೆಗಳಿಗೆ ಹಂಚಿ:</p>
+        <div class="sorting-arena">
+            <div class="pool-shelf" id="babylonPool">
+                <div class="pool-token" draggable="true" id="tok1" ondragstart="tokenDrag(event)">ತೂಗುವ ಉದ್ಯಾನವನ</div>
+                <div class="pool-token" draggable="true" id="tok2" ondragstart="tokenDrag(event)">ಕಣ್ಣಿಗೆ ಕಣ್ಣು ಸಂಹಿತೆ</div>
+                <div class="pool-token" draggable="true" id="tok3" ondragstart="tokenDrag(event)">ಅದ್ವಿತೀಯ ಅರಮನೆ ನಿರ್ಮಾಣ</div>
+                <div class="pool-token" draggable="true" id="tok4" ondragstart="tokenDrag(event)">ವೈಜ್ಞಾನಿಕ ಅಧ್ಯಯನಕ್ಕೆ ಪ್ರೋತ್ಸಾಹ</div>
+                <div class="pool-token" draggable="true" id="tok5" ondragstart="tokenDrag(event)">ಅಮೊರೈಟರ ಸುಪ್ರಸಿದ್ಧ ದೊರೆ</div>
+                <div class="pool-token" draggable="true" id="tok6" ondragstart="tokenDrag(event)">ಕ್ಯೂನಿಫಾರ್ಮ್ ದಾಖಲೆಗಳು</div>
+            </div>
+            <div class="drop-targets" style="flex:2; display:flex; flex-direction:column; gap:15px;">
+                <div class="arcade-drop-zone" ondragover="allowDrop(event)" ondrop="tokenDrop(event, 'hammu')">
+                    <h3>ದೊರೆ ಹಮ್ಮುರಬಿ (Hammurabi)</h3>
+                </div>
+                <div class="arcade-drop-zone" ondragover="allowDrop(event)" ondrop="tokenDrop(event, 'nebu')">
+                    <h3>ದೊರೆ ನೆಬುಕಡ್ನಿಜರ್ (Nebuchadnezzar)</h3>
+                </div>
+            </div>
+        </div>
+        <button class="fire-btn" onclick="verifyScreen2()">ಗೇಟ್ಸ್ ಅನ್ ಲಾಕ್ ಮಾಡು</button>
+        <div class="game-status" id="status2"></div>
+    </div>
+
+    <!-- SCREEN 3 -->
+    <div id="screen3" class="game-screen">
+        <h2 class="screen-title">ಆಕ್ಟಿವಿಟಿ 3: ಜಾಗತಿಕ ನಾಗರಿಕತೆಗಳ ಮಹಾ ಸಂಗ್ರಾಮ (Epic 10 Quiz)</h2>
+        <div class="progress-hud"><div class="progress-hud-fill" id="hudBar"></div></div>
+        <div style="font-weight: bold; margin-bottom: 15px; color: var(--neon-purple);" id="arcadeQText">ಪ್ರಶ್ನೆ: 1 / 10</div>
+        <div id="arcadeQuestion" style="font-size: 1.3rem; font-weight: bold; margin-bottom: 20px;">ಲೋಡ್ ಆಗುತ್ತಿದೆ...</div>
+        <div id="arcadeOptions"></div>
+        <button class="fire-btn" id="nextArcadeBtn" style="display:none;" onclick="shiftArcadeQuestion()">ಮುಂದಿನ ಸವಾಲು ➔</button>
+        <div class="game-status" id="status3"></div>
+    </div>
+
+    <!-- SCREEN 4 -->
+    <div id="screen4" class="game-screen">
+        <h2 class="screen-title">ಆಕ್ಟಿವಿಟಿ 4: ಚೀನಾದ ದುಗುಡ ಮತ್ತು ಕಲೆ (Great Wall Cipher)</h2>
+        <div class="crypto-grid">
+            <div class="fib-q">1. 'ಚೀನಾದ ದುಗುಡ' ಅಥವಾ ದುಃಖದ ಪ್ರತೀಕ ಎಂದು ಕರೆಯಲ್ಪಡುವ ನದಿ ಯಾವುದು? <br><input type="text" class="arcade-input" id="cry1" placeholder="ನರ್ಮದಾ / ಹವಾಂಗೊ?"></div>
+            <div class="fib-q">2. ಚೀನಾದ ಮಹಾಗೋಡೆಯನ್ನು ಒಗ್ಗೂಡಿಸಲು ಆದೇಶವಿತ್ತ ಪ್ರಸಿದ್ಧ ಚಕ್ರವರ್ತಿ ಯಾರು? <br><input type="text" class="arcade-input" id="cry2" placeholder="ಕ್ವಿನ್ ಷಿಹುಯಾಂಗ್ / ಶಾಂಗ್?"></div>
+            <div class="fib-q">3. ಚೀನಾದಲ್ಲಿ ಉಗಮವಾಗಿ ಇಡೀ ಜಗತ್ತಿಗೆ ಹರಡಿದ ಅತ್ಯುನ್ನತ ಜೇಡಿಮಣ್ಣಿನ ಪಾತ್ರೆ ಕಲೆ ಯಾವುದು? <br><input type="text" class="arcade-input" id="cry3" placeholder="ಪಿಂಗಾಣಿ / ಕಂಚು?"></div>
+            <div class="fib-q">4. ಚೀನಿಯರ ಆರಂಭಿಕ ಬರವಣಿಗೆಯು ಯಾವ ಲಿಪಿಯಿಂದ ಪ್ರಾರಂಭವಾಯಿತು? <br><input type="text" class="arcade-input" id="cry4" placeholder="ಚಿತ್ರಲಿಪಿ / ಕ್ಯೂನಿಫಾರ್ಮ್?"></div>
+        </div>
+        <button class="fire-btn" onclick="verifyScreen4()">ಕೋಡ್ ಕ್ರಾಕ್ ಮಾಡು</button>
+        <div class="game-status" id="status4"></div>
+    </div>
+
+    <!-- SCREEN 5 -->
+    <div id="screen5" class="game-screen">
+        <h2 class="screen-title">ಆಕ್ಟಿವಿಟಿ 5: ರೋಮನ್ ಇತಿಹಾಸ ಮತ್ತು ಗ್ಲಾಡಿಯೇಟರ್ಸ್ (Binary Switches)</h2>
+        <div class="binary-row">
+            <span>1. ರೋಮನ್ ಸಮಾಜದಲ್ಲಿದ್ದ ಪೆಟ್ರಿಷಿಯನರು ಮತ್ತು ಪ್ಲೇಬಿಯನರಲ್ಲಿ ಪ್ಲೇಬಿಯನರು ಸಮಾಜದ ಉನ್ನತ ಭೂ ಮಾಲೀಕರಾಗಿದ್ದರು.</span>
+            <div class="switch-group"><button id="sw1_t" onclick="toggleSwitch(1,true)">ಹೌದು</button><button id="sw1_f" onclick="toggleSwitch(1,false)">ಅಲ್ಲ</button></div>
+        </div>
+        <div class="binary-row">
+            <span>2. ರೋಮನ್ನರ ಕಾಲದ ಕಲೋಸ್ಸಿಯಂ ಎಂಬುದು ಪ್ರೇಕ್ಷಕರ ಮನೋರಂಜನೆಗಾಗಿ ಬಳಸುತ್ತಿದ್ದ ಬೃಹತ್ ರಂಗಮಂದಿರವಾಗಿತ್ತು.</span>
+            <div class="switch-group"><button id="sw2_t" onclick="toggleSwitch(2,true)">ಹೌದು</button><button id="sw2_f" onclick="toggleSwitch(2,false)">ಅಲ್ಲ</button></div>
+        </div>
+        <div class="binary-row">
+            <span>3. ರೋಮ್ ದೇಶದಲ್ಲಿ ಜೂಲಿಯಸ್ ಸೀಸರ್ ನನ್ನು ಸೆನೆಟ್ಟಿನ ಆವರಣದಲ್ಲಿ ಅವನ ಸ್ನೇಹಿತ ಬ್ರೂಟಸ್ ಮತ್ತು ಸಹವರ್ತಿಗಳು ಕೊಂದರು.</span>
+            <div class="switch-group"><button id="sw3_t" onclick="toggleSwitch(3,true)">ಹೌದು</button><button id="sw3_f" onclick="toggleSwitch(3,false)">ಅಲ್ಲ</button></div>
+        </div>
+        <div class="binary-row">
+            <span>4. ರೋಮನ್ನರ ಆಳ್ವಿಕೆಯು ಜಗತ್ತಿಗೆ ಅತ್ಯಂತ ಪ್ರಸಿದ್ಧವಾದ ಗ್ರೀಕ್ ಭಾಷೆ ಮತ್ತು ಸಾಹಿತ್ಯವನ್ನು ಕೊಡುಗೆಯಾಗಿ ನೀಡಿತು.</span>
+            <div class="switch-group"><button id="sw4_t" onclick="toggleSwitch(4,true)">ಹೌದು</button><button id="sw4_f" onclick="toggleSwitch(4,false)">ಅಲ್ಲ</button></div>
+        </div>
+        <button class="fire-btn" onclick="verifyScreen5()">ಸ್ವಿಚ್ ಪರಿಶೀಲಿಸು</button>
+        <div class="game-status" id="status5"></div>
+    </div>
+
+    <!-- SCREEN 6 -->
+    <div id="screen6" class="game-screen">
+        <h2 class="screen-title">ಆಕ್ಟಿವಿಟಿ 6: ಅಮೆರಿಕದ ಕೊಲಂಬಿಯಾ ಪೂರ್ವ ನಾಗರಿಕತೆಗಳು (Word Cipher)</h2>
+        <div class="cipher-arcade-box">
+            <div class="cipher-big-txt">ಯ ನ್ನ ಮಾ ರು ಮಾ ಯ</div>
+            <input type="text" class="arcade-input" id="cipInput1" placeholder="ಸರಿಯಾದ ನಾಗರಿಕತೆ/ವ್ಯಕ್ತಿ ಹೆಸರಿಸಿ">
+        </div>
+        <div class="cipher-arcade-box">
+            <div class="cipher-big-txt">ನ್ ನ್ಟಾ ಟ್ಲಾ ಟೆ ಷಿ ನೋ</div>
+            <input type="text" class="arcade-input" id="cipInput2" placeholder="ಆಸ್ಟೆಕರ ಸುಂದರ ರಾಜಧಾನಿ ಹೆಸರಿಸಿ">
+        </div>
+        <div class="cipher-arcade-box">
+            <div class="cipher-big-txt">ರ್ಯ ಸೂ ದೆ ಕ ವು ನ್</div>
+            <input type="text" class="arcade-input" id="cipInput3" placeholder="ಇಂಕಾಗಳ ಪ್ರಮುಖ ಆರಾಧ್ಯದೈವ ಹೆಸರಿಸಿ">
+        </div>
+        <button class="fire-btn" onclick="verifyScreen6()">ಪದಗಳ ಯುದ್ಧ ಮುಗಿಸು</button>
+        <div class="game-status" id="status6"></div>
+    </div>
+
+    <!-- SCREEN 7 -->
+    <div id="screen7" class="game-screen">
+        <h2 class="screen-title">ಆಕ್ಟಿವಿಟಿ 7: ಜಗತ್ತಿನ ಲಿಪಿಗಳು ಮತ್ತು ನಾಗರಿಕತೆಯ ಮ್ಯಾಟ್ರಿಕ್ಸ್ (Matrix Connector)</h2>
+        <div class="matrix-layout">
+            <div>
+                <div class="binary-row">1. ಈಜಿಪ್ಟಿನ ಲಿಪಿ</div>
+                <div class="binary-row">2. ಸುಮೇರಿಯನ್ನರ ಲಿಪಿ</div>
+                <div class="binary-row">3. ಜೂಲಿಯಸ್ ಸೀಸರ್</div>
+                <div class="binary-row">4. ರೋಮನ್ ಭಾಷೆ</div>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:20px; justify-content:center;">
+                <select id="matrixSel1" class="arcade-select">
+                    <option value="">ಮ್ಯಾಟ್ರಿಕ್ಸ್ ಕನೆಕ್ಟ್ ಮಾಡಿ</option>
+                    <option value="A">ಕ್ಯೂನಿಫಾರ್ಮ್ (Cuneiform)</option>
+                    <option value="B">ಹಿರೋಗ್ಲಿಫಿಕ್ಸ್ (Hieroglyphics)</option>
+                    <option value="C">ಲ್ಯಾಟಿನ್ ಭಾಷೆ ಮತ್ತು ಸಾಹಿತ್ಯ</option>
+                    <option value="D">ರೋಮನ್ ಸಾಮ್ರಾಜ್ಯದ ಸರ್ವಾಧಿಕಾರಿ</option>
+                </select>
+                <select id="matrixSel2" class="arcade-select">
+                    <option value="">ಮ್ಯಾಟ್ರಿಕ್ಸ್ ಕನೆಕ್ಟ್ ಮಾಡಿ</option>
+                    <option value="A">ಕ್ಯೂನಿಫಾರ್ಮ್ (Cuneiform)</option>
+                    <option value="B">ಹಿರೋಗ್ಲಿಫಿಕ್ಸ್ (Hieroglyphics)</option>
+                    <option value="C">ಲ್ಯಾಟಿನ್ ಭಾಷೆ ಮತ್ತು ಸಾಹಿತ್ಯ</option>
+                    <option value="D">ರೋಮನ್ ಸಾಮ್ರಾಜ್ಯದ ಸರ್ವಾಧಿಕಾರಿ</option>
+                </select>
+                <select id="matrixSel3" class="arcade-select">
+                    <option value="">ಮ್ಯಾಟ್ರಿಕ್ಸ್ ಕನೆಕ್ಟ್ ಮಾಡಿ</option>
+                    <option value="A">ಕ್ಯೂನಿಫಾರ್ಮ್ (Cuneiform)</option>
+                    <option value="B">ಹಿರೋಗ್ಲಿಫಿಕ್ಸ್ (Hieroglyphics)</option>
+                    <option value="C">ಲ್ಯಾಟಿನ್ ಭಾಷೆ ಮತ್ತು ಸಾಹಿತ್ಯ</option>
+                    <option value="D">ರೋಮನ್ ಸಾಮ್ರಾಜ್ಯದ ಸರ್ವಾಧಿಕಾರಿ</option>
+                </select>
+                <select id="matrixSel4" class="arcade-select">
+                    <option value="">ಮ್ಯಾಟ್ರಿಕ್ಸ್ ಕನೆಕ್ಟ್ ಮಾಡಿ</option>
+                    <option value="A">ಕ್ಯೂನಿಫಾರ್ಮ್ (Cuneiform)</option>
+                    <option value="B">ಹಿರೋಗ್ಲಿಫಿಕ್ಸ್ (Hieroglyphics)</option>
+                    <option value="C">ಲ್ಯಾಟಿನ್ ಭಾಷೆ ಮತ್ತು ಸಾಹಿತ್ಯ</option>
+                    <option value="D">ರೋಮನ್ ಸಾಮ್ರಾಜ್ಯದ ಸರ್ವಾಧಿಕಾರಿ</option>
+                </select>
+            </div>
+        </div>
+        <button class="fire-btn" onclick="verifyScreen7()">ಮ್ಯಾಟ್ರಿಕ್ಸ್ ಪೂರ್ಣಗೊಳಿಸು</button>
+        <div class="game-status" id="status7"></div>
+    </div>
+
+    <script>
+        let currentXP = 0;
+        function updateXP(amount) {
+            currentXP += amount;
+            document.getElementById("hudScore").innerText = `ಆರ್ಕೇಡ್ ಅಂಕಗಳು: ${currentXP}XP`;
+        }
+
+        function launchScreen(idx) {
+            document.querySelectorAll('.game-screen').forEach(el => el.classList.remove('active-screen'));
+            document.querySelectorAll('.arcade-card').forEach(el => el.classList.remove('active-zone'));
+            document.getElementById('screen' + idx).classList.add('active-screen');
+            event.target.classList.add('active-zone');
+        }
+
+        // Screen 1: Mummy Flip Cards Logic
+        const mummyData = [
+            {t: "ಹಿರೋಗ್ಲಿಫಿಕ್ಸ್", m: 1}, {t: "ಪವಿತ್ರ ಬರವಣಿಗೆ", m: 1},
+            {t: "ಮಮ್ಮಿ", m: 2}, {t: "ಸಂರಕ್ಷಿಸಲ್ಪಟ್ಟ ಶವ", m: 2},
+            {t: "ಫ್ಯಾರೊ", m: 3}, {t: "ದೊಡ್ಡ ಮನೆ ನಿವಾಸಿ", m: 3},
+            {t: "ಕ್ಲಿಯೋಪಾತ್ರ", m: 4}, {t: "ಈಜಿಪ್ಟಿನ ಕಡೆಯ ರಾಣಿ", m: 4}
+        ];
+        let mummyFlipped = [];
+        function initMummyGame() {
+            let zone = document.getElementById("mummyGrid");
+            zone.innerHTML = "";
+            mummyData.sort(() => Math.random() - 0.5);
+            mummyData.forEach((c, idx) => {
+                let div = document.createElement("div");
+                div.classList.add("arcade-flip-card");
+                div.dataset.idx = idx;
+                div.dataset.m = c.m;
+                div.innerText = "𓂀";
+                div.onclick = function() {
+                    if(mummyFlipped.length < 2 && !this.classList.contains('flipped') && !this.classList.contains('matched')) {
+                        this.classList.add('flipped');
+                        this.innerText = mummyData[this.dataset.idx].t;
+                        mummyFlipped.push(this);
+                        if(mummyFlipped.length === 2) {
+                            if(mummyFlipped[0].dataset.m === mummyFlipped[1].dataset.m) {
+                                mummyFlipped[0].classList.add('matched');
+                                mummyFlipped[1].classList.add('matched');
+                                mummyFlipped = [];
+                                updateXP(50);
+                            } else {
+                                setTimeout(() => {
+                                    mummyFlipped[0].classList.remove('flipped'); mummyFlipped[0].innerText = "𓂀";
+                                    mummyFlipped[1].classList.remove('flipped'); mummyFlipped[1].innerText = "𓂀";
+                                    mummyFlipped = [];
+                                }, 1000);
+                            }
+                        }
+                    }
+                };
+                zone.appendChild(div);
+            });
+        }
+        initMummyGame();
+
+        // Screen 2: Babylon Grid Sorting
+        function allowDrop(ev) { ev.preventDefault(); }
+        function tokenDrag(ev) { ev.dataTransfer.setData("text", ev.target.id); }
+        function tokenDrop(ev, section) {
+            ev.preventDefault();
+            let id = ev.dataTransfer.getData("text");
+            let node = document.getElementById(id);
+            node.dataset.section = section;
+            ev.target.appendChild(node);
+        }
+        function verifyScreen2() {
+            let win = true;
+            const key = {tok1:'nebu', tok2:'hammu', tok3:'hammu', tok4:'nebu', tok5:'hammu', tok6:'hammu'};
+            for(let id in key) {
+                let node = document.getElementById(id);
+                if(!node || node.dataset.section !== key[id]) win = false;
+            }
+            if(win) updateXP(150);
+            showStatus(2, win ? "ಅದ್ಭುತ ಸರ್! ಬ್ಯಾಬಿಲೋನ್ ಗೇಟ್ಸ್ ಅನ್ ಲಾಕ್ ಆಗಿವೆ!" : "ವರ್ಗೀಕರಣದಲ್ಲಿ ದೋಷವಿದೆ, ಮತ್ತೊಮ್ಮೆ ಯೋಚಿಸಿ.", win);
+        }
+
+        // Screen 3: Epic 10 Quiz System
+        const questionsList = [
+            { q: "1. ಜಗತ್ತಿನ ಬಹುತೇಕ ಎಲ್ಲಾ ಶ್ರೇಷ್ಠ ನಾಗರಿಕತೆಗಳು ಎಲ್ಲಿ ಉಗಮವಾಗಿವೆ?", o: ["ಮರುಭೂಮಿಗಳಲ್ಲಿ", "ನದಿ ಬಯಲು ಪ್ರದೇಶಗಳಲ್ಲಿ", "ಪರ್ವತ ಶ್ರೇಣಿಗಳಲ್ಲಿ"], c: 1 },
+            { q: "2. ಈಜಿಪ್ಟಿನ ವೈಭವಕ್ಕೆ ಮತ್ತು ಅಲ್ಲಿನ ಕೃಷಿ ಸಮೃದ್ಧಿಗೆ ಕಾರಣವಾದ ಆಫ್ರಿಕಾದ ಪ್ರಮುಖ ನದಿ ಯಾವುದು?", o: ["ನೈಲ್ ನದಿ", "ಕಾಂಗೋ ನದಿ", "ಲಿಂಪೋಪೋ ನದಿ"], c: 0 },
+            { q: "3. ಮೆಸಪಟೊಮಿಯ ನಾಗರಿಕತೆಯು ಯಾವ ಎರಡು ನದಿಗಳ ನಡುವಿನ ಕಣಿವೆಯಲ್ಲಿ ಚಿಗುರೊಡೆಯಿತು?", o: ["ಸಿಂಧೂ ಮತ್ತು ಸರಸ್ವತಿ", "ಯೂಫ್ರೇಟಿಸ್ ಮತ್ತು ಟೈಗ್ರಿಸ್", "ಹವಾಂಗೊ ಮತ್ತು ಯಾಂಗ್ಟ್ಸೆ"], c: 1 },
+            { q: "4. ಮೆಸಪಟೊಮಿಯದ ಮೊಟ್ಟಮೊದಲ ಬರವಣಿಗೆಯ ಲಿಪಿಯಾದ 'ಕ್ಯೂನಿಫಾರ್ಮ್' ಅನ್ನು ಅಭಿವೃದ್ಧಿಪಡಿಸಿದವರು ಯಾರು?", o: ["ಬ್ಯಾಬಿಲೋನಿಯನ್ನರು", "ಅಸ್ಸಿರಿಯನ್ನರು", "ಸುಮೇರಿಯನ್ನರು"], c: 2 },
+            { q: "5. ಚೀನಾ ನಾಗರಿಕತೆಯ ಪ್ರಥಮ ಐತಿಹಾಸಿಕ ರಾಜಮನೆತನ ಯಾವುದು?", o: ["ಚೌ ಮನೆತನ", "ಶಾಂಗ್ ಮನೆತನ", "ಹ್ಯಾನ್ ಮನೆತನ"], correct: 1, c: 1 },
+            { q: "6. ಗ್ರೀಸ್ ದೇಶದ ಮೆಸಿಡೋನಿಯಾದ ಪ್ರಸಿದ್ಧ ರಾಜ ಹಾಗೂ ಅರಿಸ್ಟಾಟಲ್ ನ ಪ್ರೀತಿಯ ಶಿಷ್ಯ ಯಾರು?", o: ["ಜೂಲಿಯಸ್ ಸೀಸರ್", "ಅಲೆಕ್ಸಾಂಡರ್", "ಆಗಸ್ಟಸ್"], c: 1 },
+            { q: "7. ರೋಮನ್ ಗಣರಾಜ್ಯದ ಅತ್ಯಂತ ಪ್ರಭಾವಿ ಮತ್ತು ಪ್ರಖ್ಯಾತ ಪ್ರತಿಷ್ಠಿತರ ರಾಜಕೀಯ ಸಲಹಾ ಸಂಸ್ಥೆ ಯಾವುದು?", o: ["ಸೆನೆಟ್", "ಅಸೆಂಬ್ಲಿ", "ಕೌನ್ಸಿಲ್"], c: 0 },
+            { q: "8. ರೋಮನ್ನರು ಸಿಸಿಲಿ ದ್ವೀಪದ ಹಿಡಿತಕ್ಕಾಗಿ ಕಾರ್ಥೇಜ್ ನಗರದ ಜೊತೆ ನಡೆಸಿದ 118 ವರ್ಷಗಳ ಯುದ್ಧ ಯಾವುದು?", o: ["ಪೀಲೋಪೋನೇಷಿಯನ್ ಯುದ್ಧ", "ಟ್ರೋಜನ್ ಯುದ್ಧ", "ಪ್ಯೂನಿಕ್ ಯುದ್ಧ"], c: 2 },
+            { q: "9. ಪ್ರಾಚೀನ ಅಮೆರಿಕದ ಇಂಡಿಯನ್ ಮೂಲನಿವಾಸಿಗಳಲ್ಲೇ ಅತ್ಯಂತ ಅಭಿವೃದ್ಧಿ ಹೊಂದಿದ 'ಮಾಯಾ' ಸಂಸ್ಕೃತಿಯ ನೆಲೆ ಎಲ್ಲಿದೆ?", o: ["ಪೆರು ದೇಶ", "ಮೆಕ್ಸಿಕೋದ ಯುಕಟೆನ್", "ಅರ್ಜೆಂಟೈನಾ"], c: 1 },
+            { q: "10. ದಕ್ಷಿಣ ಅಮೆರಿಕದ ಪೆರು ದೇಶದಲ್ಲಿ 15 ಮತ್ತು 16ನೇ ಶತಮಾನದಲ್ಲಿ ವೈಭವದಿಂದ ಏಳಿಗೆ ಕಂಡ ಸಾಮ್ರಾಜ್ಯ ಯಾವುದು?", o: ["ಇಂಕಾ ಸಾಮ್ರಾಜ್ಯ", "ಆಸ್ಟೆಕ್ ಸಾಮ್ರಾಜ್ಯ", "ಮಾಯಾ ಸಾಮ್ರಾಜ್ಯ"], c: 0 }
+        ];
+
+        let qIndex = 0; let arcadeScore = 0; let activeFlag = true;
+        function loadArcadeQuestion() {
+            activeFlag = true;
+            document.getElementById("nextArcadeBtn").style.display = "none";
+            document.getElementById("status3").style.display = "none";
+            let data = questionsList[qIndex];
+            document.getElementById("arcadeQText").innerText = `ಪ್ರಶ್ನೆ: ${qIndex + 1} / 10`;
+            document.getElementById("hudBar").style.width = `${(qIndex+1)*10}%`;
+            document.getElementById("arcadeQuestion").innerText = data.q;
+            
+            let zone = document.getElementById("arcadeOptions");
+            zone.innerHTML = "";
+            data.o.forEach((opt, idx) => {
+                let div = document.createElement("div");
+                div.classList.add("quiz-arcade-row");
+                div.innerText = opt;
+                div.onclick = function() {
+                    if(!activeFlag) return;
+                    activeFlag = false;
+                    if(idx === data.c) {
+                        this.classList.add("correct-glow");
+                        arcadeScore++;
+                        updateXP(10);
+                        showStatus(3, "ಸರಿಯಾದ ಉತ್ತರ! ಅದ್ಭುತ ಜ್ಞಾನ.", true);
+                    } else {
+                        this.classList.add("wrong-glow");
+                        zone.children[data.c].classList.add("correct-glow");
+                        showStatus(3, "ಉತ್ತರ ತಪ್ಪಾಗಿದೆ! ಸರಿಯಾದದ್ದನ್ನು ಹಸಿರು ಬಣ್ಣದಲ್ಲಿ ಗುರುತಿಸಲಾಗಿದೆ.", false);
+                    }
+                    document.getElementById("nextArcadeBtn").style.display = "inline-block";
+                };
+                zone.appendChild(div);
+            });
+        }
+        function shiftArcadeQuestion() {
+            qIndex++;
+            if(qIndex < questionsList.length) {
+                loadArcadeQuestion();
+            } else {
+                document.getElementById("arcadeQText").innerText = "ಮಿಷನ್ ಕಂಪ್ಲೀಟ್!";
+                document.getElementById("arcadeQuestion").innerText = `ಮಕ್ಕಳ ಒಟ್ಟು ಸ್ಕೋರ್: ${arcadeScore} / 10`;
+                document.getElementById("arcadeOptions").innerHTML = "";
+                document.getElementById("nextArcadeBtn").style.display = "none";
+                showStatus(3, arcadeScore >= 7 ? "ಅಪ್ರತಿಮ ಇತಿಹಾಸ ಸಾಧಕರು!" : "ಉತ್ತಮ ಪ್ರಯತ್ನ!", true);
+            }
+        }
+        loadArcadeQuestion();
+
+        // Screen 4: Great Wall Cipher
+        function verifyScreen4() {
+            let a1 = document.getElementById("cry1").value.trim();
+            let a2 = document.getElementById("cry2").value.trim();
+            let a3 = document.getElementById("cry3").value.trim();
+            let a4 = document.getElementById("cry4").value.trim();
+
+            if((a1 === "ಹವಾಂಗೊ" || a1 === "ಹವಾಂಗೋ") && a2 === "ಕ್ವಿನ್ ಷಿಹುಯಾಂಗ್" && a3 === "ಪಿಂಗಾಣಿ" && a4 === "ಚಿತ್ರಲಿಪಿ") {
+                updateXP(100);
+                showStatus(4, "ವಾಹ್ ಸರ್! ಚೀನಾದ ರಹಸ್ಯ ಕೋಡ್ ಸಂಪೂರ್ಣ ಭೇದಿಸಿದ್ದೀರಿ!", true);
+            } else {
+                showStatus(4, "ಕೆಲವು ಉತ್ತರಗಳು ತಪ್ಪಾಗಿವೆ. ಸುಳಿವು: ಹವಾಂಗೊ, ಕ್ವಿನ್ ಷಿಹುಯಾಂಗ್, ಪಿಂಗಾಣಿ, ಚಿತ್ರಲಿಪಿ.", false);
+            }
+        }
+
+        // Screen 5: Binary Switches
+        let swStatus = {1:null, 2:null, 3:null, 4:null};
+        function toggleSwitch(num, flag) {
+            swStatus[num] = flag;
+            document.getElementById(`sw${num}_t`).classList.remove('switch-on');
+            document.getElementById(`sw${num}_f`).classList.remove('switch-on');
+            if(flag) document.getElementById(`sw${num}_t`).classList.add('switch-on');
+            else document.getElementById(`sw${num}_f`).classList.add('switch-on');
+        }
+        function verifyScreen5() {
+            if(swStatus[1] === false && swStatus[2] === true && swStatus[3] === true && swStatus[4] === false) {
+                updateXP(100);
+                showStatus(5, "ರೋಮನ್ ಸ್ವಿಚ್ ಗೇಮ್ ಯಶಸ್ವಿಯಾಗಿದೆ! ಎಲ್ಲಾ ಉತ್ತರಗಳು ಸರಿ.", true);
+            } else {
+                showStatus(5, "ದೋಷವಿದೆ ಪರಿಶೀಲಿಸಿ! (ಪೆಟ್ರಿಷಿಯನರು ಮಾಲೀಕರಾಗಿದ್ದರು ಮತ್ತು ರೋಮ್ ನದ್ದು ಲ್ಯಾಟಿನ್ ಭಾಷೆ)", false);
+            }
+        }
+
+        // Screen 6: Word Cipher
+        function verifyScreen6() {
+            let i1 = document.getElementById("cipInput1").value.replace(/\s+/g, '');
+            let i2 = document.getElementById("cipInput2").value.replace(/\s+/g, '');
+            let i3 = document.getElementById("cipInput3").value.replace(/\s+/g, '');
+
+            if(i1 === "ಮಾಯನ್ನರು" && i2 === "ಟೆನೋಷಿಟ್ಲಾನ್" && i3 === "ಸೂರ್ಯದೇವ") {
+                updateXP(100);
+                showStatus(6, "ಹೊಸ ಜಗತ್ತಿನ ರಹಸ್ಯ ಪದಗಳನ್ನು ಮಕ್ಕಳು ಪತ್ತೆ ಹಚ್ಚಿದ್ದಾರೆ!", true);
+            } else {
+                showStatus(6, "ಅಕ್ಷರಗಳ ಜೋಡಣೆ ತಪ್ಪಾಗಿದೆ (ಸುಳಿವು: ಮಾಯನ್ನರು, ಟೆನೋಷಿಟ್ಲಾನ್, ಸೂರ್ಯದೇವ).", false);
+            }
+        }
+
+        // Screen 7: Connector Matrix
+        function verifyScreen7() {
+            let s1 = document.getElementById("matrixSel1").value;
+            let s2 = document.getElementById("matrixSel2").value;
+            let s3 = document.getElementById("matrixSel3").value;
+            let s4 = document.getElementById("matrixSel4").value;
+
+            if(s1 === 'B' && s2 === 'A' && s3 === 'D' && s4 === 'C') {
+                updateXP(200);
+                showStatus(7, "ಅದ್ಭುತ Chandrakant ಸರ್! ಮ್ಯಾಟ್ರಿಕ್ಸ್ ಯಶಸ್ವಿಯಾಗಿದೆ. 4ನೇ ಪಾಠ ಸಂಪೂರ್ಣ ಮುಕ್ತಾಯವಾಯಿತು!", true);
+            } else {
+                showStatus(7, "ತಪ್ಪಾದ ಜೋಡಣೆ, ಲಿಪಿ ಮತ್ತು ಐತಿಹಾಸಿಕ ವ್ಯಕ್ತಿಗಳನ್ನು ಮತ್ತೊಮ್ಮೆ ಗಮನಿಸಿ.", false);
+            }
+        }
+
+        function showStatus(screenNum, text, isSuccess) {
+            let box = document.getElementById("status" + screenNum);
+            box.style.display = "block";
+            box.innerText = text;
+            box.style.background = isSuccess ? "rgba(0, 184, 148, 0.15)" : "rgba(214, 48, 49, 0.1)";
+            box.style.color = isSuccess ? "#00b894" : "#d63031";
+            box.style.border = isSuccess ? "1px solid #00b894" : "1px solid #d63031";
+        }
+    </script>
+</body>
+</html>

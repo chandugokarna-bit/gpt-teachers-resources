@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಇಕೋ-ಲೈಫ್ ಸಿಮ್ಯುಲೇಟರ್ ೧೫.೦ - ಅರ್ಥಶಾಸ್ತ್ರದ ಪರಿಚಯ</title>
+    <style>
+        :root {
+            --eco-purple: #6c5ce7;
+            --money-green: #00b894;
+            --gold-bright: #f1c40f;
+            --dark-space: #090a0f;
+            --pink-neon: #ff007f;
+            --panel-glass: rgba(20, 24, 39, 0.96);
+            --danger-red: #d63031;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Verdana, sans-serif; }
+
+        body {
+            background: var(--dark-space);
+            background-image: linear-gradient(135deg, #0f172a 0%, #020617 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #ffffff;
+        }
+
+        header.eco-header {
+            text-align: center;
+            padding: 25px;
+            background: var(--panel-glass);
+            border: 2px solid var(--money-green);
+            border-radius: 24px;
+            box-shadow: 0 0 30px rgba(0, 184, 148, 0.25);
+            margin-bottom: 25px;
+        }
+
+        header.eco-header h1 {
+            color: var(--money-green);
+            font-size: 2.4rem;
+            text-shadow: 0 0 12px rgba(0, 184, 148, 0.4);
+            margin-bottom: 5px;
+        }
+
+        header.eco-header p { color: #cbd5e1; font-size: 1.15rem; }
+
+        /* NEW CLASSROOM HUD: FAMILY BUDGET HEALTH */
+        .eco-hud {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #1e293b;
+            padding: 15px 25px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            border-left: 5px solid var(--gold-bright);
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .budget-bar-container {
+            background: #334155;
+            width: 45%;
+            height: 18px;
+            border-radius: 9px;
+            overflow: hidden;
+            border: 1px solid var(--money-green);
+        }
+
+        .budget-bar-fill {
+            background: linear-gradient(90deg, var(--money-green), #55efc4);
+            height: 100%;
+            width: 100%;
+            transition: width 0.4s ease;
+        }
+
+        /* Horizontal Track Row Menu */
+        .eco-track-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 35px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+
+        .eco-track-row::-webkit-scrollbar { height: 6px; }
+        .eco-track-row::-webkit-scrollbar-thumb { background: var(--money-green); border-radius: 3px; }
+
+        .eco-card {
+            background: #1e293b;
+            border: 1px solid #334155;
+            padding: 12px 25px;
+            border-radius: 14px;
+            cursor: pointer;
+            font-weight: bold;
+            white-space: nowrap;
+            transition: all 0.3s;
+        }
+
+        .eco-card:hover, .eco-card.active-mission {
+            background: var(--money-green);
+            color: #000000;
+            border-color: #ffffff;
+            box-shadow: 0 0 15px var(--money-green);
+            transform: translateY(-3px);
+        }
+
+        /* Core Screen Box */
+        .eco-arena {
+            background: var(--panel-glass);
+            border: 2px solid #334155;
+            border-radius: 24px;
+            padding: 35px;
+            min-height: 520px;
+            display: none;
+            box-shadow: 0 20px 45px rgba(0,0,0,0.5);
+        }
+
+        .eco-arena.active-arena { display: block; animation: budgetBoot 0.4s ease; }
+
+        @keyframes budgetBoot {
+            from { opacity: 0; transform: scale(0.98); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        h2.arena-title {
+            font-size: 1.65rem;
+            color: var(--gold-bright);
+            margin-bottom: 25px;
+            border-bottom: 1px dashed rgba(241, 196, 15, 0.3);
+            padding-bottom: 12px;
+        }
+
+        /* Grid Connector System */
+        .grid-connector-system {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .eco-node {
+            background: #1e293b;
+            padding: 18px;
+            border-radius: 14px;
+            cursor: pointer;
+            border: 2px solid #334155;
+            font-weight: bold;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .eco-node:hover { border-color: var(--money-green); background: #223047; }
+        .eco-node.node-selected { background: var(--money-green); color: black; border-color: white; font-weight: bold; box-shadow: 0 0 12px var(--money-green); }
+
+        /* Quiz Row Elements */
+        .quiz-box-row {
+            background: #1e293b;
+            border: 2px solid #334155;
+            padding: 16px;
+            margin: 12px 0;
+            border-radius: 14px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+        }
+
+        .quiz-box-row:hover { border-color: var(--money-green); transform: translateX(5px); }
+        .quiz-box-row.correct-glow { background: rgba(0, 184, 148, 0.2); border-color: var(--money-green); color: #55efc4; }
+        .quiz-box-row.wrong-glow { background: rgba(214, 48, 49, 0.2); border-color: var(--danger-red); color: #ff7675; }
+
+        /* Inputs Base styling */
+        .smart-eco-input {
+            background: #05070c;
+            border: 2px solid #334155;
+            border-radius: 10px;
+            padding: 12px;
+            font-size: 1.1rem;
+            color: var(--gold-bright);
+            font-weight: bold;
+            outline: none;
+            width: 100%;
+            max-width: 320px;
+            margin-top: 8px;
+        }
+
+        .smart-eco-input:focus { border-color: var(--money-green); }
+
+        /* Mining Grid */
+        .mining-card-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        .ore-token {
+            background: #1e293b;
+            border: 2px solid #334155;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .ore-token.active-token { background: #6c5ce7; border-color: white; }
+
+        /* Universal Action Buttons */
+        .action-btn {
+            background: linear-gradient(135deg, var(--money-green), #55efc4);
+            color: black;
+            border: none;
+            padding: 14px 35px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 25px;
+            box-shadow: 0 5px 15px rgba(0, 184, 148, 0.3);
+        }
+
+        .action-btn:hover { transform: scale(1.02); box-shadow: 0 8px 25px rgba(0, 184, 148, 0.5); }
+
+        .eco-alert-box {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 12px;
+            font-weight: bold;
+            display: none;
+            font-size: 1.1rem;
+            border: 1px solid transparent;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="eco-header">
+        <h1>ಅರ್ಥಶಾಸ್ತ್ರ ವಿಭಾಗ: ಇಕೋ-ಲೈಫ್ ಲ್ಯಾಬ್</h1>
+        <p>ಸಿಮ್ಯುಲೇಟರ್ ಮಾದರಿ ೧೫.೦ • ಸಂಪನ್ಮೂಲಗಳ ಮಿತ ಬಳಕೆ ಮತ್ತು ಬಜೆಟ್ ನಿರ್ವಹಣೆಯ ಡಿಜಿಟಲ್ ಆಟಗಳು</p>
+    </div>
+
+    <div class="eco-hud">
+        <span>ಕುಟುಂಬದ ಆರ್ಥಿಕ ಬಜೆಟ್ ಆರೋಗ್ಯ:</span>
+        <div class="budget-bar-container"><div class="budget-bar-fill" id="budgetFill"></div></div>
+        <span style="color: var(--gold-bright);" id="liveXPCount">ಇಕೋ ಕಾಯಿನ್ಸ್: 0000 EC</span>
+    </div>
+
+    <div class="eco-track-row">
+        <div class="eco-card active-mission" id="lvlBtn1" onclick="loadLevel(1)">1. ಪದದ ಗ್ರೀಕ್ ಮೂಲ</div>
+        <div class="eco-card" id="lvlBtn2" onclick="loadLevel(2)">2. ಆಸೆಗಳು Vs ಸಂಪನ್ಮೂಲ</div>
+        <div class="eco-card" id="lvlBtn3" onclick="loadLevel(3)">3. ಎಪಿಕ್ 10 ಇಕೋ ಕ್ವಿಜ್</div>
+        <div class="eco-card" id="lvlBtn4" onclick="loadLevel(4)">4. ಚಿಂತಕರ ವ್ಯಾಖ್ಯಾನಗಳು</div>
+        <div class="eco-card" id="lvlBtn5" onclick="loadLevel(5)">5. ೪ ಮೂಲ ಆರ್ಥಿಕ ಕ್ರಿಯೆಗಳು</div>
+        <div class="eco-card" id="lvlBtn6" onclick="loadLevel(6)">6. ಆದ್ಯತೆಯ ಬಜೆಟ್ ಹಂಚಿಕೆ</div>
+        <div class="eco-card" id="lvlBtn7" onclick="loadLevel(7)">7. ಅರ್ಥಶಾಸ್ತ್ರದ ಮಹತ್ವ ಮ್ಯಾಟ್ರಿಕ್ಸ್</div>
+    </div>
+
+    <div id="level1" class="eco-arena active-arena">
+        <h2 class="arena-title">ಹಂತ 1: ಇಕನಾಮಿಕ್ಸ್ ಪದದ ಭಾಷಾ ಮೂಲ (Language Node Connector)</h2>
+        <p style="margin-bottom: 15px;">ಗೆಳೆಯಾ, ಇಂಗ್ಲಿಷ್‌ನ 'Economics' ಪದದ ಮೂಲ ಗ್ರೀಕ್ ಪದ ಮತ್ತು ಅದರ ಅರ್ಥವನ್ನು ಸರಿಯಾಗಿ ಲಿಂಕ್ ಮಾಡು:</p>
+        <div class="grid-connector-system">
+            <div>
+                <div class="eco-node" id="l1_nodeL1" onclick="connectEcoNodes('L', 'l1_nodeL1', 1)">ಗ್ರೀಕ್ ಭಾಷೆಯ ಮೂಲ ಪದಗಳು</div>
+                <div class="eco-node" id="l1_nodeL2" style="margin-top:15px;" onclick="connectEcoNodes('L', 'l1_nodeL2', 2)">ಅರ್ಥಶಾಸ್ತ್ರ ಶಬ್ದದ ನೈಜ ಅರ್ಥ</div>
+            </div>
+            <div>
+                <div class="eco-node" id="l1_nodeR1" onclick="connectEcoNodes('R', 'l1_nodeR1', 2)">ಗೃಹ ನಿರ್ವಹಣೆ (Household Management)</div>
+                <div class="eco-node" id="l1_nodeR2" style="margin-top:15px;" onclick="connectEcoNodes('R', 'l1_nodeR2', 1)">ಓಯಿಕೋಸ್ (Oikos) ಮತ್ತು ನೋಮೋಸ್ (Nomos)</div>
+            </div>
+        </div>
+        <div class="eco-alert-box" id="alert1"></div>
+    </div>
+
+    <div id="level2" class="eco-arena">
+        <h2 class="arena-title">ಹಂತ 2: ಮಾನವನ ಆಸೆಗಳು ಮತ್ತು ಕೊರತೆಯ ಸತ್ಯ (Scarcity & Choice Crypt)</h2>
+        <div style="display:flex; flex-direction:column; gap:20px;">
+            <div class="fib-q">1. ಪ್ರತಿಯೊಬ್ಬ ಮನುಷ್ಯನಿಗೆ ಇರುವ ಆಸೆಗಳು ಹಾಗೂ ಆಕಾಂಕ್ಷೆಗಳ ಪ್ರಮಾಣ ಎಂತಹುದು? <br><input type="text" class="smart-eco-input" id="cryptIn1" placeholder="ಅಪರಿಮಿತ / ಅತ್ಯಂತ ಕಡಿಮೆ?"></div>
+            <div class="fib-q">2. ಆಸೆಗಳನ್ನು ಪೂರೈಸಿಕೊಳ್ಳಲು ನಮ್ಮ ಪ್ರಕೃತಿಯಲ್ಲಿರುವ ಮತ್ತು ಆದಾಯದ ರೂಪದಲ್ಲಿರುವ ಸಂಪನ್ಮೂಲಗಳು ಎಂತಹುದು? <br><input type="text" class="smart-eco-input" id="cryptIn2" placeholder="ಮಿತವಾದ / ಕೊರತೆಯುಳ್ಳ?"></div>
+            <div class="fib-q">3. ಸಂಪನ್ಮೂಲಗಳ ಕೊರತೆಯಿರುವುದರಿಂದ ಲಭ್ಯವಿರುವ ಮಿತ ಸಂಪನ್ಮೂಲಗಳಲ್ಲಿ ನಮ್ಮ ಆದ್ಯತೆಗಳನ್ನು ಆರಿಸಿಕೊಳ್ಳುವ ಕ್ರಿಯೆಗೆ ಏನನ್ನುತ್ತಾರೆ? <br><input type="text" class="smart-eco-input" id="cryptIn3" placeholder="ಆಯ್ಕೆ (Choice) / ಯುದ್ಧ?"></div>
+        </div>
+        <button class="action-btn" onclick="verifyLevel2()">ಕೊರತೆಯ ಕೋಡ್ ಕ್ರಾಕ್ ಮಾಡು</button>
+        <div class="eco-alert-box" id="alert2"></div>
+    </div>
+
+    <div id="level3" class="eco-arena">
+        <h2 class="arena-title">ಹಂತ 3: ಆರ್ಥಿಕ ಪ್ರಜ್ಞೆಯ ಮಹಾ ಸಂಗ್ರಾಮ (Epic 10 Economics Quiz)</h2>
+        <div class="progress-hud-bar"><div class="progress-bar-fill" id="barFill"></div></div>
+        <div style="font-weight: bold; margin-bottom: 15px; color: var(--gold-bright);" id="quizTrackTxt">ಪ್ರಶ್ನೆ ಕೋಡ್: 1 / 10</div>
+        <div id="quizQuestionText" style="font-size: 1.25rem; font-weight: bold; margin-bottom: 20px;">ಲೋಡ್ ಆಗುತ್ತಿದೆ...</div>
+        <div id="quizOptionsContainer"></div>
+        <button class="action-btn" id="nextQuizBtn" style="display:none;" onclick="nextEcoQuestion()">ಮುಂದಿನ ಆರ್ಥಿಕ ಹಂತಕ್ಕೆ ಚಲಿಸು ➔</button>
+        <div class="eco-alert-box" id="alert3"></div>
+    </div>
+
+    <div id="level4" class="eco-arena">
+        <h2 class="arena-title">ಹಂತ 4: ಜಾಗತಿಕ ಅರ್ಥಶಾಸ್ತ್ರದ ಪ್ರಸಿದ್ಧ ವ್ಯಾಖ್ಯಾನಗಳು (Thinkers Core Grid)</h2>
+        <div style="display:flex; flex-direction:column; gap:20px;">
+            <div class="fib-q">1. 1776ರಲ್ಲಿ 'ರಾಷ್ಟ್ರಗಳ ಸಂಪತ್ತು' ಗ್ರಂಥ ಬರೆದು, ಅರ್ಥಶಾಸ್ತ್ರವನ್ನು 'ಸಂಪತ್ತಿನ ವಿಜ್ಞಾನ' ಎಂದು ಕರೆದ ಪಿತಾಮಹ ಯಾರು? <br><input type="text" class="smart-eco-input" id="thinkIn1" placeholder="ಆಡಮ್ ಸ್ಮಿತ್ / ಆಲ್ಫ್ರೆಡ್ ಮಾರ್ಷಲ್?"></div>
+            <div class="fib-q">2. ಅರ್ಥಶಾಸ್ತ್ರವನ್ನು ಮಾನವನ ಕಲ್ಯಾಣಕ್ಕೆ ಹಾಗೂ ಸುಖ ಜೀವನದ 'ಕ್ಷೇಮಾಭ್ಯುದಯ ವಿಜ್ಞಾನ' ಎಂದು ವ್ಯಾಖ್ಯಾನಿಸಿದ ಬ್ರಿಟಿಷ್ ಚಿಂತಕ ಯಾರು? <br><input type="text" class="smart-eco-input" id="thinkIn2" placeholder="ಆಲ್ಫ್ರೆಡ್ ಮಾರ್ಷಲ್ / ರಾಬಿನ್ಸ್?"></div>
+        </div>
+        <button class="action-btn" onclick="verifyLevel4()">ವ್ಯಾಖ್ಯಾನ ದೃಢೀಕರಿಸು</button>
+        <div class="eco-alert-box" id="alert4"></div>
+    </div>
+
+    <div id="level5" class="eco-arena">
+        <h2 class="arena-title">ಹಂತ 5: ಅರ್ಥಶಾಸ್ತ್ರದ ೪ ಪ್ರಮುಖ ಮೂಲ ಆರ್ಥಿಕ ಕ್ರಿಯೆಗಳು (Core Economic Activities Mining)</h2>
+        <p style="margin-bottom: 15px;">ಗೆಳೆಯಾ, ಪಠ್ಯಪುಸ್ತಕದಲ್ಲಿ ತಿಳಿಸಿರುವ ಮಾನವನ **ನಾಲ್ಕು ಪ್ರಮುಖ ಮೂಲ ಆರ್ಥಿಕ ಕ್ರಿಯೆಗಳನ್ನು** ಮಾತ್ರ ಕ್ಲಿಕ್ ಮಾಡಿ ಗಣಿ ಮಾಡು:</p>
+        <div class="mining-card-grid">
+            <div class="ore-token" id="state1" onclick="toggleStateOre('state1', true)">1. ಉತ್ಪಾದನೆ (Production)</div>
+            <div class="ore-token" id="state2" onclick="toggleStateOre('state2', false)">2. ಕಳ್ಳತನ ಮಾಡುವುದು</div>
+            <div class="ore-token" id="state3" onclick="toggleStateOre('state3', true)">3. ಬಳಕೆ / ಉಪಭೋಗ (Consumption)</div>
+            <div class="ore-token" id="state4" onclick="toggleStateOre('state4', true)">4. ವಿನಿಮಯ (Exchange)</div>
+            <div class="ore-token" id="state5" onclick="toggleStateOre('state5', false)">5. ದೂರದರ್ಶನ ನೋಡುವುದು</div>
+            <div class="ore-token" id="state6" onclick="toggleStateOre('state6', true)">6. ವಿತರಣೆ (Distribution)</div>
+        </div>
+        <button class="action-btn" onclick="verifyLevel5()">ಆರ್ಥಿಕ ಕ್ರಿಯೆಗಳನ್ನು ದೃಢೀಕರಿಸು</button>
+        <div class="eco-alert-box" id="alert5"></div>
+    </div>
+
+    <div id="level6" class="eco-arena">
+        <h2 class="arena-title">ಹಂತ 6: ಆದ್ಯತೆಗಳ ಆಧಾರದ ಮೇಲೆ ಕುಟುಂಬದ ಬಜೆಟ್ ವಿಂಗಡಣೆ (Budget Priority Sorting)</h2>
+        <p style="margin-bottom: 15px;">ಮಿತವಾದ ಸಂಬಳದಲ್ಲಿ ಕುಟುಂಬ ನೆಮ್ಮದಿಯಿಂದ ಇರಲು ಮೊದಲು ಯಾವ ವಸ್ತುಗಳಿಗೆ ಬಜೆಟ್ ಕೊಡಬೇಕು? ಹಂಚು ಗೆಳೆಯಾ:</p>
+        <div style="display:flex; gap:25px;">
+            <div style="flex:1; display:flex; flex-direction:column; gap:10px;" id="organSource">
+                <div style="background:#2c3e50; padding:12px; border-radius:10px; cursor:grab; font-weight:bold;" draggable="true" id="org1" ondragstart="startOrganDrag(event)">ಪೌಷ್ಟಿಕ ಆಹಾರ ಮತ್ತು ಆರೋಗ್ಯ</div>
+                <div style="background:#2c3e50; padding:12px; border-radius:10px; cursor:grab; font-weight:bold;" draggable="true" id="org2" ondragstart="startOrganDrag(event)">ಮಕ್ಕಳ ಶಾಲಾ ಶಿಕ್ಷಣದ ಫೀಸ್</div>
+                <div style="background:#2c3e50; padding:12px; border-radius:10px; cursor:grab; font-weight:bold;" draggable="true" id="org3" ondragstart="startOrganDrag(event)">ದುಬಾರಿ ಮೊಬೈಲ್ ಮತ್ತು ಸಿನಿಮಾ</div>
+            </div>
+            <div style="flex:2; display:flex; flex-direction:column; gap:15px;">
+                <div style="background:rgba(0,0,0,0.3); border:2px dashed var(--money-green); padding:15px; border-radius:12px;" ondragover="allowOrganDrop(event)" ondrop="handleOrganDrop(event, 'first')">
+                    <h3>ಪ್ರಥಮ ಆದ್ಯತೆ (ಬದುಕಲು ಅತ್ಯಗತ್ಯವಾದದ್ದು)</h3>
+                </div>
+                <div style="background:rgba(0,0,0,0.3); border:2px dashed var(--money-green); padding:15px; border-radius:12px;" ondragover="allowOrganDrop(event)" ondrop="handleOrganDrop(event, 'second')">
+                    <h3>ದ್ವಿತೀಯ ಆದ್ಯತೆ (ಭವಿಷ್ಯದ ಬೆಳವಣಿಗೆಗೆ ಮುಖ್ಯ)</h3>
+                </div>
+                <div style="background:rgba(0,0,0,0.3); border:2px dashed var(--money-green); padding:15px; border-radius:12px;" ondragover="allowOrganDrop(event)" ondrop="handleOrganDrop(event, 'luxury')">
+                    <h3>ತೃತೀಯ ಆದ್ಯತೆ (ಐಷಾರಾಮಿ / ಸಾಲ ತರುವ ಖರ್ಚುಗಳು)</h3>
+                </div>
+            </div>
+        </div>
+        <button class="action-btn" onclick="verifyLevel6()">ಬಜೆಟ್ ವಿನ್ಯಾಸ ಪರಿಶೀಲಿಸು</button>
+        <div class="eco-alert-box" id="alert6"></div>
+    </div>
+
+    <div id="level7" class="eco-arena">
+        <h2 class="arena-title">ಹಂತ 7: ದೈನಂದಿನ ಜೀವನದಲ್ಲಿ ಅರ್ಥಶಾಸ್ತ್ರದ ಮಹತ್ವ (Economic Significance Matrix)</h2>
+        <p style="margin-bottom: 15px;">ಅಂತಿಮ ಹಂತ! ಅರ್ಥಶಾಸ್ತ್ರದ ತಿಳುವಳಿಕೆಯಿಂದ ಸಮಾಜಕ್ಕೆ ಸಿಗುವ ಲಾಭಗಳನ್ನು ಮ್ಯಾಚ್ ಮಾಡಿ ಸಿಮ್ಯುಲೇಶನ್ ಮುಗಿಸು ಗೆಳೆಯಾ:</p>
+        <div class="grid-connector-system">
+            <div class="eco-node" id="matL1" onclick="selectFinalMatrix('L', 'matL1', 'home')">ಕುಟುಂಬದಲ್ಲಿ ಬಜೆಟ್ ನಿರ್ವಹಣೆ ಮಾಡುವುದು</div>
+            <div class="eco-node" id="matR1" onclick="selectFinalMatrix('R', 'matR1', 'home')">ಮಿತ ಆದಾಯದಲ್ಲಿ ಗರಿಷ್ಠ ತೃಪ್ತಿ ಪಡೆಯುವ ಮಾರ್ಗ</div>
+            <div class="eco-node" id="matL2" onclick="selectFinalMatrix('L', 'matL2', 'govt')">ಸರ್ಕಾರವು ತೆರಿಗೆ ಮತ್ತು ಯೋಜನೆ ರೂಪಿಸುವುದು</div>
+            <div class="eco-node" id="matR2" onclick="selectFinalMatrix('R', 'matR2', 'govt')">ದೇಶದ ಬಡತನ ನಿವಾರಣೆ ಮತ್ತು ಆರ್ಥಿಕ ಪ್ರಗತಿಯ ಹಾದಿ</div>
+        </div>
+        <button class="action-btn" onclick="verifyLevel7()">ಇಕೋ ಮ್ಯಾಟ್ರಿಕ್ಸ್ ಕಂಪ್ಲೀಟ್ ಮಾಡು</button>
+        <div class="eco-alert-box" id="alert7"></div>
+    </div>
+
+    <script>
+        let ecoPoints = 0; let budgetHealth = 100;
+        function modifyHUDTracker(epChange, budgetDamage) {
+            ecoPoints += epChange;
+            budgetHealth = Math.max(10, budgetHealth - budgetDamage);
+            document.getElementById("liveXPCount").innerText = `ಇಕೋ ಕಾಯಿನ್ಸ್: ${ecoPoints.toString().padStart(4, '0')} EC`;
+            document.getElementById("budgetFill").style.width = `${budgetHealth}%`;
+        }
+
+        function loadLevel(levelIdx) {
+            document.querySelectorAll('.eco-arena').forEach(el => el.classList.remove('active-arena'));
+            document.querySelectorAll('.eco-card').forEach(el => el.classList.remove('active-mission'));
+            
+            document.getElementById('level' + levelIdx).classList.add('active-arena');
+            document.getElementById('lvlBtn' + levelIdx).classList.add('active-mission');
+        }
+
+        // Level 1 Logic
+        let nodeL = null; let nodeR = null;
+        function connectEcoNodes(side, id, matchVal) {
+            if(side === 'L') {
+                if(nodeL) document.getElementById(nodeL.id).classList.remove('node-selected');
+                nodeL = { id: id, match: matchVal };
+            } else {
+                if(nodeR) document.getElementById(nodeR.id).classList.remove('node-selected');
+                nodeR = { id: id, match: matchVal };
+            }
+            document.getElementById(id).classList.add('node-selected');
+
+            if(nodeL && nodeR) {
+                if(nodeL.match === nodeR.match) {
+                    document.getElementById(nodeL.id).style.background = "var(--money-green)";
+                    document.getElementById(nodeR.id).style.background = "var(--money-green)";
+                    modifyHUDTracker(100, 0);
+                    showEcoAlert(1, "ಸರಿಯಾದ ಜೋಡಣೆ ಗೆಳೆಯಾ! ಶಬ್ದದ ಗ್ರೀಕ್ ಮೂಲ ಸರಿಹೊಂದಿದೆ.", true);
+                    document.getElementById('lvlBtn1').style.background = "var(--money-green)";
+                } else {
+                    modifyHUDTracker(0, 10);
+                    showEcoAlert(1, "ತಪ್ಪಾದ ಜೋಡಣೆ, ಬಜೆಟ್ ಆರೋಗ್ಯ ಇಳಿಕೆಯಾಗಿದೆ! ಮತ್ತೊಮ್ಮೆ ಯೋಚಿಸು.", false);
+                }
+                nodeL = null; nodeR = null;
+            }
+        }
+
+        // Level 2 Logic
+        function verifyLevel2() {
+            let c1 = document.getElementById("cryptIn1").value.trim();
+            let c2 = document.getElementById("cryptIn2").value.trim();
+            let c3 = document.getElementById("cryptIn3").value.trim();
+
+            if(c1 === "ಅಪರಿಮಿತ" && (c2 === "ಮಿತವಾದ" || c2 === "ಕೊರತೆಯುಳ್ಳ") && c3 === "ಆಯ್ಕೆ") {
+                modifyHUDTracker(150, 0);
+                document.getElementById('lvlBtn2').style.background = "var(--money-green)";
+                showEcoAlert(2, "ಅದ್ಭುತ! ಆಸೆ ಮತ್ತು ಕೊರತೆಯ ನಡುವಿನ ಸಂಬಂಧದ ಕೋಡ್ ಯಶಸ್ವಿಯಾಗಿ ಅನ್ಲಾಕ್ ಆಗಿದೆ.", true);
+            } else {
+                modifyHUDTracker(0, 10);
+                showEcoAlert(2, "ಕೋಡ್ ತಪ್ಪಾಗಿದೆ ಗೆಳೆಯಾ! ಸುಳಿವು: ಅಪರಿಮಿತ, ಮಿತವಾದ, ಆಯ್ಕೆ.", false);
+            }
+        }
+
+        // Level 3: 10 Questions Quiz Data
+        const economicsQuizPool = [
+            { q: "1. ಮಾನವನ ದೈನಂದಿನ ಆರ್ಥಿಕ ಬದುಕು, ಹಣದ ಗಳಿಕೆ ಮತ್ತು ಬಳಕೆಯನ್ನು ಕುರಿತು ಅಧ್ಯಯನ ಮಾಡುವ ಶಾಸ್ತ್ರವೇನು?", o: ["ರಾಜ್ಯಶಾಸ್ತ್ರ", "ಸಮಾಜಶಾಸ್ತ್ರ", "ಅರ್ಥಶಾಸ್ತ್ರ (Economics)"], c: 2 },
+            { q: "2. ಜಗತ್ತಿನಲ್ಲಿ ವ್ಯವಸ್ಥಿತವಾಗಿ ಆರ್ಥಿಕ ಚಿಂತನೆಗಳನ್ನು ಮಂಡಿಸಿ 'ಅರ್ಥಶಾಸ್ತ್ರದ ಪಿತಾಮಹ' ಎನಿಸಿಕೊಂಡವರು ಯಾರು?", o: ["ಕೌಟಿಲ್ಯ", "ಆಡಮ್ ಸ್ಮಿತ್ (Adam Smith)", "ಆಲ್ಫ್ರೆಡ್ ಮಾರ್ಷಲ್"], c: 1 },
+            { q: "3. ಆಡಮ್ ಸ್ಮಿತ್ ಅವರು 1776 ರಲ್ಲಿ ಪ್ರಕಟಿಸಿದ ಇಡೀ ಜಗತ್ತನ್ನೇ ಬದಲಿಸಿದ ಪ್ರಸಿದ್ಧ ಆರ್ಥಿಕ ಗ್ರಂಥ ಯಾವುದು?", o: ["ದಿ ರಿಪಬ್ಲಿಕ್", "ರಾಷ್ಟ್ರಗಳ ಸಂಪತ್ತು (Wealth of Nations)", "ಪಾಲಿಟಿಕ್ಸ್"], c: 1 },
+            { q: "4. ಸರಕು ಮತ್ತು ಸೇವೆಗಳನ್ನು ಹಣ ಕೊಟ್ಟು ಕೊಂಡು, ನೇರವಾಗಿ ನಮ್ಮ ಆಸೆಗಳನ್ನು ಪೂರೈಸಿಕೊಳ್ಳುವ ಕ್ರಿಯೆಗೆ ಏನನ್ನುತ್ತಾರೆ?", o: ["ಉತ್ಪಾದನೆ", "ವಿನಿಮಯ", "ಬಳಕೆ / ಉಪಭೋಗ (Consumption)"], c: 2 },
+            { q: "5. ಮಾರುಕಟ್ಟೆಯಲ್ಲಿ ಉತ್ಪಾದಕರಿಂದ ಗ್ರಾಹಕರಿಗೆ ಸರಕುಗಳನ್ನು ತಲುಪಿಸಲು ಬಳಸುವ ಕೊಂಡಿ ಅಥವಾ ವ್ಯಾಪಾರ ಕ್ರಿಯೆ ಯಾವುದು?", o: ["ವಿನಿಮಯ (Exchange)", "ವಿತರಣೆ", "ಬಳಕೆ"], c: 0 },
+            { q: "6. ಉತ್ಪಾದನೆಯಿಂದ ಬಂದ ಒಟ್ಟು ಆದಾಯವನ್ನು ಭೂಮಿ, ಶ್ರಮ, ಬಂಡವಾಳಗಳಿಗೆ (ಬಾಡಿಗೆ, ಕೂಲಿ, ಬಡ್ಡಿ) ಹಂಚುವ ಕ್ರಿಯೆ ಯಾವುದು?", o: ["ಉತ್ಪಾದನೆ", "ವಿತರಣೆ (Distribution)", "ವಿನಿಮಯ"], c: 1 },
+            { q: "7. ನಾವು ಮಾಡುವ ಆರ್ಥಿಕ ಖರ್ಚುಗಳಲ್ಲಿ ಯಾವುದು ನಮ್ಮ ಭವಿಷ್ಯದ ಆರ್ಥಿಕ ಸುಭದ್ರತೆಗೆ ಅತ್ಯಂತ ಮುಖ್ಯವಾದುದಾಗಿದೆ?", o: ["ಸಿನಿಮಾ ನೋಡುವುದು", "ಉಳಿತಾಯ ಮತ್ತು ಹೂಡಿಕೆ (Savings)", "ಸಾಲ ಮಾಡುವುದು"], c: 1 },
+            { q: "8. ನಮ್ಮ ಭಾರತ ದೇಶದಲ್ಲಿ ಪ್ರಸ್ತುತ ಆರ್ಥಿಕ ವರ್ಷವು (Financial Year) ಪ್ರತಿ ವರ್ಷ ಯಾವಾಗ ಪ್ರಾರಂಭವಾಗುತ್ತದೆ?", o: ["ಜನವರಿ ೧ ರಂದು", "ಏಪ್ರಿಲ್ ೧ ರಂದು (April 1st)", "ಜೂನ್ ೧ ರಂದು"], c: 1 },
+            { q: "9. ಕುಟುಂಬವೊಂದರ ಆದಾಯ ಮತ್ತು ಖರ್ಚುಗಳನ್ನು ಸಮತೋಲನದಲ್ಲಿಡಲು ಶಿಕ್ಷಕರು ಸೂಚಿಸುವ ಅತ್ಯುತ್ತಮ ಯೋಜನೆ ಯಾವುದು?", o: ["ಕುಟುಂಬದ ಬಜೆಟ್ (Family Budget)", "ಹೆಚ್ಚಿನ ಸಾಲ ಮಾಡುವುದು", "ಖರ್ಚು ಹೆಚ್ಚಿಸುವುದು"], c: 0 },
+            { q: "10. ಅರ್ಥಶಾಸ್ತ್ರದ ಆಳವಾದ ಅಧ್ಯಯನದಿಂದ ದೇಶದಲ್ಲಿರುವ ಯಾವ ದೊಡ್ಡ ಸಾಮಾಜಿಕ ಸಮಸ್ಯೆಯನ್ನು ನಿವಾರಿಸಲು ಸಾಧ್ಯವಿದೆ?", o: ["ಕೇವಲ ಕೈಗಾರಿಕೆ", "ಬಡತನ ಮತ್ತು ನಿರುದ್ಯೋಗ (Poverty)", "ಜನಸಂಖ್ಯೆ ಹೆಚ್ಚಳ"], c: 1 }
+        ];
+
+        let qIdx = 0; let qScore = 0; let isQuizActive = true;
+        function loadQuizQuestion() {
+            isQuizActive = true;
+            document.getElementById("nextQuizBtn").style.display = "none";
+            document.getElementById("alert3").style.display = "none";
+            let qData = economicsQuizPool[qIdx];
+            document.getElementById("quizTrackTxt").innerText = `ಪ್ರಶ್ನೆ ಕೋಡ್: ${qIdx + 1} / 10`;
+            document.getElementById("barFill").style.width = `${(qIdx + 1) * 10}%`;
+            document.getElementById("quizQuestionText").innerText = qData.q;
+            
+            let container = document.getElementById("quizOptionsContainer");
+            container.innerHTML = "";
+            qData.o.forEach((opt, idx) => {
+                let div = document.createElement("div");
+                div.classList.add("quiz-box-row");
+                div.innerText = opt;
+                div.onclick = function() {
+                    if(!isQuizActive) return;
+                    isQuizActive = false;
+                    if(idx === qData.c) {
+                        this.classList.add("correct-glow");
+                        qScore++; modifyHUDTracker(30, 0);
+                        showEcoAlert(3, "ಸರಿಯಾದ ಆರ್ಥಿಕ ನಿರ್ಧಾರ! ಬಜೆಟ್ ಆರೋಗ್ಯಕರವಾಗಿದೆ.", true);
+                    } else {
+                        this.classList.add("wrong-glow");
+                        container.children[qData.c].classList.add("correct-glow");
+                        modifyHUDTracker(0, 10);
+                        showEcoAlert(3, "ತಪ್ಪು ಆರ್ಥಿಕ ನಿರ್ಧಾರ! ಕುಟುಂಬದ ಬಜೆಟ್ ಆರೋಗ್ಯ ಇಳಿಕೆಯಾಗಿದೆ.", false);
+                    }
+                    document.getElementById("nextQuizBtn").style.display = "inline-block";
+                };
+                container.appendChild(div);
+            });
+        }
+        function nextEcoQuestion() {
+            qIdx++;
+            if(qIdx < economicsQuizPool.length) {
+                loadQuizQuestion();
+            } else {
+                document.getElementById("quizTrackTxt").innerText = "ಸಿಮ್ಯುಲೇಶನ್ ಮುಕ್ತಾಯ!";
+                document.getElementById("quizQuestionText").innerText = `ತರಗತಿಯ ಒಟ್ಟು ಸ್ಕೋರ್: ${qScore} / 10`;
+                document.getElementById("quizOptionsContainer").innerHTML = "";
+                document.getElementById("nextQuizBtn").style.display = "none";
+                document.getElementById('lvlBtn3').style.background = "var(--money-green)";
+                showEcoAlert(3, qScore >= 7 ? "ಅಪ್ರತಿಮ ಅರ್ಥಶಾಸ್ತ್ರಜ್ಞರು ಗೆಳೆಯಾ!" : "ಉತ್ತಮ ಪ್ರಯತ್ನ!", true);
+            }
+        }
+        loadQuizQuestion();
+
+        // Level 4 Logic
+        function verifyLevel4() {
+            let t1 = document.getElementById("thinkIn1").value.trim();
+            let t2 = document.getElementById("thinkIn2").value.trim();
+
+            if(t1 === "ಆಡಮ್ ಸ್ಮಿತ್" && t2 === "ಆಲ್ಫ್ರೆಡ್ ಮಾರ್ಷಲ್") {
+                modifyHUDTracker(150, 0);
+                document.getElementById('lvlBtn4').style.background = "var(--money-green)";
+                showEcoAlert(4, "ವಾಹ್ ಗೆಳೆಯಾ! ಚಿಂತಕರ ವ್ಯಾಖ್ಯಾನಗಳು ಪಕ್ಕಾ ಸರಿಯಾಗಿವೆ.", true);
+            } else {
+                modifyHUDTracker(0, 10);
+                showEcoAlert(4, "ವ್ಯಾಖ್ಯಾನ ತಪ್ಪಾಗಿದೆ. ಸುಳಿವು: ಆಡಮ್ ಸ್ಮಿತ್, ಆಲ್ಫ್ರೆಡ್ ಮಾರ್ಷಲ್ ಎಂದು ಬರೆಯಿರಿ.", false);
+            }
+        }
+
+        // Level 5 Logic
+        let selectedOres = {};
+        function toggleStateOre(id, isCoreActivity) {
+            let node = document.getElementById(id);
+            if(node.classList.contains('activated')) {
+                node.classList.remove('activated');
+                delete selectedOres[id];
+            } else {
+                node.classList.add('activated');
+                selectedOres[id] = isCoreActivity;
+            }
+        }
+        function verifyLevel5() {
+            let win = true; let count = 0;
+            for(let id in selectedOres) {
+                if(selectedOres[id] === false) win = false;
+                count++;
+            }
+            if(count !== 4) win = false; // 4 essential activities
+
+            if(win) {
+                modifyHUDTracker(150, 0);
+                document.getElementById('lvlBtn5').style.background = "var(--money-green)";
+                showEcoAlert(5, "ಅದ್ಭುತ! ೪ ಮೂಲ ಆರ್ಥಿಕ ಕ್ರಿಯೆಗಳು (ಉತ್ಪಾದನೆ, ಬಳಕೆ, ವಿನಿಮಯ, ವಿತರಣೆ) ಪಕ್ಕಾ ಸರಿ ಇವೆ.", true);
+            } else {
+                modifyHUDTracker(0, 10);
+                showEcoAlert(5, "ತಪ್ಪಾಗಿದೆ! ಕೇವಲ ನಾಲ್ಕು ಪ್ರಮುಖ ಆರ್ಥಿಕ ಕ್ರಿಯೆಗಳನ್ನು ಮಾತ್ರ ಆರಿಸು ಗೆಳೆಯಾ.", false);
+            }
+        }
+
+        // Level 6 Logic
+        function allowOrganDrop(ev) { ev.preventDefault(); }
+        function startOrganDrag(ev) { ev.dataTransfer.setData("text", ev.target.id); }
+        function handleOrganDrop(ev, cat) {
+            ev.preventDefault();
+            let id = ev.dataTransfer.getData("text");
+            let el = document.getElementById(id);
+            el.dataset.cat = cat;
+            ev.target.appendChild(el);
+        }
+        function verifyLevel6() {
+            let o1 = document.getElementById("org1").dataset.cat;
+            let o2 = document.getElementById("org2").dataset.cat;
+            let o3 = document.getElementById("org3").dataset.cat;
+
+            if(o1 === "first" && o2 === "second" && o3 === "luxury") {
+                modifyHUDTracker(200, 0);
+                document.getElementById('lvlBtn6').style.background = "var(--money-green)";
+                showEcoAlert(6, "ಕುಟುಂಬದ ಬಜೆಟ್ ಹಂಚಿಕೆಯ ಆದ್ಯತೆಗಳು ನೂರಕ್ಕೆ ನೂರು ಬುದ್ಧಿವಂತಿಕೆಯಿಂದ ಕೂಡಿವೆ!", true);
+            } else {
+                modifyHUDTracker(0, 10);
+                showEcoAlert(6, "ತಪ್ಪಾದ ವಿಭಾಗ! ಆಹಾರ ಮೊದಲ ಆದ್ಯತೆ, ಶಿಕ್ಷಣ ದ್ವಿತೀಯ ಆದ್ಯತೆ, ದುಬಾರಿ ಮೊಬೈಲ್ ಐಷಾರಾಮಿ ವರ್ಗಕ್ಕೆ ಸೇರಬೇಕು.", false);
+            }
+        }
+
+        // Level 7 Logic
+        let finalL = null; let finalR = null;
+        function selectFinalMatrix(side, id, key) {
+            if(side === 'L') {
+                finalL = { id: id, key: key };
+                document.getElementById("matL1").classList.remove('node-selected');
+                document.getElementById("matL2").classList.remove('node-selected');
+            } else {
+                finalR = { id: id, key: key };
+                document.getElementById("matR1").classList.remove('node-selected');
+                document.getElementById("matR2").classList.remove('node-selected');
+            }
+            document.getElementById(id).classList.add('node-selected');
+        }
+        function verifyLevel7() {
+            if(finalL && finalR && finalL.key === finalR.key) {
+                modifyHUDTracker(250, 0);
+                document.getElementById('lvlBtn7').style.background = "var(--money-green)";
+                showEcoAlert(7, "ವಾಹ್ Chandrakant ಗೆಳೆಯಾ! ಇಡೀ 'ಅರ್ಥಶಾಸ್ತ್ರ ಮತ್ತು ಅದರ ಮಹತ್ವ' ಪಾಠದ ಸಿಮ್ಯುಲೇಶನ್ ಯಶಸ್ವಿಯಾಗಿದೆ. ಗೆಲುವು ನಿಮ್ಮದೇ!", true);
+            } else {
+                modifyHUDTracker(0, 10);
+                showEcoAlert(7, "ಮ್ಯಾಟ್ರಿಕ್ಸ್ ಲಿಂಕ್ ತಪ್ಪಾಗಿದೆ. ಅರ್ಥಶಾಸ್ತ್ರದ ಲಾಭಗಳನ್ನು ಮತ್ತೊಮ್ಮೆ ಗಮನಿಸು ಗೆಳೆಯಾ.", false);
+            }
+        }
+
+        function showEcoAlert(lvlNum, text, success) {
+            let box = document.getElementById("alert" + lvlNum);
+            box.style.display = "block";
+            box.innerText = text;
+            box.style.background = success ? "rgba(0, 184, 148, 0.15)" : "rgba(214, 48, 49, 0.1)";
+            box.style.color = success ? "var(--money-green)" : "var(--danger-red)";
+            box.style.borderColor = success ? "var(--money-green)" : "var(--danger-red)";
+        }
+    </script>
+</body>
+</html>

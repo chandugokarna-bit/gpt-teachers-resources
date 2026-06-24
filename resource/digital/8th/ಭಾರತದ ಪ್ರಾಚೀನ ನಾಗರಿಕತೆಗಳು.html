@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಭಾರತದ ಪ್ರಾಚೀನ ನಾಗರಿಕತೆಗಳು - ನಿಯಾನ್ ಗೇಮಿಂಗ್ ಕ್ಲಾಸ್</title>
+    <style>
+        :root {
+            --neon-blue: #0984e3;
+            --neon-green: #00b894;
+            --neon-purple: #6c5ce7;
+            --neon-pink: #fd79a8;
+            --dark-card: #ffffff;
+            --text-dark: #2d3436;
+            --body-bg: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%);
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: var(--body-bg);
+            min-height: 100vh;
+            padding: 25px;
+            color: var(--text-dark);
+        }
+
+        /* Modern Dashboard Header */
+        .game-header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 25px;
+            border-radius: 24px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+            border: 2px solid var(--neon-blue);
+        }
+
+        .game-header h1 {
+            color: var(--neon-purple);
+            font-size: 2.4rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .game-header p {
+            color: #636e72;
+            font-size: 1.2rem;
+            font-weight: 500;
+        }
+
+        /* Gaming Grid Menu */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 35px;
+        }
+
+        .panel-card {
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            padding: 18px;
+            border-radius: 18px;
+            cursor: pointer;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1rem;
+            color: var(--text-dark);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .panel-card:hover, .panel-card.active-panel {
+            background: var(--neon-purple);
+            color: #ffffff;
+            transform: translateY(-8px);
+            box-shadow: 0 15px 25px rgba(108, 92, 231, 0.4);
+        }
+
+        /* Main Arena Container */
+        .game-arena {
+            background: var(--dark-card);
+            border-radius: 30px;
+            padding: 35px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.2);
+            min-height: 550px;
+            display: none;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .game-arena.visible-arena {
+            display: block;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        h2.arena-title {
+            font-size: 1.8rem;
+            color: var(--neon-purple);
+            margin-bottom: 25px;
+            padding-bottom: 12px;
+            border-bottom: 2px dashed #dfe6e9;
+        }
+
+        /* New Components Styling */
+        .action-btn {
+            background: linear-gradient(135deg, var(--neon-purple), #a29bfe);
+            color: white;
+            border: none;
+            padding: 14px 35px;
+            border-radius: 14px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 10px 20px rgba(108, 92, 231, 0.3);
+            transition: all 0.3s;
+            margin-top: 25px;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 25px rgba(108, 92, 231, 0.5);
+        }
+
+        .alert-box {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 12px;
+            font-weight: bold;
+            display: none;
+            font-size: 1.1rem;
+        }
+
+        /* Act 1: 3D Grid */
+        .grid-3d {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        .card-3d {
+            background: #f1f2f6;
+            height: 110px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.1rem;
+            cursor: pointer;
+            box-shadow: inset 0 -5px 0 #ced6e0;
+            transition: all 0.2s;
+            text-align: center;
+            padding: 10px;
+        }
+
+        .card-3d.flipped {
+            background: linear-gradient(135deg, #74b9ff, var(--neon-blue));
+            color: white;
+            box-shadow: inset 0 -5px 0 #0984e3;
+        }
+
+        .card-3d.matched {
+            background: linear-gradient(135deg, #55efc4, var(--neon-green));
+            color: white;
+            box-shadow: inset 0 -5px 0 #00b894;
+        }
+
+        /* Act 2: Interactive Sorting */
+        .flex-sort {
+            display: flex;
+            gap: 25px;
+        }
+
+        .pool-box {
+            flex: 1;
+            background: #f5f6fa;
+            border: 2px solid #dfe6e9;
+            padding: 15px;
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .sort-pill {
+            background: white;
+            padding: 12px;
+            border-radius: 10px;
+            cursor: grab;
+            border-left: 5px solid var(--neon-pink);
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        .target-box {
+            flex: 1;
+            background: #f5f6fa;
+            border: 3px dashed var(--neon-purple);
+            padding: 20px;
+            border-radius: 20px;
+            min-height: 150px;
+        }
+
+        .target-box h3 { margin-bottom: 15px; color: var(--neon-purple); }
+
+        /* Act 3: Modern Quiz Interface */
+        .progress-bar-container {
+            background: #dfe6e9;
+            height: 10px;
+            border-radius: 5px;
+            margin-bottom: 25px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            background: var(--neon-green);
+            height: 100%;
+            width: 10%;
+            transition: width 0.4s;
+        }
+
+        .choice-row {
+            background: #f8f9fa;
+            padding: 16px;
+            margin: 12px 0;
+            border-radius: 14px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+            border: 2px solid #dfe6e9;
+        }
+
+        .choice-row:hover {
+            border-color: var(--neon-purple);
+            background: #f1f0ff;
+            transform: scale(1.01);
+        }
+
+        .choice-row.correct-ans {
+            background: #e8f5e9;
+            border-color: var(--neon-green);
+            color: #2e7d32;
+        }
+
+        .choice-row.wrong-ans {
+            background: #ffe9e9;
+            border-color: var(--neon-danger);
+            color: #c62828;
+        }
+
+        /* Act 4: Inputs Grid */
+        .inputs-block {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .modern-input {
+            border: 2px solid #dfe6e9;
+            border-radius: 12px;
+            padding: 10px 15px;
+            font-size: 1.1rem;
+            outline: none;
+            width: 250px;
+            font-weight: bold;
+            color: var(--neon-purple);
+            transition: border 0.3s;
+        }
+
+        .modern-input:focus {
+            border-color: var(--neon-purple);
+        }
+
+        /* Act 5: Toggle Rows */
+        .toggle-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f8f9fa;
+            padding: 18px;
+            border-radius: 14px;
+            margin-bottom: 15px;
+        }
+
+        .choice-btn-group button {
+            padding: 10px 22px;
+            border: 2px solid #dfe6e9;
+            background: white;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-left: 10px;
+            transition: all 0.2s;
+        }
+
+        .choice-btn-group button.active-choice {
+            background: var(--neon-purple);
+            color: white;
+            border-color: var(--neon-purple);
+        }
+
+        /* Act 6: Cipher Block */
+        .cipher-card {
+            background: #f1f2f6;
+            padding: 25px;
+            border-radius: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+            border: 1px dashed var(--neon-pink);
+        }
+
+        .cipher-txt {
+            font-size: 2.2rem;
+            color: var(--neon-pink);
+            font-weight: 800;
+            letter-spacing: 6px;
+            margin-bottom: 15px;
+        }
+
+        /* Act 7: Dropdown Match */
+        .matrix-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .dropdown-select {
+            padding: 12px;
+            border-radius: 12px;
+            border: 2px solid var(--neon-purple);
+            width: 100%;
+            font-weight: 600;
+            outline: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="game-header">
+        <h1>ಅಧ್ಯಾಯ-೩: ಭಾರತದ ಪ್ರಾಚೀನ ನಾಗರಿಕತೆಗಳು</h1>
+        <p>ಗೇಮಿಂಗ್ ಡ್ಯಾಶ್‌ಬೋರ್ಡ್ ೨.೦ - ಕ್ಲಾಸಿನಲ್ಲಿ ಧಮಾಕಾ ಮೂಡಿಸುವ ಅಲ್ಟ್ರಾ ಮಾಡರ್ನ್ ಆಟಗಳು</p>
+    </div>
+
+    <div class="dashboard-grid">
+        <button class="panel-card active-panel" onclick="openArena(1)">1. ನಾಗರಿಕತೆ ಕ್ವೆಸ್ಟ್</button>
+        <button class="panel-card" onclick="openArena(2)">2. ನಗರ ರಹಸ್ಯ</button>
+        <button class="panel-card" onclick="openArena(3)">3. ಎಪಿಕ್ 10 ಕ್ವಿಜ್</button>
+        <button class="panel-card" onclick="openArena(4)">4. ಲಿಪಿ ಮುದ್ರೆಗಳು</button>
+        <button class="panel-card" onclick="openArena(5)">5. ಪತನದ ಸತ್ಯಗಳು</button>
+        <button class="panel-card" onclick="openArena(6)">6. ವೇದಕಾಲದ ಯುದ್ಧ</button>
+        <button class="panel-card" onclick="openArena(7)">7. ಕನೆಕ್ಟರ್ ಮಾಸ್ಟರಿ</button>
+    </div>
+
+    <div id="arena1" class="game-arena visible-arena">
+        <h2 class="arena-title">ಆಕ್ಟಿವಿಟಿ 1: ವಿಶ್ವದ ನಾಗರಿಕತೆಗಳು ಮತ್ತು ನದಿಗಳು (3D Match)</h2>
+        <p style="margin-bottom: 20px; font-weight: bold; color: var(--neon-blue);">ಕಾರ್ಡ್‌ಗಳನ್ನು ತಿರುವಿ ಆಯಾ ನಾಗರಿಕತೆ ಮತ್ತು ಅದು ಉಗಮವಾದ ನದಿಯನ್ನು ಜೋಡಿ ಮಾಡಿ:</p>
+        <div class="grid-3d" id="grid3DZone"></div>
+        <div class="alert-box" id="alert1"></div>
+    </div>
+
+    <div id="arena2" class="game-arena">
+        <h2 class="arena-title">ಆಕ್ಟಿವಿಟಿ 2: ಹರಪ್ಪ ನಗರ ಯೋಜನೆ ವಿಶ್ಲೇಷಣೆ (Sorting Pool)</h2>
+        <p style="margin-bottom: 15px;">ಹರಪ್ಪ ನಾಗರಿಕತೆಯ ವಿಶಿಷ್ಟ ನಗರ ವಿನ್ಯಾಸದ ಅಂಶಗಳನ್ನು ಸರಿಯಾದ ಕೋಣೆಗೆ ಡ್ರಾಗ್ ಮಾಡಿ ಹಾಕಿ:</p>
+        <div class="flex-sort">
+            <div class="pool-box" id="poolSource">
+                <div class="sort-pill" draggable="true" id="sp1" ondragstart="startDrag(event)">ಧಾನ್ಯದ ಉಗ್ರಾಣಗಳು</div>
+                <div class="sort-pill" draggable="true" id="sp2" ondragstart="startDrag(event)">ಮನೆಗಳ ನಿರ್ಮಾಣ ಜಾಗ</div>
+                <div class="sort-pill" draggable="true" id="sp3" ondragstart="startDrag(event)">ಮಹಾವಿಶಾಲ ಸ್ನಾನಘಟ್ಟ</div>
+                <div class="sort-pill" draggable="true" id="sp4" ondragstart="startDrag(event)">ರಸ್ತೆಗಳ ಬದಿ ಒಳಚರಂಡಿ</div>
+                <div class="sort-pill" draggable="true" id="sp5" ondragstart="startDrag(event)">ಎತ್ತರವಾದ ಕೋಟೆ ಭಾಗ</div>
+                <div class="sort-pill" draggable="true" id="sp6" ondragstart="startDrag(event)">ಸಾಮಾನ್ಯ ಜನರ ವಾಸಸ್ಥಳ</div>
+            </div>
+            <div class="drop-targets" style="flex:2; display:flex; flex-direction:column; gap:15px;">
+                <div class="target-box" ondragover="allowDrop(event)" ondrop="handleDrop(event, 'upper')">
+                    <h3>ಮೇಲ್ನಗರ (Citadel)</h3>
+                </div>
+                <div class="target-box" ondragover="allowDrop(event)" ondrop="handleDrop(event, 'lower')">
+                    <h3>ಕೆಳಗಿನ ನಗರ (Lower Town)</h3>
+                </div>
+            </div>
+        </div>
+        <button class="action-btn" onclick="verifyArena2()">ವರ್ಗೀಕರಣ ಪರಿಶೀಲಿಸು</button>
+        <div class="alert-box" id="alert2"></div>
+    </div>
+
+    <div id="arena3" class="game-arena">
+        <h2 class="arena-title">ಆಕ್ಟಿವಿಟಿ 3: ನಾಗರಿಕತೆಗಳ ಮಹಾ ಸಂಗ್ರಾಮ (Epic 10 Quiz)</h2>
+        <div class="progress-bar-container"><div class="progress-bar-fill" id="quizBar"></div></div>
+        <div style="font-weight: bold; margin-bottom: 15px;" id="qNumText">ಪ್ರಶ್ನೆ: 1 / 10</div>
+        <div id="questionText" style="font-size: 1.3rem; font-weight: bold; margin-bottom: 20px;">ಲೋಡ್ ಆಗುತ್ತಿದೆ...</div>
+        <div id="optionsContainer"></div>
+        <button class="action-btn" id="nextQuizBtn" style="display:none;" onclick="goNextQuestion()">ಮುಂದಿನ ಸವಾಲು ➔</button>
+        <div class="alert-box" id="alert3"></div>
+    </div>
+
+    <div id="arena4" class="game-arena">
+        <h2 class="arena-title">ಆಕ್ಟಿವಿಟಿ 4: ಹರಪ್ಪ ಸಂಸ್ಕೃತಿಯ ಕುರುಹುಗಳು (Crypto Puzzle)</h2>
+        <div class="inputs-block">
+            <div class="fib-q">1. ಹರಪ್ಪನ್ನರು ಬಳಸುತ್ತಿದ್ದ ಲಿಪಿಯು ಯಾವ ರೂಪದಲ್ಲಿದೆ? <br><input type="text" class="modern-input" id="cr1" placeholder="ಚಿತ್ರಲಿಪಿ / ಬ್ರಾಹ್ಮಿ ಲಿಪಿ?"></div>
+            <div class="fib-q">2. ಹರಪ್ಪ ನಾಗರಿಕತೆಯ ಪ್ರಸಿದ್ಧ ಬಂದರು ನಗರ ಯಾವುದು? <br><input type="text" class="modern-input" id="cr2" placeholder="ಲೋಥಾಲ್ / ಕಾಲಿಬಂಗನ್?"></div>
+            <div class="fib-q">3. ಸಿಂಧೂ ಬಯಲಿನಲ್ಲಿ ದೊರೆತಿರುವ ನೃತ್ಯಗಾತಿಯ ವಿಗ್ರಹವು ಯಾವ ಲೋಹದ್ದಾಗಿದೆ? <br><input type="text" class="modern-input" id="cr3" placeholder="ಕಂಚು / ಕಬ್ಬಿಣ?"></div>
+            <div class="fib-q">4. ಹರಪ್ಪನ್ನರು ಯಾವ ಪ್ರಾಣಿಯನ್ನು ದೈವೀಕ ರೂಪದಲ್ಲಿ ಆರಾಧಿಸುತ್ತಿದ್ದರು? <br><input type="text" class="modern-input" id="cr4" placeholder="ಗೂಳಿ / ಕುದುರೆ?"></div>
+        </div>
+        <button class="action-btn" onclick="verifyArena4()">ರಹಸ್ಯ ಭೇದಿಸು</button>
+        <div class="alert-box" id="alert4"></div>
+    </div>
+
+    <div id="arena5" class="game-arena">
+        <h2 class="arena-title">ಆಕ್ಟಿವಿಟಿ 5: ನಾಗರಿಕತೆಯ ಅಂತ್ಯ ಮತ್ತು ಸತ್ಯಗಳು (Decision Gates)</h2>
+        <div class="toggle-row">
+            <span>1. ಆರ್ಯರ ಆಕ್ರಮಣ ಮತ್ತು ಭೀಕರ ಪ್ರವಾಹಗಳು ಸಿಂಧೂ ನಾಗರಿಕತೆಯ ನಾಶಕ್ಕೆ ಕಾರಣ ಇರಬಹುದು.</span>
+            <div class="choice-btn-group"><button id="g1_t" onclick="setGate(1,true)">ಹೌದು</button><button id="g1_f" onclick="setGate(1,false)">ಅಲ್ಲ</button></div>
+        </div>
+        <div class="toggle-row">
+            <span>2. ಹರಪ್ಪ ನಾಗರಿಕತೆಯ ಜನರಿಗೆ ಕಬ್ಬಿಣ ಲೋಹದ ಪೂರ್ಣ ಜ್ಞಾನ ಇತ್ತು.</span>
+            <div class="choice-btn-group"><button id="g2_t" onclick="setGate(2,true)">ಹೌದು</button><button id="g2_f" onclick="setGate(2,false)">ಅಲ್ಲ</button></div>
+        </div>
+        <div class="toggle-row">
+            <span>3. ಹರಪ್ಪ ಸಂಸ್ಕೃತಿಯ ಮುದ್ರೆಗಳು ಸ್ಟೀಟೈಟ್ ಕಲ್ಲುಗಳಿಂದ ಮಾಡಲ್ಪಟ್ಟಿದ್ದವು.</span>
+            <div class="choice-btn-group"><button id="g3_t" onclick="setGate(3,true)">ಹೌದು</button><button id="g3_f" onclick="setGate(3,false)">ಅಲ್ಲ</button></div>
+        </div>
+        <div class="toggle-row">
+            <span>4. ವೇದಗಳ ಕಾಲದ ಆರಂಭಿಕ ಹಂತವನ್ನು 'ಉತ್ತರ ವೇದಕಾಲ' ಎನ್ನುತ್ತಾರೆ.</span>
+            <div class="choice-btn-group"><button id="g4_t" onclick="setGate(4,true)">ಹೌದು</button><button id="g4_f" onclick="setGate(4,false)">ಅಲ್ಲ</button></div>
+        </div>
+        <button class="action-btn" onclick="verifyArena5()">ನಿರ್ಧಾರ ಪರಿಶೀಲಿಸು</button>
+        <div class="alert-box" id="alert5"></div>
+    </div>
+
+    <div id="arena6" class="game-arena">
+        <h2 class="arena-title">ಆಕ್ಟಿವಿಟಿ 6: ವೈದಿಕ ಸಾಹಿತ್ಯದ ಪದಗಳ ಶೋಧನೆ (Word Cipher)</h2>
+        <div class="cipher-card">
+            <div class="cipher-txt">ವೇ ದ ಋ ಗ್ವ </div>
+            <input type="text" class="modern-input" id="ciph1" placeholder="ಸರಿಯಾದ ಪದ ಬರೆಯಿರಿ">
+        </div>
+        <div class="cipher-card">
+            <div class="cipher-txt">ಪ ತೀ ಗೃ ಹ </div>
+            <input type="text" class="modern-input" id="ciph2" placeholder="ಸರಿಯಾದ ಪದ ಬರೆಯಿರಿ">
+        </div>
+        <div class="cipher-card">
+            <div class="cipher-txt">ತಿ ಮಿ ಸ ಮ </div>
+            <input type="text" class="modern-input" id="ciph3" placeholder="ಸರಿಯಾದ ಪದ ಬರೆಯಿರಿ">
+        </div>
+        <button class="action-btn" onclick="verifyArena6()">ಪದಗಳ ಯುದ್ಧ ಮುಗಿಸು</button>
+        <div class="alert-box" id="alert6"></div>
+    </div>
+
+    <div id="arena7" class="game-arena">
+        <h2 class="arena-title">ಆಕ್ಟಿವಿಟಿ 7: ವೇದಗಳು ಮತ್ತು ವಿಶೇಷತೆಗಳ ಜೋಡಣೆ (Connector Matrix)</h2>
+        <div class="matrix-container">
+            <div>
+                <div class="toggle-row">1. ಋಗ್ವೇದ</div>
+                <div class="toggle-row">2. ಸಾಮವೇದ</div>
+                <div class="toggle-row">3. ಅಥರ್ವಣವೇದ</div>
+                <div class="toggle-row">4. ರಾಜಕೀಯ ಸಂಸ್ಥೆಗಳು</div>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:20px; justify-content:center;">
+                <select id="sel1" class="dropdown-select">
+                    <option value="">ಸರಿಯಾದದ್ದನ್ನು ಜೋಡಿಸಿ</option>
+                    <option value="A">ಸಂಗೀತದ ಗಾಯನ ಕಲೆ</option>
+                    <option value="B">ಅತ್ಯಂತ ಪ್ರಾಚೀನ ಮಂತ್ರಗಳ ಸಂಗ್ರಹ</option>
+                    <option value="C">ಸಭಾ ಮತ್ತು ಸಮಿತಿ</option>
+                    <option value="D">ತಂತ್ರ ಮಂತ್ರ ಮತ್ತು ರೋಗ ನಿವಾರಣೆ</option>
+                </select>
+                <select id="sel2" class="dropdown-select">
+                    <option value="">ಸರಿಯಾದದ್ದನ್ನು ಜೋಡಿಸಿ</option>
+                    <option value="A">ಸಂಗೀತದ ಗಾಯನ ಕಲೆ</option>
+                    <option value="B">ಅತ್ಯಂತ ಪ್ರಾಚೀನ ಮಂತ್ರಗಳ ಸಂಗ್ರಹ</option>
+                    <option value="C">ಸಭಾ ಮತ್ತು ಸಮಿತಿ</option>
+                    <option value="D">ತಂತ್ರ ಮಂತ್ರ ಮತ್ತು ರೋಗ ನಿವಾರಣೆ</option>
+                </select>
+                <select id="sel3" class="dropdown-select">
+                    <option value="">ಸರಿಯಾದದ್ದನ್ನು ಜೋಡಿಸಿ</option>
+                    <option value="A">ಸಂಗೀತದ ಗಾಯನ ಕಲೆ</option>
+                    <option value="B">ಅತ್ಯಂತ ಪ್ರಾಚೀನ ಮಂತ್ರಗಳ ಸಂಗ್ರಹ</option>
+                    <option value="C">ಸಭಾ ಮತ್ತು ಸಮಿತಿ</option>
+                    <option value="D">ತಂತ್ರ ಮಂತ್ರ ಮತ್ತು ರೋಗ ನಿವಾರಣೆ</option>
+                </select>
+                <select id="sel4" class="dropdown-select">
+                    <option value="">ಸರಿಯಾದದ್ದನ್ನು ಜೋಡಿಸಿ</option>
+                    <option value="A">ಸಂಗೀತದ ಗಾಯನ ಕಲೆ</option>
+                    <option value="B">ಅತ್ಯಂತ ಪ್ರಾಚೀನ ಮಂತ್ರಗಳ ಸಂಗ್ರಹ</option>
+                    <option value="C">ಸಭಾ ಮತ್ತು ಸಮಿತಿ</option>
+                    <option value="D">ತಂತ್ರ ಮಂತ್ರ ಮತ್ತು ರೋಗ ನಿವಾರಣೆ</option>
+                </select>
+            </div>
+        </div>
+        <button class="action-btn" onclick="verifyArena7()">ಮ್ಯಾಟ್ರಿಕ್ಸ್ ಕನೆಕ್ಟ್ ಮಾಡು</button>
+        <div class="alert-box" id="alert7"></div>
+    </div>
+
+    <script>
+        function openArena(index) {
+            document.querySelectorAll('.game-arena').forEach(el => el.classList.remove('visible-arena'));
+            document.querySelectorAll('.panel-card').forEach(el => el.classList.remove('active-panel'));
+            document.getElementById('arena' + index).classList.add('visible-arena');
+            event.target.classList.add('active-panel');
+        }
+
+        // Arena 1: 3D Cards Game Data & Logic
+        const dynamicCards = [
+            {t: "ಹರಪ್ಪ ನಾಗರಿಕತೆ", m: 1}, {t: "ಸಿಂಧೂ ನದಿ", m: 1},
+            {t: "ಈಜಿಪ್ಟ್ ನಾಗರಿಕತೆ", m: 2}, {t: "ನೈಲ್ ನದಿ", m: 2},
+            {t: "ಮೆಸೊಪಟೇಮಿಯ", m: 3}, {t: "ಯೂಫ್ರೇಟಿಸ್ ನದಿ", m: 3},
+            {t: "ಚೀನಾ ನಾಗರಿಕತೆ", m: 4}, {t: "ಹ್ಯಾಂಗ್ ಹೋ ನದಿ", m: 4}
+        ];
+        let flippedList = [];
+        function start3DGame() {
+            let zone = document.getElementById("grid3DZone");
+            zone.innerHTML = "";
+            dynamicCards.sort(() => Math.random() - 0.5);
+            dynamicCards.forEach((c, idx) => {
+                let block = document.createElement("div");
+                block.classList.add("card-3d");
+                block.dataset.idx = idx;
+                block.dataset.m = c.m;
+                block.innerText = "★";
+                block.onclick = function() {
+                    if(flippedList.length < 2 && !this.classList.contains('flipped') && !this.classList.contains('matched')) {
+                        this.classList.add('flipped');
+                        this.innerText = dynamicCards[this.dataset.idx].t;
+                        flippedList.push(this);
+                        if(flippedList.length === 2) {
+                            if(flippedList[0].dataset.m === flippedList[1].dataset.m) {
+                                flippedList[0].classList.add('matched');
+                                flippedList[1].classList.add('matched');
+                                flippedList = [];
+                            } else {
+                                setTimeout(() => {
+                                    flippedList[0].classList.remove('flipped'); flippedList[0].innerText = "★";
+                                    flippedList[1].classList.remove('flipped'); flippedList[1].innerText = "★";
+                                    flippedList = [];
+                                }, 1000);
+                            }
+                        }
+                    }
+                };
+                zone.appendChild(block);
+            });
+        }
+        start3DGame();
+
+        // Arena 2: Sorting Logic
+        function allowDrop(ev) { ev.preventDefault(); }
+        function startDrag(ev) { ev.dataTransfer.setData("text", ev.target.id); }
+        function handleDrop(ev, section) {
+            ev.preventDefault();
+            let data = ev.dataTransfer.setData ? ev.dataTransfer.getData("text") : ev.target.id;
+            let targetEl = document.getElementById(ev.dataTransfer.getData("text"));
+            targetEl.dataset.section = section;
+            ev.target.appendChild(targetEl);
+        }
+        function verifyArena2() {
+            let passed = true;
+            const answers = {sp1:'upper', sp2:'lower', sp3:'upper', sp4:'lower', sp5:'upper', sp6:'lower'};
+            for(let id in answers) {
+                let item = document.getElementById(id);
+                if(!item || item.dataset.section !== answers[id]) passed = false;
+            }
+            showAlert(2, passed ? "ಸೂಪರ್ ಸರ್! ನಗರ ವಿನ್ಯಾಸವನ್ನು ಮಕ್ಕಳು ಅದ್ಭುತವಾಗಿ ಅರ್ಥಮಾಡಿಕೊಂಡಿದ್ದಾರೆ." : "ವರ್ಗೀಕರಣ ಸರಿಯಾಗಿಲ್ಲ, ಮತ್ತೊಮ್ಮೆ ಪ್ರಯತ್ನಿಸಿ.", passed);
+        }
+
+        // Arena 3: Epic Quiz System (10 Questions)
+        const arena3Questions = [
+            { q: "1. ಹರಪ್ಪ ನಾಗರಿಕತೆಯ ಕುರುಹುಗಳನ್ನು ಮೊದಲು ಪತ್ತೆ ಹಚ್ಚಿದ ಬ್ರಿಟಿಷ್ ಇಂಜಿನಿಯರ್ ಯಾರು?", o: ["ಜಾನ್ ಮಾರ್ಷಲ್", "ಚಾರ್ಲ್ಸ್ ಮ್ಯಾಸನ್", "ಕನ್ನಿಂಗ್ ಹ್ಯಾಮ್"], c: 1 },
+            { q: "2. ವಿಶಾಲವಾದ ಈಜುಕೊಳ ಅಥವಾ 'ಮಹಾವಿಶಾಲ ಸ್ನಾನಘಟ್ಟ' ಎಲ್ಲಿದೆ?", o: ["ಲೋಥಾಲ್", "ಹರಪ್ಪ", "ಮೊಹೆಂಜೊದಾರೊ"], c: 2 },
+            { q: "3. ಮೆಸೊಪಟೇಮಿಯ ನಾಗರಿಕತೆಯು ಪ್ರಸ್ತುತ ಯಾವ ದೇಶದಲ್ಲಿದೆ?", o: ["ಇರಾಕ್", "ಈಜಿಪ್ಟ್", "ಇರಾನ್"], c: 0 },
+            { q: "4. ಈಜಿಪ್ಟ್ ನಾಗರಿಕತೆಯ ರಾಜರುಗಳನ್ನು ಏನೆಂದು ಕರೆಯಲಾಗುತ್ತಿತ್ತು?", o: ["ಫೇರೋ", "ಚಕ್ರವರ್ತಿ", "ಸುಲ್ತಾನ್"], c: 0 },
+            { q: "5. 'ಜಿಕುರಾತ್' ಎಂಬ ಹೆಸರಿನ ಭವ್ಯವಾದ ಪ್ರಾರ್ಥನಾ ಮಂದಿರಗಳನ್ನು ನಿರ್ಮಿಸಿದವರು ಯಾರು?", o: ["ಹರಪ್ಪನ್ನರು", "ಮೆಸೊಪಟೇಮಿಯನ್ನರು", "ಚೀನಿಯರು"], c: 1 },
+            { q: "6. ವೇದಗಳ ಕಾಲದ ಅತ್ಯಂತ ಪ್ರಾಚೀನವಾದ ಮತ್ತು ಮೊದಲ ವೇದ ಯಾವುದು?", o: ["ಯಜುರ್ವೇದ", "ಸಾಮವೇದ", "ಋಗ್ವೇದ"], c: 2 },
+            { q: "7. ಋಗ್ವೇದ ಕಾಲದಲ್ಲಿ ಕುಟುಂಬದ ಮುಖ್ಯಸ್ಥನನ್ನು ಏನೆಂದು ಕರೆಯಲಾಗುತ್ತಿತ್ತು?", o: ["ಗ್ರಾಮಿಣಿ", "ಕುಲಪತಿ", "ರಾಜನ್"], c: 1 },
+            { q: "8. ವೈದಿಕ ಕಾಲದ ಕೊನೆಯ ಹಂತದಲ್ಲಿ ರಚಿತವಾದ ತತ್ತ್ವಜ್ಞಾನದ ಗ್ರಂಥಗಳನ್ನು ಏನೆನ್ನುತ್ತಾರೆ?", o: ["ಉಪನಿಷತ್ತುಗಳು", "ಬ್ರಾಹ್ಮಣಗಳು", "ಆರಣ್ಯಕಗಳು"], c: 0 },
+            { q: "9. ಆರ್ಯರ ಅತ್ಯಂತ ಪ್ರಮುಖ ಉದ್ಯೋಗ ಯಾವುದಾಗಿತ್ತು?", o: ["ನೇಯ್ಗೆ", "ಪಶುಸಂಗೋಪನೆ ಮತ್ತು ಕೃಷಿ", "ವ್ಯಾಪಾರ"], c: 1 },
+            { q: "10. 'ಮಹಾವಿಶಾಲ ಧಾನ್ಯದ ಉಗ್ರಾಣ' ಕಂಡುಬಂದಿರುವ ಹರಪ್ಪದ ಪ್ರಮುಖ ತಾಣ ಯಾವುದು?", o: ["ಕಾಲಿಬಂಗನ್", "ಹರಪ್ಪ", "ಲೋಥಾಲ್"], c: 1 }
+        ];
+
+        let qIdx = 0; let scoreTracker = 0; let activeQuiz = true;
+        function fillQuestion() {
+            activeQuiz = true;
+            document.getElementById("nextQuizBtn").style.display = "none";
+            document.getElementById("alert3").style.display = "none";
+            let currentQ = arena3Questions[qIdx];
+            document.getElementById("qNumText").innerText = `ಪ್ರಶ್ನೆ: ${qIdx + 1} / 10`;
+            document.getElementById("quizBar").style.width = `${(qIdx+1)*10}%`;
+            document.getElementById("questionText").innerText = currentQ.q;
+            
+            let optZone = document.getElementById("optionsContainer");
+            optZone.innerHTML = "";
+            currentQ.o.forEach((option, i) => {
+                let div = document.createElement("div");
+                div.classList.add("choice-row");
+                div.innerText = option;
+                div.onclick = function() {
+                    if(!activeQuiz) return;
+                    activeQuiz = false;
+                    if(i === currentQ.c) {
+                        this.classList.add("correct-ans");
+                        scoreTracker++;
+                        showAlert(3, "ಸರಿಯಾದ ಆಯ್ಕೆ! ಜ್ಞಾನದ ಭಂಡಾರ!", true);
+                    } else {
+                        this.classList.add("wrong-ans");
+                        optZone.children[currentQ.c].classList.add("correct-ans");
+                        showAlert(3, "ಉತ್ತರ ತಪ್ಪಾಗಿದೆ!", false);
+                    }
+                    document.getElementById("nextQuizBtn").style.display = "inline-block";
+                };
+                optZone.appendChild(div);
+            });
+        }
+        function goNextQuestion() {
+            qIdx++;
+            if(qIdx < arena3Questions.length) {
+                fillQuestion();
+            } else {
+                document.getElementById("qNumText").innerText = "ಫಲಿತಾಂಶ ಸಿದ್ಧ!";
+                document.getElementById("questionText").innerText = `ಮಕ್ಕಳ ಒಟ್ಟು ಸ್ಕೋರ್: ${scoreTracker} / 10`;
+                document.getElementById("optionsContainer").innerHTML = "";
+                document.getElementById("nextQuizBtn").style.display = "none";
+                showAlert(3, "ಪಾಠದ ರಸಪ್ರಶ್ನೆ ಯಶಸ್ವಿಯಾಗಿ ಮುಗಿದಿದೆ ಸರ್!", true);
+            }
+        }
+        fillQuestion();
+
+        // Arena 4: Crypto Logic
+        function verifyArena4() {
+            let r1 = document.getElementById("cr1").value.trim();
+            let r2 = document.getElementById("cr2").value.trim();
+            let r3 = document.getElementById("cr3").value.trim();
+            let r4 = document.getElementById("cr4").value.trim();
+
+            if(r1 === "ಚಿತ್ರಲಿಪಿ" && r2 === "ಲೋಥಾಲ್" && r3 === "ಕಂಚು" && r4 === "ಗೂಳಿ") {
+                showAlert(4, "ಅದ್ಭುತ! ಇತಿಹಾಸದ ರಹಸ್ಯ ಭೇದಿಸಿದ್ದೀರಿ!", true);
+            } else {
+                showAlert(4, "ಕೆಲವು ಉತ್ತರಗಳು ತಪ್ಪಾಗಿವೆ. ಸುಳಿವು: ಚಿತ್ರಲಿಪಿ, ಲೋಥಾಲ್, ಕಂಚು, ಗೂಳಿ.", false);
+            }
+        }
+
+        // Arena 5: Gates Logic
+        let gateStatus = {1:null, 2:null, 3:null, 4:null};
+        function setGate(gNum, flag) {
+            gateStatus[gNum] = flag;
+            document.getElementById(`g${gNum}_t`).classList.remove('active-choice');
+            document.getElementById(`g${gNum}_f`).classList.remove('active-choice');
+            if(flag) document.getElementById(`g${gNum}_t`).classList.add('active-choice');
+            else document.getElementById(`g${gNum}_f`).classList.add('active-choice');
+        }
+        function verifyArena5() {
+            if(gateStatus[1] === true && gateStatus[2] === false && gateStatus[3] === true && gateStatus[4] === false) {
+                showAlert(5, "ಎಲ್ಲಾ ನಿರ್ಧಾರಗಳು ಶೇಕಡಾ 100 ರಷ್ಟು ಸರಿಯಾಗಿವೆ!", true);
+            } else {
+                showAlert(5, "ತಪ್ಪು ನಿರ್ಧಾರಗಳಿವೆ ಪರಿಶೀಲಿಸಿ! (ಹರಪ್ಪನ್ನರಿಗೆ ಕಬ್ಬಿಣ ಗೊತ್ತಿರಲಿಲ್ಲ, ಮೊದಲ ಹಂತ ಋಗ್ವೇದಕಾಲ)", false);
+            }
+        }
+
+        // Arena 6: Cipher Logic
+        function verifyArena6() {
+            let p1 = document.getElementById("ciph1").value.trim();
+            let p2 = document.getElementById("ciph2").value.trim();
+            let p3 = document.getElementById("ciph3").value.trim();
+
+            if(p1 === "ಋಗ್ವೇದ" && p2 === "ಗೃಹಪತಿ" && p3 === "ಸಮಿತಿ") {
+                showAlert(6, "ಪದಗಳ ಯುದ್ಧದಲ್ಲಿ ವಿಜಯ ಸಾಧಿಸಿದ್ದೀರಿ!", true);
+            } else {
+                showAlert(6, "ಪದಗಳನ್ನು ಮರುಪರಿಶೀಲಿಸಿ (ಉದಾಹರಣೆ: ಋಗ್ವೇದ, ಗೃಹಪತಿ, ಸಮಿತಿ).", false);
+            }
+        }
+
+        // Arena 7: Connect Matrix Logic
+        function verifyArena7() {
+            let s1 = document.getElementById("sel1").value;
+            let s2 = document.getElementById("sel2").value;
+            let s3 = document.getElementById("sel3").value;
+            let s4 = document.getElementById("sel4").value;
+
+            if(s1 === 'B' && s2 === 'A' && s3 === 'D' && s4 === 'C') {
+                showAlert(7, "ಅದ್ಭುತ ಸರ್! ಕನೆಕ್ಟರ್ ಮ್ಯಾಟ್ರಿಕ್ಸ್ ಯಶಸ್ವಿಯಾಗಿದೆ. ಇಡೀ ಪಾಠ ಪೂರ್ಣಗೊಂಡಿದೆ!", true);
+            } else {
+                showAlert(7, "ತಪ್ಪಾದ ಜೋಡಣೆ, ವೇದಗಳ ಗುಣಲಕ್ಷಣಗಳನ್ನು ಮತ್ತೊಮ್ಮೆ ಗಮನಿಸಿ.", false);
+            }
+        }
+
+        function showAlert(arenaNum, text, success) {
+            let box = document.getElementById("alert" + arenaNum);
+            box.style.display = "block";
+            box.innerText = text;
+            box.style.background = success ? "rgba(0, 184, 148, 0.15)" : "rgba(223, 230, 233, 0.5)";
+            box.style.color = success ? "#00b894" : "#d63031";
+            box.style.border = success ? "1px solid #00b894" : "1px solid #d63031";
+        }
+    </script>
+</body>
+</html>
