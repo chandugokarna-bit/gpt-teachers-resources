@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        /* (Styles remain the same as previous version) */
+        body { background: #121212; color: #fff; font-family: 'Arial', sans-serif; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+        .scale-container { position: relative; margin: 100px 0; }
+        .beam { width: 400px; height: 8px; background: #00e5ff; transition: transform 0.3s ease; }
+        .weight { width: 70px; height: 70px; border-radius: 50%; display: flex; align-items: center; justify-content: center; position: absolute; top: -80px; font-weight: bold; font-size: 1.2em; }
+        .left { background: #ff00ff; left: 40px; }
+        .right { background: #00ff00; right: 40px; }
+        button { background: #00e5ff; border: none; padding: 10px 20px; cursor: pointer; font-weight: bold; border-radius: 5px; margin-top: 20px; font-size: 1.1em; }
+    </style>
+</head>
+<body>
+
+    <h1>ಹಂತ <span id="lvl">1</span>/10: ಸಮೀಕರಣವನ್ನು ಸರಿದೂಗಿಸಿ</h1>
+    <div class="equation" id="eq" style="font-size: 2em; margin-bottom: 20px;">?</div>
+
+    <div class="scale-container">
+        <div id="beam" class="beam"></div>
+        <div class="weight left" id="leftWeight">?</div>
+        <div class="weight right" id="rightWeight">?</div>
+    </div>
+
+    <input type="range" id="xSlider" min="-10" max="20" value="0" oninput="updateBalance()">
+    <p>x ನ ಬೆಲೆಯನ್ನು ಹೊಂದಿಸಿ: <span id="xVal">0</span></p>
+    <h2 id="msg">ಸಮತೋಲನವನ್ನು ಹುಡುಕಿ...</h2>
+    <button id="nextBtn" style="display:none;" onclick="nextLevel()">ಮುಂದಿನ ಸವಾಲು</button>
+
+<script>
+    // Audio Context for generating a 'ding' sound
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    
+    function playSuccessSound() {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(880, audioCtx.currentTime); // High pitch
+        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.5);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.5);
+    }
+
+    const challenges = [
+        { eq: "x + 5 = 10", left: (x) => x + 5, right: 10 },
+        { eq: "2x = 8", left: (x) => 2 * x, right: 8 },
+        { eq: "x - 3 = 4", left: (x) => x - 3, right: 4 },
+        { eq: "3x + 1 = 10", left: (x) => 3 * x + 1, right: 10 },
+        { eq: "2x + 10 = 20", left: (x) => 2 * x + 10, right: 20 },
+        { eq: "5x - 5 = 15", left: (x) => 5 * x - 5, right: 15 },
+        { eq: "4x = 24", left: (x) => 4 * x, right: 24 },
+        { eq: "x / 2 = 3", left: (x) => x / 2, right: 3 },
+        { eq: "2x + 6 = 14", left: (x) => 2 * x + 6, right: 14 },
+        { eq: "10x - 50 = 0", left: (x) => 10 * x - 50, right: 0 }
+    ];
+
+    let currentLvl = 0;
+    let solved = false;
+
+    function updateBalance() {
+        let x = parseInt(document.getElementById("xSlider").value);
+        let challenge = challenges[currentLvl];
+        let lVal = challenge.left(x);
+        let rVal = challenge.right;
+
+        document.getElementById("xVal").innerText = x;
+        document.getElementById("leftWeight").innerText = lVal;
+        document.getElementById("rightWeight").innerText = rVal;
+        document.getElementById("beam").style.transform = `rotate(${(lVal - rVal) * 5}deg)`;
+
+        if (lVal === rVal && !solved) {
+            document.getElementById("msg").innerText = "ಸಮತೋಲನ ಸಾಧಿಸಲಾಗಿದೆ!";
+            document.getElementById("nextBtn").style.display = "inline-block";
+            playSuccessSound();
+            solved = true;
+        }
+    }
+
+    function nextLevel() {
+        currentLvl++;
+        solved = false;
+        if (currentLvl < challenges.length) {
+            document.getElementById("lvl").innerText = currentLvl + 1;
+            document.getElementById("eq").innerText = challenges[currentLvl].eq;
+            document.getElementById("nextBtn").style.display = "none";
+            document.getElementById("xSlider").value = 0;
+            updateBalance();
+        } else {
+            document.body.innerHTML = "<h1>ಅಭಿನಂದನೆಗಳು: ನೀವು ಬೀಜಗಣಿತದ ಮಾಸ್ಟರ್ ಆಗಿದ್ದೀರಿ!</h1>";
+        }
+    }
+
+    document.getElementById("eq").innerText = challenges[0].eq;
+    document.getElementById("rightWeight").innerText = challenges[0].right;
+</script>
+</body>
+</html>
