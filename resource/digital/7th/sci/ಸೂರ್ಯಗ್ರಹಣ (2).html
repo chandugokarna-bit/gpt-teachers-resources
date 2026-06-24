@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D ಸೂರ್ಯಗ್ರಹಣ ಅನಿಮೇಷನ್ ಮತ್ತು ಧ್ವನಿ ವಿವರಣೆ</title>
+    <style>
+        body {
+            margin: 0;
+            background-color: #050510;
+            color: #fff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        #controls {
+            margin-bottom: 20px;
+            z-index: 10;
+        }
+
+        button {
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: bold;
+            background-color: #e67e22;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(230, 126, 34, 0.4);
+        }
+
+        button:hover {
+            background-color: #d35400;
+            transform: translateY(-2px);
+        }
+
+        button:disabled {
+            background-color: #7f8c8d;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        #canvas-container {
+            width: 800px;
+            height: 500px;
+            position: relative;
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        #subtitle {
+            margin-top: 15px;
+            font-size: 18px;
+            color: #f1c40f;
+            min-height: 24px;
+            text-align: center;
+            max-width: 600px;
+            font-weight: 300;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+
+    <div id="controls">
+        <button id="actionBtn" onclick="triggerAlignment()">ಸೇರಿಸಿ ಮತ್ತು ವಿವರಿಸಿ (Align & Explain)</button>
+    </div>
+
+    <div id="canvas-container"></div>
+
+    <div id="subtitle">ಖಗೋಳ ಕಾಯಗಳನ್ನು ಒಂದೇ ಸರಳ ರೇಖೆಗೆ ತರಲು ಬಟನ್ ಕ್ಲಿಕ್ ಮಾಡಿ!</div>
+
+    <script>
+        const container = document.getElementById('canvas-container');
+        const subtitle = document.getElementById('subtitle');
+        const actionBtn = document.getElementById('actionBtn');
+
+        // 1. Setup Three.js Scene
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(60, 800 / 500, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(800, 500);
+        renderer.shadowMap.enabled = true; 
+        container.appendChild(renderer.domElement);
+
+        // Lights
+        const sunLight = new THREE.PointLight(0xffffff, 2, 500);
+        sunLight.castShadow = true;
+        scene.add(sunLight);
+
+        const ambientLight = new THREE.AmbientLight(0x222222);
+        scene.add(ambientLight);
+
+        // 2. Create Celestial Spheres
+        // Sun
+        const sunMat = new THREE.MeshBasicMaterial({ color: 0xffaa00 });
+        const sunMesh = new THREE.Mesh(new THREE.SphereGeometry(3.5, 32, 32), sunMat);
+        scene.add(sunMesh);
+
+        // Earth Pivot
+        const earthPivot = new THREE.Group();
+        scene.add(earthPivot);
+
+        // Earth
+        const earthMat = new THREE.MeshStandardMaterial({ color: 0x2233ff, roughness: 0.6 });
+        const earthMesh = new THREE.Mesh(new THREE.SphereGeometry(1.2, 32, 32), earthMat);
+        earthMesh.position.x = 16; // Placed on X axis
+        earthMesh.castShadow = true;
+        earthMesh.receiveShadow = true;
+        earthPivot.add(earthMesh);
+
+        // Moon Pivot (Nested inside Earth Pivot so its position is relative to Earth)
+        const moonPivot = new THREE.Group();
+        moonPivot.position.set(16, 0, 0); // Center it exactly at Earth's default position
+        earthPivot.add(moonPivot);
+
+        // Moon
+        const moonMat = new THREE.MeshStandardMaterial({ color: 0x888888, roughness: 0.9 });
+        const moonMesh = new THREE.Mesh(new THREE.SphereGeometry(0.35, 32, 32), moonMat);
+        // Position it at -4 on X axis, so when pivot rotation is 0, it is directly BETWEEN Sun (0) and Earth (16)
+        moonMesh.position.x = -4; 
+        moonMesh.castShadow = true;
+        moonMesh.receiveShadow = true;
+        moonPivot.add(moonMesh);
+
+        // Starfield
+        const starsGeo = new THREE.BufferGeometry();
+        const starPositions = new Float32Array(500 * 3);
+        for(let i=0; i<500*3; i++) {
+            starPositions[i] = (Math.random() - 0.5) * 100;
+        }
+        starsGeo.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
+        const starField = new THREE.Points(starsGeo, new THREE.PointsMaterial({ color: 0xffffff, size: 0.1 }));
+        scene.add(starField);
+
+        // Camera Angle (Slightly tilted up to see the 3D depth)
+        camera.position.set(0, 8, 24);
+        camera.lookAt(0, 0, 0);
+
+        let isRunning = true;
+        let stopAtAlignment = false;
+
+        const explanationText = "ಸೂರ್ಯ ಮತ್ತು ಭೂಮಿಯ ನಡುವೆ ಚಂದ್ರನು ನೇರವಾಗಿ ಬಂದಾಗ ಸೂರ್ಯಗ್ರಹಣ ಸಂಭವಿಸುತ್ತದೆ. ಇವೆಲ್ಲವೂ ಒಂದೇ ಸರಳ ರೇಖೆಯಲ್ಲಿ ಬಂದಾಗ, ಚಂದ್ರನು ಸೂರ್ಯನ ಬೆಳಕನ್ನು ತಡೆದು ಭೂಮಿಯ ಮೇಲ್ಮೈಯ ಮೇಲೆ ತನ್ನ ನೆರಳನ್ನು ಬೀಳಿಸುತ್ತಾನೆ.";
+
+        // 3. Render Loop
+        function animate() {
+            requestAnimationFrame(animate);
+
+            if (isRunning) {
+                if (stopAtAlignment) {
+                    // 1. Guide Earth smoothly to the perfect 0 angle (Horizontal right side)
+                    let currentEarthRot = earthPivot.rotation.y % (Math.PI * 2);
+                    if (currentEarthRot > 0.05) {
+                        earthPivot.rotation.y += (0 - currentEarthRot) * 0.1; // Smooth dampening to 0
+                    } else {
+                        earthPivot.rotation.y = 0; // Lock Earth straight
+                    }
+
+                    // 2. Guide Moon smoothly to 0 angle relative to Earth
+                    let currentMoonRot = moonPivot.rotation.y % (Math.PI * 2);
+                    if (Math.abs(currentMoonRot) > 0.03) {
+                        // Bring moon rotation smoothly down to 0
+                        moonPivot.rotation.y -= currentMoonRot * 0.08;
+                    } else {
+                        // Perfect Alignment Achieved! Lock everything.
+                        moonPivot.rotation.y = 0;
+                        earthPivot.rotation.y = 0;
+                        isRunning = false;
+                        executeEclipsePresentation();
+                    }
+                } else {
+                    // Normal continuous orbiting state
+                    earthPivot.rotation.y += 0.005;
+                    moonPivot.rotation.y += 0.025;
+                }
+                
+                // Subtle rotation of Earth on its own axis
+                earthMesh.rotation.y += 0.01;
+            }
+
+            renderer.render(scene, camera);
+        }
+
+        function triggerAlignment() {
+            actionBtn.disabled = true;
+            subtitle.innerText = "ಸರಿಯಾದ ಸರಳ ರೇಖೆಯ ಜೋಡಣೆಗಾಗಿ ಕಾಯಲಾಗುತ್ತಿದೆ...";
+            
+            // Normalize angles before running the easing formula so they don't spin backwards
+            earthPivot.rotation.y = earthPivot.rotation.y % (Math.PI * 2);
+            moonPivot.rotation.y = moonPivot.rotation.y % (Math.PI * 2);
+            
+            stopAtAlignment = true;
+        }
+
+        function executeEclipsePresentation() {
+            subtitle.innerText = "3D ಗ್ರಹಣ ಜೋಡಣೆ ಪೂರ್ಣಗೊಂಡಿದೆ! ಧ್ವನಿ ವಿವರಣೆ ಪ್ಲೇ ಆಗುತ್ತಿದೆ...";
+            
+            // Online streaming TTS for Kannada
+            const audioUrl = "https://translate.google.com/translate_tts?ie=UTF-8&tl=kn&client=tw-ob&q=" + encodeURIComponent(explanationText);
+            const audio = new Audio(audioUrl);
+            
+            audio.play().then(() => {
+                audio.onended = function() {
+                    subtitle.innerText = "ವಿವರಣೆ ಪೂರ್ಣಗೊಂಡಿದೆ. ಮರುಪ್ರಾರಂಭಿಸಲು ರಿಸೆಟ್ ಬಟನ್ ಕ್ಲಿಕ್ ಮಾಡಿ.";
+                    actionBtn.innerText = "ಮತ್ತೆ ರನ್ ಮಾಡಿ (Reset)";
+                    actionBtn.disabled = false;
+                    actionBtn.onclick = resetSimulation;
+                };
+            }).catch(error => {
+                // SpeechSynthesis fallback
+                if ('speechSynthesis' in window) {
+                    window.speechSynthesis.cancel();
+                    const utterance = new SpeechSynthesisUtterance(explanationText);
+                    utterance.lang = 'kn-IN';
+                    utterance.rate = 0.85;
+                    utterance.onend = () => {
+                        subtitle.innerText = "ವಿವರಣೆ ಪೂರ್ಣಗೊಂಡಿದೆ.";
+                        actionBtn.innerText = "ಮತ್ತೆ ರನ್ ಮಾಡಿ (Reset)";
+                        actionBtn.disabled = false;
+                        actionBtn.onclick = resetSimulation;
+                    };
+                    window.speechSynthesis.speak(utterance);
+                }
+            });
+        }
+
+        function resetSimulation() {
+            isRunning = true;
+            stopAtAlignment = false;
+            // Add initial random offset angles so they orbit separately again
+            earthPivot.rotation.y = 1.0;
+            moonPivot.rotation.y = 3.5;
+            subtitle.innerText = "ಖಗೋಳ ಕಾಯಗಳನ್ನು ಒಂದೇ ಸರಳ ರೇಖೆಗೆ ತರಲು ಬಟನ್ ಕ್ಲಿಕ್ ಮಾಡಿ!";
+            actionBtn.innerText = "ಸೇರಿಸಿ ಮತ್ತು ವಿವರಿಸಿ (Align & Explain)";
+            actionBtn.onclick = triggerAlignment;
+        }
+
+        // Run Engine
+        animate();
+    </script>
+</body>
+</html>
