@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Photosynthesis Lab</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --primary: #10b981;
+            --primary-glow: rgba(16, 185, 129, 0.2);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        header {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        header h1 {
+            margin: 0 0 5px 0;
+            color: var(--primary);
+            font-size: 2rem;
+        }
+
+        header p {
+            margin: 0;
+            color: var(--text-muted);
+        }
+
+        .container {
+            display: flex;
+            gap: 25px;
+            max-width: 1200px;
+            width: 100%;
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+            box-sizing: border-box;
+        }
+
+        .video-section {
+            flex: 1.3;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        video {
+            width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            background: #000;
+        }
+
+        .dashboard-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .panel-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            border-bottom: 2px solid #334155;
+            padding-bottom: 8px;
+            margin: 0;
+            color: var(--primary);
+        }
+
+        /* Timeline / Stepper */
+        .timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            background: #273549;
+            border-left: 4px solid #475569;
+            border-radius: 0 8px 8px 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .step:hover {
+            background: #334155;
+            transform: translateX(5px);
+        }
+
+        .step.active {
+            border-left-color: var(--primary);
+            background: rgba(16, 185, 129, 0.1);
+            box-shadow: inset 0 0 10px var(--primary-glow);
+        }
+
+        .step-time {
+            font-size: 0.85rem;
+            background: #334155;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-right: 12px;
+            color: var(--text-muted);
+            font-family: monospace;
+        }
+
+        .step.active .step-time {
+            background: var(--primary);
+            color: #fff;
+        }
+
+        .step-text {
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        /* Formula Widgets */
+        .formula-box {
+            background: #111827;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 1.1rem;
+            letter-spacing: 0.5px;
+            border: 1px solid #334155;
+        }
+
+        .formula-box span {
+            padding: 2px 6px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .highlight-molecule {
+            background: var(--primary);
+            color: #000;
+            font-weight: bold;
+            box-shadow: 0 0 10px var(--primary);
+            transform: scale(1.05);
+        }
+
+        @media (max-width: 900px) {
+            .container {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>ದ್ವಿತಿಸಂಶ್ಲೇಷಣೆ — Photosynthesis Lab</h1>
+    <p>Interactive Video Companion • Click any stage below to jump through the process</p>
+</header>
+
+<div class="container">
+    <div class="video-section">
+        <video id="photoVideo" controls>
+            <source src="WhatsApp Video 2026-06-15 at 1.42.51 AM.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+    </div>
+
+    <div class="dashboard-section">
+        <h3 class="panel-title">Chemical Track</h3>
+        <div class="formula-box" id="formulaBox">
+            <span id="f-co2">6CO₂</span> + <span id="f-h2o">6H₂O</span> 
+            ➔ 
+            <span id="f-c6h12o6">C₆H₁₂O₆</span> + <span id="f-o2">6O₂</span>
+        </div>
+
+        <h3 class="panel-title">Process Timeline</h3>
+        <div class="timeline">
+            <div class="step" data-time="0" id="step1">
+                <span class="step-time">0:00</span>
+                <span class="step-text">ಪೀಠಿಕೆ / Introduction</span>
+            </div>
+            <div class="step" data-time="23" id="step2">
+                <span class="step-time">0:23</span>
+                <span class="step-text">ಸೂರ್ಯನ ಬೆಳಕು ಮತ್ತು ಕ್ಲೋರೊಫಿಲ್ / Sunlight & Chlorophyll</span>
+            </div>
+            <div class="step" data-time="29" id="step3">
+                <span class="step-time">0:29</span>
+                <span class="step-text">ಕಾರ್ಬನ್ ಡೈಆಕ್ಸೈಡ್ ಮತ್ತು ಪತ್ರರಂಧ್ರ / CO₂ Absorption (Stomata)</span>
+            </div>
+            <div class="step" data-time="39" id="step4">
+                <span class="step-time">0:39</span>
+                <span class="step-text">ಬೇರುಗಳಿಂದ ನೀರು ಸರಬರಾಜು / Water Absorption via Roots</span>
+            </div>
+            <div class="step" data-time="48" id="step5">
+                <span class="step-time">0:48</span>
+                <span class="step-text">ಗ್ಲುಕೋಸ್ ಆಹಾರ ತಯಾರಿಕೆ / Glucose Synthesis</span>
+            </div>
+            <div class="step" data-time="56" id="step6">
+                <span class="step-time">0:56</span>
+                <span class="step-text">ಆಮ್ಲಜನಕ ಬಿಡುಗಡೆ / Oxygen Release & Respiration</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const video = document.getElementById('photoVideo');
+    const steps = document.querySelectorAll('.step');
+    
+    // Formula components
+    const fCo2 = document.getElementById('f-co2');
+    const fH2o = document.getElementById('f-h2o');
+    const fGlucose = document.getElementById('f-c6h12o6');
+    const fO2 = document.getElementById('f-o2');
+
+    // Time chapters map (in seconds)
+    const chapters = [
+        { id: 'step1', start: 0, end: 23 },
+        { id: 'step2', start: 23, end: 29 },
+        { id: 'step3', start: 29, end: 39 },
+        { id: 'step4', start: 39, end: 48 },
+        { id: 'step5', start: 48, end: 56 },
+        { id: 'step6', start: 56, end: 100 }
+    ];
+
+    // Click to seek functionality
+    steps.forEach(step => {
+        step.addEventListener('click', () => {
+            const timeToSeek = parseInt(step.getAttribute('data-time'));
+            video.currentTime = timeToSeek;
+            video.play();
+        });
+    });
+
+    // Update active UI elements based on current video timestamp
+    video.addEventListener('timeupdate', () => {
+        const currentTime = video.currentTime;
+
+        // Reset all dynamic styling
+        steps.forEach(s => s.classList.remove('active'));
+        fCo2.classList.remove('highlight-molecule');
+        fH2o.classList.remove('highlight-molecule');
+        fGlucose.classList.remove('highlight-molecule');
+        fO2.classList.remove('highlight-molecule');
+
+        // Identify current active segment
+        let currentChapterId = '';
+        for (let i = 0; i < chapters.length; i++) {
+            if (currentTime >= chapters[i].start && currentTime < chapters[i].end) {
+                currentChapterId = chapters[i].id;
+                break;
+            }
+        }
+
+        if (currentChapterId) {
+            document.getElementById(currentChapterId).classList.add('active');
+            
+            // Highlight specific chemical components based on what's active in video narration
+            if (currentChapterId === 'step2') {
+                // Solar energy conversion window
+            } else if (currentChapterId === 'step3') {
+                fCo2.classList.add('highlight-molecule');
+            } else if (currentChapterId === 'step4') {
+                fH2o.classList.add('highlight-molecule');
+            } else if (currentChapterId === 'step5') {
+                fGlucose.classList.add('highlight-molecule');
+            } else if (currentChapterId === 'step6') {
+                fO2.classList.add('highlight-molecule');
+            }
+        }
+    });
+</script>
+
+</body>
+</html>
