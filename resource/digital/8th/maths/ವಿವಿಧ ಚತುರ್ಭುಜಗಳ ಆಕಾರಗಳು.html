@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಚತುರ್ಭುಜಗಳ ಪ್ರಪಂಚ (World of Quadrilaterals)</title>
+    <style>
+        :root {
+            --bg-dark: #070a13;
+            --card-bg: #111827;
+            --accent-cyan: #00f0ff;
+            --accent-purple: #9d4edd;
+            --accent-green: #39ff14;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: #1f2937;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+            max-width: 800px;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            color: var(--accent-cyan);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
+        }
+
+        header p {
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .main-container {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 2rem;
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        @media (max-width: 900px) {
+            .main-container { grid-template-columns: 1fr; }
+        }
+
+        .panel {
+            background-color: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+        }
+
+        h2 {
+            font-size: 1.4rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border-color);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Shape Selection Grid */
+        .shape-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .shape-btn {
+            background: #1f2937;
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 1rem;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 1.05rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .shape-btn:hover, .shape-btn.active {
+            background: linear-gradient(135deg, var(--accent-cyan), #0072ff);
+            color: var(--bg-dark);
+            font-weight: bold;
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
+            transform: translateY(-2px);
+        }
+
+        /* Interactive Canvas Display */
+        .display-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #090d16;
+            border-radius: 12px;
+            border: 1px dashed var(--accent-cyan);
+            min-height: 320px;
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+
+        svg {
+            width: 280px;
+            height: 220px;
+        }
+
+        polygon {
+            fill: rgba(0, 240, 255, 0.1);
+            stroke: var(--accent-cyan);
+            stroke-width: 4;
+            transition: all 0.5s ease;
+        }
+
+        line {
+            stroke: var(--accent-purple);
+            stroke-width: 2;
+            stroke-dasharray: 5, 5;
+            transition: all 0.5s ease;
+        }
+
+        /* Properties Info Display */
+        .property-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .property-list li {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 0.8rem 1.2rem;
+            border-radius: 8px;
+            border-left: 4px solid var(--accent-green);
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
+        .property-list li b {
+            color: var(--accent-cyan);
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>ಚತುರ್ಭುಜಗಳ ಡಿಜಿಟಲ್ ಪ್ರಯೋಗಾಲಯ</h1>
+        <p>ವಿವಿಧ ಚತುರ್ಭುಜಗಳ ಆಕಾರಗಳು ಮತ್ತು ಅವುಗಳ ವಿಶಿಷ್ಟ ಗುಣಲಕ್ಷಣಗಳನ್ನು ಸಂವಾದಾತ್ಮಕವಾಗಿ ಕಲಿಯಿರಿ</p>
+    </header>
+
+    <div class="main-container">
+        
+        <div class="panel">
+            <h2>ಚತುರ್ಭುಜವನ್ನು ಆರಿಸಿ (Select Shape)</h2>
+            <div class="shape-grid">
+                <button class="shape-btn active" onclick="loadShape('parallelogram', this)">ಸಮಾಂತರ ಚತುರ್ಭುಜ</button>
+                <button class="shape-btn" onclick="loadShape('rectangle', this)">ಆಯತ (Rectangle)</button>
+                <button class="shape-btn" onclick="loadShape('square', this)">ಚೌಕ / ವರ್ಗ (Square)</button>
+                <button class="shape-btn" onclick="loadShape('rhombus', this)">ವಜ್ರಾಕೃತಿ (Rhombus)</button>
+                <button class="shape-btn" onclick="loadShape('trapezium', this)">ತ್ರಾಪಿಜ್ಯ (Trapezium)</button>
+                <button class="shape-btn" onclick="loadShape('kite', this)">ಪತಂಗ (Kite)</button>
+            </div>
+            
+            <div style="margin-top: 1.5rem; font-size: 0.9rem; color: var(--text-muted); background: #090d16; padding: 10px; border-radius: 8px;">
+                💡 <b>ಶಿಕ್ಷಕರ ಸೂಚನೆ:</b> ವಿದ್ಯಾರ್ಥಿಗಳಿಗೆ ಪ್ರತಿ ಆಕೃತಿಯ ಕರ್ಣಗಳು (Diagonals) ಹೇಗೆ ಪರಸ್ಪರ ಛೇದಿಸುತ್ತವೆ ಮತ್ತು ಬಾಹುಗಳ ನಡುವಿನ ವ್ಯತ್ಯಾಸವೇನು ಎಂಬುದನ್ನು ಬೋರ್ಡ್ ಮೇಲೆ ಹೋಲಿಕೆ ಮಾಡಿ ತೋರಿಸಿ.
+            </div>
+        </div>
+
+        <div class="panel">
+            <h2>
+                <span id="shape-title" style="color: var(--accent-green);">ಸಮಾಂತರ ಚತುರ್ಭುಜ (Parallelogram)</span>
+                <span style="font-size: 0.9rem; color: var(--text-muted);">ಲಕ್ಷಣಗಳು</span>
+            </h2>
+
+            <div class="display-box">
+                <svg viewBox="0 0 300 240">
+                    <polygon id="quad-shape" points="60,180 240,180 270,60 90,60" />
+                    <line id="diag-1" x1="60" y1="180" x2="270" y2="60" />
+                    <line id="diag-2" x1="240" y1="180" x2="90" y2="60" />
+                </svg>
+            </div>
+
+            <ul class="property-list" id="property-container">
+                </ul>
+        </div>
+
+    </div>
+
+    <script>
+        // Data Registry for Quadrilaterals Properties in Kannada
+        const quadrilateralData = {
+            parallelogram: {
+                title: "ಸಮಾಂತರ ಚತುರ್ಭುಜ (Parallelogram)",
+                points: "60,180 240,180 270,60 90,60",
+                d1: {x1: 60, y1: 180, x2: 270, y2: 60},
+                d2: {x1: 240, y1: 180, x2: 90, y2: 60},
+                properties: [
+                    "<b>ಅಭಿಮುಖ ಬಾಹುಗಳು:</b> ಎದುರುಬದಿಯ ಬಾಹುಗಳು ಸಮಾನ ಮತ್ತು ಸಮಾಂತರವಾಗಿರುತ್ತವೆ.",
+                    "<b>ಅಭಿಮುಖ ಕೋನಗಳು:</b> ಎದುರುಬದಿಯ ಕೋನಗಳು ಪರಸ್ಪರ ಸಮವಾಗಿರುತ್ತವೆ.",
+                    "<b>ಕರ್ಣಗಳು (Diagonals):</b> ಕರ್ಣಗಳು ಪರಸ್ಪರ ಅರ್ಧಿಸುತ್ತವೆ (Bisect each other).",
+                    "<b>ಪಾರ್ಶ್ವ ಕೋನಗಳು:</b> ಯಾವುದೇ ಎರಡು ಪಾರ್ಶ್ವ ಕೋನಗಳ ಮೊತ್ತ 180° ಆಗಿರುತ್ತದೆ (ಪೂರಕ ಕೋನಗಳು)."
+                ]
+            },
+            rectangle: {
+                title: "ಆಯತ (Rectangle)",
+                points: "60,180 240,180 240,60 60,60",
+                d1: {x1: 60, y1: 180, x2: 240, y2: 60},
+                d2: {x1: 240, y1: 180, x2: 60, y2: 60},
+                properties: [
+                    "<b>ಬಾಹುಗಳು:</b> ಅಭಿಮುಖ ಬಾಹುಗಳು ಸಮನಾಗಿರುತ್ತವೆ.",
+                    "<b>ಕೋನಗಳು:</b> ಪ್ರತಿಯೊಂದು ಆಂತರಿಕ ಕೋನವು 90° (ಲಂಬಕೋನ) ಆಗಿರುತ್ತದೆ.",
+                    "<b>ಕರ್ಣಗಳು:</b> ಕರ್ಣಗಳ ಉದ್ದವು ಪರಸ್ಪರ ಸಮನಾಗಿರುತ್ತದೆ ಮತ್ತು ಅವು ಪರಸ್ಪರ ಅರ್ಧಿಸುತ್ತವೆ."
+                ]
+            },
+            square: {
+                title: "ಚೌಕ / ವರ್ಗ (Square)",
+                points: "70,180 190,180 190,60 70,60",
+                d1: {x1: 70, y1: 180, x2: 190, y2: 60},
+                d2: {x1: 190, y1: 180, x2: 70, y2: 60},
+                properties: [
+                    "<b>ಬಾಹುಗಳು:</b> ಎಲ್ಲಾ ನಾಲ್ಕು ಬಾಹುಗಳ ಉದ್ದವು ಸಮನಾಗಿರುತ್ತದೆ.",
+                    "<b>ಕೋನಗಳು:</b> ಎಲ್ಲಾ ಕೋನಗಳು 90° ಆಗಿರುತ್ತವೆ.",
+                    "<b>ಕರ್ಣಗಳು:</b> ಕರ್ಣಗಳು ಸಮನಾಗಿದ್ದು, ಪರಸ್ಪರ 90° ಕೋನದಲ್ಲಿ (ಲಂಬವಾಗಿ) ಅರ್ಧಿಸುತ್ತವೆ."
+                ]
+            },
+            rhombus: {
+                title: "ವಜ್ರಾಕೃತಿ (Rhombus)",
+                points: "150,200 240,120 150,40 60,120",
+                d1: {x1: 150, y1: 200, x2: 150, y2: 40},
+                d2: {x1: 240, y1: 120, x2: 60, y2: 120},
+                properties: [
+                    "<b>ಬಾಹುಗಳು:</b> ಎಲ್ಲಾ ನಾಲ್ಕು ಬಾಹುಗಳು ಸಮನಾಗಿರುತ್ತವೆ ಮತ್ತು ಅಭಿಮುಖ ಬಾಹುಗಳು ಸಮಾಂತರವಾಗಿರುತ್ತವೆ.",
+                    "<b>ಕೋನಗಳು:</b> ಅಭಿಮುಖ ಕೋನಗಳು ಸಮವಾಗಿರುತ್ತವೆ.",
+                    "<b>ಕರ್ಣಗಳು:</b> ಕರ್ಣಗಳು ಪರಸ್ಪರ ಲಂಬವಾಗಿ ಅರ್ಧಿಸುತ್ತವೆ (Bisections at 90°), ಆದರೆ ಅವುಗಳ ಉದ್ದ ಸಮನಾಗಿರುವುದಿಲ್ಲ."
+                ]
+            },
+            trapezium: {
+                title: "ತ್ರಾಪಿಜ್ಯ (Trapezium)",
+                points: "50,180 260,180 200,60 100,60",
+                d1: {x1: 50, y1: 180, x2: 200, y2: 60},
+                d2: {x1: 260, y1: 180, x2: 100, y2: 60},
+                properties: [
+                    "<b>ಬಾಹುಗಳು:</b> ಕೇವಲ ಒಂದು ಜೊತೆ ಅಭಿಮುಖ ಬಾಹುಗಳು ಮಾತ್ರ ಸಮಾಂತರವಾಗಿರುತ್ತವೆ (Parallel).",
+                    "<b>ವಿಶೇಷತೆ:</b> ಸಮಾಂತರವಲ್ಲದ ಬಾಹುಗಳ ಉದ್ದ ಸಮನಾಗಿದ್ದರೆ ಅದನ್ನು 'ಸಮದ್ವಿಬಾಹು ತ್ರಾಪಿಜ್ಯ' ಎನ್ನಲಾಗುತ್ತದೆ."
+                ]
+            },
+            kite: {
+                title: "ಪತಂಗ (Kite)",
+                points: "150,210 230,110 150,40 70,110",
+                d1: {x1: 150, y1: 210, x2: 150, y2: 40},
+                d2: {x1: 230, y1: 110, x2: 70, y2: 110},
+                properties: [
+                    "<b>ಬಾಹುಗಳು:</b> ಪಾರ್ಶ್ವ ಬಾಹುಗಳ (Adjacent sides) ಎರಡು ಜೊತೆಗಳು ಪ್ರತ್ಯೇಕವಾಗಿ ಸಮನಾಗಿರುತ್ತವೆ.",
+                    "<b>ಕರ್ಣಗಳು:</b> ಕರ್ಣಗಳು ಪರಸ್ಪರ ಲಂಬವಾಗಿರುತ್ತವೆ ಮತ್ತು ಒಂದು ಕರ್ಣವು ಮತ್ತೊಂದನ್ನು ಅರ್ಧಿಸುತ್ತದೆ."
+                ]
+            }
+        };
+
+        function loadShape(shapeKey, buttonElement) {
+            // Manage Active Button States
+            document.querySelectorAll('.shape-btn').forEach(btn => btn.classList.remove('active'));
+            if(buttonElement) buttonElement.classList.add('active');
+
+            const data = quadrilateralData[shapeKey];
+
+            // Target DOM nodes and animate polygon vector arrays
+            document.getElementById('shape-title').innerText = data.title;
+            document.getElementById('quad-shape').setAttribute('points', data.points);
+
+            // Animate Diagonal vectors 
+            const d1 = document.getElementById('diag-1');
+            d1.setAttribute('x1', data.d1.x1);
+            d1.setAttribute('y1', data.d1.y1);
+            d1.setAttribute('x2', data.d1.x2);
+            d1.setAttribute('y2', data.d1.y2);
+
+            const d2 = document.getElementById('diag-2');
+            d2.setAttribute('x1', data.d2.x1);
+            d2.setAttribute('y1', data.d2.y1);
+            d2.setAttribute('x2', data.d2.x2);
+            d2.setAttribute('y2', data.d2.y2);
+
+            // Populate Text Properties Module
+            const container = document.getElementById('property-container');
+            container.innerHTML = '';
+            data.properties.forEach(prop => {
+                const li = document.createElement('li');
+                li.innerHTML = prop;
+                container.appendChild(li);
+            });
+        }
+
+        // Trigger default initialization loop
+        window.onload = function() {
+            loadShape('parallelogram', null);
+        };
+    </script>
+</body>
+</html>

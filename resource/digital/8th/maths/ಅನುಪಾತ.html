@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಅನುಪಾತ ಮತ್ತು ಸಮಾನುಪಾತ - Interactive Book</title>
+    <style>
+        :root {
+            --bg-dark: #090d16;
+            --card-bg: #111827;
+            --accent-cyan: #00f0ff;
+            --accent-purple: #9d4edd;
+            --accent-orange: #ffb703;
+            --accent-green: #39ff14;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: #1f2937;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .book-container {
+            width: 100%;
+            max-width: 1000px;
+            background-color: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.6);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Navigation Tabs */
+        .book-tabs {
+            display: flex;
+            background: #1f2937;
+            border-bottom: 2px solid var(--border-color);
+            overflow-x: auto;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            padding: 1.2rem 1.5rem;
+            font-size: 1.05rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            flex: 1;
+            text-align: center;
+        }
+
+        .tab-btn:hover, .tab-btn.active {
+            color: var(--accent-cyan);
+            background: #0f172a;
+            border-bottom: 4px solid var(--accent-cyan);
+        }
+
+        /* Content Area */
+        .book-content {
+            padding: 2.5rem;
+            min-height: 500px;
+        }
+
+        .page {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 {
+            color: var(--accent-cyan);
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        p {
+            font-size: 1.1rem;
+            line-height: 1.7;
+            color: #cbd5e1;
+            margin-bottom: 1.5rem;
+        }
+
+        .highlight-box {
+            background: rgba(0, 240, 255, 0.04);
+            border-left: 5px solid var(--accent-cyan);
+            padding: 1.2rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            font-size: 1.05rem;
+        }
+
+        /* Interactive Playground Components */
+        .playground {
+            background: #090d16;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .control-row {
+            display: flex;
+            gap: 2rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .control-item {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            accent-color: var(--accent-cyan);
+            cursor: pointer;
+        }
+
+        .visual-display {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            min-height: 150px;
+            background: rgba(255,255,255,0.02);
+            border-radius: 8px;
+            padding: 1rem;
+        }
+
+        /* Visual tokens for Page 1 */
+        .token {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+
+        .token-apple { background-color: #ef4444; box-shadow: 0 0 10px rgba(239,68,68,0.5); }
+        .token-orange { background-color: #f97316; box-shadow: 0 0 10px rgba(249,115,22,0.5); }
+
+        .live-formula {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 1.3rem;
+            color: var(--accent-orange);
+            font-weight: bold;
+            text-align: center;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="book-container">
+        
+        <div class="book-tabs">
+            <button class="tab-btn active" onclick="openPage('page1', this)">1. ಅನುಪಾತದ ಪರಿಚಯ</button>
+            <button class="tab-btn" onclick="openPage('page2', this)">2. ಸಮಾನ ಅನುಪಾತ</button>
+            <button class="tab-btn" onclick="openPage('page3', this)">3. ನೇರ ಅನುಪಾತ</button>
+            <button class="tab-btn" onclick="openPage('page4', this)">4. ವಿಲೋಮ ಅನುಪಾತ</button>
+        </div>
+
+        <div class="book-content">
+            
+            <div id="page1" class="page active">
+                <h1>1. ಅನುಪಾತ ಎಂದರೇನು? (What is Ratio?)</h1>
+                <p>ಎರಡು ಒಂದೇ ರೀತಿಯ ಪ್ರಮಾಣಗಳನ್ನು ಭಾಗಾಕಾರದ ಮೂಲಕ ಹೋಲಿಕೆ ಮಾಡುವುದನ್ನು <b>ಅನುಪಾತ (Ratio)</b> ಎನ್ನಲಾಗುತ್ತದೆ. ಅನುಪಾತವನ್ನು ಸೂಚಿಸಲು <b>' : '</b> (Colon) ಚಿಹ್ನೆಯನ್ನು ಬಳಸುತ್ತೇವೆ.</p>
+                
+                <div class="highlight-box">
+                    ಉದಾಹರಣೆಗೆ, ಒಂದು ಬುಟ್ಟಿಯಲ್ಲಿ ಸೇಬುಗಳು ಮತ್ತು ಕಿತ್ತಳೆ ಹಣ್ಣುಗಳ ಹೋಲಿಕೆಯನ್ನು ಕೆಳಗೆ ಸ್ಲೈಡರ್ ಬಳಸಿ ಬದಲಾಯಿಸಿ ನೋಡಿ!
+                </div>
+
+                <div class="playground">
+                    <div class="control-row">
+                        <div class="control-item">
+                            <label>ಸೇಬುಗಳ ಸಂಖ್ಯೆ (Apples - A): <span id="lbl-apples" style="color: #ef4444;">4</span></label>
+                            <input type="range" id="slide-apples" min="1" max="12" value="4" oninput="simRatio()">
+                        </div>
+                        <div class="control-item">
+                            <label>ಕಿತ್ತಳೆಗಳ ಸಂಖ್ಯೆ (Oranges - B): <span id="lbl-oranges" style="color: #f97316;">6</span></label>
+                            <input type="range" id="slide-oranges" min="1" max="12" value="6" oninput="simRatio()">
+                        </div>
+                    </div>
+
+                    <div class="visual-display" id="ratio-visual">
+                        </div>
+
+                    <div class="live-formula" id="ratio-output">
+                        ಸೇಬುಗಳು : ಕಿತ್ತಳೆಗಳು = 4 : 6 = 2 : 3
+                    </div>
+                </div>
+            </div>
+
+            <div id="page2" class="page">
+                <h1>2. ಸಮಾನ ಅನುಪಾತಗಳು (Equivalent Ratios)</h1>
+                <p>ಒಂದು ಅನುಪಾತದ ಅಂಶ ಮತ್ತು ಛೇದಗಳನ್ನು ಒಂದೇ ಶೂನ್ಯವಲ್ಲದ ಸಂಖ್ಯೆಯಿಂದ ಗುಣಿಸಿದಾಗ ಅಥವಾ ಭಾಗಿಸಿದಾಗ ಸಿಗುವ ಅನುಪಾತಗಳನ್ನು <b>ಸಮಾನ ಅನುಪಾತಗಳು</b> ಎನ್ನುತ್ತೇವೆ.</p>
+                
+                <div class="highlight-box">
+                    <b>ಪರೀಕ್ಷೆ:</b> ಮೂಲ ಅನುಪಾತ <span style="color:var(--accent-cyan)">1 : 2</span> ಕ್ಕೆ ಸಮನಾದ ದೊಡ್ಡ ಅನುಪಾತದ ಗುಣಕವನ್ನು ಬದಲಾಯಿಸಿ ನೋಡಿ.
+                </div>
+
+                <div class="playground">
+                    <div class="control-row">
+                        <div class="control-item">
+                            <label>ಗುಣಕ ಸಂಖ್ಯೆ (Multiplier - ನಿಯತಾಂಕ): <span id="lbl-mult" style="color: var(--accent-green);">2</span></label>
+                            <input type="range" id="slide-mult" min="1" max="10" value="2" oninput="simEquivalent()">
+                        </div>
+                    </div>
+
+                    <div class="live-formula" id="equiv-output" style="font-size: 1.5rem; padding: 2rem 0;">
+                        (1 × 2) : (2 × 2) = 2 : 4
+                    </div>
+                </div>
+            </div>
+
+            <div id="page3" class="page">
+                <h1>3. ನೇರ ಅನುಪಾತ (Direct Proportion)</h1>
+                <p>ಒಂದು ಪ್ರಮಾಣವು ಹೆಚ್ಚಾದಾಗ ಅದಕ್ಕೆ ಅನುಗುಣವಾಗಿ ಮತ್ತೊಂದು ಪ್ರಮಾಣವೂ ಸಹ ಹೆಚ್ಚಾದರೆ ಅಥವಾ ಒಂದು ಪ್ರಮಾಣ ಕಡಿಮೆಯಾದಾಗ ಮತ್ತೊಂದೂ ಕಡಿಮೆಯಾದರೆ ಅದನ್ನು <b>ನೇರ ಅನುಪಾತ</b> ಎನ್ನಲಾಗುತ್ತದೆ. ಇಲ್ಲಿ <span class="live-formula" style="font-size:1rem;">x / y = k (ಸ್ಥಿರಾಂಕ)</span> ಆಗಿರುತ್ತದೆ.</p>
+                
+                <div class="highlight-box">
+                    <b>ನೈಜ ಉದಾಹರಣೆ:</b> ಕಾರಿನ ಪೆಟ್ರೋಲ್ ಪ್ರಮಾಣ ಹೆಚ್ಚಾದಂತೆ ಅದು ಕ್ರಮಿಸುವ ದೂರವೂ ಹೆಚ್ಚಾಗುತ್ತದೆ!
+                </div>
+
+                <div class="playground">
+                    <div class="control-row">
+                        <div class="control-item">
+                            <label>ಪೆಟ್ರೋಲ್ ಪ್ರಮಾಣ (ಲೀಟರ್‌ಗಳಲ್ಲಿ): <span id="lbl-petrol" style="color: var(--accent-cyan);">2 ಲೀಟರ್</span></label>
+                            <input type="range" id="slide-petrol" min="1" max="10" value="2" oninput="simDirect()">
+                        </div>
+                    </div>
+
+                    <div class="live-formula" id="direct-output">
+                        2 ಲೀಟರ್ ಪೆಟ್ರೋಲ್ = 40 ಕಿ.ಮೀ ದೂರ (ಸ್ಥಿರ ಅನುಪಾತ = 20 ಕಿ.ಮೀ/ಲೀಟರ್)
+                    </div>
+                </div>
+            </div>
+
+            <div id="page4" class="page">
+                <h1>4. ವಿಲೋಮ ಅನುಪಾತ (Inverse Proportion)</h1>
+                <p>ಒಂದು ಪ್ರಮಾಣವು ಹೆಚ್ಚಾದಾಗ ಅದಕ್ಕೆ ಅನುಗುಣವಾಗಿ ಮತ್ತೊಂದು ಪ್ರಮಾಣವು ಕಡಿಮೆಯಾದರೆ (ಅಥವಾ ಒಂದು ಕಡಿಮೆಯಾದಾಗ ಮತ್ತೊಂದು ಹೆಚ್ಚಾದರೆ) ಅದನ್ನು <b>ವಿಲೋಮ ಅನುಪಾತ</b> ಎನ್ನಲಾಗುತ್ತದೆ. ಇಲ್ಲಿ <span class="live-formula" style="font-size:1rem;">x × y = k (ಸ್ಥಿರಾಂಕ)</span> ಆಗಿರುತ್ತದೆ.</p>
+                
+                <div class="highlight-box">
+                    <b>ನೈಜ ಉದಾಹರಣೆ:</b> ಒಂದು ಕೆಲಸವನ್ನು ಮಾಡಲು ಕೆಲಸಗಾರರ ಸಂಖ್ಯೆ ಹೆಚ್ಚಾದರೆ, ಆ ಕೆಲಸ ಮುಗಿಯಲು ಬೇಕಾಗುವ ದಿನಗಳ ಸಂಖ್ಯೆ ಕಡಿಮೆಯಾಗುತ್ತದೆ!
+                </div>
+
+                <div class="playground">
+                    <div class="control-row">
+                        <div class="control-item">
+                            <label>ಕೆಲಸಗಾರರ ಸಂಖ್ಯೆ (Workers): <span id="lbl-workers" style="color: var(--accent-orange);">2</span></label>
+                            <input type="range" id="slide-workers" min="1" max="8" value="2" oninput="simInverse()">
+                        </div>
+                    </div>
+
+                    <div class="live-formula" id="inverse-output">
+                        2 ಕೆಲಸಗಾರರು = 12 ದಿನಗಳು (ಒಟ್ಟು ಕೆಲಸದ ಸ್ಥಿರಾಂಕ = 24 ಮ್ಯಾನ್-ಡೇಸ್)
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // Page Navigation Logic
+        function openPage(pageId, btn) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            
+            document.getElementById(pageId).classList.add('active');
+            btn.classList.add('active');
+            
+            // Trigger specific page load states
+            if(pageId === 'page1') simRatio();
+            if(pageId === 'page2') simEquivalent();
+            if(pageId === 'page3') simDirect();
+            if(pageId === 'page4') simInverse();
+        }
+
+        // GCD (Greatest Common Divisor) helper function for simplified ratio
+        function gcd(a, b) {
+            return b ? gcd(b, a % b) : a;
+        }
+
+        // Page 1: Ratio Simulation Logic
+        function simRatio() {
+            const apples = parseInt(document.getElementById('slide-apples').value);
+            const oranges = parseInt(document.getElementById('slide-oranges').value);
+            
+            document.getElementById('lbl-apples').innerText = apples;
+            document.getElementById('lbl-oranges').innerText = oranges;
+
+            const display = document.getElementById('ratio-visual');
+            display.innerHTML = '';
+
+            // Inject dynamic visual tokens
+            for(let i=0; i<apples; i++) {
+                let s = document.createElement('span'); s.className = 'token token-apple'; display.appendChild(s);
+            }
+            for(let j=0; j<oranges; j++) {
+                let s = document.createElement('span'); s.className = 'token token-orange'; display.appendChild(s);
+            }
+
+            const factor = gcd(apples, oranges);
+            const simpA = apples / factor;
+            const simpB = oranges / factor;
+
+            document.getElementById('ratio-output').innerHTML = 
+                `ಸೇಬುಗಳು : ಕಿತ್ತಳೆಗಳು = ${apples} : ${oranges} = <span style='color:var(--accent-green)'>${simpA} : ${simpB}</span>`;
+        }
+
+        // Page 2: Equivalent Ratio Logic
+        function simEquivalent() {
+            const m = parseInt(document.getElementById('slide-mult').value);
+            document.getElementById('lbl-mult').innerText = m;
+            document.getElementById('equiv-output').innerHTML = 
+                `ಮೂಲ ಅನುಪಾತ = 1 : 2 <br><br> (1 × ${m}) : (2 × ${m}) = <span style='color:var(--accent-cyan)'>${1*m} : ${2*m}</span>`;
+        }
+
+        // Page 3: Direct Proportion Logic
+        function simDirect() {
+            const petrol = parseInt(document.getElementById('slide-petrol').value);
+            const distance = petrol * 20; // Constant speed factor of 20km per liter
+            document.getElementById('lbl-petrol').innerText = petrol + " ಲೀಟರ್";
+            document.getElementById('direct-output').innerHTML = 
+                `⛽ ${petrol} ಲೀಟರ್ ಪೆಟ್ರೋಲ್ = 🚗 <b>${distance} ಕಿ.ಮೀ</b> ದೂರ<br><br><small style='color:var(--text-muted)'>ಸ್ಥಿರ ಅನುಪಾತ (x/y) = ${petrol}/${distance} = 1/20</small>`;
+        }
+
+        // Page 4: Inverse Proportion Logic
+        function simInverse() {
+            const workers = parseInt(document.getElementById('slide-workers').value);
+            const totalJob = 24; // Constant total task units
+            const days = (totalJob / workers).toFixed(1);
+            document.getElementById('lbl-workers').innerText = workers;
+            document.getElementById('inverse-output').innerHTML = 
+                `👷 ${workers} ಕೆಲಸಗಾರರು = ⏱️ <b>${days} ದಿನಗಳು</b><br><br><small style='color:var(--text-muted)'>ಸ್ಥಿರ ಗುಣಲಬ್ಧ (x × y) = ${workers} × ${days} = 24</small>`;
+        }
+
+        // Setup Init Loop
+        window.onload = function() {
+            simRatio();
+        }
+    </script>
+</body>
+</html>
