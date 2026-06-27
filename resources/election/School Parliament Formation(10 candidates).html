@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>School Digital EVM System</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f4f8;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+        }
+        /* Top Header Style */
+        .top-resource-header {
+            font-size: 0.9rem;
+            color: #4a5568;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+            margin-bottom: 15px;
+            background-color: #e2e8f0;
+            display: inline-block;
+            padding: 6px 20px;
+            border-radius: 20px;
+        }
+        .container {
+            max-width: 850px;
+            margin: 0 auto;
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            position: relative;
+        }
+        h1 { color: #1a365d; margin-top: 5px; margin-bottom: 5px; }
+        h2 { color: #2b6cb0; margin-bottom: 25px; font-size: 1.2rem; }
+        .school-title-display {
+            font-size: 1.5rem;
+            color: #2c5282;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+        
+        /* Mode Tabs */
+        .mode-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .tab-btn {
+            padding: 12px 30px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn-setup { background-color: #4a5568; color: white; }
+        .btn-evm { background-color: #2b6cb0; color: white; }
+        .tab-btn.active {
+            outline: 3px solid #3182ce;
+            box-shadow: 0 0 10px rgba(49,130,206,0.5);
+        }
+
+        /* School Name Input Container */
+        .school-input-container {
+            background-color: #edf2f7;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        .school-input-container label {
+            font-weight: bold;
+            color: #2d3748;
+            display: block;
+            margin-bottom: 5px;
+        }
+        .input-school {
+            width: 97%;
+            padding: 10px;
+            font-size: 1.1rem;
+            border: 2px solid #cbd5e0;
+            border-radius: 5px;
+        }
+
+        /* Setup Table Style */
+        .setup-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        .setup-table th, .setup-table td {
+            border: 1px solid #cbd5e0;
+            padding: 10px;
+            text-align: left;
+        }
+        .setup-table th { background-color: #edf2f7; }
+        .input-name {
+            width: 90%;
+            padding: 8px;
+            border: 1px solid #cbd5e0;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        .save-btn {
+            background-color: #48bb78;
+            color: white;
+            padding: 12px 40px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        /* EVM Voting Board Style */
+        .evm-board {
+            border: 4px solid #4a5568;
+            padding: 20px;
+            border-radius: 10px;
+            background: #fff;
+        }
+        .candidate-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #fff;
+            margin-bottom: 12px;
+            padding: 10px 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+        }
+        .serial-no { font-size: 1.2rem; font-weight: bold; width: 40px; text-align: left; }
+        .symbol-preview {
+            width: 60px;
+            height: 60px;
+            object-fit: contain;
+            border: 1px solid #cbd5e0;
+            background: #f7fafc;
+        }
+        .candidate-name { flex-grow: 1; text-align: left; margin-left: 20px; font-size: 1.1rem; font-weight: 600; }
+        .vote-btn {
+            background-color: #e53e3e;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #9b2c2c;
+        }
+        .vote-btn:active { transform: translateY(4px); box-shadow: none; }
+
+        /* 5-Second Automatic Pop-up Style */
+        .custom-popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #2f855a;
+            color: white;
+            padding: 25px 50px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            z-index: 1000;
+            border: 3px solid #fff;
+        }
+
+        /* Result Section Style */
+        .admin-section { margin-top: 40px; padding-top: 20px; border-top: 2px dashed #cbd5e0; }
+        .result-btn { background-color: #2b6cb0; color: white; border: none; padding: 12px 30px; font-size: 1.1rem; border-radius: 5px; cursor: pointer; }
+        .result-display { display: none; margin-top: 25px; background: #edf2f7; padding: 20px; border-radius: 8px; text-align: left; scroll-margin-top: 20px; }
+        .result-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #cbd5e0; font-size: 1.1rem; }
+        .winner { background-color: #c6f6d5; padding: 15px; margin-top: 15px; border-radius: 5px; font-weight: bold; color: #22543d; text-align: center; font-size: 1.2rem; }
+        .reset-btn { background-color: #718096; color: white; border: none; padding: 8px 15px; margin-top: 15px; cursor: pointer; border-radius: 4px; }
+    </style>
+</head>
+<body>
+
+    <div class="top-resource-header">
+        🛠️ GPT Teachers' Educational Resources, Uttara Kannada 🛠️
+    </div>
+
+    <div id="vote-popup" class="custom-popup">
+        ✔ Your vote has been successfully cast!<br>
+        <span style="font-size: 1rem; font-weight: normal; color: #e2e8f0;">(This screen will disappear after 5 seconds)</span>
+    </div>
+
+    <div class="container">
+        <h1 id="school-title-header">🏫 School Parliament Election 🏫</h1>
+        <h2 id="page-subtitle">Election Setup Page</h2>
+
+        <div class="mode-tabs">
+            <button id="tab1" class="tab-btn btn-setup active" onclick="switchMode('setup')">⚙️ Candidate Setup</button>
+            <button id="tab2" class="tab-btn btn-evm" onclick="switchMode('evm')">🔴 EVM (Real Voting)</button>
+        </div>
+
+        <div id="setup-view">
+            <div class="school-input-container">
+                <label for="school-name-input">Enter Your School Name:</label>
+                <input type="text" id="school-name-input" class="input-school" placeholder="e.g., Government Higher Primary School...">
+            </div>
+
+            <p style="color: #718096; font-weight: bold; text-align: left; margin-left: 5px;">Enter names and choose symbols for 10 candidates, then click 'Save Data' before switching to EVM Mode.</p>
+            <table class="setup-table">
+                <thead>
+                    <tr>
+                        <th style="width: 8%;">Sl. No.</th>
+                        <th style="width: 50%;">Candidate Name</th>
+                        <th style="width: 42%;">Choose Election Symbol (Image File)</th>
+                    </tr>
+                </thead>
+                <tbody id="setup-rows"></tbody>
+            </table>
+            <button class="save-btn" onclick="saveElectionData()">💾 Save Election Data Securely</button>
+        </div>
+
+        <div id="evm-view" style="display: none;">
+            <div id="school-name-display" class="school-title-display"></div>
+            
+            <div class="evm-board">
+                <div id="evm-candidates-list"></div>
+            </div>
+
+            <div class="admin-section">
+                <button class="result-btn" onclick="showResults()">📊 View Results</button>
+                <div id="result-box" class="result-display">
+                    <h3>📊 Election Results Summary</h3>
+                    <div id="votes-count-list"></div>
+                    <div id="winner-box"></div>
+                    <button class="reset-btn" onclick="resetVotesOnly()">🔄 Reset Votes Only (For Re-election)</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let electionData = JSON.parse(localStorage.getItem('school_evm_data_en')) || Array.from({length: 10}, (_, i) => ({
+            id: i + 1,
+            name: i === 9 ? "NOTA (None of the Above)" : `Candidate ${i + 1}`,
+            symbol: "", 
+            votes: 0
+        }));
+
+        let savedSchoolName = localStorage.getItem('school_name_data_en') || "";
+        let isVotingInProgress = false; 
+
+        window.onload = function() {
+            document.getElementById('school-name-input').value = savedSchoolName;
+            buildSetupTable();
+            buildEVMBoard();
+            updateSchoolDisplay();
+        };
+
+        function updateSchoolDisplay() {
+            const displayDiv = document.getElementById('school-name-display');
+            if (savedSchoolName.trim() !== "") {
+                displayDiv.innerText = savedSchoolName;
+            } else {
+                displayDiv.innerText = "School Parliament Election";
+            }
+        }
+
+        function buildSetupTable() {
+            const tbody = document.getElementById('setup-rows');
+            tbody.innerHTML = "";
+            electionData.forEach((cand) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><b>${cand.id}</b></td>
+                    <td>
+                        <input type="text" id="name-${cand.id}" class="input-name" value="${cand.name}" ${cand.id === 10 ? 'readonly' : ''}>
+                    </td>
+                    <td>
+                        <input type="file" id="file-${cand.id}" accept="image/*" onchange="handleImageUpload(this, ${cand.id})">
+                        ${cand.symbol ? `<br><img src="${cand.symbol}" class="symbol-preview" style="height:35px; width:35px; margin-top:5px;">` : ''}
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function handleImageUpload(input, id) {
+            const file = input.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const index = electionData.findIndex(c => c.id === id);
+                    electionData[index].symbol = e.target.result; 
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function saveElectionData() {
+            const schoolInput = document.getElementById('school-name-input').value;
+            savedSchoolName = schoolInput;
+            localStorage.setItem('school_name_data_en', schoolInput);
+
+            electionData.forEach(cand => {
+                const nameInput = document.getElementById(`name-${cand.id}`);
+                if (nameInput) {
+                    cand.name = nameInput.value;
+                }
+            });
+            localStorage.setItem('school_evm_data_en', JSON.stringify(electionData));
+            
+            updateSchoolDisplay();
+            alert("Election data saved successfully!");
+            buildEVMBoard();
+        }
+
+        function buildEVMBoard() {
+            const evmList = document.getElementById('evm-candidates-list');
+            evmList.innerHTML = "";
+            
+            electionData.forEach(cand => {
+                const row = document.createElement('div');
+                row.className = 'candidate-row';
+                const imgSrc = cand.symbol ? cand.symbol : "https://via.placeholder.com/60?text=Symbol";
+                
+                row.innerHTML = `
+                    <div class="serial-no">${cand.id}</div>
+                    <img src="${imgSrc}" alt="Symbol" class="symbol-preview">
+                    <div class="candidate-name">${cand.name}</div>
+                    <button class="vote-btn" id="vote-btn-${cand.id}" onclick="castVote(${cand.id})">VOTE</button>
+                `;
+                evmList.appendChild(row);
+            });
+        }
+
+        function castVote(id) {
+            if (isVotingInProgress) return; 
+            isVotingInProgress = true;
+
+            const index = electionData.findIndex(c => c.id === id);
+            if (index !== -1) {
+                electionData[index].votes++;
+                localStorage.setItem('school_evm_data_en', JSON.stringify(electionData)); 
+
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
+                oscillator.type = 'sine';
+                oscillator.frequency.value = 850; 
+                oscillator.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+                oscillator.start();
+
+                document.querySelectorAll('.vote-btn').forEach(btn => btn.disabled = true);
+
+                const popup = document.getElementById('vote-popup');
+                popup.style.display = "block";
+
+                setTimeout(() => {
+                    oscillator.stop(); 
+                    audioCtx.close();
+                    popup.style.display = "none"; 
+                    document.querySelectorAll('.vote-btn').forEach(btn => btn.disabled = false); 
+                    isVotingInProgress = false;
+                }, 5000); 
+            }
+        }
+
+        function showResults() {
+            const password = prompt("Enter Chief Election Officer Password to view results:");
+            if (password === "school123") {
+                const resultBox = document.getElementById('result-box');
+                const votesList = document.getElementById('votes-count-list');
+                const winnerBox = document.getElementById('winner-box');
+                
+                votesList.innerHTML = "";
+                resultBox.style.display = "block";
+
+                let maxVotes = -1;
+                let winner = null;
+                let tie = false;
+
+                electionData.forEach(cand => {
+                    const item = document.createElement('div');
+                    item.className = 'result-item';
+                    item.innerHTML = `<span>${cand.id}. ${cand.name}</span> <span><b>${cand.votes}</b> Votes</span>`;
+                    votesList.appendChild(item);
+
+                    if(cand.id !== 10) { 
+                        if (cand.votes > maxVotes) {
+                            maxVotes = cand.votes;
+                            winner = cand;
+                            tie = false;
+                        } else if (cand.votes === maxVotes && maxVotes > 0) {
+                            tie = true;
+                        }
+                    }
+                });
+
+                if (maxVotes > 0 && !tie) {
+                    winnerBox.innerHTML = `<div class="winner">🏆 Winner: ${winner.name} (${maxVotes} Votes)</div>`;
+                } else if (tie) {
+                    winnerBox.innerHTML = `<div class="winner" style="background-color: #feebc8; color: #c05621;">👔 It's a TIE!</div>`;
+                } else {
+                    winnerBox.innerHTML = `<div class="winner" style="background-color: #edf2f7; color: #4a5568;">No votes have been cast yet.</div>`;
+                }
+
+                // Automatically smooth-scroll directly to the results view
+                setTimeout(() => {
+                    resultBox.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 100);
+
+            } else {
+                alert("Incorrect Password!");
+            }
+        }
+
+        function resetVotesOnly() {
+            if(confirm("Are you sure you want to clear all votes? (Candidate names will remain saved)")) {
+                electionData.forEach(c => c.votes = 0);
+                localStorage.setItem('school_evm_data_en', JSON.stringify(electionData));
+                document.getElementById('result-box').style.display = "none";
+                alert("All votes have been reset successfully!");
+            }
+        }
+
+        function switchMode(mode) {
+            const setupView = document.getElementById('setup-view');
+            const evmView = document.getElementById('evm-view');
+            const tab1 = document.getElementById('tab1');
+            const tab2 = document.getElementById('tab2');
+            const subtitle = document.getElementById('page-subtitle');
+
+            if (mode === 'setup') {
+                setupView.style.display = "block";
+                evmView.style.display = "none";
+                tab1.classList.add('active');
+                tab2.classList.remove('active');
+                subtitle.innerText = "Election Setup Page";
+                buildSetupTable();
+            } else {
+                setupView.style.display = "none";
+                evmView.style.display = "block";
+                tab1.classList.remove('active');
+                tab2.classList.add('active');
+                subtitle.innerText = "EVM Mode(Real Voting Page)";
+                buildEVMBoard();
+            }
+        }
+    </script>
+</body>
+</html>
