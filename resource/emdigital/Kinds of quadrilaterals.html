@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Quadrilateral Space</title>
+    <style>
+        :root {
+            --bg-deep: #030712;
+            --panel-glass: rgba(17, 24, 39, 0.7);
+            --border-glow: rgba(99, 102, 241, 0.2);
+            --accent-neon: #818cf8;
+            --accent-emerald: #10b981;
+            --accent-amber: #f59e0b;
+            --text-primary: #f9fafb;
+            --text-secondary: #9ca3af;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Cabinet Grotesk', 'Segoe UI', system-ui, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(168, 85, 247, 0.15) 0px, transparent 50%);
+        }
+
+        header {
+            padding: 2.5rem 2rem 1rem 2rem;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2.8rem;
+            font-weight: 900;
+            letter-spacing: -0.05em;
+            background: linear-gradient(to right, #6366f1, #ec4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        header p {
+            color: var(--text-secondary);
+            margin-top: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .workspace {
+            display: grid;
+            grid-template-columns: 1fr 420px;
+            gap: 2rem;
+            padding: 1.5rem 2rem;
+            flex: 1;
+            max-width: 1600px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        @media (max-width: 1024px) {
+            .workspace {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Shapes Grid layout */
+        .shapes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .shape-card {
+            background: var(--panel-glass);
+            border: 1px solid var(--border-glow);
+            border-radius: 24px;
+            padding: 1.5rem;
+            cursor: pointer;
+            backdrop-filter: blur(16px);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .shape-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-neon);
+            box-shadow: 0 12px 30px rgba(99, 102, 241, 0.15);
+        }
+
+        .shape-card.active {
+            border-color: #ec4899;
+            box-shadow: 0 12px 30px rgba(236, 72, 153, 0.2);
+            background: rgba(236, 72, 153, 0.03);
+        }
+
+        /* Interactive Diagram Viewer Canvas Component */
+        .diagram-box {
+            width: 180px;
+            height: 180px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+
+        .geo-shape {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.6), rgba(236, 72, 153, 0.6));
+            border: 2px solid #fff;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+        }
+
+        /* Absolute CSS Shapes Architecture Formulas */
+        .shape-square { width: 120px; height: 120px; border-radius: 4px; }
+        .shape-rectangle { width: 160px; height: 100px; border-radius: 4px; }
+        .shape-parallelogram { width: 140px; height: 100px; transform: skewX(-20deg); }
+        .shape-rhombus { width: 110px; height: 110px; transform: rotate(45deg) skew(10deg, 10deg); }
+        .shape-trapezium { 
+            width: 160px; height: 100px; 
+            clip-path: polygon(25% 0%, 75% 0%, 100% 100%, 0% 100%);
+        }
+        /* Real Mathematical Geometric Form Aspect Kite Component mapping */
+        .shape-kite {
+            width: 120px; height: 160px;
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.6), rgba(236, 72, 153, 0.6));
+            clip-path: polygon(50% 0%, 100% 30%, 50% 100%, 0% 30%);
+            position: relative;
+        }
+
+        /* Diagonal Lines inside Kite for complete mathematical representation */
+        .kite-axis-v {
+            position: absolute; left: 50%; top: 0; bottom: 0;
+            border-left: 1px dashed rgba(255,255,255,0.4); transform: translateX(-50%);
+        }
+        .kite-axis-h {
+            position: absolute; top: 30%; left: 0; right: 0;
+            border-top: 1px dashed rgba(255,255,255,0.4);
+        }
+
+        .shape-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-top: auto;
+        }
+
+        /* Properties Inspector Sidebar Panel */
+        .inspector-panel {
+            background: var(--panel-glass);
+            border: 1px solid var(--border-glow);
+            border-radius: 28px;
+            padding: 2rem;
+            backdrop-filter: blur(20px);
+            position: sticky;
+            top: 2rem;
+            height: calc(100vh - 8rem);
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.1);
+        }
+
+        .inspector-title {
+            font-size: 1.8rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            color: #ec4899;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .inspector-desc {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.5;
+        }
+
+        .prop-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .prop-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--accent-neon);
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        .prop-pill {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 0.85rem 1.2rem;
+            border-radius: 14px;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+            line-height: 1.4;
+        }
+
+        .prop-pill span {
+            color: var(--accent-emerald);
+            font-weight: bold;
+        }
+
+        .empty-inspector {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            text-align: center;
+            color: var(--text-secondary);
+        }
+
+        .empty-inspector svg {
+            width: 64px;
+            height: 64px;
+            margin-bottom: 1rem;
+            stroke: rgba(255,255,255,0.1);
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Interactive Quadrilateral Space</h1>
+        <p>Explore architectural definitions and mathematical behaviors of 4-sided structures</p>
+    </header>
+
+    <div class="workspace">
+        <div class="shapes-grid">
+            
+            <div class="shape-card" onclick="inspectShape('square', this)">
+                <div class="diagram-box">
+                    <div class="geo-shape shape-square"></div>
+                </div>
+                <div class="shape-title">Square</div>
+            </div>
+
+            <div class="shape-card" onclick="inspectShape('rectangle', this)">
+                <div class="diagram-box">
+                    <div class="geo-shape shape-rectangle"></div>
+                </div>
+                <div class="shape-title">Rectangle</div>
+            </div>
+
+            <div class="shape-card" onclick="inspectShape('parallelogram', this)">
+                <div class="diagram-box">
+                    <div class="geo-shape shape-parallelogram"></div>
+                </div>
+                <div class="shape-title">Parallelogram</div>
+            </div>
+
+            <div class="shape-card" onclick="inspectShape('rhombus', this)">
+                <div class="diagram-box">
+                    <div class="geo-shape shape-rhombus"></div>
+                </div>
+                <div class="shape-title">Rhombus</div>
+            </div>
+
+            <div class="shape-card" onclick="inspectShape('trapezium', this)">
+                <div class="diagram-box">
+                    <div class="geo-shape shape-trapezium"></div>
+                </div>
+                <div class="shape-title">Trapezium</div>
+            </div>
+
+            <div class="shape-card" onclick="inspectShape('kite', this)">
+                <div class="diagram-box">
+                    <div class="shape-kite">
+                        <div class="kite-axis-v"></div>
+                        <div class="kite-axis-h"></div>
+                    </div>
+                </div>
+                <div class="shape-title">Kite</div>
+            </div>
+
+        </div>
+
+        <div class="inspector-panel" id="inspector">
+            <div class="empty-inspector" id="empty-state">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
+                </svg>
+                <p>Select any quadrilateral structure to inspect real mathematical parameters & vector attributes.</p>
+            </div>
+            
+            <div id="inspector-content" style="display: none;">
+                <h2 class="inspector-title" id="ins-name">Shape Name</h2>
+                <p class="inspector-desc" id="ins-desc">Description comes here...</p>
+                
+                <div class="prop-section">
+                    <div class="prop-label">Sides & Boundaries</div>
+                    <div class="prop-pill"><span>•</span> <p id="ins-sides">Side criteria text</p></div>
+                </div>
+
+                <div class="prop-section">
+                    <div class="prop-label">Interior Angles</div>
+                    <div class="prop-pill"><span>•</span> <p id="ins-angles">Angles criteria text</p></div>
+                </div>
+
+                <div class="prop-section">
+                    <div class="prop-label">Diagonal Framework</div>
+                    <div class="prop-pill"><span>•</span> <p id="ins-diagonals">Diagonal criteria text</p></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Updated Data Bank with simplified one-line sentences
+        const quadDatabase = {
+            square: {
+                name: "Square",
+                desc: "A regular quadrilateral with four equal sides and four equal angles.",
+                sides: "All four sides are equal and opposite sides are parallel.",
+                angles: "All four interior angles are exactly 90 degrees.",
+                diagonals: "Diagonals are equal, bisect each other, and cross at a 90 degree angle."
+            },
+            rectangle: {
+                name: "Rectangle",
+                desc: "A quadrilateral with four right angles where opposite sides are equal.",
+                sides: "Opposite sides are parallel and equal in length.",
+                angles: "All four interior angles are exactly 90 degrees.",
+                diagonals: "Diagonals are equal in length and bisect each other."
+            },
+            parallelogram: {
+                name: "Parallelogram",
+                desc: "A quadrilateral with two pairs of parallel opposite sides.",
+                sides: "Opposite sides are parallel and equal in length.",
+                angles: "Opposite angles are equal and adjacent angles add up to 180 degrees.",
+                diagonals: "Diagonals are unequal in length but bisect each other."
+            },
+            rhombus: {
+                name: "Rhombus",
+                desc: "A parallelogram with four equal sides.",
+                sides: "All four sides are equal and opposite sides are parallel.",
+                angles: "Opposite angles are equal and adjacent angles add up to 180 degrees.",
+                diagonals: "Diagonals are unequal but bisect each other at a 90 degree angle."
+            },
+            trapezium: {
+                name: "Trapezium",
+                desc: "A quadrilateral with only one pair of parallel opposite sides.",
+                sides: "Exactly one pair of opposite facing sides run parallel.",
+                angles: "Angles along matching non-parallel sides add up to 180 degrees.",
+                diagonals: "Diagonals intersect each other maintaining matching proportional ratios."
+            },
+            kite: {
+                name: "Kite",
+                desc: "A quadrilateral with two distinct pairs of equal adjacent sides.",
+                sides: "Two distinct pairs of adjacent equal-length sides.",
+                angles: "One pair of opposite matching angles where unequal sides meet.",
+                diagonals: "Diagonals intersect at 90 degrees and the longer diagonal bisects the shorter one."
+            }
+        };
+
+        function inspectShape(key, cardElement) {
+            // Manage clean UI active states
+            document.querySelectorAll('.shape-card').forEach(card => card.classList.remove('active'));
+            cardElement.classList.add('active');
+
+            // Toggle rendering visibility parameters inside inspector
+            document.getElementById('empty-state').style.display = 'none';
+            const contentBox = document.getElementById('inspector-content');
+            contentBox.style.display = 'block';
+
+            // Feed corresponding mathematical parameters dynamically
+            const data = quadDatabase[key];
+            document.getElementById('ins-name').innerText = data.name;
+            document.getElementById('ins-desc').innerText = data.desc;
+            document.getElementById('ins-sides').innerText = data.sides;
+            document.getElementById('ins-angles').innerText = data.angles;
+            document.getElementById('ins-diagonals').innerText = data.diagonals;
+        }
+    </script>
+</body>
+</html>

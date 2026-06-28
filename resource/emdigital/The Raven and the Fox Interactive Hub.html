@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Raven and the Fox: Gamified Learning Hub</title>
+    <style>
+        :root {
+            --primary: #db2777;
+            --secondary: #4f46e5;
+            --bg: #fdf2f8;
+            --surface: #ffffff;
+            --text: #0f172a;
+            --success: #10b981;
+            --error: #ef4444;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+            background: var(--surface);
+            padding: 30px;
+            border-radius: 24px;
+            box-shadow: 0 15px 35px rgba(219, 39, 119, 0.05);
+        }
+
+        h1 { 
+            color: var(--primary); 
+            text-align: center; 
+            font-size: 2.3rem; 
+            font-weight: 800;
+            margin-bottom: 25px; 
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.05);
+        }
+
+        .tab-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .tab-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        .tab {
+            background: #fbcfe8;
+            color: #831843;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.95rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border-bottom: 4px solid #f472b6;
+        }
+
+        .tab:hover { background: #f9a8d4; }
+
+        .tab.active {
+            background: var(--primary);
+            color: white;
+            border-bottom: 4px solid #be185d;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(219, 39, 119, 0.25);
+        }
+
+        .content {
+            display: none;
+            background: #fff;
+            padding: 25px;
+            border-radius: 18px;
+            border: 2px solid #fce7f3;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.01);
+        }
+
+        .content.active { display: block; animation: slideUp 0.4s ease; }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .question {
+            margin-bottom: 22px;
+            padding: 18px;
+            background: #fffdfd;
+            border-radius: 14px;
+            border: 1px solid #fae8ff;
+            transition: all 0.2s;
+        }
+
+        .question-text {
+            font-size: 1.15rem;
+            font-weight: 600;
+            margin-bottom: 14px;
+            color: #3b0764;
+        }
+
+        /* FORMAT 1: Modern MCQ Selection Cards */
+        .mcq-grid { display: flex; flex-direction: column; gap: 10px; }
+        .mcq-option {
+            padding: 14px 18px;
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+        .mcq-option:hover { border-color: var(--secondary); background: #f5f3ff; }
+        .mcq-option.selected { border-color: var(--secondary); background: #e0e7ff; font-weight: bold; }
+
+        /* FORMAT 2: Binary Toggle Switch Pairs */
+        .toggle-group { display: flex; gap: 12px; }
+        .toggle-btn {
+            padding: 12px 30px;
+            border: 2px solid #cbd5e1;
+            border-radius: 10px;
+            background: white;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+        .toggle-btn:hover { border-color: #a78bfa; }
+        .toggle-btn.selected { background: #6366f1; color: white; border-color: #6366f1; }
+
+        /* FORMAT 3: Custom Dropdown Boxes */
+        .inline-select {
+            padding: 10px 16px;
+            border-radius: 10px;
+            border: 2px solid #cbd5e1;
+            font-weight: bold;
+            color: var(--secondary);
+            font-size: 1rem;
+            background: white;
+            cursor: pointer;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .inline-select:focus { border-color: var(--secondary); }
+
+        /* Feedback Visualization Colors */
+        .correct { background: #d1fae5 !important; border-color: var(--success) !important; color: #065f46 !important; }
+        .incorrect { background: #fee2e2 !important; border-color: var(--error) !important; color: #991b1b !important; }
+
+        .action-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #fbcfe8;
+        }
+
+        button.submit {
+            background: linear-gradient(135deg, #059669, #10b981);
+            color: white;
+            border: none;
+            padding: 14px 35px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 1.05rem;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+            transition: all 0.2s;
+        }
+        button.submit:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(16, 185, 129, 0.3); }
+        
+        .score-display { 
+            font-size: 1.25rem; 
+            font-weight: 800; 
+            color: var(--primary); 
+            background: #fce7f3;
+            padding: 10px 22px;
+            border-radius: 30px;
+            border: 2px solid #fbcfe8;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>The Raven and the Fox: Interactive Hub</h1>
+    <div class="tab-grid" id="tabs"></div>
+    <div id="activity-content"></div>
+</div>
+
+<script>
+    // Gamified Data Architecture mapping your exact requirement seamlessly
+    const activities = [
+        { 
+            title: "Poem Recall", 
+            type: "mcq",
+            data: [
+                { q: "Where was Mr. Raven perched aloft at the beginning?", o: ["Upon a sturdy tree limb", "On a slippery river stone", "Inside a soft grass nest"], a: 0 },
+                { q: "Who specifically looked up to monitor the bird from the ground?", o: ["A wild brown bear", "Reynard the Fox", "A little village child"], a: 1 },
+                { q: "What premium target item did the Raven hold in his beak?", o: ["A shiny green leaf", "A round golden coin", "A tasty morsel of food"], a: 2 },
+                { q: "What specific title did the Fox use to compliment the Raven?", o: ["A handsome bird", "A lazy creature", "A wise supervisor"], a: 0 },
+                { q: "What supreme status did the Fox promise the Raven if he sang?", o: ["The master flight artist", "The absolute woods King", "The clever pilot"], a: 1 }
+            ]
+        },
+        { 
+            title: "Character Traits", 
+            type: "toggle",
+            data: [
+                { q: "Is the Fox genuinely clever and strategic?", o: ["Yes", "No"], a: 0 },
+                { q: "Is the Raven filled with foolish pride?", o: ["Yes", "No"], a: 0 },
+                { q: "Is the Raven easily fooled by strangers?", o: ["Yes", "No"], a: 0 },
+                { q: "Is the Fox's dialogue highly flattering?", o: ["Yes", "No"], a: 0 },
+                { q: "Did the Fox successfully acquire the food?", o: ["Yes", "No"], a: 0 }
+            ]
+        },
+        { 
+            title: "Vocabulary Match", 
+            type: "dropdown_match",
+            data: [
+                { q: "The term 'Morsel' contextually means", o: ["A large tree branch", "A small piece of food", "A fast running animal"], a: 1 },
+                { q: "The term 'Perched' contextually operationalizes as", o: ["Sat or rested on an elevated branch", "Swam deep in cold water", "Dug into the dry soil"], a: 0 },
+                { q: "The action word 'Seek' means to", o: ["Close both eyes tightly", "Run away very fast", "Look for or try to find something"], a: 2 },
+                { q: "The concept of 'Pride' in this poem represents", o: ["An inflated, vanity-filled opinion of oneself", "A state of deep emotional sadness", "Being extremely humble and kind"], a: 0 },
+                { q: "The action word 'Eyed' contextually maps to", o: ["Listened carefully to sounds", "Looked at with close attention", "Walked silently in circles"], a: 1 }
+            ]
+        },
+        { 
+            title: "Poem Sequence", 
+            type: "dropdown_inline",
+            data: [
+                { q: "Step 1: The narrative begins when the sly", o: ["Fox sees bird on a tree branch", "Food falls onto the soil", "Raven starts singing loudly"], a: 0 },
+                { q: "Step 2: To execute his plan, the tactical", o: ["Fox praises his beautiful feathers", "Fox shakes the entire tree trunk", "Fox runs away in fear"], a: 0 },
+                { q: "Step 3: Completely blinded by flattery, the", o: ["Raven forgets his voice is just a croak", "Raven flies to another forest", "Raven drops a shiny stone"], a: 0 },
+                { q: "Step 4: Eager to demonstrate his talent, the", o: ["Raven opens his beak to sing proudly", "Raven closes his eyes to sleep", "Raven hides inside the green leaves"], a: 0 },
+                { q: "Step 5: The immediate physical consequence is that the", o: ["Food falls down and Fox eats it", "Fox climbs up the branch instantly", "Bird flies away with joy"], a: 0 }
+            ]
+        },
+        { 
+            title: "Rhyming Words", 
+            type: "mcq",
+            data: [
+                { q: "Find the structural rhyme match for 'limb':", o: ["seek", "him", "word"], a: 1 },
+                { q: "Find the structural rhyme match for 'seek':", o: ["beak", "joke", "know"], a: 0 },
+                { q: "Find the structural rhyme match for 'word':", o: ["bird", "limb", "croak"], a: 0 },
+                { q: "Find the structural rhyme match for 'joke':", o: ["know", "croak", "seek"], a: 1 },
+                { q: "Find the structural rhyme match for 'know':", o: ["glow", "beak", "him"], a: 0 }
+            ]
+        },
+        { 
+            title: "Alliteration", 
+            type: "dropdown_match",
+            data: [
+                { q: "Identify the repeating sound in 'big' / 'beak'", o: ["The /g/ consonant sound", "The /b/ consonant sound", "The /k/ consonant sound"], a: 1 },
+                { q: "Locate the explicit alliteration phrase in Stanza 2", o: ["song of sweet birds", "handsome bird silhouette", "perched aloft limb"], a: 0 },
+                { q: "What is the structural rule of Alliteration?", o: ["Repetition of vowel ends", "Repetition of starting consonant sounds", "Matching alphabet lengths"], a: 1 },
+                { q: "Identify the correct phonetic match in 'song' / 'sweet'", o: ["The /s/ sound asset", "The /w/ sound asset", "The /t/ sound asset"], a: 0 },
+                { q: "Is alliteration an effective sound device?", o: ["No, it is a grammar tense rule", "Yes, it creates musical rhythm", "It is an punctuation marker"], a: 1 }
+            ]
+        },
+        { 
+            title: "Opposites", 
+            type: "toggle",
+            data: [
+                { q: "Is 'foolish' the correct linguistic opposite of 'wise'?", o: ["True", "False"], a: 0 },
+                { q: "Is 'vanity' the correct linguistic opposite of 'pride'?", o: ["True", "False"], a: 1 }, // False (it's a synonym)
+                { q: "Is 'wise' the correct linguistic opposite of 'foolish'?", o: ["True", "False"], a: 0 },
+                { q: "Is 'smiled' the correct linguistic opposite of 'cried'?", o: ["True", "False"], a: 1 }, // False (laughed is opposite)
+                { q: "Is 'notice' the correct linguistic opposite of 'ignore'?", o: ["True", "False"], a: 0 }
+            ]
+        },
+        { 
+            title: "Punctuation", 
+            type: "dropdown_inline",
+            data: [
+                { q: "Punctuate contextually: 'wow what a bird'", o: ["Wow! What a bird!", "wow what a bird?", "Wow, what a bird."], a: 0 },
+                { q: "Identify the correct end mark for: 'do you like the poem'", o: ["Question Mark (?)", "Exclamation Point (!)", "Comma (,)"], a: 0 },
+                { q: "What mark is required for exclamatory structures?", o: ["Exclamation Mark (!)", "Full Stop (.)", "Question Mark (?)"], a: 0 },
+                { q: "What mark is required for question profiles?", o: ["Question Mark (?)", "Hyphen (-)", "Exclamation Mark (!)"], a: 0 },
+                { q: "Choose the perfectly punctuated output form:", o: ["Oh, how big it is!", "oh how big it is?", "Oh how big it is"], a: 0 }
+            ]
+        }
+    ];
+
+    let userAnswers = {};
+    let activeTabGlobal = 0;
+
+    function buildTabs() {
+        const tabsContainer = document.getElementById('tabs');
+        activities.forEach((act, i) => {
+            tabsContainer.innerHTML += `<button class="tab ${i===0?'active':''}" id="tab-btn-${i}" onclick="switchTab(${i})">${i+1}. ${act.title}</button>`;
+        });
+        switchTab(0);
+    }
+
+    function switchTab(n) {
+        activeTabGlobal = n;
+        document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', i === n));
+        
+        const container = document.getElementById('activity-content');
+        const act = activities[n];
+        
+        let html = `<div class="content active"><h3>Activity ${n+1}: ${act.title}</h3>`;
+        
+        act.data.forEach((item, i) => {
+            html += `<div class="question" id="q-box-${n}-${i}">`;
+            
+            if (act.type === "mcq") {
+                html += `<div class="question-text">${i+1}. ${item.q}</div>`;
+                html += `<div class="mcq-grid">`;
+                item.o.forEach((opt, oIdx) => {
+                    html += `<div class="mcq-option" id="opt-${n}-${i}-${oIdx}" onclick="handleMCQSelection(${n}, ${i}, ${oIdx})">${opt}</div>`;
+                });
+                html += `</div>`;
+            } 
+            else if (act.type === "toggle") {
+                html += `<div class="question-text">${i+1}. ${item.q}</div>`;
+                html += `<div class="toggle-group">`;
+                item.o.forEach((opt, oIdx) => {
+                    html += `<button class="toggle-btn" id="opt-${n}-${i}-${oIdx}" onclick="handleToggleSelection(${n}, ${i}, ${oIdx})">${opt}</button>`;
+                });
+                html += `</div>`;
+            }
+            else if (act.type === "dropdown_match") {
+                html += `<div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">`;
+                html += `<div class="question-text" style="margin:0;">${i+1}. ${item.q} ➔</div>`;
+                html += `<div>`;
+                html += `<select class="inline-select" id="sel-${n}-${i}" onchange="handleDropdownSelection(${n}, ${i})">`;
+                html += `<option value="">-- Choose Meaning --</option>`;
+                item.o.forEach((opt, oIdx) => {
+                    html += `<option value="${oIdx}">${opt}</option>`;
+                });
+                html += `</select>`;
+                html += `</div></div>`;
+            }
+            else if (act.type === "dropdown_inline") {
+                html += `<div class="question-text">${i+1}. ${item.q} 
+                    <select class="inline-select" id="sel-${n}-${i}" onchange="handleDropdownSelection(${n}, ${i})">
+                        <option value="">...</option>`;
+                item.o.forEach((opt, oIdx) => {
+                    html += `<option value="${oIdx}">${opt}</option>`;
+                });
+                html += `</select></div>`;
+            }
+
+            html += `</div>`;
+        });
+
+        html += `
+            <div class="action-bar">
+                <button class="submit" onclick="verifyTabAnswers(${n})">Verify Answers</button>
+                <div class="score-display" id="score-${n}">Score: -- / 5</div>
+            </div>
+        </div>`;
+        
+        container.innerHTML = html;
+    }
+
+    // High performance interaction logging handlers
+    function handleMCQSelection(actIdx, qIdx, oIdx) {
+        activities[actIdx].data[qIdx].o.forEach((_, idx) => {
+            document.getElementById(`opt-${actIdx}-${qIdx}-${idx}`).classList.remove('selected');
+        });
+        document.getElementById(`opt-${actIdx}-${qIdx}-${oIdx}`).classList.add('selected');
+        userAnswers[`${actIdx}-${qIdx}`] = oIdx;
+    }
+
+    function handleToggleSelection(actIdx, qIdx, oIdx) {
+        activities[actIdx].data[qIdx].o.forEach((_, idx) => {
+            document.getElementById(`opt-${actIdx}-${qIdx}-${idx}`).classList.remove('selected');
+        });
+        document.getElementById(`opt-${actIdx}-${qIdx}-${oIdx}`).classList.add('selected');
+        userAnswers[`${actIdx}-${qIdx}`] = oIdx;
+    }
+
+    function handleDropdownSelection(actIdx, qIdx) {
+        const val = document.getElementById(`sel-${actIdx}-${qIdx}`).value;
+        if(val !== "") {
+            userAnswers[`${actIdx}-${qIdx}`] = parseInt(val);
+        }
+    }
+
+    // Accurate Evaluation Engine with full visual spectrum coloring responses
+    function verifyTabAnswers(n) {
+        const act = activities[n];
+        let score = 0;
+
+        act.data.forEach((item, i) => {
+            const selectedChoice = userAnswers[`${n}-${i}`];
+            const targetBox = document.getElementById(`q-box-${n}-${i}`);
+            
+            // Cleanup profile styles
+            targetBox.classList.remove('correct', 'incorrect');
+            if (act.type === "mcq" || act.type === "toggle") {
+                item.o.forEach((_, oIdx) => {
+                    document.getElementById(`opt-${n}-${i}-${oIdx}`).classList.remove('correct', 'incorrect');
+                });
+            } else {
+                document.getElementById(`sel-${n}-${i}`).classList.remove('correct', 'incorrect');
+            }
+
+            // Correct/Incorrect visual assignment check passes
+            if (selectedChoice !== undefined && selectedChoice === item.a) {
+                score++;
+                if (act.type === "mcq" || act.type === "toggle") {
+                    document.getElementById(`opt-${n}-${i}-${selectedChoice}`).classList.add('correct');
+                } else {
+                    document.getElementById(`sel-${n}-${i}`).classList.add('correct');
+                }
+            } else {
+                if (act.type === "mcq" || act.type === "toggle") {
+                    if(selectedChoice !== undefined) document.getElementById(`opt-${n}-${i}-${selectedChoice}`).classList.add('incorrect');
+                    document.getElementById(`opt-${n}-${i}-${item.a}`).classList.add('correct');
+                } else {
+                    document.getElementById(`sel-${n}-${i}`).classList.add('incorrect');
+                }
+            }
+        });
+
+        document.getElementById(`score-${n}`).innerText = `Score: ${score} / 5`;
+    }
+
+    // Auto boot profile runtime instance triggering
+    window.onload = buildTabs;
+</script>
+</body>
+</html>

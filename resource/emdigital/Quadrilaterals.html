@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 4: Quadrilaterals - Fun Interactive Learning</title>
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            --glass-bg: rgba(255, 255, 255, 0.07);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --accent-primary: #6366f1;
+            --accent-success: #10b981;
+            --accent-error: #ef4444;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background: var(--bg-gradient);
+            color: var(--text-main);
+            min-height: 100/vh;
+            padding: 2rem 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+            max-width: 800px;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(to right, #6366f1, #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        .dashboard {
+            width: 100%;
+            max-width: 900px;
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            padding: 1.5rem;
+            border-radius: 16px;
+            height: fit-content;
+        }
+
+        .sidebar h2 {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .nav-btn {
+            display: block;
+            width: 100%;
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.5rem;
+            background: transparent;
+            border: 1px solid transparent;
+            border-radius: 8px;
+            color: var(--text-muted);
+            text-align: left;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-main);
+        }
+
+        .nav-btn.active {
+            background: var(--accent-primary);
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+
+        /* Activity Container */
+        .activity-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            display: none;
+        }
+
+        .activity-card.active {
+            display: block;
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .activity-card h2 {
+            margin-bottom: 0.5rem;
+            color: #a855f7;
+        }
+
+        .activity-description {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .question-block {
+            margin-bottom: 2rem;
+            padding: 1.25rem;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .question-text {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        /* MCQ Options styles */
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.75rem;
+        }
+
+        .option-label {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .option-label:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .option-label input {
+            margin-right: 0.75rem;
+            accent-color: var(--accent-primary);
+            width: 18px;
+            height: 18px;
+        }
+
+        /* Drag and Drop styles */
+        .drag-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .drag-source-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            padding: 0.75rem;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            min-height: 50px;
+            align-items: center;
+        }
+
+        .drag-item {
+            background: var(--accent-primary);
+            color: white;
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            cursor: grab;
+            font-size: 0.9rem;
+            font-weight: 600;
+            user-select: none;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+
+        .drag-item:active {
+            cursor: grabbing;
+        }
+
+        .drop-target {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 140px;
+            height: 32px;
+            padding: 0 0.5rem;
+            background: rgba(255, 255, 255, 0.08);
+            border: 2px dashed rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            vertical-align: middle;
+            margin: 0 0.25rem;
+            transition: all 0.2s ease;
+        }
+
+        .drop-target.hovered {
+            background: rgba(99, 102, 241, 0.15);
+            border-color: var(--accent-primary);
+        }
+
+        .drop-target .drag-item {
+            width: 100%;
+            text-align: center;
+            box-shadow: none;
+        }
+
+        /* Actions and Feedback */
+        .action-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1.5rem;
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+            transition: all 0.2s ease;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(16, 185, 129, 0.3);
+        }
+
+        .score-display {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: var(--text-main);
+        }
+
+        .feedback-box {
+            margin-top: 1rem;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            display: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .feedback-box.correct {
+            display: block;
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid var(--accent-success);
+            color: #34d399;
+        }
+
+        .feedback-box.incorrect {
+            display: block;
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid var(--accent-error);
+            color: #f87171;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Chapter 4: Quadrilaterals</h1>
+        <p>Master properties of 4-sided figures with 5 beautifully designed interactive mini-activities!</p>
+    </header>
+
+    <div class="dashboard">
+        <div class="sidebar">
+            <h2>Activities Menu</h2>
+            <button class="nav-btn active" onclick="switchActivity(1)">Activity 1: MCQ Basics</button>
+            <button class="nav-btn" onclick="switchActivity(2)">Activity 2: Drag & Drop Angles</button>
+            <button class="nav-btn" onclick="switchActivity(3)">Activity 3: MCQ Properties</button>
+            <button class="nav-btn" onclick="switchActivity(4)">Activity 4: Match Definitions</button>
+            <button class="nav-btn" onclick="switchActivity(5)">Activity 5: MCQ True or False</button>
+        </div>
+
+        <div class="main-panel">
+
+            <div id="act1" class="activity-card active">
+                <h2>Activity 1: Quadrilateral Basics</h2>
+                <p class="activity-description">Choose the single best correct choice for each foundational concept question below.</p>
+                
+                <form id="form-act1">
+                    <div class="question-block">
+                        <p class="question-text">1. How many sides does a classic geometric quadrilateral contain?</p>
+                        <div class="options-grid">
+                            <label class="option-label"><input type="radio" name="q1_1" value="A"> 3 Sides</label>
+                            <label class="option-label"><input type="radio" name="q1_1" value="B"> 4 Sides</label>
+                            <label class="option-label"><input type="radio" name="q1_1" value="C"> 5 Sides</label>
+                        </div>
+                    </div>
+
+                    <div class="question-block">
+                        <p class="question-text">2. What is the grand total sum of all internal interior angles inside any flat quadrilateral?</p>
+                        <div class="options-grid">
+                            <label class="option-label"><input type="radio" name="q1_2" value="A"> 180 Degrees</label>
+                            <label class="option-label"><input type="radio" name="q1_2" value="B"> 270 Degrees</label>
+                            <label class="option-label"><input type="radio" name="q1_2" value="C"> 360 Degrees</label>
+                        </div>
+                    </div>
+
+                    <div class="question-block">
+                        <p class="question-text">3. How many straight diagonals can be drawn inside a standard four-vertex convex quadrilateral?</p>
+                        <div class="options-grid">
+                            <label class="option-label"><input type="radio" name="q1_3" value="A"> 1 Diagonal</label>
+                            <label class="option-label"><input type="radio" name="q1_3" value="B"> 2 Diagonals</label>
+                            <label class="option-label"><input type="radio" name="q1_3" value="C"> 4 Diagonals</label>
+                        </div>
+                    </div>
+
+                    <div class="question-block">
+                        <p class="question-text">4. If three interior angles of a quadrilateral measure 90°, 90°, and 90°, what must the final fourth angle measure?</p>
+                        <div class="options-grid">
+                            <label class="option-label"><input type="radio" name="q1_4" value="A"> 60°</label>
+                            <label class="option-label"><input type="radio" name="q1_4" value="B"> 90°</label>
+                            <label class="option-label"><input type="radio" name="q1_4" value="C"> 120°</label>
+                        </div>
+                    </div>
+
+                    <div class="question-block">
+                        <p class="question-text">5. What is the absolute minimum number of vertices required to build or frame a quadrilateral?</p>
+                        <div class="options-grid">
+                            <label class="option-label"><input type="radio" name="q1_5" value="A"> 3 Vertices</label>
+                            <label class="option-label"><input type="radio" name="q1_5" value="B"> 4 Vertices</label>
+                            <label class="option-label"><input type="radio" name="q1_5" value="C"> 5 Vertices</label>
+                        </div>
+                    </div>
+
+                    <div class="action-row">
+                        <button type="button" class="submit-btn" onclick="checkMCQ(1, {q1_1:'B', q1_2:'C', q1_3:'B', q1_4:'B', q1_5:'B'})">Submit Answers</button>
+                        <div id="score-act1" class="score-display"></div>
+                    </div>
+                </form>
+                <div id="feedback-act1" class="feedback-box"></div>
+            </div>
+
+            <div id="act2" class="activity-card">
+                <h2>Activity 2: Missing Angles Placement</h2>
+                <p class="activity-description">Drag the correct numeric target boxes from the reservoir pool into the empty dotted blanks within each statement sentence.</p>
+                
+                <div class="drag-source-row" id="source-pool-2">
+                    <div class="drag-item" draggable="true" id="d2_1">110°</div>
+                    <div class="drag-item" draggable="true" id="d2_2">70°</div>
+                    <div class="drag-item" draggable="true" id="d2_3">100°</div>
+                    <div class="drag-item" draggable="true" id="d2_4">60°</div>
+                    <div class="drag-item" draggable="true" id="d2_5">180°</div>
+                </div>
+
+                <div class="drag-container" style="margin-top: 1.5rem;">
+                    <div class="question-block">
+                        <p>1. If three angles inside a custom quadrilateral are 100°, 100°, and 90°, the final fourth angle must be <span class="drop-target" data-ans="70°"></span>.</p>
+                    </div>
+                    <div class="question-block">
+                        <p>2. In a balanced parallelogram, if one corner angle is 70°, its adjacent neighboring angle must total exactly <span class="drop-target" data-ans="110°"></span>.</p>
+                    </div>
+                    <div class="question-block">
+                        <p>3. If a quadrilateral has structural angle measurements of 120°, 80°, and 60°, the missing slot requires <span class="drop-target" data-ans="100°"></span>.</p>
+                    </div>
+                    <div class="question-block">
+                        <p>4. Four equal angles splitting a total space of 360° means each individual corner has a value of 90°. Alternatively, if three angles are 100°, 100°, and 100°, the fourth is <span class="drop-target" data-ans="60°"></span>.</p>
+                    </div>
+                    <div class="question-block">
+                        <p>5. Any two consecutive internal angles gathered along a single leg side of a parallelogram will sum up to <span class="drop-target" data-ans="180°"></span>.</p>
+                    </div>
+                </div>
+
+                <div class="action-row">
+                    <button type="button" class="submit-btn" onclick="checkDragDrop(2)">Verify Matches</button>
+                    <div id="score-act2" class="score-display"></div>
+                </div>
+                <div id="feedback-act2" class="feedback-box"></div>
+            </div>
+
+            <div id="act3" class="activity-card">
+                <h2>Activity 3: Advanced Shapes & Properties</h2>
+                <p class="activity-description">Identify specific geometrical traits regarding specialized subsets of parallelograms and related figures.</p>
+                
+                <form id="form-act3">
+                    <div class="question-block">
+                        <p class="question-text">1. Which figure features four completely equal side lengths and exact 90° right angles everywhere?</p>
+                        <div class="options-grid">
+                            <label class="option-label"><input type="radio" name="q3_1" value="A"> Rectangle</label>
+                            <label class="option-label"><input type="radio" name="q3_1" value="B"> Square</label>
+                            <label class="option-label"><input type="radio" name="q3_1" value="C"> Trapezium</label>
+                        </div>
+                    </div>
+
+                    <div class="question-block">
+                        <p class="question-text">2. In which modern quadrilateral is there exactly one pair of parallel opposite tracks?</p>
+                        <div class="options-grid">
+                            <label class="option-label"><input type="radio" name="q3_2" value="A"> Trapezium</label>
+                            <label class="option-label"><input type="radio" name="q3_2" value="B"> Rhombus</label>
+                            <label class="option-label"><input type="radio" name="q3_2" value="C"> Parallelogram</label>
+                        </div>
+                    </div>
+
+                    <div class="question-block">
+                        <p class="question-text">3. What special property is shared by the internal intersecting diagonals of a Rhombus?</p>
+                        <div class="options-grid">
+                            <label class="option-label"><input type="radio" name="q3_3" value="A"> They are unequal and cross randomly</label>
+                            <label class="option-label"><input type="radio" name="q3_3" value="B"> They intersect at 90-degree perpendicular angles</label>
+                            <label class="option-label"><input type="radio" name="q3_3" value="C"> They are always completely identical in running length</label>
+                        </div>
+                    </div>
+
+                    <div class="question-block">
+                        <p class="question-text">4. A rectangle is a specialized parallelogram where all four interior corners equal:</p>
+                        <div class="options-grid">
+                            <label class="option-label"><input type="radio" name="q3_4" value="A"> 45°</label>
+                            <label class="option-label"><input type="radio" name="q3_4" value="B"> 60°</label>
+                            <label class="option-label"><input type="radio" name="q3_4" value="C"> 90°</label>
+                        </div>
+                    </div>
+
+                    <div class="question-block">
+                        <p class="question-text">5. Which shape matches a quadrilateral configuration featuring two distinct pairs of equal adjacent sides?</p>
+                        <div class="options-grid">
+                            <label class="option-label"><input type="radio" name="q3_5" value="A"> Kite</label>
+                            <label class="option-label"><input type="radio" name="q3_5" value="B"> Trapezium</label>
+                            <label class="option-label"><input type="radio" name="q3_5" value="C"> Parallelogram</label>
+                        </div>
+                    </div>
+
+                    <div class="action-row">
+                        <button type="button" class="submit-btn" onclick="checkMCQ(3, {q3_1:'B', q3_2:'A', q3_3:'B', q3_4:'C', q3_5:'A'})">Submit Answers</button>
+                        <div id="score-act3" class="score-display"></div>
+                    </div>
+                </form>
+                <div id="feedback-act3" class="feedback-box"></div>
+            </div>
+
+            <div id="act4" class="activity-card">
+                <h2>Activity 4: Geometry Definition Matching</h2>
+                <p class="activity-description">Drag the correct vocabulary terms into the matching functional slots provided below.</p>
+                
+                <div class="drag-source-row" id="source-pool-4">
+                    <div class="drag-item" draggable="true" id="d4_1">Parallelogram</div>
+                    <div class="drag-item" draggable="true" id="d4_2">Rhombus</div>
+                    <div class="drag-item" draggable="true" id="d4_3">Trapezium</div>
+                    <div class="drag-item" draggable="true" id="d4_4">Square</div>
+                    <div class="drag-item" draggable="true" id="d4_5">Rectangle</div>
+                </div>
+
+                <div class="drag-container" style="margin-top: 1.5rem;">
+                    <div class="question-block">
+                        <p>1. A quadrilateral containing two pairs of parallel tracks is a <span class="drop-target" data-ans="Parallelogram"></span>.</p>
+                    </div>
+                    <div class="question-block">
+                        <p>2. A special parallelogram having four equal sides but not necessarily 90° angles is a <span class="drop-target" data-ans="Rhombus"></span>.</p>
+                    </div>
+                    <div class="question-block">
+                        <p>3. A four-sided figure with only one single pair of parallel opposite sides is a <span class="drop-target" data-ans="Trapezium"></span>.</p>
+                    </div>
+                    <div class="question-block">
+                        <p>4. An equitable layout having 4 equal sides and 4 equal right angles is a <span class="drop-target" data-ans="Square"></span>.</p>
+                    </div>
+                    <div class="question-block">
+                        <p>5. A parallelogram boasting four right corners but independent length vs width parameters is a <span class="drop-target" data-ans="Rectangle"></span>.</p>
+                    </div>
+                </div>
+
+                <div class="action-row">
+                    <button type="button" class="submit-btn" onclick="checkDragDrop(4)">Check Definitions</button>
+                    <div id="score-act4" class="score-display"></div>
+                </div>
+                <div id="feedback-act4" class="feedback-box"></div>
+            </div>
+
+            <div id="act5" class="activity-card">
+                <h2>Activity 5: Structural Logic (True / False)</h2>
+                <p class="activity-description">Evaluate each categorical classification rule and state whether it holds true or false universally.</p>
+                
+                <form id="form-act5">
+                    <div class="question-block">
+                        <p class="question-text">1. Every square created by definition fits cleanly into the properties of a rectangle.</p>
+                        <div class="options-grid">
+                            <label class="option-label"><input type="radio" name="q5_1" value="True"> True</label>
+                            <label class="option-label"><input type="radio" name="q5_1" value="False"> False</label>
+                        </div>
+                    </div>
+
+                    <div class="question-block">
+                        <p class="question-text">2. Every individual item defined as a modern rhombus qualifies completely as a basic kite structure.</p>
+                        <div class="options-grid">
+                            <label class="option-label"><input type="radio" name="q5_2" value="True"> True</label>
+                            <label class="option-label"><input type="radio" name="q5_2" value="False"> False</label>
+                        </div>
+                    </div>
+
+                    <div class="question-block">
+                        <p class="question-text">3. All standard classic trapeziums can safely be called balanced parallelograms.</p>
+                        <div class="options-grid">
+                            <label class="option-label"><input type="radio" name="q5_3" value="True"> True</label>
+                            <label class="option-label"><input type="radio" name="q5_3" value="False"> False</label>
+                        </div>
+                    </div>
+
+                    <div class="question-block">
+                        <p class="question-text">4. Every single square built anywhere is also simultaneously a valid rhombus.</p>
+                        <div class="options-grid">
+                            <label class="option-label"><input type="radio" name="q5_4" value="True"> True</label>
+                            <label class="option-label"><input type="radio" name="q5_4" value="False"> False</label>
+                        </div>
+                    </div>
+
+                    <div class="question-block">
+                        <p class="question-text">5. The opposite facing angles inside any standard functioning parallelogram are unequal.</p>
+                        <div class="options-grid">
+                            <label class="option-label"><input type="radio" name="q5_5" value="True"> True</label>
+                            <label class="option-label"><input type="radio" name="q5_5" value="False"> False</label>
+                        </div>
+                    </div>
+
+                    <div class="action-row">
+                        <button type="button" class="submit-btn" onclick="checkMCQ(5, {q5_1:'True', q5_2:'True', q5_3:'False', q5_4:'True', q5_5:'False'})">Evaluate Status</button>
+                        <div id="score-act5" class="score-display"></div>
+                    </div>
+                </form>
+                <div id="feedback-act5" class="feedback-box"></div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // Tab switching utility logic
+        function switchActivity(actNum) {
+            document.querySelectorAll('.activity-card').forEach(card => card.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            
+            document.getElementById('act' + actNum).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // Generic evaluation for Multiple Choice forms
+        function checkMCQ(actId, keys) {
+            const form = document.getElementById('form-act1' + (actId === 1 ? '' : actId === 3 ? '3' : '5'));
+            const formData = new FormData(document.getElementById('form-act' + actId));
+            let score = 0;
+            let total = Object.keys(keys).length;
+
+            for (let key in keys) {
+                if (formData.get(key) === keys[key]) {
+                    score++;
+                }
+            }
+
+            const feedback = document.getElementById('feedback-act' + actId);
+            const scoreDisp = document.getElementById('score-act' + actId);
+            scoreDisp.innerText = `Score: ${score} / ${total}`;
+
+            if (score === total) {
+                feedback.className = "feedback-box correct";
+                feedback.innerText = "Excellent! You answered all properties perfectly.";
+            } else {
+                feedback.className = "feedback-box incorrect";
+                feedback.innerText = `You got ${score} right. Review your quadrilateral definitions and try again!`;
+            }
+        }
+
+        // Drag and drop engine mechanics initialization
+        let draggedItem = null;
+
+        document.querySelectorAll('.drag-item').forEach(item => {
+            item.addEventListener('dragstart', function(e) {
+                draggedItem = this;
+                e.dataTransfer.setData('text/plain', this.id);
+            });
+        });
+
+        document.querySelectorAll('.drop-target').forEach(target => {
+            target.addEventListener('dragover', function(e) {
+                e.preventDefault();
+            });
+
+            target.addEventListener('dragenter', function(e) {
+                e.preventDefault();
+                this.classList.add('hovered');
+            });
+
+            target.addEventListener('dragleave', function() {
+                this.classList.remove('hovered');
+            });
+
+            target.addEventListener('drop', function(e) {
+                e.preventDefault();
+                this.classList.remove('hovered');
+                
+                // If container already contains an item, send it back to its specific natural pool 
+                if (this.children.length > 0) {
+                    const currentId = this.children[0].id;
+                    const poolId = currentId.startsWith('d2') ? 'source-pool-2' : 'source-pool-4';
+                    document.getElementById(poolId).appendChild(this.children[0]);
+                }
+                
+                this.appendChild(draggedItem);
+            });
+        });
+
+        // Let pools accept elements back via drop interaction
+        document.querySelectorAll('.drag-source-row').forEach(pool => {
+            pool.addEventListener('dragover', function(e) { e.preventDefault(); });
+            pool.addEventListener('drop', function(e) {
+                e.preventDefault();
+                this.appendChild(draggedItem);
+            });
+        });
+
+        // Check verification mechanics for Drag & Drop sheets
+        function checkDragDrop(actId) {
+            const card = document.getElementById('act' + actId);
+            const targets = card.querySelectorAll('.drop-target');
+            let score = 0;
+            let total = targets.length;
+
+            targets.forEach(target => {
+                if (target.children.length > 0) {
+                    const droppedText = target.children[0].innerText.trim();
+                    const expectedText = target.getAttribute('data-ans').trim();
+                    if (droppedText === expectedText) {
+                        score++;
+                    }
+                }
+            });
+
+            const feedback = document.getElementById('feedback-act' + actId);
+            const scoreDisp = document.getElementById('score-act' + actId);
+            scoreDisp.innerText = `Score: ${score} / ${total}`;
+
+            if (score === total) {
+                feedback.className = "feedback-box correct";
+                feedback.innerText = "Fantastic matching skill! Everything is logically placed.";
+            } else {
+                feedback.className = "feedback-box incorrect";
+                feedback.innerText = `Score: ${score}/${total}. Drag items to different slots to fix errors.`;
+            }
+        }
+    </script>
+</body>
+</html>

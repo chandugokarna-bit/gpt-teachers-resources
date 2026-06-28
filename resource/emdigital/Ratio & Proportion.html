@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ratio & Proportion - Interactive Digital Studio</title>
+    <style>
+        :root {
+            --bg-deep: #080c14;
+            --card-surface: #111827;
+            --accent-cyan: #00f0ff;
+            --accent-purple: #a855f7;
+            --accent-amber: #f59e0b;
+            --accent-emerald: #10b981;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --border-glow: #1f2937;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+            max-width: 900px;
+        }
+
+        header h1 {
+            font-size: 2.6rem;
+            color: var(--accent-cyan);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
+        }
+
+        header p {
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .book-frame {
+            width: 100%;
+            max-width: 1100px;
+            background-color: var(--card-surface);
+            border: 2px solid var(--border-glow);
+            border-radius: 20px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.7);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Navigation Tabs */
+        .navigation-tabs {
+            display: flex;
+            background: #1f2937;
+            border-bottom: 2px solid var(--border-glow);
+            overflow-x: auto;
+        }
+
+        .tab-trigger {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            padding: 1.2rem 1rem;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex: 1;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        .tab-trigger:hover, .tab-trigger.active {
+            color: var(--accent-cyan);
+            background: #0f172a;
+            border-bottom: 4px solid var(--accent-cyan);
+        }
+
+        /* Content Panel Layout */
+        .book-body {
+            padding: 2.5rem;
+            min-height: 550px;
+        }
+
+        .chapter-page {
+            display: none;
+            animation: slideUp 0.4s ease forwards;
+        }
+
+        .chapter-page.active {
+            display: block;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 {
+            color: #fff;
+            font-size: 1.6rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        p.intro {
+            font-size: 1.1rem;
+            line-height: 1.7;
+            color: #d1d5db;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Brainstorming Boxes */
+        .brainstorm-container {
+            background: rgba(168, 85, 247, 0.05);
+            border-left: 5px solid var(--accent-purple);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin: 1.5rem 0;
+        }
+
+        .brainstorm-container h3 {
+            color: var(--accent-purple);
+            font-size: 1.15rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Interactive Laboratory Sandbox */
+        .lab-sandbox {
+            background: #090d16;
+            border: 1px solid #1f2937;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .slider-matrix {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        input[type="range"], input[type="number"] {
+            width: 100%;
+            accent-color: var(--accent-cyan);
+            background: #1f2937;
+            border: 1px solid #374151;
+            padding: 0.5rem;
+            border-radius: 6px;
+            color: white;
+        }
+
+        .visualizer-window {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            min-height: 160px;
+            background: rgba(255,255,255,0.02);
+            border-radius: 8px;
+            padding: 1.5rem;
+            border: 1px dashed #374151;
+        }
+
+        /* Math Vectors */
+        .dot-token {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            transition: transform 0.2s ease;
+        }
+        .cyan-token { background: var(--accent-cyan); box-shadow: 0 0 10px rgba(0,240,255,0.4); }
+        .amber-token { background: var(--accent-amber); box-shadow: 0 0 10px rgba(245,158,11,0.4); }
+
+        .math-banner {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 1.4rem;
+            color: var(--accent-amber);
+            font-weight: bold;
+            text-align: center;
+            margin-top: 1.2rem;
+            letter-spacing: 1px;
+        }
+
+        /* Plot Engine Style */
+        .plot-svg {
+            width: 100%;
+            max-width: 400px;
+            height: 250px;
+            background: #05070c;
+            border-radius: 6px;
+            display: block;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Ratio & Proportion Digital Textbook</h1>
+        <p>An Ultra-Modern Interactive Lab for Conceptual Thinking, Dynamic Visualizations, and Brainstorming</p>
+    </header>
+
+    <div class="book-frame">
+        
+        <div class="navigation-tabs">
+            <button class="tab-trigger active" onclick="navigateBook('ch1', this)">1. Meaning of Ratio</button>
+            <button class="tab-trigger" onclick="navigateBook('ch2', this)">2. Proportion Mechanics</button>
+            <button class="tab-trigger" onclick="navigateBook('ch3', this)">3. Direct Variation</button>
+            <button class="tab-trigger" onclick="navigateBook('ch4', this)">4. Inverse Variation</button>
+        </div>
+
+        <div class="book-body">
+            
+            <div id="ch1" class="chapter-page active">
+                <h2>1. Mastering Ratios through Scale Comparisons</h2>
+                <p class="intro">A <b>Ratio</b> is a mathematical comparison of two or more quantities of the same kind using division. It represents how many times one value contains another.</p>
+                
+                <div class="brainstorm-container">
+                    <h3>🧠 Brainstorm Challenge: The Recipe Paradox</h3>
+                    <p>If a cement mix requires a <b>3:1</b> ratio of sand to gravel, what happens if you add 2 extra cups of both sand and gravel to the bowl? Does the mixture retain the exact same strength or property? Discuss how scaling up by <i>addition</i> breaks ratios vs <i>multiplication</i>.</p>
+                </div>
+
+                <div class="lab-sandbox">
+                    <div class="slider-matrix">
+                        <div>
+                            <label>Blue Atoms (Quantity A): <span id="num-A" style="color:var(--accent-cyan)">3</span></label>
+                            <input type="range" id="slide-A" min="1" max="15" value="3" oninput="runRatioLab()">
+                        </div>
+                        <div>
+                            <label>Gold Atoms (Quantity B): <span id="num-B" style="color:var(--accent-amber)">6</span></label>
+                            <input type="range" id="slide-B" min="1" max="15" value="6" oninput="runRatioLab()">
+                        </div>
+                    </div>
+
+                    <div class="visualizer-window" id="ratio-canvas"></div>
+                    <div class="math-banner" id="ratio-string">A : B = 3 : 6 = 1 : 2</div>
+                </div>
+            </div>
+
+            <div id="ch2" class="chapter-page">
+                <h2>2. Proportion Equality & Cross Multiplication</h2>
+                <p class="intro">When two ratios are declared equal, they form a <b>Proportion</b>. If <span style="color:var(--accent-cyan)">a:b = c:d</span>, then the product of the extremes equals the product of the means (<span style="color:var(--accent-amber)">a × d = b × c</span>).</p>
+                
+                <div class="brainstorm-container">
+                    <h3>🧠 Brainstorm Challenge: The False Blueprint</h3>
+                    <p>An architect scales a floor window from 2 meters wide by 3 meters high to a larger wall model that is 6 meters wide by 8 meters high. Are these window designs truly proportional? Use the grid check below to test your thinking.</p>
+                </div>
+
+                <div class="lab-sandbox">
+                    <div class="slider-matrix" style="grid-template-columns: repeat(4, 1fr);">
+                        <div><label>Ratio 1 - a</label><input type="number" id="prop-a" value="2" oninput="runProportionLab()"></div>
+                        <div><label>Ratio 1 - b</label><input type="number" id="prop-b" value="3" oninput="runProportionLab()"></div>
+                        <div><label>Ratio 2 - c</label><input type="number" id="prop-c" value="4" oninput="runProportionLab()"></div>
+                        <div><label>Ratio 2 - d</label><input type="number" id="prop-d" value="6" oninput="runProportionLab()"></div>
+                    </div>
+
+                    <div class="math-banner" id="proportion-string">2 / 3 = 4 / 6</div>
+                    <div class="math-banner" id="cross-product-string" style="color:var(--accent-emerald); font-size:1.1rem; margin-top:0.5rem;">Extremes (2×6) = Means (3×4) = 12</div>
+                </div>
+            </div>
+
+            <div id="ch3" class="chapter-page">
+                <h2>3. Direct Proportion & Linear Scaling Graphs</h2>
+                <p class="intro">Two variables are in <b>Direct Proportion</b> if an increase in one causes a constant proportionate increase in the other. Formally, <span class="math-banner" style="font-size:1rem; display:inline;">y / x = k</span> where <i>k</i> is the constant of variation.</p>
+
+                <div class="brainstorm-container">
+                    <h3>🧠 Brainstorm Challenge: Shadows at Sundown</h3>
+                    <p>A 2-meter pole casts a 3-meter shadow at 10:00 AM. At the exact same time, a nearby tree casts a 15-meter shadow. How tall is the tree? Does this direct proportion scale cleanly throughout the entire evening?</p>
+                </div>
+
+                <div class="lab-sandbox" style="display: grid; grid-template-columns: 1fr 1fr; gap:1.5rem; align-items: center;">
+                    <div>
+                        <label>Constant of Scale (k = Cost per Item): $<span id="direct-k-lbl">15</span></label>
+                        <input type="range" id="direct-k" min="5" max="30" value="15" oninput="runDirectLab()">
+                        <br><br>
+                        <label>Items Purchased (x): <span id="direct-x-lbl">3</span></label>
+                        <input type="range" id="direct-x" min="1" max="10" value="3" oninput="runDirectLab()">
+                        
+                        <div class="math-banner" id="direct-output" style="text-align: left; font-size:1.1rem;">Total Cost (y) = $45</div>
+                    </div>
+                    <div>
+                        <svg class="plot-svg" id="direct-svg">
+                            <line x1="20" y1="230" x2="380" y2="230" stroke="#374151" stroke-width="2"/>
+                            <line x1="20" y1="20" x2="20" y2="230" stroke="#374151" stroke-width="2"/>
+                            <circle id="direct-dot" cx="100" cy="100" r="6" fill="var(--accent-cyan)"/>
+                            <path id="direct-line" d="" fill="transparent" stroke="var(--accent-purple)" stroke-width="3" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <div id="ch4" class="chapter-page">
+                <h2>4. Inverse Proportion & Hyperbolic Resource Distributions</h2>
+                <p class="intro">In an <b>Inverse Proportion</b>, as one variable increases, the other decreases such that their mathematical product remains constant: <span class="math-banner" style="font-size:1rem; display:inline;">x × y = k</span>.</p>
+
+                <div class="brainstorm-container">
+                    <h3>🧠 Brainstorm Challenge: The Speed Trap</h3>
+                    <p>If it takes 4 hours to complete a highway journey traveling at an average speed of 60 km/h, how fast must you drive to make the journey in exactly 2 hours? Why is it physically impossible to reduce the travel time to zero seconds using this inverse law?</p>
+                </div>
+
+                <div class="lab-sandbox" style="display: grid; grid-template-columns: 1fr 1fr; gap:1.5rem; align-items: center;">
+                    <div>
+                        <label>Fixed Field Crop Workload (k = Total Man-Hours): <span id="inverse-k-lbl">24</span></label>
+                        <input type="range" id="inverse-k" min="12" max="48" value="24" oninput="runInverseLab()">
+                        <br><br>
+                        <label>Number of Field Workers (x): <span id="inverse-x-lbl">4</span></label>
+                        <input type="range" id="inverse-x" min="1" max="12" value="4" oninput="runInverseLab()">
+                        
+                        <div class="math-banner" id="inverse-output" style="text-align: left; font-size:1.1rem;">Time Needed (y) = 6.0 Hours</div>
+                    </div>
+                    <div>
+                        <svg class="plot-svg" id="inverse-svg">
+                            <line x1="20" y1="230" x2="380" y2="230" stroke="#374151" stroke-width="2"/>
+                            <line x1="20" y1="20" x2="20" y2="230" stroke="#374151" stroke-width="2"/>
+                            <circle id="inverse-dot" cx="100" cy="100" r="6" fill="var(--accent-amber)"/>
+                            <path id="inverse-curve" d="" fill="transparent" stroke="var(--accent-cyan)" stroke-width="3" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // Tab Navigation Router
+        function navigateBook(targetPage, element) {
+            document.querySelectorAll('.chapter-page').forEach(page => page.classList.remove('active'));
+            document.querySelectorAll('.tab-trigger').forEach(btn => btn.classList.remove('active'));
+            
+            document.getElementById(targetPage).classList.add('active');
+            element.classList.add('active');
+
+            // Initialize respective page engines dynamically
+            if(targetPage === 'ch1') runRatioLab();
+            if(targetPage === 'ch2') runProportionLab();
+            if(targetPage === 'ch3') runDirectLab();
+            if(targetPage === 'ch4') runInverseLab();
+        }
+
+        // Euclid Common Divisor Math Logic
+        function findGcd(val1, val2) {
+            return val2 ? findGcd(val2, val1 % val2) : val1;
+        }
+
+        // Chapter 1 Simulator Engine
+        function runRatioLab() {
+            const a = parseInt(document.getElementById('slide-A').value);
+            const b = parseInt(document.getElementById('slide-B').value);
+            
+            document.getElementById('num-A').innerText = a;
+            document.getElementById('num-B').innerText = b;
+
+            const box = document.getElementById('ratio-canvas');
+            box.innerHTML = '';
+
+            for(let i=0; i<a; i++) {
+                let d = document.createElement('div'); d.className = 'dot-token cyan-token'; box.appendChild(d);
+            }
+            for(let j=0; j<b; j++) {
+                let d = document.createElement('div'); d.className = 'dot-token amber-token'; box.appendChild(d);
+            }
+
+            const commonFactor = findGcd(a, b);
+            document.getElementById('ratio-string').innerHTML = `A : B = ${a} : ${b} = <span style="color:var(--accent-emerald)">${a/commonFactor} : ${b/commonFactor}</span>`;
+        }
+
+        // Chapter 2 Simulator Engine
+        function runProportionLab() {
+            const a = parseFloat(document.getElementById('prop-a').value) || 1;
+            const b = parseFloat(document.getElementById('prop-b').value) || 1;
+            const c = parseFloat(document.getElementById('prop-c').value) || 1;
+            const d = parseFloat(document.getElementById('prop-d').value) || 1;
+
+            const isProportional = (a * d === b * c);
+            
+            document.getElementById('proportion-string').innerHTML = `${a} / ${b} ${isProportional ? '=' : '≠'} ${c} / ${d}`;
+            
+            const badge = document.getElementById('cross-product-string');
+            badge.innerHTML = `Extremes (a×d) = ${a*d} | Means (b×c) = ${b*c}`;
+            badge.style.color = isProportional ? 'var(--accent-emerald)' : 'var(--accent-amber)';
+        }
+
+        // Chapter 3 Simulator Engine
+        function runDirectLab() {
+            const k = parseFloat(document.getElementById('direct-k').value);
+            const x = parseFloat(document.getElementById('direct-x').value);
+            const y = k * x;
+
+            document.getElementById('direct-k-lbl').innerText = k;
+            document.getElementById('direct-x-lbl').innerText = x;
+            document.getElementById('direct-output').innerHTML = `Total Cost (y) = x × k = ${x} × $${k} = <strong>$${y}</strong>`;
+
+            // SVG Graph Render Vectors
+            const plotX = 20 + (x * 35);
+            const plotY = 230 - (y * 0.7);
+
+            const targetCircle = document.getElementById('direct-dot');
+            targetCircle.setAttribute('cx', plotX);
+            targetCircle.setAttribute('cy', plotY);
+
+            // Redraw line trend path
+            const linePath = `M 20 230 L 370 ${230 - (10 * k * 0.7)}`;
+            document.getElementById('direct-line').setAttribute('d', linePath);
+        }
+
+        // Chapter 4 Simulator Engine
+        function runInverseLab() {
+            const k = parseFloat(document.getElementById('inverse-k').value);
+            const x = parseFloat(document.getElementById('inverse-x').value);
+            const y = k / x;
+
+            document.getElementById('inverse-k-lbl').innerText = k;
+            document.getElementById('inverse-x-lbl').innerText = x;
+            document.getElementById('inverse-output').innerHTML = `Time Required (y) = k / x = ${k} / ${x} = <strong>${y.toFixed(1)} Hours</strong>`;
+
+            // Vector mapping tracking dot
+            const plotX = 20 + (x * 28);
+            const plotY = 230 - (y * 4);
+
+            const targetCircle = document.getElementById('inverse-dot');
+            targetCircle.setAttribute('cx', plotX);
+            targetCircle.setAttribute('cy', plotY);
+
+            // Generate hyperbolic path curve smoothly
+            let curveD = "M ";
+            for (let i = 1; i <= 12; i += 0.5) {
+                let calcY = k / i;
+                curveD += `${20 + (i * 28)} ${230 - (calcY * 4)} ` + (i === 1 ? " " : "L ");
+            }
+            document.getElementById('inverse-curve').setAttribute('d', curveD.replace(/ L $/, ''));
+        }
+
+        // Global Bootstrapper Initialization
+        window.onload = function() {
+            runRatioLab();
+        };
+    </script>
+</body>
+</html>

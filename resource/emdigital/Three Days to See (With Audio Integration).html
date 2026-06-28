@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gemini Audio Metaverse Arena - Three Days to See</title>
+    <style>
+        :root {
+            --bg-glow: #020208;
+            --panel-bg: rgba(10, 10, 22, 0.88);
+            --neon-blue: #00f0ff;
+            --neon-green: #39ff14;
+            --neon-pink: #ff007f;
+            --neon-purple: #9d00ff;
+            --text-main: #ffffff;
+            --text-sub: #8fa0c0;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, sans-serif; }
+        body {
+            background: radial-gradient(circle at center, #0a1128 0%, var(--bg-glow) 100%);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            text-align: center;
+            padding: 20px;
+            background: rgba(3, 3, 10, 0.95);
+            border-bottom: 3px solid var(--neon-purple);
+            box-shadow: 0 0 30px rgba(157, 0, 255, 0.4);
+        }
+
+        header h1 {
+            font-size: 2.3rem;
+            color: var(--neon-purple);
+            text-shadow: 0 0 15px var(--neon-purple);
+            letter-spacing: 2px;
+        }
+
+        .main-container {
+            display: flex;
+            flex: 1;
+            padding: 25px;
+            gap: 25px;
+            max-width: 1600px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .sidebar {
+            width: 340px;
+            background: var(--panel-bg);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(157, 0, 255, 0.2);
+            border-radius: 20px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+        }
+
+        .sidebar h2 {
+            font-size: 1.2rem;
+            color: var(--neon-blue);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-align: center;
+            text-shadow: 0 0 10px var(--neon-blue);
+            margin-bottom: 10px;
+        }
+
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            padding: 15px 18px;
+            border-radius: 12px;
+            color: var(--text-sub);
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.2, 1, 0.2, 1);
+            font-size: 0.95rem;
+        }
+
+        .nav-btn:hover {
+            border-color: var(--neon-purple);
+            color: var(--neon-purple);
+            background: rgba(157, 0, 255, 0.08);
+            transform: translateX(8px);
+            box-shadow: 0 0 15px rgba(157, 0, 255, 0.25);
+        }
+
+        .nav-btn.active {
+            background: linear-gradient(90deg, rgba(157, 0, 255, 0.25), transparent);
+            border-left: 5px solid var(--neon-purple);
+            color: #ffffff;
+            font-weight: bold;
+            box-shadow: 0 0 20px rgba(157, 0, 255, 0.15);
+        }
+
+        .arena-display {
+            flex: 1;
+            background: var(--panel-bg);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(157, 0, 255, 0.2);
+            border-radius: 20px;
+            padding: 35px;
+            position: relative;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.7);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .score-board {
+            position: absolute;
+            top: 25px;
+            right: 35px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 10px 22px;
+            border-radius: 30px;
+            border: 1px solid var(--neon-blue);
+            font-weight: bold;
+            color: var(--neon-blue);
+            text-shadow: 0 0 10px var(--neon-blue);
+        }
+
+        .progress-indicator { color: #ffaa00; font-size: 0.9rem; margin-bottom: 8px; font-weight: bold; letter-spacing: 1px; }
+        .game-header { border-bottom: 1px dashed rgba(255, 255, 255, 0.1); padding-bottom: 15px; margin-bottom: 25px; }
+        .game-title { font-size: 2rem; color: var(--neon-green); text-shadow: 0 0 10px var(--neon-green); margin-bottom: 5px; }
+        .game-desc { color: var(--text-sub); font-style: italic; }
+        .content-box { background: rgba(0, 0, 0, 0.5); border: 1px solid rgba(255, 255, 255, 0.05); padding: 30px; border-radius: 16px; margin-bottom: 25px; flex: 1; }
+        .q-text { font-size: 1.25rem; margin-bottom: 20px; line-height: 1.6; }
+
+        /* Component Styles */
+        .input-field { background: rgba(0,0,0,0.7); border: 1px solid rgba(255,255,255,0.15); padding: 15px; border-radius: 10px; color: white; width: 100%; font-size: 1.1rem; outline: none; }
+        .option-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .option-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); padding: 16px; border-radius: 12px; cursor: pointer; transition: 0.2s; }
+        .option-card:hover, .option-card.active { border-color: var(--neon-blue); background: rgba(0,240,255,0.1); }
+        .quantum-select { background: #080816; color: white; border: 1px solid var(--neon-blue); padding: 12px; border-radius: 8px; font-size: 1.1rem; width: 100%; }
+        
+        /* Drag Drop */
+        .drag-container { display: flex; flex-direction: column; gap: 20px; }
+        .drag-box-pool { display: flex; flex-wrap: wrap; gap: 15px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); padding: 15px; border-radius: 12px; }
+        .drop-target-box { background: rgba(0, 240, 255, 0.02); border: 2px dashed var(--neon-blue); padding: 25px; border-radius: 12px; text-align: center; font-size: 1.2rem; }
+        .drop-target-box.drag-over { background: rgba(0, 240, 255, 0.15); }
+        .drag-item { background: #121834; border: 1px solid var(--neon-blue); padding: 10px 22px; border-radius: 8px; cursor: move; font-weight: bold; }
+
+        /* True False */
+        .tf-grid { display: flex; gap: 20px; }
+        .tf-btn { flex: 1; padding: 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.03); font-size: 1.2rem; font-weight: bold; cursor: pointer; color: white; text-align: center;}
+        .tf-btn.selected { background: rgba(255,170,0,0.2); border-color: #ffaa00; }
+
+        /* Sniper Pool */
+        .sniper-pool { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 20px; }
+        .sniper-word { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 1.1rem; }
+        .built-sentence { min-height: 55px; background: rgba(0,0,0,0.3); border-bottom: 2px solid var(--neon-green); margin-bottom: 20px; padding: 10px; font-size: 1.3rem; display: flex; gap: 8px; align-items: center; border-radius: 6px;}
+
+        .action-btn { background: linear-gradient(135deg, #9d00ff, #ff007f); border: none; color: white; padding: 15px 35px; border-radius: 10px; cursor: pointer; font-weight: bold; letter-spacing: 1px; transition: all 0.3s; box-shadow: 0 5px 25px rgba(157, 0, 255, 0.4); align-self: flex-start; }
+        .action-btn:hover { transform: translateY(-3px); box-shadow: 0 8px 30px rgba(157, 0, 255, 0.6); }
+        .feedback-txt { margin-top: 20px; font-weight: bold; font-size: 1.15rem; min-height: 30px; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>GPT TEACHERS EDUCATIONAL RESOURCES, UTTARA KANNADA</h1>
+        <p>Active Engine: Unit 1 Lesson 3 - Three Days to See (With Audio Integration)</p>
+    </header>
+
+    <div class="main-container">
+        <div class="sidebar">
+            <h2>System Nodes</h2>
+            <button class="nav-btn active" id="btn-a1" onclick="loadUniverseEngine(1)">🤖 1. AI Language Mentor</button>
+            <button class="nav-btn" id="btn-a2" onclick="loadUniverseEngine(2)">🥽 2. VR Story World</button>
+            <button class="nav-btn" id="btn-a3" onclick="loadUniverseEngine(3)">🌐 3. Metaverse Classroom</button>
+            <button class="nav-btn" id="btn-a4" onclick="loadUniverseEngine(4)">🧠 4. Brain Quest Challenge</button>
+            <button class="nav-btn" id="btn-a5" onclick="loadUniverseEngine(5)">🎤 5. Smart Voice Adventure</button>
+            <button class="nav-btn" id="btn-a6" onclick="loadUniverseEngine(6)">🛰️ 6. Galaxy Explorer English</button>
+            <button class="nav-btn" id="btn-a7" onclick="loadUniverseEngine(7)">🕶️ 7. AR Word Hunt</button>
+            <button class="nav-btn" id="btn-a8" onclick="loadUniverseEngine(8)">⚡ 8. AI Challenge Arena</button>
+        </div>
+
+        <div class="arena-display">
+            <div class="score-board">ARENA XP: <span id="xp-global">0</span></div>
+            <div class="progress-indicator" id="progress-indicator">Block 1 of 5</div>
+            
+            <div class="game-header">
+                <div class="game-title" id="arena-title">Initializing Node...</div>
+                <div class="game-desc" id="arena-desc">Loading structural parameters...</div>
+            </div>
+
+            <div class="content-box" id="arena-body"></div>
+
+            <button class="action-btn" id="submit-btn" onclick="evaluateActiveBlock()">EXECUTE SUBMISSION NODE</button>
+            <div id="arena-feedback" class="feedback-txt"></div>
+        </div>
+    </div>
+
+    <script>
+        // Synthesized Dynamic Audio Engine
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        function playSound(type) {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            if (type === 'success') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5 node
+                osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1); // E5 node
+                osc.frequency.setValueAtTime(783.99, audioCtx.currentTime + 0.2); // G5 node
+                gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.4);
+            } else if (type === 'error') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(150, audioCtx.currentTime); // Low buzz node
+                osc.frequency.setValueAtTime(120, audioCtx.currentTime + 0.15);
+                gain.gain.setValueAtTime(0.4, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.3);
+            }
+        }
+
+        const curriculumDatabase = {
+            1: {
+                title: "AI Language Mentor (Text Input UI)",
+                desc: "Type exact contextual responses into the interactive mentor loop.",
+                items: [
+                    { question: "Complete Helen's beautiful metaphor: 'The eye is the window of the _______.'", answer: "soul" },
+                    { question: "Type the past participle form of the main verb 'divide' used in the timeline split:", answer: "divided" },
+                    { question: "What season does Helen touch branches hopefully in search of a bud?", answer: "spring" },
+                    { question: "What slender tree with thin peeling smooth skin does Helen pass hands lovingly about?", answer: "silver birch" },
+                    { question: "Which core human sensory capability did Helen Keller consider most delightful of all?", answer: "sight" }
+                ],
+                engine: "ai-text"
+            },
+            2: {
+                title: "Virtual Reality Story World (Grid Choice UI)",
+                desc: "Immerse into the visual text matrix blocks and isolate historical fact components.",
+                items: [
+                    { question: "On which specific designated day would Helen divide the period to see her friends?", opts: ["The first day", "The second day", "The third day", "She would never see them"], answer: "The first day" },
+                    { question: "Where does Helen state she would go on the second day to witness the pageant of man's progress?", opts: ["To the local markets", "To the historical museums", "To the forest thicket", "To an ocean harbor"], answer: "To the historical museums" },
+                    { question: "What massive Fur-covered elephant-like prehistoric creatures does Helen observe?", opts: ["Dinosaurs", "Mastodons", "Silver birch logs", "Silver fish"], answer: "Mastodons" },
+                    { question: "Where does Helen spend her entire third day of granted sight?", opts: ["In the silent dark room", "In the busy workaday world and city", "Deep in the forest trails", "At a mountain summit"], answer: "In the busy workaday world and city" },
+                    { question: "What emotion does Helen say she feels when she stands at a busy corner and spots suffering?", opts: ["Sorrow and irritation", "Compassionate", "Hesitation", "Proud"], answer: "Compassionate" }
+                ],
+                engine: "vr-mcq"
+            },
+            3: {
+                title: "Metaverse English Classroom (Sensory Matching UI)",
+                desc: "Grid matching operation: Identify correct descriptive Sensory Word profiles.",
+                items: [
+                    { question: "Identify the sensory word relating specifically to the sense of TOUCH:", opts: ["tactile", "panorama", "music", "perfume"], answer: "tactile" },
+                    { question: "Which term describes a complete, wide magnificent display or viewing of scenery?", opts: ["morsel", "panorama", "strains", "quiver"], answer: "panorama" },
+                    { question: "What word describes the texture of a pine tree's rough, hairy bark?", opts: ["smooth", "shaggy", "symmetry", "filmy"], answer: "shaggy" },
+                    { question: "What term denotes the happy shivering or shaking movement of a bird singing?", opts: ["relish", "quiver", "stature", "strains"], answer: "quiver" },
+                    { question: "A small, tiny broken piece of food tasted with relish is called a...", opts: ["morsel", "facet", "panorama", "clue"], answer: "morsel" }
+                ],
+                engine: "meta-grid"
+            },
+            4: {
+                title: "Brain Quest Challenge (Boolean Logic UI)",
+                desc: "Train logical recognition patterns. Verify statements via Boolean States.",
+                items: [
+                    { question: "Helen Keller states that she finds absolutely nothing of interest through mere touch.", state: false },
+                    { question: "Helen advises people with sight to use eyes as if they would be stricken blind tomorrow.", state: true },
+                    { question: "According to the story, Helen can detect emotions like laughter and sorrow through her fingertips.", state: true },
+                    { question: "At midnight of the third day, Helen's temporary window of sight closes into permanent night again.", state: true },
+                    { question: "Helen believes that the sense of taste is far more delightful than the sense of sight.", state: false }
+                ],
+                engine: "brain-tf"
+            },
+            5: {
+                title: "Smart Voice Adventure (Click Word Order UI)",
+                desc: "Reconstruct spoken language streams by selecting block nodes sequentially.",
+                items: [
+                    { question: "Assemble the central sensory directive:", segments: ["Make", "the", "most", "of", "every", "sense"], answer: "Make the most of every sense" },
+                    { question: "Formulate Helen's touch observation:", segments: ["I", "feel", "the", "delicate", "symmetry"], answer: "I feel the delicate symmetry" },
+                    { question: "Construct the sunrise description statement:", segments: ["Night", "is", "transformed", "into", "day"], answer: "Night is transformed into day" },
+                    { question: "Build the warning node loop:", segments: ["Realise", "how", "much", "left", "unseen"], answer: "Realise how much left unseen" },
+                    { question: "Assemble the final priority node:", segments: ["Sight", "must", "be", "most", "delightful"], answer: "Sight must be most delightful" }
+                ],
+                engine: "voice-build"
+            },
+            6: {
+                title: "Galaxy Explorer English (Multi-Option Drag UI)",
+                desc: "Multi-option structural injection: Drag correct Modal Verbs onto the path.",
+                items: [
+                    { question: "She ______ finish her homework before dinner. (Expressing strict necessity node)", options: ["must", "might", "can", "would"], answer: "must" },
+                    { question: "They ______ arrive late due to heavy traffic loops. (Expressing weak possibility)", options: ["might", "must", "ought to", "shall"], answer: "might" },
+                    { question: "You ______ learn a lot from this immersive virtual experience. (Expressing ability parameter)", options: ["can", "should", "would", "must"], answer: "can" },
+                    { question: "They ______ to apologize for making careless blunders. (Expressing clear moral obligation)", options: ["ought to", "could", "may", "will"], answer: "ought to" },
+                    { question: "______ I leave early today if all tasks are completed? (Polite permission request)", options: ["May", "Must", "Should", "Would"], answer: "May" }
+                ],
+                engine: "galaxy-drag"
+            },
+            7: {
+                title: "Augmented Reality Word Hunt (Drop Down Matrix UI)",
+                desc: "Scan targets via drop-down coordinate matrices to resolve missing syntax elements.",
+                items: [
+                    { question: "Select the missing modal context: 'I ______ arise with the dawn and see the miracle.'", opts: ["should", "can", "must", "may"], answer: "should" },
+                    { question: "Select the missing structural item: 'How much more beauty must be ______ by sight.'", opts: ["revealed", "divided", "broken", "taken"], answer: "revealed" },
+                    { question: "Select the texture term: 'Silver birch has a perfectly ______ skin.'", opts: ["smooth", "rough", "shaggy", "sharp"], answer: "smooth" },
+                    { question: "Select the musical component word: 'Hear the mighty ______ of an orchestra.'", opts: ["strains", "quivers", "morsels", "barks"], answer: "strains" },
+                    { question: "Select the visual factor word: 'This day I should devote to a hasty ______ of the world.'", opts: ["glimpse", "tactile", "symmetry", "morsel"], answer: "glimpse" }
+                ],
+                engine: "ar-drop"
+            },
+            8: {
+                title: "AI Challenge Arena (Battle Match UI)",
+                desc: "Combat smart options. Match the precise functionality context of deployed Modal Verbs.",
+                items: [
+                    { question: "What specific operational function does 'can' perform inside: 'You can learn a lot'?", opts: ["ability", "necessity", "moral obligation", "polite request"], answer: "ability" },
+                    { question: "What is the function state of 'must' inside: 'You must finish this report'?", opts: ["necessity", "possibility", "advice", "permission"], answer: "necessity" },
+                    { question: "What functionality is mapped by 'would' inside: 'Would you pass the salt, please'?", opts: ["polite request", "ability", "moral obligation", "possibility"], answer: "polite request" },
+                    { question: "What parameter does 'ought to' express inside: 'You ought to apologize'?", opts: ["moral obligation", "permission", "possibility", "ability"], answer: "moral obligation" },
+                    { question: "What state description applies to 'might' inside: 'They might arrive late'?", opts: ["possibility", "necessity", "command", "permission"], answer: "possibility" }
+                ],
+                engine: "ai-battle"
+            }
+        };
+
+        let currentEngine = 1;
+        let currentNode = 0;
+        let scoreCounter = 0;
+
+        window.selectedMCQ = "";
+        window.selectedBoolean = null;
+        window.draggedOption = "";
+        window.droppedOption = "";
+
+        function loadUniverseEngine(engineId) {
+            currentEngine = engineId;
+            currentNode = 0;
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('btn-a' + engineId).classList.add('active');
+            renderNodeFrame();
+        }
+
+        function renderNodeFrame() {
+            const block = curriculumDatabase[currentEngine];
+            document.getElementById('arena-title').innerText = block.title;
+            document.getElementById('arena-desc').innerText = block.desc;
+            document.getElementById('arena-feedback').innerText = "";
+            document.getElementById('submit-btn').style.display = "block";
+            document.getElementById('progress-indicator').innerText = `Node Question ${currentNode + 1} of ${block.items.length}`;
+
+            const item = block.items[currentNode];
+            const body = document.getElementById('arena-body');
+            body.innerHTML = "";
+
+            if (block.engine === "ai-text") {
+                body.innerHTML = `
+                    <p class="q-text">${item.question}</p>
+                    <input type="text" id="text-node-input" class="input-field" placeholder="Transmit correct text string sequence...">
+                `;
+            }
+            else if (block.engine === "vr-mcq" || block.engine === "meta-grid" || block.engine === "ai-battle") {
+                body.innerHTML = `<p class="q-text">${item.question}</p><div class="option-grid" id="options-zone"></div>`;
+                window.selectedMCQ = "";
+                item.opts.forEach(o => {
+                    let card = document.createElement('div');
+                    card.className = "option-card";
+                    card.innerText = o;
+                    card.onclick = () => {
+                        document.querySelectorAll('.option-card').forEach(c => c.classList.remove('active'));
+                        card.classList.add('active');
+                        window.selectedMCQ = o;
+                    };
+                    document.getElementById('options-zone').appendChild(card);
+                });
+            }
+            else if (block.engine === "brain-tf") {
+                body.innerHTML = `
+                    <p class="q-text">${item.question}</p>
+                    <div class="tf-grid">
+                        <button class="tf-btn" id="tf-true" onclick="setBooleanInput(true)">TRUE / DETECTED</button>
+                        <button class="tf-btn" id="tf-false" onclick="setBooleanInput(false)">FALSE / REJECTED</button>
+                    </div>
+                `;
+                window.selectedBoolean = null;
+            }
+            else if (block.engine === "voice-build") {
+                body.innerHTML = `<p class="q-text">${item.question}</p><div class="built-sentence" id="voice-sentence-zone"></div><div class="sniper-pool" id="voice-pool-zone"></div>`;
+                let buildArray = [];
+                let shuffled = [...item.segments].sort(() => Math.random() - 0.5);
+                shuffled.forEach(w => {
+                    let btn = document.createElement('div');
+                    btn.className = "sniper-word";
+                    btn.innerText = w;
+                    btn.onclick = () => {
+                        buildArray.push(w);
+                        document.getElementById('voice-sentence-zone').innerText = buildArray.join(" ");
+                        btn.style.display = "none";
+                    };
+                    document.getElementById('voice-pool-zone').appendChild(btn);
+                });
+            }
+            else if (block.engine === "galaxy-drag") {
+                window.droppedOption = "";
+                body.innerHTML = `
+                    <p class="q-text">${item.question}</p>
+                    <div class="drag-container">
+                        <div class="drag-box-pool" id="galaxy-pool"></div>
+                        <div class="drop-target-box" id="galaxy-dropzone">Orbital Drop Slot (Drag Target Here)</div>
+                    </div>
+                `;
+                let zone = document.getElementById('galaxy-dropzone');
+                zone.ondragover = (e) => { e.preventDefault(); zone.classList.add('drag-over'); };
+                zone.ondragleave = () => { zone.classList.remove('drag-over'); };
+                zone.ondrop = (e) => {
+                    e.preventDefault();
+                    zone.classList.remove('drag-over');
+                    window.droppedOption = window.draggedOption;
+                    zone.innerText = "Quantum Loaded: " + window.droppedOption;
+                };
+
+                item.options.forEach((opt, idx) => {
+                    let dragItem = document.createElement('div');
+                    dragItem.className = "drag-item";
+                    dragItem.draggable = true;
+                    dragItem.innerText = opt;
+                    dragItem.addEventListener('dragstart', () => { window.draggedOption = opt; });
+                    document.getElementById('galaxy-pool').appendChild(dragItem);
+                });
+            }
+            else if (block.engine === "ar-drop") {
+                let optsHtml = item.opts.map(o => `<option value="${o}">${o}</option>`).join("");
+                body.innerHTML = `
+                    <p class="q-text">${item.question}</p>
+                    <select id="ar-matrix-select" class="quantum-select">
+                        <option value="">-- RESOLVE COORDINATE OPTION --</option>
+                        ${optsHtml}
+                    </select>
+                `;
+            }
+        }
+
+        function setBooleanInput(val) {
+            window.selectedBoolean = val;
+            document.getElementById('tf-true').classList.remove('selected');
+            document.getElementById('tf-false').classList.remove('selected');
+            if(val) document.getElementById('tf-true').classList.add('selected');
+            else document.getElementById('tf-false').classList.add('selected');
+        }
+
+        function evaluateActiveBlock() {
+            const block = curriculumDatabase[currentEngine];
+            const item = block.items[currentNode];
+            let checkPassed = false;
+            let feedback = document.getElementById('arena-feedback');
+
+            if (block.engine === "ai-text") {
+                let ans = document.getElementById('text-node-input').value.trim().toLowerCase();
+                if (ans === item.answer.toLowerCase()) checkPassed = true;
+            }
+            else if (block.engine === "vr-mcq" || block.engine === "meta-grid" || block.engine === "ai-battle") {
+                if (window.selectedMCQ === item.answer) checkPassed = true;
+            }
+            else if (block.engine === "brain-tf") {
+                if (window.selectedBoolean === item.state) checkPassed = true;
+            }
+            else if (block.engine === "voice-build") {
+                let ans = document.getElementById('voice-sentence-zone').innerText;
+                if (ans === item.answer) checkPassed = true;
+            }
+            else if (block.engine === "galaxy-drag") {
+                if (window.droppedOption === item.answer) checkPassed = true;
+            }
+            else if (block.engine === "ar-drop") {
+                let ans = document.getElementById('ar-matrix-select').value;
+                if (ans === item.answer) checkPassed = true;
+            }
+
+            if (checkPassed) {
+                playSound('success');
+                feedback.innerText = "⚡ VALIDATED: Target Node processing stable! (+20 XP)";
+                feedback.style.color = "var(--neon-green)";
+                scoreCounter += 20;
+                document.getElementById('xp-global').innerText = scoreCounter;
+
+                setTimeout(() => {
+                    currentNode++;
+                    if(currentNode < block.items.length) {
+                        renderNodeFrame();
+                    } else {
+                        feedback.innerText = "🏆 SECTOR SECURED: Core loop cleared successfully.";
+                        feedback.style.color = "var(--neon-blue)";
+                        document.getElementById('submit-btn').style.display = "none";
+                    }
+                }, 1200);
+            } else {
+                playSound('error');
+                feedback.innerText = "❌ CORRUPTION ALERT: Processing anomaly. Access Node Refused.";
+                feedback.style.color = "var(--neon-pink)";
+            }
+        }
+
+        window.onload = () => { loadUniverseEngine(1); };
+    </script>
+</body>
+</html>

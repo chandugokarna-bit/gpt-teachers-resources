@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Friend's Prayer - Fantasy Learning Hub</title>
+    <!-- Canvas Confetti Library for Cracker Burst Animation -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        :root {
+            --primary: #8b5cf6;
+            --secondary: #06b6d4;
+            --bg: #0f172a;
+            --surface: #1e293b;
+            --text: #f8fafc;
+            --success: #10b981;
+            --error: #ef4444;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .hub-container {
+            max-width: 950px;
+            width: 100%;
+            background: var(--surface);
+            padding: 35px;
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            border: 2px solid #334155;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            background: linear-gradient(135deg, #8b5cf6, #ec4899, #06b6d4);
+            padding: 25px;
+            border-radius: 20px;
+            color: white;
+        }
+
+        h1 { margin: 0; font-size: 2.3rem; font-weight: 800; text-shadow: 1px 1px 4px rgba(0,0,0,0.2); }
+        h2 { margin: 5px 0 0 0; font-size: 1.2rem; opacity: 0.9; }
+
+        .tab-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 35px;
+        }
+
+        @media (max-width: 768px) {
+            .tab-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        .tab-btn {
+            background: #334155;
+            color: #cbd5e1;
+            border: 1px solid #475569;
+            padding: 14px;
+            border-radius: 14px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn:hover { background: #475569; color: #fff; }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, var(--primary), #6d28d9);
+            color: white;
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(139, 92, 246, 0.4);
+        }
+
+        .adventure-panel { display: none; }
+        .adventure-panel.active { display: block; animation: zoomIn 0.4s ease; }
+
+        @keyframes zoomIn {
+            from { opacity: 0; transform: scale(0.98); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .game-card {
+            background: #1e293b;
+            border: 2px solid #334155;
+            border-radius: 18px;
+            padding: 22px;
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .quest-text {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 14px;
+            color: #38bdf8;
+        }
+
+        /* Options Formats Layout */
+        .option-stack { display: flex; flex-direction: column; gap: 10px; }
+        .game-option {
+            padding: 14px 20px;
+            background: #111827;
+            border: 2px solid #334155;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #e2e8f0;
+            transition: all 0.2s ease;
+        }
+        .game-option:hover { border-color: var(--primary); background: #1f2937; }
+        .game-option.selected { border-color: var(--primary); background: #2e1065; color: #fff; }
+
+        .game-dropdown {
+            padding: 12px 18px;
+            border-radius: 12px;
+            border: 2px solid #334155;
+            font-weight: bold;
+            color: #f59e0b;
+            background: #111827;
+            font-size: 1rem;
+            cursor: pointer;
+            width: 100%;
+            max-width: 350px;
+        }
+
+        .balloon {
+            position: absolute;
+            font-size: 2.2rem;
+            animation: floatUp 1.4s ease-out forwards;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(0) scale(0.5); opacity: 1; }
+            100% { transform: translateY(-130px) scale(1.3); opacity: 0; }
+        }
+
+        .correct-card { background: #064e3b !important; border-color: var(--success) !important; color: #a7f3d0 !important; }
+        .incorrect-card { background: #7f1d1d !important; border-color: var(--error) !important; color: #fca5a5 !important; }
+
+        .action-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 35px;
+            padding-top: 20px;
+            border-top: 2px solid #334155;
+        }
+
+        button.action-btn {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            border: none;
+            padding: 15px 35px;
+            border-radius: 14px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 1.05rem;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+        button.action-btn:hover { transform: translateY(-2px); }
+
+        .score-badge {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: #ec4899;
+            background: #271625;
+            padding: 10px 25px;
+            border-radius: 30px;
+            border: 2px solid #4c0519;
+        }
+    </style>
+</head>
+<body>
+
+<div class="hub-container">
+    <header>
+        <h1>A Friend's Prayer: Grand Quest</h1>
+        <h2>Unit 2 - Fantasy Learning Arena</h2>
+    </header>
+
+    <div class="tab-grid">
+        <button class="tab-btn active" onclick="switchAdventure(1)">🌍 World Explorer</button>
+        <button class="tab-btn" onclick="switchAdventure(2)">🚀 Space Language</button>
+        <button class="tab-btn" onclick="switchAdventure(3)"> castle Castle Escape</button>
+        <button class="tab-btn" onclick="switchAdventure(4)">🧭 Lost Island</button>
+        <button class="tab-btn" onclick="switchAdventure(5)">🐉 Dragon Challenge</button>
+        <button class="tab-btn" onclick="switchAdventure(6)">⚔️ Kingdom Grammar</button>
+        <button class="tab-btn" onclick="switchAdventure(7)">🧙 Magic Spell Lab</button>
+        <button class="tab-btn" onclick="switchAdventure(8)">🦸 Hero Academy</button>
+    </div>
+
+    <div id="dynamic-adventure-arena"></div>
+</div>
+
+<script>
+    const adventureDataset = {
+        1: {
+            title: "English World Explorer (Poem Insights)",
+            type: "mcq",
+            questions: [
+                { q: "Destination 1: According to the poet, what should always be the most important thing?", o: ["Amassing heavy gold coins", "Nurturing true friendships", "Traveling alone to new towns"], a: 1 },
+                { q: "Destination 2: How does the poet feel when surrounded by special friends?", o: ["Extremely lonely", "Deeply blessed and grateful", "Confused and angry"], a: 1 },
+                { q: "Destination 3: What does the poet want to give to her special friends?", o: ["Her absolute very best effort", "Expensive clothing assets", "Only simple material gifts"], a: 0 },
+                { q: "Destination 4: The poet wants to do much more than just share which elements?", o: ["Daily classroom chores", "Hopes and plans of friends who care", "Only outdoor games"], a: 1 },
+                { q: "Destination 5: What is the primary spiritual theme of this entire poem?", o: ["A request for a bicycle ride", "A thoughtful prayer for friendship", "An exploration of a farm"], a: 1 }
+            ]
+        },
+        2: {
+            title: "Space Language Mission (Textual Analysis)",
+            type: "dropdown",
+            questions: [
+                { q: "Planet Alpha: Complete the poem lyric line: 'May my ______ always be the most important thing to me.'", o: ["friendships", "comforts", "hobbies"], a: 0 },
+                { q: "Planet Beta: 'With special friends I feel I am ______, so let me give my very best.'", o: ["blessed", "worried", "tired"], a: 0 },
+                { q: "Planet Gamma: Complete the promise: 'I will try all that a friend can do to make their ______ come true.'", o: ["wishes", "chores", "feathers"], a: 0 },
+                { q: "Planet Delta: 'Let me use my ______ to see, to realise what friends can be.'", o: ["mind", "heart", "eyes"], a: 1 },
+                { q: "Planet Epsilon: Complete the acceptance vow: 'And make no judgements from afar, but ______ my friends the way they are.'", o: ["hate", "love", "ignore"], a: 1 }
+            ]
+        },
+        3: {
+            title: "Castle Escape Adventure (Adjective Mastery)",
+            type: "mcq",
+            questions: [
+                { q: "Secret Door 1: Identify the descriptive adjective in: 'With special friends I feel I'm blessed.'", o: ["friends", "special", "feel"], a: 1 },
+                { q: "Secret Door 2: Select the matching adjective that means 'faithful and always supportive':", o: ["Loyal", "Silly", "Heavy"], a: 0 },
+                { q: "Secret Door 3: If a friend never tells lies and always tells the truth, they are ______.", o: ["honest", "polite", "caring"], a: 0 },
+                { q: "Secret Door 4: Choose the missing attribute: 'A ______ classmate always shares things and supports you.'", o: ["helpful", "lazy", "careless"], a: 0 },
+                { q: "Secret Door 5: What grammatical profile describes words like 'loyal, kind, and caring'?", o: ["Action Verbs", "Descriptive Adjectives", "Abstract Nouns"], a: 1 }
+            ]
+        },
+        4: {
+            title: "Lost Island Survival Quest (Suffix Synthesis)",
+            type: "dropdown",
+            questions: [
+                { q: "Tool Drop 1: Combine the root word 'friend' with the correct suffix: 'friend + ______ = friendship'", o: ["-ly", "-ship", "-ful"], a: 1 },
+                { q: "Tool Drop 2: Form an adjective from 'care': 'care + ______ = caring / careful'", o: ["-tion", "-ful", "-al"], a: 1 },
+                { q: "Tool Drop 3: Form a word that specifies a state of celebration: 'celebrate + -tion = ______'", o: ["celebrateed", "celebration", "celebrately"], a: 1 },
+                { q: "Tool Drop 4: Create an adverb from 'sudden': 'sudden + ______ = suddenly'", o: ["-ly", "-ful", "-ship"], a: 0 },
+                { q: "Tool Drop 5: What is the sequence of letters added *after* a root word called?", o: ["Prefixes", "Suffixes", "Pronouns"], a: 1 }
+            ]
+        },
+        5: {
+            title: "Dragon's Word Challenge (Vocabulary Decode)",
+            type: "mcq",
+            questions: [
+                { q: "Dragon Strike 1: What is the contextual meaning of being 'blessed' inside the poem?", o: ["Feeling extremely angry", "Feeling highly grateful and fortunate", "Feeling very sleepy"], a: 1 },
+                { q: "Dragon Strike 2: Decode the operational definition of making 'judgements':", o: ["Forming opinions or critical conclusions about someone", "Playing games on a park bench", "Purchasing ice-cream items"], a: 0 },
+                { q: "Dragon Strike 3: What does the phrase 'from afar' mean contextually in the text?", o: ["From a close distance", "From a distance / without knowing deeply", "Inside the same classroom"], a: 1 },
+                { q: "Dragon Strike 4: To 'realise' what friends can be means to ______.", o: ["completely forget", "understand clearly / become aware", "ignore fully"], a: 1 },
+                { q: "Dragon Strike 5: Which word from the poem indicates an expression of hope or desire directed to a higher power?", o: ["Prayer", "Chore", "Morsel"], a: 0 }
+            ]
+        },
+        6: {
+            title: "Kingdom of Grammar (Adjective-Noun Pairings)",
+            type: "dropdown",
+            questions: [
+                { q: "Kingdom Shield 1: Match the adjective 'brave' to its proper noun asset:", o: ["soldier", "rain", "cold"], a: 0 },
+                { q: "Kingdom Shield 2: Match the adjective 'heavy' to its proper natural noun asset:", o: ["plan", "rain", "peanuts"], a: 1 },
+                { q: "Kingdom Shield 3: Complete the pairing profile: 'The chef cooked a very ______ meal for dinner.'", o: ["tasty", "slight", "clever"], a: 0 },
+                { q: "Kingdom Shield 4: Complete the pairing profile: 'The sage came up with a highly ______ plan.'", o: ["clever", "heavy", "tasty"], a: 0 },
+                { q: "Kingdom Shield 5: 'Abhishek found an ______ book inside the dark attic storage.'", o: ["old", "magical creatures", "colourful"], a: 0 }
+            ]
+        },
+        7: {
+            title: "Magic Spell Vocabulary Lab (Synonyms & Values)",
+            type: "mcq",
+            questions: [
+                { q: "Spell 1: Find a word that has a similar emotional meaning to 'blessed':", o: ["Grateful / Thankful", "Excited", "Relaxed"], a: 0 },
+                { q: "Spell 2: Which word represents a positive value of being true and faithful to a friend?", o: ["Loyal", "Silly", "Unwise"], a: 0 },
+                { q: "Spell 3: A person who always supports you and helps you in need is ______.", o: ["caring", "indifferent", "cunning"], a: 0 },
+                { q: "Spell 4: Complete the spell: 'We should love our true friends the way they ______.'", o: ["change everyday", "are / accept them fully", "look physically"], a: 1 },
+                { q: "Spell 5: What is the synonym for 'wishes' in the poem context?", o: ["desires / hopes", "chores", "judgements"], a: 0 }
+            ]
+        },
+        8: {
+            title: "Superhero Language Academy (Master Mode)",
+            type: "dropdown",
+            questions: [
+                { q: "Hero Badge 1: Complete with the best value: 'A friend in need is a friend ______.'", o: ["indeed", "afar", "blessed"], a: 0 },
+                { q: "Hero Badge 2: Complete the definition: 'My best friend is the one who brings out the ______ in me.'", o: ["best", "worst", "sadness"], a: 0 },
+                { q: "Hero Badge 3: 'Jill Wolf' is the ______ who wrote 'A Friend's Prayer'.", o: ["poet", "author", "handler"], a: 0 },
+                { q: "Hero Badge 4: The line 'To make their wishes come true' shows a ______ attitude.", o: ["supportive / caring", "selfish", "proud"], a: 0 },
+                { q: "Hero Badge 5: An acrostic poem using the word 'FRIEND' uses each letter to write a descriptive ______.", o: ["word / line", "number", "punctuation mark"], a: 0 }
+            ]
+        }
+    };
+
+    let gameAnswers = {};
+
+    function generateAdventureHubUI() {
+        const arena = document.getElementById('dynamic-adventure-arena');
+        arena.innerHTML = Object.keys(adventureDataset).map(id => {
+            const quest = adventureDataset[id];
+            return `
+                <div id="quest-panel-${id}" class="adventure-panel ${id == 1 ? 'active' : ''}">
+                    <h2>Adventure Mission ${id}: ${quest.title}</h2>
+                    ${quest.questions.map((item, qIdx) => {
+                        let dynamicUi = '';
+                        if (quest.type === "mcq") {
+                            dynamicUi = `
+                                <div class="option-stack">
+                                    ${item.o.map((opt, oIdx) => `
+                                        <div class="game-option" id="opt-${id}-${qIdx}-${oIdx}" onclick="logClick(${id}, ${qIdx}, ${oIdx})">${opt}</div>
+                                    `).join('')}
+                                </div>`;
+                        } else if (quest.type === "dropdown") {
+                            dynamicUi = `
+                                <select class="game-dropdown" id="drop-${id}-${qIdx}" onchange="logDropdownSelection(${id}, ${qIdx})">
+                                    <option value="">-- Select Magical Option --</option>
+                                    ${item.o.map((opt, oIdx) => `<option value="${oIdx}">${opt}</option>`).join('')}
+                                </select>`;
+                        }
+
+                        return `
+                            <div class="game-card" id="card-${id}-${qIdx}">
+                                <div class="quest-text">Quest ${qIdx + 1}: ${item.q}</div>
+                                ${dynamicUi}
+                            </div>
+                        `;
+                    }).join('')}
+                    <div class="action-container">
+                        <button class="action-btn" onclick="verifyAdventureAnswers(${id})">Verify Mission Answers</button>
+                        <div class="score-badge" id="score-badge-${id}">Mission Score: -- / 5</div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    window.logClick = function(panelId, qIdx, oIdx) {
+        adventureDataset[panelId].questions[qIdx].o.forEach((_, idx) => {
+            document.getElementById(`opt-${panelId}-${qIdx}-${idx}`).classList.remove('selected');
+        });
+        document.getElementById(`opt-${panelId}-${qIdx}-${oIdx}`).classList.add('selected');
+        gameAnswers[`${panelId}-${qIdx}`] = oIdx;
+    };
+
+    window.logDropdownSelection = function(panelId, qIdx) {
+        const val = document.getElementById(`drop-${panelId}-${qIdx}`).value;
+        if (val !== "") gameAnswers[`${panelId}-${qIdx}`] = parseInt(val);
+    };
+
+    window.switchAdventure = function(id) {
+        document.querySelectorAll('.adventure-panel').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('quest-panel-' + id).classList.add('active');
+        event.target.classList.add('active');
+    };
+
+    function triggerBalloonFloat(cardId) {
+        const card = document.getElementById(cardId);
+        const balloon = document.createElement('div');
+        balloon.className = 'balloon';
+        const emojis = ['🎈', '✨', '🎈', '🎉', '🌟'];
+        balloon.innerText = emojis[Math.floor(Math.random() * emojis.length)];
+        balloon.style.left = '50%';
+        card.appendChild(balloon);
+        setTimeout(() => balloon.remove(), 1400);
+    }
+
+    window.verifyAdventureAnswers = function(id) {
+        const quest = adventureDataset[id];
+        let scoreCount = 0;
+
+        quest.questions.forEach((item, qIdx) => {
+            const userChoice = gameAnswers[`${id}-${qIdx}`];
+            const cardId = `card-${id}-${qIdx}`;
+            const card = document.getElementById(cardId);
+            
+            card.classList.remove('correct-card', 'incorrect-card');
+
+            if (userChoice !== undefined && userChoice === item.a) {
+                scoreCount++;
+                card.classList.add('correct-card');
+                triggerBalloonFloat(cardId); // Individual floating balloon on correct answer
+            } else {
+                card.classList.add('incorrect-card');
+            }
+        });
+
+        document.getElementById(`score-badge-${id}`).innerText = `Mission Score: ${scoreCount} / 5`;
+        
+        if (scoreCount === 5) {
+            // Grand double confetti cracker burst on flawless mission clearance!
+            confetti({ particleCount: 130, spread: 80, origin: { y: 0.6 }, colors: ['#8b5cf6', '#ec4899', '#06b6d4'] });
+        }
+    };
+
+    // Auto-boot UI generation engine on runtime window load
+    generateAdventureHubUI();
+</script>
+</body>
+</html>

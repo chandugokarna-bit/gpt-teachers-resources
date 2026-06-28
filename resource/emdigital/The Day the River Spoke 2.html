@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quantum Language Arena - The Day the River Spoke</title>
+    <style>
+        :root {
+            --bg-glow: #070714;
+            --panel-bg: rgba(18, 18, 32, 0.75);
+            --neon-blue: #00f0ff;
+            --neon-green: #39ff14;
+            --neon-pink: #ff007f;
+            --text-main: #ffffff;
+            --text-sub: #a5a5c5;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            background: radial-gradient(circle at center, #141430 0%, var(--bg-glow) 100%);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        header {
+            text-align: center;
+            padding: 20px;
+            background: rgba(8, 8, 20, 0.9);
+            border-bottom: 2px solid var(--neon-blue);
+            box-shadow: 0 0 25px rgba(0, 240, 255, 0.35);
+        }
+
+        header h1 {
+            font-size: 2.3rem;
+            color: var(--neon-blue);
+            text-shadow: 0 0 12px rgba(0, 240, 255, 0.8);
+            letter-spacing: 2px;
+        }
+
+        .main-container {
+            display: flex;
+            flex: 1;
+            padding: 25px;
+            gap: 25px;
+            max-width: 1600px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* Navigation Sidebar */
+        .sidebar {
+            width: 320px;
+            background: var(--panel-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 18px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+        }
+
+        .sidebar h2 {
+            font-size: 1.1rem;
+            color: var(--neon-pink);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+            text-align: center;
+            text-shadow: 0 0 8px rgba(255, 0, 127, 0.5);
+        }
+
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 14px 18px;
+            border-radius: 12px;
+            color: var(--text-sub);
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 0.95rem;
+        }
+
+        .nav-btn:hover {
+            border-color: var(--neon-blue);
+            color: var(--neon-blue);
+            background: rgba(0, 240, 255, 0.08);
+            transform: translateX(6px);
+            box-shadow: 0 0 12px rgba(0, 240, 255, 0.3);
+        }
+
+        .nav-btn.active {
+            background: linear-gradient(90deg, rgba(0, 240, 255, 0.25), transparent);
+            border-left: 5px solid var(--neon-blue);
+            color: #ffffff;
+            font-weight: bold;
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.15);
+        }
+
+        /* Workspace Display Board */
+        .arena-display {
+            flex: 1;
+            background: var(--panel-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 18px;
+            padding: 35px;
+            position: relative;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.6);
+            min-height: 550px;
+        }
+
+        .score-board {
+            position: absolute;
+            top: 25px;
+            right: 35px;
+            background: rgba(255, 255, 255, 0.06);
+            padding: 10px 20px;
+            border-radius: 30px;
+            border: 1px solid var(--neon-pink);
+            font-weight: bold;
+            color: var(--neon-pink);
+            text-shadow: 0 0 8px rgba(255, 0, 127, 0.4);
+        }
+
+        .game-panel {
+            display: none;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .game-panel.active {
+            display: flex;
+        }
+
+        .game-header {
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.15);
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
+
+        .game-title {
+            font-size: 1.8rem;
+            color: var(--neon-green);
+            text-shadow: 0 0 10px rgba(57, 255, 20, 0.6);
+            margin-bottom: 6px;
+        }
+
+        .game-desc {
+            color: var(--text-sub);
+            font-size: 0.95rem;
+        }
+
+        .content-box {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            padding: 25px;
+            border-radius: 14px;
+            margin-bottom: 25px;
+        }
+
+        .q-text {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .option-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .option-card {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 16px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 1rem;
+        }
+
+        .option-card:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--neon-blue);
+            transform: translateY(-2px);
+        }
+
+        .option-card.selected {
+            background: rgba(0, 240, 255, 0.15);
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.3);
+        }
+
+        .input-field {
+            background: rgba(0,0,0,0.6);
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 14px;
+            border-radius: 8px;
+            color: white;
+            width: 100%;
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            outline: none;
+        }
+
+        .input-field:focus {
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 10px rgba(0,240,255,0.3);
+        }
+
+        .action-btn {
+            background: linear-gradient(135deg, #00f0ff, #0072ff);
+            border: none;
+            color: white;
+            padding: 14px 30px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            letter-spacing: 1px;
+            transition: all 0.3s;
+            box-shadow: 0 5px 20px rgba(0, 240, 255, 0.4);
+            align-self: flex-start;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 7px 25px rgba(0, 240, 255, 0.6);
+        }
+
+        .feedback-txt {
+            margin-top: 15px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            min-height: 25px;
+        }
+
+        .progress-indicator {
+            color: var(--text-sub);
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>QUANTUM LANGUAGE ARENA</h1>
+        <p>Active Learning Protocol: The Day the River Spoke (Poorvi Grade 7)</p>
+    </header>
+
+    <div class="main-container">
+        <div class="sidebar">
+            <h2>Mission Controls</h2>
+            <button class="nav-btn active" id="btn-a1" onclick="switchArena(1)">🧩 1. Word Puzzle Arena</button>
+            <button class="nav-btn" id="btn-a2" onclick="switchArena(2)">🎯 2. Sentence Sniper</button>
+            <button class="nav-btn" id="btn-a3" onclick="switchArena(3)">🔍 3. Hidden Clue Explorer</button>
+            <button class="nav-btn" id="btn-a4" onclick="switchArena(4)">🎡 4. Language Fun Fair</button>
+            <button class="nav-btn" id="btn-a5" onclick="switchArena(5)">🚂 5. Grammar Express</button>
+            <button class="nav-btn" id="btn-a6" onclick="switchArena(6)">🏕️ 6. Jungle Challenge</button>
+            <button class="nav-btn" id="btn-a7" onclick="switchArena(7)">🎭 7. Dialogue Theatre</button>
+            <button class="nav-btn" id="btn-a8" onclick="switchArena(8)">🧪 8. Language Science Lab</button>
+        </div>
+
+        <div class="arena-display">
+            <div class="score-board">XP Score: <span id="xp-global">0</span></div>
+
+            <div class="progress-indicator" id="progress-text">Question 1 of 5</div>
+            <div class="game-header">
+                <div class="game-title" id="arena-title">Loading Arena...</div>
+                <div class="game-desc" id="arena-desc">Initializing matrix configuration.</div>
+            </div>
+
+            <div class="content-box" id="arena-body">
+                </div>
+
+            <button class="action-btn" id="submit-btn" onclick="checkCurrentAnswer()">VALIDATE CORE DATA</button>
+            <div id="arena-feedback" class="feedback-txt"></div>
+        </div>
+    </div>
+
+    <script>
+        // Global Game Database (5 fully contextual items per arena block)
+        const arenaData = {
+            1: {
+                title: "Word Puzzle Arena",
+                desc: "Unscramble hidden textual vocabulary and architectural terms.",
+                items: [
+                    { q: "Unscramble Jahnavi's special transport vehicle: A A C T M A R A N", a: "catamaran" },
+                    { q: "Unscramble the loud vehicle that thundered past: N I A R T", a: "train" },
+                    { q: "Unscramble the nature creature that slithered: D R A Z I L", a: "lizard" },
+                    { q: "Unscramble the sound made by bamboo nodes: E L T S U R", a: "rustle" },
+                    { q: "Unscramble the bright blue bird that swept down: R E H S I F G N I K", a: "kingfisher" }
+                ],
+                type: "input"
+            },
+            2: {
+                title: "Sentence Sniper",
+                desc: "Shoot down errors by filling the correct textual vocabulary target.",
+                items: [
+                    { q: "A big bright tear _______ down her nose.", opts: ["splashed", "flew", "danced", "jumped"], a: "splashed" },
+                    { q: "The lizard slithered down to the river's edge to _______ in the sun.", opts: ["hide", "bask", "swim", "sleep"], a: "bask" },
+                    { q: "The river voice was a sleepy, _______ sound.", opts: ["roaring", "murmuring", "shouting", "screaming"], a: "murmuring" },
+                    { q: "The kingfisher's wings were an arrow of _______ in the sunlight.", opts: ["green", "gold", "blue", "red"], a: "blue" },
+                    { q: "Jahnavi wanted to find out why baby fish turn into _______.", opts: ["snakes", "frogs", "birds", "crabs"], a: "frogs" }
+                ],
+                type: "mcq"
+            },
+            3: {
+                title: "Hidden Clue Explorer",
+                desc: "Explore character motivations and contextual plot details.",
+                items: [
+                    { q: "What was Jahnavi's ultimate deep dream?", opts: ["To become a fisherman", "To go to school and learn", "To catch the blue kingfisher", "To swim across the ocean"], a: "To go to school and learn" },
+                    { q: "How old did Jahnavi feel she was, making her think she was too old for school?", opts: ["5 years old", "Almost 10 years old", "15 years old", "12 years old"], a: "Almost 10 years old" },
+                    { q: "Who were the three siblings that were allowed to go to school?", opts: ["Her three sisters", "Her three brothers", "Her friends", "Her cousins"], a: "Her three brothers" },
+                    { q: "What secret hiding place did the River warn Jahnavi about?", opts: ["A deep well", "A bamboo clump where a snake lives", "A dark cave", "The school attic"], a: "A bamboo clump where a snake lives" },
+                    { q: "What did Jahnavi's parents do for their livelihood?", opts: ["They were teachers", "They worked on the farm", "They built large ships", "They ran a local shop"], a: "They worked on the farm" }
+                ],
+                type: "mcq"
+            },
+            4: {
+                title: "Language Fun Fair",
+                desc: "Identify Proper Nouns and Personification rules used in the story.",
+                items: [
+                    { q: "Why is 'River' written with a capital 'R' in the story?", opts: ["It is a spelling error", "The River is personified as a talking character", "All water bodies must be capitalized", "The author likes the letter R"], a: "The River is personified as a talking character" },
+                    { q: "Identify the Proper Noun in this list:", opts: ["river", "village", "Jahnavi", "school"], a: "Jahnavi" },
+                    { q: "Which of these shows personification?", opts: ["The train thundered", "The river chuckled and spoke", "The lizard slithered", "The sun was bright"], a: "The river chuckled and spoke" },
+                    { q: "What does capitalization of a character's name indicate grammatically?", opts: ["Common Noun", "Proper Noun", "Abstract Noun", "Pronoun"], a: "Proper Noun" },
+                    { q: "Identify the Common Noun in this phrase: 'Jahnavi sat near the fields.'", opts: ["Jahnavi", "sat", "near", "fields"], a: "fields" }
+                ],
+                type: "mcq"
+            },
+            5: {
+                title: "Grammar Express",
+                desc: "Master correct Prepositions of Place and Time from the chapter syllabus.",
+                items: [
+                    { q: "Jahnavi stood nervously outside the gate _______ her first day.", opts: ["on", "at", "in", "under"], a: "on" },
+                    { q: "The green lizard slithered down _______ the river's edge.", opts: ["to", "above", "through", "with"], a: "to" },
+                    { q: "The moon always comes _______ behind the hills.", opts: ["from", "at", "into", "over"], a: "from" },
+                    { q: "She went _______ the path between the fields.", opts: ["down", "up", "inside", "on"], a: "down" },
+                    { q: "Chandu went out _______ his catamaran.", opts: ["in", "on", "at", "by"], a: "in" }
+                ],
+                type: "mcq"
+            },
+            6: {
+                title: "Jungle Adventure Challenge",
+                desc: "Conquer natural facts and animal profiles mentioned by the River.",
+                items: [
+                    { q: "The River stated that spiders turn yellow when they live in yellow _______.", opts: ["leaves", "flowers", "mud", "bamboo"], a: "flowers" },
+                    { q: "What animal did Jahnavi say she was definitely NOT afraid of?", opts: ["Tigers", "Snakes", "Elephants", "Bears"], a: "Snakes" },
+                    { q: "Where does the River eventually hurry to reach?", opts: ["The mountains", "The sea", "The village well", "The lake"], a: "The sea" }
+                ],
+                type: "mcq"
+            },
+            7: {
+                title: "Dialogue Theatre",
+                desc: "Complete the conversation loops between the characters exactly as written.",
+                items: [
+                    { q: "Jahnavi: 'I want to know why bamboo trees rustle.' -> River: '_______'", opts: ["Stop! You make me breathless.", "Go away, I am sleeping.", "Ask your school teacher.", "I do not know why."], a: "Stop! You make me breathless." },
+                    { q: "River: 'Seems to me little girls can do _______ as little boys.'", opts: ["less", "as much", "more", "nothing"], a: "as much" },
+                    { q: "What did Jahnavi tell the River happily the next morning?", opts: ["I am leaving the village", "I did it! And they're letting me go", "I caught a fish", "The school is closed"], a: "I did it! And they're letting me go" }
+                ],
+                type: "mcq"
+            },
+            8: {
+                title: "Language Science Lab",
+                desc: "Classify environmental sound words (Onomatopoeia) from the syllabus.",
+                items: [
+                    { q: "What sound word is explicitly used for the bamboo trees?", opts: ["roar", "rustle", "bang", "chirp"], a: "rustle" },
+                    { q: "What sound word represents the river's laugh?", opts: ["chuckle", "screech", "shout", "howl"], a: "chuckle" },
+                    { q: "What sound did the thunderous train make as it passed?", opts: ["whisper", "thundered", "hiss", "click"], a: "thundered" }
+                ],
+                type: "mcq"
+            }
+        };
+
+        let currentArena = 1;
+        let currentItemIndex = 0;
+        let globalScore = 0;
+        let selectedMCQAnswer = "";
+
+        // Core Renderer Module
+        function initArena() {
+            const data = arenaData[currentArena];
+            document.getElementById('arena-title').innerText = data.title;
+            document.getElementById('arena-desc').innerText = data.desc;
+            document.getElementById('arena-feedback').innerText = "";
+            document.getElementById('submit-btn').style.display = "block";
+            
+            document.getElementById('progress-text').innerText = `Question ${currentItemIndex + 1} of ${data.items.length}`;
+
+            const currentItem = data.items[currentItemIndex];
+            const body = document.getElementById('arena-body');
+            body.innerHTML = "";
+
+            const qElement = document.createElement('p');
+            qElement.className = "q-text";
+            qElement.innerText = currentItem.q;
+            body.appendChild(qElement);
+
+            selectedMCQAnswer = "";
+
+            if (data.type === "input") {
+                const input = document.createElement('input');
+                input.type = "text";
+                input.className = "input-field";
+                input.id = "user-input-field";
+                input.placeholder = "Enter your answer here...";
+                body.appendChild(input);
+            } else if (data.type === "mcq") {
+                const grid = document.createElement('div');
+                grid.className = "option-grid";
+                currentItem.opts.forEach(opt => {
+                    const card = document.createElement('div');
+                    card.className = "option-card";
+                    card.innerText = opt;
+                    card.onclick = () => {
+                        document.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
+                        card.classList.add('selected');
+                        selectedMCQAnswer = opt;
+                    };
+                    grid.appendChild(card);
+                });
+                body.appendChild(grid);
+            }
+        }
+
+        // Action Validation Logic
+        function checkCurrentAnswer() {
+            const data = arenaData[currentArena];
+            const currentItem = data.items[currentItemIndex];
+            let isCorrect = false;
+            let feedback = document.getElementById('arena-feedback');
+
+            if (data.type === "input") {
+                const val = document.getElementById('user-input-field').value.trim().toLowerCase();
+                if (val === currentItem.a.toLowerCase()) isCorrect = true;
+            } else if (data.type === "mcq") {
+                if (selectedMCQAnswer === currentItem.a) isCorrect = true;
+            }
+
+            if (isCorrect) {
+                feedback.innerText = "⚡ EXCELLENT: Matrix Match Verified! (+10 XP)";
+                feedback.style.color = "var(--neon-green)";
+                globalScore += 10;
+                document.getElementById('xp-global').innerText = globalScore;
+                
+                // Advance inside matrix
+                setTimeout(() => {
+                    currentItemIndex++;
+                    if (currentItemIndex < data.items.length) {
+                        initArena();
+                    } else {
+                        feedback.innerText = "🏆 ARENA COMPLETE! Proceed to the next mission panel via sidebar.";
+                        feedback.style.color = "var(--neon-blue)";
+                        document.getElementById('submit-btn').style.display = "none";
+                    }
+                }, 1200);
+            } else {
+                feedback.innerText = "❌ ERROR: Quantum calculation mismatch. Try again!";
+                feedback.style.color = "var(--neon-pink)";
+            }
+        }
+
+        // Navigation Switcher Engine
+        function switchArena(arenaId) {
+            currentArena = arenaId;
+            currentItemIndex = 0;
+            
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('btn-a' + arenaId).classList.add('active');
+            
+            initArena();
+        }
+
+        // Start Bootloader Sequence
+        window.onload = () => {
+            initArena();
+        };
+    </script>
+</body>
+</html>

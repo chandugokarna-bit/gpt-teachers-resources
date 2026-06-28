@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 3: A Story of Numbers - Interactive Quiz</title>
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --panel-glass: rgba(30, 41, 59, 0.7);
+            --accent-glow: #6366f1;
+            --accent-success: #10b981;
+            --accent-error: #ef4444;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            padding: 2rem 1rem;
+            background-image: radial-gradient(circle at 50% 0%, rgba(99, 102, 241, 0.15), transparent 50%);
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(to right, #818cf8, #e0e7ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        /* Tabs Configuration */
+        .tabs-nav {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .tab-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-muted);
+            padding: 0.75rem;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .tab-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-main);
+        }
+
+        .tab-btn.active {
+            background: var(--accent-glow);
+            color: #fff;
+            box-shadow: 0 0 15px rgba(99, 102, 241, 0.4);
+            border-color: transparent;
+        }
+
+        /* Activity Panels */
+        .activity-card {
+            background: var(--panel-glass);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 24px;
+            padding: 2rem;
+            backdrop-filter: blur(16px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .activity-card.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .activity-title {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: #c7d2fe;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 0.5rem;
+        }
+
+        .question-block {
+            margin-bottom: 2rem;
+            background: rgba(0,0,0,0.15);
+            padding: 1.25rem;
+            border-radius: 16px;
+            border-left: 4px solid var(--accent-glow);
+        }
+
+        .question-text {
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+
+        /* MCQ Options Grid styling */
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.5rem;
+        }
+
+        .option-label {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 0.75rem 1rem;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            transition: all 0.2s;
+        }
+
+        .option-label:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .option-label input {
+            accent-color: var(--accent-glow);
+        }
+
+        /* Drag and Drop Structural Component Architecture */
+        .drag-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .drag-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.02);
+            padding: 0.75rem;
+            border-radius: 12px;
+        }
+
+        .drag-item {
+            background: linear-gradient(135deg, #4f46e5, #3730a3);
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            cursor: grab;
+            text-align: center;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            user-select: none;
+        }
+
+        .drag-item:active { cursor: grabbing; }
+
+        .drop-zone {
+            border: 2px dashed rgba(255, 255, 255, 0.2);
+            min-height: 45px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.2);
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            transition: all 0.2s;
+            padding: 4px;
+        }
+
+        .drop-zone.hover {
+            border-color: var(--accent-glow);
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        .pool-zone {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            background: rgba(0,0,0,0.2);
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        /* Action Buttons styling */
+        .action-bar {
+            margin-top: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .submit-btn {
+            background: linear-gradient(to right, #10b981, #059669);
+            color: #fff;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3);
+        }
+
+        .score-display {
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .success-text { color: var(--accent-success); }
+        .error-text { color: var(--accent-error); }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Chapter 3: A Story of Numbers</h1>
+            <p>Explore the history of mathematical symbols and the evolution of numbers</p>
+        </header>
+
+        <div class="tabs-nav">
+            <button class="tab-btn active" onclick="switchTab(1)">Activity 1 (MCQ)</button>
+            <button class="tab-btn" onclick="switchTab(2)">Activity 2 (D&D)</button>
+            <button class="tab-btn" onclick="switchTab(3)">Activity 3 (MCQ)</button>
+            <button class="tab-btn" onclick="switchTab(4)">Activity 4 (D&D)</button>
+            <button class="tab-btn" onclick="switchTab(5)">Activity 5 (MCQ)</button>
+        </div>
+
+        <div class="activity-card active" id="act1">
+            <h2 class="activity-title">Activity 1: Understanding the Roman Numeral System (MCQ)</h2>
+            
+            <div class="question-block" data-ans="B">
+                <p class="question-text">1. Which number does the symbol 'V' represent in the Roman numeral system?</p>
+                <div class="options-grid">
+                    <label class="option-label"><input type="radio" name="q1_1" value="A"> 1</label>
+                    <label class="option-label"><input type="radio" name="q1_1" value="B"> 5</label>
+                    <label class="option-label"><input type="radio" name="q1_1" value="C"> 10</label>
+                </div>
+            </div>
+
+            <div class="question-block" data-ans="C">
+                <p class="question-text">2. What is the numerical value of the symbol 'X' in Roman numerals?</p>
+                <div class="options-grid">
+                    <label class="option-label"><input type="radio" name="q1_2" value="A"> 5</label>
+                    <label class="option-label"><input type="radio" name="q1_2" value="B"> 50</label>
+                    <label class="option-label"><input type="radio" name="q1_2" value="C"> 10</label>
+                </div>
+            </div>
+
+            <div class="question-block" data-ans="A">
+                <p class="question-text">3. What numerical value do you get when you write 'IV'?</p>
+                <div class="options-grid">
+                    <label class="option-label"><input type="radio" name="q1_3" value="A"> 4</label>
+                    <label class="option-label"><input type="radio" name="q1_3" value="B"> 6</label>
+                    <label class="option-label"><input type="radio" name="q1_3" value="C"> 5</label>
+                </div>
+            </div>
+
+            <div class="question-block" data-ans="B">
+                <p class="question-text">4. The Roman numeral 'XII' is equal to which standard number?</p>
+                <div class="options-grid">
+                    <label class="option-label"><input type="radio" name="q1_4" value="A"> 10</label>
+                    <label class="option-label"><input type="radio" name="q1_4" value="B"> 12</label>
+                    <label class="option-label"><input type="radio" name="q1_4" value="C"> 15</label>
+                </div>
+            </div>
+
+            <div class="question-block" data-ans="A">
+                <p class="question-text">5. In Roman numerals, what does placing a smaller value symbol to the left of a larger one mean?</p>
+                <div class="options-grid">
+                    <label class="option-label"><input type="radio" name="q1_5" value="A"> Subtraction</label>
+                    <label class="option-label"><input type="radio" name="q1_5" value="B"> Addition</label>
+                    <label class="option-label"><input type="radio" name="q1_5" value="C"> Multiplication</label>
+                </div>
+            </div>
+
+            <div class="action-bar">
+                <button class="submit-btn" onclick="checkMCQ('act1')">Verify Answers</button>
+                <span class="score-display" id="score-act1"></span>
+            </div>
+        </div>
+
+        <div class="activity-card" id="act2">
+            <h2 class="activity-title">Activity 2: Matching Civilizations to Numeral Systems (Drag & Drop)</h2>
+            <p style="color: var(--text-muted); margin-bottom: 1rem;">Drag the terms into their matching descriptive slots below:</p>
+            
+            <div class="pool-zone" id="pool2">
+                <div class="drag-item" draggable="true" id="d2_1">Roman System</div>
+                <div class="drag-item" draggable="true" id="d2_2">Babylonian</div>
+                <div class="drag-item" draggable="true" id="d2_3">Indian System</div>
+                <div class="drag-item" draggable="true" id="d2_4">Egyptian System</div>
+                <div class="drag-item" draggable="true" id="d2_5">Mayan System</div>
+            </div>
+
+            <div class="drag-container">
+                <div class="drag-row">
+                    <div>1. The system that introduced zero ('Sunya') to the world:</div>
+                    <div class="drop-zone" data-match="d2_3">Drop here</div>
+                </div>
+                <div class="drag-row">
+                    <div>2. The system using alphabetic symbols like I, V, X:</div>
+                    <div class="drop-zone" data-match="d2_1">Drop here</div>
+                </div>
+                <div class="drag-row">
+                    <div>3. Used Hieroglyphics and pictographic symbols for numbers:</div>
+                    <div class="drop-zone" data-match="d2_4">Drop here</div>
+                </div>
+                <div class="drag-row">
+                    <div>4. Wrote cuneiform symbols on wet clay tablets:</div>
+                    <div class="drop-zone" data-match="d2_2">Drop here</div>
+                </div>
+                <div class="drag-row">
+                    <div>5. Ancient American system utilizing dots and horizontal lines:</div>
+                    <div class="drop-zone" data-match="d2_5">Drop here</div>
+                </div>
+            </div>
+
+            <div class="action-bar">
+                <button class="submit-btn" onclick="checkDragDrop('act2')">Verify Answers</button>
+                <span class="score-display" id="score-act2"></span>
+            </div>
+        </div>
+
+        <div class="activity-card" id="act3">
+            <h2 class="activity-title">Activity 3: Origin of Ancient Numerical Symbols (MCQ)</h2>
+            
+            <div class="question-block" data-ans="A">
+                <p class="question-text">1. What did primitive humans first use to count things in early history?</p>
+                <div class="options-grid">
+                    <label class="option-label"><input type="radio" name="q3_1" value="A"> Fingers and stones</label>
+                    <label class="option-label"><input type="radio" name="q3_1" value="B"> Computers</label>
+                    <label class="option-label"><input type="radio" name="q3_1" value="C"> Paper currency notes</label>
+                </div>
+            </div>
+
+            <div class="question-block" data-ans="B">
+                <p class="question-text">2. What mediums did Babylonians use to record their numerical symbols?</p>
+                <div class="options-grid">
+                    <label class="option-label"><input type="radio" name="q3_2" value="A"> Paper books</label>
+                    <label class="option-label"><input type="radio" name="q3_2" value="B"> Damp clay tablets</label>
+                    <label class="option-label"><input type="radio" name="q3_2" value="C"> Metal coins</label>
+                </div>
+            </div>
+
+            <div class="question-block" data-ans="C">
+                <p class="question-text">3. Which shape symbol was used to denote the value of 10 in Egyptian numerals?</p>
+                <div class="options-grid">
+                    <label class="option-label"><input type="radio" name="q3_3" value="A"> A single stroke line</label>
+                    <label class="option-label"><input type="radio" name="q3_3" value="B"> A circle</label>
+                    <label class="option-label"><input type="radio" name="q3_3" value="C"> A heel bone shape</label>
+                </div>
+            </div>
+
+            <div class="question-block" data-ans="B">
+                <p class="question-text">4. The Mayan numeral system was structurally built on which base number?</p>
+                <div class="options-grid">
+                    <label class="option-label"><input type="radio" name="q3_4" value="A"> Base 10</label>
+                    <label class="option-label"><input type="radio" name="q3_4" value="B"> Base 20</label>
+                    <label class="option-label"><input type="radio" name="q3_4" value="C"> Base 60</label>
+                </div>
+            </div>
+
+            <div class="question-block" data-ans="A">
+                <p class="question-text">5. What was the base number of the ancient Babylonian numeral system?</p>
+                <div class="options-grid">
+                    <label class="option-label"><input type="radio" name="q3_5" value="A"> Base 60</label>
+                    <label class="option-label"><input type="radio" name="q3_5" value="B"> Base 10</label>
+                    <label class="option-label"><input type="radio" name="q3_5" value="C"> Base 2</label>
+                </div>
+            </div>
+
+            <div class="action-bar">
+                <button class="submit-btn" onclick="checkMCQ('act3')">Verify Answers</button>
+                <span class="score-display" id="score-act3"></span>
+            </div>
+        </div>
+
+        <div class="activity-card" id="act4">
+            <h2 class="activity-title">Activity 4: Place Value & Modern Notation (Drag & Drop)</h2>
+            <p style="color: var(--text-muted); margin-bottom: 1rem;">Drag and drop the values to complete the matching sentences:</p>
+            
+            <div class="pool-zone" id="pool4">
+                <div class="drag-item" draggable="true" id="d4_1">Place Value</div>
+                <div class="drag-item" draggable="true" id="d4_2">Zero (0)</div>
+                <div class="drag-item" draggable="true" id="d4_3">Base 10</div>
+                <div class="drag-item" draggable="true" id="d4_4">Hindu-Arabic</div>
+                <div class="drag-item" draggable="true" id="d4_5">Aryabhata</div>
+            </div>
+
+            <div class="drag-container">
+                <div class="drag-row">
+                    <div>1. The formal name of the modern numeral configuration used today:</div>
+                    <div class="drop-zone" data-match="d4_4">Drop here</div>
+                </div>
+                <div class="drag-row">
+                    <div>2. The mathematical token that tracks the total absence of a value:</div>
+                    <div class="drop-zone" data-match="d4_2">Drop here</div>
+                </div>
+                <div class="drag-row">
+                    <div>3. The attribute where a digit's value depends on its location:</div>
+                    <div class="drop-zone" data-match="d4_1">Drop here</div>
+                </div>
+                <div class="drag-row">
+                    <div>4. The legendary Indian mathematician who structured zero parameters:</div>
+                    <div class="drop-zone" data-match="d4_5">Drop here</div>
+                </div>
+                <div class="drag-row">
+                    <div>5. The fundamental structural root criteria of the decimal system:</div>
+                    <div class="drop-zone" data-match="d4_3">Drop here</div>
+                </div>
+            </div>
+
+            <div class="action-bar">
+                <button class="submit-btn" onclick="checkDragDrop('act4')">Verify Answers</button>
+                <span class="score-display" id="score-act4"></span>
+            </div>
+        </div>
+
+        <div class="activity-card" id="act5">
+            <h2 class="activity-title">Activity 5: Historical Milestones in Number Evolution (MCQ)</h2>
+            
+            <div class="question-block" data-ans="B">
+                <p class="question-text">1. What is the single biggest architectural advantage of a place value system?</p>
+                <div class="options-grid">
+                    <label class="option-label"><input type="radio" name="q5_1" value="A"> It requires infinite new unique symbols</label>
+                    <label class="option-label"><input type="radio" name="q5_1" value="B"> Any massive number can be recorded using just a few tokens</label>
+                    <label class="option-label"><input type="radio" name="q5_1" value="C"> It is too complex and difficult to write</label>
+                </div>
+            </div>
+
+            <div class="question-block" data-ans="A">
+                <p class="question-text">2. Which community spread the Indian place value system globally?</p>
+                <div class="options-grid">
+                    <label class="option-label"><input type="radio" name="q5_2" value="A"> The Arabs</label>
+                    <label class="option-label"><input type="radio" name="q5_2" value="B"> The Greeks</label>
+                    <label class="option-label"><input type="radio" name="q5_2" value="C"> The Romans</label>
+                </div>
+            </div>
+
+            <div class="question-block" data-ans="C">
+                <p class="question-text">3. What is the positional place value of the digit '5' in the number 352?</p>
+                <div class="options-grid">
+                    <label class="option-label"><input type="radio" name="q5_3" value="A"> 5</label>
+                    <label class="option-label"><input type="radio" name="q5_3" value="B"> 500</label>
+                    <label class="option-label"><input type="radio" name="q5_3" value="C"> 50</label>
+                </div>
+            </div>
+
+            <div class="question-block" data-ans="A">
+                <p class="question-text">4. Which specific number completely lacks a functional placeholder symbol in Roman numerals?</p>
+                <div class="options-grid">
+                    <label class="option-label"><input type="radio" name="q5_4" value="A"> Zero (0)</label>
+                    <label class="option-label"><input type="radio" name="q5_4" value="B"> One Hundred (100)</label>
+                    <label class="option-label"><input type="radio" name="q5_4" value="C"> One (1)</label>
+                </div>
+            </div>
+
+            <div class="question-block" data-ans="B">
+                <p class="question-text">5. Counting methods evolved over history into which format today?</p>
+                <div class="options-grid">
+                    <label class="option-label"><input type="radio" name="q5_5" value="A"> Graphic Hieroglyphics pictograms</label>
+                    <label class="option-label"><input type="radio" name="q5_5" value="B"> International Decimal place notation system</label>
+                    <label class="option-label"><input type="radio" name="q5_5" value="C"> Classical Roman alphabetic systems</label>
+                </div>
+            </div>
+
+            <div class="action-bar">
+                <button class="submit-btn" onclick="checkMCQ('act5')">Verify Answers</button>
+                <span class="score-display" id="score-act5"></span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab switching logic parameters
+        function switchTab(index) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.activity-card').forEach(card => card.classList.remove('active'));
+            
+            document.querySelectorAll('.tab-btn')[index - 1].classList.add('active');
+            document.getElementById(`act${index}`).classList.add('active');
+        }
+
+        // MCQ Scoring System Architecture Component
+        function checkMCQ(activityId) {
+            const card = document.getElementById(activityId);
+            const questions = card.querySelectorAll('.question-block');
+            let score = 0;
+
+            questions.forEach(q => {
+                const correct = q.getAttribute('data-ans');
+                const selected = q.querySelector('input[type="radio"]:checked');
+                
+                if (selected && selected.value === correct) {
+                    score++;
+                }
+            });
+
+            const scoreDisplay = document.getElementById(`score-${activityId}`);
+            scoreDisplay.innerHTML = `Score: <span class="success-text">${score} / ${questions.length}</span>`;
+        }
+
+        // Drag and Drop Core Interactive Implementation Engine
+        let draggedItem = null;
+
+        document.querySelectorAll('.drag-item').forEach(item => {
+            item.addEventListener('dragstart', function(e) {
+                draggedItem = this;
+                e.dataTransfer.setData('text/plain', this.id);
+            });
+        });
+
+        document.querySelectorAll('.drop-zone').forEach(zone => {
+            zone.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                this.classList.add('hover');
+            });
+
+            zone.addEventListener('dragleave', function() {
+                this.classList.remove('hover');
+            });
+
+            zone.addEventListener('drop', function(e) {
+                e.preventDefault();
+                this.classList.remove('hover');
+                const id = e.dataTransfer.getData('text/plain');
+                const item = document.getElementById(id);
+                
+                // If there is already an item, return it to the pool
+                if (this.children.length > 0) {
+                    const currentChild = this.children[0];
+                    const pool = this.closest('.activity-card').querySelector('.pool-zone');
+                    pool.appendChild(currentChild);
+                }
+
+                this.innerHTML = '';
+                this.appendChild(item);
+            });
+        });
+
+        // Enable moving items back to pool zone
+        document.querySelectorAll('.pool-zone').forEach(pool => {
+            pool.addEventListener('dragover', function(e) { e.preventDefault(); });
+            pool.addEventListener('drop', function(e) {
+                e.preventDefault();
+                const id = e.dataTransfer.getData('text/plain');
+                const item = document.getElementById(id);
+                this.appendChild(item);
+            });
+        });
+
+        function checkDragDrop(activityId) {
+            const card = document.getElementById(activityId);
+            const zones = card.querySelectorAll('.drop-zone');
+            let score = 0;
+
+            zones.forEach(zone => {
+                const matchId = zone.getAttribute('data-match');
+                if (zone.children.length > 0 && zone.children[0].id === matchId) {
+                    score++;
+                }
+            });
+
+            const scoreDisplay = document.getElementById(`score-${activityId}`);
+            scoreDisplay.innerHTML = `Score: <span class="success-text">${score} / ${zones.length}</span>`;
+        }
+    </script>
+</body>
+</html>

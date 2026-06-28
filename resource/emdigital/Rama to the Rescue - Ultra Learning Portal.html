@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ultra-Modern Activity Hub: Rama to the Rescue</title>
+    <!-- Canvas Confetti Library for Cracker Burst Effect -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        :root {
+            --primary: #f43f5e;
+            --secondary: #06b6d4;
+            --bg: #fff1f2;
+            --surface: #ffffff;
+            --text: #1e1b4b;
+            --success: #10b981;
+            --error: #ef4444;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            overflow-x: hidden;
+        }
+
+        .hub-container {
+            max-width: 950px;
+            width: 100%;
+            background: var(--surface);
+            padding: 35px;
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(244, 63, 94, 0.1);
+            position: relative;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h1 { color: var(--primary); margin: 0; font-size: 2.4rem; font-weight: 800; text-shadow: 1px 1px 2px rgba(0,0,0,0.1); }
+        h2 { color: var(--secondary); margin: 5px 0; font-size: 1.4rem; }
+
+        .nav-tabs {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 35px;
+        }
+
+        @media (max-width: 768px) {
+            .nav-tabs { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        .tab-btn {
+            background: #ffe4e6;
+            color: #9f1239;
+            border: none;
+            padding: 14px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 0.9rem;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, var(--primary), #db2777);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(244, 63, 94, 0.3);
+        }
+
+        .activity-panel { display: none; }
+        .activity-panel.active { display: block; animation: slideUp 0.4s ease; }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .quiz-card {
+            background: #fff5f5;
+            border: 2px solid #ffe4e6;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 22px;
+            position: relative;
+            transition: transform 0.2s;
+        }
+        .quiz-card:hover { transform: scale(1.01); }
+
+        .question-text {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 14px;
+            color: #881337;
+        }
+
+        /* Interactive Element Layouts */
+        .mcq-grid { display: flex; flex-direction: column; gap: 10px; }
+        .mcq-option {
+            padding: 14px 18px;
+            background: white;
+            border: 2px solid #fecdd3;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        .mcq-option:hover { border-color: var(--secondary); background: #ecfeff; }
+        .mcq-option.selected { border-color: var(--secondary); background: #cffafe; }
+
+        .toggle-group { display: flex; gap: 12px; }
+        .toggle-btn {
+            padding: 12px 30px;
+            border: 2px solid #fecdd3;
+            border-radius: 10px;
+            background: white;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+        .toggle-btn.selected { background: var(--secondary); color: white; border-color: var(--secondary); }
+
+        .inline-select {
+            padding: 10px 16px;
+            border-radius: 10px;
+            border: 2px solid #fecdd3;
+            font-weight: bold;
+            color: var(--secondary);
+            font-size: 1rem;
+            background: white;
+        }
+
+        /* Floating Balloon Animation Elements */
+        .balloon-animation {
+            position: absolute;
+            font-size: 2rem;
+            animation: floatUp 1.5s ease-out forwards;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(0) scale(0.5); opacity: 1; }
+            100% { transform: translateY(-120px) scale(1.2); opacity: 0; }
+        }
+
+        .correct { background: #d1fae5 !important; border-color: var(--success) !important; color: #065f46 !important; }
+        .incorrect { background: #fee2e2 !important; border-color: var(--error) !important; color: #991b1b !important; }
+
+        .action-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #ffe4e6;
+        }
+
+        button.submit {
+            background: linear-gradient(135deg, var(--secondary), #0891b2);
+            color: white;
+            border: none;
+            padding: 14px 35px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 1.05rem;
+            box-shadow: 0 4px 14px rgba(6, 182, 212, 0.3);
+            transition: all 0.2s;
+        }
+        button.submit:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(6, 182, 212, 0.4); }
+
+        .score-display {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--primary);
+            background: #ffe4e6;
+            padding: 10px 22px;
+            border-radius: 30px;
+            border: 2px solid #fecdd3;
+        }
+    </style>
+</head>
+<body>
+
+<div class="hub-container">
+    <header>
+        <h1>Unit 1: Fables and Folk Tales</h1>
+        <h2>Rama to the Rescue - Ultra Learning Portal</h2>
+    </header>
+
+    <div class="nav-tabs">
+        <button class="tab-btn active" onclick="switchPanel(1)">1. Comic Recall</button>
+        <button class="tab-btn" onclick="switchPanel(2)">2. Plot Detection</button>
+        <button class="tab-btn" onclick="switchPanel(3)">3. Context Terms</button>
+        <button class="tab-btn" onclick="switchPanel(4)">4. Smart Rescue</button>
+        <button class="tab-btn" onclick="switchPanel(5)">5. Contractions (L)</button>
+        <button class="tab-btn" onclick="switchPanel(6)">6. Progress Tense (L)</button>
+        <button class="tab-btn" onclick="switchPanel(7)">7. Adverb Check (L)</button>
+        <button class="tab-btn" onclick="switchPanel(8)">8. Mood Marks (L)</button>
+    </div>
+
+    <div id="panel-container"></div>
+</div>
+
+<script>
+    const dataset = {
+        1: {
+            title: "Comic Recall (Comprehension)",
+            type: "mcq",
+            questions: [
+                { q: "What is the setting of this folk tale?", o: ["A quiet village at night", "A noisy palace market", "A deep mountain forest"], a: 0 },
+                { q: "Who was Rama in the context of the village administration?", o: ["The local rich landlord", "The village Kotwal (policeman)", "A traveling trader"], a: 1 },
+                { q: "What sound did the husband and wife hear unexpectedly?", o: ["A torrential rainfall", "Somebody trying to dig or get in", "Wild animals roaring"], a: 1 },
+                { q: "What was the thief thinking about while hiding?", o: ["Where they keep their money", "Stealing the banana harvest", "Escaping from the village guard"], a: 0 },
+                { q: "How did the couple save themselves from being robbed?", o: ["By running out into the street", "By their smart cleverness", "By attacking the thief with a stick"], a: 1 }
+            ]
+        },
+        2: {
+            title: "Plot Detection (True or False Verification)",
+            type: "toggle",
+            questions: [
+                { q: "The husband told the wife to look out of the window directly.", o: ["True", "False"], a: 1 },
+                { q: "The thief dug a real hole through the house wall structure.", o: ["True", "False"], a: 0 },
+                { q: "The couple intentionally planned a game to loud-call the Kotwal's name.", o: ["True", "False"], a: 0 },
+                { q: "The Kotwal ignored the loud calls thinking it was just a game.", o: ["True", "False"], a: 1 },
+                { q: "The thief was successfully arrested by Rama the Kotwal.", o: ["True", "False"], a: 0 }
+            ]
+        },
+        3: {
+            title: "Context Terms (Lexical Definitions)",
+            type: "dropdown_match",
+            questions: [
+                { q: "The village guard profile 'Kotwal' means:", o: ["A thief profile", "A policeman or station officer", "A local farmer"], a: 1 },
+                { q: "The word 'Rescue' explicitly stands for:", o: ["To save someone from trouble", "To create a major issue", "To sleep soundly"], a: 0 },
+                { q: "The word 'Chatter' in the comic script means:", o: ["Complete silence", "Talk rapidly about unimportant things", "Digging a brick wall"], a: 1 },
+                { q: "The word 'Yard' contextually specifies:", o: ["An area directly outside a building", "Inside the main bedroom", "The village police station"], a: 0 },
+                { q: "The word 'Perhaps' maps cleanly to:", o: ["Absolutely certain", "Maybe / Possibly", "Never happening"], a: 1 }
+            ]
+        },
+        4: {
+            title: "Smart Rescue (Chronological Mechanics)",
+            type: "mcq",
+            questions: [
+                { q: "Where did the couple plan to call softly first?", o: ["When the imaginary boy is in the house", "When he is in the yard", "When he is on the street"], a: 0 },
+                { q: "Why did they step up the volume to 'a little louder'?", o: ["To scare the thief away", "Assuming the boy is in the yard", "To wake up the neighbors"], a: 1 },
+                { q: "When did the wife shout the name 'Rama' very loudly?", o: ["When assuming the boy is out in the street", "When the thief grabbed the money", "When the wall collapsed"], a: 0 },
+                { q: "What did the thief wish the couple would do instead of playing?", o: ["Go out to the yard", "Talk about their money placement", "Give him some food"], a: 1 },
+                { q: "What triggered Rama the Kotwal to sprint over to the house?", o: ["He saw a bright fire", "He heard his name being called repeatedly", "He found a stolen bag"], a: 1 }
+            ]
+        },
+        5: {
+            title: "Contractions Lab (Language Practice)",
+            type: "mcq",
+            questions: [
+                { q: "Expand the contracted word form: 'I'm'", o: ["I was", "I am", "I will"], a: 1 },
+                { q: "Expand the contracted word form: 'They're'", o: ["They are", "They were", "They will"], a: 0 },
+                { q: "Expand the contracted word form: 'Don't'", o: ["Do not", "Does not", "Did not"], a: 0 },
+                { q: "Expand the contracted word form: 'What's'", o: ["What was", "What is", "What has"], a: 1 },
+                { q: "Expand the contracted word form: 'Must've'", o: ["Must have", "Must be", "Must not"], a: 0 }
+            ]
+        },
+        6: {
+            title: "Progress Tense (Language Practice)",
+            type: "dropdown_match",
+            questions: [
+                { q: "Complete the syntax: 'I ______ so sleepy right now.'", o: ["am feeling", "was feeling", "will feel"], a: 0 },
+                { q: "Complete the syntax: 'Somebody ______ to get into our house.'", o: ["is trying", "are trying", "am trying"], a: 0 },
+                { q: "Complete the syntax: 'They ______ something about their gold coin stash.'", o: ["is saying", "are saying", "am saying"], a: 1 },
+                { q: "Complete the syntax: 'Perhaps they ______ about their money destination.'", o: ["is talking", "are talking", "am talking"], a: 1 },
+                { q: "Complete the syntax: 'Govind and Anu ______ football in the interactive park image.'", o: ["is playing", "are playing", "am playing"], a: 1 }
+            ]
+        },
+        7: {
+            title: "Adverb Check (Language Practice)",
+            type: "mcq",
+            questions: [
+                { q: "Choose the proper adverb: 'I had better listen ______ to their chat.'", o: ["closely", "heavy", "brightly"], a: 0 },
+                { q: "Choose the proper adverb: 'I will call out ______ to him inside the house.'", o: ["softly", "angrily", "smoothly"], a: 0 },
+                { q: "Choose the proper adverb: 'Then I will call out very ______ so he hears.'", o: ["loudly", "gracefully", "honestly"], a: 0 },
+                { q: "Choose the proper adverb: 'The car moved ______ along the clear highway track.'", o: ["smoothly", "funnily", "softly"], a: 0 },
+                { q: "Choose the proper adverb: 'The ants worked ______ gathering winter supplies.'", o: ["tirelessly", "angrily", "sweetly"], a: 0 }
+            ]
+        },
+        8: {
+            title: "Mood Marks (Language Practice)",
+            type: "toggle",
+            questions: [
+                { q: "Is 'Oh, hum! What a hard day it has been!' an exclamatory form?", o: ["True", "False"], a: 0 },
+                { q: "Is 'What should we name our child?' marked with a question point?", o: ["True", "False"], a: 0 },
+                { q: "Sentences that express strong emotional surprise are called interrogative.", o: ["True", "False"], a: 1 },
+                { q: "Interrogative question patterns are strictly ended using a question mark (?).", o: ["True", "False"], a: 0 },
+                { q: "Is 'Wow, what an intelligent man he is!' correctly punctuated?", o: ["True", "False"], a: 0 }
+            ]
+        }
+    };
+
+    function triggerCrackerBurst() {
+        // High-end dual cracker burst animation effect
+        confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 }, colors: ['#f43f5e', '#06b6d4', '#10b981', '#ff00ff'] });
+        setTimeout(() => {
+            confetti({ particleCount: 80, angle: 60, spread: 55, origin: { x: 0 } });
+            confetti({ particleCount: 80, angle: 120, spread: 55, origin: { x: 1 } });
+        }, 200);
+    }
+
+    function triggerBalloonFloat(cardId) {
+        const card = document.getElementById(cardId);
+        const balloon = document.createElement('div');
+        balloon.className = 'balloon-animation';
+        const emojis = ['🎈', '🎈', '🎉', '✨', '🎈'];
+        balloon.innerText = emojis[Math.floor(Math.random() * emojis.length)];
+        balloon.style.left = '50%';
+        card.appendChild(balloon);
+        setTimeout(() => balloon.remove(), 1500);
+    }
+
+    function renderHub() {
+        const container = document.getElementById('panel-container');
+        container.innerHTML = Object.keys(dataset).map(id => {
+            const data = dataset[id];
+            return `
+                <div id="panel-${id}" class="activity-panel ${id==1?'active':''}">
+                    <h2>Activity ${id}: ${data.title}</h2>
+                    ${data.questions.map((q, qIdx) => {
+                        let interfaceHtml = '';
+                        if (data.type === "mcq") {
+                            interfaceHtml = `
+                                <div class="mcq-grid">
+                                    ${q.o.map((opt, oIdx) => `
+                                        <div class="mcq-option" id="opt-${id}-${qIdx}-${oIdx}" onclick="selectOption(${id}, ${qIdx}, ${oIdx})">${opt}</div>
+                                    `).join('')}
+                                </div>`;
+                        } else if (data.type === "toggle") {
+                            interfaceHtml = `
+                                <div class="toggle-group">
+                                    ${q.o.map((opt, oIdx) => `
+                                        <button class="toggle-btn" id="opt-${id}-${qIdx}-${oIdx}" onclick="selectOption(${id}, ${qIdx}, ${oIdx})">${opt}</button>
+                                    `).join('')}
+                                </div>`;
+                        } else if (data.type === "dropdown_match") {
+                            interfaceHtml = `
+                                <select class="inline-select" id="sel-${id}-${qIdx}" onchange="selectDropdown(${id}, ${qIdx})">
+                                    <option value="">-- Choose Option --</option>
+                                    ${q.o.map((opt, oIdx) => `<option value="${oIdx}">${opt}</option>`).join('')}
+                                </select>`;
+                        }
+
+                        return `
+                            <div class="quiz-card" id="card-${id}-${qIdx}">
+                                <div class="question-text">${qIdx + 1}. ${q.q}</div>
+                                ${interfaceHtml}
+                            </div>
+                        `;
+                    }).join('')}
+                    <div class="action-bar">
+                        <button class="submit" onclick="evaluatePanel(${id})">Verify Answers</button>
+                        <div class="score-display" id="score-${id}">Score: -- / 5</div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    let selections = {};
+
+    window.selectOption = function(panelId, qIdx, oIdx) {
+        const data = dataset[panelId];
+        data.questions[qIdx].o.forEach((_, idx) => {
+            document.getElementById(`opt-${panelId}-${qIdx}-${idx}`).classList.remove('selected');
+        });
+        document.getElementById(`opt-${panelId}-${qIdx}-${oIdx}`).classList.add('selected');
+        selections[`${panelId}-${qIdx}`] = oIdx;
+    };
+
+    window.selectDropdown = function(panelId, qIdx) {
+        const val = document.getElementById(`sel-${panelId}-${qIdx}`).value;
+        if (val !== "") selections[`${panelId}-${qIdx}`] = parseInt(val);
+    };
+
+    window.switchPanel = function(id) {
+        document.querySelectorAll('.activity-panel').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('panel-none' ? 'panel-'+id : 'panel-'+id).classList.add('active');
+        document.querySelectorAll('.tab-btn')[id-1].classList.add('active');
+    };
+
+    window.evaluatePanel = function(id) {
+        const data = dataset[id];
+        let correctCount = 0;
+
+        data.questions.forEach((item, qIdx) => {
+            const userAns = selections[`${id}-${qIdx}`];
+            const cardId = `card-${id}-${qIdx}`;
+            const card = document.getElementById(cardId);
+            
+            card.classList.remove('correct', 'incorrect');
+
+            if (userAns !== undefined && userAns === item.a) {
+                correctCount++;
+                card.classList.add('correct');
+                triggerBalloonFloat(cardId); // Balloon Float on individual correct card
+            } else {
+                card.classList.add('incorrect');
+            }
+        });
+
+        document.getElementById(`score-${id}`).innerText = `Score: ${correctCount} / 5`;
+        
+        if (correctCount === 5) {
+            triggerCrackerBurst(); // Cracker Burst animation on full master pass
+        }
+    }
+
+    renderHub();
+</script>
+</body>
+</html>

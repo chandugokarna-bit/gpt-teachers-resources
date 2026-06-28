@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Learning Hub - A Bottle of Dew</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --secondary: #7c3aed;
+            --background: #f8fafc;
+            --surface: #ffffff;
+            --text: #0f172a;
+            --success: #22c55e;
+            --error: #ef4444;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: var(--background);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+            background: var(--surface);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 20px;
+        }
+
+        h1 { color: var(--primary); margin: 0; font-size: 2.5rem; }
+        h2 { color: var(--secondary); margin: 10px 0; }
+
+        .nav-tabs {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 600px) {
+            .nav-tabs { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        .tab-btn {
+            background: #e2e8f0;
+            border: none;
+            padding: 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+
+        .tab-btn.active {
+            background: var(--primary);
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .activity-panel {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .activity-panel.active { display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: opacity: 1; transform: translateY(0); }
+        }
+
+        /* Interactive Elements styling */
+        .option-card, .drag-item, .drop-zone {
+            padding: 15px;
+            margin: 10px 0;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: #f8fafc;
+        }
+
+        .option-card:hover, .drag-item:hover {
+            border-color: var(--primary);
+            background: #f0f7ff;
+        }
+
+        .selected { border-color: var(--primary); background: #e0f2fe; }
+        .correct { background: #dcfce7 !important; border-color: var(--success) !important; }
+        .incorrect { background: #fee2e2 !important; border-color: var(--error) !important; }
+
+        .btn-action {
+            background: var(--secondary);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 15px;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .score-display {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-top: 15px;
+            color: var(--primary);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Unit 1: Fables and Folk Tales</h1>
+        <h2>A Bottle of Dew - Learning Hub</h2>
+        <p>Interactive Activities for Grade 6</p>
+    </header>
+
+    <div class="nav-tabs">
+        <button class="tab-btn active" onclick="switchTab(1)">1. Story Timeline</button>
+        <button class="tab-btn" onclick="switchTab(2)">2. Word Match</button>
+        <button class="tab-btn" onclick="switchTab(3)">3. Character Insights</button>
+        <button class="tab-btn" onclick="switchTab(4)">4. Sage's Wisdom</button>
+        <button class="tab-btn" onclick="switchTab(5)">5. Homophones (L)</button>
+        <button class="tab-btn" onclick="switchTab(6)">6. Connectors (L)</button>
+        <button class="tab-btn" onclick="switchTab(7)">7. Speech Sounds (L)</button>
+        <button class="tab-btn" onclick="switchTab(8)">8. Grammar Check (L)</button>
+    </div>
+
+    <!-- Act 1: Timeline -->
+    <div id="act1" class="activity-panel active">
+        <h3>Activity 1: Story Timeline Quest</h3>
+        <p>Arrange the events of Rama Natha's journey in the correct sequence (1 to 7):</p>
+        <div id="timeline-container"></div>
+        <button class="btn-action" onclick="checkTimeline()">Verify Timeline</button>
+        <div id="act1-score" class="score-display"></div>
+    </div>
+
+    <!-- Act 2: Word Match -->
+    <div id="act2" class="activity-panel">
+        <h3>Activity 2: Vocabulary Vault</h3>
+        <p>Match the key terms from the story to their correct meanings:</p>
+        <div class="grid-2">
+            <div id="vocab-words"></div>
+            <div id="vocab-meanings"></div>
+        </div>
+        <button class="btn-action" onclick="checkVocabulary()">Validate Matches</button>
+        <div id="act2-score" class="score-display"></div>
+    </div>
+
+    <!-- Act 3: Character Insights -->
+    <div id="act3" class="activity-panel">
+        <h3>Activity 3: Character Insights (True/False)</h3>
+        <p>Analyze the characters of Rama Natha, Madhumati, and Sage Mahipati:</p>
+        <div id="tf-container"></div>
+        <button class="btn-action" onclick="checkTrueFalse()">Evaluate Answers</button>
+        <div id="act3-score" class="score-display"></div>
+    </div>
+
+    <!-- Act 4: Wisdom Challenge -->
+    <div id="act4" class="activity-panel">
+        <h3>Activity 4: Sage Mahipati's Riddle</h3>
+        <p>Choose the correct analytical answer based on the climax of the story:</p>
+        <div id="mcq-container"></div>
+        <button class="btn-action" onclick="checkMCQ()">Submit Choices</button>
+        <div id="act4-score" class="score-display"></div>
+    </div>
+
+    <!-- Act 5: Homophones -->
+    <div id="act5" class="activity-panel">
+        <h3>Activity 5: Language Lab - Homophone Hunt</h3>
+        <p>Select the correct homophone to complete each contextually accurate sentence:</p>
+        <div id="homophone-container"></div>
+        <button class="btn-action" onclick="checkHomophones()">Check Homophones</button>
+        <div id="act5-score" class="score-display"></div>
+    </div>
+
+    <!-- Act 6: Connectors -->
+    <div id="act6" class="activity-panel">
+        <h3>Activity 6: Language Lab - Sentence Connectors</h3>
+        <p>Fill in the blanks with correct connecting words (because, before, as soon as, as):</p>
+        <div id="connector-container"></div>
+        <button class="btn-action" onclick="checkConnectors()">Verify Connectors</button>
+        <div id="act6-score" class="score-display"></div>
+    </div>
+
+    <!-- Act 7: Speech Sounds -->
+    <div id="act7" class="activity-panel">
+        <h3>Activity 7: Language Lab - Phonetics & Phonology ('s' sounds)</h3>
+        <p>Determine if the letter 's' produces a /s/ sound (like in 'sage') or a /z/ sound (like in 'wisdom'):</p>
+        <div id="speech-container"></div>
+        <button class="btn-action" onclick="checkSpeech()">Analyze Sounds</button>
+        <div id="act7-score" class="score-display"></div>
+    </div>
+
+    <!-- Act 8: Grammar Check -->
+    <div id="act8" class="activity-panel">
+        <h3>Activity 8: Language Lab - Text Completion Cloze</h3>
+        <p>Complete the missing textual aspects of the lesson vocabulary contextually:</p>
+        <div id="cloze-container"></div>
+        <button class="btn-action" onclick="checkCloze()">Assess Mastery</button>
+        <div id="act8-score" class="score-display"></div>
+    </div>
+
+</div>
+
+<script>
+    function switchTab(tabIndex) {
+        document.querySelectorAll('.activity-panel').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('act' + tabIndex).classList.add('active');
+        document.querySelectorAll('.tab-btn')[tabIndex-1].classList.add('active');
+    }
+
+    // --- Activity 1: Timeline Setup ---
+    const timelineData = [
+        "Rama Natha spends all his time searching for a magic potion.",
+        "His wife Madhumati worries about their dwindling wealth.",
+        "Sage Mahipati arrives and provides a formula involving banana dew.",
+        "Rama Natha clears his fields and plants rows of banana plants.",
+        "For six years, Rama Natha tends the plants and collects dew.",
+        "Madhumati sells the rich banana crops in the market regularly.",
+        "The copper vessel does not turn to gold with the collected dew.",
+        "Rama Natha realizes that hard work is the real magic potion."
+    ];
+    
+    function initTimeline() {
+        const container = document.getElementById('timeline-container');
+        container.innerHTML = timelineData.map((text, idx) => `
+            <div class="option-card">
+                <input type="number" min="1" max="8" style="width: 40px; margin-right: 15px;" id="time-${idx}">
+                <span>${text}</span>
+            </div>
+        `).join('');
+    }
+
+    function checkTimeline() {
+        let score = 0;
+        timelineData.forEach((_, idx) => {
+            const val = parseInt(document.getElementById(`time-${idx}`).value);
+            if(val === idx + 1) { score++; }
+        });
+        document.getElementById('act1-score').innerText = `Score: ${score}/8`;
+    }
+
+    // --- Activity 2: Vocabulary Match Setup ---
+    const vocabWords = ["Potion", "Dew", "Chant", "Tended", "Muttered", "Precious", "Wisdom"];
+    const vocabMeanings = [
+        "A liquid with magical properties",
+        "Small drops of water on leaves formed at night",
+        "To repeat or sing a word or phrase",
+        "Looked after carefully",
+        "Spoke in a low voice",
+        "Highly valuable",
+        "Deep understanding of life"
+    ];
+
+    function initVocab() {
+        const wordsDiv = document.getElementById('vocab-words');
+        const meaningsDiv = document.getElementById('vocab-meanings');
+        
+        wordsDiv.innerHTML = vocabWords.map((w, i) => `<div class="drag-item" onclick="selectItem(this, 'word', ${i})">${w}</div>`).join('');
+        meaningsDiv.innerHTML = vocabMeanings.map((m, i) => `<div class="drop-zone" onclick="selectItem(this, 'meaning', ${i})">${m}</div>`).join('');
+    }
+
+    let selectedWordIdx = null;
+    let wordElement = null;
+    function selectItem(el, type, idx) {
+        if(type === 'word') {
+            selectedWordIdx = idx;
+            wordElement = el;
+            document.querySelectorAll('.drag-item').forEach(i => i.classList.remove('selected'));
+            el.classList.add('selected');
+        } else if(type === 'meaning' && selectedWordIdx !== null) {
+            if(selectedWordIdx === idx) {
+                el.classList.add('correct');
+                wordElement.classList.add('correct');
+            } else {
+                el.classList.add('incorrect');
+                setTimeout(() => el.classList.remove('incorrect'), 1000);
+            }
+        }
+    }
+
+    // --- Activity 3: True or False ---
+    const tfQuestions = [
+        "Rama Natha inherited large tracts of land from his rich landlord father.",
+        "Rama Natha looked after his fields carefully from day one.",
+        "People often cheated Rama Natha by promising to share the secret of gold.",
+        "Madhumati was extremely happy with how her husband spent the money.",
+        "The famous Sage Mahipati was met by Rama Natha in the town.",
+        "Sage Mahipati instructed Rama Natha to collect 10 liters of morning dew.",
+        "Madhumati gathered the banana crops and got a good price in the market."
+    ];
+    const tfAnswers = [true, false, true, false, true, false, true];
+
+    function initTF() {
+        document.getElementById('tf-container').innerHTML = tfQuestions.map((q, i) => `
+            <div style="margin-bottom: 15px;">
+                <p>${i+1}. ${q}</p>
+                <label><input type="radio" name="tf-${i}" value="true"> True</label>
+                <label style="margin-left: 15px;"><input type="radio" name="tf-${i}" value="false"> False</label>
+            </div>
+        `).join('');
+    }
+
+    function checkTrueFalse() {
+        let score = 0;
+        tfQuestions.forEach((_, i) => {
+            const selected = document.querySelector(`input[name="tf-${i}"]:checked`);
+            if(selected && (selected.value === 'true') === tfAnswers[i]) score++;
+        });
+        document.getElementById('act3-score').innerText = `Score: ${score}/7`;
+    }
+
+    // --- Activity 4: MCQ Setup ---
+    const mcqQuestions = [
+        { q: "Why did the magic potion fail to turn the copper vessel into gold?", o: ["The dew was collected in summer", "There is no such thing as a magic potion turning objects to gold", "Rama Natha forgot the magic chant"], a: 1 },
+        { q: "What was inside the big box brought forward by Madhumati?", o: ["Stacks of shimmering gold coins", "More banana leaves", "Another bottle of magical holy water"], a: 0 },
+        { q: "What was the actual source of wealth discovered by Rama Natha?", o: ["The Sage's hidden stash", "Hard work on his plantation and selling fruits", "A gold mine under the field"], a: 1 },
+        { q: "Why did Sage Mahipati play a trick on Rama Natha?", o: ["To make fun of him", "Because Rama Natha wouldn't have listened to direct advice without a trick", "To steal his land"], a: 1 },
+        { q: "What did Rama Natha do after understanding the wisdom of the sage?", o: ["He became angry and left the town", "He worked even harder on his plantation from that day on", "He went to the Himalayas"], a: 1 },
+        { q: "Who helped Rama Natha throughout the six years in creating the wealth?", o: ["The village neighbors", "Only the sage", "His supportive wife, Madhumati"], a: 2 },
+        { q: "How long did it take to accumulate the required volume of dew?", o: ["Six long years", "Six months", "One winter season"], a: 0 }
+    ];
+
+    function initMCQ() {
+        document.getElementById('mcq-container').innerHTML = mcqQuestions.map((item, i) => `
+            <div style="margin-bottom: 15px;">
+                <p><strong>${i+1}. ${item.q}</strong></p>
+                ${item.o.map((o, oi) => `<label style="display:block; margin: 5px 0;"><input type="radio" name="mcq-${i}" value="${oi}"> ${o}</label>`).join('')}
+            </div>
+        `).join('');
+    }
+
+    function checkMCQ() {
+        let score = 0;
+        mcqQuestions.forEach((item, i) => {
+            const checked = document.querySelector(`input[name="mcq-${i}"]:checked`);
+            if(checked && parseInt(checked.value) === item.a) score++;
+        });
+        document.getElementById('act4-score').innerText = `Score: ${score}/7`;
+    }
+
+    // --- Activity 5: Homophones Language Lab ---
+    const homophones = [
+        { q: "The landlord's ______ helped him collect the dew.", o: ["son", "sun"], a: "son" },
+        { q: "There was only ______ magic formula that worked.", o: ["one", "won"], a: "one" },
+        { q: "The morning ______ was sparkling brilliantly on the leaves.", o: ["dew", "due"], a: "dew" },
+        { q: "Rama Natha could ______ the truth behind the sage's words.", o: ["see", "sea"], a: "see" },
+        { q: "Madhumati ______ eight bananas during the morning break.", o: ["ate", "eight"], a: "ate" },
+        { q: "The assignment was ______ for submission next week.", o: ["dew", "due"], a: "due" },
+        { q: "They ______ the best plantation award in the district.", o: ["one", "won"], a: "won" },
+        { q: "The majestic ______ rose up early over the Himalayan peaks.", o: ["son", "sun"], a: "sun" }
+    ];
+
+    function initHomophones() {
+        document.getElementById('homophone-container').innerHTML = homophones.map((h, i) => `
+            <p>${i+1}. Fill the blank: ${h.q.replace('______', `
+                <select id="homo-${i}">
+                    <option value="">--Select--</option>
+                    ${h.o.map(opt => `<option value="${o = opt}">${opt}</option>`).join('')}
+                </select>
+            `)}</p>
+        `).join('');
+    }
+
+    function checkHomophones() {
+        let score = 0;
+        homophones.forEach((h, i) => {
+            if(document.getElementById(`homo-${i}`).value === h.a) score++;
+        });
+        document.getElementById('act5-score').innerText = `Language Score: ${score}/8`;
+    }
+
+    // --- Activity 6: Sentence Connectors Lab ---
+    const connectorData = [
+        { s: "Nitin was late to school today ______ of a huge traffic jam.", a: "because" },
+        { s: "The students submitted their project work ______ the final deadline.", a: "before" },
+        { s: "The children ran towards the primary school gate ______ the bell rang.", a: "as soon as" },
+        { s: "He did not want to attempt rock climbing ______ he had a fear of heights.", a: "as" },
+        { s: "Rama Natha cleaned his field ______ it had been lying empty for years.", a: "because" },
+        { s: "Collect the fresh morning dew ______ the winter season ends.", a: "before" },
+        { s: "Madhumati went to the crowded market ______ the banana crop was gathered.", a: "as soon as" },
+        { s: "The clever trick worked beautifully ______ the sage was highly wise.", a: "as" }
+    ];
+
+    function initConnectors() {
+        document.getElementById('connector-container').innerHTML = connectorData.map((c, i) => `
+            <p>${i+1}. ${c.s.replace('______', `<input type="text" id="conn-${i}" style="width:100px;">`)}</p>
+        `).join('');
+    }
+
+    function checkConnectors() {
+        let score = 0;
+        connectorData.forEach((c, i) => {
+            if(document.getElementById(`conn-${i}`).value.trim().toLowerCase() === c.a) score++;
+        });
+        document.getElementById('act6-score').innerText = `Connector Score: ${score}/8`;
+    }
+
+    // --- Activity 7: Speech Sounds Lab ---
+    const speechWords = ["sage", "wisdom", "trees", "surprise", "beds", "sand", "clothes", "bags"];
+    const speechAnswers = ["/s/", "/z/", "/z/", "/s/", "/z/", "/s/", "/z/", "/z/"];
+
+    function initSpeech() {
+        document.getElementById('speech-container').innerHTML = speechWords.map((w, i) => `
+            <div style="margin: 10px 0;">
+                <span>Word: <strong>${w}</strong></span>
+                <select id="speech-${i}" style="margin-left: 20px;">
+                    <option value="">--Choose Sound--</option>
+                    <option value="/s/">/s/ Sound</option>
+                    <option value="/z/">/z/ Sound</option>
+                </select>
+            </div>
+        `).join('');
+    }
+
+    function checkSpeech() {
+        let score = 0;
+        speechWords.forEach((_, i) => {
+            if(document.getElementById(`speech-${i}`).value === speechAnswers[i]) score++;
+        });
+        document.getElementById('act7-score').innerText = `Phonetic Score: ${score}/8`;
+    }
+
+    // --- Activity 8: Cloze Test Lab ---
+    const clozeWords = ["huge", "cheated", "difficult", "luck", "market", "promised", "spending"];
+    const clozeText = "There was a farmer who had a 1.______ coconut plantation. Every day was 2.______ but he did not give up. He worked incredibly hard and did not depend on mere 3.______. One day, a man bought a bag of organic coconuts from him and 4.______ to pay him the money the very next day. Days passed and the man did not pay him anything. The farmer felt completely 5.______ because his family needed money for 6.______ on necessities. Finally, he met the man in the local 7.______ and recovered his money.";
+    const clozeAnswers = ["huge", "difficult", "luck", "promised", "cheated", "spending", "market"];
+
+    function initCloze() {
+        let currentText = clozeText;
+        clozeAnswers.forEach((_, i) => {
+            currentText = currentText.replace(`${i+1}.______`, `<input type="text" id="cloze-${i}" style="width:80px;" placeholder="word ${i+1}">`);
+        });
+        document.getElementById('cloze-container').innerHTML = `
+            <p style="line-height: 1.8;">${currentText}</p>
+            <p><strong>Available Choices:</strong> [ ${clozeWords.join(', ')} ]</p>
+        `;
+    }
+
+    function checkCloze() {
+        let score = 0;
+        clozeAnswers.forEach((ans, i) => {
+            if(document.getElementById(`cloze-${i}`).value.trim().toLowerCase() === ans) score++;
+        });
+        document.getElementById('act8-score').innerText = `Cloze Test Mastery Score: ${score}/7`;
+    }
+
+    // --- Core Master Initialization ---
+    window.onload = function() {
+        initTimeline();
+        initVocab();
+        initTF();
+        initMCQ();
+        initHomophones();
+        initConnectors();
+        initSpeech();
+        initCloze();
+    };
+</script>
+
+</body>
+</html>

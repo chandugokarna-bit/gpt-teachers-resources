@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gemini Emperor Language Arena - Poorvi Grade 7</title>
+    <style>
+        :root {
+            --bg-glow: #050510;
+            --panel-bg: rgba(15, 15, 28, 0.85);
+            --neon-blue: #00f0ff;
+            --neon-green: #39ff14;
+            --neon-pink: #ff007f;
+            --neon-orange: #ffaa00;
+            --text-main: #ffffff;
+            --text-sub: #9090b5;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            background: radial-gradient(circle at center, #101026 0%, var(--bg-glow) 100%);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            text-align: center;
+            padding: 20px;
+            background: rgba(5, 5, 15, 0.95);
+            border-bottom: 3px solid var(--neon-blue);
+            box-shadow: 0 0 30px rgba(0, 240, 255, 0.4);
+        }
+
+        header h1 {
+            font-size: 2.3rem;
+            color: var(--neon-blue);
+            text-shadow: 0 0 15px var(--neon-blue);
+            letter-spacing: 2px;
+        }
+
+        .main-container {
+            display: flex;
+            flex: 1;
+            padding: 25px;
+            gap: 25px;
+            max-width: 1600px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* Sidebar Nav */
+        .sidebar {
+            width: 340px;
+            background: var(--panel-bg);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.7);
+        }
+
+        .sidebar h2 {
+            font-size: 1.2rem;
+            color: var(--neon-pink);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-align: center;
+            text-shadow: 0 0 10px var(--neon-pink);
+            margin-bottom: 10px;
+        }
+
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            padding: 15px 18px;
+            border-radius: 12px;
+            color: var(--text-sub);
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.2, 1, 0.2, 1);
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .nav-btn:hover {
+            border-color: var(--neon-blue);
+            color: var(--neon-blue);
+            background: rgba(0, 240, 255, 0.08);
+            transform: translateX(8px);
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.25);
+        }
+
+        .nav-btn.active {
+            background: linear-gradient(90deg, rgba(0, 240, 255, 0.2), transparent);
+            border-left: 5px solid var(--neon-blue);
+            color: #ffffff;
+            font-weight: bold;
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.15);
+        }
+
+        /* Main Display Arena */
+        .arena-display {
+            flex: 1;
+            background: var(--panel-bg);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 35px;
+            position: relative;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.7);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .score-board {
+            position: absolute;
+            top: 25px;
+            right: 35px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 10px 22px;
+            border-radius: 30px;
+            border: 1px solid var(--neon-pink);
+            font-weight: bold;
+            color: var(--neon-pink);
+            text-shadow: 0 0 10px var(--neon-pink);
+        }
+
+        .progress-indicator {
+            color: var(--neon-orange);
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .game-header {
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
+
+        .game-title {
+            font-size: 2rem;
+            color: var(--neon-green);
+            text-shadow: 0 0 10px var(--neon-green);
+            margin-bottom: 5px;
+        }
+
+        .game-desc {
+            color: var(--text-sub);
+            font-style: italic;
+        }
+
+        .content-box {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 30px;
+            border-radius: 16px;
+            margin-bottom: 25px;
+            flex: 1;
+        }
+
+        .q-text {
+            font-size: 1.25rem;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        /* 1. Puzzle Mode Layout */
+        .scrambled-box {
+            font-size: 1.8rem;
+            color: var(--neon-blue);
+            letter-spacing: 4px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-shadow: 0 0 8px rgba(0,240,255,0.4);
+        }
+
+        .input-field {
+            background: rgba(0,0,0,0.7);
+            border: 1px solid rgba(255,255,255,0.15);
+            padding: 15px;
+            border-radius: 10px;
+            color: white;
+            width: 100%;
+            font-size: 1.1rem;
+            outline: none;
+            transition: 0.3s;
+        }
+        .input-field:focus { border-color: var(--neon-blue); box-shadow: 0 0 10px rgba(0,240,255,0.3); }
+
+        /* 2. Sentence Sniper Snippets */
+        .sniper-pool { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 20px; }
+        .sniper-word { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 1.1rem; transition: 0.2s; }
+        .sniper-word:hover { border-color: var(--neon-green); color: var(--neon-green); background: rgba(57,255,20,0.1); }
+        .built-sentence { min-height: 55px; background: rgba(0,0,0,0.3); border-bottom: 2px solid var(--neon-green); margin-bottom: 20px; padding: 10px; font-size: 1.3rem; display: flex; gap: 8px; align-items: center; border-radius: 6px;}
+
+        /* 3. Dropdown Selector */
+        .quantum-select { background: #101020; color: white; border: 1px solid var(--neon-blue); padding: 12px; border-radius: 8px; font-size: 1.1rem; width: 100%; outline: none; cursor: pointer; }
+
+        /* 4. Fun Fair Grid MCQ */
+        .mcq-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+        .mcq-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); padding: 15px 20px; border-radius: 10px; cursor: pointer; transition: 0.2s; }
+        .mcq-card:hover { border-color: var(--neon-pink); background: rgba(255,0,127,0.05); }
+        .mcq-card.active { border-color: var(--neon-pink); background: rgba(255,0,127,0.15); box-shadow: 0 0 10px rgba(255,0,127,0.2); }
+
+        /* 5. MULTI-OPTION Drag & Drop Architecture */
+        .drag-container { display: flex; flex-direction: column; gap: 20px; margin-top: 20px; }
+        .drag-box-pool { display: flex; flex-wrap: wrap; gap: 15px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); padding: 15px; border-radius: 12px; min-height: 70px; }
+        .drop-target-box { background: rgba(0, 240, 255, 0.02); border: 2px dashed var(--neon-blue); padding: 20px; border-radius: 12px; min-height: 80px; text-align: center; font-size: 1.2rem; color: var(--text-sub); transition: 0.3s; }
+        .drop-target-box.drag-over { background: rgba(0, 240, 255, 0.15); border-style: solid; }
+        .drag-item { background: #202040; border: 1px solid var(--neon-blue); padding: 10px 22px; border-radius: 8px; cursor: move; font-weight: bold; display: inline-block; user-select: none; }
+
+        /* 6. True/False Survival Grid */
+        .tf-grid { display: flex; gap: 20px; margin-top: 20px; }
+        .tf-btn { flex: 1; padding: 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.03); font-size: 1.3rem; font-weight: bold; cursor: pointer; color: white; text-align: center; transition: 0.2s; }
+        .tf-btn.true-btn:hover { background: rgba(57,255,20,0.15); border-color: var(--neon-green); color: var(--neon-green); }
+        .tf-btn.false-btn:hover { background: rgba(255,0,127,0.15); border-color: var(--neon-pink); color: var(--neon-pink); }
+        .tf-btn.selected { background: rgba(255,170,0,0.2); border-color: var(--neon-orange); }
+
+        /* 7. Dialogue Theatre Layout */
+        .chat-container { display: flex; flex-direction: column; gap: 15px; max-height: 300px; overflow-y: auto; padding: 10px; }
+        .chat-bubble { max-width: 80%; padding: 12px 18px; border-radius: 15px; line-height: 1.4; font-size: 1.05rem; }
+        .chat-bubble.left { background: #1a1a35; align-self: flex-start; border-bottom-left-radius: 2px; border: 1px solid rgba(255,255,255,0.05); }
+        
+        /* 8. Pair Matcher Styles */
+        .pair-container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 15px; }
+        .pair-column { display: flex; flex-direction: column; gap: 10px; }
+        .pair-node { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); padding: 12px; border-radius: 8px; cursor: pointer; transition: 0.2s; min-height: 50px; display: flex; align-items: center; user-select: none; }
+        .pair-node:hover { border-color: var(--neon-orange); background: rgba(255,170,0,0.05); }
+        .pair-node.selected { background: rgba(255,170,0,0.2); border-color: var(--neon-orange); box-shadow: 0 0 8px rgba(255,170,0,0.3); }
+        .pair-node.matched { background: rgba(57,255,20,0.1); border-color: var(--neon-green); cursor: not-allowed; opacity: 0.6; }
+
+        /* Action Buttons */
+        .action-btn {
+            background: linear-gradient(135deg, #00f0ff, #0072ff);
+            border: none;
+            color: white;
+            padding: 15px 35px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            letter-spacing: 1px;
+            transition: all 0.3s;
+            box-shadow: 0 5px 25px rgba(0, 240, 255, 0.4);
+            align-self: flex-start;
+        }
+        .action-btn:hover { transform: translateY(-3px); box-shadow: 0 8px 30px rgba(0, 240, 255, 0.6); }
+
+        .feedback-txt { margin-top: 20px; font-weight: bold; font-size: 1.15rem; min-height: 30px; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>GEMINI EMPEROR SYSTEM v2.0</h1>
+        <p>Active Architecture: Unit 1 - The Day the River Spoke (Poorvi Text Engine)</p>
+    </header>
+
+    <div class="main-container">
+        <div class="sidebar">
+            <h2>Active Engines</h2>
+            <button class="nav-btn active" id="btn-a1" onclick="loadGameEngine(1)">🧩 1. Word Puzzle Arena</button>
+            <button class="nav-btn" id="btn-a2" onclick="loadGameEngine(2)">🎯 2. Sentence Sniper</button>
+            <button class="nav-btn" id="btn-a3" onclick="loadGameEngine(3)">🔍 3. Hidden Clue Explorer</button>
+            <button class="nav-btn" id="btn-a4" onclick="loadGameEngine(4)">🎡 4. Language Fun Fair</button>
+            <button class="nav-btn" id="btn-a5" onclick="loadGameEngine(5)">🚂 5. Grammar Express</button>
+            <button class="nav-btn" id="btn-a6" onclick="loadGameEngine(6)">🏕️ 6. Jungle Adventure</button>
+            <button class="nav-btn" id="btn-a7" onclick="loadGameEngine(7)">🎭 7. Dialogue Theatre</button>
+            <button class="nav-btn" id="btn-a8" onclick="showScienceLab()">🧪 8. Language Science Lab</button>
+        </div>
+
+        <div class="arena-display">
+            <div class="score-board">GLOBAL XP: <span id="xp-global">0</span></div>
+            <div class="progress-indicator" id="progress-indicator">Node Block 1 of 5</div>
+            
+            <div class="game-header">
+                <div class="game-title" id="arena-title">Loading Framework...</div>
+                <div class="game-desc" id="arena-desc">Booting data files...</div>
+            </div>
+
+            <div class="content-box" id="arena-body">
+                </div>
+
+            <button class="action-btn" id="submit-btn" onclick="validateCurrentNode()">VERIFY SUBMISSION NODE</button>
+            <div id="arena-feedback" class="feedback-txt"></div>
+        </div>
+    </div>
+
+    <script>
+        // Data Matrix Configuration
+        const universeMatrix = {
+            1: {
+                title: "Word Puzzle Arena",
+                desc: "Reassemble scrambled text strings to unlock structural vocabulary data.",
+                items: [
+                    { scrambled: "A A C T M A R A N", question: "Chandu's traditional fishing boat structure:", answer: "catamaran" },
+                    { scrambled: "E L T S U R", question: "The subtle sound made by dense bamboo leaves:", answer: "rustle" },
+                    { scrambled: "D R A Z I L", question: "The green creature basking near the water's edge:", answer: "lizard" },
+                    { scrambled: "N I K G F I S H E R", question: "The bright blue arrow wings bird catching fish:", answer: "kingfisher" },
+                    { scrambled: "E C K L U H C", question: "The river's low, sleepy sounding laugh:", answer: "chuckle" }
+                ],
+                engine: "puzzle"
+            },
+            2: {
+                title: "Sentence Sniper",
+                desc: "Build complete contextual sentences by targeting blocks in the correct chronological order.",
+                items: [
+                    { question: "Complete the text sentence:", segments: ["A", "big", "bright", "tear", "splashed", "down"], answer: "A big bright tear splashed down" },
+                    { question: "Reconstruct the River's statement:", segments: ["Little", "girls", "can", "do", "as", "much"], answer: "Little girls can do as much" },
+                    { question: "Assemble the action node:", segments: ["The", "kingfisher", "swept", "down", "its", "wings"], answer: "The kingfisher swept down its wings" },
+                    { question: "Formulate Jahnavi's request:", segments: ["Why", "can't", "I", "go", "to", "school"], answer: "Why can't I go to school" },
+                    { question: "Reconstruct the teacher's reassuring words:", segments: ["Don't", "you", "worry", "we'll", "find", "way"], answer: "Don't you worry we'll find way" }
+                ],
+                engine: "sniper"
+            },
+            3: {
+                title: "Hidden Clue Explorer",
+                desc: "Deploy drop-down matrix selectors to match correct conceptual parameters.",
+                items: [
+                    { question: "Where does the poisonous snake live inside the river scene?", opts: ["In the school building", "In the bamboo clump", "Under Chandu's boat"], answer: "In the bamboo clump" },
+                    { question: "Jahnavi was carrying which child on her shoulder while entering school?", opts: ["Little Appu", "Ettan", "Gopi"], answer: "Little Appu" },
+                    { question: "What story historical character was the teacher reading out loud?", opts: ["Prince Ashoka", "King Bruce", "Chandu"], answer: "Prince Ashoka" },
+                    { question: "How old was Jahnavi when little Ramu was born?", opts: ["Three years old", "Five years old", "Ten years old"], answer: "Five years old" },
+                    { question: "Where does the River hurry down to meet eventually?", opts: ["The mountains", "The rice fields", "The sea"], answer: "The sea" }
+                ],
+                engine: "dropdown"
+            },
+            4: {
+                title: "Language Fun Fair",
+                desc: "Participate in the MCQ festival to lock configuration states on Proper Nouns.",
+                items: [
+                    { question: "Which word represents a Proper Noun requiring capitalization?", opts: ["river", "village", "Jahnavi", "school"], answer: "Jahnavi" },
+                    { question: "What poetic device describes the river talking, chuckling, and advising?", opts: ["Simile", "Metaphor", "Personification", "Alliteration"], answer: "Personification" },
+                    { question: "Identify the hidden Common Noun in: 'The train rattled past the bridge.'", opts: ["rattled", "past", "bridge", "The"], answer: "bridge" },
+                    { question: "Jahnavi uses the term 'Ettan' to mean what relationship node?", opts: ["Younger brother", "Elder brother", "School teacher", "Father"], answer: "Elder brother" },
+                    { question: "What is the nature classification of the word 'Puddleby'?", opts: ["Proper Noun", "Common Noun", "Verb", "Preposition"], answer: "Proper Noun" }
+                ],
+                engine: "mcq"
+            },
+            5: {
+                title: "Grammar Express",
+                desc: "Choose and Drag the correct targeted Preposition from multiple competing choices into the wagon dropzone.",
+                items: [
+                    { question: "Jahnavi stood nervously ______ the gate.", allOptions: ["outside", "inside", "between", "under"], answer: "outside" },
+                    { question: "The moon always comes from ______ the hills.", allOptions: ["behind", "on", "through", "at"], answer: "behind" },
+                    { question: "She found a seat ______ two friendly classmates.", allOptions: ["between", "among", "outside", "into"], answer: "between" },
+                    { question: "The next day she stood ______ the door listening.", allOptions: ["by", "on", "over", "with"], answer: "by" },
+                    { question: "A kingfisher swept down, its wings an arrow of blue ______ the sunlight.", allOptions: ["in", "at", "on", "through"], answer: "in" }
+                ],
+                engine: "dragdrop"
+            },
+            6: {
+                title: "Jungle Adventure Challenge",
+                desc: "Lock True / False data points to survive critical chapter checks.",
+                items: [
+                    { question: "Jahnavi was completely afraid of snakes and green lizards.", state: false },
+                    { question: "The teacher visited Jahnavi's house to talk to her father about her education.", state: true },
+                    { question: "Jahnavi's mother was completely sad that Jahnavi wanted to join school.", state: false },
+                    { question: "Baby fish in the rice fields turn into frogs according to Jahnavi's damn observations.", state: true },
+                    { question: "The River suggested that little girls cannot swim as fast as little boys.", state: false }
+                ],
+                engine: "boolean"
+            },
+            7: {
+                title: "Dialogue Theatre",
+                desc: "Engage conversation nodes with interactive simulation interfaces.",
+                items: [
+                    { context: "Jahnavi: 'They won't let me go to school... I'm so old now.'", prompt: "Choose the River's interactive reply:", opts: ["'Try going to school first. Remember - it's up to you!'", "'You should stay at home and play with lizards.'"], answer: "'Try going to school first. Remember - it's up to you!'" },
+                    { context: "Teacher: 'Where did you spring from, little girl? What is your name?'", prompt: "Choose the classmates' intervention line:", opts: ["'It's Jahnavi, she is Gopi's sister.'", "'She does not want to learn anything.'"], answer: "'It's Jahnavi, she is Gopi's sister.'" },
+                    { context: "Mother: 'Little Jahnavi, I shall miss you when you go to school.'", prompt: "Choose Jahnavi's futuristic resolution statement:", opts: ["'When I grow up, I'll be a teacher and teach all the little girls.'", "'I will never come back to this village.'"], answer: "'When I grow up, I'll be a teacher and teach all the little girls.'" },
+                    { context: "Jahnavi: 'Will the large ships come here to our village river?'", prompt: "Choose the River's geographical fact response:", opts: ["'Too large, you know. Chandu's catamaran is good enough for me.'", "'Yes, they will land inside the rice fields tomorrow.'"], answer: "'Too large, you know. Chandu's catamaran is good enough for me.'" },
+                    { context: "The River: 'What's the matter? Why are you crying?'", prompt: "Choose Jahnavi's emotional barrier declaration:", opts: ["'They won't let me go to school.'", "'The green lizard bit my slipper.'"], answer: "'They won't let me go to school.'" }
+                ],
+                engine: "dialogue"
+            }
+        };
+
+        let activeEngineIndex = 1;
+        let activeNodeIndex = 0;
+        let globalXP = 0;
+        
+        // State variables for games
+        window.draggedValue = "";
+        window.droppedValue = "";
+        window.selectedMCQValue = "";
+        window.selectedBooleanState = null;
+        window.selectedDialogueAns = "";
+        let selectedLeftNode = null;
+        let selectedRightNode = null;
+
+        function loadGameEngine(engineId) {
+            activeEngineIndex = engineId;
+            activeNodeIndex = 0;
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('btn-a' + engineId).classList.add('active');
+            renderActiveNode();
+        }
+
+        function renderActiveNode() {
+            const matrixBlock = universeMatrix[activeEngineIndex];
+            document.getElementById('arena-title').innerText = matrixBlock.title;
+            document.getElementById('arena-desc').innerText = matrixBlock.desc;
+            document.getElementById('arena-feedback').innerText = "";
+            document.getElementById('submit-btn').style.display = "block";
+            document.getElementById('progress-indicator').innerText = `Node Question ${activeNodeIndex + 1} of ${matrixBlock.items.length}`;
+
+            const nodeItem = matrixBlock.items[activeNodeIndex];
+            const displayFrame = document.getElementById('arena-body');
+            displayFrame.innerHTML = "";
+
+            if (matrixBlock.engine === "puzzle") {
+                displayFrame.innerHTML = `
+                    <p class="q-text">${nodeItem.question}</p>
+                    <div class="scrambled-box">${nodeItem.scrambled}</div>
+                    <input type="text" id="puzzle-node-input" class="input-field" placeholder="Decrypt the unscrambled word matrix...">
+                `;
+            } 
+            else if (matrixBlock.engine === "sniper") {
+                displayFrame.innerHTML = `
+                    <p class="q-text">${nodeItem.question}</p>
+                    <div class="built-sentence" id="built-sentence-zone"></div>
+                    <div class="sniper-pool" id="sniper-pool-zone"></div>
+                `;
+                let currentBuild = [];
+                let shuffled = [...nodeItem.segments].sort(() => Math.random() - 0.5);
+                shuffled.forEach(word => {
+                    let wordBtn = document.createElement('div');
+                    wordBtn.className = "sniper-word";
+                    wordBtn.innerText = word;
+                    wordBtn.onclick = () => {
+                        currentBuild.push(word);
+                        document.getElementById('built-sentence-zone').innerText = currentBuild.join(" ");
+                        wordBtn.style.display = "none";
+                    };
+                    document.getElementById('sniper-pool-zone').appendChild(wordBtn);
+                });
+            }
+            else if (matrixBlock.engine === "dropdown") {
+                let optionsHtml = nodeItem.opts.map(o => `<option value="${o}">${o}</option>`).join("");
+                displayFrame.innerHTML = `
+                    <p class="q-text">${nodeItem.question}</p>
+                    <select id="dropdown-node-select" class="quantum-select">
+                        <option value="">-- SELECT CLUE DATA VECTOR --</option>
+                        ${optionsHtml}
+                    </select>
+                `;
+            }
+            else if (matrixBlock.engine === "mcq") {
+                displayFrame.innerHTML = `<p class="q-text">${nodeItem.question}</p><div class="mcq-grid" id="mcq-zone"></div>`;
+                window.selectedMCQValue = "";
+                nodeItem.opts.forEach(o => {
+                    let card = document.createElement('div');
+                    card.className = "mcq-card";
+                    card.innerText = o;
+                    card.onclick = () => {
+                        document.querySelectorAll('.mcq-card').forEach(c => c.classList.remove('active'));
+                        card.classList.add('active');
+                        window.selectedMCQValue = o;
+                    };
+                    document.getElementById('mcq-zone').appendChild(card);
+                });
+            }
+            else if (matrixBlock.engine === "dragdrop") {
+                window.droppedValue = "";
+                displayFrame.innerHTML = `
+                    <p class="q-text">${nodeItem.question}</p>
+                    <div class="drag-container">
+                        <div class="drag-box-pool" id="drag-pool-box"></div>
+                        <div class="drop-target-box" id="drop-target-zone">Drop your chosen preposition answer here...</div>
+                    </div>
+                `;
+                
+                let targetZone = document.getElementById('drop-target-zone');
+                targetZone.addEventListener('dragover', (e) => { e.preventDefault(); targetZone.classList.add('drag-over'); });
+                targetZone.addEventListener('dragleave', () => { targetZone.classList.remove('drag-over'); });
+                targetZone.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    targetZone.classList.remove('drag-over');
+                    window.droppedValue = window.draggedValue;
+                    targetZone.innerText = "Loaded Target: " + window.droppedValue;
+                    targetZone.style.borderColor = "var(--neon-green)";
+                });
+
+                nodeItem.allOptions.forEach((opt, idx) => {
+                    let dragItem = document.createElement('div');
+                    dragItem.className = "drag-item";
+                    dragItem.draggable = true;
+                    dragItem.innerText = opt;
+                    dragItem.id = "drag-opt-" + idx;
+                    dragItem.addEventListener('dragstart', () => { window.draggedValue = opt; });
+                    document.getElementById('drag-pool-box').appendChild(dragItem);
+                });
+            }
+            else if (matrixBlock.engine === "boolean") {
+                displayFrame.innerHTML = `
+                    <p class="q-text">${nodeItem.question}</p>
+                    <div class="tf-grid">
+                        <button class="tf-btn true-btn" id="tf-t" onclick="setBooleanState(true)">TRUE / DATA VALID</button>
+                        <button class="tf-btn false-btn" id="tf-f" onclick="setBooleanState(false)">FALSE / ANOMALY</button>
+                    </div>
+                `;
+                window.selectedBooleanState = null;
+            }
+            else if (matrixBlock.engine === "dialogue") {
+                displayFrame.innerHTML = `
+                    <div class="chat-container">
+                        <div class="chat-bubble left">${nodeItem.context}</div>
+                    </div>
+                    <p class="q-text" style="margin-top:15px; color:var(--neon-pink);">${nodeItem.prompt}</p>
+                    <div class="mcq-grid" id="dialogue-choices"></div>
+                `;
+                window.selectedDialogueAns = "";
+                nodeItem.opts.forEach(o => {
+                    let card = document.createElement('div');
+                    card.className = "mcq-card";
+                    card.innerText = o;
+                    card.onclick = () => {
+                        document.querySelectorAll('.mcq-card').forEach(c => c.classList.remove('active'));
+                        card.classList.add('active');
+                        window.selectedDialogueAns = o;
+                    };
+                    document.getElementById('dialogue-choices').appendChild(card);
+                });
+            }
+        }
+
+        function setBooleanState(state) {
+            window.selectedBooleanState = state;
+            document.getElementById('tf-t').classList.remove('selected');
+            document.getElementById('tf-f').classList.remove('selected');
+            if(state) document.getElementById('tf-t').classList.add('selected');
+            else document.getElementById('tf-f').classList.add('selected');
+        }
+
+        function validateCurrentNode() {
+            const matrixBlock = universeMatrix[activeEngineIndex];
+            const nodeItem = matrixBlock.items[activeNodeIndex];
+            let isVerified = false;
+            let feedback = document.getElementById('arena-feedback');
+
+            if (matrixBlock.engine === "puzzle") {
+                let userAns = document.getElementById('puzzle-node-input').value.trim().toLowerCase();
+                if (userAns === nodeItem.answer.toLowerCase()) isVerified = true;
+            }
+            else if (matrixBlock.engine === "sniper") {
+                let userAns = document.getElementById('built-sentence-zone').innerText;
+                if (userAns === nodeItem.answer) isVerified = true;
+            }
+            else if (matrixBlock.engine === "dropdown") {
+                let userAns = document.getElementById('dropdown-node-select').value;
+                if (userAns === nodeItem.answer) isVerified = true;
+            }
+            else if (matrixBlock.engine === "mcq") {
+                if (window.selectedMCQValue === nodeItem.answer) isVerified = true;
+            }
+            else if (matrixBlock.engine === "dragdrop") {
+                if (window.droppedValue === nodeItem.answer) isVerified = true;
+            }
+            else if (matrixBlock.engine === "boolean") {
+                if (window.selectedBooleanState === nodeItem.state) isVerified = true;
+            }
+            else if (matrixBlock.engine === "dialogue") {
+                if (window.selectedDialogueAns === nodeItem.answer) isVerified = true;
+            }
+
+            if (isVerified) {
+                feedback.innerText = "⚡ SUCCESS: Node Parameter Authenticated! (+20 XP)";
+                feedback.style.color = "var(--neon-green)";
+                globalXP += 20;
+                document.getElementById('xp-global').innerText = globalXP;
+
+                setTimeout(() => {
+                    activeNodeIndex++;
+                    if(activeNodeIndex < matrixBlock.items.length) {
+                        renderActiveNode();
+                    } else {
+                        feedback.innerText = "🏆 ENGINE SECTOR LOCKED: Sector Cleared Successfully.";
+                        feedback.style.color = "var(--neon-blue)";
+                        document.getElementById('submit-btn').style.display = "none";
+                    }
+                }, 1200);
+            } else {
+                feedback.innerText = "❌ EXCEPTION ERROR: Mismatch detected. Core Block Rejected.";
+                feedback.style.color = "var(--neon-pink)";
+            }
+        }
+
+        // 8. Custom Special Engine: Language Science Lab (Click-Pair Matching)
+        function showScienceLab() {
+            activeEngineIndex = 8;
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('btn-a8').classList.add('active');
+            
+            document.getElementById('progress-indicator').innerText = "Quantum Pair Combinator Engine";
+            document.getElementById('arena-title').innerText = "Language Science Lab";
+            document.getElementById('arena-desc').innerText = "Mix and pair sound definitions to produce stable linguistic chemical bonds.";
+            document.getElementById('arena-feedback').innerText = "";
+            document.getElementById('submit-btn').style.display = "none";
+
+            const leftData = ["shrieked", "splash", "murmuring", "sob", "gasp"];
+            const rightData = [
+                "continuous low background noise",
+                "high-pitched piercing sound",
+                "liquid falling on something loudly",
+                "cry with uncontrollable loud gasps",
+                "short quick unexpected catch of breath"
+            ];
+
+            const answersMap = {
+                "shrieked": "high-pitched piercing sound",
+                "splash": "liquid falling on something loudly",
+                "murmuring": "continuous low background noise",
+                "sob": "cry with uncontrollable loud gasps",
+                "gasp": "short quick unexpected catch of breath"
+            };
+
+            const body = document.getElementById('arena-body');
+            body.innerHTML = `<div class="pair-container"><div class="pair-column" id="left-col"></div><div class="pair-column" id="right-col"></div></div>`;
+
+            leftData.forEach(text => {
+                let node = document.createElement('div');
+                node.className = "pair-node";
+                node.innerText = text;
+                node.onclick = () => {
+                    if(node.classList.contains('matched')) return;
+                    document.querySelectorAll('#left-col .pair-node').forEach(n => n.classList.remove('selected'));
+                    node.classList.add('selected');
+                    selectedLeftNode = text;
+                    evaluatePairBond(answersMap);
+                };
+                document.getElementById('left-col').appendChild(node);
+            });
+
+            let shuffledRight = [...rightData].sort(() => Math.random() - 0.5);
+            shuffledRight.forEach(text => {
+                let node = document.createElement('div');
+                node.className = "pair-node";
+                node.innerText = text;
+                node.onclick = () => {
+                    if(node.classList.contains('matched')) return;
+                    document.querySelectorAll('#right-col .pair-node').forEach(n => n.classList.remove('selected'));
+                    node.classList.add('selected');
+                    selectedRightNode = text;
+                    evaluatePairBond(answersMap);
+                };
+                document.getElementById('right-col').appendChild(node);
+            });
+        }
+
+        function evaluatePairBond(answersMap) {
+            if(selectedLeftNode && selectedRightNode) {
+                let feedback = document.getElementById('arena-feedback');
+                if(answersMap[selectedLeftNode] === selectedRightNode) {
+                    feedback.innerText = "🧪 REACTION SUCCESSFUL: Stable Bond Created! (+30 XP)";
+                    feedback.style.color = "var(--neon-green)";
+                    globalXP += 30;
+                    document.getElementById('xp-global').innerText = globalXP;
+
+                    document.querySelectorAll('.pair-node').forEach(node => {
+                        if(node.innerText === selectedLeftNode || node.innerText === selectedRightNode) {
+                            node.classList.remove('selected');
+                            node.classList.add('matched');
+                        }
+                    });
+                } else {
+                    feedback.innerText = "💥 CHEMICAL FAILURE: Elements repelled elements.";
+                    feedback.style.color = "var(--neon-pink)";
+                    document.querySelectorAll('.pair-node').forEach(node => node.classList.remove('selected'));
+                }
+                selectedLeftNode = null;
+                selectedRightNode = null;
+            }
+        }
+
+        window.onload = () => { loadGameEngine(1); };
+    </script>
+</body>
+</html>

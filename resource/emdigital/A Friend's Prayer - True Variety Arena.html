@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Next-Gen Gamified Hub: A Friend's Prayer</title>
+    <!-- Canvas Confetti Library for Advanced Cracker Burst -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        :root {
+            --primary: #ec4899;
+            --secondary: #3b82f6;
+            --bg: #090d16;
+            --surface: #172554;
+            --text: #f8fafc;
+            --success: #10b981;
+            --error: #ef4444;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .hub-container {
+            max-width: 950px;
+            width: 100%;
+            background: #111827;
+            padding: 35px;
+            border-radius: 24px;
+            border: 2px solid #1f2937;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            background: linear-gradient(135deg, #a855f7, #ec4899, #3b82f6);
+            padding: 25px;
+            border-radius: 20px;
+        }
+
+        h1 { margin: 0; font-size: 2.3rem; font-weight: 800; }
+
+        .tab-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 35px;
+        }
+
+        @media (max-width: 768px) {
+            .tab-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        .tab-btn {
+            background: #1f2937;
+            color: #9ca3af;
+            border: 1px solid #374151;
+            padding: 14px;
+            border-radius: 14px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+
+        .tab-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(236, 72, 153, 0.4);
+        }
+
+        .game-panel { display: none; }
+        .game-panel.active { display: block; }
+
+        .game-card {
+            background: #1f2937;
+            border: 2px solid #374151;
+            border-radius: 18px;
+            padding: 22px;
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .quest-text { font-size: 1.2rem; font-weight: 700; margin-bottom: 14px; color: #38bdf8; }
+
+        /* MECHANISM 1: Custom Typing Inputs */
+        .typing-input {
+            background: #030712;
+            border: 2px solid #4b5563;
+            color: #34d399;
+            font-family: monospace;
+            font-size: 1.2rem;
+            padding: 10px 15px;
+            border-radius: 8px;
+            width: 150px;
+            text-align: center;
+        }
+
+        /* MECHANISM 2: Gate Grid Matrix */
+        .gate-matrix { display: flex; gap: 10px; flex-wrap: wrap; }
+        .gate-node {
+            padding: 12px 24px;
+            background: #111827;
+            border: 2px solid #4b5563;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .gate-node.active-node { border-color: #f59e0b; background: #78350f; }
+
+        /* MECHANISM 3: Binary Switch */
+        .switch-box {
+            display: inline-flex;
+            background: #374151;
+            padding: 6px;
+            border-radius: 30px;
+            cursor: pointer;
+        }
+        .switch-node {
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+        .switch-node.active { background: #3b82f6; color: white; }
+
+        /* MECHANISM 4: Dynamic Word Picker Grid */
+        .word-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .grid-word {
+            background: #111827;
+            border: 2px solid #374151;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .grid-word.picked { background: #6d28d9; border-color: #a78bfa; }
+
+        /* Feedback Colors */
+        .win { background: #064e3b !important; border-color: var(--success) !important; }
+        .fail { background: #7f1d1d !important; border-color: var(--danger) !important; }
+
+        .action-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 35px;
+            padding-top: 20px;
+            border-top: 2px solid #374151;
+        }
+
+        button.action-btn {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            border: none;
+            padding: 14px 35px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 700;
+        }
+
+        .badge-display { font-size: 1.25rem; font-weight: 800; color: #ec4899; background: #2e1026; padding: 8px 20px; border-radius: 20px; }
+    </style>
+</head>
+<body>
+
+<div class="hub-container">
+    <header>
+        <h1>A Friend's Prayer - True Variety Arena</h1>
+    </header>
+
+    <div class="tab-grid">
+        <button class="tab-btn active" onclick="switchMode(1)">🚀 Space Launch</button>
+        <button class="tab-btn" onclick="switchMode(2)">🏰 Castle Gate</button>
+        <button class="tab-btn" onclick="switchMode(3)">🧭 Island Switch</button>
+        <button class="tab-btn" onclick="switchMode(4)">🐉 Dragon Length</button>
+        <button class="tab-btn" onclick="switchMode(5)">⚔️ Grammar Shield</button>
+        <button class="tab-btn" onclick="switchMode(6)">🧙 Magic Word Grid</button>
+        <button class="tab-btn" onclick="switchMode(7)">🌋 Volcano Type</button>
+        <button class="tab-btn" onclick="switchMode(8)">🦸 Academy Battle</button>
+    </div>
+
+    <!-- 1. SPACE MISSION: KEYBOARD INPUT CODES -->
+    <div id="mode-1" class="game-panel active">
+        <h2>Mission 1: Space Language Code Entry</h2>
+        <div class="game-card" id="c-1-0">
+            <div class="quest-text">1. Type the suffix needed to change 'friend' into a relation noun asset:</div>
+            friend + <input type="text" class="typing-input" id="in-1-0" placeholder="e.g. ship">
+        </div>
+        <div class="game-card" id="c-1-1">
+            <div class="quest-text">2. Type the suffix needed to change 'care' into an adjective asset:</div>
+            care + <input type="text" class="typing-input" id="in-1-1" placeholder="e.g. ful">
+        </div>
+        <div class="game-card" id="c-1-2">
+            <div class="quest-text">3. Type the missing letter inside the contraction profile: 'I am' ➔ I<input type="text" class="typing-input" id="in-1-2" style="width:50px;" placeholder="'m"></div>
+        </div>
+        <div class="game-card" id="c-1-3">
+            <div class="quest-text">4. Type the missing letters to complete the attribute: 'He always tells the truth, he is h_n_st.'➔ <input type="text" class="typing-input" id="in-1-3"></div>
+        </div>
+        <div class="game-card" id="c-1-4">
+            <div class="quest-text">5. Type the negative connector counterpart for 'Neither': Neither / <input type="text" class="typing-input" id="in-1-4" placeholder="nor"></div>
+        </div>
+        <div class="action-bar"><button class="action-btn" onclick="checkMode1()">Verify System Codes</button><div class="badge-display" id="sb-1">Score: --</div></div>
+    </div>
+
+    <!-- 2. CASTLE ESCAPE: MULTI-STEP GATE NODES -->
+    <div id="mode-2" class="game-panel">
+        <h2>Mission 2: Castle Gate Sequence Unlocker</h2>
+        <div class="game-card" id="c-2-0">
+            <div class="quest-text">1. Select the precise Adjective node from the castle matrix setup below:</div>
+            <div class="gate-matrix">
+                <div class="gate-node" id="gn-2-0-0" onclick="nodePick(2,0,0)">friend</div>
+                <div class="gate-node" id="gn-2-0-1" onclick="nodePick(2,0,1)">special</div>
+                <div class="gate-node" id="gn-2-0-2" onclick="nodePick(2,0,2)">pray</div>
+            </div>
+        </div>
+        <div class="game-card" id="c-2-1">
+            <div class="quest-text">2. Select the Node that represents an Abstract Noun asset:</div>
+            <div class="gate-matrix">
+                <div class="gate-node" id="gn-2-1-0" onclick="nodePick(2,1,0)">friendship</div>
+                <div class="gate-node" id="gn-2-1-1" onclick="nodePick(2,1,1)">loyal</div>
+                <div class="gate-node" id="gn-2-1-2" onclick="nodePick(2,1,2)">see</div>
+            </div>
+        </div>
+        <div class="game-card" id="c-2-2">
+            <div class="quest-text">3. Select the Node that represents the Poet's identity asset:</div>
+            <div class="gate-matrix">
+                <div class="gate-node" id="gn-2-2-0" onclick="nodePick(2,2,0)">Jill Wolf</div>
+                <div class="gate-node" id="gn-2-2-1" onclick="nodePick(2,2,1)">Sudha Murty</div>
+                <div class="gate-node" id="gn-2-2-2" onclick="nodePick(2,2,2)">Mahipati</div>
+            </div>
+        </div>
+        <div class="game-card" id="c-2-3">
+            <div class="quest-text">4. Select the genuine synonym node for 'wishes':</div>
+            <div class="gate-matrix">
+                <div class="gate-node" id="gn-2-3-0" onclick="nodePick(2,3,0)">chores</div>
+                <div class="gate-node" id="gn-2-3-1" onclick="nodePick(2,3,1)">hopes/desires</div>
+                <div class="gate-node" id="gn-2-3-2" onclick="nodePick(2,3,2)">judgements</div>
+            </div>
+        </div>
+        <div class="game-card" id="c-2-4">
+            <div class="quest-text">5. Select the antonym node for 'afar':</div>
+            <div class="gate-matrix">
+                <div class="gate-node" id="gn-2-4-0" onclick="nodePick(2,4,0)">close</div>
+                <div class="gate-node" id="gn-2-4-1" onclick="nodePick(2,4,1)">distant</div>
+                <div class="gate-node" id="gn-2-4-2" onclick="nodePick(2,4,2)">lonely</div>
+            </div>
+        </div>
+        <div class="action-bar"><button class="action-btn" onclick="checkMode2()">Verify Gate Sequence</button><div class="badge-display" id="sb-2">Score: --</div></div>
+    </div>
+
+    <!-- 3. LOST ISLAND: BINARY SWITCH TOGGLES -->
+    <div id="mode-3" class="game-panel">
+        <h2>Mission 3: Island Signal Switch Matrix</h2>
+        <div class="game-card" id="c-3-0">
+            <span class="quest-text">1. 'Blessed' means feeling deeply grateful:</span>
+            <div class="switch-box" onclick="toggleSwitch(3,0)"><div class="switch-node" id="sw-3-0-t">TRUE</div><div class="switch-node" id="sw-3-0-f">FALSE</div></div>
+        </div>
+        <div class="game-card" id="c-3-1">
+            <span class="quest-text">2. 'Judgements' mean making physical tree structures:</span>
+            <div class="switch-box" onclick="toggleSwitch(3,1)"><div class="switch-node" id="sw-3-1-t">TRUE</div><div class="switch-node" id="sw-3-1-f">FALSE</div></div>
+        </div>
+        <div class="game-card" id="c-3-2">
+            <span class="quest-text">3. A loyal classmate will easily cheat you in class tasks:</span>
+            <div class="switch-box" onclick="toggleSwitch(3,2)"><div class="switch-node" id="sw-3-2-t">TRUE</div><div class="switch-node" id="sw-3-2-f">FALSE</div></div>
+        </div>
+        <div class="game-card" id="c-3-3">
+            <span class="quest-text">4. Suffixes are strings attached before a root word:</span>
+            <div class="switch-box" onclick="toggleSwitch(3,3)"><div class="switch-node" id="sw-3-3-t">TRUE</div><div class="switch-node" id="sw-3-3-f">FALSE</div></div>
+        </div>
+        <div class="game-card" id="c-3-4">
+            <span class="quest-text">5. The poet prays to accept friends exactly as they are:</span>
+            <div class="switch-box" onclick="toggleSwitch(3,4)"><div class="switch-node" id="sw-3-4-t">TRUE</div><div class="switch-node" id="sw-3-4-f">FALSE</div></div>
+        </div>
+        <div class="action-bar"><button class="action-btn" onclick="checkMode3()">Verify Signal Toggles</button><div class="badge-display" id="sb-3">Score: --</div></div>
+    </div>
+
+    <!-- 4. DRAGON'S WORD: CHARACTER LENGTH COUNTER -->
+    <div id="mode-4" class="game-panel">
+        <h2>Mission 4: Dragon's Letter Count Challenge</h2>
+        <div class="game-card" id="c-4-0">
+            <div class="quest-text">1. Count and enter the number of letters inside the target word 'PRAYER':</div>
+            <input type="number" class="typing-input" id="in-4-0"> letters.
+        </div>
+        <div class="game-card" id="c-4-1">
+            <div class="quest-text">2. Count and enter the number of letters inside the target suffix 'SHIP':</div>
+            <input type="number" class="typing-input" id="in-4-1"> letters.
+        </div>
+        <div class="game-card" id="c-4-2">
+            <div class="quest-text">3. Count and enter the number of letters inside the adjective 'LOYAL':</div>
+            <input type="number" class="typing-input" id="in-4-2"> letters.
+        </div>
+        <div class="game-card" id="c-4-3">
+            <div class="quest-text">4. Count and enter the number of letters inside the word 'HEART':</div>
+            <input type="number" class="typing-input" id="in-4-3"> letters.
+        </div>
+        <div class="game-card" id="c-4-4">
+            <div class="quest-text">5. Count and enter the number of letters inside the root word 'KIND':</div>
+            <input type="number" class="typing-input" id="in-4-4"> letters.
+        </div>
+        <div class="action-bar"><button class="action-btn" onclick="checkMode4()">Attack Dragon</button><div class="badge-display" id="sb-4">Score: --</div></div>
+    </div>
+
+    <!-- 5. KINGDOM GRAMMAR: MULTI-SELECTION FILTERS -->
+    <div id="mode-5" class="game-panel">
+        <h2>Mission 5: Kingdom Filter (Select ALL matching Adjectives)</h2>
+        <div class="game-card" id="c-5-0">
+            <div class="quest-text">Click to pick ALL descriptive adjectives from this list grid below:</div>
+            <div class="word-grid">
+                <div class="grid-word" id="gw-5-0" onclick="pickWord(5,0)">special</div>
+                <div class="grid-word" id="gw-5-1" onclick="pickWord(5,1)">book</div>
+                <div class="grid-word" id="gw-5-2" onclick="pickWord(5,2)">honest</div>
+                <div class="grid-word" id="gw-5-3" onclick="pickWord(5,3)">run</div>
+                <div class="grid-word" id="gw-5-4" onclick="pickWord(5,4)">loyal</div>
+                <div class="grid-word" id="gw-5-5" onclick="pickWord(5,5)">bench</div>
+            </div>
+        </div>
+        <div class="action-bar"><button class="action-btn" onclick="checkMode5()">Verify Filter Shield</button><div class="badge-display" id="sb-5">Score: --</div></div>
+    </div>
+
+    <!-- 6. MAGIC SPELL: WORD PICKER GRID -->
+    <div id="mode-6" class="game-panel">
+        <h2>Mission 6: Magic Grid Picker</h2>
+        <div class="game-card" id="c-6-0">
+            <div class="quest-text">Pick the proper noun item that maps to the poet's name profile from this grid:</div>
+            <div class="word-grid">
+                <div class="grid-word" id="gw-6-0" onclick="pickSingleWord(6,0)">Rama</div>
+                <div class="grid-word" id="gw-6-1" onclick="pickSingleWord(6,1)">Jill Wolf</div>
+                <div class="grid-word" id="gw-6-2" onclick="pickSingleWord(6,2)">Gajaraj</div>
+            </div>
+        </div>
+        <div class="action-bar"><button class="action-btn" onclick="checkMode6()">Cast Spell</button><div class="badge-display" id="sb-6">Score: --</div></div>
+    </div>
+
+    <!-- 7. VOLCANO ADVENTURE: LIVE RHYME TYPING -->
+    <div id="mode-7" class="game-panel">
+        <h2>Mission 7: Volcano Live Text Prediction</h2>
+        <div class="game-card" id="c-7-0">
+            <div class="quest-text">1. Type the matching rhyme output for 'be' contextually:</div>
+            May my friendships always be... the most important thing to <input type="text" class="typing-input" id="in-7-0">
+        </div>
+        <div class="game-card" id="c-7-1">
+            <div class="quest-text">2. Type the matching rhyme output for 'best':</div>
+            With special friends I feel I'm blessed... so let me give my very <input type="text" class="typing-input" id="in-7-1">
+        </div>
+        <div class="game-card" id="c-7-2">
+            <div class="quest-text">3. Type the matching rhyme output for 'see':</div>
+            Let me use my heart to see... to realise what friends can <input type="text" class="typing-input" id="in-7-2">
+        </div>
+        <div class="game-card" id="c-7-3">
+            <div class="quest-text">4. Type the matching rhyme output for 'afar':</div>
+            And make no judgements from afar... but love my friends the way they <input type="text" class="typing-input" id="in-7-3">
+        </div>
+        <div class="game-card" id="c-7-4">
+            <div class="quest-text">5. Type the matching rhyme output for 'care':</div>
+            The hopes and plans of friends who care... much more than just to <input type="text" class="typing-input" id="in-7-4">
+        </div>
+        <div class="action-bar"><button class="action-btn" onclick="checkMode7()">Cross Path</button><div class="badge-display" id="sb-7">Score: --</div></div>
+    </div>
+
+    <!-- 8. HERO ACADEMY: BOSS BATTLE HEALTH DEPLOYER -->
+    <div id="mode-8" class="game-panel">
+        <h2>Mission 8: Academy Boss Battle Evaluation</h2>
+        <div class="game-card">
+            <div class="quest-text">To strike down the Language Enemy, confirm if 'A friend in need is a friend indeed' is a golden value asset:</div>
+            <div class="gate-matrix">
+                <button class="gate-node" id="hb-8-t" onclick="heroStrike(true)">CONFIRM & ATTACK</button>
+                <button class="gate-node" id="hb-8-f" onclick="heroStrike(false)">DENY</button>
+            </div>
+        </div>
+        <div class="action-bar"><div class="badge-display" id="sb-8">Battle Status: Standing</div></div>
+    </div>
+
+</div>
+
+<script>
+    let states = { node: {}, switch: {}, grid: {}, singleGrid: {} };
+
+    window.switchMode = function(id) {
+        document.querySelectorAll('.game-panel').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('mode-' + id).classList.add('active');
+        event.target.classList.add('active');
+    };
+
+    // System Logging Engines
+    window.nodePick = function(p, q, opt) {
+        for(let i=0; i<3; i++) document.getElementById(`gn-${p}-${q}-${i}`).classList.remove('active-node');
+        document.getElementById(`gn-${p}-${q}-${opt}`).classList.add('active-node');
+        states.node[`${p}-${q}`] = opt;
+    };
+
+    window.toggleSwitch = function(p, q) {
+        let current = states.switch[`${p}-${q}`];
+        let next = (current === undefined || current === false) ? true : false;
+        states.switch[`${p}-${q}`] = next;
+        document.getElementById(`sw-${p}-${q}-t`).classList.toggle('active', next === true);
+        document.getElementById(`sw-${p}-${q}-f`).classList.toggle('active', next === false);
+    };
+
+    window.pickWord = function(p, opt) {
+        let el = document.getElementById(`gw-${p}-${opt}`);
+        el.classList.toggle('picked');
+        states.grid[`${p}-${opt}`] = el.classList.contains('picked');
+    };
+
+    window.pickSingleWord = function(p, opt) {
+        for(let i=0; i<3; i++) document.getElementById(`gw-${p}-${i}`).classList.remove('picked');
+        document.getElementById(`gw-${p}-${opt}`).classList.add('picked');
+        states.singleGrid[p] = opt;
+    };
+
+    // Advanced Checking Blocks with distinct structural targets
+    window.checkMode1 = function() {
+        const answers = ["ship", "ful", "m", "honest", "nor"]; let score = 0;
+        for(let i=0; i<5; i++) {
+            let val = document.getElementById(`in-1-${i}`).value.trim().toLowerCase();
+            let c = document.getElementById(`c-1-${i}`);
+            c.classList.remove('win', 'fail');
+            if(val === answers[i]) { score++; c.classList.add('win'); } else { c.classList.add('fail'); }
+        }
+        document.getElementById('sb-1').innerText = `Score: ${score} / 5`;
+        if(score === 5) confetti({ particleCount: 100, spread: 60 });
+    };
+
+    window.checkMode2 = function() {
+        const answers = [1, 0, 0, 1, 0]; let score = 0;
+        for(let i=0; i<5; i++) {
+            let c = document.getElementById(`c-2-${i}`); c.classList.remove('win', 'fail');
+            if(states.node[`2-${i}`] === answers[i]) { score++; c.classList.add('win'); } else { c.classList.add('fail'); }
+        }
+        document.getElementById('sb-2').innerText = `Score: ${score} / 5`;
+        if(score === 5) confetti({ particleCount: 100, spread: 60 });
+    };
+
+    window.checkMode3 = function() {
+        const answers = [true, false, false, false, true]; let score = 0;
+        for(let i=0; i<5; i++) {
+            let c = document.getElementById(`c-3-${i}`); c.classList.remove('win', 'fail');
+            let userAns = states.switch[`3-${i}`] === undefined ? false : states.switch[`3-${i}`];
+            if(userAns === answers[i]) { score++; c.classList.add('win'); } else { c.classList.add('fail'); }
+        }
+        document.getElementById('sb-3').innerText = `Score: ${score} / 5`;
+        if(score === 5) confetti({ particleCount: 100, spread: 60 });
+    };
+
+    window.checkMode4 = function() {
+        const answers = [6, 4, 5, 5, 4]; let score = 0;
+        for(let i=0; i<5; i++) {
+            let val = parseInt(document.getElementById(`in-4-${i}`).value);
+            let c = document.getElementById(`c-4-${i}`); c.classList.remove('win', 'fail');
+            if(val === answers[i]) { score++; c.classList.add('win'); } else { c.classList.add('fail'); }
+        }
+        document.getElementById('sb-4').innerText = `Score: ${score} / 5`;
+        if(score === 5) confetti({ particleCount: 100, spread: 60 });
+    };
+
+    window.checkMode5 = function() {
+        let c = document.getElementById('c-5-0'); c.classList.remove('win', 'fail');
+        // Valid indices are 0 (special), 2 (honest), 4 (loyal)
+        if(states.grid['5-0'] && !states.grid['5-1'] && states.grid['5-2'] && !states.grid['5-3'] && states.grid['5-4'] && !states.grid['5-5']) {
+            c.classList.add('win'); document.getElementById('sb-5').innerText = "Score: 5 / 5"; confetti();
+        } else {
+            c.classList.add('fail'); document.getElementById('sb-5').innerText = "Score: Fail";
+        }
+    };
+
+    window.checkMode6 = function() {
+        let c = document.getElementById('c-6-0'); c.classList.remove('win', 'fail');
+        if(states.singleGrid[6] === 1) {
+            c.classList.add('win'); document.getElementById('sb-6').innerText = "Score: 5 / 5"; confetti();
+        } else {
+            c.classList.add('fail'); document.getElementById('sb-6').innerText = "Score: Fail";
+        }
+    };
+
+    window.checkMode7 = function() {
+        const answers = ["me", "best", "be", "are", "share"]; let score = 0;
+        for(let i=0; i<5; i++) {
+            let val = document.getElementById(`in-7-${i}`).value.trim().toLowerCase();
+            let c = document.getElementById(`c-7-${i}`); c.classList.remove('win', 'fail');
+            if(val === answers[i]) { score++; c.classList.add('win'); } else { c.classList.add('fail'); }
+        }
+        document.getElementById('sb-7').innerText = `Score: ${score} / 5`;
+        if(score === 5) confetti({ particleCount: 100, spread: 60 });
+    };
+
+    window.heroStrike = function(val) {
+        let bar = document.getElementById('sb-8');
+        if(val === true) {
+            bar.innerText = "BOSS DEFEATED! VICTORY!"; bar.style.color = "#10b981";
+            confetti({ particleCount: 150, spread: 100 });
+        } else {
+            bar.innerText = "Super Hero Defeated. Try again!"; bar.style.color = "#ef4444";
+        }
+    };
+</script>
+</body>
+</html>

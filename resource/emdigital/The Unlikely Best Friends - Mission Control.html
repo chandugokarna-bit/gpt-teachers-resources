@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gamer Hub: The Unlikely Best Friends</title>
+    <!-- Canvas Confetti for Cracker Burst -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        :root {
+            --primary: #8b5cf6;
+            --secondary: #ec4899;
+            --bg: #f5f3ff;
+            --surface: #ffffff;
+            --text: #1e1b4b;
+            --success: #10b981;
+            --error: #ef4444;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .hub-container {
+            max-width: 950px;
+            width: 100%;
+            background: var(--surface);
+            padding: 35px;
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(139, 92, 246, 0.1);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            padding: 25px;
+            border-radius: 16px;
+            color: white;
+        }
+
+        h1 { margin: 0; font-size: 2.3rem; font-weight: 800; }
+        h2 { margin: 5px 0; font-size: 1.3rem; opacity: 0.9; }
+
+        .tab-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 35px;
+        }
+
+        @media (max-width: 768px) {
+            .tab-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        .tab {
+            background: #ede9fe;
+            color: #5b21b6;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            border-bottom: 4px solid #ddd6fe;
+        }
+
+        .tab.active {
+            background: var(--primary);
+            color: white;
+            border-bottom: 4px solid #6d28d9;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(139, 92, 246, 0.3);
+        }
+
+        .panel { display: none; }
+        .panel.active { display: block; animation: slideUp 0.4s ease; }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .quest-card {
+            background: #faf5ff;
+            border: 2px solid #f3e8ff;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 22px;
+            position: relative;
+        }
+
+        .quest-card:nth-child(even) { background: #fff5f5; border-color: #ffe4e6; }
+
+        .title-text { font-size: 1.2rem; font-weight: 700; margin-bottom: 12px; color: #4c1d95; }
+
+        .interactive-select {
+            padding: 10px 16px;
+            border-radius: 10px;
+            border: 2px solid #cbd5e1;
+            font-weight: bold;
+            color: var(--primary);
+            background: white;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        .choice-btn-grid { display: flex; flex-direction: column; gap: 8px; }
+        .choice-option {
+            padding: 12px 16px;
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        .choice-option:hover { border-color: var(--primary); background: #f5f3ff; }
+        .choice-option.selected { border-color: var(--primary); background: #ddd6fe; }
+
+        .balloon {
+            position: absolute;
+            font-size: 2rem;
+            animation: floatAway 1.4s ease-out forwards;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        @keyframes floatAway {
+            0% { transform: translateY(0) scale(0.6); opacity: 1; }
+            100% { transform: translateY(-100px) scale(1.2); opacity: 0; }
+        }
+
+        .correct { background: #d1fae5 !important; border-color: var(--success) !important; color: #065f46 !important; }
+        .incorrect { background: #fee2e2 !important; border-color: var(--error) !important; color: #991b1b !important; }
+
+        .action-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 30px;
+            padding-top: 15px;
+            border-top: 2px solid #e2e8f0;
+        }
+
+        button.verify-btn {
+            background: linear-gradient(135deg, var(--primary), #6d28d9);
+            color: white;
+            border: none;
+            padding: 14px 35px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 1rem;
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.2);
+        }
+
+        .score-badge {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: var(--secondary);
+            background: #fdf2f8;
+            padding: 8px 20px;
+            border-radius: 20px;
+            border: 2px solid #fbcfe8;
+        }
+    </style>
+</head>
+<body>
+
+<div class="hub-container">
+    <header>
+        <h1>Unit 2: Friendship</h1>
+        <h2>The Unlikely Best Friends - Mission Control</h2>
+    </header>
+
+    <div class="tab-grid">
+        <button class="tab active" onclick="switchQuest(1)">🎯 Vocab Quest</button>
+        <button class="tab" onclick="switchQuest(2)">🧩 Sentence Builder</button>
+        <button class="tab" onclick="switchQuest(3)">📖 Story Sequence</button>
+        <button class="tab" onclick="switchQuest(4)">🎭 Role Play Sim</button>
+        <button class="tab" onclick="switchQuest(5)">🕵️ Clue Hunt</button>
+        <button class="tab" onclick="switchQuest(6)">🏝️ Treasure Hunt</button>
+        <button class="tab" onclick="switchQuest(7)">🚪 Escape Room</button>
+        <button class="tab" onclick="switchQuest(8)">🎮 Mission Mode</button>
+    </div>
+
+    <div id="quest-panels"></div>
+</div>
+
+<script>
+    const gameDatabase = {
+        1: {
+            title: "Picture Vocabulary Quest",
+            type: "mcq",
+            questions: [
+                { q: "What does the action word 'Munching' look like in the stables?", o: ["Drinking cold fresh water", "Chewing food steadily", "Running around in circles"], a: 1 },
+                { q: "Identify the word for an elephant trainer or handler:", o: ["Farmer", "Mahout", "Sage"], a: 1 },
+                { q: "What does 'Strayed' mean when Buntee entered the royal stable?", o: ["Came by mistake or wandered", "Ran for a race", "Jumped high in joy"], a: 0 },
+                { q: "What is the rectangular living space for the royal elephant called?", o: ["Attic", "Booth in stables", "Open playground"], a: 1 },
+                { q: "When Buntee moved his tail from side to side, he ______ it.", o: ["Wagged", "Splashed", "Yelped"], a: 0 }
+            ]
+        },
+        2: {
+            title: "Sentence Builder Challenge",
+            type: "dropdown",
+            questions: [
+                { q: "Gajaraj the elephant ______ in the best booth of the royal stables.", o: ["lived", "was living", "had lived"], a: 0 },
+                { q: "While the elephant was bathing, the dog ______ him contextually.", o: ["accompanied", "was accompanying", "had accompanied"], a: 0 },
+                { q: "The farmer removed the rope because he ______ Buntee the day before.", o: ["tied", "was tying", "had tied"], a: 2 },
+                { q: "The mahout finish his other chores and ______ that food remained untouched.", o: ["noticed", "was noticing", "had noticed"], a: 0 },
+                { q: "Buntee and Gajaraj ______ happily together before the separation happened.", o: ["played", "were playing", "had played"], a: 2 }
+            ]
+        },
+        3: {
+            title: "Story Sequence Adventure",
+            type: "dropdown",
+            questions: [
+                { q: "Chronology 1: Gajaraj lives comfortably but is deeply sad because...", o: ["He has no friends to play with", "The food tastes very bad", "The weather is too cold"], a: 0 },
+                { q: "Chronology 2: A hungry stray dog named Buntee enters and...", o: ["Shouts at the handler", "Gajaraj pushes some food toward him", "Runs away immediately"], a: 1 },
+                { q: "Chronology 3: A passing farmer identifies his missing dog and...", o: ["Tosses a rope to take him home", "Gifts him to the king", "Leaves him there forever"], a: 0 },
+                { q: "Chronology 4: Due to intense sorrow and loneliness, both friends...", o: ["Refuse to touch their food", "Start fighting loudly", "Sleep the whole day"], a: 0 },
+                { q: "Chronology 5: The kind farmer unlocks the rope and Buntee...", o: ["Runs straight back to the stable", "Goes into the deep forest", "Barks at the mahout"], a: 0 }
+            ]
+        },
+        4: {
+            title: "Character Role Play Simulator",
+            type: "mcq",
+            questions: [
+                { q: "As GAJARAJ: How do you feel when you have no buddies despite royal comforts?", o: ["Extremely proud", "Lonely and sad", "Angry at the mahout"], a: 1 },
+                { q: "As BUNTEE: What is your response when Gajaraj shares his dinner with you?", o: ["Growl in warning", "Wag tail to convey thanks", "Run out of the stable"], a: 1 },
+                { q: "As MAHOUT: What do you do when you see Gajaraj missing his buddy?", o: ["Force him to work hard", "Understand his feelings and wait for him", "Complain to the king"], a: 1 },
+                { q: "As FARMER: What is your realization when Buntee refuses to eat at home?", o: ["He needs a new rope", "He is missing his friend Gajaraj", "He dislikes the farm"], a: 1 },
+                { q: "As BOTH FRIENDS: What happens when you unite back in the stable?", o: ["A joyous swing and satisfaction", "Total silence", "They look for more food"], a: 0 }
+            ]
+        },
+        5: {
+            title: "Mystery Clue Hunt",
+            type: "mcq",
+            questions: [
+                { q: "CLUE 1: I shrink back in pain or distress. Who am I?", o: ["Wince", "Plunge", "Stray"], a: 0 },
+                { q: "CLUE 2: We are negative connector choices like 'Neither... nor'. What do we do?", o: ["Connect positive plans", "Connect two negative choices together", "Ask a question mark"], a: 1 },
+                { q: "CLUE 3: I am a dynamic word prefix that flips 'happy' into its opposite. What am I?", o: ["dis-", "un-", "mis-"], a: 1 },
+                { q: "CLUE 4: I describe daily household or stable duties. What am I?", o: ["Chores", "Crumbs", "Booths"], a: 0 },
+                { q: "CLUE 5: I stand for the opposite of 'appeared' inside this lesson. What am I?", o: ["Disappeared", "Unappeared", "Misappeared"], a: 0 }
+            ]
+        },
+        6: {
+            title: "Treasure Hunt Quest",
+            type: "dropdown",
+            questions: [
+                { q: "Treasure Chest 1: Choose the correct opposite pairing asset:", o: ["Sad × Filled with Joy", "Kind × Tended", "Munching × Yelped"], a: 0 },
+                { q: "Treasure Chest 2: Complete: 'Neither the farmer ______ the mahout noticed the tears.'", o: ["or", "nor", "and"], a: 1 },
+                { q: "Treasure Chest 3: Complete: 'Buntee was free to go ______ to the farm or the stable.'", o: ["either", "neither", "nor"], a: 0 },
+                { q: "Treasure Chest 4: Find the word that represents a small piece of food item:", o: ["Crumb", "Trunk", "Stable"], a: 0 },
+                { q: "Treasure Chest 5: Gajaraj gave Buntee a ______ swing using his trunk asset.", o: ["joyous", "sad", "untouched"], a: 0 }
+            ]
+        },
+        7: {
+            title: "Escape Room Challenge",
+            type: "mcq",
+            questions: [
+                { q: "ROOM DOOR 1: To unlock, find the verb form used for actions already completed:", o: ["Simple Past Tense", "Past Perfect Tense", "Past Progressive Tense"], a: 1 },
+                { q: "ROOM DOOR 2: Break the lock: 'was looking' and 'was missing' belong to:", o: ["Simple Past", "Past Progressive", "Past Perfect"], a: 1 },
+                { q: "ROOM DOOR 3: Password match: 'had remaining' and 'had ordered' are profiles of:", o: ["Past Perfect Tense", "Simple Past Tense", "Present Progressive Tense"], a: 0 },
+                { q: "ROOM DOOR 4: Decrypt: Jataka tales are ancient Buddhist stories of life values and ______.", o: ["wisdom", "warfare", "indigestion"], a: 0 },
+                { q: "ROOM DOOR 5: Final Escape: Real-life elephant and dog friendship report tracked ______.", o: ["Tarra and Bella", "Gajaraj and Buntee", "Rama and Kotwal"], a: 0 }
+            ]
+        },
+        8: {
+            title: "English Mission Mode Adventure",
+            type: "dropdown",
+            questions: [
+                { q: "Mission 1: Gajaraj and Buntee had a wonderful time even if they were ______ friends.", o: ["unlikely", "dislikely", "mislikely"], a: 0 },
+                { q: "Mission 2: Buntee ______ to his feet as soon as the farmer removed the rope.", o: ["sprang", "strayed", "winced"], a: 0 },
+                { q: "Mission 3: The dog was ______ to get a ride on the elephant's back.", o: ["delighted", "concerned", "untouched"], a: 0 },
+                { q: "Mission 4: The two caretakers watched with ______ the friends eating together.", o: ["satisfaction", "indigestion", "comforts"], a: 0 },
+                { q: "Mission 5: At the end of the mission, the mahout and the farmer also became ______.", o: ["friends", "strangers", "handlers"], a: 0 }
+            ]
+        }
+    };
+
+    let logAnswers = {};
+
+    function launchGameHub() {
+        const panContainer = document.getElementById('quest-panels');
+        panContainer.innerHTML = Object.keys(gameDatabase).map(id => {
+            const current = gameDatabase[id];
+            return `
+                <div id="panel-${id}" class="panel ${id == 1 ? 'active' : ''}">
+                    <h2>Mission ${id}: ${current.title}</h2>
+                    ${current.questions.map((q, qIdx) => {
+                        let innerUi = '';
+                        if (current.type === "mcq") {
+                            innerUi = `
+                                <div class="choice-btn-grid">
+                                    ${q.o.map((opt, oIdx) => `
+                                        <div class="choice-option" id="opt-${id}-${qIdx}-${oIdx}" onclick="logClick(${id}, ${qIdx}, ${oIdx})">${opt}</div>
+                                    `).join('')}
+                                </div>`;
+                        } else if (current.type === "dropdown") {
+                            innerUi = `
+                                <select class="interactive-select" id="sel-${id}-${qIdx}" onchange="logSelect(${id}, ${qIdx})">
+                                    <option value="">-- Select Option Asset --</option>
+                                    ${q.o.map((opt, oIdx) => `<option value="${oIdx}">${opt}</option>`).join('')}
+                                </select>`;
+                        }
+
+                        return `
+                            <div class="quest-card" id="card-${id}-${qIdx}">
+                                <div class="title-text">${qIdx + 1}. ${q.q}</div>
+                                ${innerUi}
+                            </div>
+                        `;
+                    }).join('')}
+                    <div class="action-bar">
+                        <button class="verify-btn" onclick="verifyMissionAnswers(${id})">Verify Mission Answers</button>
+                        <div class="score-badge" id="score-${id}">Mission Score: -- / 5</div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    window.logClick = function(panelId, qIdx, oIdx) {
+        gameDatabase[panelId].questions[qIdx].o.forEach((_, idx) => {
+            document.getElementById(`opt-${panelId}-${qIdx}-${idx}`).classList.remove('selected');
+        });
+        document.getElementById(`opt-${panelId}-${qIdx}-${oIdx}`).classList.add('selected');
+        logAnswers[`${panelId}-${qIdx}`] = oIdx;
+    };
+
+    window.logSelect = function(panelId, qIdx) {
+        const val = document.getElementById(`sel-${panelId}-${qIdx}`).value;
+        if (val !== "") logAnswers[`${panelId}-${qIdx}`] = parseInt(val);
+    };
+
+    window.switchQuest = function(id) {
+        document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+        document.getElementById('panel-' + id).classList.add('active');
+        document.querySelectorAll('.tab')[id - 1].classList.add('active');
+    };
+
+    function deployBalloons(cardId) {
+        const targetCard = document.getElementById(cardId);
+        const b = document.createElement('div');
+        b.className = 'balloon';
+        b.innerText = '🎈';
+        b.style.left = '45%';
+        targetCard.appendChild(b);
+        setTimeout(() => b.remove(), 1400);
+    }
+
+    window.verifyMissionAnswers = function(id) {
+        const current = gameDatabase[id];
+        let correctCount = 0;
+
+        current.questions.forEach((item, qIdx) => {
+            const userChoice = logAnswers[`${id}-${qIdx}`];
+            const cardId = `card-${id}-${qIdx}`;
+            const card = document.getElementById(cardId);
+            
+            card.classList.remove('correct', 'incorrect');
+
+            if (userChoice !== undefined && userChoice === item.a) {
+                correctCount++;
+                card.classList.add('correct');
+                deployBalloons(cardId);
+            } else {
+                card.classList.add('incorrect');
+            }
+        });
+
+        document.getElementById(`score-${id}`).innerText = `Mission Score: ${correctCount} / 5`;
+        
+        if (correctCount === 5) {
+            confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 }, colors: ['#8b5cf6', '#ec4899', '#10b981'] });
+        }
+    };
+
+    launchGameHub();
+</script>
+</body>
+</html>

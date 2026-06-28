@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>World of Quadrilaterals</title>
+    <style>
+        :root {
+            --bg-dark: #070a13;
+            --card-bg: #111827;
+            --accent-cyan: #00f0ff;
+            --accent-purple: #9d4edd;
+            --accent-green: #39ff14;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: #1f2937;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+            max-width: 800px;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            color: var(--accent-cyan);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
+        }
+
+        header p {
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .main-container {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 2rem;
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        @media (max-width: 900px) {
+            .main-container { grid-template-columns: 1fr; }
+        }
+
+        .panel {
+            background-color: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+        }
+
+        h2 {
+            font-size: 1.4rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border-color);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .shape-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .shape-btn {
+            background: #1f2937;
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 1rem;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 1.05rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .shape-btn:hover, .shape-btn.active {
+            background: linear-gradient(135deg, var(--accent-cyan), #0072ff);
+            color: var(--bg-dark);
+            font-weight: bold;
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .display-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #090d16;
+            border-radius: 12px;
+            border: 1px dashed var(--accent-cyan);
+            min-height: 320px;
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+
+        svg {
+            width: 280px;
+            height: 220px;
+        }
+
+        polygon {
+            fill: rgba(0, 240, 255, 0.1);
+            stroke: var(--accent-cyan);
+            stroke-width: 4;
+            transition: all 0.5s ease;
+        }
+
+        line {
+            stroke: var(--accent-purple);
+            stroke-width: 2;
+            stroke-dasharray: 5, 5;
+            transition: all 0.5s ease;
+        }
+
+        .property-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .property-list li {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 0.8rem 1.2rem;
+            border-radius: 8px;
+            border-left: 4px solid var(--accent-green);
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
+        .property-list li b {
+            color: var(--accent-cyan);
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Digital Quadrilateral Lab</h1>
+        <p>Learn various quadrilateral shapes and their unique properties interactively.</p>
+    </header>
+
+    <div class="main-container">
+        
+        <div class="panel">
+            <h2>Select a Quadrilateral</h2>
+            <div class="shape-grid">
+                <button class="shape-btn active" onclick="loadShape('parallelogram', this)">Parallelogram</button>
+                <button class="shape-btn" onclick="loadShape('rectangle', this)">Rectangle</button>
+                <button class="shape-btn" onclick="loadShape('square', this)">Square</button>
+                <button class="shape-btn" onclick="loadShape('rhombus', this)">Rhombus</button>
+                <button class="shape-btn" onclick="loadShape('trapezium', this)">Trapezium</button>
+                <button class="shape-btn" onclick="loadShape('kite', this)">Kite</button>
+            </div>
+            
+            <div style="margin-top: 1.5rem; font-size: 0.9rem; color: var(--text-muted); background: #090d16; padding: 10px; border-radius: 8px;">
+                💡 <b>Teacher's Note:</b> Compare how the diagonals of each shape bisect each other and explain the differences between side properties on the whiteboard.
+            </div>
+        </div>
+
+        <div class="panel">
+            <h2>
+                <span id="shape-title" style="color: var(--accent-green);">Parallelogram</span>
+                <span style="font-size: 0.9rem; color: var(--text-muted); margin-left: 10px;">Properties</span>
+            </h2>
+
+            <div class="display-box">
+                <svg viewBox="0 0 300 240">
+                    <polygon id="quad-shape" points="60,180 240,180 270,60 90,60" />
+                    <line id="diag-1" x1="60" y1="180" x2="270" y2="60" />
+                    <line id="diag-2" x1="240" y1="180" x2="90" y2="60" />
+                </svg>
+            </div>
+
+            <ul class="property-list" id="property-container">
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        const quadrilateralData = {
+            parallelogram: {
+                title: "Parallelogram",
+                points: "60,180 240,180 270,60 90,60",
+                d1: {x1: 60, y1: 180, x2: 270, y2: 60},
+                d2: {x1: 240, y1: 180, x2: 90, y2: 60},
+                properties: [
+                    "<b>Opposite Sides:</b> Opposite sides are equal and parallel.",
+                    "<b>Opposite Angles:</b> Opposite angles are equal.",
+                    "<b>Diagonals:</b> Diagonals bisect each other.",
+                    "<b>Consecutive Angles:</b> Any two consecutive angles are supplementary (sum to 180°)."
+                ]
+            },
+            rectangle: {
+                title: "Rectangle",
+                points: "60,180 240,180 240,60 60,60",
+                d1: {x1: 60, y1: 180, x2: 240, y2: 60},
+                d2: {x1: 240, y1: 180, x2: 60, y2: 60},
+                properties: [
+                    "<b>Sides:</b> Opposite sides are equal.",
+                    "<b>Angles:</b> Each interior angle is 90° (Right angle).",
+                    "<b>Diagonals:</b> Diagonals are equal in length and bisect each other."
+                ]
+            },
+            square: {
+                title: "Square",
+                points: "70,180 190,180 190,60 70,60",
+                d1: {x1: 70, y1: 180, x2: 190, y2: 60},
+                d2: {x1: 190, y1: 180, x2: 70, y2: 60},
+                properties: [
+                    "<b>Sides:</b> All four sides are equal in length.",
+                    "<b>Angles:</b> All angles are 90°.",
+                    "<b>Diagonals:</b> Diagonals are equal and bisect each other at 90°."
+                ]
+            },
+            rhombus: {
+                title: "Rhombus",
+                points: "150,200 240,120 150,40 60,120",
+                d1: {x1: 150, y1: 200, x2: 150, y2: 40},
+                d2: {x1: 240, y1: 120, x2: 60, y2: 120},
+                properties: [
+                    "<b>Sides:</b> All four sides are equal and opposite sides are parallel.",
+                    "<b>Angles:</b> Opposite angles are equal.",
+                    "<b>Diagonals:</b> Diagonals bisect each other at 90°, but their lengths are not equal."
+                ]
+            },
+            trapezium: {
+                title: "Trapezium",
+                points: "50,180 260,180 200,60 100,60",
+                d1: {x1: 50, y1: 180, x2: 200, y2: 60},
+                d2: {x1: 260, y1: 180, x2: 100, y2: 60},
+                properties: [
+                    "<b>Sides:</b> Only one pair of opposite sides is parallel.",
+                    "<b>Special Case:</b> If the non-parallel sides are equal, it is called an 'Isosceles Trapezium'."
+                ]
+            },
+            kite: {
+                title: "Kite",
+                points: "150,210 230,110 150,40 70,110",
+                d1: {x1: 150, y1: 210, x2: 150, y2: 40},
+                d2: {x1: 230, y1: 110, x2: 70, y2: 110},
+                properties: [
+                    "<b>Sides:</b> Two pairs of adjacent sides are equal in length.",
+                    "<b>Diagonals:</b> Diagonals intersect at 90°, and one diagonal bisects the other."
+                ]
+            }
+        };
+
+        function loadShape(shapeKey, buttonElement) {
+            document.querySelectorAll('.shape-btn').forEach(btn => btn.classList.remove('active'));
+            if(buttonElement) buttonElement.classList.add('active');
+
+            const data = quadrilateralData[shapeKey];
+
+            document.getElementById('shape-title').innerText = data.title;
+            document.getElementById('quad-shape').setAttribute('points', data.points);
+
+            const d1 = document.getElementById('diag-1');
+            d1.setAttribute('x1', data.d1.x1);
+            d1.setAttribute('y1', data.d1.y1);
+            d1.setAttribute('x2', data.d1.x2);
+            d1.setAttribute('y2', data.d1.y2);
+
+            const d2 = document.getElementById('diag-2');
+            d2.setAttribute('x1', data.d2.x1);
+            d2.setAttribute('y1', data.d2.y1);
+            d2.setAttribute('x2', data.d2.x2);
+            d2.setAttribute('y2', data.d2.y2);
+
+            const container = document.getElementById('property-container');
+            container.innerHTML = '';
+            data.properties.forEach(prop => {
+                const li = document.createElement('li');
+                li.innerHTML = prop;
+                container.appendChild(li);
+            });
+        }
+
+        window.onload = function() {
+            loadShape('parallelogram', null);
+        };
+    </script>
+</body>
+</html>
