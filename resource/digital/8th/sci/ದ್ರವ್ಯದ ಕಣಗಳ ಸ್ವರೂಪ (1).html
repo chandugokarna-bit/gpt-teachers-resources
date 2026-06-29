@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ದ್ರವ್ಯದ ಕಣಗಳ ಸ್ವರೂಪ: ಸಂವಾದಾತ್ಮಕ ಕ್ವಾಂಟಮ್ ಸ್ಯಾಂಡ್‌ಬಾಕ್ಸ್</title>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --secondary: #22d3ee;
+            --accent: #f43f5e;
+            --solid-color: #38bdf8;
+            --liquid-color: #fbbf24;
+            --gas-color: #34d399;
+            --bg-dark: #090d16;
+            --card-dark: #151f32;
+            --text-light: #f8fafc;
+            --text-muted: #94a3b8;
+            --success: #10b981;
+            --danger: #ef4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            padding: 25px 15px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1150px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            background: linear-gradient(135deg, #0f172a, #1e1b4b);
+            padding: 25px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+        }
+
+        header h1 {
+            font-size: 2.1rem;
+            background: linear-gradient(to right, #a78bfa, #22d3ee);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+
+        /* 6-Category Navigation System */
+        .game-nav {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .nav-btn {
+            background: var(--card-dark);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            color: var(--text-muted);
+            padding: 14px 8px;
+            border-radius: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            font-size: 0.85rem;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .nav-btn span {
+            font-size: 1.4rem;
+        }
+
+        .nav-btn:hover {
+            background: #1e2d4a;
+            color: var(--text-light);
+            transform: translateY(-2px);
+        }
+
+        .nav-btn.active {
+            background: linear-gradient(135deg, var(--primary), #4338ca);
+            color: white;
+            border-color: #818cf8;
+            box-shadow: 0 0 15px rgba(99, 102, 241, 0.4);
+        }
+
+        /* Layout Main Workspace Workspace */
+        .main-workspace {
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 25px;
+        }
+
+        @media (max-width: 850px) {
+            .main-workspace {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .panel {
+            background: var(--card-dark);
+            border-radius: 20px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 4px 25px rgba(0,0,0,0.3);
+        }
+
+        .panel-title {
+            font-size: 1.2rem;
+            color: var(--secondary);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 10px;
+            font-weight: 600;
+        }
+
+        /* Sandbox Canvas Viewport Display */
+        .sandbox-display {
+            background: #040711;
+            height: 280px;
+            border-radius: 16px;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .canvas-container {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Info Explanation Card */
+        .info-card {
+            margin-top: 15px;
+            background: rgba(34, 211, 238, 0.05);
+            border-left: 4px solid var(--secondary);
+            padding: 12px;
+            border-radius: 0 10px 10px 0;
+            font-size: 0.9rem;
+            line-height: 1.45;
+        }
+
+        /* Dynamic Quiz Testing Interface System */
+        .quiz-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .question-card {
+            display: none;
+        }
+
+        .question-card.active {
+            display: block;
+            animation: slideIn 0.35s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .question-text {
+            font-size: 1.05rem;
+            font-weight: 500;
+            margin-bottom: 16px;
+            line-height: 1.4;
+        }
+
+        .option-btn {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: var(--text-light);
+            padding: 14px 16px;
+            border-radius: 12px;
+            text-align: left;
+            cursor: pointer;
+            margin-bottom: 10px;
+            transition: all 0.2s ease;
+            font-size: 0.95rem;
+        }
+
+        .option-btn:hover {
+            background: rgba(255, 255, 255, 0.07);
+            border-color: var(--text-muted);
+            transform: translateX(4px);
+        }
+
+        .option-btn.correct {
+            background: rgba(16, 185, 129, 0.18) !important;
+            border-color: var(--success) !important;
+            color: #34d399;
+            font-weight: 600;
+        }
+
+        .option-btn.wrong {
+            background: rgba(239, 68, 68, 0.18) !important;
+            border-color: var(--danger) !important;
+            color: #f87171;
+        }
+
+        .score-hud {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #0f172a;
+            padding: 12px 16px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            border: 1px solid rgba(99, 102, 241, 0.25);
+        }
+
+        .score-hud span.score-val {
+            color: #a78bfa;
+        }
+
+        /* Controls Deck Layout */
+        .interactive-widget {
+            margin-top: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .slider-control {
+            width: 100%;
+            accent-color: var(--secondary);
+            cursor: pointer;
+            margin-top: 4px;
+        }
+
+        /* Group buttons style for state selectors */
+        .state-selector-group {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 5px;
+        }
+
+        .state-btn {
+            flex: 1;
+            background: #1e2d4a;
+            border: 1px solid rgba(255,255,255,0.1);
+            color: var(--text-muted);
+            padding: 8px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .state-btn:hover {
+            background: #27395e;
+            color: var(--text-light);
+        }
+
+        .state-btn.active-state {
+            background: var(--secondary);
+            color: #090d16;
+            border-color: #22d3ee;
+        }
+
+        .action-btn {
+            background: linear-gradient(135deg, #06b6d4, #0891b2);
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s;
+            margin-top: 4px;
+        }
+        .action-btn:hover { opacity: 0.9; }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 6px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 3px;
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            width: 25%;
+            background: var(--secondary);
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>🔬 ದ್ರವ್ಯದ ಕಣಗಳ ಸ್ವರೂಪದ ಪ್ರಾಯೋಗಿಕ ಸಿಮ್ಯುಲೇಶನ್ ಪ್ರಯೋಗಾಲಯ</h1>
+            <p>ಅಣುಗಳ ರಚನೆ, ಚಲನ ಶಕ್ತಿ, ಪ್ರಸರಣ ಸ್ಥಿತಿಗಳನ್ನು ಅನ್ವೇಷಿಸಿ ಮತ್ತು ರಸಪ್ರಶ್ನೆಗಳನ್ನು ಪೂರ್ಣಗೊಳಿಸಿ</p>
+        </header>
+
+        <div class="game-nav">
+            <button class="nav-btn active" onclick="switchActivity(1)">
+                <span>💎</span>ಹಂತ 1: ಘನ ಜಾಲರಿ
+            </button>
+            <button class="nav-btn" onclick="switchActivity(2)">
+                <span>💧</span>ಹಂತ 2: ದ್ರವ ಪ್ರವಾಹ
+            </button>
+            <button class="nav-btn" onclick="switchActivity(3)">
+                <span>☁️</span>ಹಂತ 3: ಅನಿಲ ಅಸ್ತವ್ಯಸ್ತತೆ
+            </button>
+            <button class="nav-btn" onclick="switchActivity(4)">
+                <span>🔥</span>ಹಂತ 4: ಉಷ್ಣ ಶಕ್ತಿ
+            </button>
+            <button class="nav-btn" onclick="switchActivity(5)">
+                <span>🧪</span>ಹಂತ 5: ಪ್ರಸರಣ ದರಗಳು
+            </button>
+            <button class="nav-btn" onclick="switchActivity(6)">
+                <span>💉</span>ಹಂತ 6: ಸಂಕೋಚನ
+            </button>
+        </div>
+
+        <div class="main-workspace">
+            
+            <div class="panel">
+                <div class="panel-title" id="sandbox-title">💎 ಘನ ಸ್ಥಿತಿಯ ಕಠಿಣ ಜಾಲರಿ ಮ್ಯಾಟ್ರಿಕ್ಸ್</div>
+                
+                <div class="sandbox-display">
+                    <canvas id="particleCanvas" class="canvas-container"></canvas>
+                </div>
+
+                <div class="interactive-widget" id="sandbox-control-block">
+                    <div id="additional-controls"></div>
+                    
+                    <label id="slider-label" style="font-size:0.85rem; font-weight:600; color:var(--text-muted);">ಕಂಪನದ ವೈಶಾಲ್ಯ (ಶಕ್ತಿಯ ಹೊಂದಾಣಿಕೆ):</label>
+                    <input type="range" id="param-slider" class="slider-control" min="1" max="100" value="10" oninput="executeSimulationAdjustment()">
+
+                    <div class="info-card" id="sandbox-explanation">
+                        ಘನಪದಾರ್ಥಗಳಲ್ಲಿ, ಕಣಗಳು ತಮ್ಮ ನಡುವೆ ಅತ್ಯಲ್ಪ ಜಾಗವನ್ನು ಹೊಂದಿದ್ದು, ನಿರ್ದಿಷ್ಟ ಜ್ಯಾಮಿತೀಯ ಸ್ಥಳಗಳಲ್ಲಿ ಬಿಗಿಯಾಗಿ ಜೋಡಿಸಲ್ಪಟ್ಟಿರುತ್ತವೆ. ಅವು ತಮ್ಮ ಸ್ಥಾನಗಳನ್ನು ಬದಲಾಯಿಸಲು ಸಾಧ್ಯವಿಲ್ಲ ಆದರೆ ಒಂದೇ ಸ್ಥಳದಲ್ಲಿ ನಿರಂತರವಾಗಿ ಕಂಪಿಸುತ್ತಿರುತ್ತವೆ.
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel quiz-container">
+                <div class="panel-title">🏆 ಸಕ್ರಿಯ ಜ್ಞಾನ ಪರೀಕ್ಷಾ ಮ್ಯಾಟ್ರಿಕ್ಸ್</div>
+                
+                <div class="score-hud">
+                    <div>ಪ್ರಗತಿ ಹಂತ: <span id="progress-hud-text">1 / 4</span></div>
+                    <div>ಗಳಿಸಿದ ಅಂಕಗಳು: <span id="score-counter" class="score-val">0</span> XP</div>
+                </div>
+
+                <div class="progress-bar-container">
+                    <div id="progress-indicator" class="progress-fill"></div>
+                </div>
+
+                <div id="quiz-deck-wrapper">
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        const comprehensiveActivities = {
+            1: {
+                title: "💎 ಘನ ಸ್ಥಿತಿಯ ಕಠಿಣ ಜಾಲರಿ ಮ್ಯಾಟ್ರಿಕ್ಸ್",
+                explanation: "ಘನಪದಾರ್ಥಗಳಲ್ಲಿ, ಕಣಗಳು ತಮ್ಮ ನಡುವೆ ಅತ್ಯಲ್ಪ ಜಾಗವನ್ನು ಹೊಂದಿದ್ದು, ನಿರ್ದಿಷ್ಟ ಜ್ಯಾಮಿತೀಯ ಸ್ಥಳಗಳಲ್ಲಿ ಬಿಗಿಯಾಗಿ ಜೋಡಿಸಲ್ಪಟ್ಟಿರುತ್ತವೆ. ಅವು ಮುಕ್ತವಾಗಿ ಚಲಿಸಲು ಸಾಧ್ಯವಿಲ್ಲ ಆದರೆ ಒಂದೇ ಸ್ಥಳದಲ್ಲಿ ನಿರಂತರವಾಗಿ ಕಂಪಿಸುತ್ತಿರುತ್ತವೆ, ಇದರಿಂದಾಗಿ ಅವು ನಿರ್ದಿಷ್ಟ ಆಕಾರ ಮತ್ತು ಸ್ಥಿರ ಗಾತ್ರವನ್ನು ಕಾಯ್ದುಕೊಳ್ಳುತ್ತವೆ.",
+                sliderText: "ಕಂಪನದ ವೈಶಾಲ್ಯ (ಶಕ್ತಿಯ ಹೊಂದಾಣಿಕೆ):",
+                initSliderVal: 10,
+                questions: [
+                    { q: "ಘನವಸ್ತುವಿನಲ್ಲಿರುವ ಕಣಗಳ ರಚನಾತ್ಮಕ ಜೋಡಣೆಯನ್ನು ಈ ಕೆಳಗಿನ ಯಾವ ಹೇಳಿಕೆಯು ಅತ್ಯುತ್ತಮವಾಗಿ ವಿವರಿಸುತ್ತದೆ?", o: ["ಕಣಗಳು ನಿರ್ದಿಷ್ಟ ಸ್ಥಳಗಳಲ್ಲಿ ಬಿಗಿಯಾಗಿ ಜೋಡಿಸಲ್ಪಟ್ಟಿದ್ದು ಒಂದೇ ಕಡೆ ಕಂಪಿಸುತ್ತಿರುತ್ತವೆ", "ಕಣಗಳು ದೂರವಿದ್ದು ಸಂಪೂರ್ಣವಾಗಿ ಯಾದೃಚ್ಛಿಕವಾಗಿ ಹಾರಾಡುತ್ತಿರುತ್ತವೆ", "ಕಣಗಳು ನಿರಂತರವಾಗಿ ತಮ್ಮ ಗುರುತು ಮತ್ತು ಗಾತ್ರವನ್ನು ಬದಲಾಯಿಸುತ್ತಿರುತ್ತವೆ"], c: 0 },
+                    { q: "ಘನಪದಾರ್ಥಗಳು ನಿರ್ದಿಷ್ಟ ಆಕಾರ ಮತ್ತು ಸ್ಥಿರ ಗಾತ್ರವನ್ನು ಹೊಂದಿರಲು ಕಾರಣವೇನು?", o: ["ಬಲವಾದ ಆಕರ್ಷಣಾ ಬಲಗಳು ಬಿಗಿಯಾಗಿ ಜೋಡಿಸಲ್ಪಟ್ಟಿರುವ ಕಣಗಳನ್ನು ಒಂದೇ ಸ್ಥಳದಲ್ಲಿ ಹಿಡಿದಿಟ್ಟಿರುತ್ತವೆ", "ಘನಪದಾರ್ಥಗಳು ಶೂನ್ಯ ದ್ರವ್ಯದ ಕಣಗಳನ್ನು ಹೊಂದಿರುತ್ತವೆ", "ಕಣಗಳು ರೂಪವನ್ನು ಬದಲಾಯಿಸಲು ಸಾಧ್ಯವಾಗದಷ್ಟು ಅತಿ ವೇಗವಾಗಿ ಚಲಿಸುತ್ತವೆ"], c: 0 },
+                    { q: "ಒಂದು ಘನವಾದ ಬ್ಲಾಕ್ ಅನ್ನು ಭಾರವಾದ ಸುತ್ತಿಗೆಯಿಂದ ಬಲವಾಗಿ ಹೊಡೆದರೆ ಕಣಗಳ ರಚನೆಗೆ ಏನಾಗುತ್ತದೆ?", o: ["ಕಠಿಣವಾದ ಸ್ಪಟಿಕದಂತಹ ವಿನ್ಯಾಸವು ಬಿರುಕು ಬಿಡುತ್ತದೆ ಅಥವಾ ಒಡೆದು ಚೂರಾಗುತ್ತದೆ", "ಕಣಗಳು ತಕ್ಷಣವೇ ಸಣ್ಣ ಅನಿಲ ಗುಳ್ಳೆಗಳಾಗಿ ಬದಲಾಗುತ್ತವೆ", "ಕಣಗಳ ನಡುವಿನ ಅಂತರವು ಸಂಪೂರ್ಣ ಶೂನ್ಯ ಪ್ರದೇಶವಾಗಿ ವಿಸ್ತರಿಸುತ್ತದೆ"], c: 0 },
+                    { q: "ಸಾಮಾನ್ಯ ತಾಪಮಾನದಲ್ಲಿ ಘನವಸ್ತುವಿನ ಒಳಗಿರುವ ಕಣಗಳು ಸ್ವಯಂಪ್ರೇರಿತವಾಗಿ ಸ್ಥಾನಗಳನ್ನು ಬದಲಾಯಿಸಬಲ್ಲವೇ?", o: ["ಇಲ್ಲ, ಅವು ಕೇವಲ ತಮ್ಮ ನಿಗದಿತ ಸರಾಸರಿ ಸ್ಥಾನಗಳ ಸುತ್ತ ಕಂಪಿಸುತ್ತವೆ", "ಹೌದು, ಅವು ಜಾಲರಿಯ ಮೇಲ್ಮೈಯಲ್ಲಿ ಹರಿಯುವ ನದಿಗಳಂತೆ ಚಲಿಸುತ್ತವೆ", "ಕೇವಲ ಘನವಸ್ತುವಿಗೆ ಗಾಢವಾದ ಬಣ್ಣವನ್ನು ಬಳಿದಾಗ幕 ಮಾತ್ರ ಸಾಧ್ಯ"], c: 0 }
+                ]
+            },
+            2: {
+                title: "💧 ದ್ರವ ಸ್ಥಿತಿಯ ಸ್ಥಳಾಂತರ ಪ್ರವಾಹ ಕ್ಷೇತ್ರ",
+                explanation: "ದ್ರವಗಳಲ್ಲಿನ ಕಣಗಳು ಹತ್ತಿರದಲ್ಲಿದ್ದರೂ ಕಠಿಣವಾದ ರಚನೆಯನ್ನು ಹೊಂದಿರುವುದಿಲ್ಲ. ಕಣಗಳ ನಡುವಿನ ಅಂತರವು ಘನವಸ್ತುಗಳಿಗಿಂತ ಸ್ವಲ್ಪ ಹೆಚ್ಚಾಗಿರುತ್ತದೆ, ಇದರಿಂದಾಗಿ ಕಣಗಳು ಯಾವುದೇ ಪಾತ್ರೆಯ ಆಕಾರವನ್ನು ಪಡೆಯಲು ಒಂದರ ಮೇಲೊಂದು ಜಾರಬಲ್ಲವು.",
+                sliderText: "ದ್ರವ ಚಲನೆ ಶರವೇಗ (ವೇಗದ ಮಾರ್ಪಡಕ):",
+                initSliderVal: 30,
+                questions: [
+                    { q: "ದ್ರವಗಳು ಸುಲಭವಾಗಿ ಹರಿದು ಸಂಪೂರ್ಣವಾಗಿ ವಿಭಿನ್ನವಾಗಿರುವ ಪಾತ್ರೆಗಳ ಆಕಾರಕ್ಕೆ ಹೊಂದಿಕೊಳ್ಳಲು ಕಾರಣವೇನು?", o: ["ಕಣಗಳು ನಿರ್ದಿಷ್ಟ ಸ್ಥಳಗಳಲ್ಲಿ ಬಂಧಿಸಲ್ಪಟ್ಟಿಲ್ಲ ಮತ್ತು ಒಂದರ ಮೇಲೊಂದು ಜಾರಬಲ್ಲವು", "ದ್ರವವನ್ನು ಸುರಿದಾಗ ಅದರ ಕಣಗಳ ಗಾತ್ರವು ಗಣನೀಯವಾಗಿ ಕುಗ್ಗುತ್ತದೆ", "ಅವು ಪಕ್ಕದ ಕಣಗಳ ನಡುವೆ ಅನಂತವಾದ ಜಾಗವನ್ನು ಹೊಂದಿರುತ್ತವೆ"], c: 0 },
+                    { q: "ದ್ರವದಲ್ಲಿನ ಕಣಗಳ ನಡುವಿನ ಅಂತರವು ಘನಸ್ಥಿತಿಗೆ ಹೋಲಿಸಿದರೆ ಸಾಮಾನ್ಯವಾಗಿ ಹೇಗಿರುತ್ತದೆ?", o: ["ಘನವಸ್ತುಗಳಿಗಿಂತ ಸ್ವಲ್ಪ ದೊಡ್ಡದಾಗಿದ್ದು, ಮಧ್ಯಮ ಚಲನೆಯ ಸ್ವಾತಂತ್ರ್ಯವನ್ನು ನೀಡುತ್ತದೆ", "ಘನವಸ್ತುಗಳಿಗಿಂತ ಅನಂತ ಪಟ್ಟು ಚಿಕ್ಕದಾಗಿರುತ್ತದೆ", "ಕಠಿಣತೆಯ ಗುಣಲಕ್ಷಣಗಳಲ್ಲಿ ಪೂರ್ಣವಾಗಿ ಹೋಲುತ್ತದೆ"], c: 0 },
+                    { q: "ತೆರೆದ ಫ್ಲಾಸ್ಕ್‌ನಲ್ಲಿ ಇರಿಸಲಾದ ದ್ರವದ ಮಾದರಿಯಲ್ಲಿ ಈ ಕೆಳಗಿನ ಯಾವ ಗುಣಲಕ್ಷಣವು ಸ್ಥಿರವಾಗಿರುತ್ತದೆ?", o: ["ಅದರ ಒಟ್ಟು ಗಾತ್ರ (Volume)", "ಅದರ ಜ್ಯಾಮಿತೀಯ ಆಕಾರದ ಸಂರಚನೆ", "ಅದರ ಸಂಪೂರ್ಣ ರಾಸಾಯನಿಕ ಮೇಲ್ಮೈ ಸೆಳೆತ"], c: 0 },
+                    { q: "ಈಜುಕೊಳದ ಒಳಗಿನ ನೀರಿನಲ್ಲಿ ನಿಮ್ಮ ಕೈಯನ್ನು ಸುಲಭವಾಗಿ ಚಲಿಸಲು ಯಾವುದು ಸಹಾಯ ಮಾಡುತ್ತದೆ?", o: ["ದ್ರವದ ಕಣಗಳನ್ನು ಹಿಡಿದಿಟ್ಟುಕೊಳ್ಳುವ ಬಲಗಳು ಘನವಸ್ತುಗಳಿಗಿಂತ ದುರ್ಬಲವಾಗಿವೆ", "ನೀರು ಯಾವುದೇ ನೈಜ ದ್ರವ್ಯರಾಶಿ ಇಲ್ಲದ ಕೇವಲ ಕಾಲ್ಪನಿಕ ಶಕ್ತಿಯಿಂದ ಮಾಡಲ್ಪಟ್ಟಿದೆ", "ಚರ್ಮದ ಸಂಪರ್ಕಕ್ಕೆ ಬಂದ ತಕ್ಷಣ ದ್ರವದ ಕಣಗಳು ಆವಿಯಾಗುತ್ತವೆ"], c: 0 }
+                ]
+            },
+            3: {
+                title: "☁️ ಅನಿಲ ಸ್ಥಿತಿಯ ಅಸ್ತವ್ಯಸ್ತ ಪ್ರಸರಣ ಮೋಡ",
+                explanation: "ಅನಿಲ ಕಣಗಳು ವಿಶಾಲವಾದ ಅಂತರದಿಂದ ಬೇರ್ಪಟ್ಟಿದ್ದು, ಅವುಗಳ ನಡುವೆ ಅತ್ಯಲ್ಪ ಆಕರ್ಷಣಾ ಬಲ ಇರುತ್ತದೆ. ಅವು ಎಲ್ಲಾ ದಿಕ್ಕುಗಳಲ್ಲಿಯೂ ಯಾದೃಚ್ಛಿಕವಾಗಿ ವೇಗವಾಗಿ ಚಲಿಸುತ್ತಾ, ಯಾವುದೇ ಮುಚ್ಚಿದ ಜಾಗವನ್ನು ಸಂಪೂರ್ಣವಾಗಿ ತುಂಬುತ್ತವೆ.",
+                sliderText: "ಚಲನ ಶಕ್ತಿ ಚದುರುವಿಕೆ ವೇಗ (ದಾರಿ ತಪ್ಪಿಸುವ ಗುಣಕ):",
+                initSliderVal: 40,
+                questions: [
+                    { q: "ಅನಿಲ ದ್ರವ್ಯದ ಒಳಗಿರುವ ಕಣಗಳ ಚಲನೆಯ ವೇಗವನ್ನು ಯಾವ ಪ್ರಮುಖ ಕಾರ್ಯವಿಧಾನವು ಗುರುತಿಸುತ್ತದೆ?", o: ["ಎಲ್ಲಾ ದಿಕ್ಕುಗಳಲ್ಲಿಯೂ ಹೆಚ್ಚಿನ ವೇಗದಲ್ಲಿ ತೀವ್ರವಾದ, ನಿರಂತರ ಯಾದೃಚ್ಛಿಕ ಚಲನೆ", "ಚಲನ ಶಕ್ತಿಯಿಲ್ಲದೆ ಸಂಪೂರ್ಣವಾಗಿ ಒಂದೇ ಕಡೆ ನಿಶ್ಚಲವಾಗಿರುವುದು", "ಸ್ಥಿರ ಬಿಂದುಗಳ ಸುತ್ತ ರಿದಮಿಕ್ ಆದ ಸಿಂಕ್ರೊನೈಸ್ಡ್ ಕಕ್ಷೆಯ ಮಾದರಿಗಳು"], c: 0 },
+                    { q: "ಅನಿಲದ ಮಾದರಿಯು ಯಾವುದೇ ಪಾತ್ರೆಯ ಸಂಪೂರ್ಣ ಜಾಗವನ್ನು ಆಕ್ರಮಿಸಲು ತಕ್ಷಣವೇ ವಿಸ್ತರಿಸಲು ಕಾರಣವೇನು?", o: ["ಕಣಗಳ ನಡುವಿನ ಬಲಗಳು ಅತ್ಯಲ್ಪವಾಗಿದ್ದು, ಸಂಪೂರ್ಣವಾಗಿ ಚದುರಿಹೋಗಲು ಅನುವು ಮಾಡಿಕೊಡುತ್ತವೆ", "ಅನಿಲ ಕಣಗಳು ನಿರಂತರವಾಗಿ ದ್ರವ್ಯರಾಶಿಯ ಗಾತ್ರದಲ್ಲಿ ದ್ವಿಗುಣಗೊಳ್ಳುತ್ತವೆ", "ವಾತಾವರಣದ ಶೂನ್ಯತೆಯು ಅವುಗಳನ್ನು ಪದೇ ಪದೇ ನಕಲು ಮಾಡಲು ಒತ್ತಾಯಿಸುತ್ತದೆ"], c: 0 },
+                    { q: "ಅನಿಲಗಳಲ್ಲಿನ ಕಣಗಳ ನಡುವಿನ ಅಂತರವು ಘನ ಮತ್ತು ದ್ರವ ರಚನೆಗಳಿಗೆ ಹೋಲಿಸಿದರೆ ಹೇಗಿರುತ್ತದೆ?", o: ["ಅನಿಲಗಳು ಘನ ಮತ್ತು ದ್ರವಗಳಿಗಿಂತ ಗಮನಾರ್ಹವಾಗಿ ದೊಡ್ಡದಾದ ಕಣಗಳ ನಡುವಿನ ಅಂತರವನ್ನು ಹೊಂದಿವೆ", "ಅನಿಲಗಳ ಕಣಗಳ ನಡುವೆ ಯಾವುದೇ ಅಂತರವಿರುವುದಿಲ್ಲ", "ಅನಿಲಗಳು ದ್ರವದ ಅಂತರದ ಮೌಲ್ಯಗಳನ್ನು ನ್ಯಾನೊಮೀಟರ್‌ವರೆಗೂ ನಿಖರವಾಗಿ ಹೋಲುತ್ತವೆ"], c: 0 },
+                    { q: "ಸ್ಥಿತಿಸ್ಥಾಪಕ ಸಿಲಿಂಡರ್ ಪಾತ್ರೆಯೊಳಗೆ ಅನಿಲವನ್ನು ಬಂಧಿಸಿದರೆ, ಪಾತ್ರೆಯ ಗೋಡೆಗಳ ಮೇಲೆ ಒತ್ತಡವನ್ನು ಉಂಟುಮಾಡುವುದು ಯಾವುದು?", o: ["ವೇಗವಾಗಿ ಚಲಿಸುವ ಕಣಗಳು ಆಂತರಿಕ ಮೇಲ್ಮೈಗಳ ಮೇಲೆ ನಿರಂತರವಾಗಿ ಯಾದೃಚ್ಛಿಕವಾಗಿ ಡಿಕ್ಕಿ ಹೊಡೆಯುವುದು", "ಲೋಹದ ಚೌಕಟ್ಟಿನ ಕೊಂಡಿಗಳನ್ನು ತಿನ್ನುವ ರಾಸಾಯನಿಕ ತುಕ್ಕು", "ಬಾಹ್ಯ ಅನಿಲ ಗಡಿಗಳ ಸ್ಥಿರ ತೂಕದ ಹೊರೆ"], c: 0 }
+                ]
+            },
+            4: {
+                title: "🔥 ಉಷ್ಣ ಚಲನ ಶಕ್ತಿ ಸಕ್ರಿಯಗೊಳಿಸುವ ಇಂಜಿನ್",
+                explanation: "ಉಷ್ಣ ಶಕ್ತಿಯನ್ನು (ಶಾಖ) ಒದಗಿಸುವುದರಿಂದ ಕಣಗಳ ಚಲನ ವೇಗ ಹೆಚ್ಚಾಗುತ್ತದೆ. ಇದು ಆಕರ್ಷಣಾ ಬಲಗಳನ್ನು ಜಯಿಸುತ್ತದೆ, ಇದರಿಂದಾಗಿ ಘನದಿಂದ ದ್ರವಕ್ಕೆ ಮತ್ತು ದ್ರವದಿಂದ ಅನಿಲಕ್ಕೆ ಸ್ಥಿತ್ಯಂತರಗಳು ಉಂಟಾಗುತ್ತವೆ.",
+                sliderText: "ಉಷ್ಣದ ಇನ್‌ಪುಟ್ (ಉಷ್ಣ ಶಕ್ತಿಯ ಪ್ರಮಾಣ):",
+                initSliderVal: 20,
+                questions: [
+                    { q: "ನೀವು ಶಾಖದ ಶಕ್ತಿಯನ್ನು ಅನ್ವಯಿಸಿದಾಗ ದ್ರವ್ಯದ ಕಣಗಳ ಒಳಗಿನ ಯಾವ ಮೂಲಭೂತ ಗುಣಲಕ್ಷಣವು ಬದಲಾಗುತ್ತದೆ?", o: ["ಅವುಗಳ ಚಲನ ಶಕ್ತಿಯು ಹೆಚ್ಚಾಗುತ್ತದೆ, ಇದರಿಂದ ಕಣಗಳು ವೇಗವಾಗಿ ಚಲಿಸುತ್ತವೆ", "ಕಣಗಳು ತಮ್ಮ ವೈಯಕ್ತಿಕ ಭೌತಿಕ ತೂಕದ ವಿಶೇಷಣಗಳಲ್ಲಿ ಹೆಚ್ಚಾಗುತ್ತವೆ", "ಅವುಗಳ ಪರಮಾಣು ನ್ಯೂಕ್ಲಿಯಸ್‌ಗಳು ಕರಗಿ ವಿದ್ಯುತ್ಕಾಂತೀಯ ವಿಕಿರಣದ ಕೊಳಗಳಾಗುತ್ತವೆ"], c: 0 },
+                    { q: "ಕಾಯಿಸಿದಾಗ ಘನವಾದ ಬ್ಲಾಕ್ ಅಂತಿಮವಾಗಿ ದ್ರವ ಸ್ಥಿತಿಗೆ ಹೇಗೆ ಪರಿವರ್ತನೆಯಾಗುತ್ತದೆ?", o: ["ತೀವ್ರವಾದ ಉಷ್ಣ ಕಂಪನಗಳು ಕಠಿಣವಾದ ಕಣಗಳ ಜಾಲರಿಯ ಬಂಧಗಳನ್ನು ಮುರಿಯುತ್ತವೆ", "ಕಣಗಳು ತಣ್ಣಗಾಗುವವರೆಗೆ ಅಸ್ತಿತ್ವದಿಂದಲೇ ಮಾಯವಾಗುತ್ತವೆ", "ವಸ್ತುವು ನೇರವಾಗಿ ಗಾಳಿಯಿಂದ ಸಾರಜನಕ ಅಣುಗಳನ್ನು ಹೀರಿಕೊಳ್ಳುತ್ತದೆ"], c: 0 },
+                    { q: "ನೀವು ಅನಿಲದ ಮೋಡವನ್ನು ವಿಪರೀತ ಶೀತ ತಾಪಮಾನಕ್ಕೆ ತಂಪಾಗಿಸಿದರೆ ಆಣ್ವಿಕ ಚಲನೆಯ ದರಕ್ಕೆ ಏನಾಗುತ್ತದೆ?", o: ["ಚಲನ ಶಕ್ತಿಯು ಕಡಿಮೆಯಾಗುವುದರಿಂದ ಕಣದ ವೇಗವು ನಾಟಕೀಯವಾಗಿ ನಿಧಾನಗೊಳ್ಳುತ್ತದೆ", "ಕಣಗಳು ತಕ್ಷಣವೇ ಬೆಳಕಿನ ವೇಗದ ನಿಯತಾಂಕಗಳಿಗೆ ವೇಗಗೊಳ್ಳುತ್ತವೆ", "ಯಾವುದೇ ಪರಸ್ಪರ ಸಂಬಂಧವಿಲ್ಲದೆ ಕಣಗಳ ನಡುವಿನ ಅಂತರವು ಅನಂತವಾಗಿ ವಿಸ್ತರಿಸುತ್ತದೆ"], c: 0 },
+                    { q: "ಸಾಮಾನ್ಯ ತಾಪಮಾನದಲ್ಲಿ ದ್ರವವು ನೇರವಾಗಿ ಅನಿಲ ಸ್ಥಿತಿಗೆ ಬದಲಾಗುವ ಭೌತಿಕ ಪ್ರಕ್ರಿಯೆಯನ್ನು ಯಾವುದು ವಿವರಿಸುತ್ತದೆ?", o: ["ಬಾಷ್ಪೀಕರಣ (Evaporation)", "ಉತ್ಪತನ (Sublimation)", "ಸಾಂದ್ರೀಕರಣ ಮ್ಯಾಟ್ರಿಕ್ಸ್ (Condensation)"], c: 0 }
+                ]
+            },
+            5: {
+                title: "🧪 ಆಣ್ವಿಕ ಪ್ರಸರಣ ದರ ಮತ್ತು ದ್ರವ್ಯಗಳ ಹೋಲಿಕೆ",
+                explanation: "ಪ್ರಸರಣ (Diffusion) ಎಂದರೆ ವಿವಿಧ ಕಣಗಳು ಪರಸ್ಪರ ಸ್ವಯಂಪ್ರೇರಿತವಾಗಿ ಮಿಶ್ರಣಗೊಳ್ಳುವುದು. ಇದು ಅನಿಲಗಳಲ್ಲಿ ಅತಿ ವೇಗವಾಗಿಯೂ, ದ್ರವಗಳಲ್ಲಿ ನಿಧಾನವಾಗಿಯೂ ಇರುತ್ತದೆ ಮತ್ತು ಘನವಸ್ತುಗಳಲ್ಲಿ ಬಹುತೇಕ ಶೂನ್ಯವಾಗಿರುತ್ತದೆ.",
+                sliderText: "ತಾಪಮಾನ ಪ್ರಭಾವ ನಿಯಂತ್ರಣ (ಪ್ರಸರಣ ವೇಗ ವರ್ಧಕ):",
+                initSliderVal: 25,
+                questions: [
+                    { q: "ತೆರೆದ ಸುಗಂಧ ದ್ರವ್ಯದ (Perfume) ಬಾಟಲಿಯ ಪರಿಮಳವು ಇಡೀ ಕೋಣೆಯ ತುಂಬಾ ಹರಡಲು ಕಾರಣವಾಗುವ ಪ್ರಮುಖ ವೈಜ್ಞಾನಿಕ ಪ್ರಕ್ರಿಯೆ ಯಾವುದು?", o: ["ಗಾಳಿ ಮತ್ತು ಅನಿಲ ಕಣಗಳ ಯಾದೃಚ್ಛಿಕ ಚಲನೆಯಿಂದ ಉಂಟಾಗುವ ಪ್ರಸರಣ (Diffusion)", "ಸುಗಂಧದ ಅಣುಗಳನ್ನು ಹೊತ್ತೊಯ್ಯುವ ಗುರುತ್ವಾಕರ್ಷಣೆಯ ಕಾಂತೀಯ ಅಲೆಗಳು", "ಬಾಗಿಲುಗಳ ಮೂಲಕ ಆಣ್ವಿಕ ಎಳೆಗಳನ್ನು ತಳ್ಳುವ ಸ್ಥಿರ ವಿದ್ಯುತ್ ಆವೇಶಗಳು"], c: 0 },
+                    { q: "ದ್ರವ್ಯದ ಯಾವ ಭೌತಿಕ ಸ್ಥಿತಿಯಲ್ಲಿ ಕಣಗಳ ಪ್ರಸರಣ ದರವು ಅತ್ಯಂತ ವೇಗವಾಗಿರುತ್ತದೆ?", o: ["ಅನಿಲ ಸ್ಥಿತಿ", "ದ್ರವ ಸ್ಥಿತಿ", "ಘನ ಸ್ಥಿತಿಯ ರಚನಾತ್ಮಕ ಬ್ಲಾಕ್‌ಗಳು"], c: 0 },
+                    { q: "ದ್ರವದ ತಾಪಮಾನವು ಹೆಚ್ಚಾದಾಗ ಪ್ರಸರಣದ ದರವು ಗಮನಾರ್ಹವಾಗಿ ವೇಗಗೊಳ್ಳಲು ಕಾರಣವೇನು?", o: ["ಹೆಚ್ಚಿನ ಶಾಖವು ಕಣದ ವೇಗವನ್ನು ಹೆಚ್ಚಿಸುತ್ತದೆ, ಇದು ಪರಸ್ಪರ ಮಿಶ್ರಣದ ದರವನ್ನು ವೇಗಗೊಳಿಸುತ್ತದೆ", "ಉಷ್ಣದ ಶಾಖವು ದ್ರಾವಣದ ದ್ರವ್ಯರಾಶಿಯ ಗುಣಲಕ್ಷಣಗಳನ್ನು ಸಂಪೂರ್ಣವಾಗಿ ರದ್ದುಗೊಳಿಸುತ್ತದೆ", "ಕಣಗಳು ಚಿಕ್ಕದಾಗುತ್ತವೆ, ಪರಮಾಣು ಜಾಲರಿಯ ರಂಧ್ರಗಳ ಮೂಲಕ ಸುಲಭವಾಗಿ ಜಾರುತ್ತವೆ"], c: 0 },
+                    { q: "ನೀವು ಒಂದು ಲೋಟ ಸ್ಥಿರವಾದ ನೀರಿಗೆ ಒಂದು ಹನಿ ನೀಲಿ ಶಾಯಿಯನ್ನು ಹಾಕಿದರೆ, ಅದು ಇಡೀ ದ್ರವಕ್ಕೆ ನಿಧಾನವಾಗಿ ಬಣ್ಣವನ್ನು ನೀಡಲು ಕಾರಣವೇನು?", o: ["შಾಯಿಯ ಕಣಗಳು ನೀರಿನ ಕಣಗಳ ನಡುವೆ ಸ್ವಯಂಪ್ರೇರಿತವಾಗಿ ಮಿಶ್ರಣಗೊಳ್ಳುವುದು", "ಪಾರದರ್ಶಕತೆಯ ಮೌಲ್ಯಗಳನ್ನು ನಾಶಪಡಿಸುವ ರಾಸಾಯನಿಕ ದಹನ ಪ್ರಕ್ರಿಯೆಗಳು", "ಭ್ರಮೆಯ ರಚನೆಯನ್ನು ಸೃಷ್ಟಿಸುವ ಆಪ್ಟಿಕಲ್ ಬೆಳಕಿನ ವಕ್ರೀಭವನದ ವಿದ್ಯಮಾನಗಳು"], c: 0 }
+                ]
+            },
+            6: {
+                title: "💉 ಯಾಂತ್ರಿಕ ಸಂಕೋಚನ ಮತ್ತು ದ್ರವ್ಯಗಳ ಹೋಲಿಕೆ",
+                explanation: "ಅನಿಲಗಳು ಹೆಚ್ಚಿನ ಸಂಕೋಚನ (Compressible) ಗುಣವನ್ನು ಹೊಂದಿರುತ್ತವೆ ಏಕೆಂದರೆ ಅವುಗಳ ಕಣಗಳ ನಡುವೆ ವಿಶಾಲವಾದ ಖಾಲಿ ಜಾಗವಿರುತ್ತದೆ. ಆದರೆ ಘನವಸ್ತುಗಳು ಮತ್ತು ದ್ರವಗಳ ಕಣಗಳು ಈಗಾಗಲೇ ಹತ್ತಿರದಲ್ಲಿ ಜೋಡಿಸಲ್ಪಟ್ಟಿರುವುದರಿಂದ ಅವುಗಳನ್ನು ಸಂಕೋಚಿಸಲು ಸಾಧ್ಯವಿಲ್ಲ.",
+                sliderText: "ಪಿಸ್ಟನ್ ಸ್ಥಳಾಂತರದ ಒತ್ತಡ (ಸಿರಿಂಜ್ ಸಂಕೋಚನ):",
+                initSliderVal: 5,
+                questions: [
+                    { q: "ಸಿರಿಂಜ್‌ನಲ್ಲಿ ಸಿಲುಕಿರುವ ಅನಿಲವನ್ನು ಬಲವಾಗಿ ಸಂಕೋಚಿಸಲು ಸಾಧ್ಯವಿದ್ದರೂ, ದ್ರವದ ಮಾದರಿಯನ್ನು ಸಂಕೋಚಿಸಲು ಏಕೆ ಸಾಧ್ಯವಿಲ್ಲ?", o: ["ಅನಿಲಗಳು ವಿಶಾಲವಾದ ಕಣಗಳ ನಡುವಿನ ಅಂತರವನ್ನು ಹೊಂದಿದ್ದು, ಅವುಗಳನ್ನು ಹತ್ತಿರಕ್ಕೆ ತಳ್ಳಬಹುದು", "ದ್ರವದ ಕಣಗಳು ಪೊಳ್ಳಾಗಿದ್ದು, ಒತ್ತಡದಲ್ಲಿ ತಕ್ಷಣವೇ ಒಡೆಯುತ್ತವೆ", "ಘನ ಪಿಸ್ಟನ್‌ಗಳು ಕಡಿಮೆ ಸಾಂದ್ರತೆಯ ಪರಮಾಣು ಮಾದರಿಗಳೊಂದಿಗೆ ಮಾತ್ರ ಸಂವಹನ ನಡೆಸಬಲ್ಲವು"], c: 0 },
+                    { q: "ಅನಿಲವು ಬಲವಾದ ಸಂಕೋಚನಕ್ಕೆ ಒಳಗಾದಾಗ ಅದರ ಆಂತರಿಕ ಗಾತ್ರ ಮತ್ತು ಕಣದ ಸಾಂದ್ರತೆಗೆ ಏನಾಗುತ್ತದೆ?", o: ["ಕಣಗಳ ನಡುವಿನ ಅಂತರವು ಕುಗ್ಗಿ, ಕಣಗಳನ್ನು ಪರಸ್ಪರ ಹತ್ತಿರಕ್ಕೆ ತಳ್ಳುತ್ತದೆ", "ಅನಿಲ ಕಣಗಳು ಒಟ್ಟಾಗಿ ಒಂದು ದೈತ್ಯ ಘನ ಮ್ಯಾಕ್ರೋಮಾಲಿಕ್ಯೂಲ್ ಅನ್ನು ರೂಪಿಸುತ್ತವೆ", "ವಿಪರೀತ ಒತ್ತಡದಲ್ಲಿ ಒಟ್ಟು ಕಣಗಳ ಸಂಖ್ಯೆಯು ಶೂನ್ಯಕ್ಕೆ ಇಳಿಯುತ್ತದೆ"], c: 0 },
+                    { q: "ಒಂದು ಮುಚ್ಚಿದ ಪರೀಕ್ಷಾ ಸಿರಿಂಜ್ ಅನ್ನು ಒಣ ಮರಳು ಅಥವಾ ಮರದ ಪುಡಿಯಿಂದ ತುಂಬಿಸಿದರೆ, ನೀವು ಅದರ ಪ್ಲಂಗರ್ ಅನ್ನು ಎಷ್ಟು ದೂರ ತಳ್ಳಬಹುದು?", o: ["ಸ್ವಲ್ಪವೂ ಇಲ್ಲ, ಏಕೆಂದರೆ ಘನ ಕಣಗಳು ಈಗಾಗಲೇ ಬಿಗಿಯಾಗಿ ಜೋಡಿಸಲ್ಪಟ್ಟಿವೆ", "ಹೆಚ್ಚಿನ ಸ್ಥಿತಿಸ್ಥಾಪಕತ್ವದ ಮಿತಿಗಳಿಂದಾಗಿ ಕೆಳಗಿನ ಗೋಡೆಯವರೆಗೆ ಸುಲಭವಾಗಿ ತಳ್ಳಬಹುದು", "ಪರಮಾಣು ವಿಕರ್ಷಣ ಕ್ಷೇತ್ರಗಳಿಂದಾಗಿ ಅದು ಸ್ವಯಂಚಾಲಿತವಾಗಿ ಹಿಂದಕ್ಕೆ ಚಲಿಸುತ್ತದೆ"], c: 0 },
+                    { q: "ದ್ರವ್ಯದ ಯಾವ ಸ್ಥಿತಿಯು ವಾಲ್ಯೂಮೆಟ್ರಿಕ್ ಸಂಕೋಚನ ಬಲಗಳ ವಿರುದ್ಧ ಹೆಚ್ಚಿನ ಪ್ರತಿರೋಧವನ್ನು ತೋರಿಸುತ್ತದೆ?", o: ["ಘನ ಸ್ಥಿತಿ", "ಅನಿಲ ಸ್ಥಿತಿ", "ಬಾಷ್ಪ ಮೋಡದ ರೂಪಗಳು"], c: 0 }
+                ]
+            }
+        };
+
+        let currentActivityIndex = 1;
+        let compressionState = 'gas'; // For activity 6
+        let diffusionState = 'liquid'; // Default for activity 5: 'solid', 'liquid', 'gas'
+        let globalXPScore = 0;
+        
+        const canvas = document.getElementById('particleCanvas');
+        const ctx = canvas.getContext('2d');
+        let animationFrameId;
+        let particles = [];
+
+        window.onload = function() {
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+            switchActivity(1);
+        };
+
+        function resizeCanvas() {
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+            initParticles();
+        }
+
+        class Particle {
+            constructor(x, y, type) {
+                this.baseX = x;
+                this.baseY = y;
+                this.x = x;
+                this.y = y;
+                this.vx = (Math.random() - 0.5) * 2;
+                this.vy = (Math.random() - 0.5) * 2;
+                this.radius = 6;
+                this.color = '#38bdf8';
+                this.type = type; 
+            }
+
+            update(sliderVal) {
+                if (currentActivityIndex === 1) { 
+                    let amp = sliderVal * 0.15;
+                    this.x = this.baseX + (Math.random() - 0.5) * amp;
+                    this.y = this.baseY + (Math.random() - 0.5) * amp;
+                    this.color = varToHex('--solid-color');
+                } 
+                else if (currentActivityIndex === 2) { 
+                    let speed = sliderVal * 0.08;
+                    this.x += this.vx * speed;
+                    this.y += this.vy * speed;
+                    this.color = varToHex('--liquid-color');
+
+                    if (this.x < 30 || this.x > canvas.width - 30) this.vx *= -1;
+                    if (this.y < canvas.height - 120 || this.y > canvas.height - 20) this.vy *= -1;
+                } 
+                else if (currentActivityIndex === 3) { 
+                    let speed = sliderVal * 0.15;
+                    this.x += this.vx * speed;
+                    this.y += this.vy * speed;
+                    this.color = varToHex('--gas-color');
+
+                    if (this.x < 15 || this.x > canvas.width - 15) this.vx *= -1;
+                    if (this.y < 15 || this.y > canvas.height - 15) this.vy *= -1;
+                }
+                else if (currentActivityIndex === 4) { 
+                    let speed = sliderVal * 0.12;
+                    this.x += this.vx * speed;
+                    this.y += this.vy * speed;
+                    
+                    if(sliderVal < 30) {
+                        this.color = varToHex('--solid-color');
+                        if (this.x < 100 || this.x > canvas.width - 100) this.vx *= -1;
+                        if (this.y < canvas.height - 100 || this.y > canvas.height - 20) this.vy *= -1;
+                    } else if(sliderVal < 70) {
+                        this.color = varToHex('--liquid-color');
+                        if (this.x < 40 || this.x > canvas.width - 40) this.vx *= -1;
+                        if (this.y < canvas.height - 140 || this.y > canvas.height - 15) this.vy *= -1;
+                    } else {
+                        this.color = varToHex('--accent');
+                        if (this.x < 15 || this.x > canvas.width - 15) this.vx *= -1;
+                        if (this.y < 15 || this.y > canvas.height - 15) this.vy *= -1;
+                    }
+                }
+                else if (currentActivityIndex === 5) { 
+                    // ಪ್ರಸರಣ ನಿಯಂತ್ರಣ ವ್ಯವಸ್ಥೆ (Diffusion Physics Update)
+                    if (diffusionState === 'solid') {
+                        // ಘನ ಮಾಧ್ಯಮ: ಚಲನೆ ಇರುವುದಿಲ್ಲ, ಕಣಗಳು ತಮ್ಮ ಸ್ಥಾನದಲ್ಲೇ ಲಘುವಾಗಿ ಕಂಪಿಸುತ್ತವೆ
+                        this.x = this.baseX + (Math.random() - 0.5) * 0.5;
+                        this.y = this.baseY + (Math.random() - 0.5) * 0.5;
+                    } 
+                    else if (diffusionState === 'liquid') {
+                        // ದ್ರವ ಮಾಧ್ಯಮ: ತಾಪಮಾನಕ್ಕೆ (Slider) ತಕ್ಕಂತೆ ಚಲನೆ
+                        let speed = 0.3 + (sliderVal * 0.04);
+                        this.x += this.vx * speed;
+                        this.y += this.vy * speed;
+                    } 
+                    else if (diffusionState === 'gas') {
+                        // ಅನಿಲ ಮಾಧ್ಯಮ: ಅತ್ಯಂತ ವೇಗವಾದ ಮುಕ್ತ ಪ್ರಸರಣ ಚಲನೆ
+                        let speed = 1.5 + (sliderVal * 0.08);
+                        this.x += this.vx * speed;
+                        this.y += this.vy * speed;
+                    }
+
+                    // ಸಾಮಾನ್ಯ ಗಡಿ ನಿಯಂತ್ರಣ
+                    if (this.x < 15 || this.x > canvas.width - 15) this.vx *= -1;
+                    if (this.y < 15 || this.y > canvas.height - 15) this.vy *= -1;
+
+                    // ಬಣ್ಣ ವಿನ್ಯಾಸ ನಿರ್ಣಯ
+                    if (this.type === 'ink') {
+                        this.color = varToHex('--accent');
+                    } else {
+                        this.color = diffusionState === 'solid' ? varToHex('--solid-color') : 
+                                     diffusionState === 'liquid' ? 'rgba(251, 191, 36, 0.3)' : 'rgba(52, 211, 153, 0.15)';
+                    }
+                }
+                else if (currentActivityIndex === 6) { 
+                    let maxAllowedWidth = canvas.width - (sliderVal * 2.5);
+                    if (maxAllowedWidth < 100) maxAllowedWidth = 100;
+
+                    if (compressionState === 'solid') {
+                        this.x = this.baseX + (Math.random() - 0.5) * 1.5;
+                        this.y = this.baseY + (Math.random() - 0.5) * 1.5;
+                        this.color = varToHex('--solid-color');
+                    } 
+                    else if (compressionState === 'liquid') {
+                        let speed = 1.2;
+                        this.x += this.vx * speed;
+                        this.y += this.vy * speed;
+                        this.color = varToHex('--liquid-color');
+
+                        if (this.x < 30 || this.x > maxAllowedWidth - 15) this.vx *= -1;
+                        if (this.y < 60 || this.y > canvas.height - 60) this.vy *= -1;
+                    } 
+                    else if (compressionState === 'gas') {
+                        let speedMultiplier = 1.5 + (sliderVal * 0.04);
+                        this.x += this.vx * speedMultiplier;
+                        this.y += this.vy * speedMultiplier;
+                        this.color = varToHex('--gas-color');
+
+                        if (this.x < 30) { this.x = 30; this.vx *= -1; }
+                        if (this.x > maxAllowedWidth - 15) { this.x = maxAllowedWidth - 15; this.vx *= -1; }
+                        if (this.y < 60) { this.y = 60; this.vy *= -1; }
+                        if (this.y > canvas.height - 60) { this.y = canvas.height - 60; this.vy *= -1; }
+                    }
+                }
+            }
+
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+                ctx.closePath();
+            }
+        }
+
+        function varToHex(varName) {
+            return getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
+        }
+
+        function initParticles() {
+            particles = [];
+            let w = canvas.width;
+            let h = canvas.height;
+
+            if (currentActivityIndex === 1) { 
+                let rows = 6;
+                let cols = 10;
+                let xSpacing = 22;
+                let ySpacing = 22;
+                let startX = (w - (cols * xSpacing)) / 2;
+                let startY = (h - (rows * ySpacing)) / 2;
+
+                for (let r = 0; r < rows; r++) {
+                    for (let c = 0; c < cols; c++) {
+                        particles.push(new Particle(startX + c * xSpacing, startY + r * ySpacing, 'solid'));
+                    }
+                }
+            } 
+            else if (currentActivityIndex === 2 || currentActivityIndex === 4) { 
+                for (let i = 0; i < 75; i++) {
+                    let rx = 50 + Math.random() * (w - 100);
+                    let ry = (h - 110) + Math.random() * 80;
+                    particles.push(new Particle(rx, ry, 'fluid'));
+                }
+            } 
+            else if (currentActivityIndex === 3) { 
+                for (let i = 0; i < 40; i++) {
+                    let rx = 30 + Math.random() * (w - 60);
+                    let ry = 30 + Math.random() * (h - 60);
+                    particles.push(new Particle(rx, ry, 'gas'));
+                }
+            }
+            else if (currentActivityIndex === 5) { 
+                // ಪ್ರಸರಣ ಆರಂಭಿಕ ಸಂರಚನೆ (Diffusion Initialization Setup)
+                if (diffusionState === 'solid') {
+                    // ಎರಡು ಪ್ರತ್ಯೇಕ ಘನ ಬ್ಲಾಕ್‌ಗಳು ಬೆರೆಯದೆ ಹಾಗೇ ಇರುತ್ತವೆ
+                    let startX1 = w * 0.15;
+                    let startX2 = w * 0.6;
+                    for(let r=0; r<8; r++) {
+                        for(let c=0; c<6; c++) {
+                            particles.push(new Particle(startX1 + c*18, 60 + r*18, 'matrix'));
+                        }
+                    }
+                    for(let r=0; r<8; r++) {
+                        for(let c=0; c<4; c++) {
+                            particles.push(new Particle(startX2 + c*18, 60 + r*18, 'ink'));
+                        }
+                    }
+                } 
+                else if (diffusionState === 'liquid') {
+                    // ದ್ರವ ಮಾಧ್ಯಮ ರಚನೆ
+                    for (let i = 0; i < 65; i++) {
+                        particles.push(new Particle(30 + Math.random() * (w/2 - 40), 30 + Math.random() * (h - 60), 'water'));
+                    }
+                    for (let i = 0; i < 20; i++) {
+                        particles.push(new Particle((w/2 + 20) + Math.random() * (w/2 - 50), 40 + Math.random() * (h - 80), 'ink'));
+                    }
+                } 
+                else if (diffusionState === 'gas') {
+                    // ಅನಿಲ ಮಾಧ್ಯಮ ರಚನೆ
+                    for (let i = 0; i < 35; i++) {
+                        particles.push(new Particle(20 + Math.random() * (w/2 - 30), 30 + Math.random() * (h - 60), 'air'));
+                    }
+                    for (let i = 0; i < 15; i++) {
+                        particles.push(new Particle((w * 0.7) + Math.random() * (w*0.25), 40 + Math.random() * (h - 80), 'ink'));
+                    }
+                }
+            }
+            else if (currentActivityIndex === 6) { 
+                let sliderVal = parseInt(document.getElementById('param-slider').value);
+                let maxAllowedWidth = w - (sliderVal * 2.5);
+                if (maxAllowedWidth < 100) maxAllowedWidth = 100;
+
+                if (compressionState === 'solid') {
+                    let rows = 8;
+                    let cols = 12;
+                    for (let r = 0; r < rows; r++) {
+                        for (let c = 0; c < cols; c++) {
+                            particles.push(new Particle(40 + c * 14, 80 + r * 14, 'compressedSolid'));
+                        }
+                    }
+                } 
+                else if (compressionState === 'liquid') {
+                    for (let i = 0; i < 80; i++) {
+                        let rx = 40 + Math.random() * (w * 0.65);
+                        let ry = 70 + Math.random() * (h - 140);
+                        particles.push(new Particle(rx, ry, 'compressedLiquid'));
+                    }
+                } 
+                else if (compressionState === 'gas') {
+                    for (let i = 0; i < 35; i++) {
+                        let rx = 40 + Math.random() * (maxAllowedWidth - 60);
+                        let ry = 70 + Math.random() * (h - 140);
+                        particles.push(new Particle(rx, ry, 'compressedGases'));
+                    }
+                }
+            }
+        }
+
+        function changeDiffusionState(state) {
+            diffusionState = state;
+            
+            document.querySelectorAll('.state-btn').forEach(btn => {
+                btn.classList.remove('active-state');
+            });
+            document.getElementById(state + 'DiffBtn').classList.add('active-state');
+
+            const explanation = document.getElementById('sandbox-explanation');
+            const slider = document.getElementById('param-slider');
+
+            if (state === 'solid') {
+                slider.disabled = true;
+                explanation.innerText = "ಘನವಸ್ತುಗಳಲ್ಲಿ ಪ್ರಸರಣ: ಕಣಗಳು ತಮ್ಮದೇ ಆದ ಕಠಿಣ ಜಾಲರಿಯಲ್ಲಿ ಬಂಧಿತವಾಗಿರುವುದರಿಂದ ಅವು ಪರಸ್ಪರ ಬೆರೆಯುವುದಿಲ್ಲ. ಇಲ್ಲಿ ಪ್ರಸರಣ ದರ ಸಂಪೂರ್ಣ ಶೂನ್ಯವಾಗಿರುತ್ತದೆ!";
+            } 
+            else if (state === 'liquid') {
+                slider.disabled = false;
+                explanation.innerText = "ದ್ರವಗಳಲ್ಲಿ ಪ್ರಸರಣ (ಉದಾಹರಣೆಗೆ ನೀರಿನಲ್ಲಿ ಶಾಯಿ): ಕಣಗಳು ಮಧ್ಯಮ ಜಾಗವನ್ನು ಹೊಂದಿದ್ದು ನಿಧಾನವಾಗಿ ಸ್ವಯಂಪ್ರೇರಿತವಾಗಿ ಇಡೀ ದ್ರವದ ತುಂಬಾ ಹರಡಿಕೊಳ್ಳುತ್ತವೆ. ಶಾಖ ಹೆಚ್ಚಿಸಿದರೆ ಪ್ರಸರಣ ವೇಗವಾಗುತ್ತದೆ.";
+            } 
+            else {
+                slider.disabled = false;
+                explanation.innerText = "ಅನಿಲಗಳಲ್ಲಿ ಪ್ರಸರಣ (ಉದಾಹರಣೆಗೆ ಗಾಳಿಯಲ್ಲಿ ಸುಗಂಧ ದ್ರವ್ಯ): ಅನಿಲ ಕಣಗಳು ವಿಶಾಲವಾದ ಖಾಲಿ ಜಾಗವನ್ನು ಹೊಂದಿದ್ದು ಅತಿ ವೇಗವಾಗಿ ಎಲ್ಲಾ ದಿಕ್ಕುಗಳಲ್ಲಿಯೂ ಚದುರಿ ನಿಮಿಷಗಳಲ್ಲಿ ಇಡೀ ಕೋಣೆಯನ್ನು ಆವರಿಸುತ್ತವೆ.";
+            }
+
+            initParticles();
+        }
+
+        function changeCompressionState(state) {
+            compressionState = state;
+            
+            document.querySelectorAll('.state-btn').forEach(btn => {
+                btn.classList.remove('active-state');
+            });
+            document.getElementById(state + 'StateBtn').classList.add('active-state');
+
+            const slider = document.getElementById('param-slider');
+            const explanation = document.getElementById('sandbox-explanation');
+
+            if (state === 'solid') {
+                slider.value = 1; 
+                slider.disabled = true;
+                explanation.innerText = "ಘನವಸ್ತುಗಳು (ಉದಾಹರಣೆಗೆ ಮರಳು/ಲೋಹ): ಕಣಗಳ ನಡುವೆ ಖಾಲಿ ಜಾಗ ಇಲ್ಲದಿರುವುದರಿಂದ ಇವುಗಳನ್ನು ಸಂಕೋಚಿಸಲು ಸಾಧ್ಯವೇ ಇಲ್ಲ. ಆದ್ದರಿಂದ ಸಿರಿಂಜ್ ಪಿಸ್ಟನ್ ಜಾರುವುದಿಲ್ಲ!";
+            } 
+            else if (state === 'liquid') {
+                slider.value = 8; 
+                slider.disabled = false;
+                explanation.innerText = "ದ್ರವವಸ್ತುಗಳು (ಉದಾಹರಣೆಗೆ ನೀರು): ಕಣಗಳು ಹತ್ತಿರದಲ್ಲಿರುವುದರಿಂದ ಇವುಗಳನ್ನು ಬಹುತೇಕ ಸಂಕೋಚಿಸಲು ಸಾಧ್ಯವಿಲ್ಲ (Virtually Incompressible). ಪಿಸ್ಟನ್ ಅತ್ಯಲ್ಪ ದೂರ ಮಾತ್ರ ಜಾರುತ್ತದೆ.";
+            } 
+            else {
+                slider.value = 5;
+                slider.disabled = false;
+                explanation.innerText = "ಅನಿಲಗಳು (ಉದಾಹರಣೆಗೆ ಗಾಳಿ): ಕಣಗಳ ನಡುವೆ ವಿಶಾಲವಾದ ಖಾಲಿ ಜಾಗವಿರುತ್ತದೆ. ಆದ್ದರಿಂದ ಇವುಗಳನ್ನು ಗರಿಷ್ಠ ಮಟ್ಟಕ್ಕೆ ಸಂಕೋಚಿಸಬಹುದು (Highly Compressible). ಪಿಸ್ಟನ್ ಸುಲಭವಾಗಿ ಒಳಗೆ ಹೋಗುತ್ತದೆ!";
+            }
+
+            initParticles();
+        }
+
+        function executeSimulationAdjustment() {
+            let slider = document.getElementById('param-slider');
+            let val = parseInt(slider.value);
+
+            if (currentActivityIndex === 6) {
+                if (compressionState === 'solid' && val > 1) slider.value = 1;
+                if (compressionState === 'liquid' && val > 12) slider.value = 12; 
+            }
+        }
+
+        function runParticleLabEngine() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            let sliderVal = parseInt(document.getElementById('param-slider').value);
+
+            if(currentActivityIndex === 6) { 
+                let maxAllowedWidth = canvas.width - (sliderVal * 2.5);
+                if (maxAllowedWidth < 100) maxAllowedWidth = 100;
+
+                particles.forEach(p => {
+                    if (p.x > maxAllowedWidth - 15) {
+                        p.x = maxAllowedWidth - 15;
+                        p.vx = -Math.abs(p.vx); 
+                    }
+                });
+
+                ctx.strokeStyle = '#475569';
+                ctx.lineWidth = 6;
+                ctx.beginPath();
+                ctx.moveTo(canvas.width, 50);
+                ctx.lineTo(20, 50);
+                ctx.lineTo(20, canvas.height - 50);
+                ctx.lineTo(canvas.width, canvas.height - 50);
+                ctx.stroke();
+
+                ctx.strokeStyle = varToHex('--accent');
+                ctx.beginPath();
+                ctx.moveTo(maxAllowedWidth, 53);
+                ctx.lineTo(maxAllowedWidth, canvas.height - 53);
+                ctx.moveTo(maxAllowedWidth, canvas.height / 2);
+                ctx.lineTo(canvas.width, canvas.height / 2);
+                ctx.lineWidth = 8;
+                ctx.stroke();
+            }
+
+            particles.forEach(p => {
+                p.update(sliderVal);
+                p.draw();
+            });
+
+            animationFrameId = requestAnimationFrame(runParticleLabEngine);
+        }
+
+        function switchActivity(activityId) {
+            currentActivityIndex = activityId;
+            cancelAnimationFrame(animationFrameId);
+
+            document.querySelectorAll('.nav-btn').forEach((btn, index) => {
+                btn.classList.toggle('active', (index + 1) === activityId);
+            });
+
+            const configData = comprehensiveActivities[activityId];
+            document.getElementById('sandbox-title').innerText = configData.title;
+            document.getElementById('slider-label').innerText = configData.sliderText;
+            document.getElementById('sandbox-explanation').innerText = configData.explanation;
+            
+            const slider = document.getElementById('param-slider');
+            slider.value = configData.initSliderVal;
+            slider.disabled = false;
+
+            const addCtrlBox = document.getElementById('additional-controls');
+            addCtrlBox.innerHTML = "";
+            
+            if(activityId === 5) {
+                // ಪ್ರಸರಣ ಹಂತಕ್ಕಾಗಿ 3 ಮಾಧ್ಯಮ ಸೆಲೆಕ್ಟರ್ ಬಟನ್‌ಗಳು ಮತ್ತು ಮರುಹೊಂದಿಸುವ ವ್ಯವಸ್ಥೆ
+                addCtrlBox.innerHTML = `
+                    <div class="state-selector-group">
+                        <button id="solidDiffBtn" class="state-btn" onclick="changeDiffusionState('solid')">💎 ಘನ ಮಾಧ್ಯಮ</button>
+                        <button id="liquidDiffBtn" class="state-btn active-state" onclick="changeDiffusionState('liquid')">💧 ದ್ರವ ಮಾಧ್ಯಮ</button>
+                        <button id="gasDiffBtn" class="state-btn" onclick="changeDiffusionState('gas')">☁️ ಅನಿಲ ಮಾಧ್ಯಮ</button>
+                    </div>
+                    <button class="action-btn" onclick="initParticles()">ಪ್ರಸರಣ ಮರುಹೊಂದಿಸಿ (Reset)</button>
+                `;
+                diffusionState = 'liquid';
+            } 
+            else if(activityId === 6) {
+                addCtrlBox.innerHTML = `
+                    <div class="state-selector-group">
+                        <button id="solidStateBtn" class="state-btn" onclick="changeCompressionState('solid')">💎 ಘನವಸ್ತು (Solid)</button>
+                        <button id="liquidStateBtn" class="state-btn" onclick="changeCompressionState('liquid')">💧 ದ್ರವವಸ್ತು (Liquid)</button>
+                        <button id="gasStateBtn" class="state-btn active-state" onclick="changeCompressionState('gas')">☁️ ಅನಿಲವಸ್ತು (Gas)</button>
+                    </div>
+                `;
+                compressionState = 'gas';
+            }
+
+            initParticles();
+            runParticleLabEngine();
+            renderActiveQuizDeck();
+        }
+
+        function renderActiveQuizDeck() {
+            const wrapper = document.getElementById('quiz-deck-wrapper');
+            wrapper.innerHTML = ""; 
+
+            const currentData = comprehensiveActivities[currentActivityIndex];
+            const questionsArray = currentData.questions;
+
+            document.getElementById('progress-hud-text').innerText = `1 / ${questionsArray.length}`;
+            document.getElementById('progress-indicator').style.width = `${(1 / questionsArray.length) * 100}%`;
+
+            questionsArray.forEach((questionData, questionIdx) => {
+                const qCard = document.createElement('div');
+                qCard.className = `question-card ${questionIdx === 0 ? 'active' : ''}`;
+                qCard.id = `act-${currentActivityIndex}-q-${questionIdx}`;
+
+                const qText = document.createElement('p');
+                qText.className = "question-text";
+                qText.innerText = `${questionIdx + 1}. ${questionData.q}`;
+                qCard.appendChild(qText);
+
+                questionData.o.forEach((optionString, optionIdx) => {
+                    const optBtn = document.createElement('button');
+                    optBtn.className = "option-btn";
+                    optBtn.innerText = optionString;
+
+                    optBtn.onclick = function() {
+                        if(qCard.classList.contains('evaluated-node')) return;
+                        qCard.classList.add('evaluated-node');
+
+                        if(optionIdx === questionData.c) {
+                            optBtn.classList.add('correct');
+                            globalXPScore += 100;
+                            document.getElementById('score-counter').innerText = globalXPScore;
+                        } else {
+                            optBtn.classList.add('wrong');
+                            qCard.querySelectorAll('.option-btn')[questionData.c].classList.add('correct');
+                        }
+
+                        setTimeout(() => {
+                            proceedToNextQuestionNode(questionIdx, questionsArray.length);
+                        }, 1400);
+                    };
+
+                    qCard.appendChild(optBtn);
+                });
+
+                wrapper.appendChild(qCard);
+            });
+        }
+
+        function proceedToNextQuestionNode(currentIdx, totalQuestions) {
+            const nextIdx = currentIdx + 1;
+            const activeCard = document.getElementById(`act-${currentActivityIndex}-q-${currentIdx}`);
+            
+            if(nextIdx < totalQuestions) {
+                const nextCard = document.getElementById(`act-${currentActivityIndex}-q-${nextIdx}`);
+                activeCard.classList.remove('active');
+                nextCard.classList.add('active');
+
+                document.getElementById('progress-hud-text').innerText = `${nextIdx + 1} / ${totalQuestions}`;
+                document.getElementById('progress-indicator').style.width = `${((nextIdx + 1) / totalQuestions) * 100}%`;
+            } else {
+                alert(`🎉 ಅಭಿನಂದನೆಗಳು! ಈ ಹಂತವನ್ನು ನೀವು ಯಶಸ್ವಿಯಾಗಿ ಪೂರ್ಣಗೊಳಿಸಿದ್ದೀರಿ. ಒಟ್ಟು ಸ್ಕೋರ್: ${globalXPScore} XP. ಮೇಲಿನ ಸಾಲಿನಿಂದ ಮತ್ತೊಂದು ಹಂತವನ್ನು ಆಯ್ಕೆಮಾಡಿ!`);
+            }
+        }
+    </script>
+</body>
+</html>
