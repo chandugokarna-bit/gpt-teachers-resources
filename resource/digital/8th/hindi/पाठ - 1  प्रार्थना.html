@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>पाठ 1: प्रार्थना - अल्फ्रा इंटरैक्टिव क्लासरूम</title>
+    <style>
+        :root {
+            --bg-color: #0d0e15;
+            --panel-bg: rgba(20, 24, 40, 0.85);
+            --neon-cyan: #00f0ff;
+            --neon-magenta: #ff007f;
+            --neon-green: #39ff14;
+            --neon-yellow: #fff01f;
+            --text-color: #f1f5f9;
+            --shadow-cyan: 0 0 15px #00f0ff;
+            --shadow-magenta: 0 0 15px #ff007f;
+            --shadow-green: 0 0 15px #39ff14;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image: radial-gradient(circle at 50% 50%, #1e1e38 0%, #0d0e15 100%);
+            color: var(--text-color);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            font-size: 3rem;
+            color: #fff;
+            text-shadow: 0 0 10px var(--neon-cyan), 0 0 20px var(--neon-cyan);
+            margin-bottom: 5px;
+        }
+
+        header p {
+            font-size: 1.2rem;
+            color: var(--neon-magenta);
+            text-shadow: 0 0 8px var(--neon-magenta);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+        }
+
+        .activity-card {
+            background: var(--panel-bg);
+            border: 2px solid #22253a;
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 35px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .activity-card:hover {
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.2);
+        }
+
+        .activity-card h2 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: var(--neon-yellow);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-shadow: 0 0 5px rgba(255, 240, 31, 0.5);
+        }
+
+        .badge {
+            background: var(--neon-magenta);
+            color: #fff;
+            padding: 3px 10px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            text-shadow: none;
+            box-shadow: var(--shadow-magenta);
+        }
+
+        .poem-box {
+            background: rgba(0,0,0,0.3);
+            padding: 20px;
+            border-left: 4px solid var(--neon-magenta);
+            border-radius: 0 15px 15px 0;
+            line-height: 2;
+            font-size: 1.2rem;
+            text-align: center;
+            color: #e2e8f0;
+        }
+
+        .question-block {
+            margin-top: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px dashed #2a2f4c;
+        }
+
+        .question-block:last-child {
+            border-bottom: none;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        @media (max-width: 600px) {
+            .options-grid { grid-template-columns: 1fr; }
+        }
+
+        .opt-btn {
+            background: #181b2b;
+            border: 2px solid #2a2f4c;
+            color: var(--text-color);
+            padding: 15px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: all 0.2s ease;
+            text-align: left;
+        }
+
+        .opt-btn:hover {
+            background: #222741;
+            border-color: var(--neon-cyan);
+            box-shadow: var(--shadow-cyan);
+        }
+
+        .drag-drop-zone {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-top: 15px;
+        }
+
+        .drag-items, .drop-targets {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .drag-item {
+            background: #251c3a;
+            border: 2px solid var(--neon-magenta);
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: grab;
+            box-shadow: var(--shadow-magenta);
+            font-weight: bold;
+        }
+
+        .drop-box {
+            background: #111424;
+            border: 2px dashed #333a60;
+            padding: 15px;
+            border-radius: 15px;
+            min-width: 200px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .feedback {
+            margin-top: 10px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            min-height: 25px;
+        }
+
+        .correct {
+            color: var(--neon-green) !important;
+            text-shadow: 0 0 10px rgba(57, 255, 20, 0.5);
+        }
+
+        .incorrect {
+            color: var(--neon-magenta) !important;
+            text-shadow: 0 0 10px rgba(255, 0, 127, 0.5);
+        }
+
+        .input-match {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 12px;
+            background: rgba(0,0,0,0.2);
+            padding: 10px;
+            border-radius: 10px;
+        }
+
+        .input-match label {
+            width: 220px;
+            font-size: 1.1rem;
+        }
+
+        .neon-input {
+            background: #0d0e15;
+            border: 1px solid #333a60;
+            color: #fff;
+            padding: 8px 15px;
+            border-radius: 8px;
+            outline: none;
+            flex-grow: 1;
+        }
+
+        .neon-input:focus {
+            border-color: var(--neon-cyan);
+            box-shadow: var(--shadow-cyan);
+        }
+
+        .check-btn {
+            background: transparent;
+            border: 2px solid var(--neon-green);
+            color: var(--neon-green);
+            padding: 10px 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: var(--shadow-green);
+            transition: all 0.2s;
+            margin-top: 10px;
+        }
+
+        .check-btn:hover {
+            background: var(--neon-green);
+            color: #000;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>पाठ - 1 : प्रार्थना</h1>
+        <p>रिफ्रेश्ड वर्जन - 5x5 चैलेंज मोड</p>
+    </header>
+
+    <div class="container">
+
+        <!-- ACTIVITY 1: SUMMARY POEM -->
+        <div class="activity-card">
+            <h2><span class="badge">गतिविधि 1</span> कविता का मूल भाव व संदेश</h2>
+            <div class="poem-box">
+                "इस कविता के अनुसार मनुष्य-जीवन में <strong>सद्भाव और एकता</strong> सर्वोपरि है। हमें बिना किसी भेदभाव के आपस में मिलजुलकर रहना चाहिए, किसी का अनादर या अपमान नहीं करना चाहिए और अपनी मातृभूमि पर सर्वस्व न्यौछावर करने के लिए सदा तत्पर रहना चाहिए।"
+            </div>
+        </div>
+
+        <!-- ACTIVITY 2: MCQ (5 QUESTIONS) -->
+        <div class="activity-card">
+            <h2><span class="badge">गतिविधि 2</span> बहुविकल्पीय प्रश्न (MCQs)</h2>
+            
+            <div class="question-block" id="mcq1">
+                <p><strong>प्रश्न 1: हमें आपस में किस भावना के साथ मिलकर रहना चाहिए?</strong></p>
+                <div class="options-grid">
+                    <button class="opt-btn" onclick="checkMCQ(this, false, 'mcq1')">A) क्रोध और बैर</button>
+                    <button class="opt-btn" onclick="checkMCQ(this, true, 'mcq1')">B) सद्भाव और एकता</button>
+                    <button class="opt-btn" onclick="checkMCQ(this, false, 'mcq1')">C) स्वार्थ भावना</button>
+                    <button class="opt-btn" onclick="checkMCQ(this, false, 'mcq1')">D) अहंकार भावना</button>
+                </div>
+                <div class="feedback"></div>
+            </div>
+
+            <div class="question-block" id="mcq2">
+                <p><strong>प्रश्न 2: कवि के अनुसार हमें जीवन किस पर वारना (समर्पित करना) चाहिए?</strong></p>
+                <div class="options-grid">
+                    <button class="opt-btn" onclick="checkMCQ(this, true, 'mcq2')">A) भले काम पर</button>
+                    <button class="opt-btn" onclick="checkMCQ(this, false, 'mcq2')">B) केवल धन कमाने पर</button>
+                    <button class="opt-btn" onclick="checkMCQ(this, false, 'mcq2')">C) आराम करने पर</button>
+                    <button class="opt-btn" onclick="checkMCQ(this, false, 'mcq2')">D) हठ करने पर</button>
+                </div>
+                <div class="feedback"></div>
+            </div>
+
+            <div class="question-block" id="mcq3">
+                <p><strong>प्रश्न 3: हमें भगवान से कैसी 'मति' (बुद्धि) माँगनी चाहिए?</strong></p>
+                <div class="options-grid">
+                    <button class="opt-btn" onclick="checkMCQ(this, false, 'mcq3')">A) चतुर और कपटी</button>
+                    <button class="opt-btn" onclick="checkMCQ(this, false, 'mcq3')">B) अहंकारी बुद्धि</button>
+                    <button class="opt-btn" onclick="checkMCQ(this, true, 'mcq3')">C) किसी का अपमान न करने वाली मति</button>
+                    <button class="opt-btn" onclick="checkMCQ(this, false, 'mcq3')">D) चुप रहने वाली मति</button>
+                </div>
+                <div class="feedback"></div>
+            </div>
+
+            <div class="question-block" id="mcq4">
+                <p><strong>प्रश्न 4: 'बीती बातों को बिसराएँ' का अर्थ क्या है?</strong></p>
+                <div class="options-grid">
+                    <button class="opt-btn" onclick="checkMCQ(this, false, 'mcq4')">A) पढ़ाई भूल जाना</button>
+                    <button class="opt-btn" onclick="checkMCQ(this, true, 'mcq4')">B) पुरानी कड़वाहट या गलतियाँ भूलना</button>
+                    <button class="opt-btn" onclick="checkMCQ(this, false, 'mcq4')">C) कल की बात याद रखना</button>
+                    <button class="opt-btn" onclick="checkMCQ(this, false, 'mcq4')">D) समय नष्ट करना</button>
+                </div>
+                <div class="feedback"></div>
+            </div>
+
+            <div class="question-block" id="mcq5">
+                <p><strong>प्रश्न 5: हठ छोड़कर मनुष्य को जीवन में क्या अपनाना चाहिए?</strong></p>
+                <div class="options-grid">
+                    <button class="opt-btn" onclick="checkMCQ(this, false, 'mcq5')">A) क्रोध</button>
+                    <button class="opt-btn" onclick="checkMCQ(this, false, 'mcq5')">B) अधिक धन</button>
+                    <button class="opt-btn" onclick="checkMCQ(this, false, 'mcq5')">C) आलस्य</button>
+                    <button class="opt-btn" onclick="checkMCQ(this, true, 'mcq5')">A) संयम</button>
+                </div>
+                <div class="feedback"></div>
+            </div>
+        </div>
+
+        <!-- ACTIVITY 3: DRAG & DROP (5 MATCHES) -->
+        <div class="activity-card">
+            <h2><span class="badge">गतिविधि 3</span> तुकवाले शब्दों का मिलान (Rhyming Pair Drop)</h2>
+            <p style="margin-bottom: 15px;">नीचे दिए गए सभी 5 शब्दों को उनके सही तुकांत बक्से में ड्रैग करें:</p>
+            <div class="drag-drop-zone">
+                <div class="drag-items">
+                    <div class="drag-item" draggable="true" id="d1" ondragstart="drag(event)">बिसराएँ</div>
+                    <div class="drag-item" draggable="true" id="d2" ondragstart="drag(event)">अपमान</div>
+                    <div class="drag-item" draggable="true" id="d3" ondragstart="drag(event)">उठाएँ</div>
+                    <div class="drag-item" draggable="true" id="d4" ondragstart="drag(event)">वारें</div>
+                    <div class="drag-item" draggable="true" id="d5" ondragstart="drag(event)">जाएँ</div>
+                </div>
+                <div class="drop-targets">
+                    <div class="drop-box" ondragover="allowDrop(event)" ondrop="drop(event, 'd1')">
+                        <strong>नियम अपनाएँ ➔</strong>
+                        <div class="dropped-here"></div>
+                    </div>
+                    <div class="drop-box" ondragover="allowDrop(event)" ondrop="drop(event, 'd3')">
+                        <strong>मिल जाएँ ➔</strong>
+                        <div class="dropped-here"></div>
+                    </div>
+                    <div class="drop-box" ondragover="allowDrop(event)" ondrop="drop(event, 'd2')">
+                        <strong>भगवान ➔</strong>
+                        <div class="dropped-here"></div>
+                    </div>
+                    <div class="drop-box" ondragover="allowDrop(event)" ondrop="drop(event, 'd4')">
+                        <strong>विचारें ➔</strong>
+                        <div class="dropped-here"></div>
+                    </div>
+                    <div class="drop-box" ondragover="allowDrop(event)" ondrop="drop(event, 'd5')">
+                        <strong>बलि जाएँ ➔</strong>
+                        <div class="dropped-here"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="feedback" id="drag-feedback"></div>
+        </div>
+
+        <!-- ACTIVITY 4: FILL IN THE BLANKS (5 QUESTIONS) -->
+        <div class="activity-card" id="act4">
+            <h2><span class="badge">गतिविधि 4</span> पद्यभाग पूर्ण करो (रिक्त स्थान)</h2>
+            <div class="input-match">
+                <label>1. भले काम पर _________ ।।</label>
+                <input type="text" class="neon-input" placeholder="जीवन वारें" id="f1">
+            </div>
+            <div class="input-match">
+                <label>2. बीती बातों को _________ ।।</label>
+                <input type="text" class="neon-input" placeholder="बिसराएँ" id="f2">
+            </div>
+            <div class="input-match">
+                <label>3. गिरे हुए को _________ ।।</label>
+                <input type="text" class="neon-input" placeholder="तुरत उठाएँ" id="f3">
+            </div>
+            <div class="input-match">
+                <label>4. एक रहें _________ हम ।</label>
+                <input type="text" class="neon-input" placeholder="सद्भाव रखें" id="f4">
+            </div>
+            <div class="input-match">
+                <label>5. _________ , संयम अपनाएँ ।</label>
+                <input type="text" class="neon-input" placeholder="हठ छोड़ें" id="f5">
+            </div>
+            <button class="check-btn" onclick="checkBlanks()">उत्तर की जाँच करें</button>
+            <div class="feedback"></div>
+        </div>
+
+        <!-- ACTIVITY 5: GRAMMAR & VOCABULARY (5 QUESTIONS) -->
+        <div class="activity-card" id="act5">
+            <h2><span class="badge">गतिविधि 5</span> व्याकरण ज्ञान: शब्दार्थ एवं समझ</h2>
+            <p style="margin-bottom: 15px;">निम्नलिखित शब्दों के सही अर्थ पाठ के आधार पर भरें (संकेत: बुद्धि, तुरंत, भुला देना, मर्यादा, मातृभूमि):</p>
+            <div class="input-match">
+                <label>1. मति =</label>
+                <input type="text" class="neon-input" id="s1">
+            </div>
+            <div class="input-match">
+                <label>2. तुरत =</label>
+                <input type="text" class="neon-input" id="s2">
+            </div>
+            <div class="input-match">
+                <label>3. बिसराना =</label>
+                <input type="text" class="neon-input" id="s3">
+            </div>
+            <div class="input-match">
+                <label>4. मान =</label>
+                <input type="text" class="neon-input" id="s4">
+            </div>
+            <div class="input-match">
+                <label>5. वह भूमि जहाँ जन्म हुआ हो =</label>
+                <input type="text" class="neon-input" id="s5">
+            </div>
+            <button class="check-btn" onclick="checkGrammar()">व्याकरण स्कोर देखें</button>
+            <div class="feedback"></div>
+        </div>
+
+        <!-- ACTIVITY 6: VALUES TRUE/FALSE (5 QUESTIONS) -->
+        <div class="activity-card">
+            <h2><span class="badge">गतिविधि 6</span> नैतिक मूल्य एवं समझ (सही या गलत)</h2>
+            
+            <div class="question-block" id="tf1">
+                <p><strong>कथन 1: समाज में छोटे-बड़े का अत्यधिक भेदभाव रखना अच्छी बात है।</strong></p>
+                <div class="options-grid">
+                    <button class="opt-btn" onclick="checkMCQ(this, false, 'tf1')">✓ सही (True)</button>
+                    <button class="opt-btn" onclick="checkMCQ(this, true, 'tf1')">✗ गलत (False)</button>
+                </div>
+                <div class="feedback"></div>
+            </div>
+
+            <div class="question-block" id="tf2">
+                <p><strong>कथन 2: दूसरों का तिरस्कार या अपमान करना एक अच्छे नागरिक की पहचान है।</strong></p>
+                <div class="options-grid">
+                    <button class="opt-btn" onclick="checkMCQ(this, false, 'tf2')">✓ सही (True)</button>
+                    <button class="opt-btn" onclick="checkMCQ(this, true, 'tf2')">✗ गलत (False)</button>
+                </div>
+                <div class="feedback"></div>
+            </div>
+
+            <div class="question-block" id="tf3">
+                <p><strong>कथन 3: यदि कोई व्यक्ति पिछड़ गया है या गिरा हुआ है, तो हमें उसे तुरंत उठाना चाहिए।</strong></p>
+                <div class="options-grid">
+                    <button class="opt-btn" onclick="checkMCQ(this, true, 'tf3')">✓ सही (True)</button>
+                    <button class="opt-btn" onclick="checkMCQ(this, false, 'tf3')">✗ गलत (False)</button>
+                </div>
+                <div class="feedback"></div>
+            </div>
+
+            <div class="question-block" id="tf4">
+                <p><strong>कथन 4: हमें अपने देश के सम्मान को विदेशों में भी बनाए रखना चाहिए।</strong></p>
+                <div class="options-grid">
+                    <button class="opt-btn" onclick="checkMCQ(this, true, 'tf4')">✓ सही (True)</button>
+                    <button class="opt-btn" onclick="checkMCQ(this, false, 'tf4')">✗ गलत (False)</button>
+                </div>
+                <div class="feedback"></div>
+            </div>
+
+            <div class="question-block" id="tf5">
+                <p><strong>कथन 5: अपनी जिद या हठ पर अड़े रहना संयम रखने से बेहतर है।</strong></p>
+                <div class="options-grid">
+                    <button class="opt-btn" onclick="checkMCQ(this, false, 'tf5')">✓ सही (True)</button>
+                    <button class="opt-btn" onclick="checkMCQ(this, true, 'tf5')">✗ गलत (False)</button>
+                </div>
+                <div class="feedback"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playSound(type) {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            if (type === 'correct') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); 
+                osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.08); 
+                osc.frequency.setValueAtTime(783.99, audioCtx.currentTime + 0.16); 
+                gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.35);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.35);
+            } else if (type === 'incorrect') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(110, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.25);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.25);
+            }
+        }
+
+        function checkMCQ(button, isCorrect, sectionId) {
+            const section = document.getElementById(sectionId);
+            const feedback = section.querySelector('.feedback');
+            const buttons = section.querySelectorAll('.opt-btn');
+            
+            buttons.forEach(btn => btn.style.borderColor = '#2a2f4c');
+
+            if (isCorrect) {
+                button.style.borderColor = 'var(--neon-green)';
+                feedback.innerHTML = "✓ बिल्कुल सही उत्तर!";
+                feedback.className = "feedback correct";
+                playSound('correct');
+            } else {
+                button.style.borderColor = 'var(--neon-magenta)';
+                feedback.innerHTML = "✗ गलत! पुनः प्रयास करें।";
+                feedback.className = "feedback incorrect";
+                playSound('incorrect');
+            }
+        }
+
+        function allowDrop(ev) { ev.preventDefault(); }
+        function drag(ev) { ev.dataTransfer.setData("text", ev.target.id); }
+        
+        let correctDrops = 0;
+        function drop(ev, expectedId) {
+            ev.preventDefault();
+            const data = ev.dataTransfer.getData("text");
+            const draggedElement = document.getElementById(data);
+            const containerBox = ev.target.closest('.drop-box');
+            const dropTargetZone = containerBox.querySelector('.dropped-here');
+            const feedback = document.getElementById('drag-feedback');
+
+            if (data === expectedId) {
+                dropTargetZone.appendChild(draggedElement);
+                draggedElement.setAttribute('draggable', 'false');
+                draggedElement.style.borderColor = 'var(--neon-green)';
+                correctDrops++;
+                playSound('correct');
+                feedback.innerHTML = "";
+                
+                if(correctDrops === 5) {
+                    feedback.innerHTML = "✓ कमाल कर दिया! सभी 5 तुकांत मिलान एकदम सही हैं!";
+                    feedback.className = "feedback correct";
+                }
+            } else {
+                feedback.innerHTML = "✗ गलत मिलान! सही मिलान वाले डिब्बे में रखें।";
+                feedback.className = "feedback incorrect";
+                playSound('incorrect');
+            }
+        }
+
+        function checkBlanks() {
+            const f1 = document.getElementById('f1').value.trim();
+            const f2 = document.getElementById('f2').value.trim();
+            const f3 = document.getElementById('f3').value.trim();
+            const f4 = document.getElementById('f4').value.trim();
+            const f5 = document.getElementById('f5').value.trim();
+            const feedback = document.getElementById('act4').querySelector('.feedback');
+
+            if (f1.includes("जीवन वारें") && f2.includes("बिसराएँ") && f3.includes("तुरत उठाएँ") && f4.includes("सद्भाव रखें") && f5.includes("हठ छोड़ें")) {
+                feedback.innerHTML = "✓ बधाई हो! आपने सभी 5 रिक्त स्थान सही भरे हैं।";
+                feedback.className = "feedback correct";
+                playSound('correct');
+            } else {
+                feedback.innerHTML = "✗ कुछ शब्द अशुद्ध हैं या छूट गए हैं। एक बार फिर ध्यान से चेक करें।";
+                feedback.className = "feedback incorrect";
+                playSound('incorrect');
+            }
+        }
+
+        function checkGrammar() {
+            const s1 = document.getElementById('s1').value.trim();
+            const s2 = document.getElementById('s2').value.trim();
+            const s3 = document.getElementById('s3').value.trim();
+            const s4 = document.getElementById('s4').value.trim();
+            const s5 = document.getElementById('s5').value.trim();
+            const feedback = document.getElementById('act5').querySelector('.feedback');
+
+            if (s1.includes("बुद्धि") && (s2.includes("तुरंत") || s2.includes("जल्दी")) && s3.includes("भुला देना") && (s4.includes("मर्यादा") || s4.includes("मान")) && s5.includes("मातृभूमि")) {
+                feedback.innerHTML = "✓ बेहतरीन! व्याकरण के सभी 5 प्रश्नों के उत्तर शत-प्रतिशत सही हैं।";
+                feedback.className = "feedback correct";
+                playSound('correct');
+            } else {
+                feedback.innerHTML = "✗ कोई उत्तर गलत है। संकेत शब्दों की सहायता से सही उत्तर भरें।";
+                feedback.className = "feedback incorrect";
+                playSound('incorrect');
+            }
+        }
+    </script>
+</body>
+</html>

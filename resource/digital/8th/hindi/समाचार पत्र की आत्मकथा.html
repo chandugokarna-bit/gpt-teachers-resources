@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>पाठ 6: समाचार पत्र की आत्मकथा - साइबर स्पेस गेम</title>
+    <style>
+        :root {
+            --bg-color: #08090f;
+            --panel-bg: rgba(15, 18, 36, 0.9);
+            --neon-cyan: #00f0ff;
+            --neon-magenta: #ff007f;
+            --neon-green: #39ff14;
+            --neon-yellow: #fff01f;
+            --neon-purple: #9d4edd;
+            --text-color: #f1f5f9;
+            --glow-cyan: 0 0 15px #00f0ff;
+            --glow-magenta: 0 0 15px #ff007f;
+            --glow-green: 0 0 15px #39ff14;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image: radial-gradient(circle at 50% 50%, #121324 0%, #08090f 100%);
+            color: var(--text-color);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        header h1 {
+            font-size: 3.2rem;
+            color: #fff;
+            text-shadow: 0 0 10px var(--neon-cyan), 0 0 25px var(--neon-cyan);
+            letter-spacing: 1px;
+        }
+
+        header p {
+            font-size: 1.3rem;
+            color: var(--neon-magenta);
+            text-shadow: 0 0 8px var(--neon-magenta);
+            margin-top: 5px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 950px;
+        }
+
+        /* Extraordinary Game Cards */
+        .game-card {
+            background: var(--panel-bg);
+            border: 2px solid #1f2445;
+            border-radius: 24px;
+            padding: 30px;
+            margin-bottom: 40px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+        }
+
+        .game-card:hover {
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 25px rgba(0, 240, 255, 0.25);
+            transform: translateY(-5px);
+        }
+
+        .game-card h2 {
+            font-size: 1.6rem;
+            margin-bottom: 20px;
+            color: var(--neon-yellow);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-shadow: 0 0 8px rgba(255, 240, 31, 0.4);
+        }
+
+        .game-badge {
+            background: linear-gradient(45deg, var(--neon-magenta), var(--neon-purple));
+            color: #fff;
+            padding: 4px 14px;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            box-shadow: var(--glow-magenta);
+        }
+
+        .game-instruction {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 15px 20px;
+            border-left: 4px solid var(--neon-cyan);
+            border-radius: 4px 15px 15px 4px;
+            margin-bottom: 20px;
+            font-size: 1.05rem;
+            color: #cbd5e1;
+        }
+
+        .quiz-arena {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(255,255,255,0.02);
+            border-radius: 16px;
+        }
+
+        /* Neon Interactive Grids */
+        .grid-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        @media (max-width: 650px) {
+            .grid-options { grid-template-columns: 1fr; }
+        }
+
+        .neon-btn {
+            background: #111428;
+            border: 2px solid #282f54;
+            color: var(--text-color);
+            padding: 16px;
+            border-radius: 14px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            text-align: left;
+        }
+
+        .neon-btn:hover {
+            background: #191f3e;
+            border-color: var(--neon-cyan);
+            box-shadow: var(--glow-cyan);
+        }
+
+        /* Drag & Drop Spaces */
+        .drag-box-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .chips-pool {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
+            background: rgba(0,0,0,0.3);
+            padding: 15px;
+            border-radius: 12px;
+        }
+
+        .game-chip {
+            background: #25183a;
+            border: 2px solid var(--neon-magenta);
+            padding: 10px 18px;
+            border-radius: 10px;
+            cursor: grab;
+            font-weight: 600;
+            box-shadow: var(--glow-magenta);
+        }
+
+        .target-slots {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 600px) {
+            .target-slots { grid-template-columns: 1fr; }
+        }
+
+        .neon-slot {
+            background: #090a14;
+            border: 2px dashed #343b68;
+            padding: 20px;
+            border-radius: 16px;
+            text-align: center;
+            min-height: 90px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Feedback Real Estate */
+        .game-feedback {
+            margin-top: 12px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            min-height: 25px;
+        }
+
+        .win { color: var(--neon-green) !important; text-shadow: 0 0 12px rgba(57, 255, 20, 0.6); }
+        .fail { color: var(--neon-magenta) !important; text-shadow: 0 0 12px rgba(255, 0, 127, 0.6); }
+
+        /* Form Layouts */
+        .input-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            background: rgba(0,0,0,0.25);
+            padding: 12px 18px;
+            border-radius: 12px;
+        }
+
+        .input-row label {
+            width: 300px;
+            font-size: 1.1rem;
+        }
+
+        .cyber-input {
+            background: #06070c;
+            border: 2px solid #282f54;
+            color: #fff;
+            padding: 10px 16px;
+            border-radius: 10px;
+            outline: none;
+            flex-grow: 1;
+            font-size: 1.05rem;
+        }
+
+        .cyber-input:focus {
+            border-color: var(--neon-cyan);
+            box-shadow: var(--glow-cyan);
+        }
+
+        .action-gate {
+            background: transparent;
+            border: 2px solid var(--neon-green);
+            color: var(--neon-green);
+            padding: 12px 28px;
+            border-radius: 14px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.05rem;
+            box-shadow: var(--glow-green);
+            transition: all 0.2s;
+            margin-top: 10px;
+        }
+
+        .action-gate:hover {
+            background: var(--neon-green);
+            color: #000;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>समाचार पत्र की आत्मकथा</h1>
+        <p>पाठ 6 - अल्टीमेट साइबर गेमिंग एडिशन</p>
+    </header>
+
+    <div class="container">
+
+        <!-- GAME AREA 1: CHRONO TIME-LINE DRAG & DROP -->
+        <div class="game-card">
+            <h2><span class="game-badge">गेम 1</span> इतिहास की टाइमलाइन (Chrono-Match)</h2>
+            <div class="game-instruction">मशीन को सक्रिय करने के लिए सही इतिहास/वर्ष को उसके उचित समाचार पत्र के स्लॉट में ड्रैग करें!</div>
+            
+            <div class="drag-box-container">
+                <div class="chips-pool">
+                    <div class="game-chip" draggable="true" id="g1-c1" ondragstart="startDrag(event)">सन् 1780 (अंग्रेज़ी)</div>
+                    <div class="game-chip" draggable="true" id="g1-c2" ondragstart="startDrag(event)">सन् 1843 (कन्नड)</div>
+                    <div class="game-chip" draggable="true" id="g1-c3" ondragstart="startDrag(event)">उदंत मार्तंड</div>
+                    <div class="game-chip" draggable="true" id="g1-c4" ondragstart="startDrag(event)">कबूतर और संदेशवाहक</div>
+                </div>
+
+                <div class="target-slots">
+                    <div class="neon-slot" ondragover="allowDropSpace(event)" ondrop="handleDrop(event, 'g1-c1')">
+                        <strong>बंगाल गज़ट (भारत का पहला पत्र) ➔</strong>
+                        <div class="slot-fill"></div>
+                    </div>
+                    <div class="neon-slot" ondragover="allowDropSpace(event)" ondrop="handleDrop(event, 'g1-c2')">
+                        <strong>मंगलूरु समाचार ➔</strong>
+                        <div class="slot-fill"></div>
+                    </div>
+                    <div class="neon-slot" ondragover="allowDropSpace(event)" ondrop="handleDrop(event, 'g1-c3')">
+                        <strong>हिंदी का पहला समाचार पत्र ➔</strong>
+                        <div class="slot-fill"></div>
+                    </div>
+                    <div class="neon-slot" ondragover="allowDropSpace(event)" ondrop="handleDrop(event, 'g1-c4')">
+                        <strong>प्राचीन काल में संदेश प्रेषण ➔</strong>
+                        <div class="slot-fill"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="game-feedback" id="g1-feedback"></div>
+        </div>
+
+        <!-- GAME AREA 2: LANGUAGE INTELLIGENCE (MCQ MATRIX) -->
+        <div class="game-card">
+            <h2><span class="game-badge">गेम 2</span> समाचार पत्र के प्रकार और अंग (4 स्तर)</h2>
+            <div class="game-instruction">सही विकल्प चुनकर डेटाबेस अनलॉक करें।</div>
+
+            <!-- Q1 -->
+            <div class="quiz-arena" id="g2q1">
+                <p><strong>स्तर 1: जो अखबार 'रोज़' या प्रतिदिन छपता है, उसे क्या कहते हैं?</strong></p>
+                <div class="grid-options">
+                    <button class="neon-btn" onclick="evaluateMCQ(this, true, 'g2q1')">A) दैनिक समाचार पत्र</button>
+                    <button class="neon-btn" onclick="evaluateMCQ(this, false, 'g2q1')">B) साप्ताहिक पत्र</button>
+                    <button class="neon-btn" onclick="evaluateMCQ(this, false, 'g2q1')">C) पाक्षिक पत्र</button>
+                    <button class="neon-btn" onclick="evaluateMCQ(this, false, 'g2q1')">D) मासिक पत्रिका</button>
+                </div>
+                <div class="game-feedback"></div>
+            </div>
+
+            <!-- Q2 -->
+            <div class="quiz-arena" id="g2q2">
+                <p><strong>स्तर 2: जो पत्र 'पंद्रह दिन में एक बार' छपता है, उसे पाठ में क्या कहा गया है?</strong></p>
+                <div class="grid-options">
+                    <button class="neon-btn" onclick="evaluateMCQ(this, false, 'g2q2')">A) दैनिक</button>
+                    <button class="neon-btn" onclick="evaluateMCQ(this, false, 'g2q2')">B) साप्ताहिक</button>
+                    <button class="neon-btn" onclick="evaluateMCQ(this, true, 'g2q2')">C) पाक्षिक</button>
+                    <button class="neon-btn" onclick="evaluateMCQ(this, false, 'g2q2')">D) वार्षिक</button>
+                </div>
+                <div class="game-feedback"></div>
+            </div>
+
+            <!-- Q3 -->
+            <div class="quiz-arena" id="g2q3">
+                <p><strong>स्तर 3: समाचार पत्र अमीर और गरीब सबके ज्ञान का कैसा साधन है?</strong></p>
+                <div class="grid-options">
+                    <button class="neon-btn" onclick="evaluateMCQ(this, false, 'g2q3')">A) बहुत महँगा और कठिन</button>
+                    <button class="neon-btn" onclick="evaluateMCQ(this, true, 'g2q3')">B) सस्ता और सुलभ साधन</button>
+                    <button class="neon-btn" onclick="evaluateMCQ(this, false, 'g2q3')">C) अनुपयोगी साधन</button>
+                    <button class="neon-btn" onclick="evaluateMCQ(this, false, 'g2q3')">D) केवल मनोरंजन का साधन</button>
+                </div>
+                <div class="game-feedback"></div>
+            </div>
+
+            <!-- Q4 -->
+            <div class="quiz-arena" id="g2q4">
+                <p><strong>स्तर 4: पाठ के अनुसार, आवश्यक विषयों की कतरनें संभाल कर रखने की क्रिया को क्या कहते हैं?</strong></p>
+                <div class="grid-options">
+                    <button class="neon-btn" onclick="evaluateMCQ(this, false, 'g2q4')">A) फेंकना</button>
+                    <button class="neon-btn" onclick="evaluateMCQ(this, false, 'g2q4')">B) बेचना</button>
+                    <button class="neon-btn" onclick="evaluateMCQ(this, false, 'g2q4')">C) भूल जाना</button>
+                    <button class="neon-btn" onclick="evaluateMCQ(this, true, 'g2q4')">D) संग्रह करना</button>
+                </div>
+                <div class="game-feedback"></div>
+            </div>
+        </div>
+
+        <!-- GAME AREA 3: THE GRAMMAR BLAST (द्विरुक्ति टाइमर) -->
+        <div class="game-card" id="game3">
+            <h2><span class="game-badge">गेम 3</span> भाषा ज्ञान: 'द्विरुक्ति' क्रैकर चैलेंज</h2>
+            <div class="game-instruction">पाठ में प्रयुक्त शब्द 'पढ़ते - पढ़ते' की तरह आवृत्ति वाले (द्विरुक्ति) शब्दों को पूर्ण करें!</div>
+            
+            <div class="input-row">
+                <label>1. कई लोग अखबार पढ़ते-_________ चाय पीते हैं।</label>
+                <input type="text" class="cyber-input" placeholder="पढ़ते" id="g3-i1">
+            </div>
+            <div class="input-row">
+                <label>2. मनुष्य घर बैठे-_________ विश्व की जानकारी पाता है।</label>
+                <input type="text" class="cyber-input" placeholder="बैठे" id="g3-i2">
+            </div>
+            <div class="input-row">
+                <label>3. आजकल मेरे अंदर समय-_________ पर लेख छपते हैं।</label>
+                <input type="text" class="cyber-input" placeholder="समय" id="g3-i3">
+            </div>
+            <div class="input-row">
+                <label>4. विशेषांकों में बड़े-_________ लेखकों की रचनाएँ होती हैं।</label>
+                <input type="text" class="cyber-input" placeholder="बड़े" id="g3-i4">
+            </div>
+            <button class="action-gate" onclick="verifyGrammarCrack()">द्विरुक्ति कोड रन करें</button>
+            <div class="game-feedback"></div>
+        </div>
+
+        <!-- GAME AREA 4: CYBER WORD-DETECTIVE (विलोम शब्द) -->
+        <div class="game-card" id="game4">
+            <h2><span class="game-badge">गेम 4</span> विलोम शब्द डिकोडर (4 कोड)</h2>
+            <div class="game-instruction">पाठ के आधार पर सही विलोम (अनलॉक कोड) टाइप करें:</div>
+
+            <div class="input-row">
+                <label>1. अमीर का विलोम शब्द ➔</label>
+                <input type="text" class="cyber-input" placeholder="उदा: गरीब" id="g4-w1">
+            </div>
+            <div class="input-row">
+                <label>2. सस्ता का विलोम शब्द ➔</label>
+                <input type="text" class="cyber-input" placeholder="उदा: महँगा" id="g4-w2">
+            </div>
+            <div class="input-row">
+                <label>3. सरल का विलोम शब्द ➔</label>
+                <input type="text" class="cyber-input" placeholder="उदा: कठिन" id="g4-w3">
+            </div>
+            <div class="input-row">
+                <label>4. सुबह का विलोम शब्द ➔</label>
+                <input type="text" class="cyber-input" placeholder="उदा: शाम" id="g4-w4">
+            </div>
+            <button class="action-gate" onclick="verifyAntonyms()">डिकोड विलोम</button>
+            <div class="game-feedback"></div>
+        </div>
+
+        <!-- GAME AREA 5: AUDIO-LINKED MEDIA DETECTOR -->
+        <div class="game-card">
+            <h2><span class="game-badge">गेम 5</span> संचार के साधन: दृश्य-श्रव्य वर्गीकरण</h2>
+            <div class="game-instruction">पाठ्यपुस्तक के अनुसार, संचार साधनों की कार्यप्रणाली को पहचानें।</div>
+
+            <!-- Q1 -->
+            <div class="quiz-arena" id="g5q1">
+                <p><strong>प्रश्न 1: 'रेडियो' से समाचार केवल _________ जा सकता है।</strong></p>
+                <div class="grid-options">
+                    <button class="neon-btn" onclick="evaluateMCQ(this, true, 'g5q1')">A) सुना</button>
+                    <button class="neon-btn" onclick="evaluateMCQ(this, false, 'g5q1')">B) देखा</button>
+                    <button class="neon-btn" onclick="evaluateMCQ(this, false, 'g5q1')">C) पढ़ा</button>
+                    <button class="neon-btn" onclick="evaluateMCQ(this, false, 'g5q1')">D) लिखा</button>
+                </div>
+                <div class="game-feedback"></div>
+            </div>
+
+            <!-- Q2 -->
+            <div class="quiz-arena" id="g5q2">
+                <p><strong>प्रश्न 2: 'दूरदर्शन' (टेलीविज़न) में हम समाचार देखने के साथ-साथ _________ भी सकते हैं।</strong></p>
+                <div class="grid-options">
+                    <button class="neon-btn" onclick="evaluateMCQ(this, false, 'g5q2')">A) केवल सूंघ</button>
+                    <button class="neon-btn" onclick="evaluateMCQ(this, true, 'g5q2')">B) सुन</button>
+                    <button class="neon-btn" onclick="evaluateMCQ(this, false, 'g5q2')">C) स्पर्श कर</button>
+                    <button class="neon-btn" onclick="evaluateMCQ(this, false, 'g5q2')">D) चख</button>
+                </div>
+                <div class="game-feedback"></div>
+            </div>
+
+            <!-- Q3 -->
+            <div class="quiz-arena" id="g5q3">
+                <p><strong>प्रश्न 3: दूरभाष को हिंदी में क्या कहते हैं?</strong></p>
+                <div class="grid-options">
+                    <button class="neon-btn" onclick="evaluateMCQ(this, false, 'g5q3')">A) टेलीविज़न</button>
+                    <button class="neon-btn" onclick="evaluateMCQ(this, true, 'g5q3')">B) टेलीफ़ोन</button>
+                    <button class="neon-btn" onclick="evaluateMCQ(this, false, 'g5q3')">C) कंप्यूटर</button>
+                    <button class="neon-btn" onclick="evaluateMCQ(this, false, 'g5q3')">D) रेडियो</button>
+                </div>
+                <div class="game-feedback"></div>
+            </div>
+
+            <!-- Q4 -->
+            <div class="quiz-arena" id="g5q4">
+                <p><strong>प्रश्न 4: समाचार पत्र इन सभी में से कैसा साधन है?</strong></p>
+                <div class="grid-options">
+                    <button class="neon-btn" onclick="evaluateMCQ(this, true, 'g5q4')">A) सरल और मितव्ययी (कम खर्च वाला)</button>
+                    <button class="neon-btn" onclick="evaluateMCQ(this, false, 'g5q4')">B) अत्यधिक खर्चीला</button>
+                    <button class="neon-btn" onclick="evaluateMCQ(this, false, 'g5q4')">C) बहुत ही अव्यावहारिक</button>
+                    <button class="neon-btn" onclick="evaluateMCQ(this, false, 'g5q4')">D) पुराना और बेकार</button>
+                </div>
+                <div class="game-feedback"></div>
+            </div>
+        </div>
+
+        <!-- GAME AREA 6: SENSE CHECKER (TRUE OR FALSE) -->
+        <div class="game-card">
+            <h2><span class="game-badge">गेम 6</span> आत्मकथा सत्यता जाँच (True / False)</h2>
+            <div class="game-instruction">क्या आप समाचार पत्र की आत्मकथा के बयानों से सहमत हैं? सही या गलत चुनें!</div>
+
+            <!-- Q1 -->
+            <div class="quiz-arena" id="g6q1">
+                <p><strong>कथन 1: रोज़ समाचार पत्र पढ़ने से हमारा सामान्य ज्ञान और बौद्धिक स्तर बढ़ता है।</strong></p>
+                <div class="options-grid">
+                    <button class="neon-btn" onclick="evaluateMCQ(this, true, 'g6q1')">✓ सत्य (True)</button>
+                    <button class="neon-btn" onclick="evaluateMCQ(this, false, 'g6q1')">✗ असत्य (False)</button>
+                </div>
+                <div class="game-feedback"></div>
+            </div>
+
+            <!-- Q2 -->
+            <div class="quiz-arena" id="g6q2">
+                <p><strong>कथन 2: समाचार पत्र में केवल खेल-कूद की खबरें होती हैं, सिनेमा या मौसम की नहीं।</strong></p>
+                <div class="options-grid">
+                    <button class="neon-btn" onclick="evaluateMCQ(this, false, 'g6q2')">✓ सत्य (True)</button>
+                    <button class="neon-btn" onclick="evaluateMCQ(this, true, 'g6q2')">✗ असत्य (False)</button>
+                </div>
+                <div class="game-feedback"></div>
+            </div>
+
+            <!-- Q3 -->
+            <div class="quiz-arena" id="g6q3">
+                <p><strong>कथन 3: यदि एक बार समाचार पत्र पढ़ने का रिश्ता मनुष्य से बन जाए तो वह ज़िंदगी भर नहीं टूटता।</strong></p>
+                <div class="options-grid">
+                    <button class="neon-btn" onclick="evaluateMCQ(this, true, 'g6q3')">✓ सत्य (True)</button>
+                    <button class="neon-btn" onclick="evaluateMCQ(this, false, 'g6q3')">✗ असत्य (False)</button>
+                </div>
+                <div class="game-feedback"></div>
+            </div>
+
+            <!-- Q4 -->
+            <div class="quiz-arena" id="g6q4">
+                <p><strong>कथन 4: समाचार पत्र पढ़ने से विद्यार्थियों को परीक्षा उपयोगी सामग्री और परीक्षा-फल भी जानने को मिलता है।</strong></p>
+                <div class="options-grid">
+                    <button class="neon-btn" onclick="evaluateMCQ(this, true, 'g6q4')">✓ सत्य (True)</button>
+                    <button class="neon-btn" onclick="evaluateMCQ(this, false, 'g6q4')">✗ असत्य (False)</button>
+                </div>
+                <div class="game-feedback"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Cyber Gaming Synthesized Audio Engine (Child Friendly)
+        const audioEngine = new (window.AudioContext || window.webkitAudioContext)();
+
+        function triggerGameSound(status) {
+            const oscillator = audioEngine.createOscillator();
+            const amp = audioEngine.createGain();
+            oscillator.connect(amp);
+            amp.connect(audioEngine.destination);
+
+            if (status === 'win') {
+                // Retro dynamic chime combo
+                oscillator.type = 'triangle';
+                oscillator.frequency.setValueAtTime(587.33, audioEngine.currentTime); // D5
+                oscillator.frequency.setValueAtTime(698.46, audioEngine.currentTime + 0.08); // F5
+                oscillator.frequency.setValueAtTime(880.00, audioEngine.currentTime + 0.16); // A5
+                amp.gain.setValueAtTime(0.25, audioEngine.currentTime);
+                amp.gain.exponentialRampToValueAtTime(0.01, audioEngine.currentTime + 0.4);
+                oscillator.start();
+                oscillator.stop(audioEngine.currentTime + 0.4);
+            } else if (status === 'fail') {
+                // Space laser blast failure sound
+                oscillator.type = 'sawtooth';
+                oscillator.frequency.setValueAtTime(130, audioEngine.currentTime);
+                oscillator.frequency.linearRampToValueAtTime(70, audioEngine.currentTime + 0.25);
+                amp.gain.setValueAtTime(0.2, audioEngine.currentTime);
+                amp.gain.exponentialRampToValueAtTime(0.01, audioEngine.currentTime + 0.25);
+                oscillator.start();
+                oscillator.stop(audioEngine.currentTime + 0.25);
+            }
+        }
+
+        // Game 1: Drag Match Control
+        function allowDropSpace(ev) { ev.preventDefault(); }
+        function startDrag(ev) { ev.dataTransfer.setData("text/plain", ev.target.id); }
+        
+        let scoreG1 = 0;
+        function handleDrop(ev, rightChipId) {
+            ev.preventDefault();
+            const incomingData = ev.dataTransfer.getData("text/plain");
+            const elementMoved = document.getElementById(incomingData);
+            const slotBox = ev.target.closest('.neon-slot');
+            const targetFill = slotBox.querySelector('.slot-fill');
+            const feedbackZone = document.getElementById('g1-feedback');
+
+            if (incomingData === rightChipId) {
+                targetFill.appendChild(elementMoved);
+                elementMoved.setAttribute('draggable', 'false');
+                elementMoved.style.borderColor = 'var(--neon-green)';
+                elementMoved.style.boxShadow = 'var(--glow-green)';
+                scoreG1++;
+                triggerGameSound('win');
+                feedbackZone.innerHTML = "";
+                
+                if (scoreG1 === 4) {
+                    feedbackZone.innerHTML = "✓ असाधारण! इतिहास की टाइमलाइन पूरी तरह डिकोड हो चुकी है!";
+                    feedbackZone.className = "game-feedback win";
+                }
+            } else {
+                feedbackZone.innerHTML = "✗ गलत कनेक्शन! समाचार पत्र का मिलान सही तथ्य से करें।";
+                feedbackZone.className = "game-feedback fail";
+                triggerGameSound('fail');
+            }
+        }
+
+        // Game 2, 5 & 6: MCQ System
+        function evaluateMCQ(btnRef, isTrue, containerId) {
+            const scope = document.getElementById(containerId);
+            const feedbackNode = scope.querySelector('.game-feedback');
+            const siblings = scope.querySelectorAll('.neon-btn');
+            
+            siblings.forEach(s => s.style.borderColor = '#282f54');
+
+            if (isTrue) {
+                btnRef.style.borderColor = 'var(--neon-green)';
+                feedbackNode.innerHTML = "✓ सिस्टम रिस्पांस: बिल्कुल सही उत्तर!";
+                feedbackNode.className = "game-feedback win";
+                triggerGameSound('win');
+            } else {
+                btnRef.style.borderColor = 'var(--neon-magenta)';
+                feedbackNode.innerHTML = "✗ त्रुटि: गलत उत्तर। पाठ दोबारा जांचें।";
+                feedbackNode.className = "game-feedback fail";
+                triggerGameSound('fail');
+            }
+        }
+
+        // Game 3: Grammar Validator
+        function verifyGrammarCrack() {
+            const r1 = document.getElementById('g3-i1').value.trim();
+            const r2 = document.getElementById('g3-i2').value.trim();
+            const r3 = document.getElementById('g3-i3').value.trim();
+            const r4 = document.getElementById('g3-i4').value.trim();
+            const outNode = document.getElementById('game3').querySelector('.game-feedback');
+
+            if (r1 === "पढ़ते" && r2 === "बैठे" && r3 === "समय" && r4 === "बड़े") {
+                outNode.innerHTML = "✓ द्विरुक्ति मैट्रिक्स अनलॉक! सभी शब्द पूर्णतः शुद्ध हैं।";
+                outNode.className = "game-feedback win";
+                triggerGameSound('win');
+            } else {
+                outNode.innerHTML = "✗ कुछ इनपुट कोड गलत हैं। पाठ के आधार पर समान आवृत्ति के शब्द लिखें।";
+                outNode.className = "game-feedback fail";
+                triggerGameSound('fail');
+            }
+        }
+
+        // Game 4: Antonyms Decoder
+        function verifyAntonyms() {
+            const a1 = document.getElementById('g4-w1').value.trim();
+            const a2 = document.getElementById('g4-w2').value.trim();
+            const a3 = document.getElementById('g4-w3').value.trim();
+            const a4 = document.getElementById('g4-w4').value.trim();
+            const outNode = document.getElementById('game4').querySelector('.game-feedback');
+
+            if (a1 === "गरीब" && (a2 === "महँगा" || a2 === "महंगा") && (a3 === "कठिन" || a3 === "जटिल") && a4 === "शाम") {
+                outNode.innerHTML = "✓ कोड सफल! चारों विलोम शब्द एकदम सटीक हैं।";
+                outNode.className = "game-feedback win";
+                triggerGameSound('win');
+            } else {
+                outNode.innerHTML = "✗ डिकोडिंग विफल! वर्तनी जांचें (उदा: गरीब, महँगा, कठिन, शाम)।";
+                outNode.className = "game-feedback fail";
+                triggerGameSound('fail');
+            }
+        }
+    </script>
+</body>
+</html>

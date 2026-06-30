@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>पाठ 7: बंदर बाँट - नियन गेमिंग जोन</title>
+    <style>
+        :root {
+            --bg-color: #08090f;
+            --panel-bg: rgba(17, 19, 36, 0.9);
+            --neon-cyan: #00f0ff;
+            --neon-magenta: #ff007f;
+            --neon-green: #39ff14;
+            --neon-yellow: #fff01f;
+            --neon-purple: #9d4edd;
+            --text-color: #f1f5f9;
+            --shadow-cyan: 0 0 15px #00f0ff;
+            --shadow-magenta: 0 0 15px #ff007f;
+            --shadow-green: 0 0 15px #39ff14;
+            --shadow-purple: 0 0 15px #9d4edd;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image: linear-gradient(180deg, #0f101d 0%, #050508 100%);
+            color: var(--text-color);
+            padding: 30px 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        header h1 {
+            font-size: 3.5rem;
+            color: #fff;
+            text-shadow: 0 0 10px var(--neon-cyan), 0 0 25px var(--neon-cyan);
+            letter-spacing: 2px;
+        }
+
+        header p {
+            font-size: 1.3rem;
+            color: var(--neon-magenta);
+            text-shadow: 0 0 8px var(--neon-magenta);
+            margin-top: 5px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 950px;
+        }
+
+        .game-card {
+            background: var(--panel-bg);
+            border: 2px solid #1a1d36;
+            border-radius: 24px;
+            padding: 30px;
+            margin-bottom: 40px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.7);
+            position: relative;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .game-card:hover {
+            border-color: var(--neon-purple);
+            box-shadow: 0 0 25px rgba(157, 78, 221, 0.25);
+            transform: translateY(-5px);
+        }
+
+        .game-card h2 {
+            font-size: 1.6rem;
+            margin-bottom: 20px;
+            color: var(--neon-yellow);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-shadow: 0 0 8px rgba(255, 240, 31, 0.4);
+        }
+
+        .game-badge {
+            background: var(--neon-cyan);
+            color: #000;
+            padding: 4px 12px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            box-shadow: var(--shadow-cyan);
+        }
+
+        .quest-box {
+            background: rgba(0,0,0,0.4);
+            padding: 20px;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            border-left: 4px solid var(--neon-purple);
+        }
+
+        /* MCQ Grid */
+        .grid-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .btn-opt {
+            background: #121424;
+            border: 2px solid #25294a;
+            color: var(--text-color);
+            padding: 16px;
+            border-radius: 14px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: all 0.2s ease;
+            text-align: left;
+        }
+
+        .btn-opt:hover {
+            background: #191c33;
+            border-color: var(--neon-cyan);
+            box-shadow: var(--shadow-cyan);
+        }
+
+        /* Drag & Drop Space */
+        .drag-zone {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .drag-pool, .drop-slots {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .draggable-node {
+            background: #241433;
+            border: 2px solid var(--neon-magenta);
+            padding: 12px 24px;
+            border-radius: 12px;
+            cursor: grab;
+            box-shadow: var(--shadow-magenta);
+            font-weight: bold;
+        }
+
+        .target-slot {
+            background: #090a12;
+            border: 2px dashed #30375c;
+            padding: 20px;
+            border-radius: 16px;
+            min-width: 210px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Input Matches for Word Typing */
+        .row-match {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            background: rgba(255,255,255,0.03);
+            padding: 12px 20px;
+            border-radius: 12px;
+        }
+
+        .row-match label {
+            width: 250px;
+            font-size: 1.1rem;
+        }
+
+        .neon-textbox {
+            background: #06070a;
+            border: 2px solid #22263f;
+            color: #fff;
+            padding: 10px 16px;
+            border-radius: 10px;
+            outline: none;
+            flex-grow: 1;
+            font-size: 1.05rem;
+            transition: border-color 0.2s;
+        }
+
+        .neon-textbox:focus {
+            border-color: var(--neon-cyan);
+            box-shadow: var(--shadow-cyan);
+        }
+
+        .action-btn {
+            background: transparent;
+            border: 2px solid var(--neon-green);
+            color: var(--neon-green);
+            padding: 12px 28px;
+            border-radius: 14px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.05rem;
+            box-shadow: var(--shadow-green);
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .action-btn:hover {
+            background: var(--neon-green);
+            color: #000;
+        }
+
+        /* Feedback Notifications */
+        .msg-feedback {
+            margin-top: 12px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            min-height: 25px;
+        }
+
+        .correct-pulse {
+            color: var(--neon-green) !important;
+            text-shadow: 0 0 12px rgba(57, 255, 20, 0.6);
+        }
+
+        .incorrect-pulse {
+            color: var(--neon-magenta) !important;
+            text-shadow: 0 0 12px rgba(255, 0, 127, 0.6);
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>बंदर बाँट (गेमिंग एडिशन)</h1>
+        <p>दो के झगड़े में तीसरे का लाभ! चलिए खेलते हैं।</p>
+    </header>
+
+    <div class="container">
+
+        <!-- GAME ACTIVITY 1: STORY CHRONICLES (MCQ) -->
+        <div class="game-card">
+            <h2><span class="game-badge">गेम 1</span> बिल्ली बनाम बिल्ली: कहानी की शुरुआत (MCQ)</h2>
+            
+            <div class="quest-box" id="q1_1">
+                <p><strong>प्रश्न 1: पहली बिल्ली कहीं से ढूँढकर क्या लेकर आई थी?</strong></p>
+                <div class="grid-options">
+                    <button class="btn-opt" onclick="verifyMCQ(this, false, 'q1_1')">A) दूध का कटोरा</button>
+                    <button class="btn-opt" onclick="verifyMCQ(this, true, 'q1_1')">B) एक रोटी</button>
+                    <button class="btn-opt" onclick="verifyMCQ(this, false, 'q1_1')">C) मछली का टुकड़ा</button>
+                    <button class="btn-opt" onclick="verifyMCQ(this, false, 'q1_1')">D) सोने की चेन</button>
+                </div>
+                <div class="msg-feedback"></div>
+            </div>
+
+            <div class="quest-box" id="q1_2">
+                <p><strong>प्रश्न 2: रोटी देखकर दूसरी बिल्ली ने पहली को क्या दिखाया?</strong></p>
+                <div class="grid-options">
+                    <button class="btn-opt" onclick="verifyMCQ(this, false, 'q1_2')">A) अपनी मूँछें</button>
+                    <button class="btn-opt" onclick="verifyMCQ(this, false, 'q1_2')">B) अपना गुस्सा</button>
+                    <button class="btn-opt" onclick="verifyMCQ(this, true, 'q1_2')">C) अकड़ दिखाई</button>
+                    <button class="btn-opt" onclick="verifyMCQ(this, false, 'q1_2')">D) अपनी चाल</button>
+                </div>
+                <div class="msg-feedback"></div>
+            </div>
+
+            <div class="quest-box" id="q1_3">
+                <p><strong>प्रश्न 3: दोनों बिल्लियों के बीच अचानक कौन आकर अड़ गया?</strong></p>
+                <div class="grid-options">
+                    <button class="btn-opt" onclick="verifyMCQ(this, true, 'q1_3')">A) एक चतुर बंदर</button>
+                    <button class="btn-opt" onclick="verifyMCQ(this, false, 'q1_3')">B) एक भयानक शेर</button>
+                    <button class="btn-opt" onclick="verifyMCQ(this, false, 'q1_3')">C) एक वफादार कुत्ता</button>
+                    <button class="btn-opt" onclick="verifyMCQ(this, false, 'q1_3')">D) एक बड़ा हाथी</button>
+                </div>
+                <div class="msg-feedback"></div>
+            </div>
+
+            <div class="quest-box" id="q1_4">
+                <p><strong>प्रश्न 4: अंत में बिल्लियों के हाथ में क्या आया?</strong></p>
+                <div class="grid-options">
+                    <button class="btn-opt" onclick="verifyMCQ(this, false, 'q1_4')">A) आधी-आधी रोटी</button>
+                    <button class="btn-opt" onclick="verifyMCQ(this, false, 'q1_4')">B) सारी रोटी</button>
+                    <button class="btn-opt" onclick="verifyMCQ(this, true, 'q1_4')">C) कुछ भी हाथ नहीं आया</button>
+                    <button class="btn-opt" onclick="verifyMCQ(this, false, 'q1_4')">D) बहुत सारा दूध</button>
+                </div>
+                <div class="msg-feedback"></div>
+            </div>
+        </div>
+
+        <!-- GAME ACTIVITY 2: RHYMING RUSH (DRAG & DROP) -->
+        <div class="game-card">
+            <h2><span class="game-badge">गेम 2</span> तुकांत शब्द चक्रव्यूह (Drag & Drop)</h2>
+            <p style="margin-bottom: 20px;">नीचे उड़ रहे शब्दों को उनके सही राइमिंग (तुकवाले) बॉक्स में सही जगह ड्रॉप करें:</p>
+            <div class="drag-zone">
+                <div class="drag-pool">
+                    <div class="draggable-node" draggable="true" id="drg1" ondragstart="startDrag(event)">आई</div>
+                    <div class="draggable-node" draggable="true" id="drg2" ondragstart="startDrag(event)">झगड़ा</div>
+                    <div class="draggable-node" draggable="true" id="drg3" ondragstart="startDrag(event)">खोटी</div>
+                    <div class="draggable-node" draggable="true" id="drg4" ondragstart="startDrag(event)">दिखाई</div>
+                </div>
+                <div class="drop-slots">
+                    <div class="target-slot" ondragover="enableDrop(event)" ondrop="handleDrop(event, 'drg1')">
+                        <strong>लाई ➔</strong>
+                        <div class="dropped-node"></div>
+                    </div>
+                    <div class="target-slot" ondragover="enableDrop(event)" ondrop="handleDrop(event, 'drg2')">
+                        <strong>तगड़ा/अड़ा ➔</strong>
+                        <div class="dropped-node"></div>
+                    </div>
+                    <div class="target-slot" ondragover="enableDrop(event)" ondrop="handleDrop(event, 'drg3')">
+                        <strong>रोटी ➔</strong>
+                        <div class="dropped-node"></div>
+                    </div>
+                    <div class="target-slot" ondragover="enableDrop(event)" ondrop="handleDrop(event, 'drg4')">
+                        <strong>आई (दूसरी बिल्ली) ➔</strong>
+                        <div class="dropped-node"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="msg-feedback" id="pool-feedback"></div>
+        </div>
+
+        <!-- GAME ACTIVITY 3: WEIGH THE WORDS (VOCABULARY VALUE MATCH) -->
+        <div class="game-card" id="act3">
+            <h2><span class="game-badge">गेम 3</span> तराजू के पल्ले: कठिन शब्दार्थ (Type Check)</h2>
+            <p style="margin-bottom: 15px;">बंदर के तराजू को संतुलित करने के लिए सही अर्थ टाइप करें (विकल्प: बचा हुआ, तोलने का साधन, इच्छा, परिश्रम का धन):</p>
+            <div class="row-match">
+                <label>1. तराजू =</label>
+                <input type="text" class="neon-textbox" id="vocab1" placeholder="जैसे: तोलने का साधन...">
+            </div>
+            <div class="row-match">
+                <label>2. शेष =</label>
+                <input type="text" class="neon-textbox" id="vocab2" placeholder="जैसे: बचा हुआ...">
+            </div>
+            <div class="row-match">
+                <label>3. मजदूरी =</label>
+                <input type="text" class="neon-textbox" id="vocab3" placeholder="मेहनत का धन...">
+            </div>
+            <div class="row-match">
+                <label>4. कामना =</label>
+                <input type="text" class="neon-textbox" id="vocab4" placeholder="जैसे: इच्छा...">
+            </div>
+            <button class="action-btn" onclick="verifyVocab()">शब्द सामर्थ्य जाँचें</button>
+            <div class="msg-feedback"></div>
+        </div>
+
+        <!-- GAME ACTIVITY 4: ANIMAL SOUND matrix (SOUND IDENTITY) -->
+        <div class="game-card" id="act4">
+            <h2><span class="game-badge">गेम 4</span> जंगल की आवाज़ें (बोली मिलान)</h2>
+            <p style="margin-bottom: 15px;">कौन से जानवर की कौन सी सही बोली है? सही शब्द भरें (विकल्प: म्याऊँ-म्याऊँ, हिनहिनाना, भौंकना, गरजना):</p>
+            <div class="row-match">
+                <label>1. बिल्ली =</label>
+                <input type="text" class="neon-textbox" id="sound1" placeholder="म्याऊँ-म्याऊँ">
+            </div>
+            <div class="row-match">
+                <label>2. घोड़ा =</label>
+                <input type="text" class="neon-textbox" id="sound2" placeholder="जैसे: हिनहिनाना...">
+            </div>
+            <div class="row-match">
+                <label>3. कुत्ता =</label>
+                <input type="text" class="neon-textbox" id="sound3" placeholder="जैसे: भौंकना...">
+            </div>
+            <div class="row-match">
+                <label>4. शेर =</label>
+                <input type="text" class="neon-textbox" id="sound4" placeholder="जैसे: गरजना...">
+            </div>
+            <button class="action-btn" onclick="verifySounds()">ध्वनि मैट्रिक्स लॉक करें</button>
+            <div class="msg-feedback"></div>
+        </div>
+
+        <!-- GAME ACTIVITY 5: SPEEDSTER POWER (TRUE OR FALSE CYBER) -->
+        <div class="game-card">
+            <h2><span class="game-badge">गेम 5</span> रेंगना या दौड़ना: जीव चाल परीक्षण (True / False)</h2>
+            
+            <div class="quest-box" id="q5_1">
+                <p><strong>कथन 1: मेंढक ज़मीन पर फुदक-फुदककर आगे बढ़ता है।</strong></p>
+                <div class="grid-options">
+                    <button class="btn-opt" onclick="verifyMCQ(this, true, 'q5_1')">✓ सत्य (True)</button>
+                    <button class="btn-opt" onclick="verifyMCQ(this, false, 'q5_1')">✗ असत्य (False)</button>
+                </div>
+                <div class="msg-feedback"></div>
+            </div>
+
+            <div class="quest-box" id="q5_2">
+                <p><strong>कथन 2: साँप छलांग-छलांगकर हवा में उड़ता है।</strong></p>
+                <div class="grid-options">
+                    <button class="btn-opt" onclick="verifyMCQ(this, false, 'q5_2')">✓ सत्य (True)</button>
+                    <button class="btn-opt" onclick="verifyMCQ(this, true, 'q5_2')">✗ असत्य (False) - वह रेंगता है</button>
+                </div>
+                <div class="msg-feedback"></div>
+            </div>
+
+            <div class="quest-box" id="q5_3">
+                <p><strong>कथन 3: हिरन बहुत धीरे-धीरे कछुए की तरह चलने वाला जीव है।</strong></p>
+                <div class="grid-options">
+                    <button class="btn-opt" onclick="verifyMCQ(this, false, 'q5_3')">✓ सत्य (True)</button>
+                    <button class="btn-opt" onclick="verifyMCQ(this, true, 'q5_3')">✗ असत्य (False) - वह चौकड़ी भरता है</button>
+                </div>
+                <div class="msg-feedback"></div>
+            </div>
+
+            <div class="quest-box" id="q5_4">
+                <p><strong>कथन 4: दो व्यक्तियों के आपस में झगड़ने से हमेशा तीसरे का ही लाभ होता है।</strong></p>
+                <div class="grid-options">
+                    <button class="btn-opt" onclick="verifyMCQ(this, true, 'q5_4')">✓ सत्य (True)</button>
+                    <button class="btn-opt" onclick="verifyMCQ(this, false, 'q5_4')">✗ असत्य (False)</button>
+                </div>
+                <div class="msg-feedback"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Audio Synthesis Engine for child interactivity
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+        function triggerAudio(status) {
+            const osc = audioContext.createOscillator();
+            const volume = audioContext.createGain();
+            osc.connect(volume);
+            volume.connect(audioContext.destination);
+
+            if (status === 'correct') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(587.33, audioContext.currentTime); // D5
+                osc.frequency.setValueAtTime(880.00, audioContext.currentTime + 0.08); // A5
+                volume.gain.setValueAtTime(0.2, audioContext.currentTime);
+                volume.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+                osc.start();
+                osc.stop(audioContext.currentTime + 0.3);
+            } else if (status === 'incorrect') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(130, audioContext.currentTime);
+                volume.gain.setValueAtTime(0.25, audioContext.currentTime);
+                volume.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.25);
+                osc.start();
+                osc.stop(audioContext.currentTime + 0.25);
+            }
+        }
+
+        // Generic MCQ validation
+        function verifyMCQ(btnNode, isRight, targetBlockId) {
+            const block = document.getElementById(targetBlockId);
+            const alertBox = block.querySelector('.msg-feedback');
+            const siblingBtns = block.querySelectorAll('.btn-opt');
+            
+            siblingBtns.forEach(b => b.style.borderColor = '#25294a');
+
+            if (isRight) {
+                btnNode.style.borderColor = 'var(--neon-green)';
+                alertBox.innerHTML = "✓ एकदम सही! तुम जीत गए।";
+                alertBox.className = "msg-feedback correct-pulse";
+                triggerAudio('correct');
+            } else {
+                btnNode.style.borderColor = 'var(--neon-magenta)';
+                alertBox.innerHTML = "✗ गलत जवाब! बंदर सारी रोटी खा जाएगा, सोचो!";
+                alertBox.className = "msg-feedback incorrect-pulse";
+                triggerAudio('incorrect');
+            }
+        }
+
+        // Drag & Drop handlers
+        function enableDrop(ev) { ev.preventDefault(); }
+        function startDrag(ev) { ev.dataTransfer.setData("text", ev.target.id); }
+        
+        let counterScore = 0;
+        function handleDrop(ev, matchingId) {
+            ev.preventDefault();
+            const transData = ev.dataTransfer.setData ? ev.dataTransfer.getData("text") : matchingId; 
+            const nodeElement = document.getElementById(matchingId);
+            const zoneTarget = ev.target.closest('.target-slot').querySelector('.dropped-node');
+            const mainFeedback = document.getElementById('pool-feedback');
+
+            zoneTarget.appendChild(nodeElement);
+            nodeElement.setAttribute('draggable', 'false');
+            nodeElement.style.borderColor = 'var(--neon-green)';
+            counterScore++;
+            triggerAudio('correct');
+            
+            if(counterScore === 4) {
+                mainFeedback.innerHTML = "✓ अविश्वसनीय! सारे तुकांत युग्म एकदम सही जगह पर सेट हैं!";
+                mainFeedback.className = "msg-feedback correct-pulse";
+            }
+        }
+
+        // Vocabulary typing test
+        function verifyVocab() {
+            const v1 = document.getElementById('vocab1').value.trim();
+            const v2 = document.getElementById('vocab2').value.trim();
+            const v3 = document.getElementById('vocab3').value.trim();
+            const v4 = document.getElementById('vocab4').value.trim();
+            const report = document.getElementById('act3').querySelector('.msg-feedback');
+
+            if (v1.includes("तोलने") && v2.includes("बचा") && v3.includes("परिश्रम") && v4.includes("इच्छा")) {
+                report.innerHTML = "✓ परफेक्ट! तराजू संतुलित हो गया। सारे अर्थ सही हैं!";
+                report.className = "msg-feedback correct-pulse";
+                triggerAudio('correct');
+            } else {
+                report.innerHTML = "✗ पल्ले असंतुलित हैं! किसी शब्द का अर्थ गलत है।";
+                report.className = "msg-feedback incorrect-pulse";
+                triggerAudio('incorrect');
+            }
+        }
+
+        // Animal sounds test
+        function verifySounds() {
+            const s1 = document.getElementById('sound1').value.trim();
+            const s2 = document.getElementById('sound2').value.trim();
+            const s3 = document.getElementById('sound3').value.trim();
+            const s4 = document.getElementById('sound4').value.trim();
+            const report = document.getElementById('act4').querySelector('.msg-feedback');
+
+            if (s1.includes("म्याऊँ") && s2.includes("हिनहिनाना") && s3.includes("भौंकना") && s4.includes("गरजना")) {
+                report.innerHTML = "✓ शानदार! सभी पशु बोलियाँ पूरी तरह सत्यापित हैं।";
+                report.className = "msg-feedback correct-pulse";
+                triggerAudio('correct');
+            } else {
+                report.innerHTML = "✗ कोई ध्वनि मेल नहीं खा रही है! पुनः जाँचें।";
+                report.className = "msg-feedback incorrect-pulse";
+                triggerAudio('incorrect');
+            }
+        }
+    </script>
+</body>
+</html>

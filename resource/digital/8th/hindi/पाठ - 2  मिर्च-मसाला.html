@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>पाठ 2: मिर्च-मसाला - इनोवेटिव क्लासरूम</title>
+    <style>
+        :root {
+            --bg-color: #0d0e15;
+            --panel-bg: rgba(20, 24, 40, 0.85);
+            --neon-cyan: #00f0ff;
+            --neon-magenta: #ff007f;
+            --neon-green: #39ff14;
+            --neon-yellow: #fff01f;
+            --text-color: #f1f5f9;
+            --shadow-cyan: 0 0 15px #00f0ff;
+            --shadow-magenta: 0 0 15px #ff007f;
+            --shadow-green: 0 0 15px #39ff14;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image: radial-gradient(circle at 50% 50%, #1e1e38 0%, #0d0e15 100%);
+            color: var(--text-color);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            font-size: 3rem;
+            color: #fff;
+            text-shadow: 0 0 10px var(--neon-cyan), 0 0 20px var(--neon-cyan);
+            margin-bottom: 5px;
+        }
+
+        header p {
+            font-size: 1.2rem;
+            color: var(--neon-magenta);
+            text-shadow: 0 0 8px var(--neon-magenta);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+        }
+
+        .activity-card {
+            background: var(--panel-bg);
+            border: 2px solid #22253a;
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 35px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .activity-card:hover {
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.2);
+        }
+
+        .activity-card h2 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: var(--neon-yellow);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-shadow: 0 0 5px rgba(255, 240, 31, 0.5);
+        }
+
+        .badge {
+            background: var(--neon-magenta);
+            color: #fff;
+            padding: 3px 10px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            text-shadow: none;
+            box-shadow: var(--shadow-magenta);
+        }
+
+        .story-box {
+            background: rgba(0,0,0,0.3);
+            padding: 20px;
+            border-left: 4px solid var(--neon-magenta);
+            border-radius: 0 15px 15px 0;
+            line-height: 1.8;
+            font-size: 1.1rem;
+            color: #e2e8f0;
+        }
+
+        .question-block {
+            margin-top: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px dashed #2a2f4c;
+        }
+
+        .question-block:last-child {
+            border-bottom: none;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        @media (max-width: 600px) {
+            .options-grid { grid-template-columns: 1fr; }
+        }
+
+        .opt-btn {
+            background: #181b2b;
+            border: 2px solid #2a2f4c;
+            color: var(--text-color);
+            padding: 15px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: all 0.2s ease;
+            text-align: left;
+        }
+
+        .opt-btn:hover {
+            background: #222741;
+            border-color: var(--neon-cyan);
+            box-shadow: var(--shadow-cyan);
+        }
+
+        .drag-drop-zone {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-top: 15px;
+        }
+
+        .drag-items, .drop-targets {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .drag-item {
+            background: #251c3a;
+            border: 2px solid var(--neon-magenta);
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: grab;
+            box-shadow: var(--shadow-magenta);
+            font-weight: bold;
+        }
+
+        .drop-box {
+            background: #111424;
+            border: 2px dashed #333a60;
+            padding: 15px;
+            border-radius: 15px;
+            min-width: 200px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .feedback {
+            margin-top: 10px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            min-height: 25px;
+        }
+
+        .correct {
+            color: var(--neon-green) !important;
+            text-shadow: 0 0 10px rgba(57, 255, 20, 0.5);
+        }
+
+        .incorrect {
+            color: var(--neon-magenta) !important;
+            text-shadow: 0 0 10px rgba(255, 0, 127, 0.5);
+        }
+
+        .input-match {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 12px;
+            background: rgba(0,0,0,0.2);
+            padding: 10px;
+            border-radius: 10px;
+        }
+
+        .input-match label {
+            width: 280px;
+            font-size: 1.1rem;
+        }
+
+        .neon-input {
+            background: #0d0e15;
+            border: 1px solid #333a60;
+            color: #fff;
+            padding: 8px 15px;
+            border-radius: 8px;
+            outline: none;
+            flex-grow: 1;
+        }
+
+        .neon-input:focus {
+            border-color: var(--neon-cyan);
+            box-shadow: var(--shadow-cyan);
+        }
+
+        .check-btn {
+            background: transparent;
+            border: 2px solid var(--neon-green);
+            color: var(--neon-green);
+            padding: 10px 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: var(--shadow-green);
+            transition: all 0.2s;
+            margin-top: 10px;
+        }
+
+        .check-btn:hover {
+            background: var(--neon-green);
+            color: #000;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>पाठ - 2 : मिर्च-मसाला</h1>
+        <p>इंटरैक्टिव गेमिंग एडिशन - 4x4 चैलेंज</p>
+    </header>
+
+    <div class="container">
+
+        <!-- ACTIVITY 1: STORY SUMMARY -->
+        <div class="activity-card">
+            <h2><span class="badge">गतिविधि 1</span> लोककथा का सारांश व सीख</h2>
+            <div class="story-box">
+                "कभी-कभी आदमी अपने विचारों को दूसरों के साथ बाँटना चाहता है, लेकिन राज की बात बताने से पहले उसे सावधानी बरतनी चाहिए। भोलू के मुँह से केवल दो पंख निकले थे, पर बात का बतंगड़ बनते-बनते पूरे आकाश में अनगिनत पक्षी उड़ने की अफवाह फैल गई! यह पाठ हमें सिखाता है कि किसी भी रहस्य को दूसरों से बताने से पहले दस बार सोचना चाहिए।"
+            </div>
+        </div>
+
+        <!-- ACTIVITY 2: MCQ (4 QUESTIONS) -->
+        <div class="activity-card">
+            <h2><span class="badge">गतिविधि 2</span> बहुविकल्पीय प्रश्न (MCQs)</h2>
+            
+            <div class="question-block" id="mcq1">
+                <p><strong>प्रश्न 1: भोलू आँगन में बैठकर क्या पी रहा था?</strong></p>
+                <div class="options-grid">
+                    <button class="opt-btn" onclick="checkMCQ(this, false, 'mcq1')">A) पानी</button>
+                    <button class="opt-btn" onclick="checkMCQ(this, true, 'mcq1')">B) दूध</button>
+                    <button class="opt-btn" onclick="checkMCQ(this, false, 'mcq1')">C) चाय</button>
+                    <button class="opt-btn" onclick="checkMCQ(this, false, 'mcq1')">D) शरबत</button>
+                </div>
+                <div class="feedback"></div>
+            </div>
+
+            <div class="question-block" id="mcq2">
+                <p><strong>प्रश्न 2: खाँसी आने पर ज़मीन पर फैले दूध में भोलू को क्या दिखाई दिया?</strong></p>
+                <div class="options-grid">
+                    <button class="opt-btn" onclick="checkMCQ(this, false, 'mcq2')">A) सिक्का</button>
+                    <button class="opt-btn" onclick="checkMCQ(this, false, 'mcq2')">B) मक्खी</button>
+                    <button class="opt-btn" onclick="checkMCQ(this, true, 'mcq2')">C) दो पंख</button>
+                    <button class="opt-btn" onclick="checkMCQ(this, false, 'mcq2')">D) तिनका</button>
+                </div>
+                <div class="feedback"></div>
+            </div>
+
+            <div class="question-block" id="mcq3">
+                <p><strong>प्रश्न 3: भोलू की पत्नी का नाम क्या था जो बात को पचा नहीं पाई?</strong></p>
+                <div class="options-grid">
+                    <button class="opt-btn" onclick="checkMCQ(this, true, 'mcq3')">A) हीरा</button>
+                    <button class="opt-btn" onclick="checkMCQ(this, false, 'mcq3')">B) चंपा</button>
+                    <button class="opt-btn" onclick="checkMCQ(this, false, 'mcq3')">C) चमेली</button>
+                    <button class="opt-btn" onclick="checkMCQ(this, false, 'mcq3')">D) मीरा</button>
+                </div>
+                <div class="feedback"></div>
+            </div>
+
+            <div class="question-block" id="mcq4">
+                <p><strong>प्रश्न 4: गाँव वाले अफवाह का क्या चमत्कार देखने के लिए जमा होने लगे?</strong></p>
+                <div class="options-grid">
+                    <button class="opt-btn" onclick="checkMCQ(this, false, 'mcq4')">A) उड़ता हुआ पेड़</button>
+                    <button class="opt-btn" onclick="checkMCQ(this, false, 'mcq4')">B) सोने का घड़ा</button>
+                    <button class="opt-btn" onclick="checkMCQ(this, true, 'mcq4')">C) भोलू के मुँह से रंग-बिरंगे विदेशी पक्षी निकलना</button>
+                    <button class="opt-btn" onclick="checkMCQ(this, false, 'mcq4')">D) जादुई बादल</button>
+                </div>
+                <div class="feedback"></div>
+            </div>
+        </div>
+
+        <!-- ACTIVITY 3: DRAG & DROP (4 IDIOMS MATCH) -->
+        <div class="activity-card">
+            <h2><span class="badge">गतिविधि 3</span> मुहावरों का सही अर्थ से मिलान (Drag & Drop)</h2>
+            <p style="margin-bottom: 15px;">नीचे दिए गए 4 मुहावरों को उनके सही अर्थ वाले बक्से में ड्रैग करें:</p>
+            <div class="drag-drop-zone">
+                <div class="drag-items">
+                    <div class="drag-item" draggable="true" id="m1" ondragstart="drag(event)">राई का पहाड़ बनाना</div>
+                    <div class="drag-item" draggable="true" id="m2" ondragstart="drag(event)">आग बबूला होना</div>
+                    <div class="drag-item" draggable="true" id="m3" ondragstart="drag(event)">नौ दो ग्यारह होना</div>
+                    <div class="drag-item" draggable="true" id="m4" ondragstart="drag(event)">बात का बतंगड़ बनाना</div>
+                </div>
+                <div class="drop-targets">
+                    <div class="drop-box" ondragover="allowDrop(event)" ondrop="drop(event, 'm1')">
+                        <strong>छोटी बात को बहुत बड़ा करना ➔</strong>
+                        <div class="dropped-here"></div>
+                    </div>
+                    <div class="drop-box" ondragover="allowDrop(event)" ondrop="drop(event, 'm2')">
+                        <strong>अत्यंत क्रोधित होना ➔</strong>
+                        <div class="dropped-here"></div>
+                    </div>
+                    <div class="drop-box" ondragover="allowDrop(event)" ondrop="drop(event, 'm3')">
+                        <strong>भाग जाना ➔</strong>
+                        <div class="dropped-here"></div>
+                    </div>
+                    <div class="drop-box" ondragover="allowDrop(event)" ondrop="drop(event, 'm4')">
+                        <strong>बात को बढ़ा-चढ़ाकर फैलाना ➔</strong>
+                        <div class="dropped-here"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="feedback" id="drag-feedback"></div>
+        </div>
+
+        <!-- ACTIVITY 4: FILL IN THE BLANKS (4 QUESTIONS) -->
+        <div class="activity-card" id="act4">
+            <h2><span class="badge">गतिविधि 4</span> कहानी के रिक्त स्थान भरो</h2>
+            <div class="input-match">
+                <label>1. हीरा बात छिपा न सकी, उसका _________ लगा।</label>
+                <input type="text" class="neon-input" placeholder="पेट फूलने" id="f1">
+            </div>
+            <div class="input-match">
+                <label>2. चंपा ने सहेली _________ को देखते ही बात उगल दी।</label>
+                <input type="text" class="neon-input" placeholder="चमेली" id="f2">
+            </div>
+            <div class="input-match">
+                <label>3. देखते ही देखते बात फैलकर _________ का पहाड़ बन गई।</label>
+                <input type="text" class="neon-input" placeholder="राई" id="f3">
+            </div>
+            <div class="input-match">
+                <label>4. बेचारा भोलू भयभीत होकर एक _________ पर छिप गया।</label>
+                <input type="text" class="neon-input" placeholder="पेड़" id="f4">
+            </div>
+            <button class="check-btn" onclick="checkBlanks()">उत्तर सबमिट करें</button>
+            <div class="feedback"></div>
+        </div>
+
+        <!-- ACTIVITY 5: GRAMMAR - NOUN IDENTIFICATION (4 QUESTIONS) -->
+        <div class="activity-card" id="act5">
+            <h2><span class="badge">गतिविधि 5</span> भाषा ज्ञान: संज्ञा के भेद पहचानो</h2>
+            <p style="margin-bottom: 15px;">दिए गए संज्ञा शब्दों को उनके सही भेद वर्ग में लिखें (विकल्प: व्यक्तिवाचक, जातिवाचक, भाववाचक, द्रव्यवाचक):</p>
+            <div class="input-match">
+                <label>1. 'भोलू' या 'भारत' किस संज्ञा का उदाहरण है?</label>
+                <input type="text" class="neon-input" id="g1">
+            </div>
+            <div class="input-match">
+                <label>2. 'कबूतर', 'पक्षी' या 'गाँव' कौन सी संज्ञा है?</label>
+                <input type="text" class="neon-input" id="g2">
+            </div>
+            <div class="input-match">
+                <label>3. 'घबराहट' या 'चिंता' किस भेद में आते हैं?</label>
+                <input type="text" class="neon-input" id="g3">
+            </div>
+            <div class="input-match">
+                <label>4. 'दूध' या 'पानी' को किस संज्ञा में रखेंगे?</label>
+                <input type="text" class="neon-input" id="g4">
+            </div>
+            <button class="check-btn" onclick="checkGrammar()">व्याकरण स्कोर जाँचें</button>
+            <div class="feedback"></div>
+        </div>
+    </div>
+
+    <script>
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playSound(type) {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            if (type === 'correct') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); 
+                osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.08); 
+                osc.frequency.setValueAtTime(783.99, audioCtx.currentTime + 0.16); 
+                gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.35);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.35);
+            } else if (type === 'incorrect') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(110, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.25);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.25);
+            }
+        }
+
+        function checkMCQ(button, isCorrect, sectionId) {
+            const section = document.getElementById(sectionId);
+            const feedback = section.querySelector('.feedback');
+            const buttons = section.querySelectorAll('.opt-btn');
+            
+            buttons.forEach(btn => btn.style.borderColor = '#2a2f4c');
+
+            if (isCorrect) {
+                button.style.borderColor = 'var(--neon-green)';
+                feedback.innerHTML = "✓ एकदम सही जवाब! शानदार गजब।";
+                feedback.className = "feedback correct";
+                playSound('correct');
+            } else {
+                button.style.borderColor = 'var(--neon-magenta)';
+                feedback.innerHTML = "✗ ओहो! यह गलत है, कहानी फिर से सोचो।";
+                feedback.className = "feedback incorrect";
+                playSound('incorrect');
+            }
+        }
+
+        function allowDrop(ev) { ev.preventDefault(); }
+        function drag(ev) { ev.dataTransfer.setData("text", ev.target.id); }
+        
+        let correctDrops = 0;
+        function drop(ev, expectedId) {
+            ev.preventDefault();
+            const data = ev.dataTransfer.getData("text");
+            const draggedElement = document.getElementById(data);
+            const containerBox = ev.target.closest('.drop-box');
+            const dropTargetZone = containerBox.querySelector('.dropped-here');
+            const feedback = document.getElementById('drag-feedback');
+
+            if (data === expectedId) {
+                dropTargetZone.appendChild(draggedElement);
+                draggedElement.setAttribute('draggable', 'false');
+                draggedElement.style.borderColor = 'var(--neon-green)';
+                correctDrops++;
+                playSound('correct');
+                feedback.innerHTML = "";
+                
+                if(correctDrops === 4) {
+                    feedback.innerHTML = "✓ अद्भुत! आपने चारों मुहावरों के सही अर्थ मिला दिए हैं!";
+                    feedback.className = "feedback correct";
+                }
+            } else {
+                feedback.innerHTML = "✗ गलत मिलान! सही अर्थ वाले डिब्बे में ड्रैग करें।";
+                feedback.className = "feedback incorrect";
+                playSound('incorrect');
+            }
+        }
+
+        function checkBlanks() {
+            const f1 = document.getElementById('f1').value.trim();
+            const f2 = document.getElementById('f2').value.trim();
+            const f3 = document.getElementById('f3').value.trim();
+            const f4 = document.getElementById('f4').value.trim();
+            const feedback = document.getElementById('act4').querySelector('.feedback');
+
+            if (f1.includes("पेट") && f2.includes("चमेली") && f3.includes("राई") && f4.includes("पेड़")) {
+                feedback.innerHTML = "✓ बहुत खूब! कहानी के सभी चारों रिक्त स्थान बिल्कुल सही हैं।";
+                feedback.className = "feedback correct";
+                playSound('correct');
+            } else {
+                feedback.innerHTML = "✗ कुछ उत्तर गलत लग रहे हैं। पाठ्यपुस्तक की कहानी फिर से पढ़ें।";
+                feedback.className = "feedback incorrect";
+                playSound('incorrect');
+            }
+        }
+
+        function checkGrammar() {
+            const g1 = document.getElementById('g1').value.trim();
+            const g2 = document.getElementById('g2').value.trim();
+            const g3 = document.getElementById('g3').value.trim();
+            const g4 = document.getElementById('g4').value.trim();
+            const feedback = document.getElementById('act5').querySelector('.feedback');
+
+            if (g1.includes("व्यक्ति") && g2.includes("जाति") && g3.includes("भाव") && (g4.includes("द्रव्य") || g4.includes("पदार्थ"))) {
+                feedback.innerHTML = "✓ लाजवाब! संज्ञा व्याकरण के सभी 4 उत्तर शत-प्रतिशत सही हैं।";
+                feedback.className = "feedback correct";
+                playSound('correct');
+            } else {
+                feedback.innerHTML = "✗ कोई भेद गलत है। संज्ञा चार्ट की मदद से दुबारा प्रयास करें।";
+                feedback.className = "feedback incorrect";
+                playSound('incorrect');
+            }
+        }
+    </script>
+</body>
+</html>

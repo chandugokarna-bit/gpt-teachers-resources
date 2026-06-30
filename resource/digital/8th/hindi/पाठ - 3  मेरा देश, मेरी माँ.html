@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>पाठ 3: मेरा देश, मेरी माँ - अल्ट्रा गेमिंग ज़ोन</title>
+    <style>
+        :root {
+            --bg-color: #08090f;
+            --panel-bg: rgba(15, 18, 36, 0.9);
+            --neon-blue: #00d2ff;
+            --neon-pink: #ff0055;
+            --neon-green: #00ff66;
+            --neon-purple: #b026ff;
+            --neon-orange: #ff9900;
+            --text-color: #f8fafc;
+            --border-glow: 2px solid #1e293b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(at 10% 20%, rgba(0, 210, 255, 0.08) 0px, transparent 50%),
+                radial-gradient(at 90% 80%, rgba(255, 0, 85, 0.08) 0px, transparent 50%);
+            color: var(--text-color);
+            padding: 30px 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        header h1 {
+            font-size: 3.5rem;
+            color: #fff;
+            text-shadow: 0 0 10px var(--neon-blue), 0 0 30px var(--neon-blue);
+            letter-spacing: -1px;
+        }
+
+        header p {
+            font-size: 1.3rem;
+            color: var(--neon-pink);
+            text-shadow: 0 0 10px var(--neon-pink);
+            margin-top: 5px;
+            font-weight: 500;
+        }
+
+        .game-zone {
+            width: 100%;
+            max-width: 950px;
+        }
+
+        /* Extraordinary Game Panel */
+        .game-card {
+            background: var(--panel-bg);
+            border: 2px solid #1e2235;
+            border-radius: 24px;
+            padding: 30px;
+            margin-bottom: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.7);
+            position: relative;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .game-card:hover {
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 30px rgba(0, 210, 255, 0.25);
+            transform: translateY(-4px);
+        }
+
+        .game-card h2 {
+            font-size: 1.6rem;
+            color: #fff;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+        }
+
+        .game-tag {
+            background: linear-gradient(90deg, var(--neon-pink), var(--neon-purple));
+            color: #fff;
+            padding: 4px 12px;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            box-shadow: 0 0 15px rgba(255, 0, 85, 0.4);
+        }
+
+        .story-summary {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 20px;
+            border-left: 4px solid var(--neon-blue);
+            border-radius: 12px;
+            line-height: 1.8;
+            font-size: 1.15rem;
+            color: #cbd5e1;
+        }
+
+        .quiz-mission {
+            background: rgba(255,255,255,0.02);
+            padding: 20px;
+            border-radius: 16px;
+            margin-top: 20px;
+            border: 1px solid #1e293b;
+        }
+
+        .btn-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        @media (max-width: 600px) {
+            .btn-grid { grid-template-columns: 1fr; }
+        }
+
+        .action-btn {
+            background: #0f1322;
+            border: 2px solid #282e4e;
+            color: var(--text-color);
+            padding: 16px;
+            border-radius: 14px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            text-align: left;
+        }
+
+        .action-btn:hover {
+            background: #181f36;
+            border-color: var(--neon-purple);
+            box-shadow: 0 0 15px rgba(176, 38, 255, 0.4);
+        }
+
+        /* Drag & Drop Matrix */
+        .matrix-container {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            margin-top: 15px;
+        }
+
+        .chip-pool {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .drag-chip {
+            background: #20132e;
+            border: 2px solid var(--neon-pink);
+            padding: 12px 22px;
+            border-radius: 12px;
+            cursor: grab;
+            font-weight: 600;
+            box-shadow: 0 0 10px rgba(255, 0, 85, 0.2);
+            transition: transform 0.2s;
+        }
+
+        .drag-chip:active { cursor: grabbing; }
+
+        .slots-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        @media (max-width: 650px) {
+            .slots-grid { grid-template-columns: 1fr; }
+        }
+
+        .target-slot {
+            background: #090b14;
+            border: 2px dashed #2a3356;
+            padding: 20px;
+            border-radius: 16px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .target-slot strong { color: var(--neon-orange); }
+
+        .input-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            background: rgba(0,0,0,0.3);
+            padding: 12px 18px;
+            border-radius: 14px;
+        }
+
+        .input-row label {
+            width: 50%;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        .neon-textbox {
+            background: #07090f;
+            border: 1px solid #2e375e;
+            color: #fff;
+            padding: 10px 16px;
+            border-radius: 10px;
+            outline: none;
+            width: 50%;
+            font-size: 1.05rem;
+        }
+
+        .neon-textbox:focus {
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 12px var(--neon-blue);
+        }
+
+        .score-btn {
+            background: transparent;
+            border: 2px solid var(--neon-green);
+            color: var(--neon-green);
+            padding: 12px 28px;
+            border-radius: 14px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.1rem;
+            box-shadow: 0 0 15px rgba(0, 255, 102, 0.3);
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+
+        .score-btn:hover {
+            background: var(--neon-green);
+            color: #000;
+        }
+
+        .feedback-banner {
+            margin-top: 15px;
+            font-weight: 700;
+            font-size: 1.2rem;
+            min-height: 30px;
+        }
+
+        .win { color: var(--neon-green) !important; text-shadow: 0 0 12px rgba(0,255,102,0.5); }
+        .lose { color: var(--neon-pink) !important; text-shadow: 0 0 12px rgba(255,0,85,0.5); }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>पाठ - 3 : मेरा देश, मेरी माँ</h1>
+        <p>🎮 शौर्य गाथा - सुपर गेमिंग डैशबोर्ड 🎮</p>
+    </header>
+
+    <div class="game-zone">
+
+        <!-- ACTIVITY 1: EXTRAORDINARY HERO SUMMARY -->
+        <div class="game-card">
+            <h2><span class="game-tag">मिशन 1</span> शौर्य गाथा: पाठ का मूल सारांश</h2>
+            <div class="story-summary">
+                "यह कहानी सन् 1965 के भारत-पाकिस्तान युद्ध की पृष्ठभूमि पर आधारित है। जब दुश्मनों ने अचानक हमला किया, तो छुट्टियाँ बिता रहे भारतीय सेना के बहादुर मेजर आशाराम त्यागी को तुरंत मोर्चे पर वापस आने का आदेश मिला। युद्ध भूमि पर जाने से पहले उनकी माँ ने उन्हें आशीर्वाद दिया कि 'भारतीय परंपरा सीने पर गोली खाने की है, पीठ पर नहीं'। मेजर ने अदम्य साहस दिखाते हुए इच्छोगिल नहर के अभेद्य मोर्चे को ध्वस्त कर दिया और अपने प्राणों की बाजी लगाकर देश की रक्षा की।"
+            </div>
+        </div>
+
+        <!-- ACTIVITY 2: CYBER MCQ (4 STRATEGIC QUESTIONS) -->
+        <div class="game-card">
+            <h2><span class="game-tag">मिशन 2</span> रणभूमि युद्ध कौशल (MCQ चुनौती)</h2>
+            
+            <div class="quiz-mission" id="m1">
+                <p><strong>चैलेंज 1: भारत पर दुश्मनों ने अचानक किस वर्ष आक्रमण कर दिया था?</strong></p>
+                <div class="btn-grid">
+                    <button class="action-btn" onclick="verifyG(this, false, 'm1')">A) सन् 1947 में</button>
+                    <button class="action-btn" onclick="verifyG(this, true, 'm1')">B) सन् 1965 में</button>
+                    <button class="action-btn" onclick="verifyG(this, false, 'm1')">C) सन् 1999 में</button>
+                    <button class="action-btn" onclick="verifyG(this, false, 'm1')">D) सन् 1971 में</button>
+                </div>
+                <div class="feedback-banner"></div>
+            </div>
+
+            <div class="quiz-mission" id="m2">
+                <p><strong>चैलेंज 2: युद्ध के समय भारतीय सेना के लिए कौन सी नहर चुनौती की दीवार बनी खड़ी थी?</strong></p>
+                <div class="btn-grid">
+                    <button class="action-btn" onclick="verifyG(this, false, 'm2')">A) स्वेज़ नहर</button>
+                    <button class="action-btn" onclick="verifyG(this, false, 'm2')">B) शारदा नहर</button>
+                    <button class="action-btn" onclick="verifyG(this, true, 'm2')">C) इच्छोगिल नहर</button>
+                    <button class="action-btn" onclick="verifyG(this, false, 'm2')">D) इंदिरा गांधी नहर</button>
+                </div>
+                <div class="feedback-banner"></div>
+            </div>
+
+            <div class="quiz-mission" id="m3">
+                <p><strong>चैलेंज 3: घायल होने के बाद मेजर आशाराम त्यागी को किस अस्पताल में भर्ती कराया गया था?</strong></p>
+                <div class="btn-grid">
+                    <button class="action-btn" onclick="verifyG(this, true, 'm3')">A) अमृतसर के सैनिक अस्पताल में</button>
+                    <button class="action-btn" onclick="verifyG(this, false, 'm3')">B) दिल्ली के आर्मी अस्पताल में</button>
+                    <button class="action-btn" onclick="verifyG(this, false, 'm3')">C) मुंबई के अस्पताल में</button>
+                    <button class="action-btn" onclick="verifyG(this, false, 'm3')">D) लाहौर के अस्पताल में</button>
+                </div>
+                <div class="feedback-banner"></div>
+            </div>
+
+            <div class="quiz-mission" id="m4">
+                <p><strong>चैलेंज 4: वीर गति प्राप्त करने के बाद मेजर त्यागी को किस चक्र से सम्मानित किया गया?</strong></p>
+                <div class="btn-grid">
+                    <button class="action-btn" onclick="verifyG(this, false, 'm4')">A) परमवीर चक्र</button>
+                    <button class="action-btn" onclick="verifyG(this, true, 'm4')">B) महावीर चक्र</button>
+                    <button class="action-btn" onclick="verifyG(this, false, 'm4')">C) शौर्य चक्र</button>
+                    <button class="action-btn" onclick="verifyG(this, false, 'm4')">D) कीर्ति चक्र</button>
+                </div>
+                <div class="feedback-banner"></div>
+            </div>
+        </div>
+
+        <!-- ACTIVITY 3: MATRIX DRAG & DROP (4 SMART MATCHES) -->
+        <div class="game-card">
+            <h2><span class="game-tag">मिशन 3</span> ड्रैग एंड ड्रॉप: वचनों और परंपराओं का मिलान</h2>
+            <p style="margin-bottom: 15px;">नीचे दिए गए सही ऐतिहासिक पात्रों/शब्दों को उनके संबंधित कथनों/विशेषताओं के बॉक्स में सेट करें:</p>
+            <div class="matrix-container">
+                <div class="chip-pool">
+                    <div class="drag-chip" draggable="true" id="c1" ondragstart="startDrag(event)">मेजर आशाराम त्यागी</div>
+                    <div class="drag-chip" draggable="true" id="c2" ondragstart="startDrag(event)">पीठ पर नहीं</div>
+                    <div class="drag-chip" draggable="true" id="c3" ondragstart="startDrag(event)">अमृतसर</div>
+                    <div class="drag-chip" draggable="true" id="c4" ondragstart="startDrag(event)">परम पुनीत कर्तव्य</div>
+                </div>
+                <div class="slots-grid">
+                    <div class="target-slot" ondragover="enableDrop(event)" ondrop="processDrop(event, 'c1')">
+                        <strong>1. प्राणों की बाजी लगाने वाले वीर ➔</strong>
+                        <div class="dropped-here"></div>
+                    </div>
+                    <div class="target-slot" ondragover="enableDrop(event)" ondrop="processDrop(event, 'c2')">
+                        <strong>2. गोली सीने पर खानी है... ➔</strong>
+                        <div class="dropped-here"></div>
+                    </div>
+                    <div class="target-slot" ondragover="enableDrop(event)" ondrop="processDrop(event, 'c3')">
+                        <strong>3. सैनिकों का इलाज स्थल ➔</strong>
+                        <div class="dropped-here"></div>
+                    </div>
+                    <div class="target-slot" ondragover="enableDrop(event)" ondrop="processDrop(event, 'c4')">
+                        <strong>4. शत्रु से देश की रक्षा करना ➔</strong>
+                        <div class="dropped-here"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="feedback-banner" id="matrix-status"></div>
+        </div>
+
+        <!-- ACTIVITY 4: FILL IN THE BLANKS (4 HIGH-LEVEL TEXT QUESTIONS) -->
+        <div class="game-card" id="blank-zone">
+            <h2><span class="game-tag">मिशन 4</span> ऐतिहासिक संवाद पूर्ति (रिक्त स्थान भरें)</h2>
+            <div class="input-row">
+                <label>1. हर तरफ _________ का वातावरण था।</label>
+                <input type="text" class="neon-textbox" placeholder="शांति" id="tx1">
+            </div>
+            <div class="input-row">
+                <label>2. इस समय _________ ही प्रत्येक भारतीय का सबसे बड़ा कर्तव्य है।</label>
+                <input type="text" class="neon-textbox" placeholder="राष्ट्ररक्षा" id="tx2">
+            </div>
+            <div class="input-row">
+                <label>3. दुश्मन के सारे टैंकों को _________ कर मेजर आगे बढ़े।</label>
+                <input type="text" class="neon-textbox" placeholder="ध्वस्त" id="tx3">
+            </div>
+            <div class="input-row">
+                <label>4. तुम्हारी माँ तक _________ पहुँचा देना।</label>
+                <input type="text" class="neon-textbox" placeholder="संदेश" id="tx4">
+            </div>
+            <button class="score-btn" onclick="evalBlanks()">संवादों की सत्यता जाँचें</button>
+            <div class="feedback-banner"></div>
+        </div>
+
+        <!-- ACTIVITY 5: GRAMMAR CORE (4 CONVERSIONS/SYNONYMS) -->
+        <div class="game-card" id="grammar-zone">
+            <h2><span class="game-tag">मिशन 5</span> व्याकरण युद्ध क्षेत्र (बहुवचन एवं विपरीतार्थक शब्द)</h2>
+            <p style="margin-bottom: 15px;">पाठ्यपुस्तक के नियमों के अनुसार बहुवचन तथा विलोम रूप भरें (संकेत: तैयारियाँ, गोलियाँ, अभेद्य, पीछे):</p>
+            <div class="input-row">
+                <label>1. बहुवचन रूप: तैयारी = _________</label>
+                <input type="text" class="neon-textbox" id="g1">
+            </div>
+            <div class="input-row">
+                <label>2. बहुवचन रूप: गोली = _________</label>
+                <input type="text" class="neon-textbox" id="g2">
+            </div>
+            <div class="input-row">
+                <label>3. विलोम शब्द: भेद्य X _________</label>
+                <input type="text" class="neon-textbox" id="g3">
+            </div>
+            <div class="input-row">
+                <label>4. विलोम शब्द: आगे X _________</label>
+                <input type="text" class="neon-textbox" id="g4">
+            </div>
+            <button class="score-btn" onclick="evalGrammar()">व्याकरण शुद्धता जाँचें</button>
+            <div class="feedback-banner"></div>
+        </div>
+
+        <!-- ACTIVITY 6: TRUE OR FALSE GAME FRAME (4 IDEOLOGICAL STATEMENTS) -->
+        <div class="game-card">
+            <h2><span class="game-tag">मिशन 6</span> देशप्रेम परीक्षा (सत्य अथवा असत्य कथन)</h2>
+            
+            <div class="quiz-mission" id="t1">
+                <p><strong>कथन 1: लड़ाई के मैदान में सैनिक को हमेशा अपनी पीठ दिखाकर भाग जाना चाहिए।</strong></p>
+                <div class="btn-grid">
+                    <button class="action-btn" onclick="verifyG(this, false, 't1')">✓ सत्य (True)</button>
+                    <button class="action-btn" onclick="verifyG(this, true, 't1')">✗ असत्य (False)</button>
+                </div>
+                <div class="feedback-banner"></div>
+            </div>
+
+            <div class="quiz-mission" id="t2">
+                <p><strong>कथन 2: मेजर आशाराम त्यागी ने अंतिम क्षणों में भी चेहरे पर मुस्कान बनाए रखी थी।</strong></p>
+                <div class="btn-grid">
+                    <button class="action-btn" onclick="verifyG(this, true, 't2')">✓ सत्य (True)</button>
+                    <button class="action-btn" onclick="verifyG(this, false, 't2')">✗ असत्य (False)</button>
+                </div>
+                <div class="feedback-banner"></div>
+            </div>
+
+            <div class="quiz-mission" id="t3">
+                <p><strong>कथन 3: लाहौर इच्छोगिल नहर से लगभग 14 किलोमीटर की दूरी पर स्थित है।</strong></p>
+                <div class="btn-grid">
+                    <button class="action-btn" onclick="verifyG(this, true, 't3')">✓ सत्य (True)</button>
+                    <button class="action-btn" onclick="verifyG(this, false, 't3')">✗ असत्य (False)</button>
+                </div>
+                <div class="feedback-banner"></div>
+            </div>
+
+            <div class="quiz-mission" id="t4">
+                <p><strong>कथन 4: मेजर त्यागी को जब आदेश मिला तब वे अपनी छुट्टियां बिता रहे थे।</strong></p>
+                <div class="btn-grid">
+                    <button class="action-btn" onclick="verifyG(this, true, 't4')">✓ सत्य (True)</button>
+                    <button class="action-btn" onclick="verifyG(this, false, 't4')">✗ असत्य (False)</button>
+                </div>
+                <div class="feedback-banner"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Synthesized Custom Laser Audio Engine
+        const soundEngine = new (window.AudioContext || window.webkitAudioContext)();
+
+        function triggerAudio(status) {
+            const oscillator = soundEngine.createOscillator();
+            const volumeControl = soundEngine.createGain();
+            oscillator.connect(volumeControl);
+            volumeControl.connect(soundEngine.destination);
+
+            if (status === 'success') {
+                oscillator.type = 'triangle';
+                // Futuristic upward synth frequency chime
+                oscillator.frequency.setValueAtTime(300, soundEngine.currentTime);
+                oscillator.frequency.exponentialRampToValueAtTime(900, soundEngine.currentTime + 0.3);
+                volumeControl.gain.setValueAtTime(0.25, soundEngine.currentTime);
+                volumeControl.gain.exponentialRampToValueAtTime(0.01, soundEngine.currentTime + 0.3);
+                oscillator.start();
+                oscillator.stop(soundEngine.currentTime + 0.3);
+            } else if (status === 'fail') {
+                oscillator.type = 'sawtooth';
+                // Low pitch down-ramp alert
+                oscillator.frequency.setValueAtTime(150, soundEngine.currentTime);
+                oscillator.frequency.linearRampToValueAtTime(70, soundEngine.currentTime + 0.25);
+                volumeControl.gain.setValueAtTime(0.2, soundEngine.currentTime);
+                volumeControl.gain.exponentialRampToValueAtTime(0.01, soundEngine.currentTime + 0.25);
+                oscillator.start();
+                oscillator.stop(soundEngine.currentTime + 0.25);
+            }
+        }
+
+        // Action Response Handler for MCQs & True/False Games
+        function verifyG(element, matchStatus, areaId) {
+            const container = document.getElementById(areaId);
+            const statusDisplay = container.querySelector('.feedback-banner');
+            const targetButtons = container.querySelectorAll('.action-btn');
+            
+            targetButtons.forEach(b => b.style.borderColor = '#282e4e');
+
+            if (matchStatus) {
+                element.style.borderColor = 'var(--neon-green)';
+                statusDisplay.innerHTML = "✓ मिशन सफल! उत्कृष्ट चुनाव।";
+                statusDisplay.className = "feedback-banner win";
+                triggerAudio('success');
+            } else {
+                element.style.borderColor = 'var(--neon-pink)';
+                statusDisplay.innerHTML = "✗ मिशन असफल! सही मोर्चा चुनें।";
+                statusDisplay.className = "feedback-banner lose";
+                triggerAudio('fail');
+            }
+        }
+
+        // Drag & Drop Matrix Handling Engine
+        function enableDrop(ev) { ev.preventDefault(); }
+        function startDrag(ev) { ev.dataTransfer.setData("text", ev.target.id); }
+        
+        let pointCounter = 0;
+        function processDrop(ev, matchingKey) {
+            ev.preventDefault();
+            const elementId = ev.dataTransfer.getData("text");
+            const component = document.getElementById(elementId);
+            const landingSpot = ev.target.closest('.target-slot').querySelector('.dropped-here');
+            const matrixAlert = document.getElementById('matrix-status');
+
+            if (elementId === matchingKey) {
+                landingSpot.appendChild(component);
+                component.setAttribute('draggable', 'false');
+                component.style.borderColor = 'var(--neon-green)';
+                pointCounter++;
+                triggerAudio('success');
+                matrixAlert.innerHTML = "";
+                
+                if(pointCounter === 4) {
+                    matrixAlert.innerHTML = "🏆 असाधारण! आपने सभी 4 ऐतिहासिक वचनों का सही मिलान पूर्ण किया!";
+                    matrixAlert.className = "feedback-banner win";
+                }
+            } else {
+                matrixAlert.innerHTML = "✗ गलत मिलान! सोच समझकर ड्रैग करें।";
+                matrixAlert.className = "feedback-banner lose";
+                triggerAudio('fail');
+            }
+        }
+
+        // Text Blank Verification
+        function evalBlanks() {
+            const inputs = [
+                document.getElementById('tx1').value.trim(),
+                document.getElementById('tx2').value.trim(),
+                document.getElementById('tx3').value.trim(),
+                document.getElementById('tx4').value.trim()
+            ];
+            const alertBox = document.getElementById('blank-zone').querySelector('.feedback-banner');
+
+            if (inputs[0] === "शांति" && inputs[1] === "राष्ट्ररक्षा" && inputs[2] === "ध्वस्त" && inputs[3] === "संदेश") {
+                alertBox.innerHTML = "✓ बेहतरीन! चारों ऐतिहासिक संवाद एकदम सटीक और सत्य हैं।";
+                alertBox.className = "feedback-banner win";
+                triggerAudio('success');
+            } else {
+                alertBox.innerHTML = "✗ कुछ रिक्त स्थान पाठ के तथ्यों से मेल नहीं खा रहे हैं। पुनः लिखें।";
+                alertBox.className = "feedback-banner lose";
+                triggerAudio('fail');
+            }
+        }
+
+        // Grammar Validation Check
+        function evalGrammar() {
+            const gInputs = [
+                document.getElementById('g1').value.trim(),
+                document.getElementById('g2').value.trim(),
+                document.getElementById('g3').value.trim(),
+                document.getElementById('g4').value.trim()
+            ];
+            const alertBox = document.getElementById('grammar-zone').querySelector('.feedback-banner');
+
+            if (gInputs[0] === "तैयारियाँ" && gInputs[1] === "गोलियाँ" && gInputs[2] === "अभेद्य" && gInputs[3] === "पीछे") {
+                alertBox.innerHTML = "✓ अद्भुत! आपके व्याकरणिक रूपांतरण के सभी 4 उत्तर शत-प्रतिशत शुद्ध हैं।";
+                alertBox.className = "feedback-banner win";
+                triggerAudio('success');
+            } else {
+                alertBox.innerHTML = "✗ अशुद्ध वर्तनी अथवा गलत उत्तर! सही रूपांतरण भरें।";
+                alertBox.className = "feedback-banner lose";
+                triggerAudio('fail');
+            }
+        }
+    </script>
+</body>
+</html>

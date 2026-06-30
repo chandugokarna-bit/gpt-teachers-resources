@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>पाठ 4: शिक्षा - नियन गेमिंग ज़ोन</title>
+    <style>
+        :root {
+            --bg-color: #080911;
+            --panel-bg: rgba(18, 20, 38, 0.9);
+            --neon-cyan: #00f0ff;
+            --neon-magenta: #ff007f;
+            --neon-green: #39ff14;
+            --neon-yellow: #fff01f;
+            --neon-purple: #9d4edd;
+            --text-color: #f1f5f9;
+            --shadow-cyan: 0 0 20px #00f0ff;
+            --shadow-magenta: 0 0 20px #ff007f;
+            --shadow-green: 0 0 20px #39ff14;
+            --shadow-purple: 0 0 20px #9d4edd;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image: linear-gradient(180deg, #121324 0%, #080911 100%);
+            color: var(--text-color);
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        header h1 {
+            font-size: 3.5rem;
+            color: #fff;
+            text-shadow: 0 0 10px var(--neon-purple), 0 0 30px var(--neon-purple);
+            letter-spacing: 2px;
+        }
+
+        header p {
+            font-size: 1.3rem;
+            color: var(--neon-cyan);
+            text-shadow: 0 0 10px var(--neon-cyan);
+            margin-top: 5px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 950px;
+        }
+
+        /* Video-Game Frame Card Style */
+        .game-card {
+            background: var(--panel-bg);
+            border: 3px solid #252846;
+            border-radius: 24px;
+            padding: 30px;
+            margin-bottom: 40px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.7);
+            position: relative;
+            transition: all 0.4s ease;
+        }
+
+        .game-card:hover {
+            border-color: var(--neon-purple);
+            box-shadow: 0 0 30px rgba(157, 78, 221, 0.3);
+        }
+
+        .game-card h2 {
+            font-size: 1.6rem;
+            color: var(--neon-yellow);
+            text-shadow: 0 0 8px rgba(255, 240, 31, 0.4);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .level-badge {
+            background: var(--neon-magenta);
+            color: #fff;
+            padding: 4px 12px;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            box-shadow: var(--shadow-magenta);
+        }
+
+        .poem-display {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 20px;
+            border-radius: 16px;
+            border-right: 4px solid var(--neon-cyan);
+            border-left: 4px solid var(--neon-cyan);
+            text-align: center;
+            line-height: 2.2;
+            font-size: 1.25rem;
+            color: #e2e8f0;
+            text-shadow: 0 0 2px rgba(255,255,255,0.2);
+        }
+
+        .game-instructions {
+            font-size: 1.05rem;
+            color: #94a3b8;
+            margin-bottom: 15px;
+            font-style: italic;
+        }
+
+        .quest-block {
+            background: rgba(255,255,255,0.02);
+            padding: 20px;
+            border-radius: 16px;
+            margin-top: 20px;
+            border: 1px solid #1f233a;
+        }
+
+        /* Arcade MCQ Grid */
+        .arcade-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .arcade-btn {
+            background: #16192b;
+            border: 2px solid #2e3456;
+            color: #fff;
+            padding: 16px;
+            border-radius: 14px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            text-align: left;
+            transition: all 0.2s ease;
+        }
+
+        .arcade-btn:hover {
+            background: #20243e;
+            border-color: var(--neon-cyan);
+            box-shadow: var(--shadow-cyan);
+            transform: translateY(-2px);
+        }
+
+        /* Puzzle Matching / Drag Zone */
+        .puzzle-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .puzzle-items, .puzzle-slots {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .puzzle-piece {
+            background: #241435;
+            border: 2px solid var(--neon-purple);
+            padding: 12px 24px;
+            border-radius: 12px;
+            cursor: grab;
+            font-weight: bold;
+            box-shadow: var(--shadow-purple);
+        }
+
+        .puzzle-slot {
+            background: #0b0c16;
+            border: 2px dashed #3a416f;
+            padding: 15px;
+            border-radius: 16px;
+            min-width: 210px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Input Matches */
+        .grid-inputs {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+
+        .input-row {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            background: rgba(0,0,0,0.3);
+            padding: 12px 20px;
+            border-radius: 12px;
+        }
+
+        .input-row label {
+            font-size: 1.15rem;
+            width: 280px;
+        }
+
+        .game-input {
+            background: #090a12;
+            border: 1px solid #3a416f;
+            color: #fff;
+            padding: 10px 18px;
+            border-radius: 10px;
+            outline: none;
+            flex-grow: 1;
+            font-size: 1.1rem;
+        }
+
+        .game-input:focus {
+            border-color: var(--neon-yellow);
+            box-shadow: 0 0 10px rgba(255, 240, 31, 0.3);
+        }
+
+        /* Action Buttons */
+        .action-btn {
+            background: transparent;
+            border: 2px solid var(--neon-green);
+            color: var(--neon-green);
+            padding: 12px 28px;
+            border-radius: 14px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.05rem;
+            box-shadow: var(--shadow-green);
+            transition: all 0.3s ease;
+            margin-top: 15px;
+        }
+
+        .action-btn:hover {
+            background: var(--neon-green);
+            color: #000;
+            box-shadow: 0 0 25px var(--neon-green);
+        }
+
+        /* Live Feedbacks */
+        .game-feedback {
+            margin-top: 12px;
+            font-weight: bold;
+            font-size: 1.15rem;
+            min-height: 25px;
+        }
+
+        .win-text {
+            color: var(--neon-green) !important;
+            text-shadow: 0 0 10px rgba(57, 255, 20, 0.6);
+        }
+
+        .lose-text {
+            color: var(--neon-magenta) !important;
+            text-shadow: 0 0 10px rgba(255, 0, 127, 0.6);
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>पाठ 4 : शिक्षा</h1>
+        <p>अल्ट्रा मॉडर्न क्लासरूम गेमिंग एडिशन</p>
+    </header>
+
+    <div class="container">
+
+        <!-- GAME 1: POEM AUDIO VISUAL SUMMARY -->
+        <div class="game-card">
+            <h2><span class="level-badge">गेम 1</span> कविता का काव्यात्मक सारांश व मूल भाव</h2>
+            <div class="poem-display">
+                "शिशु ने दुनिया में आकर, रो-रोकर हँसना सीखा।<br>
+                लघु होकर बढ़ना सीखा, गिर-गिरकर चलना सीखा।।<br>
+                मिट-मिटकर वारिधरों ने, पानी बरसाना सीखा।<br>
+                तरु गिरिवर से गिर-गिरकर, नदियों ने बहना सीखा।।"
+            </div>
+            <p style="margin-top: 15px; font-size: 1.1rem; text-align: center; color: var(--neon-cyan);">
+                <strong>मूल संदेश:</strong> जीवन में यश या सफलता पाने के लिए कठिनाइयों का सामना करना पड़ता है; बिना परिश्रम और संघर्ष के कोई शिक्षा या सुख प्राप्त नहीं होता।
+            </p>
+        </div>
+
+        <!-- GAME 2: ARCADE MCQ CHALLENGE (4 QUESTIONS) -->
+        <div class="game-card">
+            <h2><span class="level-badge">गेम 2</span> आर्मचेयर एमसीक्यू आर्केड (4 प्रश्न)</h2>
+            <p class="game-instructions">सही विकल्प पर क्लिक करके अपना स्कोर बढ़ाएं:</p>
+
+            <div class="quest-block" id="q2-1">
+                <p><strong>प्रश्न 1: शिशु ने दुनिया में आकर रो-रोकर क्या सीखा है?</strong></p>
+                <div class="arcade-grid">
+                    <button class="arcade-btn" onclick="runArcade(this, false, 'q2-1')">A) सो जाना</button>
+                    <button class="arcade-btn" onclick="runArcade(this, true, 'q2-1')">B) हँसना सीखा</button>
+                    <button class="arcade-btn" onclick="runArcade(this, false, 'q2-1')">C) भागना</button>
+                    <button class="arcade-btn" onclick="runArcade(this, false, 'q2-1')">D) चिल्लाना</button>
+                </div>
+                <div class="game-feedback"></div>
+            </div>
+
+            <div class="quest-block" id="q2-2">
+                <p><strong>प्रश्न 2: पतंगों (चंगों) ने ऊँचाई पर चढ़ना कैसे सीखा है?</strong></p>
+                <div class="arcade-grid">
+                    <button class="arcade-btn" onclick="runArcade(this, false, 'q2-2')">A) हवा के बिना</button>
+                    <button class="arcade-btn" onclick="runArcade(this, false, 'q2-2')">B) धागा तोड़कर</button>
+                    <button class="arcade-btn" onclick="runArcade(this, true, 'q2-2')">C) अपना उर (छाती) छेदकर</button>
+                    <button class="arcade-btn" onclick="runArcade(this, false, 'q2-2')">D) ज़मीन पर रहकर</button>
+                </div>
+                <div class="game-feedback"></div>
+            </div>
+
+            <div class="quest-block" id="q2-3">
+                <p><strong>प्रश्न 3: वारिधरों (बादलों) ने पानी बरसाना कैसे सीखा है?</strong></p>
+                <div class="arcade-grid">
+                    <button class="arcade-btn" onclick="runArcade(this, true, 'q2-3')">A) मिट-मिटकर (स्वयं को खोकर)</button>
+                    <button class="arcade-btn" onclick="runArcade(this, false, 'q2-3')">B) गरजना बंद करके</button>
+                    <button class="arcade-btn" onclick="runArcade(this, false, 'q2-3')">C) धूप बढ़ाकर</button>
+                    <button class="arcade-btn" onclick="runArcade(this, false, 'q2-3')">D) सागर में मिलकर</button>
+                </div>
+                <div class="game-feedback"></div>
+            </div>
+
+            <div class="quest-block" id="q2-4">
+                <p><strong>प्रश्न 4: इस प्रेरक कविता के रचयिता कौन से महान कवि हैं?</strong></p>
+                <div class="arcade-grid">
+                    <button class="arcade-btn" onclick="runArcade(this, false, 'q2-4')">A) कबीरदास</button>
+                    <button class="arcade-btn" onclick="runArcade(this, false, 'q2-4')">B) महात्मा गांधी</button>
+                    <button class="arcade-btn" onclick="runArcade(this, false, 'q2-4')">C) मैथिलीशरण गुप्त</button>
+                    <button class="arcade-btn" onclick="runArcade(this, true, 'q2-4')">D) ठाकुर गोपालशरण सिंह</button>
+                </div>
+                <div class="game-feedback"></div>
+            </div>
+        </div>
+
+        <!-- GAME 3: PUZZLE DROP (4 RHYMING MATCHES) -->
+        <div class="game-card">
+            <h2><span class="level-badge">गेम 3</span> राइमिंग पहेली: ड्रैग एंड ड्रॉप (4 पेयर्स)</h2>
+            <p class="game-instructions">नीचे दिए गए टुकड़ों को सही तुकवाले बॉक्स में ड्रैग करें:</p>
+            <div class="puzzle-container">
+                <div class="puzzle-items">
+                    <div class="puzzle-piece" draggable="true" id="pz1" ondragstart="startDrag(event)">हँसना सीखा</div>
+                    <div class="puzzle-piece" draggable="true" id="pz2" ondragstart="startDrag(event)">चढ़ना सीखा</div>
+                    <div class="puzzle-piece" draggable="true" id="pz3" ondragstart="startDrag(event)">चलना सीखा</div>
+                    <div class="puzzle-piece" draggable="true" id="pz4" ondragstart="startDrag(event)">बहना सीखा</div>
+                </div>
+                <div class="puzzle-slots">
+                    <div class="puzzle-slot" ondragover="allowDropZone(event)" ondrop="endDrop(event, 'pz1')">
+                        <strong>चलना सीखा ➔</strong>
+                        <div class="dropped-here"></div>
+                    </div>
+                    <div class="puzzle-slot" ondragover="allowDropZone(event)" ondrop="endDrop(event, 'pz2')">
+                        <strong>बरसाना सीखा ➔</strong>
+                        <div class="dropped-here"></div>
+                    </div>
+                    <div class="puzzle-slot" ondragover="allowDropZone(event)" ondrop="endDrop(event, 'pz3')">
+                        <strong>गिर-कर ➔</strong>
+                        <div class="dropped-here"></div>
+                    </div>
+                    <div class="puzzle-slot" ondragover="allowDropZone(event)" ondrop="endDrop(event, 'pz4')">
+                        <strong>गाना सीखा ➔</strong>
+                        <div class="dropped-here"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="game-feedback" id="puzzle-score"></div>
+        </div>
+
+        <!-- GAME 4: CRYPTO FILL-UPS (4 LINE CHALLENGE) -->
+        <div class="game-card" id="crypto-game">
+            <h2><span class="level-badge">गेम 4</span> काव्य मैट्रिक्स: रिक्त स्थान पूर्ति (4 चुनौतियाँ)</h2>
+            <p class="game-instructions">कविता की पंक्तियों को पूरा करने के लिए सही शब्द टाइप करें:</p>
+            <div class="grid-inputs">
+                <div class="input-row">
+                    <label>1. लघु होकर _________ सीखा।</label>
+                    <input type="text" class="game-input" placeholder="बढ़ना" id="cf1">
+                </div>
+                <div class="input-row">
+                    <label>2. गिर-गिरकर _________ सीखा।</label>
+                    <input type="text" class="game-input" placeholder="चलना" id="cf2">
+                </div>
+                <div class="input-row">
+                    <label>3. तरु गिरिवर से _________</label>
+                    <input type="text" class="game-input" placeholder="गिर-गिरकर" id="cf3">
+                </div>
+                <div class="input-row">
+                    <label>4. मुरली ने _________ सीखा।</label>
+                    <input type="text" class="game-input" placeholder="गाना" id="cf4">
+                </div>
+            </div>
+            <button class="action-btn" onclick="verifyCrypto()">पंक्तियां लॉक करें</button>
+            <div class="game-feedback"></div>
+        </div>
+
+        <!-- GAME 5: GRAMMAR BOSS QUEST (4 SYNONYMS) -->
+        <div class="game-card" id="grammar-game">
+            <h2><span class="level-badge">गेम 5</span> व्याकरण बॉस: पर्यायवाची शब्द हंट (4 शब्द)</h2>
+            <p class="game-instructions">पाठ्यपुस्तक के शब्दार्थ खंड से सही पर्यायवाची शब्द लिखें:</p>
+            <div class="grid-inputs">
+                <div class="input-row">
+                    <label>1. दुनिया =</label>
+                    <input type="text" class="game-input" placeholder="जगत या..." id="gm1">
+                </div>
+                <div class="input-row">
+                    <label>2. लघु =</label>
+                    <input type="text" class="game-input" placeholder="छोटा या..." id="gm2">
+                </div>
+                <div class="input-row">
+                    <label>3. वारिधर =</label>
+                    <input type="text" class="game-input" placeholder="जैसे..." id="gm3">
+                </div>
+                <div class="input-row">
+                    <label>4. गिरि =</label>
+                    <input type="text" class="game-input" placeholder="जैसे..." id="gm4">
+                </div>
+            </div>
+            <button class="action-btn" onclick="verifyGrammar()">व्याकरण सबमिट करें</button>
+            <div class="game-feedback"></div>
+        </div>
+
+    </div>
+
+    <script>
+        // Retro Electronic Synth Sound Matrix
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+        function triggerBeep(status) {
+            const osc = audioContext.createOscillator();
+            const amp = audioContext.createGain();
+            osc.connect(amp);
+            amp.connect(audioContext.destination);
+
+            if (status === 'win') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(587.33, audioContext.currentTime); // D5
+                osc.frequency.setValueAtTime(698.46, audioContext.currentTime + 0.08); // F5
+                osc.frequency.setValueAtTime(880.00, audioContext.currentTime + 0.16); // A5
+                amp.gain.setValueAtTime(0.25, audioContext.currentTime);
+                amp.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.4);
+                osc.start();
+                osc.stop(audioContext.currentTime + 0.4);
+            } else if (status === 'lose') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(130, audioContext.currentTime);
+                amp.gain.setValueAtTime(0.2, audioContext.currentTime);
+                amp.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+                osc.start();
+                osc.stop(audioContext.currentTime + 0.3);
+            }
+        }
+
+        // Game 2 Logic (Arcade MCQ)
+        function runArcade(btn, isCorrect, parentId) {
+            const block = document.getElementById(parentId);
+            const feedback = block.querySelector('.game-feedback');
+            const targetBtns = block.querySelectorAll('.arcade-btn');
+
+            targetBtns.forEach(b => b.style.borderColor = '#2e3456');
+
+            if (isCorrect) {
+                btn.style.borderColor = 'var(--neon-green)';
+                feedback.innerHTML = "🎯 परफेक्ट हिट! सही उत्तर।";
+                feedback.className = "game-feedback win-text";
+                triggerBeep('win');
+            } else {
+                btn.style.borderColor = 'var(--neon-magenta)';
+                feedback.innerHTML = "⚡ मिशन फेल! फिर से प्रयास करें।";
+                feedback.className = "game-feedback lose-text";
+                triggerBeep('lose');
+            }
+        }
+
+        // Game 3 Logic (Drag & Drop)
+        function allowDropZone(ev) { ev.preventDefault(); }
+        function startDrag(ev) { ev.dataTransfer.setData("text", ev.target.id); }
+        
+        let scoreCounter = 0;
+        function endDrop(ev, targetId) {
+            ev.preventDefault();
+            const dataId = ev.dataTransfer.setData ? "" : ev.dataTransfer.getData("text");
+            const elementData = dataId || ev.dataTransfer.getData("text");
+            const piece = document.getElementById(elementData);
+            const currentSlot = ev.target.closest('.puzzle-slot');
+            const holder = currentSlot.querySelector('.dropped-here');
+            const scoreDisplay = document.getElementById('puzzle-score');
+
+            if (elementData === targetId) {
+                holder.appendChild(piece);
+                piece.setAttribute('draggable', 'false');
+                piece.style.borderColor = 'var(--neon-green)';
+                scoreCounter++;
+                triggerBeep('win');
+                scoreDisplay.innerHTML = "";
+
+                if (scoreCounter === 4) {
+                    scoreDisplay.innerHTML = "🏆 अद्भुत! पहेली के सभी 4 जोड़ बिल्कुल सही स्थान पर सेट हुए!";
+                    scoreDisplay.className = "game-feedback win-text";
+                }
+            } else {
+                scoreDisplay.innerHTML = "❌ अमान्य मिलान! यह टुकड़ा इस खांचे में फिट नहीं बैठता।";
+                scoreDisplay.className = "game-feedback lose-text";
+                triggerBeep('lose');
+            }
+        }
+
+        // Game 4 Logic (Crypto Fill-ups)
+        function verifyCrypto() {
+            const c1 = document.getElementById('cf1').value.trim();
+            const c2 = document.getElementById('cf2').value.trim();
+            const c3 = document.getElementById('cf3').value.trim();
+            const c4 = document.getElementById('cf4').value.trim();
+            const feedback = document.getElementById('crypto-game').querySelector('.game-feedback');
+
+            if (c1 === "बढ़ना" && c2 === "चलना" && c3 === "गिर-गिरकर" && c4 === "गाना") {
+                feedback.innerHTML = "🚀 मैट्रिक्स क्लियर! सभी 4 पंक्तियां शत-प्रतिशत सही हैं।";
+                feedback.className = "game-feedback win-text";
+                triggerBeep('win');
+            } else {
+                feedback.innerHTML = "⚠️ कुछ शब्द मेल नहीं खा रहे हैं। कविता की पंक्तियों को दोबारा याद करें।";
+                feedback.className = "game-feedback lose-text";
+                triggerBeep('lose');
+            }
+        }
+
+        // Game 5 Logic (Grammar Quest)
+        function verifyGrammar() {
+            const g1 = document.getElementById('gm1').value.trim();
+            const g2 = document.getElementById('gm2').value.trim();
+            const g3 = document.getElementById('gm3').value.trim();
+            const g4 = document.getElementById('gm4').value.trim();
+            const feedback = document.getElementById('grammar-game').querySelector('.game-feedback');
+
+            if ((g1.includes("संसार") || g1.includes("जगत")) && (g2.includes("छोटा") || g2.includes("हल्का")) && g3.includes("बादल") && g4.includes("पर्वत")) {
+                feedback.innerHTML = "🔥 व्याकरण बॉस स्तर पार हुआ! सभी पर्यायवाची शब्द एकदम सही हैं।";
+                feedback.className = "game-feedback win-text";
+                triggerBeep('win');
+            } else {
+                feedback.innerHTML = "❌ गलत उत्तर! पाठ के शब्दार्थ संकेतों की सहायता लें।";
+                feedback.className = "game-feedback lose-text";
+                triggerBeep('lose');
+            }
+        }
+    </script>
+</body>
+</html>
