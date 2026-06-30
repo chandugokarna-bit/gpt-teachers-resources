@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Class 8 Science: Electrolysis & Ion Sandbox Ultimate</title>
+    <style>
+        :root {
+            --bg-dark: #0a0f1d;
+            --card-dark: #161f38;
+            --text-light: #f1f5f9;
+            --text-muted: #94a3b8;
+            --primary: #4f46e5;
+            --secondary: #06b6d4;
+            --anode-color: #ef4444;
+            --cathode-color: #3b82f6;
+            --na-color: #22c55e;
+            --cl-color: #a855f7;
+            --sugar-color: #eab308;
+            --success: #10b981;
+            --danger: #ef4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            padding: 25px 15px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1150px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 25px;
+            background: linear-gradient(135deg, #0f172a, #1e1b4b);
+            padding: 20px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        header h1 {
+            font-size: 2rem;
+            background: linear-gradient(to right, #38bdf8, #818cf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .main-workspace {
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 25px;
+        }
+
+        @media (max-width: 850px) {
+            .main-workspace {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .panel {
+            background: var(--card-dark);
+            border-radius: 20px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 4px 25px rgba(0,0,0,0.3);
+        }
+
+        .panel-title {
+            font-size: 1.15rem;
+            color: var(--secondary);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .sandbox-display {
+            background: #050814;
+            height: 320px;
+            border-radius: 16px;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .canvas-container {
+            width: 100%;
+            height: 100%;
+        }
+
+        .interactive-widget {
+            margin-top: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .selector-group {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .solute-btn {
+            background: #1e294b;
+            border: 1px solid rgba(255,255,255,0.1);
+            color: var(--text-muted);
+            padding: 12px;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .solute-btn:hover {
+            background: #273564;
+            color: var(--text-light);
+            transform: translateY(-1px);
+        }
+
+        .solute-btn.active {
+            background: var(--secondary);
+            color: #050814;
+            border-color: #22d3ee;
+            box-shadow: 0 0 12px rgba(34, 211, 238, 0.3);
+        }
+
+        .control-block {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .slider-control {
+            width: 100%;
+            accent-color: var(--secondary);
+            cursor: pointer;
+            margin-top: 4px;
+        }
+
+        .slider-control:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .info-card {
+            background: rgba(34, 211, 238, 0.04);
+            border-left: 4px solid var(--secondary);
+            padding: 12px;
+            border-radius: 0 10px 10px 0;
+            font-size: 0.88rem;
+            line-height: 1.5;
+        }
+
+        /* Quiz Panel Layout Styles */
+        .quiz-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .score-hud {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #0f162e;
+            padding: 12px 16px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            border: 1px solid rgba(99, 102, 241, 0.25);
+        }
+
+        .score-val {
+            color: #a78bfa;
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 6px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 3px;
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: var(--secondary);
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .question-card {
+            display: none;
+        }
+
+        .question-card.active {
+            display: block;
+            animation: slideIn 0.35s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .question-text {
+            font-size: 1rem;
+            font-weight: 500;
+            margin-bottom: 16px;
+            line-height: 1.45;
+        }
+
+        .option-btn {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: var(--text-light);
+            padding: 12px 16px;
+            border-radius: 12px;
+            text-align: left;
+            cursor: pointer;
+            margin-bottom: 10px;
+            transition: all 0.2s ease;
+            font-size: 0.9rem;
+        }
+
+        .option-btn:hover {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: var(--text-muted);
+            transform: translateX(3px);
+        }
+
+        .option-btn.correct {
+            background: rgba(16, 185, 129, 0.18) !important;
+            border-color: var(--success) !important;
+            color: #34d399;
+            font-weight: 600;
+        }
+
+        .option-btn.wrong {
+            background: rgba(239, 68, 68, 0.18) !important;
+            border-color: var(--danger) !important;
+            color: #f87171;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>⚡ Electrolysis & Ionic Conductivity Sandbox Ultimate</h1>
+            <p>Test the chemical effects of electric currents, watch mobile molecular charges, and close shuffled audio quests</p>
+        </header>
+
+        <div class="main-workspace">
+            
+            <!-- Simulation Sandbox Frame -->
+            <div class="panel">
+                <div class="panel-title">🔬 Electrolytic Beaker & Circuit Loop Viewport</div>
+                
+                <div class="sandbox-display">
+                    <canvas id="electrolysisCanvas" class="canvas-container"></canvas>
+                </div>
+
+                <div class="interactive-widget">
+                    <div class="control-block">
+                        <label style="font-size:0.85rem; font-weight:600; color:var(--text-muted); margin-bottom: 5px;">Select Solution Liquid Substrate:</label>
+                        <div class="selector-group">
+                            <button id="waterBtn" class="solute-btn active" onclick="changeSolution('water')">💧 Distilled Water</button>
+                            <button id="saltBtn" class="solute-btn" onclick="changeSolution('salt')">🧂 Salt Solution (NaCl)</button>
+                            <button id="sugarBtn" class="solute-btn" onclick="changeSolution('sugar')">🍭 Sugar Solution</button>
+                            <button id="lemonBtn" class="solute-btn" onclick="changeSolution('lemon')">🍋 Lemon Juice (Acid)</button>
+                        </div>
+                    </div>
+
+                    <div class="control-block">
+                        <label id="slider-label" style="font-size:0.85rem; font-weight:600; color:var(--text-muted);">Solute Ion Concentration Matrix:</label>
+                        <input type="range" id="concentrationSlider" class="slider-control" min="0" max="100" value="0" oninput="adjustConcentration()">
+                    </div>
+
+                    <div class="info-card" id="solution-explanation">
+                        Distilled water contains clean H₂O covalent compounds without any detached ions. Because there are no wandering charge carrying agents available to ferry electrons, the loop remains broken and the lamp stays unlit.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quiz Assessments Panel -->
+            <div class="panel quiz-container">
+                <div class="panel-title">🏆 Diagnostic Quest Evaluation Node</div>
+                
+                <div class="score-hud">
+                    <div>Module Progress: <span id="progress-hud-text">1 / 4</span></div>
+                    <div>Score Profile: <span id="score-counter" class="score-val">0</span> XP</div>
+                </div>
+
+                <div class="progress-bar-container">
+                    <div id="progress-indicator" class="progress-fill"></div>
+                </div>
+
+                <div id="quiz-deck-wrapper">
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        const activeActivities = {
+            water: {
+                explanation: "Distilled water contains pure H₂O covalent compounds with no detached ions. Because there are no floating mobile charge particles to ferry electrons across the container gaps, the loop stays open and the bulb remains dark.",
+                sliderVal: 0,
+                allowSlider: false,
+                conductivity: 0,
+                particleType: 'none',
+                questions: [
+                    { q: "Why doesn't pure distilled water conduct electricity and light up the test bulb?", o: ["It completely lacks free ions to carry the electric current", "It absorbs all electrons into atomic nuclei structures", "Liquid molecules are packed too loosely to physically touch"], c: 0 },
+                    { q: "Which type of chemical bonding prevents pure water compounds from splitting freely at room state?", o: ["Covalent bonding sharing electron loops tightly", "Metallic lattice attraction parameters", "Weak ionic fields without real electron sharing maps"], c: 0 },
+                    { q: "How can we safely make tap water or distilled water a good conductor of electricity in a lab?", o: ["By dissolving small amounts of common salt, acids, or bases", "By boiling it continuously until it turns completely to steam", "By pouring it into a plastic container instead of glass"], c: 0 },
+                    { q: "Why is it strictly recommended not to handle household electrical appliances with wet hands?", o: ["Normal water has trace minerals making it conductive, increasing shock risks", "Water molecules chemically strip wires of insulation covers instantly", "Moisture forces the battery or main station to reverse its path"], c: 0 }
+                ]
+            },
+            salt: {
+                explanation: "Salt (NaCl) breaks into mobile sodium ions (Na⁺) and chlorine ions (Cl⁻). The positive ions drift to the negative electrode, while negative ions rush to the positive electrode, completing the circuit and making the bulb glow brightly!",
+                sliderVal: 45,
+                allowSlider: true,
+                conductivity: 0.8,
+                particleType: 'salt',
+                questions: [
+                    { q: "What happens down at the microscopic level when common salt crystals are dissolved into water?", o: ["The crystal lattice breaks apart into individual mobile ions (Na⁺ and Cl⁻)", "Salt atoms instantly gasify into vapor packets", "The water changes chemical composition into covalent glucose chains"], c: 0 },
+                    { q: "If you slide the Concentration scale to the maximum tier value, why does the bulb illuminate fiercely?", o: ["More mobile charge-carrying ions are present, lowering electrical resistance", "The total voltage potential of the alkaline battery is doubled", "The water volume doubles in mass and weight metrics"], c: 0 },
+                    { q: "Toward which terminal does the positively charged Sodium ion (Na⁺) travel during current transmission?", o: ["The Cathode (Negative Electrode terminal link)", "The Anode (Positive Electrode terminal link)", "It hovers statically right in the center point"], c: 0 },
+                    { q: "What are substances called that break apart into mobile charged particles when dissolved in liquid to allow electric flow?", o: ["Electrolytes", "Insulators", "Neutral Covalent Elements"], c: 0 }
+                ]
+            },
+            sugar: {
+                explanation: "Sugar dissolves as whole sucrose molecules instead of dividing into isolated ion structures. Since these floating mass clusters remain electrically neutral, no charges cross the gap, keeping the indicator lamp unlit.",
+                sliderVal: 50,
+                allowSlider: true,
+                conductivity: 0,
+                particleType: 'sugar',
+                questions: [
+                    { q: "Why does a highly concentrated sugar solution fail to complete the electrical circuit?", o: ["Sugar dissolves as neutral whole molecules that carry no electric charge", "Sugar removes all power stored inside battery cores", "Sugar acts as an ultra-conductive shield absorbing all paths"], c: 0 },
+                    { q: "If you add pounds of pure sugar crystals into the beaker, what happens to the bulb parameter?", o: ["It stays dark because concentration updates do not unlock free ion sets", "It begins flashing frantically with intermittent current loops", "It turns red due to heat generations"], c: 0 },
+                    { q: "Which property must a liquid possess to be classified as a non-electrolyte?", o: ["It must not release free mobile charged ions in its solution form", "It must have a boiling threshold lower than room temperature", "It must be completely transparent to passing light waves"], c: 0 },
+                    { q: "What differentiates a salt particle from a sugar particle when suspended in a water medium?", o: ["Salt forms charged wandering ions, while sugar splits into neutral molecules", "Sugar undergoes a phase change turning into an invisible gas cloud", "Salt repels water completely, floating directly along the surface lines"], c: 0 }
+                ]
+            },
+            lemon: {
+                explanation: "Lemon juice contains citric acid, which naturally splits into hydrogen (H⁺) and citrate ions. These charged carriers move through the liquid to complete the circuit, lighting up the test bulb with moderate intensity.",
+                sliderVal: 40,
+                allowSlider: true,
+                conductivity: 0.45,
+                particleType: 'acid',
+                questions: [
+                    { q: "What active compound inside natural lemon juice releases mobile charges for conductivity?", o: ["Citric Acid compounds splitting to set free ionic hydrogen (H⁺)", "Pure hydrocarbon fuel elements carrying thermal vectors", "Suspended cellulose fibers acting as micro metallic filaments"], c: 0 },
+                    { q: "Compared to the Salt solution, why does the Lemon juice medium cause a more moderate bulb intensity?", o: ["It contains a weaker acid configuration with fewer generated mobile ions", "Lemon juice blocks light wavelengths from escaping glass walls", "Acid loops completely switch direction every few seconds"], c: 0 },
+                    { q: "If you replace lemon juice with vinegar (acetic acid), how will the bulb behave?", o: ["It will glow with a dim/moderate light because vinegar is also a weak electrolyte", "It will explode instantly due to extreme high voltage accumulation", "It will stay completely dark because vinegar matches distilled water properties"], c: 0 },
+                    { q: "What chemical action occurs at the surface of electrodes when electricity passes through an acidic solution?", o: ["Gases evolve, deposits form, or colors change due to chemical reactions", "The liquid turns into a solid plastic crystalline block", "The rods swap physical weights completely via teleportation grids"], c: 0 }
+                ]
+            }
+        };
+
+        let currentActiveKey = 'water';
+        let globalXPScore = 0;
+        
+        const canvas = document.getElementById('electrolysisCanvas');
+        const ctx = canvas.getContext('2d');
+        let animationFrameId;
+        let particleArray = [];
+
+        // Synthesizer Engine using Web Audio API (No files required)
+        function playFeedbackSound(isCorrect) {
+            try {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                if (!AudioContext) return;
+                const audioCtx = new AudioContext();
+                
+                if (isCorrect) {
+                    // Crisp double chime sound
+                    let osc1 = audioCtx.createOscillator();
+                    let osc2 = audioCtx.createOscillator();
+                    let gainNode = audioCtx.createGain();
+                    
+                    osc1.type = 'sine';
+                    osc1.frequency.setValueAtTime(587.33, audioCtx.currentTime); // D5
+                    osc1.frequency.setValueAtTime(880.00, audioCtx.currentTime + 0.1); // A5
+                    
+                    gainNode.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                    
+                    osc1.connect(gainNode);
+                    gainNode.connect(audioCtx.destination);
+                    osc1.start();
+                    osc1.stop(audioCtx.currentTime + 0.3);
+                } else {
+                    // Soft low buzz sound
+                    let osc = audioCtx.createOscillator();
+                    let gainNode = audioCtx.createGain();
+                    
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(130.81, audioCtx.currentTime); // C3
+                    
+                    gainNode.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+                    
+                    osc.connect(gainNode);
+                    gainNode.connect(audioCtx.destination);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.4);
+                }
+            } catch (e) {
+                console.log("Audio contextual block prevented execution pre-gesture:", e);
+            }
+        }
+
+        window.onload = function() {
+            resizeLabCanvas();
+            window.addEventListener('resize', resizeLabCanvas);
+            changeSolution('water');
+        };
+
+        function resizeLabCanvas() {
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+            spawnSolutionParticles();
+        }
+
+        class ChemicalIon {
+            constructor(x, y, ionClass) {
+                this.x = x;
+                this.y = y;
+                this.ionClass = ionClass; 
+                this.vx = (Math.random() - 0.5) * 0.8;
+                this.vy = (Math.random() - 0.5) * 0.8;
+                this.radius = ionClass === 'sugar' ? 8 : 5;
+            }
+
+            advance(condVal, w, h) {
+                let liquidTop = h * 0.45;
+                let liquidBottom = h * 0.9;
+                let leftBarX = w * 0.35;
+                let rightBarX = w * 0.65;
+
+                if (condVal > 0) {
+                    let driftForce = 0.4;
+                    if (this.ionClass === 'na' || this.ionClass === 'h') {
+                        this.x += driftForce;
+                        if (Math.abs(this.x - rightBarX) < 15 && this.y > h * 0.35 && this.y < h * 0.8) {
+                            this.x = w * 0.45 + (Math.random() - 0.5) * 40;
+                            this.y = liquidTop + Math.random() * (liquidBottom - liquidTop);
+                        }
+                    } 
+                    else if (this.ionClass === 'cl') {
+                        this.x -= driftForce;
+                        if (Math.abs(this.x - leftBarX) < 15 && this.y > h * 0.35 && this.y < h * 0.8) {
+                            this.x = w * 0.55 + (Math.random() - 0.5) * 40;
+                            this.y = liquidTop + Math.random() * (liquidBottom - liquidTop);
+                        }
+                    }
+                }
+
+                this.x += this.vx;
+                this.y += this.vy;
+
+                let liquidLeft = w * 0.18;
+                let liquidRight = w * 0.82;
+
+                if (this.x < liquidLeft || this.x > liquidRight) this.vx *= -1;
+                if (this.y < liquidTop + 5 || this.y > liquidBottom - 8) this.vy *= -1;
+            }
+
+            paint() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                
+                if (this.ionClass === 'na') {
+                    ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--na-color').trim();
+                    ctx.fill();
+                    ctx.fillStyle = '#000';
+                    ctx.font = 'bold 8px sans-serif';
+                    ctx.fillText('Na+', this.x - 6, this.y + 3);
+                } else if (this.ionClass === 'cl') {
+                    ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--cl-color').trim();
+                    ctx.fill();
+                    ctx.fillStyle = '#fff';
+                    ctx.font = 'bold 8px sans-serif';
+                    ctx.fillText('Cl-', this.x - 5, this.y + 3);
+                } else if (this.ionClass === 'h') {
+                    ctx.fillStyle = '#e11d48';
+                    ctx.fill();
+                    ctx.fillStyle = '#fff';
+                    ctx.font = 'bold 8px sans-serif';
+                    ctx.fillText('H+', this.x - 5, this.y + 3);
+                } else if (this.ionClass === 'sugar') {
+                    ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--sugar-color').trim();
+                    ctx.fill();
+                }
+                ctx.closePath();
+            }
+        }
+
+        function spawnSolutionParticles() {
+            particleArray = [];
+            let w = canvas.width;
+            let h = canvas.height;
+            let sliderVal = parseInt(document.getElementById('concentrationSlider').value);
+
+            let liquidTop = h * 0.45;
+            let liquidBottom = h * 0.9;
+            let spawnCount = Math.floor(sliderVal * 0.6);
+
+            const activeMeta = activeActivities[currentActiveKey];
+
+            for (let i = 0; i < spawnCount; i++) {
+                let rx = (w * 0.22) + Math.random() * (w * 0.56);
+                let ry = liquidTop + 10 + Math.random() * (liquidBottom - liquidTop - 25);
+
+                if (activeMeta.particleType === 'salt') {
+                    if (i % 2 === 0) {
+                        particleArray.push(new ChemicalIon(rx, ry, 'na'));
+                    } else {
+                        particleArray.push(new ChemicalIon(rx, ry, 'cl'));
+                    }
+                } else if (activeMeta.particleType === 'sugar') {
+                    particleArray.push(new ChemicalIon(rx, ry, 'sugar'));
+                } else if (activeMeta.particleType === 'acid') {
+                    if (i % 3 === 0) {
+                        particleArray.push(new ChemicalIon(rx, ry, 'h'));
+                    } else {
+                        particleArray.push(new ChemicalIon(rx, ry, 'sugar')); 
+                    }
+                }
+            }
+        }
+
+        function runElectrolysisLabTicker() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            let w = canvas.width;
+            let h = canvas.height;
+            let sliderVal = parseInt(document.getElementById('concentrationSlider').value);
+            
+            const activeMeta = activeActivities[currentActiveKey];
+            let effectiveConductivity = activeMeta.conductivity * (sliderVal / 100);
+
+            let leftBarX = w * 0.35;
+            let rightBarX = w * 0.65;
+            let circuitY = h * 0.15;
+
+            ctx.strokeStyle = '#475569';
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.moveTo(leftBarX, h * 0.35);
+            ctx.lineTo(leftBarX, circuitY);
+            ctx.lineTo(w * 0.44, circuitY);
+            ctx.stroke();
+
+            ctx.fillStyle = '#1e293b';
+            ctx.fillRect(w * 0.44, circuitY - 15, 36, 30);
+            ctx.fillStyle = '#e2e8f0';
+            ctx.font = 'bold 10px sans-serif';
+            ctx.fillText('BATTERY', w * 0.44 + 2, circuitY + 4);
+
+            ctx.strokeStyle = '#475569';
+            ctx.beginPath();
+            ctx.moveTo(w * 0.52, circuitY);
+            ctx.lineTo(rightBarX, circuitY);
+            ctx.lineTo(rightBarX, h * 0.35);
+            ctx.stroke();
+
+            let bulbX = w * 0.58;
+            let bulbY = circuitY;
+
+            if (effectiveConductivity > 0) {
+                let glowRadius = 15 + (effectiveConductivity * 35);
+                let gradient = ctx.createRadialGradient(bulbX, bulbY, 2, bulbX, bulbY, glowRadius);
+                gradient.addColorStop(0, 'rgba(253, 224, 71, 1)');
+                gradient.addColorStop(0.4, 'rgba(253, 224, 71, 0.4)');
+                gradient.addColorStop(1, 'rgba(253, 224, 71, 0)');
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+                ctx.arc(bulbX, bulbY, glowRadius, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            ctx.fillStyle = effectiveConductivity > 0 ? '#fde047' : '#334155';
+            ctx.beginPath();
+            ctx.arc(bulbX, bulbY, 12, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = '#94a3b8';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            ctx.fillStyle = 'rgba(38, 100, 235, 0.22)';
+            ctx.fillRect(w * 0.2, h * 0.45, w * 0.6, h * 0.45); 
+
+            ctx.strokeStyle = '#cbd5e1';
+            ctx.lineWidth = 5;
+            ctx.beginPath();
+            ctx.moveTo(w * 0.18, h * 0.4);
+            ctx.lineTo(w * 0.18, h * 0.9);
+            ctx.lineTo(w * 0.82, h * 0.9);
+            ctx.lineTo(w * 0.82, h * 0.4);
+            ctx.stroke();
+
+            ctx.lineWidth = 12;
+            ctx.strokeStyle = '#64748b';
+            ctx.beginPath();
+            ctx.moveTo(leftBarX, h * 0.32);
+            ctx.lineTo(leftBarX, h * 0.8);
+            ctx.stroke();
+            
+            ctx.fillStyle = '#ef4444';
+            ctx.font = 'bold 12px sans-serif';
+            ctx.fillText('ANODE (+)', leftBarX - 28, h * 0.3);
+
+            ctx.strokeStyle = '#475569';
+            ctx.beginPath();
+            ctx.moveTo(rightBarX, h * 0.32);
+            ctx.lineTo(rightBarX, h * 0.8);
+            ctx.stroke();
+
+            ctx.fillStyle = '#3b82f6';
+            ctx.font = 'bold 12px sans-serif';
+            ctx.fillText('CATHODE (-)', rightBarX - 32, h * 0.3);
+
+            particleArray.forEach(p => {
+                p.advance(effectiveConductivity, w, h);
+                p.paint();
+            });
+
+            animationFrameId = requestAnimationFrame(runElectrolysisLabTicker);
+        }
+
+        function changeSolution(modeKey) {
+            currentActiveKey = modeKey;
+
+            document.querySelectorAll('.solute-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById(modeKey + 'Btn').classList.add('active');
+
+            const targetMeta = activeActivities[modeKey];
+            document.getElementById('solution-explanation').innerText = targetMeta.explanation;
+            
+            const slider = document.getElementById('concentrationSlider');
+            slider.value = targetMeta.sliderVal;
+            slider.disabled = !targetMeta.allowSlider;
+
+            const sliderLabel = document.getElementById('slider-label');
+            if(!targetMeta.allowSlider) {
+                sliderLabel.innerText = "Solute Ion Concentration (Fixed for Pure Liquids):";
+            } else {
+                sliderLabel.innerText = "Solute Ion Concentration Matrix:";
+            }
+
+            spawnSolutionParticles();
+            cancelAnimationFrame(animationFrameId);
+            runElectrolysisLabTicker();
+            buildInteractiveQuizNodes();
+        }
+
+        function adjustConcentration() {
+            spawnSolutionParticles();
+        }
+
+        // Shuffles an array in place using the Fisher-Yates method
+        function shuffleOptions(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function buildInteractiveQuizNodes() {
+            const wrapper = document.getElementById('quiz-deck-wrapper');
+            wrapper.innerHTML = "";
+
+            const targetData = activeActivities[currentActiveKey];
+            const questions = targetData.questions;
+
+            document.getElementById('progress-hud-text').innerText = `1 / ${questions.length}`;
+            document.getElementById('progress-indicator').style.width = `${(1 / questions.length) * 100}%`;
+
+            questions.forEach((qItem, qIdx) => {
+                const card = document.createElement('div');
+                card.className = `question-card ${qIdx === 0 ? 'active' : ''}`;
+                card.id = `q-node-${qIdx}`;
+
+                const text = document.createElement('p');
+                text.className = "question-text";
+                text.innerText = `${qIdx + 1}. ${qItem.q}`;
+                card.appendChild(text);
+
+                // Create an array of option objects tracking their original index positions
+                let indexedOptions = qItem.o.map((str, idx) => {
+                    return { textStr: str, originalIdx: idx };
+                });
+
+                // Shuffle options completely so positions are random
+                shuffleOptions(indexedOptions);
+
+                indexedOptions.forEach((optObj) => {
+                    const btn = document.createElement('button');
+                    btn.className = "option-btn";
+                    btn.innerText = optObj.textStr;
+
+                    btn.onclick = function() {
+                        if(card.classList.contains('evaluated')) return;
+                        card.classList.add('evaluated');
+
+                        // Evaluate choice using tracked original indices
+                        if(optObj.originalIdx === qItem.c) {
+                            btn.classList.add('correct');
+                            playFeedbackSound(true); // Play success chime
+                            globalXPScore += 100;
+                            document.getElementById('score-counter').innerText = globalXPScore;
+                        } else {
+                            btn.classList.add('wrong');
+                            playFeedbackSound(false); // Play low failure buzz
+                            
+                            // Find and highlight correct answer button dynamically
+                            const allButtons = card.querySelectorAll('.option-btn');
+                            allButtons.forEach((b, bIdx) => {
+                                if(indexedOptions[bIdx].originalIdx === qItem.c) {
+                                    b.classList.add('correct');
+                                }
+                            });
+                        }
+
+                        setTimeout(() => {
+                            advanceNextQuizNode(qIdx, questions.length);
+                        }, 1500);
+                    };
+                    card.appendChild(btn);
+                });
+
+                wrapper.appendChild(card);
+            });
+        }
+
+        function advanceNextQuizNode(currIdx, totalCount) {
+            const nextIdx = currIdx + 1;
+            const currentCard = document.getElementById(`q-node-${currIdx}`);
+
+            if(nextIdx < totalCount) {
+                const nextCard = document.getElementById(`q-node-${nextIdx}`);
+                currentCard.classList.remove('active');
+                nextCard.classList.add('active');
+
+                document.getElementById('progress-hud-text').innerText = `${nextIdx + 1} / ${totalCount}`;
+                document.getElementById('progress-indicator').style.width = `${((nextIdx + 1) / totalCount) * 100}%`;
+            } else {
+                alert(`🎉 Chapter Segment Completed! You earned a score balance upgrade for this solution mode! Experiment with other liquid substrates above.`);
+            }
+        }
+    </script>
+</body>
+</html>

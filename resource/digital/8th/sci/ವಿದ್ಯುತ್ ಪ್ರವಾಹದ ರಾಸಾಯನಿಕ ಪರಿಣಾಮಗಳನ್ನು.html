@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>8ನೇ ತರಗತಿ ವಿಜ್ಞಾನ: ವಿದ್ಯುತ್ ಪ್ರವಾಹದ ರಾಸಾಯನಿಕ ಪರಿಣಾಮಗಳು ಮತ್ತು ಐಯಾನ್ ಸ್ಯಾಂಡ್‌ಬಾಕ್ಸ್</title>
+    <style>
+        :root {
+            --bg-dark: #0a0f1d;
+            --card-dark: #161f38;
+            --text-light: #f1f5f9;
+            --text-muted: #94a3b8;
+            --primary: #4f46e5;
+            --secondary: #06b6d4;
+            --anode-color: #ef4444;
+            --cathode-color: #3b82f6;
+            --na-color: #22c55e;
+            --cl-color: #a855f7;
+            --sugar-color: #eab308;
+            --success: #10b981;
+            --danger: #ef4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            padding: 25px 15px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1150px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 25px;
+            background: linear-gradient(135deg, #0f172a, #1e1b4b);
+            padding: 20px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        header h1 {
+            font-size: 2rem;
+            background: linear-gradient(to right, #38bdf8, #818cf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .main-workspace {
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 25px;
+        }
+
+        @media (max-width: 850px) {
+            .main-workspace {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .panel {
+            background: var(--card-dark);
+            border-radius: 20px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 4px 25px rgba(0,0,0,0.3);
+        }
+
+        .panel-title {
+            font-size: 1.15rem;
+            color: var(--secondary);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .sandbox-display {
+            background: #050814;
+            height: 320px;
+            border-radius: 16px;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .canvas-container {
+            width: 100%;
+            height: 100%;
+        }
+
+        .interactive-widget {
+            margin-top: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .selector-group {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .solute-btn {
+            background: #1e294b;
+            border: 1px solid rgba(255,255,255,0.1);
+            color: var(--text-muted);
+            padding: 12px;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .solute-btn:hover {
+            background: #273564;
+            color: var(--text-light);
+            transform: translateY(-1px);
+        }
+
+        .solute-btn.active {
+            background: var(--secondary);
+            color: #050814;
+            border-color: #22d3ee;
+            box-shadow: 0 0 12px rgba(34, 211, 238, 0.3);
+        }
+
+        .control-block {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .slider-control {
+            width: 100%;
+            accent-color: var(--secondary);
+            cursor: pointer;
+            margin-top: 4px;
+        }
+
+        .slider-control:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .info-card {
+            background: rgba(34, 211, 238, 0.04);
+            border-left: 4px solid var(--secondary);
+            padding: 12px;
+            border-radius: 0 10px 10px 0;
+            font-size: 0.88rem;
+            line-height: 1.5;
+        }
+
+        /* Quiz Panel Layout Styles */
+        .quiz-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .score-hud {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #0f162e;
+            padding: 12px 16px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            border: 1px solid rgba(99, 102, 241, 0.25);
+        }
+
+        .score-val {
+            color: #a78bfa;
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 6px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 3px;
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: var(--secondary);
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .question-card {
+            display: none;
+        }
+
+        .question-card.active {
+            display: block;
+            animation: slideIn 0.35s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .question-text {
+            font-size: 1rem;
+            font-weight: 500;
+            margin-bottom: 16px;
+            line-height: 1.45;
+        }
+
+        .option-btn {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: var(--text-light);
+            padding: 12px 16px;
+            border-radius: 12px;
+            text-align: left;
+            cursor: pointer;
+            margin-bottom: 10px;
+            transition: all 0.2s ease;
+            font-size: 0.9rem;
+        }
+
+        .option-btn:hover {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: var(--text-muted);
+            transform: translateX(3px);
+        }
+
+        .option-btn.correct {
+            background: rgba(16, 185, 129, 0.18) !important;
+            border-color: var(--success) !important;
+            color: #34d399;
+            font-weight: 600;
+        }
+
+        .option-btn.wrong {
+            background: rgba(239, 68, 68, 0.18) !important;
+            border-color: var(--danger) !important;
+            color: #f87171;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>⚡ ವಿದ್ಯುದ್ವಿಭಜನೆ ಮತ್ತು ಐಯಾನಿಕ್ ವಾಹಕತೆಯ ಸಂವಾದಾತ್ಮಕ ಪ್ರಯೋಗಾಲಯ</h1>
+            <p>ವಿದ್ಯುತ್ ಪ್ರವಾಹದ ರಾಸಾಯನಿಕ ಪರಿಣಾಮಗಳನ್ನು ಪರೀಕ್ಷಿಸಿ, ಚಲಿಸುವ ವಿದ್ಯುದಾವಿಷ್ಟ ಕಣಗಳನ್ನು ವೀಕ್ಷಿಸಿ ಮತ್ತು ಧ್ವನಿ ಸಹಿತ ರಸಪ್ರಶ್ನೆ ಪೂರ್ಣಗೊಳಿಸಿ</p>
+        </header>
+
+        <div class="main-workspace">
+            
+            <!-- Simulation Sandbox Frame -->
+            <div class="panel">
+                <div class="panel-title">🔬 ವಿದ್ಯುದ್ವಿಭಜನ ಬಿಕರ್ ಮತ್ತು ಸರ್ಕ್ಯೂಟ್ ಲೂಪ್ ವೀಕ್ಷಣೆ</div>
+                
+                <div class="sandbox-display">
+                    <canvas id="electrolysisCanvas" class="canvas-container"></canvas>
+                </div>
+
+                <div class="interactive-widget">
+                    <div class="control-block">
+                        <label style="font-size:0.85rem; font-weight:600; color:var(--text-muted); margin-bottom: 5px;">ಪರೀಕ್ಷಿಸಬೇಕಾದ ದ್ರಾವಣವನ್ನು ಆಯ್ಕೆಮಾಡಿ:</label>
+                        <div class="selector-group">
+                            <button id="waterBtn" class="solute-btn active" onclick="changeSolution('water')">💧 ಬಟ್ಟಿ ಇಳಿಸಿದ ನೀರು (Distilled Water)</button>
+                            <button id="saltBtn" class="solute-btn" onclick="changeSolution('salt')">🧂 ಉಪ್ಪಿನ ದ್ರಾವಣ (NaCl Solution)</button>
+                            <button id="sugarBtn" class="solute-btn" onclick="changeSolution('sugar')">🍭 ಸಕ್ಕರೆ ದ್ರಾವಣ (Sugar Solution)</button>
+                            <button id="lemonBtn" class="solute-btn" onclick="changeSolution('lemon')">🍋 ನಿಂಬೆ ರಸ (ಆಮ್ಲ - Acid)</button>
+                        </div>
+                    </div>
+
+                    <div class="control-block">
+                        <label id="slider-label" style="font-size:0.85rem; font-weight:600; color:var(--text-muted);">ದ್ರಾವಣದ ಐಯಾನ್ ಸಾಂದ್ರತೆಯ ಮ್ಯಾಟ್ರಿಕ್ಸ್:</label>
+                        <input type="range" id="concentrationSlider" class="slider-control" min="0" max="100" value="0" oninput="adjustConcentration()">
+                    </div>
+
+                    <div class="info-card" id="solution-explanation">
+                        ಬಟ್ಟಿ ಇಳಿಸಿದ ನೀರು ಯಾವುದೇ ಮುಕ್ತ ಐಯಾನ್‌ಗಳಿಲ್ಲದ ಶುದ್ಧ H₂O ಸಹವ್ಯಾಲೆನ್ಸ್‌ ಸಂಯುಕ್ತಗಳನ್ನು ಹೊಂದಿರುತ್ತದೆ. ವಿದ್ಯುತ್ ಪ್ರವಾಹವನ್ನು ಸಾಗಿಸಲು ಯಾವುದೇ ಮುಕ್ತ ವಿದ್ಯುದಾವಿಷ್ಟ ಕಣಗಳಿಲ್ಲದ ಕಾರಣ, ಸರ್ಕ್ಯೂಟ್ ಪೂರ್ಣಗೊಳ್ಳುವುದಿಲ್ಲ ಮತ್ತು ಬಲ್ಬ್ ಬೆಳಗುವುದಿಲ್ಲ.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quiz Assessments Panel -->
+            <div class="panel quiz-container">
+                <div class="panel-title">🏆 ಸಕ್ರಿಯ ಜ್ಞಾನ ಪರೀಕ್ಷಾ ಮ್ಯಾಟ್ರಿಕ್ಸ್ (shuffled)</div>
+                
+                <div class="score-hud">
+                    <div>ಪ್ರಗತಿ ಹಂತ: <span id="progress-hud-text">1 / 4</span></div>
+                    <div>ಗಳಿಸಿದ ಅಂಕಗಳು: <span id="score-counter" class="score-val">0</span> XP</div>
+                </div>
+
+                <div class="progress-bar-container">
+                    <div id="progress-indicator" class="progress-fill"></div>
+                </div>
+
+                <div id="quiz-deck-wrapper">
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        const activeActivities = {
+            water: {
+                explanation: "ಬಟ್ಟಿ ಇಳಿಸಿದ ನೀರು ಯಾವುದೇ ಮುಕ್ತ ಐಯಾನ್‌ಗಳಿಲ್ಲದ ಶುದ್ಧ H₂O ಸಹವ್ಯಾಲೆನ್ಸ್‌ ಸಂಯುಕ್ತಗಳನ್ನು ಹೊಂದಿರುತ್ತದೆ. ವಿದ್ಯುತ್ ಪ್ರವಾಹವನ್ನು ಸಾಗಿಸಲು ಯಾವುದೇ ಮುಕ್ತ ಚಲಿಸುವ ವಿದ್ಯುದಾವಿಷ್ಟ ಕಣಗಳಿಲ್ಲದ ಕಾರಣ, ಸರ್ಕ್ಯೂಟ್ ಅಪೂರ್ಣವಾಗಿಯೇ ಉಳಿಯುತ್ತದೆ ಮತ್ತು ಬಲ್ಬ್ ಬೆಳಗುವುದಿಲ್ಲ.",
+                sliderVal: 0,
+                allowSlider: false,
+                conductivity: 0,
+                particleType: 'none',
+                questions: [
+                    { q: "ಶುದ್ಧ ಬಟ್ಟಿ ಇಳಿಸಿದ ನೀರು ವಿದ್ಯುತ್ ಅನ್ನು ಏಕೆ ಹರಿಸುವುದಿಲ್ಲ ಮತ್ತು ಪರೀಕ್ಷಕ ಬಲ್ಬ್ ಅನ್ನು ಬೆಳಗಿಸುವುದಿಲ್ಲ?", o: ["ಇದು ವಿದ್ಯುತ್ ಪ್ರವಾಹವನ್ನು ಸಾಗಿಸಲು ಅಗತ್ಯವಿರುವ ಮುಕ್ತ ಐಯಾನ್‌ಗಳನ್ನು ಸಂಪೂರ್ಣವಾಗಿ ಹೊಂದಿರುವುದಿಲ್ಲ", "ಇದು ಎಲ್ಲಾ ಎಲೆಕ್ಟ್ರಾನ್‌ಗಳನ್ನು ಪರಮಾಣು ಕೇಂದ್ರದೊಳಗೆ ಹೀರಿಕೊಳ್ಳುತ್ತದೆ", "ದ್ರವದ ಅಣುಗಳು ಪರಸ್ಪರ ಸ್ಪರ್ಶಿಸದಂತೆ ತುಂಬಾ ದೂರದಲ್ಲಿರುತ್ತವೆ"], c: 0 },
+                    { q: "ಯಾವ ರೀತಿಯ ರಾಸಾಯನಿಕ ಬಂಧವು ಶುದ್ಧ ನೀರಿನ ಸಂಯುಕ್ತಗಳನ್ನು ಸಾಮಾನ್ಯ ತಾಪಮಾನದಲ್ಲಿ ಮುಕ್ತವಾಗಿ ಒಡೆಯದಂತೆ ತಡೆಯುತ್ತದೆ?", o: ["ಎಲೆಕ್ಟ್ರಾನ್ ಹಂಚಿಕೆಯನ್ನು ಬಿಗಿಯಾಗಿ ಹಿಡಿದಿಟ್ಟುಕೊಳ್ಳುವ ಸಹವ್ಯಾಲೆನ್ಸ್ ಬಂಧ (Covalent bond)", "ಲೋಹೀಯ ಜಾಲರಿ ಆಕರ್ಷಣೆಯ ನಿಯತಾಂಕಗಳು", "ಯಾವುದೇ ನೈಜ ಎಲೆಕ್ಟ್ರಾನ್ ಹಂಚಿಕೆಯಿಲ್ಲದ ದುರ್ಬಲ ಐಯಾನಿಕ್ ಕ್ಷೇತ್ರಗಳು"], c: 0 },
+                    { q: "ಪ್ರಯೋಗಾಲಯದಲ್ಲಿ ಬಟ್ಟಿ ಇಳಿಸಿದ ನೀರನ್ನು ಸುಲಭವಾಗಿ ಉತ್ತಮ ವಿದ್ಯುತ್ ವಾಹಕವನ್ನಾಗಿ ಮಾಡುವುದು ಹೇಗೆ?", o: ["ಸ್ವಲ್ಪ ಪ್ರಮಾಣದ ಸಾಮಾನ್ಯ ಉಪ್ಪು, ಆಮ್ಲಗಳು ಅಥವಾ ಪ್ರತ್ಯಾಮ್ಲಗಳನ್ನು ಕರಗಿಸುವುದರಿಂದ", "ಅದು ಸಂಪೂರ್ಣವಾಗಿ ಹಬೆಯಾಗುವವರೆಗೆ ನಿರಂತರವಾಗಿ ಕುದಿಸುವುದರಿಂದ", "ಗಾಜಿನ ಬೌಲ್ ಬದಲು ಪ್ಲಾಸ್ಟಿಕ್ ಪಾತ್ರೆಯಲ್ಲಿ ನೀರನ್ನು ಸಂಗ್ರಹಿಸುವುದರಿಂದ"], c: 0 },
+                    { q: "ಮನೆಯ ವಿದ್ಯುತ್ ಉಪಕರಣಗಳನ್ನು ಒದ್ದೆ ಕೈಯಿಂದ ಮುಟ್ಟಬಾರದು ಎಂದು ಕಟ್ಟುನಿಟ್ಟಾಗಿ ಸೂಚಿಸಲು ಕಾರಣವೇನು?", o: ["ಸಾಮಾನ್ಯ ನೀರು ಖನಿಜಗಳನ್ನು ಹೊಂದಿದ್ದು ವಾಹಕವಾಗಿರುವುದರಿಂದ ವಿದ್ಯುತ್ ಆಘಾತದ (Shock) ಅಪಾಯವನ್ನು ಹೆಚ್ಚಿಸುತ್ತದೆ", "ನೀರಿನ ಅಣುಗಳು ತಂತಿಗಳ ಮೇಲಿರುವ ಇನ್ಸುಲೇಶನ್ ಕವರ್ ಅನ್ನು ತಕ್ಷಣವೇ ಕರಗಿಸುತ್ತವೆ", "ತೇವಾಂಶವು ಬ್ಯಾಟರಿ ಅಥವಾ ಮುಖ್ಯ ಕೇಂದ್ರದ ವಿದ್ಯುತ್ ದಿಕ್ಕನ್ನು ಹಿಮ್ಮುಖಗೊಳಿಸುತ್ತದೆ"], c: 0 }
+                ]
+            },
+            salt: {
+                explanation: "ಸಾಮಾನ್ಯ ಉಪ್ಪು (NaCl) ನೀರಿನಲ್ಲಿ ಕರಗಿದಾಗ ಸೋಡಿಯಂ ಐಯಾನ್‌ಗಳು (Na⁺) ಮತ್ತು ಕ್ಲೋರಿನ್ ಐಯಾನ್‌ಗಳಾಗಿ (Cl⁻) ಒಡೆಯುತ್ತದೆ. ಧನ ಐಯಾನ್‌ಗಳು ಋಣ ವಿದ್ಯುದ್ವಾರದತ್ತ (Cathode) ಮತ್ತು ಋಣ ಐಯಾನ್‌ಗಳು ಧನ ವಿದ್ಯುದ್ವಾರದತ್ತ (Anode) ಚಲಿಸಿ, ಸರ್ಕ್ಯೂಟ್ ಅನ್ನು ಪೂರ್ಣಗೊಳಿಸುತ್ತವೆ ಮತ್ತು ಬಲ್ಬ್ ಪ್ರಕಾಶಮಾನವಾಗಿ ಬೆಳಗುತ್ತದೆ!",
+                sliderVal: 45,
+                allowSlider: true,
+                conductivity: 0.8,
+                particleType: 'salt',
+                questions: [
+                    { q: "ಸಾಮಾನ್ಯ ಉಪ್ಪಿನ ಹರಳುಗಳನ್ನು ನೀರಿನಲ್ಲಿ ಕರಗಿಸಿದಾಗ ಸೂಕ್ಷ್ಮ ಮಟ್ಟದಲ್ಲಿ ಏನಾಗುತ್ತದೆ?", o: ["ಸ್ಪಟಿಕ ರಚನೆಯು ಒಡೆದು ಪ್ರತ್ಯೇಕ ಚಲಿಸುವ ಐಯಾನ್‌ಗಳಾಗಿ (Na⁺ ಮತ್ತು Cl⁻) ಮಾರ್ಪಡುತ್ತದೆ", "ಉಪ್ಪಿನ ಪರಮಾಣುಗಳು ತಕ್ಷಣವೇ ಅನಿಲದ ರೂಪಕ್ಕೆ ಬದಲಾಗುತ್ತವೆ", "ನೀರು ತನ್ನ ರಾಸಾಯನಿಕ ಸಂಯೋಜನೆಯನ್ನು ಗ್ಲುಕೋಸ್ ಸರಪಳಿಯಾಗಿ ಬದಲಾಯಿಸಿಕೊಳ್ಳುತ್ತದೆ"], c: 0 },
+                    { q: "ಸಾಂದ್ರತೆಯ ಸ್ಲೈಡರ್ ಅನ್ನು ಗರಿಷ್ಠ ಮಟ್ಟಕ್ಕೆ ಹೆಚ್ಚಿಸಿದಾಗ ಬಲ್ಬ್ ಏಕೆ ಅತ್ಯಂತ ತೀವ್ರವಾಗಿ ಬೆಳಗುತ್ತದೆ?", o: ["ಹೆಚ್ಚಿನ ಸಂಖ್ಯೆಯ ಚಲಿಸುವ ವಿದ್ಯುದಾವಿಷ್ಟ ಐಯಾನ್‌ಗಳು ಇರುವುದರಿಂದ ವಿದ್ಯುತ್ ರೋಧವು (Resistance) ಕಡಿಮೆಯಾಗುತ್ತದೆ", "ಕ್ಷಾರೀಯ ಬ್ಯಾಟರಿಯ ಒಟ್ಟು ವೋಲ್ಟೇಜ್ ಸಾಮರ್ಥ್ಯವು ದ್ವಿಗುಣಗೊಳ್ಳುತ್ತದೆ", "ನೀರಿನ ಗಾತ್ರವು ದ್ರವ್ಯರಾಶಿ ಮತ್ತು ತೂಕದ ನಿಯತಾಂಕಗಳಲ್ಲಿ ದುರ್ಬಲಗೊಳ್ಳುತ್ತದೆ"], c: 0 },
+                    { q: "ವಿದ್ಯುತ್ ಪ್ರವಹಿಸುವಾಗ ಧನ ಆವೇಶ ಹೊಂದಿರುವ ಸೋಡಿಯಂ ಐಯಾನ್ (Na⁺) ಯಾವ ವಿದ್ಯುದ್ವಾರದ ಕಡೆಗೆ ಚಲಿಸುತ್ತದೆ?", o: ["ಕ್ಯಾಥೋಡ್ (ಋಣಾತ್ಮಕ ವಿದ್ಯುದ್ವಾರದ ಕೊಂಡಿ)", "ಆನೋಡ್ (ಧನಾತ್ಮಕ ವಿದ್ಯುದ್ವಾರದ ಕೊಂಡಿ)", "ಇದು ಮಧ್ಯದ ಬಿಂದುವಿನಲ್ಲಿ ಸ್ಥಿರವಾಗಿ ಉಳಿಯುತ್ತದೆ"], c: 0 },
+                    { q: "ದ್ರವದಲ್ಲಿ ಕರಗಿದಾಗ ವಿದ್ಯುತ್ ಪ್ರವಾಹಕ್ಕೆ ಅನುವು ಮಾಡಿಕೊಡುವ ಮುಕ್ತ ಚಲಿಸುವ ವಿದ್ಯುದಾವಿಷ್ಟ ಕಣಗಳನ್ನು ಬಿಡುಗಡೆ ಮಾಡುವ ವಸ್ತುಗಳನ್ನು ಏನೆಂದು ಕರೆಯುತ್ತಾರೆ?", o: ["ವಿದ್ಯುದ್ವಿಭಾಜಕಗಳು (Electrolytes)", "ರೋಧಕಗಳು (Insulators)", "ತಟಸ್ಥ ಸಹವ್ಯಾಲೆನ್ಸ್ ಧಾತುಗಳು"], c: 0 }
+                ]
+            },
+            sugar: {
+                explanation: "ಸಕ್ಕರೆಯು ಪ್ರತ್ಯೇಕ ಐಯಾನ್ ರಚನೆಗಳಾಗಿ ಒಡೆಯುವ ಬದಲು ಸಂಪೂರ್ಣ ಸುಕ್ರೋಸ್ ಅಣುಗಳಾಗಿ ಕರಗುತ್ತದೆ. ಈ ತೇಲುವ ಅಣುಗಳ ಗುಂಪುಗಳು ವಿದ್ಯುತ್ ತಟಸ್ಥವಾಗಿರುವುದರಿಂದ (Electrically neutral), ಯಾವುದೇ ಆವೇಶಗಳು ವರ್ಗಾವಣೆಯಾಗುವುದಿಲ್ಲ, ಹೀಗಾಗಿ ಬಲ್ಬ್ ಆಫ್ ಆಗಿಯೇ ಇರುತ್ತದೆ.",
+                sliderVal: 50,
+                allowSlider: true,
+                conductivity: 0,
+                particleType: 'sugar',
+                questions: [
+                    { q: "ಹೆಚ್ಚು ಸಾಂದ್ರತೆಯುಳ್ಳ ಸಕ್ಕರೆ ದ್ರಾವಣವು ವಿದ್ಯುತ್ ಸರ್ಕ್ಯೂಟ್ ಅನ್ನು ಪೂರ್ಣಗೊಳಿಸಲು ಏಕೆ ವಿಫಲವಾಗುತ್ತದೆ?", o: ["ಸಕ್ಕರೆಯು ಯಾವುದೇ ವಿದ್ಯುದಾವೇಶವನ್ನು ಹೊಂದಿರದ ತಟಸ್ಥ ಸಂಪೂರ್ಣ ಅಣುಗಳಾಗಿ ಕರಗುತ್ತದೆ", "ಸಕ್ಕರೆಯು ಬ್ಯಾಟರಿ ಕೋರ್‌ನ ಒಳಗಿರುವ ಎಲ್ಲಾ ಶಕ್ತಿಯನ್ನು ಹೀರಿಕೊಳ್ಳುತ್ತದೆ", "ಸಕ್ಕರೆಯು ಎಲ್ಲಾ ಮಾರ್ಗಗಳನ್ನು ನಿರ್ಬಂಧಿಸುವ ಅಲ್ಟ್ರಾ-ಕಂಡಕ್ಟಿವ್ ಶೀಲ್ಡ್ ಆಗಿ ಕಾರ್ಯನಿರ್ವಹಿಸುತ್ತದೆ"], c: 0 },
+                    { q: "ನೀವು ಬಿಕರ್‌ಗೆ ಹೆಚ್ಚಿನ ಪ್ರಮಾಣದ ಶುದ್ಧ ಸಕ್ಕರೆ ಹರಳುಗಳನ್ನು ಸೇರಿಸಿದರೆ ಬಲ್ಬ್‌ನ ಸ್ಥಿತಿಗೆ ಏನಾಗುತ್ತದೆ?", o: ["ಇದು ಆಫ್ ಆಗಿಯೇ ಇರುತ್ತದೆ ಏಕೆಂದರೆ ಸಾಂದ್ರತೆ ಹೆಚ್ಚಿಸಿದರೂ ಮುಕ್ತ ಐಯಾನ್‌ಗಳು ಬಿಡುಗಡೆಯಾಗುವುದಿಲ್ಲ", "ಇದು ಬಿಟ್ಟು ಬಿಟ್ಟು ಮಿನುಗಲು ಪ್ರಾರಂಭಿಸುತ್ತದೆ", "ತಾಪ ಹೆಚ್ಚಳದಿಂದಾಗಿ ಅದು ಕೆಂಪು ಬಣ್ಣಕ್ಕೆ ತಿರುಗುತ್ತದೆ"], c: 0 },
+                    { q: "ಒಂದು ದ್ರವವನ್ನು ಅಯೋನಿಕ್ ಅಲ್ಲದ ನಾನ್-ಎಲೆಕ್ಟ್ರೋಲೈಟ್ ಎಂದು ವರ್ಗೀಕರಿಸಲು ಅದು ಯಾವ ಗುಣವನ್ನು ಹೊಂದಿರಬೇಕು?", o: ["ಅದು ತನ್ನ ದ್ರಾವಣ ರೂಪದಲ್ಲಿ ಯಾವುದೇ ಮುಕ್ತ ಚಲಿಸುವ ವಿದ್ಯುದಾವಿಷ್ಟ ಐಯಾನ್‌ಗಳನ್ನು ಬಿಡುಗಡೆ ಮಾಡಬಾರದು", "ಅದರ ಕುದಿಯುವ ಬಿಂದುವು ಕೋಣೆಯ ತಾಪಮಾನಕ್ಕಿಂತ ಕಡಿಮೆಯಿರಬೇಕು", "ಅದು ತನ್ನ ಮೂಲಕ ಹಾದುಹೋಗುವ ಬೆಳಕಿನ ಅಲೆಗಳಿಗೆ ಸಂಪೂರ್ಣ ಪಾರದರ್ಶಕವಾಗಿರಬೇಕು"], c: 0 },
+                    { q: "ನೀರಿನ ಮಾಧ್ಯಮದಲ್ಲಿ ಕರಗಿರುವ ಉಪ್ಪಿನ ಕಣ ಮತ್ತು ಸಕ್ಕರೆಯ ಕಣಗಳ ನಡುವಿನ ವ್ಯತ್ಯಾಸವೇನು?", o: ["ಉಪ್ಪು ವಿದ್ಯುದಾವಿಷ್ಟ ಚಲಿಸುವ ಐಯಾನ್‌ಗಳನ್ನು ರೂಪಿಸುತ್ತದೆ, ಸಕ್ಕರೆ ತಟಸ್ಥ ಅಣುಗಳಾಗಿ ಒಡೆಯುತ್ತದೆ", "ಸಕ್ಕರೆಯು ಹಂತ ಬದಲಾವಣೆಗೆ ಒಳಗಾಗಿ ಅದೃಶ್ಯ ಅನಿಲ ಮೋಡವಾಗಿ ಬದಲಾಗುತ್ತದೆ", "ಉಪ್ಪು ನೀರನ್ನು ಸಂಪೂರ್ಣವಾಗಿ ವಿಕರ್ಷಿಸಿ ಮೇಲ್ಮೈ ರೇಖೆಗಳಲ್ಲಿ ನೇರವಾಗಿ ತೇಲುತ್ತದೆ"], c: 0 }
+                ]
+            },
+            lemon: {
+                explanation: "ನಿಂಬೆ ರಸವು ಸಿಟ್ರಿಕ್ ಆಮ್ಲವನ್ನು ಹೊಂದಿದ್ದು, ಇದು ನೈಸರ್ಗಿಕವಾಗಿ ಹೈಡ್ರೋಜನ್ (H⁺) ಮತ್ತು ಸಿಟ್ರೇಟ್ ಐಯಾನ್‌ಗಳಾಗಿ ಒಡೆಯುತ್ತದೆ. ಈ ಚಲಿಸುವ ಆವೇಶದ ವಾಹಕಗಳು ಸರ್ಕ್ಯೂಟ್ ಪೂರ್ಣಗೊಳಿಸಲು ದ್ರವದ ಮೂಲಕ ಚಲಿಸುತ್ತವೆ ಮತ್ತು ಬಲ್ಬ್ ಮಧ್ಯಮ ತೀವ್ರತೆಯೊಂದಿಗೆ ಬೆಳಗುತ್ತದೆ.",
+                sliderVal: 40,
+                allowSlider: true,
+                conductivity: 0.45,
+                particleType: 'acid',
+                questions: [
+                    { q: "ನೈಸರ್ಗಿಕ ನಿಂಬೆ ರಸದ ಒಳಗಿರುವ ಯಾವ ಸಕ್ರಿಯ ಸಂಯುಕ್ತವು ವಾಹಕತೆಗಾಗಿ ಚಲಿಸುವ ಆವೇಶಗಳನ್ನು ಬಿಡುಗಡೆ ಮಾಡುತ್ತದೆ?", o: ["ಸಿಟ್ರಿಕ್ ಆಮ್ಲದ ಸಂಯುಕ್ತಗಳು ಒಡೆದು ಮುಕ್ತ ಐಯಾನಿಕ್ ಹೈಡ್ರೋಜನ್ (H⁺) ಅನ್ನು ಸೃಷ್ಟಿಸುತ್ತವೆ", "ಥರ್ಮಲ್ ವೆಕ್ಟರ್‌ಗಳನ್ನು ಹೊತ್ತೊಯ್ಯುವ ಶುದ್ಧ ಹೈಡ್ರೋಕಾರ್ಬನ್ ಇಂಧನ ಧಾತುಗಳು", "ಸೂಕ್ಷ್ಮ ಲೋಹದ ತಂತಿಗಳಂತೆ ಕಾರ್ಯನಿರ್ವಹಿಸುವ ಅಮಾನತುಗೊಂಡ ಸೆಲ್ಯುಲೋಸ್ ನಾರುಗಳು"], c: 0 },
+                    { q: "ಉಪ್ಪಿನ ದ್ರಾವಣಕ್ಕೆ ಹೋಲಿಸಿದರೆ, ನಿಂಬೆ ರಸದ ಮಾಧ್ಯಮವು ಬಲ್ಬ್ ಕಡಿಮೆ ತೀವ್ರತೆಯಿಂದ ಬೆಳಗಲು ಕಾರಣವೇನು?", o: ["ಇದು ಕಡಿಮೆ ಮುಕ್ತ ಐಯಾನ್‌ಗಳನ್ನು ಉತ್ಪಾದಿಸುವ ದುರ್ಬಲ ಆಮ್ಲದ ಸಂರಚನೆಯನ್ನು ಹೊಂದಿದೆ", "ನಿಂಬೆ ರಸವು ಬೆಳಕಿನ ಕಿರಣಗಳು ಗಾಜಿನ ಗೋಡೆಗಳಿಂದ ಹೊರಹೋಗದಂತೆ ತಡೆಯುತ್ತದೆ", "ಆಮ್ಲದ ಲೂಪ್‌ಗಳು ಪ್ರತಿ ಕೆಲವು ಸೆಕೆಂಡಿಗೆ ತಮ್ಮ ದಿಕ್ಕನ್ನು ಸಂಪೂರ್ಣವಾಗಿ ಬದಲಾಯಿಸುತ್ತವೆ"], c: 0 },
+                    { q: "ನೀವು ನಿಂಬೆ ರಸದ ಬದಲಿಗೆ ವಿನೆಗರ್ (ಅಸಿಟಿಕ್ ಆಮ್ಲ) ಬಳಸಿದರೆ ಬಲ್ಬ್ ಹೇಗೆ ಕಾರ್ಯನಿರ್ವಹಿಸುತ್ತದೆ?", o: ["ಇದು ಮಂದ/ಮಧ್ಯಮ ಬೆಳಕಿನಿಂದ ಬೆಳಗುತ್ತದೆ ಏಕೆಂದರೆ ವಿನೆಗರ್ ಕೂಡ ಒಂದು ದುರ್ಬಲ ವಿದ್ಯುದ್ವಿಭಾಜಕವಾಗಿದೆ", "ವಿಪರೀತ ಹೆಚ್ಚಿನ ವೋಲ್ಟೇಜ್ ಶೇಖರಣೆಯಿಂದಾಗಿ ಅದು ತಕ್ಷಣವೇ ಸ್ಫೋಟಗೊಳ್ಳುತ್ತದೆ", "ಅದು ಸಂಪೂರ್ಣವಾಗಿ ಆಫ್ ಆಗಿರುತ್ತದೆ ಏಕೆಂದರೆ ವಿನೆಗರ್ ಬಟ್ಟಿ ಇಳಿಸಿದ ನೀರಿನ ಗುಣಗಳನ್ನು ಹೋಲುತ್ತದೆ"], c: 0 },
+                    { q: "ಆಮ್ಲೀಯ ದ್ರಾವಣದ ಮೂಲಕ ವಿದ್ಯುತ್ ಹಾದುಹೋದಾಗ ವಿದ್ಯುದ್ವಿವಾರಗಳ ಮೇಲ್ಮೈಯಲ್ಲಿ ಯಾವ ರಾಸಾಯನಿಕ ಕ್ರಿಯೆ ಸಂಭವಿಸುತ್ತದೆ?", o: ["ರಾಸಾಯನಿಕ ಕ್ರಿಯೆಗಳಿಂದಾಗಿ ಅನಿಲದ ಗುಳ್ಳೆಗಳು ಬಿಡುಗಡೆಯಾಗುತ್ತವೆ, ಲೋಹದ ಶೇಖರಣೆಯಾಗುತ್ತದೆ ಅಥವಾ ಬಣ್ಣ ಬದಲಾಗುತ್ತದೆ", "ದ್ರವವು ಸಂಪೂರ್ಣವಾಗಿ ಗಟ್ಟಿಯಾದ ಪ್ಲಾಸ್ಟಿಕ್ ಸ್ಪಟಿಕ ಬ್ಲಾಕ್ ಆಗಿ ಬದಲಾಗುತ್ತದೆ", "ವಿದ್ಯುದ್ವಾರ ಕಡ್ಡಿಗಳು ಟೆಲಿಪೋರ್ಟೇಶನ್ ಮೂಲಕ ತಮ್ಮ ತೂಕವನ್ನು ಪರಸ್ಪರ ಬದಲಾಯಿಸಿಕೊಳ್ಳುತ್ತವೆ"], c: 0 }
+                ]
+            }
+        };
+
+        let currentActiveKey = 'water';
+        let globalXPScore = 0;
+        
+        const canvas = document.getElementById('electrolysisCanvas');
+        const ctx = canvas.getContext('2d');
+        let animationFrameId;
+        let particleArray = [];
+
+        // Synthesizer Engine using Web Audio API (No external files required)
+        function playFeedbackSound(isCorrect) {
+            try {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                if (!AudioContext) return;
+                const audioCtx = new AudioContext();
+                
+                if (isCorrect) {
+                    // Crisp double chime sound for correct answer
+                    let osc1 = audioCtx.createOscillator();
+                    let gainNode = audioCtx.createGain();
+                    
+                    osc1.type = 'sine';
+                    osc1.frequency.setValueAtTime(587.33, audioCtx.currentTime); // D5
+                    osc1.frequency.setValueAtTime(880.00, audioCtx.currentTime + 0.1); // A5
+                    
+                    gainNode.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                    
+                    osc1.connect(gainNode);
+                    gainNode.connect(audioCtx.destination);
+                    osc1.start();
+                    osc1.stop(audioCtx.currentTime + 0.3);
+                } else {
+                    // Soft low buzz sound for wrong answer
+                    let osc = audioCtx.createOscillator();
+                    let gainNode = audioCtx.createGain();
+                    
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(130.81, audioCtx.currentTime); // C3
+                    
+                    gainNode.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+                    
+                    osc.connect(gainNode);
+                    gainNode.connect(audioCtx.destination);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.4);
+                }
+            } catch (e) {
+                console.log("Audio contextual block prevented execution:", e);
+            }
+        }
+
+        window.onload = function() {
+            resizeLabCanvas();
+            window.addEventListener('resize', resizeLabCanvas);
+            changeSolution('water');
+        };
+
+        function resizeLabCanvas() {
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+            spawnSolutionParticles();
+        }
+
+        class ChemicalIon {
+            constructor(x, y, ionClass) {
+                this.x = x;
+                this.y = y;
+                this.ionClass = ionClass; 
+                this.vx = (Math.random() - 0.5) * 0.8;
+                this.vy = (Math.random() - 0.5) * 0.8;
+                this.radius = ionClass === 'sugar' ? 8 : 5;
+            }
+
+            advance(condVal, w, h) {
+                let liquidTop = h * 0.45;
+                let liquidBottom = h * 0.9;
+                let leftBarX = w * 0.35;
+                let rightBarX = w * 0.65;
+
+                if (condVal > 0) {
+                    let driftForce = 0.4;
+                    if (this.ionClass === 'na' || this.ionClass === 'h') {
+                        this.x += driftForce;
+                        if (Math.abs(this.x - rightBarX) < 15 && this.y > h * 0.35 && this.y < h * 0.8) {
+                            this.x = w * 0.45 + (Math.random() - 0.5) * 40;
+                            this.y = liquidTop + Math.random() * (liquidBottom - liquidTop);
+                        }
+                    } 
+                    else if (this.ionClass === 'cl') {
+                        this.x -= driftForce;
+                        if (Math.abs(this.x - leftBarX) < 15 && this.y > h * 0.35 && this.y < h * 0.8) {
+                            this.x = w * 0.55 + (Math.random() - 0.5) * 40;
+                            this.y = liquidTop + Math.random() * (liquidBottom - liquidTop);
+                        }
+                    }
+                }
+
+                this.x += this.vx;
+                this.y += this.vy;
+
+                let liquidLeft = w * 0.18;
+                let liquidRight = w * 0.82;
+
+                if (this.x < liquidLeft || this.x > liquidRight) this.vx *= -1;
+                if (this.y < liquidTop + 5 || this.y > liquidBottom - 8) this.vy *= -1;
+            }
+
+            paint() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                
+                if (this.ionClass === 'na') {
+                    ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--na-color').trim();
+                    ctx.fill();
+                    ctx.fillStyle = '#000';
+                    ctx.font = 'bold 8px sans-serif';
+                    ctx.fillText('Na+', this.x - 6, this.y + 3);
+                } else if (this.ionClass === 'cl') {
+                    ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--cl-color').trim();
+                    ctx.fill();
+                    ctx.fillStyle = '#fff';
+                    ctx.font = 'bold 8px sans-serif';
+                    ctx.fillText('Cl-', this.x - 5, this.y + 3);
+                } else if (this.ionClass === 'h') {
+                    ctx.fillStyle = '#e11d48';
+                    ctx.fill();
+                    ctx.fillStyle = '#fff';
+                    ctx.font = 'bold 8px sans-serif';
+                    ctx.fillText('H+', this.x - 5, this.y + 3);
+                } else if (this.ionClass === 'sugar') {
+                    ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--sugar-color').trim();
+                    ctx.fill();
+                }
+                ctx.closePath();
+            }
+        }
+
+        function spawnSolutionParticles() {
+            particleArray = [];
+            let w = canvas.width;
+            let h = canvas.height;
+            let sliderVal = parseInt(document.getElementById('concentrationSlider').value);
+
+            let liquidTop = h * 0.45;
+            let liquidBottom = h * 0.9;
+            let spawnCount = Math.floor(sliderVal * 0.6);
+
+            const activeMeta = activeActivities[currentActiveKey];
+
+            for (let i = 0; i < spawnCount; i++) {
+                let rx = (w * 0.22) + Math.random() * (w * 0.56);
+                let ry = liquidTop + 10 + Math.random() * (liquidBottom - liquidTop - 25);
+
+                if (activeMeta.particleType === 'salt') {
+                    if (i % 2 === 0) {
+                        particleArray.push(new ChemicalIon(rx, ry, 'na'));
+                    } else {
+                        particleArray.push(new ChemicalIon(rx, ry, 'cl'));
+                    }
+                } else if (activeMeta.particleType === 'sugar') {
+                    particleArray.push(new ChemicalIon(rx, ry, 'sugar'));
+                } else if (activeMeta.particleType === 'acid') {
+                    if (i % 3 === 0) {
+                        particleArray.push(new ChemicalIon(rx, ry, 'h'));
+                    } else {
+                        particleArray.push(new ChemicalIon(rx, ry, 'sugar')); 
+                    }
+                }
+            }
+        }
+
+        function runElectrolysisLabTicker() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            let w = canvas.width;
+            let h = canvas.height;
+            let sliderVal = parseInt(document.getElementById('concentrationSlider').value);
+            
+            const activeMeta = activeActivities[currentActiveKey];
+            let effectiveConductivity = activeMeta.conductivity * (sliderVal / 100);
+
+            let leftBarX = w * 0.35;
+            let rightBarX = w * 0.65;
+            let circuitY = h * 0.15;
+
+            ctx.strokeStyle = '#475569';
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.moveTo(leftBarX, h * 0.35);
+            ctx.lineTo(leftBarX, circuitY);
+            ctx.lineTo(w * 0.44, circuitY);
+            ctx.stroke();
+
+            ctx.fillStyle = '#1e293b';
+            ctx.fillRect(w * 0.44, circuitY - 15, 36, 30);
+            ctx.fillStyle = '#e2e8f0';
+            ctx.font = 'bold 10px sans-serif';
+            ctx.fillText('BATTERY', w * 0.44 + 2, circuitY + 4);
+
+            ctx.strokeStyle = '#475569';
+            ctx.beginPath();
+            ctx.moveTo(w * 0.52, circuitY);
+            ctx.lineTo(rightBarX, circuitY);
+            ctx.lineTo(rightBarX, h * 0.35);
+            ctx.stroke();
+
+            let bulbX = w * 0.58;
+            let bulbY = circuitY;
+
+            if (effectiveConductivity > 0) {
+                let glowRadius = 15 + (effectiveConductivity * 35);
+                let gradient = ctx.createRadialGradient(bulbX, bulbY, 2, bulbX, bulbY, glowRadius);
+                gradient.addColorStop(0, 'rgba(253, 224, 71, 1)');
+                gradient.addColorStop(0.4, 'rgba(253, 224, 71, 0.4)');
+                gradient.addColorStop(1, 'rgba(253, 224, 71, 0)');
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+                ctx.arc(bulbX, bulbY, glowRadius, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            ctx.fillStyle = effectiveConductivity > 0 ? '#fde047' : '#334155';
+            ctx.beginPath();
+            ctx.arc(bulbX, bulbY, 12, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = '#94a3b8';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            ctx.fillStyle = 'rgba(38, 100, 235, 0.22)';
+            ctx.fillRect(w * 0.2, h * 0.45, w * 0.6, h * 0.45); 
+
+            ctx.strokeStyle = '#cbd5e1';
+            ctx.lineWidth = 5;
+            ctx.beginPath();
+            ctx.moveTo(w * 0.18, h * 0.4);
+            ctx.lineTo(w * 0.18, h * 0.9);
+            ctx.lineTo(w * 0.82, h * 0.9);
+            ctx.lineTo(w * 0.82, h * 0.4);
+            ctx.stroke();
+
+            ctx.lineWidth = 12;
+            ctx.strokeStyle = '#64748b';
+            ctx.beginPath();
+            ctx.moveTo(leftBarX, h * 0.32);
+            ctx.lineTo(leftBarX, h * 0.8);
+            ctx.stroke();
+            
+            ctx.fillStyle = '#ef4444';
+            ctx.font = 'bold 12px sans-serif';
+            ctx.fillText('ANODE (+)', leftBarX - 28, h * 0.3);
+
+            ctx.strokeStyle = '#475569';
+            ctx.beginPath();
+            ctx.moveTo(rightBarX, h * 0.32);
+            ctx.lineTo(rightBarX, h * 0.8);
+            ctx.stroke();
+
+            ctx.fillStyle = '#3b82f6';
+            ctx.font = 'bold 12px sans-serif';
+            ctx.fillText('CATHODE (-)', rightBarX - 32, h * 0.3);
+
+            particleArray.forEach(p => {
+                p.advance(effectiveConductivity, w, h);
+                p.paint();
+            });
+
+            animationFrameId = requestAnimationFrame(runElectrolysisLabTicker);
+        }
+
+        function changeSolution(modeKey) {
+            currentActiveKey = modeKey;
+
+            document.querySelectorAll('.solute-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById(modeKey + 'Btn').classList.add('active');
+
+            const targetMeta = activeActivities[modeKey];
+            document.getElementById('solution-explanation').innerText = targetMeta.explanation;
+            
+            const slider = document.getElementById('concentrationSlider');
+            slider.value = targetMeta.sliderVal;
+            slider.disabled = !targetMeta.allowSlider;
+
+            const sliderLabel = document.getElementById('slider-label');
+            if(!targetMeta.allowSlider) {
+                sliderLabel.innerText = "ದ್ರಾವಣದ ಸಾಂದ್ರತೆ (ಶುದ್ಧ ದ್ರವಗಳಿಗೆ ಸ್ಥಿರವಾಗಿರುತ್ತದೆ):";
+            } else {
+                sliderLabel.innerText = "ದ್ರಾವಣದ ಐಯಾನ್ ಸಾಂದ್ರತೆಯ ಮ್ಯಾಟ್ರಿಕ್ಸ್:";
+            }
+
+            spawnSolutionParticles();
+            cancelAnimationFrame(animationFrameId);
+            runElectrolysisLabTicker();
+            buildInteractiveQuizNodes();
+        }
+
+        function adjustConcentration() {
+            spawnSolutionParticles();
+        }
+
+        // Shuffles an array in place using the Fisher-Yates method
+        function shuffleOptions(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function buildInteractiveQuizNodes() {
+            const wrapper = document.getElementById('quiz-deck-wrapper');
+            wrapper.innerHTML = "";
+
+            const targetData = activeActivities[currentActiveKey];
+            const questions = targetData.questions;
+
+            document.getElementById('progress-hud-text').innerText = `1 / ${questions.length}`;
+            document.getElementById('progress-indicator').style.width = `${(1 / questions.length) * 100}%`;
+
+            questions.forEach((qItem, qIdx) => {
+                const card = document.createElement('div');
+                card.className = `question-card ${qIdx === 0 ? 'active' : ''}`;
+                card.id = `q-node-${qIdx}`;
+
+                const text = document.createElement('p');
+                text.className = "question-text";
+                text.innerText = `${qIdx + 1}. ${qItem.q}`;
+                card.appendChild(text);
+
+                // Create an array of option objects tracking their original index positions
+                let indexedOptions = qItem.o.map((str, idx) => {
+                    return { textStr: str, originalIdx: idx };
+                });
+
+                // Shuffle options completely so positions are random
+                shuffleOptions(indexedOptions);
+
+                indexedOptions.forEach((optObj) => {
+                    const btn = document.createElement('button');
+                    btn.className = "option-btn";
+                    btn.innerText = optObj.textStr;
+
+                    btn.onclick = function() {
+                        if(card.classList.contains('evaluated')) return;
+                        card.classList.add('evaluated');
+
+                        // Evaluate choice using tracked original indices
+                        if(optObj.originalIdx === qItem.c) {
+                            btn.classList.add('correct');
+                            playFeedbackSound(true); // Play success chime
+                            globalXPScore += 100;
+                            document.getElementById('score-counter').innerText = globalXPScore;
+                        } else {
+                            btn.classList.add('wrong');
+                            playFeedbackSound(false); // Play low failure buzz
+                            
+                            // Find and highlight correct answer button dynamically
+                            const allButtons = card.querySelectorAll('.option-btn');
+                            allButtons.forEach((b, bIdx) => {
+                                if(indexedOptions[bIdx].originalIdx === qItem.c) {
+                                    b.classList.add('correct');
+                                }
+                            });
+                        }
+
+                        setTimeout(() => {
+                            advanceNextQuizNode(qIdx, questions.length);
+                        }, 1500);
+                    };
+                    card.appendChild(btn);
+                });
+
+                wrapper.appendChild(card);
+            });
+        }
+
+        function advanceNextQuizNode(currIdx, totalCount) {
+            const nextIdx = currIdx + 1;
+            const currentCard = document.getElementById(`q-node-${currIdx}`);
+
+            if(nextIdx < totalCount) {
+                const nextCard = document.getElementById(`q-node-${nextIdx}`);
+                currentCard.classList.remove('active');
+                nextCard.classList.add('active');
+
+                document.getElementById('progress-hud-text').innerText = `${nextIdx + 1} / ${totalCount}`;
+                document.getElementById('progress-indicator').style.width = `${((nextIdx + 1) / totalCount) * 100}%`;
+            } else {
+                alert(`🎉 ಈ ಭಾಗದ ರಸಪ್ರಶ್ನೆಯನ್ನು ಯಶಸ್ವಿಯಾಗಿ ಮುಗಿಸಿದ್ದೀರಿ! ನಿಮ್ಮ XP ಪ್ರೊಫೈಲ್ ಅಪ್‌ಗ್ರೇಡ್ ಆಗಿದೆ. ಮೇಲಿನ ಬಟನ್‌ಗಳಿಂದ ಬೇರೆ ದ್ರಾವಣಗಳನ್ನು ಆಯ್ದುಕೊಂಡು ಪ್ರಯೋಗ ಮುಂದುವರಿಸಿ.`);
+            }
+        }
+    </script>
+</body>
+</html>
