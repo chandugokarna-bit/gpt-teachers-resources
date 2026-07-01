@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Science Module - Chapter 2 Exploration Hub</title>
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #060a12 0%, #111827 50%, #1e1b4b 100%);
+            --card-bg: rgba(255, 255, 255, 0.03);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --text-primary: #f9fafb;
+            --text-secondary: #9ca3af;
+            --accent-cyan: #06b6d4;
+            --accent-emerald: #10b981;
+            --accent-pink: #ec4899;
+            --correct-green: #10b981;
+            --wrong-red: #ef4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background: var(--bg-gradient);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 2rem 1rem;
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+            width: 100%;
+            max-width: 900px;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(to right, var(--accent-cyan), var(--accent-emerald), var(--accent-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        header p {
+            color: var(--text-secondary);
+        }
+
+        .notebook-container {
+            width: 100%;
+            max-width: 900px;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 2.5rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            position: relative;
+        }
+
+        /* Navigation Tabs like Lumi Book */
+        .book-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 0.75rem;
+            overflow-x: auto;
+        }
+
+        .tab-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--card-border);
+            color: var(--text-secondary);
+            padding: 0.6rem 1.2rem;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 500;
+            white-space: nowrap;
+            transition: all 0.2s ease;
+        }
+
+        .tab-btn.active {
+            background: var(--accent-cyan);
+            color: white;
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 15px rgba(6, 182, 212, 0.3);
+        }
+
+        .activity-page {
+            display: none;
+        }
+
+        .activity-page.active {
+            display: block;
+            animation: fadeIn 0.4s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 {
+            font-size: 1.6rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .instruction {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+        }
+
+        /* Interactive Element Utilities */
+        .question-block {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--card-border);
+            padding: 1.25rem;
+            border-radius: 16px;
+            margin-bottom: 1.25rem;
+        }
+
+        .question-text {
+            font-weight: 500;
+            margin-bottom: 0.75rem;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+        }
+
+        @media (max-width: 640px) {
+            .options-grid { grid-template-columns: 1fr; }
+        }
+
+        .opt-btn {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--card-border);
+            color: var(--text-primary);
+            padding: 0.75rem 1rem;
+            border-radius: 10px;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s ease;
+        }
+
+        .opt-btn:hover:not(:disabled) {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--accent-cyan);
+        }
+
+        .opt-btn.correct { background: rgba(16, 185, 129, 0.2) !important; border-color: var(--correct-green) !important; color: #d1fae5; }
+        .opt-btn.wrong { background: rgba(239, 68, 68, 0.2) !important; border-color: var(--wrong-red) !important; color: #fee2e2; }
+
+        /* Drag & Drop Styles */
+        .drag-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        .drop-box {
+            background: rgba(255, 255, 255, 0.01);
+            border: 2px dashed var(--card-border);
+            border-radius: 14px;
+            padding: 1rem;
+            min-height: 140px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            align-content: flex-start;
+            transition: all 0.2s ease;
+        }
+        .drop-box.hovered { border-color: var(--accent-cyan); background: rgba(6, 182, 212, 0.03); }
+        .drop-box h4 { width: 100%; font-size: 0.95rem; margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.5px; }
+        .drag-pool { grid-column: 1 / -1; background: rgba(255, 255, 255, 0.03); border-style: solid; }
+        .drag-item {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--card-border);
+            padding: 0.4rem 0.9rem;
+            border-radius: 20px;
+            cursor: grab;
+            user-select: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: border 0.2s ease;
+        }
+
+        /* Order/Ranking Row Input */
+        .order-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            margin-bottom: 0.5rem;
+            transition: border-color 0.2s ease;
+        }
+        .rank-input {
+            width: 65px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--card-border);
+            color: white;
+            text-align: center;
+            padding: 0.3rem;
+            border-radius: 6px;
+            outline: none;
+            font-weight: bold;
+        }
+
+        /* Matrix Elements */
+        .matrix-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .matrix-table th, .matrix-table td {
+            border: 1px solid var(--card-border);
+            padding: 0.75rem;
+            text-align: left;
+            transition: background 0.2s ease;
+        }
+        .matrix-table th { background: rgba(255, 255, 255, 0.04); font-size: 0.9rem; }
+        .matrix-check { width: 18px; height: 18px; accent-color: var(--accent-cyan); cursor: pointer; }
+
+        .footer-nav {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 1.25rem;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Chapter 2 Interactive Workbook</h1>
+        <p>A Lumi-style notebook with complete instant asset evaluation</p>
+    </header>
+
+    <div class="notebook-container">
+        <div class="book-tabs">
+            <button class="tab-btn active" onclick="goToPage(1)">1. Concepts MCQ</button>
+            <button class="tab-btn" onclick="goToPage(2)">2. Ecosystem Sort</button>
+            <button class="tab-btn" onclick="goToPage(3)">3. Biological Levels</button>
+            <button class="tab-btn" onclick="goToPage(4)">4. Structural Matrix</button>
+        </div>
+
+        <div class="activity-page active" id="page-1">
+            <h2><span>🧠</span> Activity 1: Core Concepts Challenge</h2>
+            <p class="instruction">Select the single best correct answer option. Your choice will be instantly evaluated with sound effects.</p>
+            
+            <div class="question-block">
+                <p class="question-text">1. What is considered the basic structural and functional unit of all living organisms?</p>
+                <div class="options-grid">
+                    <button class="opt-btn" onclick="checkMcq(this, false)">Tissue</button>
+                    <button class="opt-btn" onclick="checkMcq(this, true)">Cell</button>
+                    <button class="opt-btn" onclick="checkMcq(this, false)">Organ</button>
+                    <button class="opt-btn" onclick="checkMcq(this, false)">Organism</button>
+                </div>
+            </div>
+
+            <div class="question-block">
+                <p class="question-text">2. Which organism is primarily an indicator species commonly discovered inside freshwater pond samples?</p>
+                <div class="options-grid">
+                    <button class="opt-btn" onclick="checkMcq(this, true)">Spirogyra</button>
+                    <button class="opt-btn" onclick="checkMcq(this, false)">Earthworm</button>
+                    <button class="opt-btn" onclick="checkMcq(this, false)">Root Nematode</button>
+                    <button class="opt-btn" onclick="checkMcq(this, false)">Mycelial Fungus</button>
+                </div>
+            </div>
+
+            <div class="question-block">
+                <p class="question-text">3. Clusters of similar cells synchronized to execute a unified mutual function are called:</p>
+                <div class="options-grid">
+                    <button class="opt-btn" onclick="checkMcq(this, false)">Organ Systems</button>
+                    <button class="opt-btn" onclick="checkMcq(this, false)">Organelles</button>
+                    <button class="opt-btn" onclick="checkMcq(this, true)">Tissues</button>
+                    <button class="opt-btn" onclick="checkMcq(this, false)">Ecosystems</button>
+                </div>
+            </div>
+
+            <div class="question-block">
+                <p class="question-text">4. Which unique structure acts as a thick outer boundary wall exclusively for plant cells?</p>
+                <div class="options-grid">
+                    <button class="opt-btn" onclick="checkMcq(this, false)">Plasma Membrane</button>
+                    <button class="opt-btn" onclick="checkMcq(this, true)">Cell Wall</button>
+                    <button class="opt-btn" onclick="checkMcq(this, false)">Cytoplasm</button>
+                    <button class="opt-btn" onclick="checkMcq(this, false)">Nuclear Matrix</button>
+                </div>
+            </div>
+
+            <div class="question-block">
+                <p class="question-text">5. What green pigment inside the chloroplast is responsible for trapping active light energy?</p>
+                <div class="options-grid">
+                    <button class="opt-btn" onclick="checkMcq(this, false)">Cytoplasm</button>
+                    <button class="opt-btn" onclick="checkMcq(this, false)">Cell Sap</button>
+                    <button class="opt-btn" onclick="checkMcq(this, true)">Chlorophyll</button>
+                    <button class="opt-btn" onclick="checkMcq(this, false)">Hemoglobin</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="activity-page" id="page-2">
+            <h2><span>🌿</span> Activity 2: Habitat Classification Pool</h2>
+            <p class="instruction">Drag and drop items. Each organism evaluates instantly the millisecond it lands in a habitat bucket.</p>
+            
+            <div class="drag-container">
+                <div class="drop-box drag-pool" id="poolBucket" ondragover="allowDrop(event)" ondrop="handleDrop(event)">
+                    <h4>Organism Bank</h4>
+                    <div class="drag-item" draggable="true" ondragstart="startDrag(event)" id="item-earth" data-target="soil-box">Earthworm</div>
+                    <div class="drag-item" draggable="true" ondragstart="startDrag(event)" id="item-amoeba" data-target="pond-box">Amoeba</div>
+                    <div class="drag-item" draggable="true" ondragstart="startDrag(event)" id="item-fungi" data-target="soil-box">Fungi</div>
+                    <div class="drag-item" draggable="true" ondragstart="startDrag(event)" id="item-param" data-target="pond-box">Paramecium</div>
+                    <div class="drag-item" draggable="true" ondragstart="startDrag(event)" id="item-nema" data-target="soil-box">Nematode</div>
+                </div>
+
+                <div class="drop-box" id="soil-box" ondragover="allowDrop(event)" ondrop="handleDrop(event)">
+                    <h4 style="color: var(--accent-pink)">Terrestrial Soil Inhabitants</h4>
+                </div>
+
+                <div class="drop-box" id="pond-box" ondragover="allowDrop(event)" ondrop="handleDrop(event)">
+                    <h4 style="color: var(--accent-cyan)">Aquatic Pond Organisms</h4>
+                </div>
+            </div>
+        </div>
+
+        <div class="activity-page" id="page-3">
+            <h2><span>🧬</span> Activity 3: Biological Hierarchy Ranking</h2>
+            <p class="instruction">Assign numeric values (1 to 5) from simplest (1) to most complex (5). Evaluates instantly as you type.</p>
+            
+            <div style="max-width: 500px; margin: 0 auto;">
+                <div class="order-row" id="row-os"><span>Organ System</span> <input type="number" class="rank-input" data-correct="4" min="1" max="5" oninput="instantEvaluateRank(this)"></div>
+                <div class="order-row" id="row-c"><span>Cell</span> <input type="number" class="rank-input" data-correct="1" min="1" max="5" oninput="instantEvaluateRank(this)"></div>
+                <div class="order-row" id="row-o"><span>Organism</span> <input type="number" class="rank-input" data-correct="5" min="1" max="5" oninput="instantEvaluateRank(this)"></div>
+                <div class="order-row" id="row-t"><span>Tissue</span> <input type="number" class="rank-input" data-correct="2" min="1" max="5" oninput="instantEvaluateRank(this)"></div>
+                <div class="order-row" id="row-or"><span>Organ</span> <input type="number" class="rank-input" data-correct="3" min="1" max="5" oninput="instantEvaluateRank(this)"></div>
+            </div>
+        </div>
+
+        <div class="activity-page" id="page-4">
+            <h2><span>📊</span> Activity 4: True/False Organelle Matrix Mapping</h2>
+            <p class="instruction">Mark True or False for each statement. Rows will automatically change color and play audio instantly.</p>
+            
+            <table class="matrix-table">
+                <thead>
+                    <tr>
+                        <th>Cell Structure / Characteristic Statement</th>
+                        <th style="width: 100px; text-align: center;">True</th>
+                        <th style="width: 100px; text-align: center;">False</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr id="matrix-r1">
+                        <td>1. Plant cells possess a single large central vacuole filling most of the space.</td>
+                        <td style="text-align: center;"><input type="radio" name="m1" class="matrix-check" data-ans="true" onclick="instantEvaluateMatrix(this)"></td>
+                        <td style="text-align: center;"><input type="radio" name="m1" class="matrix-check" data-ans="false" onclick="instantEvaluateMatrix(this)"></td>
+                    </tr>
+                    <tr id="matrix-r2">
+                        <td>2. Animal cells have a regular, rigid rectangular shape due to outer cellulose layers.</td>
+                        <td style="text-align: center;"><input type="radio" name="m2" class="matrix-check" data-ans="false" onclick="instantEvaluateMatrix(this)"></td>
+                        <td style="text-align: center;"><input type="radio" name="m2" class="matrix-check" data-ans="true" onclick="instantEvaluateMatrix(this)"></td>
+                    </tr>
+                    <tr id="matrix-r3">
+                        <td>3. Both plant and animal cells contain a functional control nucleus with DNA.</td>
+                        <td style="text-align: center;"><input type="radio" name="m3" class="matrix-check" data-ans="true" onclick="instantEvaluateMatrix(this)"></td>
+                        <td style="text-align: center;"><input type="radio" name="m3" class="matrix-check" data-ans="false" onclick="instantEvaluateMatrix(this)"></td>
+                    </tr>
+                    <tr id="matrix-r4">
+                        <td>4. Chloroplasts are found in both animal and plant cells to produce food.</td>
+                        <td style="text-align: center;"><input type="radio" name="m4" class="matrix-check" data-ans="false" onclick="instantEvaluateMatrix(this)"></td>
+                        <td style="text-align: center;"><input type="radio" name="m4" class="matrix-check" data-ans="true" onclick="instantEvaluateMatrix(this)"></td>
+                    </tr>
+                    <tr id="matrix-r5">
+                        <td>5. Cytoplasm is the jelly-like fluid that serves as the medium for cellular reactions.</td>
+                        <td style="text-align: center;"><input type="radio" name="m5" class="matrix-check" data-ans="true" onclick="instantEvaluateMatrix(this)"></td>
+                        <td style="text-align: center;"><input type="radio" name="m5" class="matrix-check" data-ans="false" onclick="instantEvaluateMatrix(this)"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="footer-nav">
+            <button class="tab-btn" id="prev-btn" onclick="movePage(-1)" disabled>Previous Activity</button>
+            <button class="tab-btn" id="next-btn" onclick="movePage(1)">Next Activity</button>
+        </div>
+    </div>
+
+    <script>
+        let currentPage = 1;
+        const totalPages = 4;
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        // Audio System Generator
+        function playFeedbackSound(isCorrect) {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            if (isCorrect) {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
+                osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.08); // E5
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.25);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.25);
+            } else {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(130, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.22);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.22);
+            }
+        }
+
+        // Tab and Page Navigation
+        function goToPage(pageNum) {
+            currentPage = pageNum;
+            document.querySelectorAll('.activity-page').forEach((p, idx) => {
+                p.classList.toggle('active', (idx + 1) === pageNum);
+            });
+            document.querySelectorAll('.tab-btn').forEach((b, idx) => {
+                if(idx < 4) b.classList.toggle('active', (idx + 1) === pageNum);
+            });
+            document.getElementById('prev-btn').disabled = currentPage === 1;
+            document.getElementById('next-btn').disabled = currentPage === totalPages;
+        }
+
+        function movePage(step) {
+            let target = currentPage + step;
+            if(target >= 1 && target <= totalPages) goToPage(target);
+        }
+
+        // Activity 1: Instant MCQ Evaluation
+        function checkMcq(btn, isCorrect) {
+            const container = btn.parentElement;
+            container.querySelectorAll('.opt-btn').forEach(b => {
+                b.disabled = true;
+                b.classList.remove('correct', 'wrong');
+            });
+            if (isCorrect) {
+                btn.classList.add('correct');
+                playFeedbackSound(true);
+            } else {
+                btn.classList.add('wrong');
+                playFeedbackSound(false);
+                // Highlight the correct answer automatically
+                container.querySelectorAll('.opt-btn').forEach(b => {
+                    if(b.onclick.toString().includes('true')) b.classList.add('correct');
+                });
+            }
+        }
+
+        // Activity 2: Instant Drag and Drop Evaluation
+        function startDrag(ev) { ev.dataTransfer.setData("text", ev.target.id); }
+        function allowDrop(ev) { ev.preventDefault(); ev.currentTarget.classList.add('hovered'); }
+        document.querySelectorAll('.drop-box').forEach(box => {
+            box.addEventListener('dragleave', (e) => e.currentTarget.classList.remove('hovered'));
+        });
+        
+        function handleDrop(ev) {
+            ev.preventDefault();
+            const destinationBox = ev.currentTarget;
+            destinationBox.classList.remove('hovered');
+            
+            const elementId = ev.dataTransfer.getData("text");
+            const element = document.getElementById(elementId);
+            
+            if (destinationBox.classList.contains('drop-box')) {
+                destinationBox.appendChild(element);
+                
+                // Instant Evaluation check upon drop
+                const targetBoxId = element.getAttribute('data-target');
+                if (destinationBox.id === targetBoxId) {
+                    element.style.border = "2px solid var(--correct-green)";
+                    playFeedbackSound(true);
+                } else if (destinationBox.id === 'poolBucket') {
+                    element.style.border = "1px solid var(--card-border)";
+                } else {
+                    element.style.border = "2px solid var(--wrong-red)";
+                    playFeedbackSound(false);
+                }
+            }
+        }
+
+        // Activity 3: Instant Rank Input Evaluation
+        function instantEvaluateRank(input) {
+            const value = parseInt(input.value);
+            const expected = parseInt(input.getAttribute('data-correct'));
+            const row = input.parentElement;
+
+            if (isNaN(value)) {
+                row.style.borderColor = "var(--card-border)";
+                return;
+            }
+
+            if (value === expected) {
+                row.style.borderColor = "var(--correct-green)";
+                playFeedbackSound(true);
+            } else {
+                row.style.borderColor = "var(--wrong-red)";
+                playFeedbackSound(false);
+            }
+        }
+
+        // Activity 4: Instant Matrix Evaluation
+        function instantEvaluateMatrix(radioInput) {
+            const row = radioInput.parentElement.parentElement;
+            const isCorrectOption = radioInput.getAttribute('data-ans') === 'true';
+
+            if (isCorrectOption) {
+                row.style.background = "rgba(16, 185, 129, 0.08)";
+                playFeedbackSound(true);
+            } else {
+                row.style.background = "rgba(239, 68, 68, 0.08)";
+                playFeedbackSound(false);
+            }
+        }
+    </script>
+</body>
+</html>
