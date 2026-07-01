@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>8ನೇ ತರಗತಿ ವಿಜ್ಞಾನ: ಘರ್ಷಣೆ ಮತ್ತು ಸೂಕ್ಷ್ಮ ಮೇಲ್ಮೈ ಪ್ರಾಯೋಗಿಕ ಪ್ರಯೋಗಾಲಯ</title>
+    <style>
+        :root {
+            --bg-dark: #070a13;
+            --card-dark: #121829;
+            --text-light: #f8fafc;
+            --text-muted: #64748b;
+            --primary: #6366f1;
+            --secondary: #38bdf8;
+            --accent: #f43f5e;
+            --success: #10b981;
+            --danger: #ef4444;
+            --wood: #b45309;
+            --metal: #94a3b8;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            padding: 20px 15px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 25px;
+            background: linear-gradient(135deg, #0f172a, #1e1b4b);
+            padding: 20px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        header h1 {
+            font-size: 2rem;
+            background: linear-gradient(to right, #6366f1, #38bdf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 6px;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .main-workspace {
+            display: grid;
+            grid-template-columns: 1.15fr 0.85fr;
+            gap: 25px;
+        }
+
+        @media (max-width: 900px) {
+            .main-workspace {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .panel {
+            background: var(--card-dark);
+            border-radius: 20px;
+            padding: 22px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            box-shadow: 0 4px 25px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .panel-title {
+            font-size: 1.1rem;
+            color: var(--secondary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            padding-bottom: 8px;
+            font-weight: 600;
+        }
+
+        /* Dual Viewport Simulation Displays */
+        .viewport-label {
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            letter-spacing: 0.05em;
+        }
+
+        .macro-display, .micro-display {
+            background: #04060f;
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .macro-display { height: 160px; }
+        .micro-display { height: 180px; }
+
+        .canvas-container {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        /* Controls Panel Grid Deck */
+        .controls-deck {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        @media (max-width: 550px) {
+            .controls-deck { grid-template-columns: 1fr; }
+        }
+
+        .control-slider-block {
+            background: rgba(255, 255, 255, 0.02);
+            padding: 12px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.04);
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .control-slider-block label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #94a3b8;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .control-slider-block label span {
+            color: var(--secondary);
+        }
+
+        .slider-control {
+            width: 100%;
+            accent-color: var(--primary);
+            cursor: pointer;
+        }
+
+        .btn-action-trigger {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, #4f46e5, #6366f1);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.02em;
+        }
+
+        .btn-action-trigger:hover {
+            opacity: 0.95;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+
+        .info-card {
+            background: rgba(56, 189, 248, 0.04);
+            border-left: 4px solid var(--secondary);
+            padding: 12px;
+            border-radius: 0 10px 10px 0;
+            font-size: 0.88rem;
+            line-height: 1.5;
+        }
+
+        /* Quest Assessments Architecture */
+        .quiz-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .score-hud {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #090e1a;
+            padding: 12px 16px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            border: 1px solid rgba(99, 102, 241, 0.2);
+        }
+
+        .score-val { color: #a78bfa; }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 6px;
+            background: rgba(255,255,255,0.06);
+            border-radius: 3px;
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: var(--secondary);
+            transition: width 0.3s ease;
+        }
+
+        .question-card { display: none; }
+        .question-card.active { display: block; animation: slideIn 0.3s ease-out; }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .question-text {
+            font-size: 0.98rem;
+            font-weight: 500;
+            margin-bottom: 15px;
+            line-height: 1.45;
+        }
+
+        .option-btn {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            color: var(--text-light);
+            padding: 12px 15px;
+            border-radius: 12px;
+            text-align: left;
+            cursor: pointer;
+            margin-bottom: 10px;
+            transition: all 0.2s ease;
+            font-size: 0.88rem;
+        }
+
+        .option-btn:hover {
+            background: rgba(255, 255, 255, 0.04);
+            border-color: #4b5563;
+            transform: translateX(3px);
+        }
+
+        .option-btn.correct {
+            background: rgba(16, 185, 129, 0.15) !important;
+            border-color: var(--success) !important;
+            color: #34d399;
+            font-weight: 600;
+        }
+
+        .option-btn.wrong {
+            background: rgba(239, 68, 68, 0.15) !important;
+            border-color: var(--danger) !important;
+            color: #f87171;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>🧲 ಸೂಕ್ಷ್ಮದರ್ಶಕೀಯ ಘರ್ಷಣೆ ಮತ್ತು ಇಂಟರ್‌ಲಾಕಿಂಗ್ ಪ್ರಯೋಗಾಲಯ</h1>
+            <p>ಮೇಲ್ಮೈಗಳ ನಡುವಿನ ಒರಟುತನ ಹಾಗೂ ಸೂಕ್ಷ್ಮ ಅಸಮತೆಗಳನ್ನು ವೀಕ್ಷಿಸಿ ಮತ್ತು ಸಂವಾದಾತ್ಮಕ ರಸಪ್ರಶ್ನೆ ಪೂರ್ಣಗೊಳಿಸಿ</p>
+        </header>
+
+        <div class="main-workspace">
+            
+            <!-- Physics Display Section -->
+            <div class="panel">
+                <div class="panel-title">🔬 ನೈಜ-ಸಮಯದ ಘರ್ಷಣೆ ಸಿಮ್ಯುಲೇಟರ್</div>
+                
+                <div>
+                    <div class="viewport-label">ಸ್ಥೂಲ ನೋಟ (Macro View): ಮರದ ಬ್ಲಾಕ್ ಮತ್ತು ಸ್ಪ್ರಿಂಗ್ ಬ್ಯಾಲೆನ್ಸ್</div>
+                    <div class="macro-display">
+                        <canvas id="macroCanvas" class="canvas-container"></canvas>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="viewport-label">ಸೂಕ್ಷ್ಮದರ್ಶಕೀಯ ನೋಟ (Micro View): ವರ್ಧಿಸಿದ ಸಂಪರ್ಕ ಮೇಲ್ಮೈ ಮತ್ತು ಅಸಮತೆಗಳು (Irregularities)</div>
+                    <div class="micro-display">
+                        <canvas id="microCanvas" class="canvas-container"></canvas>
+                    </div>
+                </div>
+
+                <div class="controls-deck">
+                    <div class="control-slider-block">
+                        <label>ಮೇಲ್ಮೈ ವಿನ್ಯಾಸದ ಪ್ರೊಫೈಲ್: <span id="roughness-label">ಮಂಜುಗಡ್ಡೆ</span></label>
+                        <input type="range" id="roughnessSlider" class="slider-control" min="0" max="3" value="0" oninput="updateLabVariables()">
+                    </div>
+
+                    <div class="control-slider-block">
+                        <label>ಅಭಿಲಂಬ ಬಲ / ತೂಕ (Block Mass): <span id="weight-label">100 ಗ್ರಾಂ</span></label>
+                        <input type="range" id="weightSlider" class="slider-control" min="1" max="4" value="1" oninput="updateLabVariables()">
+                    </div>
+
+                    <button class="btn-action-trigger" onclick="engageSpringPull()">ಸ್ಪ್ರಿಂಗ್ ಎಳೆತದ ಬಲವನ್ನು ಅನ್ವಯಿಸಿ</button>
+                </div>
+
+                <div class="info-card" id="dynamic-explanation">
+                    ಮೇಲ್ನೋಟಕ್ಕೆ ಸಂಪೂರ್ಣವಾಗಿ ನಯವಾಗಿ ಕಾಣಿಸುವ ಮಂಜುಗಡ್ಡೆಯಂತಹ ಮೇಲ್ಮೈ ಕೂಡ ಸೂಕ್ಷ್ಮ ಮಟ್ಟದಲ್ಲಿ ಸಣ್ಣ ಸಣ್ಣ ಹಳ್ಳ-ತಿಣ್ಣೆಗಳನ್ನು ಅಂದರೆ 'ಅಸಮತೆಗಳನ್ನು' (irregularities) ಹೊಂದಿರುತ್ತದೆ. ಇಲ್ಲಿ ಇಂಟರ್‌ಲಾಕಿಂಗ್ ಅತ್ಯಲ್ಪವಾಗಿರುವುದರಿಂದ, ಕನಿಷ್ಠ ಪ್ರತಿರೋಧದೊಂದಿಗೆ ವಸ್ತುಗಳು ಚಲಿಸುತ್ತವೆ.
+                </div>
+            </div>
+
+            <!-- Quiz Component Section -->
+            <div class="panel quiz-container">
+                <div class="panel-title">🏆 ಘರ್ಷಣೆ ಅಧ್ಯಾಯದ ಜ್ಞಾನ ಪರೀಕ್ಷಾ ಮ್ಯಾಟ್ರಿಕ್ಸ್</div>
+                
+                <div class="score-hud">
+                    <div>ಪ್ರಗತಿ ಹಂತ: <span id="progress-text">1 / 4</span></div>
+                    <div>ಗಳಿಸಿದ ಅಂಕಗಳು: <span id="score-counter" class="score-val">0</span> XP</div>
+                </div>
+
+                <div class="progress-bar-container">
+                    <div id="progress-indicator" class="progress-fill"></div>
+                </div>
+
+                <div id="quiz-deck-wrapper">
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // Comprehensive Question Matrix Database
+        const frictionQuests = [
+            { q: "ಎರಡು ವಸ್ತುಗಳ ಮೇಲ್ಮೈಗಳು ಪರಸ್ಪರ ಉಜ್ಜಿದಾಗ ಚಲನೆಗೆ ಎದುರಾಗುವ 'ಘರ್ಷಣೆ' (Friction) ಎಂಬ ಪ್ರತಿರೋಧ ಬಲಕ್ಕೆ ನಿಜವಾದ ಕಾರಣವೇನು?", o: ["ಮೇಲ್ಮೈಗಳ ಮೇಲಿರುವ ಸೂಕ್ಷ್ಮ ಅಸಮತೆಗಳು (ಹಳ್ಳ-ತಿಣ್ಣೆಗಳು) ಪರಸ್ಪರ ಸಿಕ್ಕಿಹಾಕಿಕೊಳ್ಳುವುದು (Interlocking)", "ಪರಮಾಣು ರಾಶಿಗಳ ನಡುವೆ ಉಂಟಾಗುವ ಸಂಪೂರ್ಣ ರಾಸಾಯನಿಕ ಕಾಂತೀಯ ನಾಶ", "ಗಾಳಿಯ ಅಂತರವನ್ನು ಛೇದಿಸುವ ಸ್ಥಿರ ಗುರುತ್ವಾಕರ್ಷಣೆಯ ವಿಕಿರಣ ರೇಖೆಗಳು"], c: 0 },
+            { q: "ನೆಲದ ಮೇಲ್ಮೈಗೆ ಸ್ಯಾಂಡ್‌ಪೇಪರ್ (Sandpaper) ಅನ್ನು ಸುತ್ತಿದಾಗ ಮರದ ಬ್ಲಾಕ್ ಅನ್ನು ಎಳೆಯಲು ಹೆಚ್ಚಿನ ಬಲ ಏಕೆ ಬೇಕಾಗುತ್ತದೆ?", o: ["ಇದು ಮೇಲ್ಮೈ ಒರಟುತನವನ್ನು ಹೆಚ್ಚಿಸಿ, ಸೂಕ್ಷ್ಮ ಹಳ್ಳ-ತಿಣ್ಣೆಗಳ ಜಾಲರಿಯನ್ನು ಆಳವಾಗಿಸುತ್ತದೆ", "ಇದು ಮರವನ್ನು ಕೆಳಕ್ಕೆ ಹಿಡಿದಿಡುವ ರಾಸಾಯನಿಕ ನಿರ್ವಾತ ಹೀರಿಕೊಳ್ಳುವ ಕ್ಷೇತ್ರವನ್ನು ಸೃಷ್ಟಿಸುತ್ತದೆ", "ಇದು ಬ್ಲಾಕ್ ರಚನೆಯ ಒಟ್ಟು ತೂಕವನ್ನು ನಾಟಕೀಯವಾಗಿ ಕಡಿಮೆ ಮಾಡುತ್ತದೆ"], c: 0 },
+            { q: "ಮರದ ಬ್ಲಾಕ್‌ನ ಮೇಲೆ ಹೆಚ್ಚಿನ ತೂಕದ ಹರಳುಗಳನ್ನು ಇರಿಸಿದಾಗ ಘರ್ಷಣೆಯು ಏಕೆ ಹೆಚ್ಚಾಗುತ್ತದೆ?", o: ["ಹೆಚ್ಚಿನ ಅಭಿಲಂಬ ಬಲವು (Normal force) ಮೇಲ್ಮೈ ಅಸಮತೆಗಳನ್ನು ಪರಸ್ಪರ ಹೆಚ್ಚು ಆಳವಾಗಿ ಒತ್ತುವಂತೆ ಮಾಡುತ್ತದೆ", "ಹೆಚ್ಚುವರಿ ದ್ರವ್ಯರಾಶಿಯು ಬ್ಲಾಕ್‌ನ ಭೌತಿಕ ಗಾತ್ರ ಮತ್ತು ಮೇಲ್ಮೈ ವಿಸ್ತೀರ್ಣವನ್ನು ಹೆಚ್ಚಿಸುತ್ತದೆ", "ಹೆಚ್ಚುವರಿ ದ್ರವ್ಯರಾಶಿಯು ನೇರವಾಗಿ ಎಳೆತದ ದಿಕ್ಕನ್ನು ತಿರುಗಿಸುವ ಕಾಂತೀಯ ಪ್ರವಾಹಗಳನ್ನು ಸೃಷ್ಟಿಸುತ್ತದೆ"], c: 0 },
+            { q: "ಇಂಟರ್‌ಲಾಕಿಂಗ್ ವ್ಯವಸ್ಥೆಯನ್ನು ಮುರಿದು ಚಲನೆ ಆರಂಭಿಸಲು ಈ ಕೆಳಗಿನ ಯಾವ ಘರ್ಷಣೆಯ ವಿರುದ್ಧ ಗರಿಷ್ಠ ಆರಂಭಿಕ ಬಲದ ಅಗತ್ಯವಿದೆ?", o: ["ಸ್ಥಿತ್ಯಾತ್ಮಕ ಘರ್ಷಣೆ (Static Friction)", "ಜಾರು ಘರ್ಷಣೆ (Sliding Kinetic Friction)", "ಉರುಳು ಘರ್ಷಣೆ (Rolling Friction)"], c: 0 },
+            { q: "ಒಂದೇ ವಸ್ತುವಿಗೆ ಜಾರು ಘರ್ಷಣೆಯ ಮೌಲ್ಯವು ಯಾವಾಗಲೂ ಸ್ಥಿತ್ಯಾತ್ಮಕ ಘರ್ಷಣೆಗಿಂತ ಸ್ವಲ್ಪ ಕಡಿಮೆ ಇರಲು ಕಾರಣವೇನು?", o: ["ವಸ್ತುವು ಚಲಿಸಲು ಪ್ರಾರಂಭಿಸಿದಾಗ, ಮೇಲ್ಮೈ ಅಸಮತೆಗಳು ಪರಸ್ಪರ ಆಳವಾಗಿ ಸಿಲುಕಿಕೊಳ್ಳಲು ಸಾಕಷ್ಟು ಸಮಯ ಸಿಗುವುದಿಲ್ಲ", "ಚಲಿಸುವ ಕಾಯಗಳು ತಮ್ಮ ಸೂಕ್ಷ್ಮ ಹಳ್ಳ-ತಿಣ್ಣೆಗಳನ್ನು ಸಂಪೂರ್ಣವಾಗಿ ಕಳೆದುಕೊಳ್ಳುತ್ತವೆ", "ವೇಗದ ಚಲನೆಯು ಗುರುತ್ವಾಕರ್ಷಣೆಯ ಸಮತಲವನ್ನು ತಕ್ಷಣವೇ ತಲೆಕೆಳಗಾಗಿಸುತ್ತದೆ"], c: 0 },
+            { q: "ಯಾಂತ್ರಿಕ ಯಂತ್ರಗಳಿಗೆ ಬಳಸುವ ಕೈಗಾರಿಕಾ ಲೂಬ್ರಿಕೆಂಟ್ ಎಣ್ಣೆಗಳು ಘರ್ಷಣೆ ಮತ್ತು ಸವೆತವನ್ನು ಹೇಗೆ ಯಶಸ್ವಿಯಾಗಿ ಕಡಿಮೆ ಮಾಡುತ್ತವೆ?", o: ["ಅವು ಸೂಕ್ಷ್ಮ ಹಳ್ಳಗಳನ್ನು ತುಂಬಿ ತೆಳುವಾದ ಪದರವನ್ನು ರೂಪಿಸುತ್ತವೆ, ಇದರಿಂದ ಒರಟು ಶಿಖರಗಳು ನೇರವಾಗಿ ಸ್ಪರ್ಶಿಸುವುದಿಲ್ಲ", "ಅವು ಸಂಪರ್ಕಕ್ಕೆ ಬಂದ ತಕ್ಷಣ ಎಲ್ಲಾ ಸೂಕ್ಷ್ಮ ಅಸಮತೆಗಳನ್ನು ರಾಸಾಯನಿಕವಾಗಿ ಕರಗಿಸಿಬಿಡುತ್ತವೆ", "ಅವು ಎಲ್ಲಾ ಚಲನ ಶಕ್ತಿ ಕ್ಷೇತ್ರಗಳನ್ನು ನೇರವಾಗಿ ಶುದ್ಧ ಧ್ವನಿ ಅಲೆಗಳಾಗಿ ಪರಿವರ್ತಿಸುತ್ತವೆ"], c: 0 }
+        ];
+
+        const textures = [
+            { name: "ನಯವಾದ ಮಂಜುಗಡ್ಡೆ (Ice)", roughness: 4, label: "Ice", text: "ಮಂಜುಗಡ್ಡೆಯು ನಯವಾಗಿ ಕಂಡರೂ ಸೂಕ್ಷ್ಮ ಮಟ್ಟದಲ್ಲಿ ಸಣ್ಣ ಸಣ್ಣ ಹಳ್ಳ-ತಿಣ್ಣೆಗಳನ್ನು ಅಂದರೆ 'ಅಸಮತೆಗಳನ್ನು' ಹೊಂದಿರುತ್ತದೆ. ಇಲ್ಲಿ ಇಂಟರ್‌ಲಾಕಿಂಗ್ ಅತ್ಯಲ್ಪವಾಗಿರುವುದರಿಂದ, ಅತ್ಯಂತ ಕಡಿಮೆ ಪ್ರತಿರೋಧದೊಂದಿಗೆ ವಸ್ತುಗಳು ಚಲಿಸುತ್ತವೆ." },
+            { name: "ಮೆರುಗುಗೊಳಿಸಿದ ಮರದ ಮೇಜು (Wood)", roughness: 12, label: "Polished Wood", text: "ಮೆರುಗುಗೊಳಿಸಿದ ಮರವು ಮಧ್ಯಮ ಮಟ್ಟದ ಸೂಕ್ಷ್ಮ ಅಸಮತೆಗಳನ್ನು ಪ್ರದರ್ಶಿಸುತ್ತದೆ. ಬಲವನ್ನು ಅನ್ವಯಿಸಿದಾಗ, ಈ ಮಧ್ಯಮ ಹಳ್ಳ-ತಿಣ್ಣೆಗಳು ಒಂದಕ್ಕೊಂದು ಸಿಲುಕಿಕೊಳ್ಳುವುದರಿಂದ, ಅವುಗಳನ್ನು ಮುಕ್ತಗೊಳಿಸಲು ಹೆಚ್ಚುವರಿ ಎಳೆತದ ಅಗತ್ಯವಿರುತ್ತದೆ." },
+            { name: "ಒರಟು ಕಾಂಕ್ರೀಟ್ ಚಪ್ಪಡಿ (Concrete)", roughness: 24, label: "Concrete Slab", text: "ಕಾಂಕ್ರೀಟ್ ಮೇಲ್ಮೈಗಳು ಆಳವಾದ ಮತ್ತು ದೊಡ್ಡದಾದ ಸೂಕ್ಷ್ಮ ವಿನ್ಯಾಸಗಳನ್ನು ಹೊಂದಿರುತ್ತವೆ. ಈ ಅಸಮತೆಗಳು ಬಲವಾಗಿ ಒಂದಕ್ಕೊಂದು ಜ್ಯಾಮ್ ಆಗುವುದರಿಂದ, ಅವುಗಳನ್ನು ಚಲಿಸುವಂತೆ ಮಾಡಲು ಬೃಹತ್ ಪ್ರಮಾಣದ ಬಲದ ಅಗತ್ಯವಿರುತ್ತದೆ." },
+            { name: "ಒರಟಾದ ಸ್ಯಾಂಡ್‌ಪೇಪರ್ (Sandpaper)", roughness: 40, label: "Sandpaper", text: "ಸ್ಯಾಂಡ್‌ಪೇಪರ್ ಅತ್ಯಂತ ತೀವ್ರವಾದ ಹಾಗೂ ಆಳವಾದ ಸೂಕ್ಷ್ಮ ಶಿಖರ ಮತ್ತು ಕಣಿವೆಗಳನ್ನು ಹೊಂದಿರುತ್ತದೆ. ಈ ಹಲ್ಲುಗಳು ಗೇರ್‌ಗಳಂತೆ ಬಿಗಿಯಾಗಿ ಲಾಕ್ ಆಗುವುದರಿಂದ, ಯಾವುದೇ ಸಮತಲ ಚಲನೆಗೆ ಅಗಾಧವಾದ ಯಾಂತ್ರಿಕ ಪ್ರತಿರೋಧವನ್ನು ಒಡ್ಡುತ್ತವೆ." }
+        ];
+
+        let macroCanvas = document.getElementById('macroCanvas');
+        let microCanvas = document.getElementById('microCanvas');
+        let macroCtx = macroCanvas.getContext('2d');
+        let microCtx = microCanvas.getContext('2d');
+
+        let blockX = 100;
+        let isMoving = false;
+        let pullProgress = 0;
+        let globalXPScore = 0;
+        let currentActivityQuestions = [];
+
+        // Synthesize native audio frequencies using Web Audio API
+        function playLabAudio(isCorrect) {
+            try {
+                const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                if (!AudioCtx) return;
+                const audioCtx = new AudioCtx();
+                
+                if (isCorrect) {
+                    // ಸರಿಯಾದ ಉತ್ತರಕ್ಕೆ ಆಡಿಯೋ ಸಂಕೇತ (Double Chime)
+                    let osc = audioCtx.createOscillator();
+                    let gain = audioCtx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
+                    osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.08); // E5
+                    osc.frequency.setValueAtTime(783.99, audioCtx.currentTime + 0.16); // G5
+                    gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+                    osc.connect(gain); gain.connect(audioCtx.destination);
+                    osc.start(); osc.stop(audioCtx.currentTime + 0.4);
+                } else {
+                    // ತಪ್ಪಾದ ಉತ್ತರಕ್ಕೆ ಆಡಿಯೋ ಸಂಕೇತ (Low Buzz)
+                    let osc = audioCtx.createOscillator();
+                    let gain = audioCtx.createGain();
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(146.83, audioCtx.currentTime); // D3
+                    osc.frequency.setValueAtTime(110.00, audioCtx.currentTime + 0.12); // A2
+                    gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.45);
+                    osc.connect(gain); gain.connect(audioCtx.destination);
+                    osc.start(); osc.stop(audioCtx.currentTime + 0.45);
+                }
+            } catch (e) { console.log(e); }
+        }
+
+        window.onload = function() {
+            setupCanvasBounds();
+            window.addEventListener('resize', setupCanvasBounds);
+            updateLabVariables();
+            initializeDiagnosticQuestDeck();
+        };
+
+        function setupCanvasBounds() {
+            macroCanvas.width = macroCanvas.offsetWidth;
+            macroCanvas.height = macroCanvas.offsetHeight;
+            microCanvas.width = microCanvas.offsetWidth;
+            microCanvas.height = microCanvas.offsetHeight;
+            renderMacroUniverse();
+            renderMicroUniverse();
+        }
+
+        function updateLabVariables() {
+            let rIdx = document.getElementById('roughnessSlider').value;
+            let wIdx = document.getElementById('weightSlider').value;
+
+            document.getElementById('roughness-label').innerText = textures[rIdx].name;
+            document.getElementById('weight-label').innerText = (wIdx * 100) + " ಗ್ರಾಂ";
+            document.getElementById('dynamic-explanation').innerText = textures[rIdx].text;
+
+            blockX = isMoving ? blockX : 100;
+            renderMacroUniverse();
+            renderMicroUniverse();
+        }
+
+        function renderMacroUniverse() {
+            macroCtx.clearRect(0, 0, macroCanvas.width, macroCanvas.height);
+            let w = macroCanvas.width;
+            let h = macroCanvas.height;
+
+            let floorY = h * 0.75;
+            let blockW = 110;
+            let blockH = 50;
+            let blockY = floorY - blockH;
+
+            // Draw Laboratory Bench Floor Track
+            macroCtx.strokeStyle = '#334155';
+            macroCtx.lineWidth = 4;
+            macroCtx.beginPath();
+            macroCtx.moveTo(0, floorY);
+            macroCtx.lineTo(w, floorY);
+            macroCtx.stroke();
+
+            // Draw Textured Surface Pattern Overlay
+            let rIdx = document.getElementById('roughnessSlider').value;
+            macroCtx.strokeStyle = rIdx == 0 ? '#38bdf8' : rIdx == 1 ? '#b45309' : rIdx == 2 ? '#475569' : '#f43f5e';
+            macroCtx.lineWidth = 2;
+            macroCtx.beginPath();
+            for(let i=0; i<w; i+=8) {
+                macroCtx.moveTo(i, floorY + 1);
+                macroCtx.lineTo(i + 4, floorY + 4);
+            }
+            macroCtx.stroke();
+
+            // Draw Wooden Block Structure
+            macroCtx.fillStyle = varToHex('--wood');
+            macroCtx.fillRect(blockX, blockY, blockW, blockH);
+            macroCtx.strokeStyle = '#78350f';
+            macroCtx.lineWidth = 2;
+            macroCtx.strokeRect(blockX, blockY, blockW, blockH);
+
+            // Draw Extra Stacked Mass Slots (Weights)
+            let wIdx = parseInt(document.getElementById('weightSlider').value);
+            for(let m=1; m<wIdx; m++) {
+                macroCtx.fillStyle = varToHex('--metal');
+                macroCtx.fillRect(blockX + 20, blockY - (m * 12), blockW - 40, 10);
+                macroCtx.strokeStyle = '#475569';
+                macroCtx.strokeRect(blockX + 20, blockY - (m * 12), blockW - 40, 10);
+            }
+
+            // Draw Pull Hook and Spring Balance framework
+            let hookX = blockX + blockW;
+            let hookY = blockY + blockH/2;
+
+            macroCtx.strokeStyle = '#e2e8f0';
+            macroCtx.lineWidth = 2;
+            macroCtx.beginPath();
+            macroCtx.moveTo(hookX, hookY);
+            macroCtx.lineTo(hookX + 15, hookY); 
+            macroCtx.stroke();
+
+            // Render elastic gauge coil line
+            let balanceX = hookX + 15;
+            let springStretch = 45 + (pullProgress * 30);
+            
+            macroCtx.strokeStyle = varToHex('--secondary');
+            macroCtx.beginPath();
+            macroCtx.moveTo(balanceX, hookY);
+            for (let s = 0; s < 10; s++) {
+                let sx = balanceX + (s * (springStretch / 10));
+                let sy = hookY + (s % 2 === 0 ? -6 : 6);
+                macroCtx.lineTo(sx, sy);
+            }
+            macroCtx.stroke();
+
+            // Scale casing cylinder shell
+            let casingX = balanceX + springStretch;
+            macroCtx.fillStyle = '#1e293b';
+            macroCtx.fillRect(casingX, hookY - 10, 80, 20);
+            macroCtx.strokeStyle = '#64748b';
+            macroCtx.strokeRect(casingX, hookY - 10, 80, 20);
+
+            // Force vector force magnitude string printout
+            macroCtx.fillStyle = '#f8fafc';
+            macroCtx.font = 'bold 10px monospace';
+            let computedNewton = (parseInt(rIdx) + 1) * wIdx * 1.8 * (isMoving ? 0.75 : pullProgress);
+            macroCtx.fillText(computedNewton.toFixed(1) + " N", casingX + 25, hookY + 4);
+        }
+
+        function renderMicroUniverse() {
+            microCtx.clearRect(0, 0, microCanvas.width, microCanvas.height);
+            let w = microCanvas.width;
+            let h = microCanvas.height;
+
+            let midY = h / 2;
+            let rIdx = parseInt(document.getElementById('roughnessSlider').value);
+            let wIdx = parseInt(document.getElementById('weightSlider').value);
+
+            let teethHeight = textures[rIdx].roughness;
+            let verticalMeshOverlap = teethHeight * 0.35 + (wIdx * 3.5); // Weight presses irregularities together deeper
+
+            let toothWidth = 24;
+            let xOffset = (blockX % toothWidth);
+
+            // Paint Bottom Floor Irregularities Row
+            microCtx.fillStyle = '#1e293b';
+            microCtx.beginPath();
+            microCtx.moveTo(0, h);
+            for(let x = -toothWidth; x <= w + toothWidth; x += toothWidth) {
+                let px = x - xOffset;
+                microCtx.lineTo(px, midY + verticalMeshOverlap/2);
+                microCtx.lineTo(px + toothWidth/2, midY + verticalMeshOverlap/2 - teethHeight);
+                microCtx.lineTo(px + toothWidth, midY + verticalMeshOverlap/2);
+            }
+            microCtx.lineTo(w, h);
+            microCtx.fill();
+            microCtx.strokeStyle = '#475569';
+            microCtx.lineWidth = 2;
+            microCtx.stroke();
+
+            // Paint Top Object Interlocking Teeth Row
+            microCtx.fillStyle = varToHex('--wood');
+            microCtx.beginPath();
+            microCtx.moveTo(0, 0);
+            for(let x = -toothWidth; x <= w + toothWidth; x += toothWidth) {
+                let px = x; 
+                microCtx.lineTo(px, midY - verticalMeshOverlap/2);
+                microCtx.lineTo(px + toothWidth/2, midY - verticalMeshOverlap/2 + teethHeight);
+                microCtx.lineTo(px + toothWidth, midY - verticalMeshOverlap/2);
+            }
+            microCtx.lineTo(w, 0);
+            microCtx.fill();
+            microCtx.strokeStyle = '#ca8a04';
+            microCtx.stroke();
+        }
+
+        function engageSpringPull() {
+            if(isMoving) return;
+            pullProgress = 0;
+            
+            let rIdx = parseInt(document.getElementById('roughnessSlider').value);
+            let wIdx = parseInt(document.getElementById('weightSlider').value);
+            let threshold = 0.25 + (rIdx * 0.2) + (wIdx * 0.12);
+
+            function springTicker() {
+                if(pullProgress < threshold) {
+                    pullProgress += 0.02;
+                    renderMacroUniverse();
+                    requestAnimationFrame(springTicker);
+                } else {
+                    isMoving = true;
+                    let movementCount = 0;
+                    
+                    function blockTicker() {
+                        if(movementCount < 60) {
+                            blockX += 2.5;
+                            movementCount++;
+                            pullProgress = threshold * 0.82; // ಜಾರು ಘರ್ಷಣೆ ಸ್ವಲ್ಪ ಕಡಿಮೆಯಿರುತ್ತದೆ
+                            updateLabVariables();
+                            requestAnimationFrame(blockTicker);
+                        } else {
+                            isMoving = false;
+                            pullProgress = 0;
+                            blockX = 100; 
+                            updateLabVariables();
+                        }
+                    }
+                    blockTicker();
+                }
+            }
+            springTicker();
+        }
+
+        function varToHex(varName) {
+            return getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
+        }
+
+        // Fisher-Yates array shuffling logic helper
+        function shuffleDeck(arr) {
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+        }
+
+        // Assessment Matrix Setup
+        function initializeDiagnosticQuestDeck() {
+            let completePool = [...frictionQuests];
+            shuffleDeck(completePool);
+            currentActivityQuestions = completePool.slice(0, 4);
+            renderQuestCardStack();
+        }
+
+        function renderQuestCardStack() {
+            const wrapper = document.getElementById('quiz-deck-wrapper');
+            wrapper.innerHTML = "";
+
+            document.getElementById('progress-text').innerText = `1 / ${currentActivityQuestions.length}`;
+            document.getElementById('progress-indicator').style.width = `${(1 / currentActivityQuestions.length) * 100}%`;
+
+            currentActivityQuestions.forEach((qData, qIdx) => {
+                const card = document.createElement('div');
+                card.className = `question-card ${qIdx === 0 ? 'active' : ''}`;
+                card.id = `quest-node-${qIdx}`;
+
+                const heading = document.createElement('p');
+                heading.className = "question-text";
+                heading.innerText = `${qIdx + 1}. ${qData.q}`;
+                card.appendChild(heading);
+
+                // Index-safe options shuffling
+                let optionsMap = qData.o.map((str, index) => {
+                    return { valStr: str, trackIdx: index };
+                });
+                shuffleDeck(optionsMap);
+
+                optionsMap.forEach((opt) => {
+                    const btn = document.createElement('button');
+                    btn.className = "option-btn";
+                    btn.innerText = opt.valStr;
+
+                    btn.onclick = function() {
+                        if(card.classList.contains('evaluated')) return;
+                        card.classList.add('evaluated');
+
+                        if(opt.trackIdx === qData.c) {
+                            btn.classList.add('correct');
+                            playLabAudio(true);
+                            globalXPScore += 100;
+                            document.getElementById('score-counter').innerText = globalXPScore;
+                        } else {
+                            btn.classList.add('wrong');
+                            playLabAudio(false);
+                            
+                            let allBtns = card.querySelectorAll('.option-btn');
+                            allBtns.forEach((b, idx) => {
+                                if(optionsMap[idx].trackIdx === qData.c) b.classList.add('correct');
+                            });
+                        }
+
+                        setTimeout(() => {
+                            advanceQuestStack(qIdx, currentActivityQuestions.length);
+                        }, 1600);
+                    };
+                    card.appendChild(btn);
+                });
+
+                wrapper.appendChild(card);
+            });
+        }
+
+        function advanceQuestStack(curr, total) {
+            let nextNode = curr + 1;
+            let currentCard = document.getElementById(`quest-node-${curr}`);
+
+            if(nextNode < total) {
+                let nextCard = document.getElementById(`quest-node-${nextNode}`);
+                currentCard.classList.remove('active');
+                nextCard.classList.add('active');
+
+                document.getElementById('progress-text').innerText = `${nextNode + 1} / ${total}`;
+                document.getElementById('progress-indicator').style.width = `${((nextNode + 1) / total) * 100}%`;
+            } else {
+                alert(`🎉 ಈ ಭಾಗದ ಪ್ರಯೋಗ ಯಶಸ್ವಿಯಾಗಿ ಮುಗಿದಿದೆ! ನೀವು ಎಲ್ಲಾ ಸವಾಲುಗಳನ್ನು ಯಶಸ್ವಿಯಾಗಿ ಪೂರ್ಣಗೊಳಿಸಿದ್ದೀರಿ. ಒಟ್ಟು ಸ್ಕೋರ್: ${globalXPScore} XP.`);
+                initializeDiagnosticQuestDeck(); 
+            }
+        }
+    </script>
+</body>
+</html>

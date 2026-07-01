@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಆರೋಗ್ಯವೇ ಭಾಗ್ಯ - ರಸಪ್ರಶ್ನೆ ಆಟ</title>
+    <style>
+        :root {
+            --bg-glow: #0d1117;
+            --panel-bg: rgba(22, 27, 34, 0.85);
+            --neon-blue: #00f2fe;
+            --neon-purple: #4facfe;
+            --neon-green: #00ff87;
+            --neon-pink: #ff0844;
+            --text-main: #f0f6fc;
+            --text-muted: #8b949e;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, 'Noto Sans Kannada', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-glow);
+            background-image: radial-gradient(circle at 50% 50%, #1f1a3a 0%, #0d1117 100%);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 25px;
+            margin-top: 10px;
+        }
+
+        header h1 {
+            font-size: 2.3rem;
+            background: linear-gradient(135deg, var(--neon-blue), var(--neon-green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+            filter: drop-shadow(0 2px 10px rgba(0,242,254,0.3));
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        /* Status Bar Hub */
+        .status-container {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+            width: 100%;
+            max-width: 900px;
+            justify-content: space-between;
+        }
+
+        .status-card {
+            background: var(--panel-bg);
+            border: 1px solid rgba(255,255,255,0.1);
+            backdrop-filter: blur(12px);
+            padding: 12px 25px;
+            border-radius: 16px;
+            flex: 1;
+            text-align: center;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        .status-card h3 {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+        }
+
+        .status-card p {
+            font-size: 1.6rem;
+            font-weight: bold;
+            color: var(--neon-blue);
+        }
+
+        /* Main Console Grid */
+        .game-wrapper {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 25px;
+            width: 100%;
+            max-width: 1100px;
+            min-height: 520px;
+        }
+
+        /* Sidebar Selector */
+        .activity-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .menu-btn {
+            background: var(--panel-bg);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: var(--text-main);
+            padding: 15px 20px;
+            border-radius: 14px;
+            cursor: pointer;
+            text-align: left;
+            font-size: 0.95rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .menu-btn:hover {
+            border-color: var(--neon-purple);
+            transform: translateX(5px);
+            background: rgba(79, 172, 254, 0.1);
+        }
+
+        .menu-btn.active {
+            background: linear-gradient(135deg, rgba(0, 242, 254, 0.2), rgba(79, 172, 254, 0.2));
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 15px rgba(0, 242, 254, 0.25);
+        }
+
+        .menu-btn .icon {
+            font-size: 1.2rem;
+        }
+
+        /* Main Activity Screen Panel */
+        .stage-panel {
+            background: var(--panel-bg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 35px;
+            backdrop-filter: blur(16px);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .stage-header {
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
+
+        .stage-title {
+            font-size: 1.6rem;
+            color: var(--neon-green);
+            margin-bottom: 5px;
+        }
+
+        .stage-desc {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        /* Form Controls */
+        .quest-box {
+            margin-bottom: 25px;
+            animation: fadeIn 0.4s ease forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .quest-text {
+            font-size: 1.15rem;
+            margin-bottom: 18px;
+            line-height: 1.6;
+        }
+
+        /* Options Grid */
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .option-node {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 14px 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 1rem;
+            text-align: left;
+            color: var(--text-main);
+        }
+
+        .option-node:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--text-muted);
+        }
+
+        .option-node.selected {
+            background: rgba(79, 172, 254, 0.15);
+            border-color: var(--neon-blue);
+        }
+
+        /* Sorting / Binary Layout */
+        .binary-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        /* Control Action Triggers */
+        .action-row {
+            margin-top: auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 20px;
+        }
+
+        .btn-action {
+            background: linear-gradient(135deg, var(--neon-blue) 0%, var(--neon-purple) 100%);
+            border: none;
+            color: #fff;
+            font-weight: bold;
+            padding: 12px 28px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 1rem;
+            box-shadow: 0 4px 15px rgba(79, 172, 254, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .btn-action:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 242, 254, 0.5);
+        }
+
+        .btn-action:disabled {
+            background: #2a2f35;
+            color: var(--text-muted);
+            box-shadow: none;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Result Feedback Overlay */
+        .feedback-toast {
+            margin-top: 15px;
+            padding: 12px 18px;
+            border-radius: 10px;
+            font-weight: 500;
+            display: none;
+        }
+
+        .feedback-toast.correct {
+            display: block;
+            background: rgba(0, 255, 135, 0.15);
+            border: 1px solid var(--neon-green);
+            color: var(--neon-green);
+        }
+
+        .feedback-toast.wrong {
+            display: block;
+            background: rgba(255, 8, 68, 0.15);
+            border: 1px solid var(--neon-pink);
+            color: var(--neon-pink);
+        }
+
+        .progress-micro {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .finish-screen {
+            text-align: center;
+            padding: 40px 10px;
+        }
+        .finish-screen h2 {
+            color: var(--neon-green);
+            font-size: 2.2rem;
+            margin-bottom: 15px;
+        }
+        .finish-screen p {
+            margin-bottom: 25px;
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>ಆರೋಗ್ಯ: ನಮ್ಮ ಅತ್ಯಮೂಲ್ಯ ಸಂಪತ್ತು</h1>
+        <p>ಸರಳ ಮತ್ತು ಮೋಜಿನ ವಿಜ್ಞಾನ ರಸಪ್ರಶ್ನೆ — 8ನೇ ತರಗತಿ, ಅಧ್ಯಾಯ 3</p>
+    </header>
+
+    <div class="status-container">
+        <div class="status-card">
+            <h3>ಸ್ಕೋರ್ (ಅಂಕಗಳು)</h3>
+            <p id="score-display">000</p>
+        </div>
+        <div class="status-card">
+            <h3>ಚಟುವಟಿಕೆ</h3>
+            <p id="activity-id-display">1 / 6</p>
+        </div>
+        <div class="status-card">
+            <h3>ಹಂತ</h3>
+            <p id="rank-display">ಆರಂಭಿಕ</p>
+        </div>
+    </div>
+
+    <div class="game-wrapper">
+        <!-- Activity Navigator Menu -->
+        <div class="activity-menu">
+            <button class="menu-btn active" onclick="loadActivity(0)">
+                <span class="icon">🍎</span> ಚಟುವಟಿಕೆ 1: ಅಭ್ಯಾಸಗಳ ವರ್ಗೀಕರಣ
+            </button>
+            <button class="menu-btn" onclick="loadActivity(1)">
+                <span class="icon">🦟</span> ಚಟುವಟಿಕೆ 2: ಸೊಳ್ಳೆಗಳ ಎಚ್ಚರಿಕೆ!
+            </button>
+            <button class="menu-btn" onclick="loadActivity(2)">
+                <span class="icon">💊</span> ಚಟುವಟಿಕೆ 3: ನಿಜವೋ ಸುಳ್ಳೋ?
+            </button>
+            <button class="menu-btn" onclick="loadActivity(3)">
+                <span class="icon">🔬</span> ಚಟುವಟಿಕೆ 4: ರೋಗಾಣುಗಳನ್ನು ಗುರುತಿಸಿ
+            </button>
+            <button class="menu-btn" onclick="loadActivity(4)">
+                <span class="icon">💧</span> ಚಟುವಟಿಕೆ 5: ರೋಗಗಳು ಹರಡುವ ವಿಧಾನ
+            </button>
+            <button class="menu-btn" onclick="loadActivity(5)">
+                <span class="icon">🛡️</span> ಚಟುವಟಿಕೆ 6: ಸುರಕ್ಷತೆ ಮತ್ತು ಆರೋಗ್ಯ
+            </button>
+        </div>
+
+        <!-- Dynamic Game Stage Area Panel -->
+        <div class="stage-panel" id="stage-panel">
+            <!-- Content Injected via Script Controller Engine Dynamically -->
+        </div>
+    </div>
+
+    <script>
+        // Kannada Textbook Question Data Matrix
+        const gameData = [
+            {
+                title: "ಚಟುವಟಿಕೆ 1: ಆರೋಗ್ಯಕರ ಜೀವನಶೈಲಿ ಅಭ್ಯಾಸಗಳು",
+                desc: "ನೀಡಿರುವ ಅಭ್ಯಾಸವನ್ನು ನೋಡಿ, ಅದು ನಿಮ್ಮ ದೇಹಕ್ಕೆ ಒಳ್ಳೆಯ ಅಭ್ಯಾಸವೇ ಅಥವಾ ಕೆಟ್ಟ ಅಭ್ಯಾಸವೇ ಎಂದು ಆಯ್ಕೆ ಮಾಡಿ.",
+                type: "binary",
+                questions: [
+                    { q: "ಸ್ವಚ್ಛ ಹಾಗೂ ಪೌಷ್ಟಿಕಾಂಶಯುಕ್ತ ಸಮತೋಲಿತ ಆಹಾರವನ್ನು ಸೇವಿಸುವುದು.", type: "healthy" },
+                    { q: "ಧೂಮಪಾನ ಮಾಡುವುದು ಅಥವಾ ಆರೋಗ್ಯಕ್ಕೆ ಹಾನಿಕಾರಕ ಮದ್ಯಪಾನ ಮಾಡುವುದು.", type: "unhealthy" },
+                    { q: "ಪ್ರತಿದಿನ ವ್ಯಾಯಾಮ ಮಾಡುವುದು ಮತ್ತು ರಾತ್ರಿ 7 ರಿಂದ 8 ಗಂಟೆಗಳ ಕಾಲ ಚೆನ್ನಾಗಿ ನಿದ್ರಿಸುವುದು.", type: "healthy" },
+                    { q: "ಯಾವುದೇ ದೈಹಿಕ ಕೆಲಸ ಮಾಡದೆ ದಿನವಿಡೀ ಒಂದೇ ಕಡೆ ಕುಳಿತಿರುವುದು.", type: "unhealthy" }
+                ]
+            },
+            {
+                title: "ಚಟುವಟಿಕೆ 2: ಸೊಳ್ಳೆಗಳ ಎಚ್ಚರಿಕೆ!",
+                desc: "ಹಾನಿಕಾರಕ ಕೀಟಗಳು ಮತ್ತು ಅಪಾಯಕಾರಿ ಸೊಳ್ಳೆಗಳ ಬಗ್ಗೆ ಸರಿಯಾದ ಉತ್ತರವನ್ನು ಆರಿಸಿ.",
+                type: "mcq",
+                questions: [
+                    {
+                        q: "ಹೆಣ್ಣು ಅನಾಫಿಲಿಸ್ (Anopheles) ಸೊಳ್ಳೆಯ ಕಡಿತದಿಂದ ಹರಡುವ ರೋಗ ಯಾವುದು?",
+                        options: ["ಡೆಂಗ್ಯೂ", "ಮಲೇರಿಯಾ", "ಟೈಫಾಯಿಡ್", "ಸಾಮಾನ್ಯ ಶೀತ"],
+                        correct: 1
+                    },
+                    {
+                        q: "ಡೆಂಗ್ಯೂ ಜ್ವರದ ಮುಖ್ಯ ಲಕ್ಷಣ ಯಾವುದು?",
+                        options: ["ಸ್ವಲ್ಪ ಮೂಗು ಸೋರುವುದು", "ತೀವ್ರವಾದ ಮೂಳೆ ಮತ್ತು ಕೀಲು ನೋವು", "ಜ್ವರವೇ ಬಾರದಿರುವುದು", "ಹಲ್ಲು ನೋವು"],
+                        correct: 1
+                    },
+                    {
+                        q: "ನಮ್ಮ ಮನೆಯ ಸುತ್ತಮುತ್ತ ಸೊಳ್ಳೆಗಳು ಬೆಳೆಯದಂತೆ ಹೇಗೆ ತಡೆಯಬಹುದು?",
+                        options: ["ಮನೆಯ ಹೊರಗೆ ನೀರನ್ನು ತೆರೆದಿಡುವುದು ಮತ್ತು ನಿಲ್ಲಿಸುವುದು", "ನಿಂತ ನೀರನ್ನು ಸ್ವಚ್ಛಗೊಳಿಸುವುದು ಮತ್ತು ತೆಗೆದುಹಾಕುವುದು", "ಕೋಣೆಗಳನ್ನು ಹೆಚ್ಚು ತೇವವಾಗಿಡುವುದು", "ಕಡಿಮೆ ಬಟ್ಟೆ ಧರಿಸುವುದು"],
+                        correct: 1
+                    },
+                    {
+                        q: "ಡೆಂಗ್ಯೂ ರೋಗಕ್ಕೆ ಕಾರಣವಾಗುವ ವೈರಸ್ ಅನ್ನು ಹೊತ್ತೊಯ್ಯುವ ಸೊಳ್ಳೆ ಯಾವುದು?",
+                        options: ["ಅನಾಫಿಲಿಸ್ ಸೊಳ್ಳೆ", "ಈಡಿಸ್ (Aedes) ಸೊಳ್ಳೆ", "ಮನೆಯ ನೊಣ", "ಇಲಿ ಚಿಗಟ (Rat flea)"],
+                        correct: 1
+                    }
+                ]
+            },
+            {
+                title: "ಚಟುವಟಿಕೆ 3: ನಿಜವೋ ಸುಳ್ಳೋ? ವಿಜ್ಞಾನ ಪರೀಕ್ಷೆ",
+                desc: "ವಾಕ್ಯಗಳನ್ನು ಗಮನವಿಟ್ಟು ಓದಿ, ಅವು ನಿಮ್ಮ ವಿಜ್ಞಾನದ ನಿಯಮಗಳ ಪ್ರಕಾರ 'ನಿಜ'ವೇ ಅಥವಾ 'ಸುಳ್ಳೇ' ಎಂದು ನಿರ್ಧರಿಸಿ.",
+                type: "binary_quiz",
+                questions: [
+                    { q: "ಆಂಟಿಬಯೋಟಿಕ್‌ಗಳು (Antibiotics) ಸಾಮಾನ್ಯ ಶೀತ ಅಥವಾ ಫ್ಲೂ ವೈರಸ್ ಅನ್ನು ಗುಣಪಡಿಸಲು ಸೂಕ್ತವಾದ ಔಷಧಿಗಳಾಗಿವೆ.", optimal: "False" },
+                    { q: "ವೈದ್ಯರ ಸಲಹೆಯಿಲ್ಲದೆ ಆಂಟಿಬಯೋಟಿಕ್‌ಗಳನ್ನು ತೆಗೆದುಕೊಳ್ಳುವುದರಿಂದ ಬ್ಯಾಕ್ಟೀರಿಯಾಗಳು ಔಷಧಿಗಳ ವಿರುದ್ಧ ಹೆಚ್ಚು ಬಲಶಾಲಿಯಾಗುತ್ತವೆ.", optimal: "True" },
+                    { q: "ಭಾರತವು ಉತ್ತಮ ಗುಣಮಟ್ಟದ ಹಾಗೂ ಕೈಗೆಟುಕುವ ಬೆಲೆಯ ಲಸಿಕೆಗಳು ಮತ್ತು ಔಷಧಿಗಳನ್ನು ತಯಾರಿಸಲು ಜಗತ್ತಿನಲ್ಲೇ ಪ್ರಸಿದ್ಧಿಯಾಗಿದೆ.", optimal: "True" },
+                    { q: "ನಿಮಗೆ ಜ್ವರ ಸ್ವಲ್ಪ ಕಡಿಮೆಯಾದ ತಕ್ಷಣವೇ ಆಂಟಿಬಯೋಟಿಕ್ ಔಷಧಿಗಳನ್ನು ತೆಗೆದುಕೊಳ್ಳುವುದನ್ನು ನಿಲ್ಲಿಸಬೇಕು.", optimal: "False" }
+                ]
+            },
+            {
+                title: "ಚಟುವಟಿಕೆ 4: ರೋಗಾಣು ಶತ್ರುವನ್ನು ಗುರುತಿಸಿ",
+                desc: "ಈ ಕೆಳಗಿನ ಸಾಮಾನ್ಯ ಕಾಯಿಲೆಗಳಿಗೆ ಯಾವ ರೀತಿಯ ಸೂಕ್ಷ್ಮಜೀವಿ ಅಥವಾ ರೋಗಾಣು ಕಾರಣ ಎಂಬುದನ್ನು ಗುರುತಿಸಿ.",
+                type: "mcq",
+                questions: [
+                    {
+                        q: "ಕ್ಷಯರೋಗ (Tuberculosis - TB) ಯಾವ ರೀತಿಯ ಜೀವಂತ ರೋಗಾಣುವಿನಿಂದ ಬರುತ್ತದೆ?",
+                        options: ["ಶಿಲೀಂಧ್ರ (Fungus)", "ಪ್ರೊಟೊಜೋವಾ (Protozoa)", "ಬ್ಯಾಕ್ಟೀರಿಯಾ (Bacteria)", "ವೈರಸ್ (Virus)"],
+                        correct: 2
+                    },
+                    {
+                        q: "ಮಲೇರಿಯಾ ರೋಗವು ಯಾವ ಸೂಕ್ಷ್ಮಜೀವಿಗಳ ಗುಂಪಿನಿಂದ ಉಂಟಾಗುತ್ತದೆ?",
+                        options: ["ಪಾಚಿ (Algae)", "ಪ್ರೊಟೊಜೋವಾ (Protozoa)", "ಬ್ಯಾಕ್ಟೀರಿಯಾ (Bacteria)", "ವೈರಸ್ (Virus)"],
+                        correct: 1
+                    },
+                    {
+                        q: "ವೈರಸ್‌ಗಳು ಎಲ್ಲಿ ಜೀವಿಸುತ್ತವೆ ಮತ್ತು ಸಂಖ್ಯೆಯಲ್ಲಿ ವೃದ್ಧಿಯಾಗುತ್ತವೆ?",
+                        options: ["ಹೊರಗಿನ ಒಣ ಧೂಳು ಮತ್ತು ಮಣ್ಣಿನಲ್ಲಿ", "ಜೀವಂತ ಆತಿಥೇಯನ (Host) ಜೀವಕೋಶಗಳ ಒಳಗೆ", "ಕುಡಿಯುವ ನೀರಿನ ಬಾವಿಗಳಲ್ಲಿ", "ಪ್ಲಾಸ್ಟಿಕ್ ಹಾಳೆಗಳ ಒಳಗೆ"],
+                        correct: 1
+                    },
+                    {
+                        q: "ಈ ಕೆಳಗಿನ ಯಾವ ಕಾಯಿಲೆಯು ಬ್ಯಾಕ್ಟೀರಿಯಾದಿಂದ ಬರುತ್ತದೆ?",
+                        options: ["ಸಾಮಾನ್ಯ ಶೀತ", "ಟೈಫಾಯಿಡ್ (Typhoid)", "ಪೋಲಿಯೋ (Polio)", "ಕಾಡಿನ ಕೋಳಿ ಜ್ವರ / ಚಿಕನ್ ಪಾಕ್ಸ್"],
+                        correct: 1
+                    }
+                ]
+            },
+            {
+                title: "ಚಟುವಟಿಕೆ 5: ರೋಗಗಳು ಹರಡುವ ವಿಧಾನ",
+                desc: "ಸೋಂಕುಗಳು ಒಬ್ಬ ರೋಗಿಯಿಂದ ಇನ್ನೊಬ್ಬ ಆರೋಗ್ಯವಂತ ವ್ಯಕ್ತಿಗೆ ಹೇಗೆ ಪ್ರಯಾಣಿಸುತ್ತವೆ ಎಂಬುದನ್ನು ಆರಿಸಿ.",
+                type: "mcq",
+                questions: [
+                    {
+                        q: "ಕಾಲರಾ (Cholera) ರೋಗವು ನಮ್ಮ ದೇಹವನ್ನು ಹೇಗೆ ತಲುಪುತ್ತದೆ ಮತ್ತು ಹರಡುತ್ತದೆ?",
+                        options: ["ಶುದ್ಧ ಗಾಳಿಯ ಮೂಲಕ", "ಕಲುಷಿತ ನೀರು ಮತ್ತು ಕೆಟ್ಟ ಆಹಾರದ ಮೂಲಕ", "ಆರೋಗ್ಯವಂತ ವ್ಯಕ್ತಿಯ ಪಕ್ಕದಲ್ಲಿ ಕುಳಿತುಕೊಳ್ಳುವುದರಿಂದ", "ಒಣ ಮಣ್ಣಿನ ಧೂಳಿನ ಮೂಲಕ"],
+                        correct: 1
+                    },
+                    {
+                        q: "ರೋಗಿಯ ಸೀನಿನ ಗಾಳಿಯ ಹನಿಗಳ ಮೂಲಕ ಸುಲಭವಾಗಿ ಹರಡುವ ಕಾಯಿಲೆ ಯಾವುದು?",
+                        options: ["ಟೈಫಾಯಿಡ್", "ಸಾಮಾನ್ಯ ಶೀತ", "ಕಾಲರಾ", "ಮಲೇರಿಯಾ"],
+                        correct: 1
+                    },
+                    {
+                        q: "ಮಾನವನ ತ್ಯಾಜ್ಯಗಳು ಕುಡಿಯುವ ನೀರಿನ ಮೂಲಗಳೊಂದಿಗೆ ಮಿಶ್ರಣಗೊಂಡರೆ ಏನಾಗುತ್ತದೆ?",
+                        options: ["ನೀರು ಹೆಚ್ಚು ಸುರಕ್ಷಿತವಾಗುತ್ತದೆ", "ನೀರಿನಿಂದ ಹರಡುವ ರೋಗಗಳು ಜನರಿಗೆ ಹರಡುತ್ತವೆ", "ಏನೂ ಬದಲಾಗುವುದಿಲ್ಲ", "ನೀರು ಸ್ವಾಭಾವಿಕವಾಗಿ ಸ್ವಚ್ಛವಾಗುತ್ತದೆ"],
+                        correct: 1
+                    },
+                    {
+                        q: "ಮಲಗುವಾಗ ಸೊಳ್ಳೆ ಕಡಿತದಿಂದ ನಮ್ಮನ್ನು ರಕ್ಷಿಸಿಕೊಳ್ಳಲು ನಾವು ಏನನ್ನು ಬಳಸಬಹುದು?",
+                        options: ["ದೊಡ್ಡ ಕಿಟಕಿಗಳನ್ನು ತೆರೆಯುವುದು", "ಹಾಸಿಗೆಯ ಮೇಲೆ ಸೊಳ್ಳೆ ಪರದೆಯನ್ನು (Mosquito Net) ಬಳಸುವುದು", "ಪೂರ್ಣ ವೇಗದಲ್ಲಿ ಫ್ಯಾನ್ ನಡೆಸುವುದು", "ಪ್ರಕಾಶಮಾನವಾದ ಲೈಟ್ ಬಲ್ಬ್ ಹಾಕುವುದು"],
+                        correct: 1
+                    }
+                ]
+            },
+            {
+                title: "ಚಟುವಟಿಕೆ 6: ಸುರಕ್ಷತೆ ಮತ್ತು ಆರೋಗ್ಯ",
+                desc: "ಸಂಪೂರ್ಣ ಆರೋಗ್ಯ ಹಾಗೂ ರಕ್ಷಣೆಯ ಬಗ್ಗೆ ನಿಮಗಿರುವ ಜ್ಞಾನವನ್ನು ತೋರಿಸಿ.",
+                type: "mcq",
+                questions: [
+                    {
+                        q: "ಜಾಗತಿಕ ಕೋವಿಡ್-19 (COVID-19) ಸಾಂಕ್ರಾಮಿಕ ರೋಗದ ಸಮಯದಲ್ಲಿ ಭಾರತವು ಏನು ಮಾಡಿತು?",
+                        options: ["ಪ್ರಪಂಚದ ಅನೇಕ ದೇಶಗಳಿಗೆ ಅಗತ್ಯ ಲಸಿಕೆಗಳನ್ನು ಕಳುಹಿಸಿಕೊಟ್ಟಿತು", "ಎಲ್ಲಾ ವೈದ್ಯಕೀಯ ಪ್ರಯೋಗಾಲಯಗಳನ್ನು ಸಂಪೂರ್ಣವಾಗಿ ಮುಚ್ಚಿತು", "ಇತರ ದೇಶಗಳಿಗೆ ಸಹಾಯ ಮಾಡುವುದನ್ನು ನಿಲ್ಲಿಸಿತು", "ಹೊರಗಿನಿಂದ ಮಾತ್ರ ಎಲ್ಲಾ ಔಷಧಿಗಳನ್ನು ಖರೀದಿಸಿತು"],
+                        correct: 0
+                    },
+                    {
+                        q: "ನಿಮ್ಮನ್ನು ರಕ್ಷಿಸಲು ಲಸಿಕೆಯು (Vaccine) ದೇಹದ ಒಳಗೆ ಏನನ್ನು ಸೃಷ್ಟಿಸುತ್ತದೆ?",
+                        options: ["ಹಾನಿಕಾರಕ ತ್ಯಾಜ್ಯ ವಸ್ತುಗಳನ್ನು", "ಆಂಟಿಬಾಡೀಸ್ (Antibodies) ಎಂಬ ರಕ್ಷಣಾತ್ಮಕ ಕವಚಗಳನ್ನು", "ದುರ್ಬಲ ಜೀವಕೋಶಗಳನ್ನು", "ಕೆಟ್ಟ ಬ್ಯಾಕ್ಟೀರಿಯಾಗಳನ್ನು"],
+                        correct: 1
+                    },
+                    {
+                        q: "ಸಣ್ಣ ಮಕ್ಕಳಿಗೆ ಆಸ್ಪತ್ರೆಗಳಲ್ಲಿ ವಿಶೇಷ ಲಸಿಕಾ ಕಾರ್ಡ್‌ಗಳನ್ನು (Vaccination Cards) ಏಕೆ ನೀಡಲಾಗುತ್ತದೆ?",
+                        options: ["ಅವರ ಶಾಲೆಯ ಅಂಕಗಳನ್ನು ತಿಳಿಯಲು", "ಬಾಲ್ಯದ ರೋಗಗಳ ವಿರುದ್ಧ ಅವರಿಗೆ ಸರಿಯಾಗಿ ಲಸಿಕೆ ಸಿಗುತ್ತಿದೆಯೇ ಎಂದು ಖಚಿತಪಡಿಸಿಕೊಳ್ಳಲು", "ಆಟಿಕೆಗಳ ಬೆಲೆಯನ್ನು ಕಡಿಮೆ ಮಾಡಲು", "ಅವರ ಚರ್ಮದ ಬಣ್ಣವನ್ನು ಬದಲಾಯಿಸಲು"],
+                        correct: 1
+                    },
+                    {
+                        q: "ಸಂಪೂರ್ಣ 'ಆರೋಗ್ಯ' (Health) ಎಂಬುದರ ನಿಜವಾದ ಅರ್ಥವೇನು?",
+                        options: ["ಕೇವಲ ದೈಹಿಕ ದೇಹದ ಬಲವನ್ನು ಹೊಂದಿರುವುದು", "ದೈಹಿಕ, ಮಾನಸಿಕ ಮತ್ತು ಸಾಮಾಜಿಕ ಜೀವನದಲ್ಲಿ ಸಂಪೂರ್ಣವಾಗಿ ಆರೋಗ್ಯವಾಗಿರುವುದು", "ಯಾವುದೇ ಮಾನಸಿಕ ಒತ್ತಡವಿಲ್ಲದೆ ಕೆಟ್ಟ ಆಹಾರವನ್ನು ತಿನ್ನುವುದು", "ಪ್ರತಿದಿನ ಕೇವಲ ಔಷಧಿಗಳನ್ನು ತೆಗೆದುಕೊಳ್ಳುವುದು"],
+                        correct: 1
+                    }
+                ]
+            }
+        ];
+
+        // App Engine Variable Space
+        let activeActivity = 0;
+        let activeQuestion = 0;
+        let score = 0;
+        let selectedAnswersTrack = null; 
+
+        // Initial Initialization Logic Block
+        window.onload = function() {
+            loadActivity(0);
+        };
+
+        // UI Activity Switch Panel Controller Component
+        function loadActivity(idx) {
+            activeActivity = idx;
+            activeQuestion = 0;
+            selectedAnswersTrack = null;
+            
+            // Sync Menu Buttons State Styles
+            const btns = document.querySelectorAll('.activity-menu .menu-btn');
+            btns.forEach((btn, i) => {
+                if(i === idx) btn.classList.add('active');
+                else btn.classList.remove('active');
+            });
+
+            // Set Top Level Info Counters
+            document.getElementById('activity-id-display').innerText = `${idx + 1} / 6`;
+            renderQuestionState();
+        }
+
+        // Framework Content Builder Controller Routing Hub
+        function renderQuestionState() {
+            const container = document.getElementById('stage-panel');
+            const data = gameData[activeActivity];
+            const currentQuestSet = data.questions[activeQuestion];
+            const totalQuests = data.questions.length;
+
+            let innerHTMLCode = `
+                <div class="stage-header">
+                    <h2 class="stage-title">${data.title}</h2>
+                    <p class="stage-desc">${data.desc}</p>
+                </div>
+                <div class="quest-box">
+                    <p class="progress-micro">ಪ್ರಶ್ನೆ ಪ್ರಗತಿ: ${activeQuestion + 1} ರಲ್ಲಿ ${totalQuests}</p>
+                    <p class="quest-text">${currentQuestSet.q}</p>
+            `;
+
+            // Render form variations based on interactive game type
+            if (data.type === 'binary') {
+                innerHTMLCode += `
+                    <p style="font-style: italic; color: var(--text-muted); margin-bottom: 12px;">ಕೆಳಗಿನ ಒಂದು ಆಯ್ಕೆಯನ್ನು ಆರಿಸಿ:</p>
+                    <div class="binary-wrapper">
+                        <button class="option-node" id="bin-btn-healthy" onclick="selectBinaryVal('healthy')">💚 ಒಳ್ಳೆಯ ಅಭ್ಯಾಸ</button>
+                        <button class="option-node" id="bin-btn-unhealthy" onclick="selectBinaryVal('unhealthy')">⚠️ ಕೆಟ್ಟ ಅಭ್ಯಾಸ</button>
+                    </div>
+                `;
+            } else if (data.type === 'mcq') {
+                innerHTMLCode += `<div class="options-grid">`;
+                currentQuestSet.options.forEach((opt, oIdx) => {
+                    innerHTMLCode += `
+                        <button class="option-node" id="mcq-node-${oIdx}" onclick="selectMcqVal(${oIdx})">
+                            <span style="color:var(--neon-blue); font-weight:bold; margin-right:8px;">${oIdx + 1}.</span> ${opt}
+                        </button>
+                    `;
+                });
+                innerHTMLCode += `</div>`;
+            } else if (data.type === 'binary_quiz') {
+                innerHTMLCode += `
+                    <div class="binary-wrapper">
+                        <button class="option-node" id="quiz-btn-true" onclick="selectQuizBinary('True')">✅ ನಿಜ</button>
+                        <button class="option-node" id="quiz-btn-false" onclick="selectQuizBinary('False')">❌ ಸುಳ್ಳಿ</button>
+                    </div>
+                `;
+            }
+
+            innerHTMLCode += `
+                </div>
+                <div id="toast-feedback-zone" class="feedback-toast"></div>
+                <div class="action-row">
+                    <button class="btn-action" id="submit-node-btn" onclick="evaluateAnswer()" disabled>ನನ್ನ ಉತ್ತರವನ್ನು ಪರಿಶೀಲಿಸಿ</button>
+                    <button class="btn-action" id="next-node-btn" onclick="advanceStep()" style="display:none; background: linear-gradient(135deg, var(--neon-green) 0%, #00d2ff 100%);">ಮುಂದಿನ ಪ್ರಶ್ನೆ</button>
+                </div>
+            `;
+
+            container.innerHTML = innerHTMLCode;
+        }
+
+        // Selection Actions Component Logic
+        function selectBinaryVal(val) {
+            selectedAnswersTrack = val;
+            document.getElementById('bin-btn-healthy').classList.remove('selected');
+            document.getElementById('bin-btn-unhealthy').classList.remove('selected');
+            document.getElementById(`bin-btn-${val}`).classList.add('selected');
+            document.getElementById('submit-node-btn').removeAttribute('disabled');
+        }
+
+        // Multiple choice selection tracking
+        function selectMcqVal(idx) {
+            selectedAnswersTrack = idx;
+            const nodes = document.querySelectorAll('.options-grid .option-node');
+            nodes.forEach(node => node.classList.remove('selected'));
+            document.getElementById(`mcq-node-${idx}`).classList.add('selected');
+            document.getElementById('submit-node-btn').removeAttribute('disabled');
+        }
+
+        // True false selection tracking
+        function selectQuizBinary(val) {
+            selectedAnswersTrack = val;
+            document.getElementById('quiz-btn-true').classList.remove('selected');
+            document.getElementById('quiz-btn-false').classList.remove('selected');
+            document.getElementById(`quiz-btn-${val.toLowerCase()}`).classList.add('selected');
+            document.getElementById('submit-node-btn').removeAttribute('disabled');
+        }
+
+        // Evaluation core loop logic
+        function evaluateAnswer() {
+            const data = gameData[activeActivity];
+            const currentQuestSet = data.questions[activeQuestion];
+            let isCorrect = false;
+
+            if (data.type === 'binary') {
+                isCorrect = (selectedAnswersTrack === currentQuestSet.type);
+            } else if (data.type === 'mcq') {
+                isCorrect = (selectedAnswersTrack === currentQuestSet.correct);
+            } else if (data.type === 'binary_quiz') {
+                isCorrect = (selectedAnswersTrack === currentQuestSet.optimal);
+            }
+
+            const toast = document.getElementById('toast-feedback-zone');
+            document.getElementById('submit-node-btn').style.display = 'none';
+            
+            if (isCorrect) {
+                score += 25;
+                document.getElementById('score-display').innerText = score.toString().padStart(3, '0');
+                toast.className = "feedback-toast correct";
+                toast.innerHTML = "🎯 <b>ಸರಿಯಾದ ಉತ್ತರ!</b> ಅತ್ಯುತ್ತಮ ಕೆಲಸ! ನಿಮಗೆ +25 ಅಂಕಗಳು ಸಿಕ್ಕಿವೆ.";
+                updateRank();
+            } else {
+                toast.className = "feedback-toast wrong";
+                let feedbackText = "⚠️ <b>ತಪ್ಪಾದ ಉತ್ತರ.</b> ";
+                if (data.type === 'mcq') {
+                    feedbackText += `ಸರಿಯಾದ ವೈಜ್ಞಾನಿಕ ಉತ್ತರ: <b>${currentQuestSet.options[currentQuestSet.correct]}</b>`;
+                } else if (data.type === 'binary_quiz') {
+                    let correctLabel = currentQuestSet.optimal === 'True' ? 'ನಿಜ' : 'ಸುಳ್ಳು';
+                    feedbackText += `ಈ ಹೇಳಿಕೆಯು ವಾಸ್ತವವಾಗಿ <b>${correctLabel}</b> ಆಗಿದೆ.`;
+                } else {
+                    let standardLabel = currentQuestSet.type === 'healthy' ? 'ಒಳ್ಳೆಯ ಅಭ್ಯಾಸ' : 'ಕೆಟ್ಟ ಅಭ್ಯಾಸ';
+                    feedbackText += `ಇದನ್ನು <b>${standardLabel}</b> ಎಂದು ಗುರುತಿಸಬೇಕು.`;
+                }
+                toast.innerHTML = feedbackText;
+            }
+
+            document.getElementById('next-node-btn').style.display = 'block';
+        }
+
+        // Advance to next game step or change activity modules
+        function advanceStep() {
+            activeQuestion++;
+            const totalQuests = gameData[activeActivity].questions.length;
+
+            if (activeQuestion < totalQuests) {
+                selectedAnswersTrack = null;
+                renderQuestionState();
+            } else {
+                if (activeActivity + 1 < gameData.length) {
+                    let transitionHTML = `
+                        <div class="finish-screen">
+                            <h2>⚡ ಈ ಚಟುವಟಿಕೆ ಪೂರ್ಣಗೊಂಡಿದೆ!</h2>
+                            <p>ಈ ಸುತ್ತಿನ ಎಲ್ಲಾ ಪ್ರಶ್ನೆಗಳಿಗೆ ನೀವು ಉತ್ತಮವಾಗಿ ಉತ್ತರಿಸಿದ್ದೀರಿ.</p>
+                            <button class="btn-action" onclick="loadActivity(${activeActivity + 1})">ಮುಂದಿನ ಚಟುವಟಿಕೆಗೆ ಹೋಗಿ</button>
+                        </div>
+                    `;
+                    document.getElementById('stage-panel').innerHTML = transitionHTML;
+                } else {
+                    let absoluteEndHTML = `
+                        <div class="finish-screen">
+                            <h2>🏆 ಅಭಿನಂದನೆಗಳು! ಆಟ ಮುಕ್ತಾಯಗೊಂಡಿದೆ!</h2>
+                            <p>ನೀವು ಅಧ್ಯಾಯ 3 ರ ಎಲ್ಲಾ 6 ಚಟುವಟಿಕೆಗಳನ್ನು ಯಶಸ್ವಿಯಾಗಿ ಪೂರ್ಣಗೊಳಿಸಿದ್ದೀರಿ.</p>
+                            <div style="font-size:3rem; margin:20px 0;">🥇</div>
+                            <p style="color:var(--neon-blue); font-size:1.5rem; font-weight:bold;">ನಿಮ್ಮ ಒಟ್ಟು ಅಂಕಗಳು: ${score}</p>
+                            <button class="btn-action" style="margin-top:20px;" onclick="resetSimGlobal()">ಮತ್ತೊಮ್ಮೆ ಆಡಿ</button>
+                        </div>
+                    `;
+                    document.getElementById('stage-panel').innerHTML = absoluteEndHTML;
+                }
+            }
+        }
+
+        // Rank updates based on scoring milestones
+        function updateRank() {
+            let rank = "ಆರಂಭಿಕ";
+            if (score >= 150) rank = "ಆರೋಗ್ಯ ಸ್ಕೌಟ್";
+            if (score >= 300) rank = "ರೋಗಾಣು ಬೇಟೆಗಾರ";
+            if (score >= 450) rank = "ಆರೋಗ್ಯ ವೀರ";
+            if (score >= 550) rank = "ಆರೋಗ್ಯ ಸಾರ್ವಭೌಮ";
+            document.getElementById('rank-display').innerText = rank;
+        }
+
+        // Completely reset everything back to baseline
+        function resetSimGlobal() {
+            score = 0;
+            document.getElementById('score-display').innerText = "000";
+            updateRank();
+            loadActivity(0);
+        }
+    </script>
+</body>
+</html>
