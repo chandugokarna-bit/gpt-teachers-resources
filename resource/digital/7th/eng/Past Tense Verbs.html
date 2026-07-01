@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Action Paragraph Chains - Story Cycle Game</title>
+    <style>
+        :root {
+            --primary: #6c5ce7;
+            --secondary: #a29bfe;
+            --success: #00b894;
+            --warning: #fdcb6e;
+            --danger: #d63031;
+            --background: #f0f3f8;
+            --card-bg: #ffffff;
+            --text: #2d3436;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--background);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .game-container {
+            background: var(--card-bg);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            max-width: 800px;
+            width: 100%;
+            text-align: center;
+            border: 4px solid var(--secondary);
+        }
+
+        h1 {
+            color: var(--primary);
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: #636e72;
+            margin-bottom: 30px;
+        }
+
+        .board-container {
+            background: #2d3436;
+            border: 8px solid #000;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+        }
+
+        .board-title {
+            color: var(--warning);
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+            border-bottom: 2px dashed #636e72;
+            padding-bottom: 5px;
+        }
+
+        .verb-bank {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .verb-badge {
+            background-color: var(--primary);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(108, 92, 231, 0.3);
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .verb-badge.active {
+            background-color: var(--success);
+            transform: scale(1.15);
+            box-shadow: 0 4px 20px rgba(0, 184, 148, 0.5);
+            border-color: white;
+        }
+
+        .verb-badge.used {
+            background-color: #b2bec3;
+            text-decoration: line-through;
+            transform: scale(0.9);
+            box-shadow: none;
+            opacity: 0.7;
+        }
+
+        .gameplay-box {
+            background: #f9f9fb;
+            border-left: 5px solid var(--primary);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+            text-align: left;
+        }
+
+        .student-turn {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: var(--warning);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #000;
+        }
+
+        .story-input-area {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #dfe6e9;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--primary);
+        }
+
+        button {
+            background-color: var(--success);
+            color: white;
+            border: none;
+            padding: 0 30px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            background-color: #00a884;
+        }
+
+        .story-book {
+            background: #fffdf0;
+            border: 2px dashed #ffeaa7;
+            border-radius: 15px;
+            padding: 30px;
+            text-align: left;
+            min-height: 100px;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.02);
+        }
+
+        .story-book h3 {
+            margin-top: 0;
+            color: #e17055;
+            border-bottom: 1px solid #ffeaa7;
+            padding-bottom: 10px;
+        }
+
+        .story-text {
+            font-size: 1.25rem;
+            line-height: 1.8;
+            font-family: 'Georgia', serif;
+        }
+
+        .highlight-verb {
+            background-color: var(--warning);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        .reset-btn {
+            background-color: var(--danger);
+            margin-top: 20px;
+        }
+        
+        .reset-btn:hover {
+            background-color: #c0392b;
+        }
+    </style>
+</head>
+<body>
+
+<div class="game-container">
+    <h1>Action Paragraph Chains</h1>
+    <div class="subtitle">Master Past Tense Verbs Through Storytelling!</div>
+
+    <!-- The Classroom Board Component -->
+    <div class="board-container">
+        <div class="board-title">Teacher's Blackboard: Target Verbs</div>
+        <div class="verb-bank" id="verbBank">
+            <div class="verb-badge active" id="v0">discovered</div>
+            <div class="verb-badge" id="v1">suggested</div>
+            <div class="verb-badge" id="v2">gathered</div>
+            <div class="verb-badge" id="v3">managed</div>
+            <div class="verb-badge" id="v4">cured</div>
+        </div>
+    </div>
+
+    <!-- Gameplay Turn Box -->
+    <div class="gameplay-box" id="gameplayBox">
+        <div class="student-turn" id="turnIndicator">
+            <span class="avatar" id="avatarIcon">1</span> 
+            <span id="turnText">Student 1's Turn</span>
+        </div>
+        <p style="margin: 5px 0 0 0; color: #636e72;">Add to the story using the green highlighted verb above!</p>
+    </div>
+
+    <!-- Story Input Submission Box -->
+    <div class="story-input-area" id="inputSection">
+        <input type="text" id="sentenceInput" placeholder="Type the next segment of your creative story here..." autocomplete="off">
+        <button onclick="submitSentence()">Add Story Link</button>
+    </div>
+
+    <!-- Live Assembled Dynamic Storybook -->
+    <div class="story-book">
+        <h3>Our Collaborative Classroom Masterpiece</h3>
+        <p class="story-text" id="storyParagraph"><span style="color: #b2bec3; font-style: italic;">The story has not started yet. Type a sentence above to write the first line!</span></p>
+    </div>
+
+    <button class="reset-btn" id="resetBtn" style="display:none;" onclick="resetGame()">Start New Story Cycle</button>
+</div>
+
+<script>
+    const verbs = ["discovered", "suggested", "gathered", "managed", "cured"];
+    let currentStep = 0;
+    const storyData = [];
+
+    // Captures Enter Keypress for Input
+    document.getElementById("sentenceInput").addEventListener("keyup", function(event) {
+        if (event.key === "Enter") {
+            submitSentence();
+        }
+    });
+
+    function submitSentence() {
+        const inputEl = document.getElementById("sentenceInput");
+        const sentence = inputEl.value.trim();
+        const targetVerb = verbs[currentStep];
+
+        if (sentence === "") {
+            alert("Please stretch your imagination and write a sentence first!");
+            return;
+        }
+
+        // Validate if the required past tense verb exists in the text string
+        if (!sentence.toLowerCase().includes(targetVerb.toLowerCase())) {
+            alert(`Oops! Your sentence must include the target past tense verb: "${targetVerb}"`);
+            return;
+        }
+
+        // Apply HTML styling highlights around the target action word
+        const regex = new RegExp(`\\b${targetVerb}\\b`, 'gi');
+        const stylizedSentence = sentence.replace(regex, `<span class="highlight-verb">${targetVerb}</span>`);
+        
+        storyData.push(stylizedSentence);
+        renderStory();
+
+        // Update CSS states on the visual board interface
+        document.getElementById(`v${currentStep}`).classList.remove("active");
+        document.getElementById(`v${currentStep}`).classList.add("used");
+
+        currentStep++;
+
+        if (currentStep < verbs.length) {
+            // Update cycle configuration for next student entry 
+            document.getElementById(`v${currentStep}`).classList.add("active");
+            document.getElementById("turnText").innerText = `Student ${currentStep + 1}'s Turn`;
+            document.getElementById("avatarIcon").innerText = currentStep + 1;
+            inputEl.value = "";
+            inputEl.placeholder = `Continue the plot using the word "${verbs[currentStep]}"...`;
+        } else {
+            // Ending cycle configurations when game limits reach bounds
+            document.getElementById("gameplayBox").style.backgroundColor = "#e8f8f5";
+            document.getElementById("gameplayBox").style.borderColor = "var(--success)";
+            document.getElementById("turnIndicator").innerHTML = `🎉 Congratulations Class!`;
+            document.getElementById("gameplayBox").querySelector('p').innerText = "You successfully linked all verbs together into a single contextual narrative!";
+            document.getElementById("inputSection").style.display = "none";
+            document.getElementById("resetBtn").style.display = "inline-block";
+        }
+    }
+
+    function renderStory() {
+        const para = document.getElementById("storyParagraph");
+        para.innerHTML = storyData.join(" ");
+    }
+
+    function resetGame() {
+        currentStep = 0;
+        storyData.length = 0;
+        
+        // Reset Visual Elements back to default structural layout
+        document.getElementById("storyParagraph").innerHTML = `<span style="color: #b2bec3; font-style: italic;">The story has not started yet. Type a sentence above to write the first line!</span>`;
+        document.getElementById("inputSection").style.display = "flex";
+        document.getElementById("resetBtn").style.display = "none";
+        
+        document.getElementById("gameplayBox").style.backgroundColor = "#f9f9fb";
+        document.getElementById("gameplayBox").style.borderColor = "var(--primary)";
+        document.getElementById("turnIndicator").innerHTML = `<span class="avatar" id="avatarIcon">1</span> <span id="turnText">Student 1's Turn</span>`;
+        document.getElementById("gameplayBox").querySelector('p').innerText = "Add to the story using the green highlighted verb above!";
+
+        const inputEl = document.getElementById("sentenceInput");
+        inputEl.value = "";
+        inputEl.placeholder = "Type the next segment of your creative story here...";
+
+        // Clear Board Status Badges
+        for (let i = 0; i < verbs.length; i++) {
+            const badge = document.getElementById(`v${i}`);
+            badge.className = "verb-badge";
+        }
+        document.getElementById("v0").classList.add("active");
+    }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚀 Parts of Speech Space Mission!</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --success: #16a34a;
+            --error: #dc2626;
+            --dark: #1e1b4b;
+            --light: #f8fafc;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            color: var(--light);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .game-container {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+            width: 100%;
+            max-width: 700px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            text-align: center;
+        }
+
+        h1 {
+            color: #38bdf8;
+            margin-bottom: 10px;
+            font-size: 2.2rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .progress-bar {
+            background: rgba(255,255,255,0.1);
+            height: 12px;
+            border-radius: 6px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #38bdf8, #818cf8);
+            height: 100%;
+            width: 0%;
+            transition: width 0.4s ease;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 25px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            background: rgba(255,255,255,0.08);
+            padding: 10px 20px;
+            border-radius: 10px;
+        }
+
+        .question-box {
+            background: rgba(255, 255, 255, 0.95);
+            color: #0f172a;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            font-size: 1.4rem;
+            line-height: 1.6;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .highlight {
+            background-color: #fef08a;
+            color: #b45309;
+            padding: 2px 10px;
+            border-radius: 5px;
+            font-weight: bold;
+            border: 2px dashed #b45309;
+            display: inline-block;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border: 2px solid rgba(255,255,255,0.2);
+            padding: 15px 20px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn:hover:not(:disabled) {
+            background: rgba(255,255,255,0.25);
+            transform: translateY(-2px);
+            border-color: #38bdf8;
+        }
+
+        .btn.correct {
+            background: var(--success) !important;
+            border-color: #22c55e !important;
+            color: white;
+        }
+
+        .btn.wrong {
+            background: var(--error) !important;
+            border-color: #ef4444 !important;
+            color: white;
+        }
+
+        .feedback {
+            min-height: 50px;
+            font-size: 1.2rem;
+            margin-top: 15px;
+            font-weight: 500;
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        .feedback.info { color: #fcd34d; }
+        .feedback.success { color: #4ade80; }
+
+        .next-btn {
+            background: #38bdf8;
+            color: #0f172a;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 30px;
+            cursor: pointer;
+            display: none;
+            margin: 20px auto 0 auto;
+            box-shadow: 0 4px 15px rgba(56, 189, 248, 0.4);
+        }
+
+        .next-btn:hover {
+            background: #7dd3fc;
+        }
+
+        .result-screen {
+            display: none;
+        }
+
+        .restart-btn {
+            background: #4ade80;
+            color: #0f172a;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            border-radius: 30px;
+            cursor: pointer;
+            margin-top: 25px;
+        }
+
+        @media (max-width: 500px) {
+            .options-grid {
+                grid-template-columns: 1fr;
+            }
+            h1 { font-size: 1.6rem; }
+            .question-box { font-size: 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="game-container" id="game-card">
+        <h1>🚀 Grammar Star Mission</h1>
+        <p style="color: #94a3b8; margin-bottom: 10px;">Identify the Part of Speech of the highlighted word!</p>
+        
+        <div class="progress-bar">
+            <div class="progress-fill" id="progress"></div>
+        </div>
+
+        <div class="stats">
+            <div>Question: <span id="q-num">1</span>/8</div>
+            <div>Score: <span id="score">0</span> ⭐</div>
+        </div>
+
+        <div class="question-box" id="question-text">
+            Loading cosmic mission...
+        </div>
+
+        <div class="options-grid" id="options-container">
+            </div>
+
+        <div class="feedback" id="feedback-text"></div>
+        <button class="next-btn" id="next-button" onclick="nextQuestion()">Next Level ➡️</button>
+    </div>
+
+    <div class="game-container result-screen" id="result-card">
+        <h1 style="font-size: 3rem; color: #4ade80;">🎉 Mission Accomplished!</h1>
+        <p style="font-size: 1.5rem; margin: 20px 0;">You helped the rocket land safely!</p>
+        
+        <div style="font-size: 2.5rem; margin: 20px 0; font-weight: bold; color: #fcd34d;">
+            Your Score: <span id="final-score">0</span> / 8 ⭐
+        </div>
+        
+        <p id="performance-msg" style="font-size: 1.2rem; color: #cbd5e1;"></p>
+        
+        <button class="restart-btn" onclick="restartGame()">Play Again 🔄</button>
+    </div>
+
+    <script>
+        // Tailored questions for Class 7 level with local Indian context names
+        const questions = [
+            {
+                sentence: "Rohan <span class='highlight'>quickly</span> finished his English homework.",
+                options: ["Noun", "Adverb", "Verb", "Adjective"],
+                correct: "Adverb",
+                hint: "💡 Hint: It tells us *how* Rohan finished his homework."
+            },
+            {
+                sentence: "The <span class='highlight'>beautiful</span> peacock danced in the rain.",
+                options: ["Noun", "Pronoun", "Adjective", "Verb"],
+                correct: "Adjective",
+                hint: "💡 Hint: It describes the quality of the peacock."
+            },
+            {
+                sentence: "Meena lives in <span class='highlight'>Bengaluru</span> with her family.",
+                options: ["Noun", "Verb", "Preposition", "Conjunction"],
+                correct: "Noun",
+                hint: "💡 Hint: It is the name of a specific city (Place)."
+            },
+            {
+                sentence: "They <span class='highlight'>swam</span> in the village pond yesterday afternoon.",
+                options: ["Adverb", "Noun", "Verb", "Pronoun"],
+                correct: "Verb",
+                hint: "💡 Hint: It shows the physical action they performed."
+            },
+            {
+                sentence: "Amit wanted to play cricket, <span class='highlight'>but</span> it started raining.",
+                options: ["Preposition", "Conjunction", "Interjection", "Adverb"],
+                correct: "Conjunction",
+                hint: "💡 Hint: It connects two different thoughts together."
+            },
+            {
+                sentence: "Look! The keys are hidden <span class='highlight'>under</span> the big textbook.",
+                options: ["Preposition", "Adjective", "Pronoun", "Noun"],
+                correct: "Preposition",
+                hint: "💡 Hint: It shows the position/location of the keys."
+            },
+            {
+                sentence: "<span class='highlight'>She</span> won the first prize in the school debate.",
+                options: ["Noun", "Verb", "Pronoun", "Adjective"],
+                correct: "Pronoun",
+                hint: "💡 Hint: This word replaces a girl's name to avoid repeating it."
+            },
+            {
+                sentence: "<span class='highlight'>Wow!</span> That was an incredible football goal.",
+                options: ["Conjunction", "Interjection", "Adverb", "Preposition"],
+                correct: "Interjection",
+                hint: "💡 Hint: It expresses sudden excitement or strong emotion."
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let hasAnswered = false;
+
+        function loadQuestion() {
+            hasAnswered = false;
+            const currentQuestion = questions[currentQuestionIndex];
+            
+            // Update stats & progress
+            document.getElementById("q-num").innerText = currentQuestionIndex + 1;
+            document.getElementById("score").innerText = score;
+            const progressPercent = ((currentQuestionIndex) / questions.length) * 100;
+            document.getElementById("progress").style.width = `${progressPercent}%`;
+
+            // Display Question
+            document.getElementById("question-text").innerHTML = currentQuestion.sentence;
+            
+            // Clean up old elements
+            document.getElementById("feedback-text").innerHTML = "";
+            document.getElementById("feedback-text").className = "feedback";
+            document.getElementById("next-button").style.display = "none";
+
+            // Generate options
+            const optionsContainer = document.getElementById("options-container");
+            optionsContainer.innerHTML = "";
+            
+            currentQuestion.options.forEach(option => {
+                const button = document.createElement("button");
+                button.className = "btn";
+                button.innerText = option;
+                button.onclick = () => checkAnswer(button, option);
+                optionsContainer.appendChild(button);
+            });
+        }
+
+        function checkAnswer(selectedButton, selectedOption) {
+            if (hasAnswered) return; // Prevent multiple clicks
+            hasAnswered = true;
+
+            const currentQuestion = questions[currentQuestionIndex];
+            const buttons = document.querySelectorAll(".options-grid .btn");
+
+            if (selectedOption === currentQuestion.correct) {
+                selectedButton.classList.add("correct");
+                score++;
+                document.getElementById("score").innerText = score;
+                document.getElementById("feedback-text").innerText = "✨ Awesome! You got it right! 🌟";
+                document.getElementById("feedback-text").className = "feedback success";
+            } else {
+                selectedButton.classList.add("wrong");
+                document.getElementById("feedback-text").innerText = currentQuestion.hint;
+                document.getElementById("feedback-text").className = "feedback info";
+
+                // Highlight correct answer gently for learning
+                buttons.forEach(btn => {
+                    if (btn.innerText === currentQuestion.correct) {
+                        btn.classList.add("correct");
+                    }
+                });
+            }
+
+            // Disable all buttons after choice
+            buttons.forEach(btn => btn.disabled = true);
+            
+            // Show next button
+            document.getElementById("next-button").style.display = "block";
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < questions.length) {
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            document.getElementById("progress").style.width = "100%";
+            document.getElementById("game-card").style.display = "none";
+            document.getElementById("result-card").style.display = "block";
+            document.getElementById("final-score").innerText = score;
+
+            let msg = "";
+            if (score === 8) msg = "Perfect score! You are a certified Grammar Rocket Scientist! 🌟🚀";
+            else if (score >= 5) msg = "Great job! Your space capsule successfully completed its mission! 👍";
+            else msg = "Good try! Give it another shot to boost your grammar rocket engines! 💪";
+            
+            document.getElementById("performance-msg").innerText = msg;
+        }
+
+        function restartGame() {
+            currentQuestionIndex = 0;
+            score = 0;
+            document.getElementById("game-card").style.display = "block";
+            document.getElementById("result-card").style.display = "none";
+            loadQuestion();
+        }
+
+        // Start the game on page load
+        window.onload = loadQuestion;
+    </script>
+</body>
+</html>

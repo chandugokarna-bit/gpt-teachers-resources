@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Collective Noun Safari Adventure</title>
+    <style>
+        :root {
+            --safari-green: #2ecc71;
+            --safari-dark: #1b4d3e;
+            --sky-blue: #3498db;
+            --sun-yellow: #f1c40f;
+            --wood-brown: #e67e22;
+            --card-bg: #ffffff;
+            --text-main: #2c3e50;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: linear-gradient(135deg, #11998e, #38ef7d);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .safari-box {
+            background: var(--card-bg);
+            border-radius: 24px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            padding: 30px;
+            max-width: 800px;
+            width: 100%;
+            text-align: center;
+            border: 5px solid var(--safari-dark);
+        }
+
+        h1 {
+            color: var(--safari-dark);
+            margin-top: 0;
+            font-size: 2.3rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .instructions {
+            background: #f1f2f6;
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 1.05rem;
+            margin-bottom: 25px;
+            border-left: 5px solid var(--wood-brown);
+            text-align: left;
+        }
+
+        /* The Live Viewfinder Lens Screen */
+        .viewfinder {
+            background: linear-gradient(to bottom, #e0f2fe, #bae6fd);
+            border: 8px solid #334155;
+            border-radius: 20px;
+            padding: 40px 20px;
+            margin-bottom: 25px;
+            position: relative;
+            box-shadow: inset 0 5px 15px rgba(0,0,0,0.15);
+            min-height: 160px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .shutter-indicator {
+            position: absolute;
+            top: 10px;
+            left: 15px;
+            background: #ef4444;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            animation: blink 1s infinite alternate;
+        }
+
+        @keyframes blink {
+            0% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
+
+        .target-phrase {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--safari-dark);
+            font-family: 'Georgia', serif;
+        }
+
+        .noun-blank {
+            display: inline-block;
+            border-bottom: 4px dashed var(--wood-brown);
+            min-width: 130px;
+            color: var(--wood-brown);
+            text-align: center;
+            padding: 0 5px;
+        }
+
+        /* Token Option Grid */
+        .token-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .noun-token {
+            background: var(--sky-blue);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 12px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .noun-token:hover {
+            transform: translateY(-3px);
+            filter: brightness(1.1);
+        }
+
+        .noun-token:active {
+            transform: scale(0.97);
+        }
+
+        /* Bottom Management & Trophy Score Tracker */
+        .safari-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--safari-dark);
+            padding: 15px 25px;
+            border-radius: 14px;
+            color: white;
+        }
+
+        .score-counter {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .next-btn {
+            background: var(--sun-yellow);
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        .next-btn:hover { background: #f39c12; }
+
+        /* Dynamic Popup Alert Banners */
+        .alert-banner {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            display: none;
+        }
+        .snap-success { background: #d1fae5; color: #065f46; }
+        .snap-error { background: #fee2e2; color: #991b1b; }
+    </style>
+</head>
+<body>
+
+<div class="safari-box">
+    <h1>📸 Collective Noun Safari</h1>
+    
+    <div class="instructions">
+        <strong>How to Play:</strong> Look inside the safari viewfinder camera lens. Click the correct collective noun option below to snap a perfect picture of the animal group!
+    </div>
+
+    <div class="safari-controls">
+        <div class="score-counter">Photos Captured: <span id="photoCount" style="color: var(--sun-yellow);">0 / 0</span></div>
+        <button class="next-btn" onclick="nextAnimal()">Next Animal 🐾</button>
+    </div>
+
+    <div class="viewfinder" id="viewfinderScreen">
+        <div class="shutter-indicator">● LIVE CAMERA</div>
+        <div class="target-phrase" id="phraseDisplay">
+            A <span class="noun-blank">????</span> of Lions.
+        </div>
+    </div>
+
+    <div class="token-grid" id="tokenOptionsBox">
+        </div>
+
+    <div class="alert-banner" id="statusAlert"></div>
+</div>
+
+<script>
+    let activeIndex = null;
+    let successfulSnaps = 0;
+    let totalAttempts = 0;
+    let questionAnswered = false;
+
+    // Database containing custom context pairings
+    const nounDatabase = [
+        { animal: "Lions", correct: "Pride", pool: ["Pride", "Pack", "Flock"] },
+        { animal: "Fish", correct: "School", pool: ["School", "Herd", "Swarm"] },
+        { animal: "Wolves", correct: "Pack", pool: ["Pack", "Mob", "Colony"] },
+        { animal: "Birds", correct: "Flock", pool: ["Flock", "Gaggle", "Troop"] },
+        { animal: "Bees", correct: "Swarm", pool: ["Swarm", "Army", "Herd"] },
+        { animal: "Cows / Elephants", correct: "Herd", pool: ["Herd", "Pride", "School"] },
+        { animal: "Ants", correct: "Colony", pool: ["Colony", "Flock", "Pack"] },
+        { animal: "Monkeys", correct: "Troop", pool: ["Troop", "Swarm", "Pride"] }
+    ];
+
+    // Native Synthesizer Audio Effects Tone Creator
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    function triggerAudioShutter(status) {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        if (status === 'success') {
+            // High-pitched double camera beep chime
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+            osc.frequency.setValueAtTime(800, audioCtx.currentTime + 0.08);
+            gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.2);
+        } else {
+            // Flat, buzz failure sound
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(200, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.25);
+        }
+    }
+
+    function nextAnimal() {
+        questionAnswered = false;
+        document.getElementById("statusAlert").style.display = "none";
+
+        // Select a fresh random index cleanly
+        let nextIndex = Math.floor(Math.random() * nounDatabase.length);
+        while (nextIndex === activeIndex) {
+            nextIndex = Math.floor(Math.random() * nounDatabase.length);
+        }
+        activeIndex = nextIndex;
+
+        const data = nounDatabase[activeIndex];
+        
+        // Render textual challenge markers safely
+        document.getElementById("phraseDisplay").innerHTML = `
+            A <span class="noun-blank">????</span> of ${data.animal}.
+        `;
+
+        // Render shuffled choice buttons safely
+        let scrambledPool = [...data.pool].sort(() => Math.random() - 0.5);
+        const tokenContainer = document.getElementById("tokenOptionsBox");
+        tokenContainer.innerHTML = scrambledPool.map(noun => `
+            <button class="noun-token" onclick="captureSnapshot(this, '${noun}')">${noun}</button>
+        `).join('');
+
+        updateScoreboard();
+    }
+
+    function captureSnapshot(btnElement, userChoice) {
+        if (questionAnswered) return;
+        questionAnswered = true;
+
+        totalAttempts++;
+        const targetData = nounDatabase[activeIndex];
+        const alertBox = document.getElementById("statusAlert");
+
+        if (userChoice === targetData.correct) {
+            successfulSnaps++;
+            triggerAudioShutter('success');
+            
+            // Render positive UI bridge confirmation tags
+            document.getElementById("phraseDisplay").innerHTML = `
+                A <span class="noun-blank" style="color: var(--safari-green); border-bottom-color: var(--safari-green);">${targetData.correct}</span> of ${targetData.animal}.
+            `;
+            alertBox.className = "alert-banner snap-success";
+            alertBox.innerHTML = `📸 CLICK! Fantastic photo! "${targetData.correct}" is the perfect collective noun!`;
+        } else {
+            triggerAudioShutter('fail');
+            
+            // Render negative correction layout tags
+            document.getElementById("phraseDisplay").innerHTML = `
+                A <span class="noun-blank" style="color: #ef4444; border-bottom-color: #ef4444;">[${userChoice}]</span> of ${targetData.animal}.
+            `;
+            alertBox.className = "alert-banner snap-error";
+            alertBox.innerHTML = `❌ BLURRY SHOT! That is incorrect. The true collective configuration is: A <strong>Pride</strong> of Lions, A <strong>Herd</strong> of Cows, etc.`;
+        }
+        
+        alertBox.style.display = "block";
+        updateScoreboard();
+    }
+
+    function updateScoreboard() {
+        document.getElementById("photoCount").innerText = `${successfulSnaps} / ${totalAttempts}`;
+    }
+
+    // Launch initial script engine step automatically on window mount loops
+    nextAnimal();
+</script>
+
+</body>
+</html>

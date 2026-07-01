@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interrogative Hot Seat Quiz Game</title>
+    <style>
+        :root {
+            --primary: #1e293b;
+            --accent-purple: #8e44ad;
+            --plastic-danger: #ef4444;
+            --global-warning: #f97316;
+            --success: #10b981;
+            --slate: #64748b;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #f1f5f9;
+            color: #334155;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .game-box {
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.08);
+            padding: 30px;
+            max-width: 800px;
+            width: 100%;
+            text-align: center;
+        }
+
+        h1 {
+            color: var(--primary);
+            margin-top: 0;
+            font-size: 2.2rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .character-selector {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .char-btn {
+            padding: 12px 24px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border: 2px solid #cbd5e1;
+            border-radius: 12px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .char-btn.active-plastic {
+            background: var(--plastic-danger);
+            color: white;
+            border-color: var(--plastic-danger);
+        }
+
+        .char-btn.active-global {
+            background: var(--global-warning);
+            color: white;
+            border-color: var(--global-warning);
+        }
+
+        .wh-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .wh-btn {
+            background: #34495e;
+            color: white;
+            border: none;
+            padding: 12px 5px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.1s;
+        }
+
+        .wh-btn:hover { background: #1a252f; transform: translateY(-2px); }
+        .wh-btn.active-wh { background: var(--accent-purple); }
+
+        .stage-box {
+            background: #f8fafc;
+            border-radius: 16px;
+            padding: 25px;
+            text-align: left;
+            border: 2px solid #e2e8f0;
+            min-height: 200px;
+        }
+
+        .question-text {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+
+        .options-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .option-btn {
+            background: white;
+            border: 2px solid #e2e8f0;
+            padding: 14px 20px;
+            border-radius: 10px;
+            font-size: 1.05rem;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 500;
+        }
+
+        .option-btn:hover {
+            border-color: #cbd5e1;
+            background: #f1f5f9;
+        }
+
+        /* Answer Feedback Animations */
+        .option-btn.correct-choice {
+            background: #d1fae5;
+            border-color: var(--success);
+            color: #065f46;
+            font-weight: bold;
+        }
+
+        .option-btn.wrong-choice {
+            background: #fee2e2;
+            border-color: #f87171;
+            color: #991b1b;
+        }
+    </style>
+</head>
+<body>
+
+<div class="game-box">
+    <h1>Interrogative Hot Seat Quiz</h1>
+    
+    <!-- Character Switching Deck -->
+    <div class="character-selector">
+        <button class="char-btn active-plastic" id="btnPlastic" onclick="switchCharacter('plastic')">🛍️ Plastic Pollution</button>
+        <button class="char-btn" id="btnGlobal" onclick="switchCharacter('global')">🌡️ Global Warming</button>
+    </div>
+
+    <!-- Wh- Controls -->
+    <div class="wh-grid" id="whGrid">
+        <button class="wh-btn" onclick="loadQuestion('Who', this)">Who</button>
+        <button class="wh-btn" onclick="loadQuestion('What', this)">What</button>
+        <button class="wh-btn" onclick="loadQuestion('Where', this)">Where</button>
+        <button class="wh-btn" onclick="loadQuestion('When', this)">When</button>
+        <button class="wh-btn" onclick="loadQuestion('Why', this)">Why</button>
+        <button class="wh-btn" onclick="loadQuestion('How', this)">How</button>
+    </div>
+
+    <!-- Main Quiz Panel Stage Area -->
+    <div class="stage-box" id="quizStage">
+        <div class="question-text" style="text-align: center; color: var(--slate); font-style: italic; margin-top: 50px;">
+            Select a "Wh-" Interrogative word button above to start your cross-examination!
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentMode = 'plastic';
+    let currentCorrectIndex = null;
+    let answerChecked = false;
+
+    // Web Audio Synthesizer Engine (Generates sounds without external audio assets)
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    function playSound(type) {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        if (type === 'correct') {
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5 Node
+            osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1); // E5 Node
+            gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.25);
+        } else {
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(180, audioCtx.currentTime); // Low buzz tone
+            gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.2);
+        }
+    }
+
+    // Dynamic textbook question matrix mapped directly to target items[cite: 1]
+    const quizDatabase = {
+        plastic: {
+            Who: {
+                q: "<u>Who</u> created the first man-made plastic substance in history?",
+                options: ["Alexander Parkes", "Doctor Fitton-Healthy", "Pedro Pablo Sacristan"],
+                correct: 0
+            },
+            What: {
+                q: "<u>What</u> makes plastic highly popular and commonly utilized across the globe?",
+                options: ["It dissolves quickly in water", "It is inexpensive, long-lasting, and easy to make", "It turns completely organic when boiled"],
+                correct: 1
+            },
+            Where: {
+                q: "<u>Where</u> is plastic pollution highly concentrated due to human migration?",
+                options: ["In remote forest patches", "In small countryside swamps", "In big cities"],
+                correct: 2
+            },
+            When: {
+                q: "<u>When</u> or how quickly can a single plastic sheet completely decompose or rot?",
+                options: ["It can take about a thousand years", "Within two years under an idol platform", "In exactly five days"],
+                correct: 0
+            },
+            Why: {
+                q: "<u>Why</u> does the simple recycling of plastic cause unexpected problems?",
+                options: ["It creates electricity unexpectedly", "It degrades quality, requiring production of more plastic", "It breaks the glass tubes of digital microscopes"],
+                correct: 1
+            },
+            How: {
+                q: "<u>How</u> do disposed plastics directly impact our environment if left in soil?",
+                options: ["They change immediately into mineral plant vitamins", "They evaporate neatly when exposed to morning dew", "They remain fully intact because they are non-biodegradable"],
+                correct: 2
+            }
+        },
+        global: {
+            Who: {
+                q: "<u>Who</u> or what group must raise climate awareness to prevent the destruction of man?",
+                options: ["Only physicians and hakims", "Someone around you who heeds the problem at hand", "The ancient hunter chiefs of southern forests"],
+                correct: 1
+            },
+            What: {
+                q: "<u>What</u> is the main characteristic definition of Global Warming?",
+                options: ["The slow increase in the temperature of the Earth", "A big explosion that completely destroys green swamps", "The sudden chilling drop of local river winds"],
+                correct: 0
+            },
+            Where: {
+                q: "<u>Where</u> does heat get trapped due to the greenhouse effect?",
+                options: ["Inside dark, deep iron wells", "In the atmosphere, failing to escape from the Earth", "Inside thick crude oil storage vaults"],
+                correct: 1
+            },
+            When: {
+                q: "<u>When</u> does global warming rapidly intensify according to textbook studies?",
+                options: ["When carbon dioxide levels increase in the atmosphere", "When people switch off lights and fans in a room", "When children complete their green survey diaries"],
+                correct: 0
+            },
+            Why: {
+                q: "<u>Why</u> is plastic production linked closely to environmental heat hazards?",
+                options: ["It uses cold rainwater structures", "It releases toxic, poisonous chemicals and increases carbon footprints", "It helps the body resist infection patterns"],
+                correct: 1
+            },
+            How: {
+                q: "<u>How</u> do airlines contribute to atmospheric damage while flying?",
+                options: ["By dropping fresh water beads on fields", "By emitting caustic gases straight out of burning fuels", "By tracking the paths of wild birds"],
+                correct: 1
+            }
+        }
+    };
+
+    function switchCharacter(modeKey) {
+        currentMode = modeKey;
+        document.querySelectorAll('.wh-btn').forEach(btn => btn.classList.remove('active-wh'));
+        
+        if(modeKey === 'plastic') {
+            document.getElementById("btnPlastic").className = "char-btn active-plastic";
+            document.getElementById("btnGlobal").className = "char-btn";
+        } else {
+            document.getElementById("btnPlastic").className = "char-btn";
+            document.getElementById("btnGlobal").className = "char-btn active-global";
+        }
+
+        document.getElementById("quizStage").innerHTML = `
+            <div class="question-text" style="text-align: center; color: var(--slate); font-style: italic; margin-top: 50px;">
+                Character swapped. Select a "Wh-" button above to load the quiz entries!
+            </div>`;
+    }
+
+    function loadQuestion(whWord, btnElement) {
+        document.querySelectorAll('.wh-btn').forEach(btn => btn.classList.remove('active-wh'));
+        btnElement.classList.add('active-wh');
+
+        const quizData = quizDatabase[currentMode][whWord];
+        currentCorrectIndex = quizData.correct;
+        answerChecked = false;
+
+        let optionsHTML = quizData.options.map((opt, index) => `
+            <button class="option-btn" onclick="verifyAnswer(this, ${index})">${opt}</button>
+        `).join('');
+
+        document.getElementById("quizStage").innerHTML = `
+            <div class="question-text">${quizData.q}</div>
+            <div class="options-grid">${optionsHTML}</div>
+        `;
+    }
+
+    function verifyAnswer(btnElement, chosenIndex) {
+        if (answerChecked) return; // Prevent clicking multiple options
+        answerChecked = true;
+
+        const allButtons = document.querySelectorAll('.option-btn');
+
+        if (chosenIndex === currentCorrectIndex) {
+            btnElement.classList.add('correct-choice');
+            playSound('correct');
+        } else {
+            btnElement.classList.add('wrong-choice');
+            allButtons[currentCorrectIndex].classList.add('correct-choice');
+            playSound('wrong');
+        }
+    }
+</script>
+
+</body>
+</html>
