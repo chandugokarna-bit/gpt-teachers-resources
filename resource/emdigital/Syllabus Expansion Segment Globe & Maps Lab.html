@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Navigation Matrix - Globe & Maps Part II</title>
+    <style>
+        :root {
+            --synth-purple: #bd00ff;
+            --synth-cyan: #00f2fe;
+            --synth-pink: #ff007f;
+            --synth-amber: #ffb700;
+            --space-black: #05030a;
+            --glass-deck: rgba(15, 8, 32, 0.9);
+            --laser-glow: rgba(189, 0, 255, 0.25);
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: radial-gradient(circle at center, #1b073a 0%, var(--space-black) 100%);
+            color: #f1f5f9;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px dashed var(--synth-cyan);
+            padding-bottom: 15px;
+            width: 100%;
+            max-width: 1050px;
+        }
+
+        h1 {
+            font-size: 2.8rem;
+            margin: 0;
+            background: linear-gradient(90deg, var(--synth-cyan), var(--synth-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            filter: drop-shadow(0 0 15px rgba(0, 242, 254, 0.4));
+        }
+
+        .geo-badge {
+            background: rgba(255, 0, 127, 0.15);
+            border: 1px solid var(--synth-pink);
+            color: var(--synth-pink);
+            padding: 4px 16px;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            display: inline-block;
+            margin-top: 8px;
+            box-shadow: 0 0 10px rgba(255, 0, 127, 0.2);
+        }
+
+        /* Synthwave Grid Menu Track */
+        .navigation-track {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 12px;
+            width: 100%;
+            max-width: 1050px;
+            margin-bottom: 35px;
+        }
+
+        .track-btn {
+            background: #0d061c;
+            border: 1px solid var(--laser-glow);
+            color: #94a3b8;
+            padding: 14px;
+            font-weight: 700;
+            font-size: 0.8rem;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .track-btn:hover, .track-btn.active {
+            color: #ffffff;
+            background: rgba(189, 0, 255, 0.15);
+            border-color: var(--synth-purple);
+            box-shadow: 0 0 25px var(--synth-purple);
+            transform: scale(1.03);
+        }
+
+        /* Glass Deck Display Screens */
+        .deck-screen {
+            width: 100%;
+            max-width: 1050px;
+            background: var(--glass-deck);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.7);
+            border-radius: 16px;
+            padding: 40px;
+            display: none;
+            box-sizing: border-box;
+            backdrop-filter: blur(20px);
+        }
+
+        .deck-screen.active {
+            display: block;
+            animation: screenPowerOn 0.5s ease-out;
+        }
+
+        @keyframes screenPowerOn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 {
+            color: var(--synth-cyan);
+            font-size: 1.6rem;
+            margin-top: 0;
+            text-transform: uppercase;
+            border-left: 5px solid var(--synth-pink);
+            padding-left: 12px;
+            text-shadow: 0 0 10px rgba(0, 242, 254, 0.3);
+        }
+
+        .console-guide {
+            color: #cbd5e1;
+            font-size: 0.95rem;
+            margin-bottom: 25px;
+            font-style: italic;
+        }
+
+        /* Style 1: MCQ Blocks */
+        .quiz-segment {
+            background: rgba(255, 255, 255, 0.02);
+            padding: 22px;
+            border-radius: 12px;
+            margin-bottom: 18px;
+            border: 1px solid rgba(255,255,255,0.04);
+        }
+        .options-cluster {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            gap: 12px;
+            margin-top: 15px;
+        }
+        .choice-node {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: #cbd5e1;
+            padding: 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s;
+        }
+        .choice-node:hover {
+            background: rgba(0, 242, 254, 0.15);
+            border-color: var(--synth-cyan);
+        }
+
+        /* Style 2: Match Rows */
+        .spine-match {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+        .strip-match {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0,0,0,0.25);
+            padding: 12px 20px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.02);
+        }
+        .anchor-node {
+            color: var(--synth-amber);
+            font-weight: 600;
+            width: 42%;
+        }
+        .selector-box {
+            background: #090514;
+            color: var(--synth-cyan);
+            border: 1px solid rgba(0, 242, 254, 0.4);
+            padding: 12px;
+            border-radius: 8px;
+            width: 52%;
+        }
+
+        /* Style 3: Drag & Drop Space */
+        .pool-dock {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            padding: 20px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 12px;
+            margin-bottom: 30px;
+            min-height: 55px;
+            border: 1px dashed rgba(255,255,255,0.1);
+        }
+        .drag-chip {
+            background: linear-gradient(135deg, #120b24, #251242);
+            border: 1px solid var(--synth-pink);
+            color: #ffffff;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: grab;
+            font-weight: 600;
+        }
+        .hangar-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+        }
+        .box-pod {
+            background: rgba(255,255,255,0.01);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+        }
+        .box-pod h3 { margin: 0 0 15px 0; color: var(--synth-cyan); font-size: 1.15rem; }
+        .receiver-target {
+            background: rgba(0,0,0,0.2);
+            border: 2px dashed rgba(0, 242, 254, 0.2);
+            border-radius: 10px;
+            min-height: 100px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+        }
+
+        /* Style 4: Scale Tracker Track */
+        .rail-track {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .rail-node {
+            background: #0c071a;
+            border-left: 4px solid var(--synth-pink);
+            padding: 16px 20px;
+            margin-bottom: 12px;
+            border-radius: 0 10px 10px 0;
+            cursor: move;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .rail-node::before {
+            content: "☩";
+            color: var(--synth-pink);
+            font-weight: bold;
+        }
+
+        /* Style 5: Paragraph Selector */
+        .universe-text {
+            font-size: 1.25rem;
+            line-height: 2.4;
+            background: rgba(0,0,0,0.2);
+            padding: 30px;
+            border-radius: 12px;
+        }
+        .menu-universe {
+            background: #05030a;
+            color: var(--synth-amber);
+            border: 1px solid rgba(255, 183, 0, 0.4);
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-weight: bold;
+        }
+
+        /* Style 6: One-Sentence Lab Component */
+        .lab-card {
+            background: rgba(255,255,255,0.01);
+            border: 1px solid rgba(255,255,255,0.05);
+            padding: 22px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+        }
+        .lab-input {
+            width: 100%;
+            background: #07040f;
+            border: 1px solid var(--synth-purple);
+            color: var(--synth-cyan);
+            padding: 14px;
+            font-size: 1rem;
+            box-sizing: border-box;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+        .btn-reveal {
+            background: var(--synth-purple);
+            color: #ffffff;
+            border: none;
+            padding: 8px 16px;
+            cursor: pointer;
+            margin-top: 12px;
+            font-weight: bold;
+            border-radius: 4px;
+        }
+        .reveal-box {
+            display: none;
+            margin-top: 12px;
+            padding: 14px;
+            background: rgba(0, 242, 254, 0.08);
+            border-left: 4px solid var(--synth-cyan);
+            color: #cbd5e1;
+            line-height: 1.5;
+        }
+
+        /* Style 7: 4-Mark Desk */
+        .card-vault {
+            background: rgba(255,255,255,0.01);
+            border: 1px solid rgba(255,255,255,0.04);
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+        }
+        .btn-lever {
+            background: linear-gradient(90deg, #120b24, #251242);
+            border: 1px solid var(--synth-pink);
+            color: #ffffff;
+            padding: 10px 22px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+        }
+        .stream-secure {
+            display: none;
+            margin-top: 18px;
+            padding: 20px;
+            background: rgba(255, 183, 0, 0.06);
+            border-left: 4px solid var(--synth-amber);
+            border-radius: 8px;
+            line-height: 1.7;
+            color: #cbd5e1;
+        }
+
+        /* Global Matrix Execution Ignition */
+        .btn-ignition {
+            background: linear-gradient(90deg, var(--synth-cyan), var(--synth-purple));
+            color: #05030a;
+            border: none;
+            padding: 14px 36px;
+            font-weight: bold;
+            border-radius: 30px;
+            cursor: pointer;
+            margin-top: 30px;
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .btn-ignition:hover {
+            box-shadow: 0 0 25px var(--synth-cyan);
+        }
+        .score-board {
+            margin-top: 25px;
+            font-weight: bold;
+            font-size: 1.3rem;
+            color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Advanced Geography Master Module</h1>
+        <div class="geo-badge">Syllabus Expansion Segment: Globe & Maps Lab</div>
+    </header>
+
+    <div class="navigation-track">
+        <button class="track-btn active" onclick="showScreen(1)">1. Grid Quiz</button>
+        <button class="track-btn" onclick="showScreen(2)">2. Codex Bind</button>
+        <button class="track-btn" onclick="showScreen(3)">3. Asset Sorter</button>
+        <button class="track-btn" onclick="showScreen(4)">4. Elements Rail</button>
+        <button class="track-btn" onclick="showScreen(5)">5. Vector Stream</button>
+        <button class="track-btn" onclick="showScreen(6)">6. 1-Sentence Lab</button>
+        <button class="track-btn" onclick="showScreen(7)">7. Expert Vault</button>
+    </div>
+
+    <!-- PANEL 1: MCQ -->
+    <div id="screen1" class="deck-screen active">
+        <h2>Activity 1: Cartographic Core Quiz</h2>
+        <div class="console-guide">Lock the verified structural options based directly on textbook geographical parameters.</div>
+        <div id="mcq-root"></div>
+        <button class="btn-ignition" onclick="evalQuiz()">Compute Matrix Input</button>
+        <div id="mcq-score" class="score-board"></div>
+    </div>
+
+    <!-- PANEL 2: MATCH THE FOLLOWING -->
+    <div id="screen2" class="deck-screen">
+        <h2>Activity 2: Relief Color Matrix Binding</h2>
+        <div class="console-guide">Integrate geographical map colors perfectly with their designated landscape features.</div>
+        <div id="match-root" class="spine-match"></div>
+        <button class="btn-ignition" onclick="evalMatch()">Verify Correlation Data</button>
+        <div id="match-score" class="score-board"></div>
+    </div>
+
+    <!-- PANEL 3: DRAG AND DROP -->
+    <div id="screen3" class="deck-screen">
+        <h2>Activity 3: Scale Matrix Classifier</h2>
+        <div class="console-guide">Drag the geographical maps and features to filter them between Large-Scale or Small-Scale classes.</div>
+        <div class="pool-dock" id="token-pool"></div>
+        <div class="hangar-grid">
+            <div class="box-pod">
+                <h3>Large-Scale Mapping Sphere</h3>
+                <div class="receiver-target" data-scale="Large"></div>
+            </div>
+            <div class="box-pod">
+                <h3>Small-Scale Mapping Sphere</h3>
+                <div class="receiver-target" data-scale="Small"></div>
+            </div>
+        </div>
+        <button class="btn-ignition" onclick="evalDragTokens()">Compute Operational Map</button>
+        <div id="drag-score" class="score-board"></div>
+    </div>
+
+    <!-- PANEL 4: REARRANGE DATA ARRAY -->
+    <div id="screen4" class="deck-screen">
+        <h2>Activity 4: Essential Component Priority Rail</h2>
+        <div class="console-guide">Reorder the foundational workflow stages required to systematically prepare and read a dynamic map.</div>
+        <ul class="rail-track" id="chronology-rail"></ul>
+        <button class="btn-ignition" onclick="evalRailOrder()">Validate Component Sequence</button>
+        <div id="rail-score" class="score-board"></div>
+    </div>
+
+    <!-- PANEL 5: INLINE DROP DOWN -->
+    <div id="screen5" class="deck-screen">
+        <h2>Activity 5: Navigation Context Solver</h2>
+        <div class="console-guide">Deploy the specific coordinate nomenclature choices to rebuild the scientific text segment.</div>
+        <div class="universe-text" id="universe-text-container"></div>
+        <button class="btn-ignition" onclick="evalUniverseMenus()">Execute Stream Audit</button>
+        <div id="universe-score" class="score-board"></div>
+    </div>
+
+    <!-- PANEL 6: ONE-SENTENCE Q&A LAB -->
+    <div id="screen6" class="deck-screen">
+        <h2>Activity 6: Interactive One-Sentence Cartography Room</h2>
+        <div class="console-guide">Formulate your response inside the terminal field and toggle to audit with the legal key.</div>
+        <div id="one-sentence-root"></div>
+    </div>
+
+    <!-- PANEL 7: 4 MARK DESCRIPTIVE CORNER -->
+    <div id="screen7" class="deck-screen">
+        <h2>Activity 7: High-Level Analytical Codex [4-Mark Parameters]</h2>
+        <div class="console-guide">Decrypt verified structural solutions taken directly from textbook records.</div>
+        <div id="vault-root"></div>
+    </div>
+
+    <script>
+        // Chapter 10 & Advanced Extension Content Arrays
+        const mQuizData = [
+            { q: "What is legally defined as the miniature model and true spherical representation of the Earth?", o: ["Map", "Globe", "Atlas", "Compass"], a: 1 },
+            { q: "What is the specialized science and art of scientific map-making officially called?", o: ["Geography", "Cartography", "Topography", "Geology"], a: 1 },
+            { q: "A bound collection or book compiling various types of structural maps is designated as what?", o: ["Textbook", "Nigama", "Atlas", "Edict"], a: 2 },
+            { q: "Which component represents the crucial ratio between the distance on a map and the actual ground distance?", o: ["Title", "Scale", "Index", "Direction"], a: 1 },
+            { q: "When an arrow is marked on a map layout, its head always points to which default direction?", o: ["East", "South", "North", "West"], a: 2 },
+            { q: "Which historical civilization is credited with creating the oldest discovered map around 2300 B.C.?", o: ["Greek", "Babylonia", "Persian", "Roman"], a: 1 },
+            { q: "Who was the historic Greek astronomer celebrated for preparing the very first Map Atlas?", o: ["Claudius Ptolemy", "Socrates", "Herodotus", "Copernicus"], a: 0 }
+        ];
+
+        const mMatchData = [
+            { left: "Blue Colour", right: "Water bodies like oceans, seas, and rivers", pool: ["Water bodies like oceans, seas, and rivers", "Lowlands or extensive flat plains", "Highlands elevated above plains", "Hills and lower parts of mountains", "High mountains and elevated peaks", "Snow-covered surface areas"] },
+            { left: "Green Colour", right: "Lowlands or extensive flat plains", pool: ["Water bodies like oceans, seas, and rivers", "Lowlands or extensive flat plains", "Highlands elevated above plains", "Hills and lower parts of mountains", "High mountains and elevated peaks", "Snow-covered surface areas"] },
+            { left: "Yellow Colour", right: "Highlands elevated above plains", pool: ["Water bodies like oceans, seas, and rivers", "Lowlands or extensive flat plains", "Highlands elevated above plains", "Hills and lower parts of mountains", "High mountains and elevated peaks", "Snow-covered surface areas"] },
+            { left: "Brown Colour", right: "Hills and lower parts of mountains", pool: ["Water bodies like oceans, seas, and rivers", "Lowlands or extensive flat plains", "Highlands elevated above plains", "Hills and lower parts of mountains", "High mountains and elevated peaks", "Snow-covered surface areas"] },
+            { left: "Dark Brown", right: "High mountains and elevated peaks", pool: ["Water bodies like oceans, seas, and rivers", "Lowlands or extensive flat plains", "Highlands elevated above plains", "Hills and lower parts of mountains", "High mountains and elevated peaks", "Snow-covered surface areas"] },
+            { left: "White / Purple", right: "Snow-covered surface areas", pool: ["Snow-covered surface areas", "Water bodies like oceans, seas, and rivers", "Lowlands or extensive flat plains"] },
+            { left: "Magnetic Needle", right: "Always points strictly to the North direction", pool: ["Always points strictly to the North direction", "Snow-covered surface areas"] }
+        ];
+
+        const mDragData = [
+            { name: "Individual Property Cadastral Maps", cat: "Large" },
+            { name: "Detailed Topographical Surface Maps", cat: "Large" },
+            { name: "Small Geographic Area Representation", cat: "Large" },
+            { name: "Massive Wall Maps for Classrooms", cat: "Small" },
+            { name: "Atlas Maps of Countries & Continents", cat: "Small" },
+            { name: "Large Geographic Area Representation", cat: "Small" }
+        ];
+
+        const mTrackData = [
+            "Establish the Title to define the clear content of the map",
+            "Apply Latitudes and Longitudes grid to locate positions",
+            "Utilize the Scale parameter to convert centimeters to kilometers",
+            "Structure the Map Index using globally uniform standard symbols"
+        ];
+
+        // One-Sentence Q&A Content Array
+        const mOneSentenceData = [
+            { q: "What is a Globe?", a: "A globe is a miniature, true three-dimensional model and representation of the Earth's spherical shape." },
+            { q: "What is a Map?", a: "A map is a diagrammatic representation of the whole Earth, or a part of it, drawn on a flat surface according to a specific scale." },
+            { q: "What is an Atlas?", a: "A collection of various types of maps systematically bound together as a book is known as an atlas." },
+            { q: "Define the term Map Scale.", a: "A scale is the ratio between the designated distance represented on a map and the corresponding actual distance on the ground." },
+            { q: "What is a Map Index?", a: "A map component containing keys, standard uniform colors, and symbols used to represent different geographical features is called an index." },
+            { q: "What color is uniformly utilized on physical maps to represent lowlands or plains?", a: "Green color is uniformly utilized across global physical maps to represent lowlands or plains." }
+        ];
+
+        const mVaultData = [
+            { q: "Detail the primary features and state four vital advantages of using a Globe as a teaching aid.", a: "A globe is a miniature model that provides a true spherical representation of the Earth. Four vital advantages are: 1. It helps accurately demonstrate the actual spherical shape of the Earth; 2. It shows the correct relative positions, shapes, and sizes of continents and oceans; 3. The lines of latitudes and longitudes help find boundaries and locate places; 4. It helps explain the inclination of the axis, rotation, revolution, and the formation of day, night, and seasons." },
+            { q: "Compare and contrast the structural differences between Large-Scale Maps and Small-Scale Maps based on textbook criteria.", a: "The core distinction lies in area size and details: Large-Scale Maps represent relatively small geographic areas (like villages or individual properties) but provide highly detailed local surface features. Examples include Cadastral and Topographical maps. Conversely, Small-Scale Maps represent massive geographic areas (like entire continents, countries, or the whole world) but can only display general features. Examples include Wall maps and Atlas maps." },
+            { q: "Analyze the five essential components required to successfully make and interpret an accurate geographical Map.", a: "The five essential components are: 1. Title, which clearly indicates the map's contents; 2. Scale, which maintains the mathematical ratio between map distance and actual ground distance; 3. Latitudes and Longitudes, providing a grid to locate places; 4. Direction, usually indicated by a North-pointing arrow ('N'); and 5. Index, which acts as a key explaining the uniform colors and symbols used." },
+            { q: "Outline the vital practical uses of Maps across various human activities, including military and tourism.", a: "Maps are vital tools that serve multiple functions: they help locate cities, states, and physical landforms; they guide transport networks by showing major roads and railway lines; they outline the distribution of crop zones, minerals, and industries; they provide crucial security layout parameters for military operations; and they guide tourists safely to their destinations." },
+            { q: "Explain how standard uniform colors are utilized on physical maps to represent different layout features.", a: "Global cartography uses a standardized color scheme to ensure universal clarity: Blue represents water bodies (oceans, seas, rivers); Green marks lowlands and plains; Yellow shows highlands; Brown represents hills and lower mountains; Dark Brown marks high mountain peaks; and White or Purple is strictly used for snow-covered areas." }
+        ];
+
+        // Panel Switch Controller
+        function showScreen(num) {
+            document.querySelectorAll('.deck-screen').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.track-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('screen' + num).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // Module 1 MCQ Builder
+        const mcqRoot = document.getElementById('mcq-root');
+        mQuizData.forEach((node, qIdx) => {
+            let block = document.createElement('div');
+            block.className = 'quiz-segment';
+            block.innerHTML = `<p><strong>Navigation Node ${qIdx+1}:</strong> ${node.q}</p>`;
+            let container = document.createElement('div');
+            container.className = 'options-cluster';
+            node.o.forEach((opt, oIdx) => {
+                container.innerHTML += `<button class="choice-node" data-q="${qIdx}" data-o="${oIdx}" onclick="logQuizChoice(this)">${opt}</button>`;
+            });
+            block.appendChild(container);
+            mcqRoot.appendChild(block);
+        });
+
+        let quizUserSelections = {};
+        function logQuizChoice(btn) {
+            let q = btn.getAttribute('data-q');
+            let o = parseInt(btn.getAttribute('data-o'));
+            quizUserSelections[q] = o;
+            btn.parentElement.querySelectorAll('.choice-node').forEach(b => b.style.background = 'rgba(255,255,255,0.04)');
+            btn.style.background = 'rgba(189, 0, 255, 0.2)';
+            btn.style.borderColor = 'var(--synth-purple)';
+        }
+
+        function evalQuiz() {
+            let score = 0;
+            mQuizData.forEach((data, idx) => {
+                if(quizUserSelections[idx] === data.a) score++;
+            });
+            document.getElementById('mcq-score').innerText = `Navigation Feedback: Approved Coords = ${score} / ${mQuizData.length}`;
+        }
+
+        // Module 2 Match Builder
+        const matchRoot = document.getElementById('match-root');
+        mMatchData.forEach((node, idx) => {
+            let strip = document.createElement('div');
+            strip.className = 'strip-match';
+            strip.innerHTML = `<div class="anchor-node">${node.left}</div>`;
+            let select = document.createElement('select');
+            select.className = 'selector-box';
+            select.id = `matrix-match-node-${idx}`;
+            select.innerHTML = '<option value="">-- Choose Relief Feature --</option>';
+            
+            let scrambledChoices = [...new Set(mMatchData.map(m => m.right))].sort(() => Math.random() - 0.5);
+            scrambledChoices.forEach(choice => {
+                select.innerHTML += `<option value="${choice}">${choice}</option>`;
+            });
+            strip.appendChild(select);
+            matchRoot.appendChild(strip);
+        });
+
+        function evalMatch() {
+            let score = 0;
+            mMatchData.forEach((data, idx) => {
+                if(document.getElementById(`matrix-match-node-${idx}`).value === data.right) score++;
+            });
+            document.getElementById('match-score').innerText = `Cartographic Readout: Aligned Features = ${score} / ${mMatchData.length}`;
+        }
+
+        // Module 3 Drag & Drop Builder
+        const tokenPool = document.getElementById('token-pool');
+        mDragData.sort(() => Math.random() - 0.5).forEach((data, idx) => {
+            let chip = document.createElement('div');
+            chip.className = 'drag-chip';
+            chip.id = `map-chip-${idx}`;
+            chip.draggable = true;
+            chip.innerText = data.name;
+            chip.setAttribute('data-scale', data.cat);
+            chip.ondragstart = (e) => { e.dataTransfer.setData("text/plain", e.target.id); };
+            tokenPool.appendChild(chip);
+        });
+
+        document.querySelectorAll('.receiver-target').forEach(receiver => {
+            receiver.ondragover = (e) => e.preventDefault();
+            receiver.ondrop = (e) => {
+                e.preventDefault();
+                let tokenId = e.dataTransfer.getData("text/plain");
+                let tokenElement = document.getElementById(tokenId);
+                if(e.target.classList.contains('receiver-target')) {
+                    e.target.appendChild(tokenElement);
+                }
+            };
+        });
+
+        function evalDragTokens() {
+            let score = 0;
+            document.querySelectorAll('.receiver-target').forEach(receiver => {
+                let currentScaleTarget = receiver.getAttribute('data-scale');
+                receiver.querySelectorAll('.drag-chip').forEach(c => {
+                    if(c.getAttribute('data-scale') === currentScaleTarget) score++;
+                });
+            });
+            document.getElementById('drag-score').innerText = `Resolution Sorter Compute: Correct Maps Mapped = ${score} / ${mDragData.length}`;
+        }
+
+        // Module 4 Timeline/Rail Reorder Builder
+        const chronologyRail = document.getElementById('chronology-rail');
+        let scrambledRail = [...mTrackData].sort(() => Math.random() - 0.5);
+        scrambledRail.forEach((text, idx) => {
+            let li = document.createElement('li');
+            li.className = 'rail-node';
+            li.draggable = true;
+            li.innerText = text;
+            li.id = `rail-node-id-${idx}`;
+            
+            li.ondragstart = (e) => {
+                e.dataTransfer.setData("text/plain", e.target.id);
+                setTimeout(() => li.style.opacity = '0.3', 0);
+            };
+            li.ondragend = () => li.style.opacity = '1';
+            chronologyRail.appendChild(li);
+        });
+
+        chronologyRail.ondragover = (e) => {
+            e.preventDefault();
+            const draggingNode = document.querySelector('.rail-node[style*="opacity: 0.3"]');
+            if(!draggingNode) return;
+            const parallelNodes = [...chronologyRail.querySelectorAll('.rail-node:not([style*="opacity: 0.3"])')];
+            let exactSpot = parallelNodes.find(node => {
+                return e.clientY <= node.getBoundingClientRect().top + node.offsetHeight / 2;
+            });
+            chronologyRail.insertBefore(draggingNode, exactSpot);
+        };
+
+        function evalRailOrder() {
+            let userTrackArray = [...chronologyRail.querySelectorAll('.rail-node')].map(li => li.innerText);
+            let score = 0;
+            userTrackArray.forEach((val, idx) => {
+                if(mTrackData[idx] === val) score++;
+            });
+            document.getElementById('rail-score').innerText = `Workflow Validation Result: Correct Alignments = ${score} / ${mTrackData.length}`;
+        }
+
+        // Module 5 Paragraph Builder
+        const universeContainer = document.getElementById('universe-text-container');
+        universeContainer.innerHTML = `
+            To learn geographic features scientifically, a flat representation drawn according to scale is called a 
+            <select class="menu-universe" id="uni-drop-0"><option value="">?</option><option value="Map">Map</option><option value="Globe">Globe</option></select>. 
+            The specific imaginary coordinate network lines that help locate exact spaces are known as 
+            <select class="menu-universe" id="uni-drop-1"><option value="">?</option><option value="Latitudes and longitudes">Latitudes and longitudes</option><option value="Scales and indexes">Scales and indexes</option></select>. 
+            When interpreting physical features, cartographers uniformly deploy the color 
+            <select class="menu-universe" id="uni-drop-2"><option value="">?</option><option value="Blue">Blue</option><option value="Green">Green</option></select> 
+            to mark vast water bodies, while the color 
+            <select class="menu-universe" id="uni-drop-3"><option value="">?</option><option value="Green">Green</option><option value="Brown">Brown</option></select> 
+            is explicitly saved for lowlands or plains, establishing uniform clarity for global navigation.
+        `;
+
+        const universeSolutions = ["Map", "Latitudes and longitudes", "Blue", "Green"];
+        function evalUniverseMenus() {
+            let tally = 0;
+            universeSolutions.forEach((sol, idx) => {
+                if(document.getElementById(`uni-drop-${idx}`).value === sol) tally++;
+            });
+            document.getElementById('universe-score').innerText = `Matrix Evaluation Index: Verified Matches = ${tally} / ${universeSolutions.length}`;
+        }
+
+        // Module 6 One-Sentence Lab Builder
+        const oneSentenceRoot = document.getElementById('one-sentence-root');
+        mOneSentenceData.forEach((node, idx) => {
+            oneSentenceRoot.innerHTML += `
+                <div class="lab-card">
+                    <p><strong>Lab Query ${idx+1}:</strong> ${node.q}</p>
+                    <input type="text" class="lab-input" placeholder="Type your vector response answer here...">
+                    <button class="btn-reveal" onclick="toggleRevealBox(${idx})">Audit Answer Key</button>
+                    <div class="reveal-box" id="reveal-box-${idx}"><strong>Ideal Standard Key:</strong> ${node.a}</div>
+                </div>`;
+        });
+
+        function toggleRevealBox(idx) {
+            let target = document.getElementById(`reveal-box-${idx}`);
+            target.style.display = (target.style.display === 'block') ? 'none' : 'block';
+        }
+
+        // Module 7 Vault Builder
+        const vaultRoot = document.getElementById('vault-root');
+        mVaultData.forEach((node, idx) => {
+            vaultRoot.innerHTML += `
+                <div class="card-vault">
+                    <p><strong>Codex Element ${idx+1} [4 Marks Standard Parameters]:</strong> ${node.q}</p>
+                    <button class="btn-lever" onclick="toggleVaultStream(${idx})">Decrypt Data Entry</button>
+                    <div class="stream-secure" id="stream-secure-${idx}">${node.a}</div>
+                </div>`;
+        });
+
+        function toggleVaultStream(idx) {
+            let target = document.getElementById(`stream-secure-${idx}`);
+            target.style.display = (target.style.display === 'block') ? 'none' : 'block';
+        }
+    </script>
+</body>
+</html>

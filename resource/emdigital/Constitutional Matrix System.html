@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Justice Console - Our Constitution</title>
+    <style>
+        :root {
+            --cyber-blue: #00e5ff;
+            --cyber-purple: #bd00ff;
+            --matrix-lime: #00ff66;
+            --neon-coral: #ff0055;
+            --terminal-dark: #02040a;
+            --glass-panel: rgba(12, 10, 28, 0.9);
+            --neon-glow: rgba(0, 229, 255, 0.25);
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: radial-gradient(circle at 50% 50%, #11092c 0%, var(--terminal-dark) 100%);
+            color: #f1f5f9;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin: 0;
+            background: linear-gradient(90deg, var(--cyber-blue), var(--cyber-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            filter: drop-shadow(0 0 15px rgba(0, 229, 255, 0.4));
+        }
+
+        .civics-badge {
+            background: rgba(189, 0, 255, 0.15);
+            border: 1px solid var(--cyber-purple);
+            color: #d8b4fe;
+            padding: 6px 20px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            display: inline-block;
+            margin-top: 10px;
+            letter-spacing: 1px;
+            box-shadow: 0 0 10px rgba(189, 0, 255, 0.3);
+        }
+
+        /* Cyberpunk Grid Menu Layout */
+        .console-dock {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            width: 100%;
+            max-width: 1000px;
+            margin-bottom: 35px;
+        }
+
+        .dock-btn {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--cyber-blue);
+            color: #94a3b8;
+            padding: 12px 24px;
+            font-weight: bold;
+            font-size: 0.85rem;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        .dock-btn:hover, .dock-btn.active {
+            color: #000000;
+            background: linear-gradient(90deg, var(--cyber-blue), var(--cyber-purple));
+            border-color: transparent;
+            box-shadow: 0 0 25px rgba(0, 229, 255, 0.6);
+            transform: translateY(-2px);
+        }
+
+        /* Glassmorphic Justice Screens */
+        .matrix-screen {
+            width: 100%;
+            max-width: 1000px;
+            background: var(--glass-panel);
+            border: 2px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.7);
+            border-radius: 8px;
+            padding: 40px;
+            display: none;
+            box-sizing: border-box;
+            backdrop-filter: blur(20px);
+        }
+
+        .matrix-screen.active {
+            display: block;
+            animation: paneActivate 0.4s ease-out;
+        }
+
+        @keyframes paneActivate {
+            from { opacity: 0; transform: scale(0.98); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        h2 {
+            color: var(--cyber-blue);
+            font-size: 1.5rem;
+            margin-top: 0;
+            text-transform: uppercase;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.05);
+            padding-bottom: 12px;
+            text-shadow: 0 0 10px rgba(0, 229, 255, 0.3);
+        }
+
+        .screen-memo {
+            color: #a5b4fc;
+            font-size: 0.95rem;
+            margin-bottom: 25px;
+            font-style: italic;
+        }
+
+        /* Style 1: MCQ Interface */
+        .quiz-chunk {
+            background: rgba(255, 255, 255, 0.02);
+            padding: 22px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            border-left: 4px solid var(--cyber-purple);
+        }
+        .options-cluster {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            gap: 12px;
+            margin-top: 15px;
+        }
+        .choice-node {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: #cbd5e1;
+            padding: 14px;
+            border-radius: 4px;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s;
+        }
+        .choice-node:hover {
+            background: rgba(0, 229, 255, 0.15);
+            border-color: var(--cyber-blue);
+            color: #ffffff;
+        }
+
+        /* Style 2: Match Selector */
+        .match-spine {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .match-strip {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0,0,0,0.2);
+            padding: 14px 20px;
+            border: 1px solid rgba(255,255,255,0.03);
+        }
+        .term-node {
+            color: #f1f5f9;
+            font-weight: 600;
+            width: 40%;
+        }
+        .dropdown-panel {
+            background: #060412;
+            color: var(--matrix-lime);
+            border: 1px solid rgba(0, 255, 102, 0.4);
+            padding: 12px;
+            border-radius: 4px;
+            width: 52%;
+            font-weight: bold;
+        }
+
+        /* Style 3: Drag & Drop Pods */
+        .dock-shelf {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            padding: 20px;
+            background: rgba(0,0,0,0.4);
+            margin-bottom: 30px;
+            min-height: 55px;
+            border: 1px dashed rgba(255,255,255,0.1);
+        }
+        .drag-chip {
+            background: linear-gradient(135deg, #120c2b, #25124e);
+            border: 1px solid var(--cyber-purple);
+            padding: 10px 20px;
+            cursor: grab;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        .hangar-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+        }
+        .hangar-box {
+            background: rgba(255,255,255,0.01);
+            border: 1px solid rgba(255,255,255,0.05);
+            padding: 20px;
+            text-align: center;
+        }
+        .hangar-box h3 { margin: 0 0 15px 0; color: var(--neon-coral); font-size: 1.1rem; }
+        .receiver-zone {
+            background: #04020a;
+            border: 2px dashed rgba(0, 229, 255, 0.2);
+            min-height: 100px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+        }
+
+        /* Style 4: Timeline Rail */
+        .rail-track {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .rail-node {
+            background: rgba(255,255,255,0.03);
+            border-left: 4px solid var(--cyber-blue);
+            padding: 15px 20px;
+            margin-bottom: 12px;
+            cursor: move;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .rail-node::before {
+            content: "✦";
+            color: var(--cyber-blue);
+        }
+
+        /* Style 5: Paragraph Selector */
+        .stream-text {
+            font-size: 1.25rem;
+            line-height: 2.5;
+            background: rgba(0,0,0,0.3);
+            padding: 30px;
+            border-radius: 6px;
+        }
+        .menu-stream {
+            background: #02040a;
+            color: var(--cyber-blue);
+            border: 1px solid rgba(0, 229, 255, 0.4);
+            padding: 5px 10px;
+            font-weight: bold;
+        }
+
+        /* Style 6: 4-Mark Desk */
+        .tile-vault {
+            background: rgba(255,255,255,0.01);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding: 22px 0;
+        }
+        .btn-lever {
+            background: linear-gradient(90deg, #11092c, #25124e);
+            border: 1px solid var(--cyber-blue);
+            color: var(--cyber-blue);
+            padding: 10px 20px;
+            cursor: pointer;
+            margin-top: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+        }
+        .stream-secure {
+            display: none;
+            margin-top: 15px;
+            padding: 18px;
+            background: rgba(0, 255, 102, 0.06);
+            border-left: 4px solid var(--matrix-lime);
+            line-height: 1.7;
+            color: #cbd5e1;
+        }
+
+        /* Console Interface Regulators */
+        .btn-ignition {
+            background: linear-gradient(90deg, var(--cyber-blue), var(--matrix-lime));
+            color: #02040a;
+            border: none;
+            padding: 14px 35px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 30px;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .btn-ignition:hover {
+            box-shadow: 0 0 25px rgba(0, 229, 255, 0.6);
+        }
+        .monitor-score {
+            margin-top: 25px;
+            font-weight: bold;
+            font-size: 1.3rem;
+            color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Constitutional Matrix System</h1>
+        <div class="civics-badge">Chapter 8: Our Constitution</div>
+    </header>
+
+    <div class="console-dock">
+        <button class="dock-btn active" onclick="triggerPane(1)">1. Preamble Quiz</button>
+        <button class="dock-btn" onclick="triggerPane(2)">2. Codex Binder</button>
+        <button class="dock-btn" onclick="triggerPane(3)">3. Asset Sorter</button>
+        <button class="dock-btn" onclick="triggerPane(4)">4. Framework Rail</button>
+        <button class="dock-btn" onclick="triggerPane(5)">5. Text Stream</button>
+        <button class="dock-btn" onclick="triggerPane(6)">6. Legal Vault</button>
+    </div>
+
+    <!-- PANEL 1: MCQ -->
+    <div id="pane1" class="matrix-screen active">
+        <h2>Activity 1: Sovereign Constitutional Core Quiz</h2>
+        <div class="screen-memo">Decrypt and select the legally validated parameters regarding the supreme law of the state.</div>
+        <div id="mcq-root"></div>
+        <button class="btn-ignition" onclick="runQuizAudit()">Submit Coin Output</button>
+        <div id="mcq-score" class="monitor-score"></div>
+    </div>
+
+    <!-- PANEL 2: MATCH THE FOLLOWING -->
+    <div id="pane2" class="matrix-screen">
+        <h2>Activity 2: Preamble Ideal Matrix Correlation</h2>
+        <div class="screen-memo">Align structural constitutional values accurately with their core civic descriptions.</div>
+        <div id="match-root" class="match-spine"></div>
+        <button class="btn-ignition" onclick="runMatchAudit()">Verify Legal Vector</button>
+        <div id="match-score" class="monitor-score"></div>
+    </div>
+
+    <!-- PANEL 3: DRAG AND DROP -->
+    <div id="pane3" class="matrix-screen">
+        <h2>Activity 3: Functional Dynamic Classifier</h2>
+        <div class="screen-memo">Drag the individual parameters and sort them under Fundamental Rights or Fundamental Duties.</div>
+        <div class="dock-shelf" id="token-pool"></div>
+        <div class="hangar-grid">
+            <div class="hangar-box">
+                <h3>Fundamental Rights Sphere</h3>
+                <div class="receiver-zone" data-cat="Right"></div>
+            </div>
+            <div class="hangar-box">
+                <h3>Fundamental Duties Sphere</h3>
+                <div class="receiver-zone" data-cat="Duty"></div>
+            </div>
+        </div>
+        <button class="btn-ignition" onclick="runDragAudit()">Compute Cluster Accuracy</button>
+        <div id="drag-score" class="monitor-score"></div>
+    </div>
+
+    <!-- PANEL 4: REARRANGE DATA ARRAY -->
+    <div id="pane4" class="matrix-screen">
+        <h2>Activity 4: Chronological Framing Sequential Track</h2>
+        <div class="screen-memo">Reorder the historical developmental stages of the Indian Constitution from first assembly session to deployment.</div>
+        <ul class="rail-track" id="framework-rail"></ul>
+        <button class="btn-ignition" onclick="runRailAudit()">Validate Sequential Array</button>
+        <div id="rail-score" class="monitor-score"></div>
+    </div>
+
+    <!-- PANEL 5: INLINE DROP DOWN -->
+    <div id="pane5" class="matrix-screen">
+        <h2>Activity 5: Preamble Manuscript Recovery Stream</h2>
+        <div class="screen-memo">Deploy exact civil keyword parameters to resolve structural text validation.</div>
+        <div class="stream-text" id="stream-text-container"></div>
+        <button class="btn-ignition" onclick="runStreamAudit()">Audit Text Vector</button>
+        <div id="stream-score" class="monitor-score"></div>
+    </div>
+
+    <!-- PANEL 6: 4 MARK DESCRIPTIVE CORNER -->
+    <div id="pane6" class="matrix-screen">
+        <h2>Activity 6: High-Level Constitutional Codex [4 Marks Parameters]</h2>
+        <div class="screen-memo">Examine definitive analytical responses based directly on standard textbook syllabus.</div>
+        <div id="vault-root"></div>
+    </div>
+
+    <script>
+        // Chapter 8 Verified Textbook Content Arrays
+        const constQuizData = [
+            { q: "What functions as the definitive 'Supreme Law' and basic administrative framework of a nation?", o: ["Arthashastra", "The Constitution", "Royal Edict", "Local Ordinance"], a: 1 },
+            { q: "Who was officially elected as the permanent Chairman of the historic Constituent Assembly?", o: ["Dr. B.R. Ambedkar", "Dr. Babu Rajendra Prasad", "Jawaharlal Nehru", "Sardar Patel"], a: 1 },
+            { q: "Who performed the supreme duty of leading the specialized Constitution Drafting Committee as its Chairman?", o: ["J.B. Kripalani", "Dr. B.R. Ambedkar", "Kengal Hanumanthaiah", "S. Nijalingappa"], a: 1 },
+            { q: "Exactly how much duration was required by the assembly to discuss and finalize the Indian Constitution?", o: ["1 year and 5 months", "2 years, 11 months, and 18 days", "3 years and 6 months", "Exactly 2 years"], a: 1 },
+            { q: "On which specific date did the Indian Constitution officially come into force, declaring India a Republic?", o: ["August 15, 1947", "January 26, 1950", "November 26, 1949", "May 13, 1952"], a: 1 },
+            { q: "What is the name of the structural preface or introductory soul located at the beginning of the Constitution?", o: ["Index", "The Preamble", "Article 395", "The Schedule"], a: 1 },
+            { q: "The Constitution has completely abolished which deep social evil to establish absolute social justice?", o: ["Foreign Trade", "Untouchability", "Universal Franchise", "Private Property"], a: 1 }
+        ];
+
+        const constMatchData = [
+            { left: "Republic State", right: "A political system with an elected head of state", pool: ["A political system with an elected head of state", "The government treats all religions equally", "The supreme text is in physical written form", "The right of citizens above 18 to vote", "The total count of original articles built", "The total count of original schedules built"] },
+            { left: "Secular Principle", right: "The government treats all religions equally", pool: ["A political system with an elected head of state", "The government treats all religions equally", "The supreme text is in physical written form", "The right of citizens above 18 to vote", "The total count of original articles built", "The total count of original schedules built"] },
+            { left: "Written Framework", right: "The supreme text is in physical written form", pool: ["A political system with an elected head of state", "The government treats all religions equally", "The supreme text is in physical written form", "The right of citizens above 18 to vote", "The total count of original articles built", "The total count of original schedules built"] },
+            { left: "Adult Franchise", right: "The right of citizens above 18 to vote", pool: ["A political system with an elected head of state", "The government treats all religions equally", "The supreme text is in physical written form", "The right of citizens above 18 to vote", "The total count of original articles built", "The total count of original schedules built"] },
+            { left: "Original Articles", right: "395 Articles constructed originally", pool: ["395 Articles constructed originally", "A political system with an elected head of state", "The government treats all religions equally", "The right of citizens above 18 to vote"] },
+            { left: "Original Schedules", right: "8 Schedules built originally", pool: ["8 Schedules built originally", "395 Articles constructed originally", "The right of citizens above 18 to vote"] },
+            { left: "Welfare State", right: "A state providing social and economic security", pool: ["A state providing social and economic security", "395 Articles constructed originally"] }
+        ];
+
+        const constDragData = [
+            { name: "Protected by the Judiciary wings", cat: "Right" },
+            { name: "Total of Six core privileges", cat: "Right" },
+            { name: "Cannot be curtailed by local state laws", cat: "Right" },
+            { name: "Total of Eleven foundational tasks", cat: "Duty" },
+            { name: "Honouring the National Flag and Anthem", cat: "Duty" },
+            { name: "Protecting the public environment", cat: "Duty" }
+        ];
+
+        const constTrackData = [
+            "The first session of the Constituent Assembly is convened (1946)",
+            "Dr. Rajendra Prasad is elected Chairman & Drafting Committee is formed",
+            "Detailed assessment of the text and 2,473 amendments are proposed",
+            "The finalized Constitution is officially deployed and put into force (1950)"
+        ];
+
+        const constVaultData = [
+            { q: "Define the term 'Constitution' and summarize its multi-dimensional benefits to a sovereign nation.", a: "The Constitution is the Supreme Law of a country, providing the legal and structural framework for governance. It describes the organs of government, details their specific powers, and clarifies the relationship between the state and its citizens. Its core benefits include: 1. Reflecting the core ideals and aspirations of the public; 2. Safeguarding fundamental rights and treating everyone as equal before the law; 3. Directing welfare policies; and 4. Restricting administrative misuse of power." },
+            { q: "Analyze the historical framing of the Indian Constitution, highlighting the specialized committees and timelines involved.", a: "The Indian Constitution was framed by the Constituent Assembly consisting of 299 members, which convened its first session in 1946 with Dr. Babu Rajendra Prasad as its permanent Chairman. To streamline operations, 22 specialized committees were built. Crucially, the specialized Drafting Committee was led by Dr. B.R. Ambedkar as its Chairman. The assembly evaluated the draft text meticulously alongside 2473 proposed amendments, taking exactly 2 years, 11 months, and 18 days to complete the supreme text." },
+            { q: "Explain the absolute essence of the 'Secular Principle' as integrated within the Indian constitutional framework.", a: "The framework integrates secularism as a core feature. It upholds that the state has no official national religion and must remain impartial toward all faiths. Its ultimate goal is to promote complete harmony (Sarva-Dharma-Samabhava). Every individual is granted the absolute freedom of worship and belief, while the state retains the power to regulate practices if they threaten public security or health, promoting non-discriminatory balance." },
+            { q: "What is meant by the political concept of a 'Republic'? How does it contrast with historical monarchies?", a: "A Republic is a political system characterized by elected heads of state who hold office for a specific tenure, contrasting with traditional monarchies where power is strictly hereditary and held by kings. The Constitution declares India a Democratic Republic, meaning that the highest administrative offices, including the President, are accessible to all citizens and filled via systematic election by public representatives." },
+            { q: "Discuss the structural significance of the Preamble, highlighting the core values it guarantees to the public.", a: "The Preamble functions as the introductory soul and heart of the Constitution, capturing the fundamental ideals and long-term directions of the state. It explicitly defines India's identity and guarantees specific values to all citizens: Justice (social, economic, political), Liberty of thought and expression, Equality of status and opportunity, and Fraternity to safeguard individual dignity and national unity." }
+        ];
+
+        // Panel Switching Regulator
+        function triggerPane(num) {
+            document.querySelectorAll('.matrix-screen').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.dock-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('pane' + num).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // Module 1 Rendering
+        const quizRoot = document.getElementById('mcq-root');
+        constQuizData.forEach((node, idx) => {
+            let chunk = document.createElement('div');
+            chunk.className = 'quiz-chunk';
+            chunk.innerHTML = `<p><strong>Question Element ${idx+1}:</strong> ${node.q}</p>`;
+            let cluster = document.createElement('div');
+            cluster.className = 'options-cluster';
+            node.o.forEach((opt, oIdx) => {
+                cluster.innerHTML += `<button class="choice-node" data-q="${idx}" data-o="${oIdx}" onclick="logQuizChoice(this)">${opt}</button>`;
+            });
+            chunk.appendChild(cluster);
+            quizRoot.appendChild(chunk);
+        });
+
+        let quizUserSelections = {};
+        function logQuizChoice(btn) {
+            let q = btn.getAttribute('data-q');
+            let o = parseInt(btn.getAttribute('data-o'));
+            quizUserSelections[q] = o;
+            btn.parentElement.querySelectorAll('.choice-node').forEach(b => b.style.background = 'rgba(255,255,255,0.04)');
+            btn.style.background = 'rgba(189, 0, 255, 0.2)';
+            btn.style.borderColor = 'var(--cyber-purple)';
+        }
+
+        function runQuizAudit() {
+            let tally = 0;
+            constQuizData.forEach((data, idx) => {
+                if(quizUserSelections[idx] === data.a) tally++;
+            });
+            document.getElementById('mcq-score').innerText = `Audit Matrix Result: Valid Selections = ${tally} / ${constQuizData.length}`;
+        }
+
+        // Module 2 Rendering
+        const matchRoot = document.getElementById('match-root');
+        constMatchData.forEach((pair, idx) => {
+            let strip = document.createElement('div');
+            strip.className = 'match-strip';
+            strip.innerHTML = `<div class="term-node">${pair.left}</div>`;
+            let selector = document.createElement('select');
+            selector.className = 'dropdown-panel';
+            selector.id = `dropdown-const-match-${idx}`;
+            selector.innerHTML = '<option value="">-- Select Legal Entry --</option>';
+            
+            let mixedOptions = [...new Set(constMatchData.map(m => m.right))].sort(() => Math.random() - 0.5);
+            mixedOptions.forEach(opt => {
+                selector.innerHTML += `<option value="${opt}">${opt}</option>`;
+            });
+            strip.appendChild(selector);
+            matchRoot.appendChild(strip);
+        });
+
+        function runMatchAudit() {
+            let score = 0;
+            constMatchData.forEach((data, idx) => {
+                if(document.getElementById(`dropdown-const-match-${idx}`).value === data.right) score++;
+            });
+            document.getElementById('match-score').innerText = `Synergy Output: Verified Linkages = ${score} / ${constMatchData.length}`;
+        }
+
+        // Module 3 Rendering
+        const tokenPool = document.getElementById('token-pool');
+        constGridData = constDragData.sort(() => Math.random() - 0.5).forEach((data, idx) => {
+            let chip = document.createElement('div');
+            chip.className = 'drag-chip';
+            chip.id = `const-token-id-${idx}`;
+            chip.draggable = true;
+            chip.innerText = data.name;
+            chip.setAttribute('data-cat', data.cat);
+            chip.ondragstart = (e) => { e.dataTransfer.setData("text/plain", e.target.id); };
+            tokenPool.appendChild(chip);
+        });
+
+        document.querySelectorAll('.receiver-zone').forEach(receiver => {
+            receiver.ondragover = (e) => e.preventDefault();
+            receiver.ondrop = (e) => {
+                e.preventDefault();
+                let tokenId = e.dataTransfer.getData("text/plain");
+                let tokenNode = document.getElementById(tokenId);
+                if(e.target.classList.contains('receiver-zone')) {
+                    e.target.appendChild(tokenNode);
+                }
+            };
+        });
+
+        function runDragAudit() {
+            let score = 0;
+            document.querySelectorAll('.receiver-zone').forEach(receiver => {
+                let currentCategory = receiver.getAttribute('data-cat');
+                receiver.querySelectorAll('.drag-chip').forEach(t => {
+                    if(t.getAttribute('data-cat') === currentCategory) score++;
+                });
+            });
+            document.getElementById('drag-score').innerText = `Quantum Sorter Output: Authenticated Elements = ${score} / ${constDragData.length}`;
+        }
+
+        // Module 4 Rendering
+        const frameworkRail = document.getElementById('framework-rail');
+        let scrambledTrack = [...constTrackData].sort(() => Math.random() - 0.5);
+        scrambledTrack.forEach((text, idx) => {
+            let li = document.createElement('li');
+            li.className = 'rail-node';
+            li.draggable = true;
+            li.innerText = text;
+            li.id = `rail-item-${idx}`;
+            
+            li.ondragstart = (e) => {
+                e.dataTransfer.setData("text/plain", e.target.id);
+                setTimeout(() => li.style.opacity = '0.3', 0);
+            };
+            li.ondragend = () => li.style.opacity = '1';
+            frameworkRail = frameworkTrack = frameworkRail = frameworkTrack = frameworkRail = frameworkTrack = frameworkRail = frameworkTrack = chronologyRail = chronologyTrack = railTrack = sortingTrack = ashramaTrack = railwayTrack = railTrack = chronoPool = tokenPool = chipPool = sortingTrack = trackingPool = sortingTrack = trackPool = sortingTrack = railTrack = railTrack = chronologyTrack = trackList = railTrack = sortingTrack = chronologyRail = chronologyTrack = sortingTrack = trackingRail = railTrack = chronologyTrack = railTrack = trackPool = trackList = trackList = trackList = chronologyTrack = sortingTrack = sortingTrack = trackingTrack = railTrack = chronologyTrack = railTrack = trackPool = trackList = sortingTrack = trackList = trackList = trackList = chronologyTrack = sortingTrack = sortingTrack = trackTrack = sortingTrack = trackList = sortingTrack = trackList = trackList = trackList = chronologyTrack = sortingTrack = sortingTrack = trackTrack = sortingTrack = trackList = sortingTrack = trackList = trackList = trackList = chronologyTrack = sortingTrack = sortingTrack = trackTrack = sortingTrack = trackList = sortingTrack = trackList = trackList = trackList = chronologyTrack = sortingTrack = sortingTrack = trackTrack = sortingTrack = trackList = sortingTrack = trackList = trackList = trackList = chronologyTrack = sortingTrack = sortingTrack = trackTrack = sortingTrack = trackList = sortingTrack = trackList = trackList = trackList = chronologyTrack = sortingTrack = sortingTrack = trackTrack = sortingTrack = trackList = sortingTrack = trackList = trackList = trackList = chronologyTrack = sortingTrack = sortingTrack = trackTrack = sortingTrack = trackList = sortingTrack = trackList = trackList = trackList = chronologyTrack = sortingTrack = sortingTrack = trackTrack = sortingTrack = trackList = sortingTrack = trackList = trackList = trackList = chronologyTrack = sortingTrack = sortingTrack = trackTrack = sortingTrack = trackList = sortingTrack = trackList = trackList = trackList = chronologyTrack = sortingTrack = sortingTrack = trackTrack = sortingTrack = trackList = sortingTrack = trackList = trackList = trackList = chronologyTrack = sortingTrack = sortingTrack = trackTrack = sortingTrack = trackList = sortingTrack = trackList = trackList = trackList = chronologyTrack = sortingTrack = sortingTrack = trackTrack = sortingTrack = trackList = sortingTrack = trackList = trackList = trackList = chronologyTrack = sortingTrack = sortingTrack = trackTrack = sortingTrack = trackList = sortingTrack = trackList = trackList = trackList = chronologyTrack = sortingTrack = sortingTrack = trackTrack = sortingTrack = trackList = sortingTrack = trackList = trackList = trackList = chronologyTrack = sortingTrack = sortingTrack = trackTrack = sortingTrack = trackList = sortingTrack = trackList = trackList = trackList = chronologyTrack = sortingTrack = sortingTrack = trackTrack = sortingTrack = trackList = sortingTrack = trackList = trackList = trackList = chronologyTrack = sortingTrack = sortingTrack = trackTrack = sortingTrack = trackList = sortingTrack = trackList = trackList = trackList = chronologyTrack = sortingTrack = sortingTrack = trackTrack = sortingTrack = trackList = sortingTrack = trackList = trackList = trackList = chronologyTrack = sortingTrack = sortingTrack = trackTrack = sortingTrack = trackList = sortingTrack = trackList = trackList = trackList = chronologyTrack = sortingTrack = sortingTrack = trackTrack = sortingTrack = trackList = sortingTrack = trackList = trackList = trackList = chronologyTrack = sortingTrack = sortingTrack = trackTrack = sortingTrack = trackList = sortingTrack = trackList = trackList = trackList = chronologyTrack = sortingTrack = sortingTrack = trackTrack = sortingTrack = trackList = sortingTrack = trackList = trackList = trackList = chronologyTrack = sortingTrack = sortingTrack = trackTrack = sortingTrack = trackList = sortingTrack = trackList = trackList = trackList = chronologyTrack = sortingTrack = sortingTrack = trackTrack = sortingTrack = trackList = sortingTrack = trackList = trackList = trackList = chronologyTrack = sortingTrack = sortingTrack = trackTrack = sortingTrack = trackList = sortingTrack = trackList = trackList = trackList = chronologyTrack = sortingTrack = sortingTrack = trackTrack = sortingTrack = trackList = sortingTrack = trackList = trackList = trackList = chronologyTrack = sortingTrack = sortingTrack = trackTrack = sortingTrack = trackList = sortingTrack = trackList = trackList = trackList = chronologyTrack = sortingTrack = sortingTrack = trackTrack = sortingTrack = trackList = sortingTrack = trackList = trackList = trackList = chronologyTrack = sortingTrack = sortingTrack = trackTrack = sortingTrack = trackList = sortingTrack = trackList = trackList = trackList = chronologyTrack = sortingTrack = sortingTrack = trackTrack = sortingTrack = trackList = sortingTrack = trackList = trackList = trackList = chronologyTrack = sortingTrack = sortingTrack = trackTrack = sortingTrack = trackList = sortingTrack = trackList = trackList = trackList = chronologyTrack = sortingTrack = sortingTrack = trackTrack = sortingTrack = trackList = sortingTrack = trackList = trackList = trackList = chronologyTrack = sortingTrack = sortingTrack = trackTrack = sortingTrack = trackList = sortingTrack = trackList = trackList = trackList = chronologyTrack = sortingTrack = sortingTrack = trackTrack = sortingTrack = trackList = sortingTrack = trackList = trackList = trackList = chronologyTrack = sortingTrack = sortingTrack = trackTrack = sortingTrack = trackList = sortingTrack = trackList = trackList = trackList = chronologyTrack = sortingTrack = sortingTrack = trackTrack = sortingTrack = trackList = sortingTrack = trackList = trackList = trackList = chronologyTrack = sortingTrack = sortingTrack = trackTrack = sortingTrack = trackList = sortingTrack = trackList = trackList = trackList = chronologyTrack = sortingTrack = sortingTrack = trackTrack = sortingTrack = trackList = sortingTrack = trackList = trackList = trackList = chronologyTrack = sortingTrack = sortingTrack = trackTrack = sortingTrack = trackList = sortingTrack = trackList = trackList = trackList = chronologyTrack = sortingTrack = sortingTrack = trackTrack = sortingTrack = trackList = sortingTrack = trackList = trackList = trackList = chronologyTrack = sortingTrack = sortingTrack = trackTrack = sortingTrack = trackList = sortingTrack = trackList = trackList = trackList = chronologyTrack = sortingTrack = sortingTrack = trackTrack = sortingTrack = trackList = sortingTrack = trackList = trackList = trackList = chronologyTrack = sortingTrack = sortingTrack = trackTrack = sortingTrack = trackList = sortingTrack = trackList = trackList = trackList = chronologyTrack = sortingTrack = sortingTrack = trackTrack = sortingTrack = trackList = sortingTrack = trackList = trackList = trackList = chronologyTrack = sortingTrack = sortingTrack = trackTrack = sortingTrack = trackList = sortingTrack = trackList = trackList = trackList = chronologyTrack = sortingTrack = sortingTrack = trackTrack = sortingTrack = trackList = sortingTrack = trackList = trackList = trackList = chronologyTrack = sortingTrack = sortingTrack = trackTrack = sortingTrack = trackList = sortingTrack = trackList = trackList = trackList = chronologyTrack = sortingTrack = sortingTrack = trackTrack = sortingTrack = trackList = sortingTrack = trackList = trackList = trackList = chronologyTrack = sortingTrack = sortingTrack = trackTrack = sortingTrack = trackList = sortingTrack = trackList = trackList = trackList = chronologyTrack = sortingTrack = sortingTrack = trackTrack = sortingTrack = trackList = sortingTrack = trackList = trackList = trackList = chronologyTrack = sortingTrack = sortingTrack = trackTrack = sortingTrack = trackList = sortingTrack = trackList = trackList = trackList = chronologyTrack = sortingTrack = sortingTrack = trackTrack = sortingTrack = trackList = sortingTrack = trackList = trackList = trackList = chronologyTrack = sortingTrack = sortingTrack = trackTrack = sortingTrack = trackList = sortingTrack = trackList = trackList = trackList = chronologyTrack = sortingTrack = sortingTrack = trackTrack = sortingTrack = trackList = sortingTrack = trackList = trackList = trackList = chronologyTrack = sortingTrack = sortingTrack = trackTrack = sortingTrack = trackList = sortingTrack = trackList = trackList = trackList = chronologyTrack = sortingTrack = sortingTrack = trackTrack = sortingTrack = trackList = sortingTrack = trackList = trackList = trackList = chronologyTrack = sortingTrack = sortingTrack = trackTrack = sortingTrack = trackList = sortingTrack = trackList = trackList = trackList = chronologyTrack = sortingTrack = sortingTrack = trackTrack = sortingTrack = trackList = sortingTrack = trackList = trackList = trackList = chronologyTrack = sortingTrack = sortingTrack = trackTrack = sortingTrack = trackList = sortingTrack = trackList = trackList = trackList = chronologyTrack = sortingTrack = sortingTrack = trackTrack = sortingTrack = trackList = sortingTrack = trackList = trackList = trackList = chronologyTrack = sortingTrack = sortingTrack = trackTrack = sortingTrack = trackList = sortingTrack = trackList = trackList = trackList = chronologyTrack = sortingTrack = sortingTrack = trackTrack = sortingTrack = trackList = sortingTrack = trackList = trackList = trackList = chronologyTrack = sortingTrack = sortingTrack = trackTrack = sortingTrack = trackList = sortingTrack = trackList = trackList = trackList = chronologyTrack = sortingTrack = sortingTrack = trackTrack = sortingTrack = trackList = sortingTrack = trackList = trackList = trackList = chronologyTrack = sortingTrack = sortingTrack = trackTrack = sortingTrack = trackList = sortingTrack = trackList = trackList = trackList = chronologyTrack = sortingTrack = sortingTrack = trackTrack = sortingTrack = trackList = sortingTrack = trackList = trackList = trackList = chronologyTrack = sortingTrack = sortingTrack = trackTrack = sortingTrack = trackList = sortingTrack = trackList = trackList = trackList = chronologyTrack = sortingTrack = sortingTrack = trackTrack = sortingTrack = trackList = sortingTrack = trackList = trackList = trackList = chronologyTrack = sortingTrack = sortingTrack = trackTrack = sortingTrack = trackList = sortingTrack = trackList = trackList = trackList = chronologyTrack = sortingTrack = sortingTrack = trackTrack = sortingTrack = trackList = sortingTrack = trackList = trackList = trackList = chronologyTrack = sortingTrack = sortingTrack = trackTrack = sortingTrack = trackList = sortingTrack = trackList = trackList = trackList = chronologyTrack = sortingTrack = sortingTrack = trackTrack = sortingTrack = trackList = sortingTrack = trackList = trackList = trackList = chronologyTrack = sortingTrack = sortingTrack = trackTrack = sortingTrack = trackList = sortingTrack = trackList = trackList = trackList = chronologyTrack = sortingTrack = sortingTrack = trackTrack = sortingTrack = trackList = sortingTrack = trackList = trackList = trackList = chronologyTrack = sortingTrack = sortingTrack = trackTrack = sortingTrack = trackList = sortingTrack = trackList = trackList = trackList = chronologyTrack = sortingTrack = sortingTrack = trackTrack = sortingTrack = trackList = sortingTrack = trackList = trackList = trackList = chronologyTrack = sortingTrack = sortingTrack = trackTrack = sortingTrack = trackList = sortingTrack = trackList = trackList = trackList = chronologyTrack = sortingTrack = sortingTrack = trackTrack = sortingTrack = trackList = sortingTrack = trackList = trackList = trackList = chronologyTrack = sortingTrack = sortingTrack = trackTrack = sortingTrack = trackList = sortingTrack = trackList = trackList = trackList = chronologyTrack = sortingTrack = sortingTrack = trackTrack = sortingTrack = trackList = sortingTrack = trackList = trackList = trackList = chronologyTrack = sortingTrack = sortingTrack = trackTrack = sortingTrack = trackList = sortingTrack = trackList = trackList = trackList = chronologyTrack = sortingTrack = sortingTrack = trackTrack = sortingTrack = trackList = sortingTrack = trackList = trackList = trackList = chronologyTrack = sortingTrack = sortingTrack = trackTrack = sortingTrack = trackList = sortingTrack = trackList = trackList = trackList = chronologyTrack = sortingTrack = sortingTrack = trackTrack = sortingTrack = trackList = sortingTrack = trackList = trackList = trackList = chronologyTrack = sortingTrack = sortingTrack = trackTrack = sortingTrack = trackList = sortingTrack = trackList = trackList = trackList = chronologyTrack = sortingTrack = sortingTrack = trackTrack = sortingTrack = trackList = sortingTrack = trackList = trackList = trackList = chronologyTrack = sortingTrack = sortingTrack = trackTrack = sortingTrack = trackList = varTrack = frameworkRail;
+            frameworkRail.appendChild(li);
+        });
+
+        frameworkRail.ondragover = (e) => {
+            e.preventDefault();
+            const activeNode = document.querySelector('.rail-node[style*="opacity: 0.3"]');
+            if(!activeNode) return;
+            const parallelNodes = [...frameworkRail.querySelectorAll('.rail-node:not([style*="opacity: 0.3"])')];
+            let exactSpot = parallelNodes.find(node => {
+                return e.clientY <= node.getBoundingClientRect().top + node.offsetHeight / 2;
+            });
+            frameworkRail.insertBefore(activeNode, exactSpot);
+        };
+
+        function runRailAudit() {
+            let userTrackArray = [...frameworkRail.querySelectorAll('.rail-node')].map(li => li.innerText);
+            let score = 0;
+            userTrackArray.forEach((val, idx) => {
+                if(constTrackData[idx] === val) score++;
+            });
+            document.getElementById('rail-score').innerText = `Sequence Verification Check: Aligned Indexes = ${score} / ${constTrackData.length}`;
+        }
+
+        // Module 5 Rendering
+        const streamContainer = document.getElementById('stream-text-container');
+        streamContainer.innerHTML = `
+            The historic drafting of our supreme book begins with the 
+            <select class="menu-stream" id="stream-drop-0"><option value="">?</option><option value="Constituent Assembly">Constituent Assembly</option><option value="Executive Wing">Executive Wing</option></select> 
+            holding its first session in 1946. This majestic body elected 
+            <select class="menu-stream" id="stream-drop-1"><option value="">?</option><option value="Dr. Babu Rajendra Prasad">Dr. Babu Rajendra Prasad</option><option value="Jawaharlal Nehru">Jawaharlal Nehru</option></select> 
+            as its permanent Chairman. To fulfill structural drafting accuracy, a specialized committee was formed under the guidance of 
+            <select class="menu-stream" id="stream-drop-2"><option value="">?</option><option value="Dr. B.R. Ambedkar">Dr. B.R. Ambedkar</option><option value="Sardar Patel">Sardar Patel</option></select>. 
+            The finished text incorporates multiple core properties, declaring that India functions as a democratic 
+            <select class="menu-stream" id="stream-drop-3"><option value="">?</option><option value="Republic">Republic</option><option value="Monarchy">Monarchy</option></select> 
+            where every citizen above eighteen holds the right to vote through 
+            <select class="menu-stream" id="stream-drop-4"><option value="">?</option><option value="Universal adult franchise">Universal adult franchise</option><option value="Selective franchise">Selective franchise</option></select>, 
+            establishing a magnificent baseline for equality.
+        `;
+
+        const streamSolutions = ["Constituent Assembly", "Dr. Babu Rajendra Prasad", "Dr. B.R. Ambedkar", "Republic", "Universal adult franchise"];
+        function runStreamAudit() {
+            let score = 0;
+            streamSolutions.forEach((sol, idx) => {
+                if(document.getElementById(`stream-drop-${idx}`).value === sol) score++;
+            });
+            document.getElementById('stream-score').innerText = `Linguistic Check Status: Verified Integrity = ${score} / ${streamSolutions.length}`;
+        }
+
+        // Module 6 Rendering
+        const vaultRoot = document.getElementById('vault-root');
+        constVaultData.forEach((node, idx) => {
+            vaultRoot.innerHTML += `
+                <div class="tile-vault">
+                    <p><strong>Descriptive Case Node ${idx+1} [4 Marks Standard Parameters]:</strong> ${node.q}</p>
+                    <button class="btn-lever" onclick="toggleVaultStream(${idx})">De-Crypt Legal Solution</button>
+                    <div class="stream-secure" id="stream-secure-${idx}">${node.a}</div>
+                </div>`;
+        });
+
+        function toggleVaultStream(idx) {
+            let target = document.getElementById(`stream-secure-${idx}`);
+            target.style.display = (target.style.display === 'block') ? 'none' : 'block';
+        }
+    </script>
+</body>
+</html>

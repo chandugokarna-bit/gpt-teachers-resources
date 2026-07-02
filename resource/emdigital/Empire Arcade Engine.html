@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Empire Arcade - Mauryas & Kushanas</title>
+    <style>
+        :root {
+            --arcade-red: #ff3333;
+            --arcade-orange: #ff9900;
+            --arcade-yellow: #ffff00;
+            --neon-blue: #00ffff;
+            --retro-bg: #030206;
+            --panel-bg: rgba(20, 10, 30, 0.9);
+            --glitch-border: rgba(255, 51, 51, 0.3);
+        }
+
+        body {
+            font-family: 'Courier New', Courier, monospace;
+            background: radial-gradient(circle at center, #150527 0%, var(--retro-bg) 100%);
+            color: #ffffff;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 25px;
+            border: 3px double var(--arcade-red);
+            padding: 15px 30px;
+            background: rgba(0,0,0,0.5);
+            box-shadow: 0 0 20px rgba(255, 51, 51, 0.4);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin: 0;
+            color: var(--arcade-yellow);
+            text-shadow: 3px 3px 0px var(--arcade-red), 0 0 10px var(--arcade-orange);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .level-badge {
+            background: var(--arcade-red);
+            color: #000000;
+            padding: 4px 15px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            display: inline-block;
+            margin-top: 8px;
+            text-transform: uppercase;
+            box-shadow: 0 0 10px var(--arcade-red);
+        }
+
+        /* Retro Arcade Button Selectors */
+        .arcade-dock {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            width: 100%;
+            max-width: 1000px;
+            margin-bottom: 30px;
+        }
+
+        .arcade-btn {
+            background: #11051c;
+            border: 2px solid var(--glitch-border);
+            color: var(--arcade-orange);
+            padding: 12px;
+            font-weight: bold;
+            font-size: 0.8rem;
+            font-family: 'Courier New', monospace;
+            cursor: pointer;
+            text-transform: uppercase;
+            box-shadow: inset 0 0 8px rgba(255, 153, 0, 0.1);
+            transition: all 0.2s steps(4);
+        }
+
+        .arcade-btn:hover, .arcade-btn.active {
+            color: #000000;
+            background: var(--arcade-orange);
+            border-color: var(--arcade-yellow);
+            box-shadow: 0 0 15px var(--arcade-orange);
+            transform: translateY(-2px);
+        }
+
+        /* Arcade Screen Panels */
+        .arcade-screen {
+            width: 100%;
+            max-width: 1000px;
+            background: var(--panel-bg);
+            border: 4px solid var(--arcade-red);
+            box-shadow: 0 0 30px rgba(255, 51, 51, 0.2), inset 0 0 20px rgba(0,0,0,0.9);
+            border-radius: 4px;
+            padding: 35px;
+            display: none;
+            box-sizing: border-box;
+        }
+
+        .arcade-screen.active {
+            display: block;
+            animation: screenFlicker 0.15s ease-out;
+        }
+
+        @keyframes screenFlicker {
+            0% { opacity: 0.3; }
+            50% { opacity: 0.9; }
+            100% { opacity: 1; }
+        }
+
+        h2 {
+            color: var(--neon-blue);
+            font-size: 1.5rem;
+            margin-top: 0;
+            text-transform: uppercase;
+            border-bottom: 2px dashed var(--arcade-red);
+            padding-bottom: 10px;
+            text-shadow: 0 0 5px var(--neon-blue);
+        }
+
+        .game-guide {
+            color: #8b5cf6;
+            font-size: 0.9rem;
+            margin-bottom: 25px;
+            text-transform: uppercase;
+        }
+
+        /* Style 1: MCQ Matrix Grid */
+        .mission-box {
+            background: rgba(0,0,0,0.4);
+            padding: 20px;
+            border: 1px dashed rgba(255,255,255,0.1);
+            margin-bottom: 20px;
+        }
+        .options-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            gap: 12px;
+            margin-top: 15px;
+        }
+        .node-choice {
+            background: #08020e;
+            border: 1px solid rgba(255,255,255,0.1);
+            color: #d1d5db;
+            padding: 12px;
+            cursor: pointer;
+            text-align: left;
+            font-family: 'Courier New', monospace;
+            transition: all 0.1s;
+        }
+        .node-choice:hover {
+            background: rgba(0, 255, 255, 0.1);
+            border-color: var(--neon-blue);
+            color: #ffffff;
+        }
+
+        /* Style 2: Match Link Matrix */
+        .spine-match {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .strip-match {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0,0,0,0.3);
+            padding: 12px 15px;
+            border: 1px solid rgba(255, 51, 51, 0.1);
+        }
+        .anchor-text {
+            color: var(--arcade-yellow);
+            font-weight: bold;
+            width: 40%;
+        }
+        .selector-box {
+            background: #000000;
+            color: var(--neon-blue);
+            border: 1px solid var(--neon-blue);
+            padding: 10px;
+            width: 55%;
+            font-family: 'Courier New', monospace;
+        }
+
+        /* Style 3: Drag & Drop Pods */
+        .shelf-pool {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            padding: 15px;
+            background: #000000;
+            margin-bottom: 25px;
+            min-height: 50px;
+            border: 2px dashed rgba(255,255,255,0.1);
+        }
+        .chip-token {
+            background: #1f072b;
+            border: 1px solid var(--arcade-orange);
+            color: #ffffff;
+            padding: 8px 16px;
+            cursor: grab;
+            font-weight: bold;
+        }
+        .hangar-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+        .box-pod {
+            background: rgba(0,0,0,0.3);
+            border: 2px solid var(--arcade-red);
+            padding: 15px;
+            text-align: center;
+        }
+        .box-pod h3 { margin: 0 0 15px 0; color: var(--arcade-yellow); font-size: 1.1rem; }
+        .receiver-target {
+            background: #000000;
+            border: 1px dashed rgba(255,255,255,0.2);
+            min-height: 90px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+        }
+
+        /* Style 4: Timeline Sequence */
+        .track-rail {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .node-rail {
+            background: #0b0514;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 15px;
+            margin-bottom: 10px;
+            cursor: move;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .node-rail::before {
+            content: "[::]";
+            color: var(--arcade-orange);
+            font-weight: bold;
+        }
+
+        /* Style 5: Paragraph Selector */
+        .universe-text {
+            font-size: 1.15rem;
+            line-height: 2.4;
+            background: #000000;
+            padding: 25px;
+            border: 1px solid rgba(255,51,51,0.2);
+        }
+        .menu-universe {
+            background: #11051c;
+            color: var(--arcade-yellow);
+            border: 1px solid var(--arcade-orange);
+            padding: 4px;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+        }
+
+        /* Style 6: 4-Mark Desk */
+        .card-vault {
+            background: rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.05);
+            padding: 20px;
+            margin-bottom: 15px;
+        }
+        .btn-lever {
+            background: var(--arcade-red);
+            color: #000000;
+            border: none;
+            padding: 8px 16px;
+            cursor: pointer;
+            margin-top: 12px;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+            text-transform: uppercase;
+        }
+        .stream-secure {
+            display: none;
+            margin-top: 15px;
+            padding: 15px;
+            background: rgba(0, 255, 255, 0.05);
+            border-left: 4px solid var(--neon-blue);
+            line-height: 1.7;
+            color: #cbd5e1;
+        }
+
+        /* Global Control Actions */
+        .btn-ignition {
+            background: var(--arcade-yellow);
+            color: #000000;
+            border: none;
+            padding: 12px 30px;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+            cursor: pointer;
+            margin-top: 25px;
+            text-transform: uppercase;
+            box-shadow: 0 0 10px var(--arcade-yellow);
+        }
+        .btn-ignition:hover {
+            box-shadow: 0 0 25px var(--arcade-yellow);
+        }
+        .score-board {
+            margin-top: 20px;
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: var(--arcade-red);
+            text-shadow: 0 0 5px rgba(255,51,51,0.5);
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Empire Arcade Engine</h1>
+        <div class="level-badge">Level 06: Mauryas & Kushanas</div>
+    </header>
+
+    <div class="arcade-dock">
+        <button class="arcade-btn active" onclick="changeScreen(1)">1. Edict Quiz</button>
+        <button class="arcade-btn" onclick="changeScreen(2)">2. Empire Bind</button>
+        <button class="arcade-btn" onclick="changeScreen(3)">3. Dynasty Sort</button>
+        <button class="arcade-btn" onclick="changeScreen(4)">4. Chrono Rail</button>
+        <button class="arcade-btn" onclick="changeScreen(5)">5. Text Solver</button>
+        <button class="arcade-btn" onclick="changeScreen(6)">6. Codex Vault</button>
+    </div>
+
+    <div id="screen1" class="arcade-screen active">
+        <h2>Activity 1: Imperial Objective Mission</h2>
+        <div class="game-guide">Isolate and execute correct historical entries to advance level.</div>
+        <div id="mcq-root"></div>
+        <button class="btn-ignition" onclick="checkQuiz()">Submit Coin Response</button>
+        <div id="mcq-score" class="score-board"></div>
+    </div>
+
+    <div id="screen2" class="arcade-screen">
+        <h2>Activity 2: Correlation Matrix Binding</h2>
+        <div class="game-guide">Map regional records and ancient literature to their correct origins.</div>
+        <div id="match-root" class="spine-match"></div>
+        <button class="btn-ignition" onclick="checkMatch()">Verify Linkages</button>
+        <div id="match-score" class="score-board"></div>
+    </div>
+
+    <div id="screen3" class="arcade-screen">
+        <h2>Activity 3: Dynasty Asset Classifier</h2>
+        <div class="game-guide">Drag the ancient assets and drop them under Maurya or Kushana commands.</div>
+        <div class="shelf-pool" id="token-pool"></div>
+        <div class="hangar-grid">
+            <div class="box-pod">
+                <h3>Maurya Empire</h3>
+                <div class="receiver-target" data-dynasty="Maurya"></div>
+            </div>
+            <div class="box-pod">
+                <h3>Kushana Empire</h3>
+                <div class="receiver-target" data-dynasty="Kushana"></div>
+            </div>
+        </div>
+        <button class="btn-ignition" onclick="checkDragTokens()">Audit Asset Map</button>
+        <div id="drag-score" class="score-board"></div>
+    </div>
+
+    <div id="screen4" class="arcade-screen">
+        <h2>Activity 4: Maurya Timeline Tracking Rail</h2>
+        <div class="game-guide">Reorder the prominent chronological milestones of the Maurya dynasty from earliest to latest.</div>
+        <ul class="track-rail" id="chrono-rail"></ul>
+        <button class="btn-ignition" onclick="checkRailOrder()">Test Chrono Sequence</button>
+        <div id="rail-score" class="score-board"></div>
+    </div>
+
+    <div id="screen5" class="arcade-screen">
+        <h2>Activity 5: Edict Manuscript Recovery Stream</h2>
+        <div class="game-guide">Deploy structural keyword nodes to process text stream validation.</div>
+        <div class="universe-text" id="universe-text-container"></div>
+        <button class="btn-ignition" onclick="checkUniverseMenus()">Execute Stream Audit</button>
+        <div id="universe-score" class="score-board"></div>
+    </div>
+
+    <div id="screen6" class="arcade-screen">
+        <h2>Activity 6: High-Level Analytical Codex [4 Marks Parameters]</h2>
+        <div class="game-guide">Decrypt verified structural solutions taken directly from textbook records.</div>
+        <div id="vault-root"></div>
+    </div>
+
+    <script>
+        // Chapter 6 Textbook Verified Content Arrays
+        const aQuizData = [
+            { q: "Who was the legendary foundational founder of the Maurya Empire?", o: ["Samrat Ashoka", "Chandragupta Maurya", "Bindusara", "Kanishka"], a: 1 },
+            { q: "Which world-famous book on administrative statecraft was written by Chanakya (Kautilya)?", o: ["Indica", "Arthashastra", "Mudra Rakshasa", "Buddhacharita"], a: 1 },
+            { q: "Which core historic battle transformed Samrat Ashoka's mind to abandon violent warfare?", o: ["Battle of Panipat", "Battle of Kalinga", "Battle of Tarain", "Battle of Magadha"], a: 1 },
+            { q: "Where is the monumental Lion Capital, which provides India's official National Emblem, located?", o: ["Pataliputra", "Saranath", "Lumbini", "Taxila"], a: 1 },
+            { q: "Who was the most illustrious and powerful sovereign ruler of the Kushana Dynasty?", o: ["Kujula Kadphises", "Kanishka", "Vima Kadphises", "Huvishka"], a: 1 },
+            { q: "Which style of sculpture fusion art developed rapidly under the patronage of King Kanishka?", o: ["Mathura Art", "Gandhara Art", "Dravidian Art", "Chola Art"], a: 1 },
+            { q: "Where did King Kanishka systematically organize the historic 4th Buddhist Council?", o: ["Rajagriha", "Kashmir", "Vaishali", "Pataliputra"], a: 1 }
+        ];
+
+        const aMatchData = [
+            { left: "Megasthenes", right: "Greek ambassador who authored 'Indica'", pool: ["Greek ambassador who authored 'Indica'", "Chanakya's book on state administration", "Sovereign capital of the Mauryas", "Court poet who wrote Buddhacharita", "Famous Buddhist scholar of Kushanas", "Royal physician during Kanishka's reign"] },
+            { left: "Arthashastra", right: "Chanakya's book on state administration", pool: ["Greek ambassador who authored 'Indica'", "Chanakya's book on state administration", "Sovereign capital of the Mauryas", "Court poet who wrote Buddhacharita", "Famous Buddhist scholar of Kushanas", "Royal physician during Kanishka's reign"] },
+            { left: "Pataliputra", right: "Sovereign capital of the Mauryas", pool: ["Greek ambassador who authored 'Indica'", "Chanakya's book on state administration", "Sovereign capital of the Mauryas", "Court poet who wrote Buddhacharita", "Famous Buddhist scholar of Kushanas", "Royal physician during Kanishka's reign"] },
+            { left: "Ashvaghosha", right: "Court poet who wrote Buddhacharita", pool: ["Greek ambassador who authored 'Indica'", "Chanakya's book on state administration", "Sovereign capital of the Mauryas", "Court poet who wrote Buddhacharita", "Famous Buddhist scholar of Kushanas", "Royal physician during Kanishka's reign"] },
+            { left: "Charaka", right: "Royal physician during Kanishka's reign", pool: ["Greek ambassador who authored 'Indica'", "Chanakya's book on state administration", "Sovereign capital of the Mauryas", "Court poet who wrote Buddhacharita", "Famous Buddhist scholar of Kushanas", "Royal physician during Kanishka's reign"] },
+            { left: "Purushapura (Peshawar)", right: "Primary capital city of the Kushanas", pool: ["Primary capital city of the Kushanas", "Greek ambassador who authored 'Indica'", "Sovereign capital of the Mauryas", "Court poet who wrote Buddhacharita"] },
+            { left: "Dharma", right: "Ashoka's universal moral code of life", pool: ["Ashoka's universal moral code of life", "Greek ambassador who authored 'Indica'", "Chanakya's book on state administration"] }
+        ];
+
+        const aDragData = [
+            { name: "Chanakya Guiding Hand", group: "Maurya" },
+            { name: "Indica Book Scripting", group: "Maurya" },
+            { name: "Rock Edicts Propagation", group: "Maurya" },
+            { name: "Kalinga War Transformation", group: "Maurya" },
+            { name: "Saka Calendar Era (78 CE)", group: "Kushana" },
+            { name: "Buddhacharita Epic Text", group: "Kushana" },
+            { name: "Fourth Buddhist Council", group: "Kushana" },
+            { name: "Gold Coins Mass Minting", group: "Kushana" }
+        ];
+
+        const aTrackData = [
+            "Overthrow of Nanda Dynasty by Chandragupta Maurya",
+            "Sovereign coronation and territorial expansion of Samrat Ashoka",
+            "The Kalinga War and absolute renunciation of military conflict",
+            "Carving of Dhamma instructions on stone pillars across India"
+        ];
+
+        const aVaultData = [
+            { q: "Detail the historical impact of the Kalinga War on Samrat Ashoka's personal philosophy and governance methods.", a: "The Kalinga War (261 BC) was a massive turning point. Witnessing the tragic destruction, death of over one lakh soldiers, and immense human suffering, Ashoka was filled with deep grief. He completely abandoned 'Digvijaya' (military conquest) and embraced 'Dharmavijaya' (conquest of hearts through righteousness). He adopted Buddhism, declared welfare operations for citizens and animals, and dedicated his entire state machinery to spreading peace." },
+            { q: "Analyze the unique administrative values and structural content discovered within Ashoka's Rock Edicts.", a: "Ashoka was the first Indian emperor to carve royal orders directly on stone rocks and pillars to connect with the public. Written primarily in Prakrit language and Brahmi script, these edicts contain universal human values: showing absolute respect to parents and teachers, practicing non-violence towards animals, maintaining religious tolerance, and declaring that 'all human beings are my children'." },
+            { q: "Explain the multi-dimensional achievements of King Kanishka, highlighting political and cultural parameters.", a: "King Kanishka was an extraordinary ruler. Politically, he expanded the Kushana empire across North India and parts of Central Asia, initiating the historic Saka Era in 78 CE. Culturally, he gave royal patronage to Buddhism, sponsored the 4th Buddhist Council in Kashmir, mass-minted gold coins, and encouraged legendary scholars like Ashvaghosha, Charaka, and Nagarjuna." },
+            { q: "How did the unique Gandhara School of Art evolve and what are its prominent artistic characteristics?", a: "The Gandhara School of Art arose during Kanishka's reign in the north-western frontiers. It was a unique fusion of Greek-Roman sculpting techniques and traditional Indian Buddhist concepts. Its core features include carving statues of Gautama Buddha with highly realistic physical muscles, flowing Greek-style hair drapery, intricate curly locks, and serene, life-like facial expressions, altering early Indian iconographic expressions." },
+            { q: "Outline the vital role played by Chanakya (Kautilya) in building the structural baseline of the Maurya Empire.", a: "Chanakya was the chief political strategist who guided Chandragupta Maurya to overthrow the oppressive Nanda dynasty. His legendary textbook, 'Arthashastra', provided the structural baseline for administration, finance, foreign policy, and military systems. This practical guidance enabled the creation of India's first highly organized, pan-Indian centralized empire." }
+        ];
+
+        // Screen Navigation
+        function changeScreen(num) {
+            document.querySelectorAll('.arcade-screen').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.arcade-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('screen' + num).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // Style 1: MCQ Rendering
+        const mcqRoot = document.getElementById('mcq-root');
+        aQuizData.forEach((node, qIdx) => {
+            let block = document.createElement('div');
+            block.className = 'mission-box';
+            block.innerHTML = `<p><strong>Mission Question ${qIdx+1}:</strong> ${node.q}</p>`;
+            let container = document.createElement('div');
+            container.className = 'options-list';
+            node.o.forEach((opt, oIdx) => {
+                container.innerHTML += `<button class="node-choice" data-q="${qIdx}" data-o="${oIdx}" onclick="logQuizNode(this)">${opt}</button>`;
+            });
+            block.appendChild(container);
+            mcqRoot.appendChild(block);
+        });
+
+        let quizAnswersLog = {};
+        function logQuizNode(btn) {
+            let q = btn.getAttribute('data-q');
+            let o = parseInt(btn.getAttribute('data-o'));
+            quizAnswersLog[q] = o;
+            btn.parentElement.querySelectorAll('.node-choice').forEach(b => b.style.background = '#08020e');
+            btn.style.background = 'rgba(0, 255, 255, 0.2)';
+            btn.style.borderColor = 'var(--neon-blue)';
+        }
+
+        function checkQuiz() {
+            let tally = 0;
+            aQuizData.forEach((data, idx) => {
+                if(quizAnswersLog[idx] === data.a) tally++;
+            });
+            document.getElementById('mcq-score').innerText = `Arcade Feedback: Valid Answers Locked = ${tally} / ${aQuizData.length}`;
+        }
+
+        // Style 2: Match Rendering
+        const matchRoot = document.getElementById('match-root');
+        aMatchData.forEach((node, idx) => {
+            let strip = document.createElement('div');
+            strip.className = 'strip-match';
+            strip.innerHTML = `<div class="anchor-text">${node.left}</div>`;
+            let select = document.createElement('select');
+            select.className = 'selector-box';
+            select.id = `arcade-match-node-${idx}`;
+            select.innerHTML = '<option value="">-- Choose Data Definition --</option>';
+            
+            let scrambledChoices = [...new Set(aMatchData.map(m => m.right))].sort(() => Math.random() - 0.5);
+            scrambledChoices.forEach(choice => {
+                select.innerHTML += `<option value="${choice}">${choice}</option>`;
+            });
+            strip.appendChild(select);
+            matchRoot.appendChild(strip);
+        });
+
+        function checkMatch() {
+            let score = 0;
+            aMatchData.forEach((data, idx) => {
+                if(document.getElementById(`arcade-match-node-${idx}`).value === data.right) score++;
+            });
+            document.getElementById('match-score').innerText = `Matrix Result: Aligned Nodes = ${score} / ${aMatchData.length}`;
+        }
+
+        // Style 3: Drag & Drop Rendering
+        const tokenPool = document.getElementById('token-pool');
+        aDragData.sort(() => Math.random() - 0.5).forEach((data, idx) => {
+            let chip = document.createElement('div');
+            chip.className = 'chip-token';
+            chip.id = `asset-chip-${idx}`;
+            chip.draggable = true;
+            chip.innerText = data.name;
+            chip.setAttribute('data-dynasty', data.group);
+            chip.ondragstart = (e) => { e.dataTransfer.setData("text/plain", e.target.id); };
+            tokenPool.appendChild(chip);
+        });
+
+        document.querySelectorAll('.receiver-target').forEach(receiver => {
+            receiver.ondragover = (e) => e.preventDefault();
+            receiver.ondrop = (e) => {
+                e.preventDefault();
+                let tokenId = e.dataTransfer.getData("text/plain");
+                let tokenElement = document.getElementById(tokenId);
+                if(e.target.classList.contains('receiver-target')) {
+                    e.target.appendChild(tokenElement);
+                }
+            };
+        });
+
+        function checkDragTokens() {
+            let score = 0;
+            document.querySelectorAll('.receiver-target').forEach(receiver => {
+                let currentDynasty = receiver.getAttribute('data-dynasty');
+                receiver.querySelectorAll('.chip-token').forEach(c => {
+                    if(c.getAttribute('data-dynasty') === currentDynasty) score++;
+                });
+            });
+            document.getElementById('drag-score').innerText = `Asset Sorter Processing: Authenticated items = ${score} / ${aDragData.length}`;
+        }
+
+        // Style 4: Timeline Rail Rendering
+        const chronoRail = document.getElementById('chrono-rail');
+        let scrambledRail = [...aTrackData].sort(() => Math.random() - 0.5);
+        scrambledRail.forEach((text, idx) => {
+            let li = document.createElement('li');
+            li.className = 'node-rail';
+            li.draggable = true;
+            li.innerText = text;
+            li.id = `rail-item-${idx}`;
+            
+            li.ondragstart = (e) => {
+                e.dataTransfer.setData("text/plain", e.target.id);
+                setTimeout(() => li.style.opacity = '0.3', 0);
+            };
+            li.ondragend = () => li.style.opacity = '1';
+            chronoRail.appendChild(li);
+        });
+
+        chronoRail.ondragover = (e) => {
+            e.preventDefault();
+            const draggingNode = document.querySelector('.node-rail[style*="opacity: 0.3"]');
+            if(!draggingNode) return;
+            const parallelNodes = [...chronoRail.querySelectorAll('.node-rail:not([style*="opacity: 0.3"])')];
+            let exactSpot = parallelNodes.find(node => {
+                return e.clientY <= node.getBoundingClientRect().top + node.offsetHeight / 2;
+            });
+            chronoRail.insertBefore(draggingNode, exactSpot);
+        };
+
+        function checkRailOrder() {
+            let userTrackArray = [...chronoRail.querySelectorAll('.node-rail')].map(li => li.innerText);
+            let score = 0;
+            userTrackArray.forEach((val, idx) => {
+                if(aTrackData[idx] === val) score++;
+            });
+            document.getElementById('rail-score').innerText = `Rail Array Audit: Synchronized Indexes = ${score} / ${aTrackData.length}`;
+        }
+
+        // Style 5: Paragraph Selector Rendering
+        const universeContainer = document.getElementById('universe-text-container');
+        universeContainer.innerHTML = `
+            The ancient history of India was profoundly transformed by the Mauryas, who built their capital at 
+            <select class="menu-universe" id="uni-drop-0"><option value="">?</option><option value="Pataliputra">Pataliputra</option><option value="Kashmir">Kashmir</option></select>. 
+            Following the violent destruction of the 
+            <select class="menu-universe" id="uni-drop-1"><option value="">?</option><option value="Kalinga Battle">Kalinga Battle</option><option value="Saka conflict">Saka conflict</option></select>, 
+            Samrat Ashoka renounced warfare and carved his moral values using the unique 
+            <select class="menu-universe" id="uni-drop-2"><option value="">?</option><option value="Brahmi Script">Brahmi Script</option><option value="Greek Code">Greek Code</option></select>. 
+            Centuries later, the north-western horizon was consolidated by King 
+            <select class="menu-universe" id="uni-drop-3"><option value="">?</option><option value="Kanishka">Kanishka</option><option value="Chandragupta">Chandragupta</option></select>, 
+            who pioneered the world-renowned 
+            <select class="menu-universe" id="uni-drop-4"><option value="">?</option><option value="Gandhara Art">Gandhara Art</option><option value="Mathura style">Mathura style</option></select> 
+            sculpting fusion, proving the rich cultural multi-dimensionality of early Indian empires.
+        `;
+
+        const universeSolutions = ["Pataliputra", "Kalinga Battle", "Brahmi Script", "Kanishka", "Gandhara Art"];
+        function checkUniverseMenus() {
+            let tally = 0;
+            universeSolutions.forEach((sol, idx) => {
+                if(document.getElementById(`uni-drop-${idx}`).value === sol) tally++;
+            });
+            document.getElementById('universe-score').innerText = `Script Engine Matrix: Integrity Checked = ${tally} / ${universeSolutions.length}`;
+        }
+
+        // Style 6: Vault Rendering
+        const vaultRoot = document.getElementById('vault-root');
+        aVaultData.forEach((node, idx) => {
+            vaultRoot.innerHTML += `
+                <div class="card-vault">
+                    <p><strong>Codex Node ${idx+1} [4 Marks Standard Parameters]:</strong> ${node.q}</p>
+                    <button class="btn-lever" onclick="toggleVaultStream(${idx})">Decrypt Data Entry</button>
+                    <div class="stream-secure" id="stream-secure-${idx}">${node.a}</div>
+                </div>`;
+        });
+
+        function toggleVaultStream(idx) {
+            let target = document.getElementById(`stream-secure-${idx}`);
+            target.style.display = (target.style.display === 'block') ? 'none' : 'block';
+        }
+    </script>
+</body>
+</html>

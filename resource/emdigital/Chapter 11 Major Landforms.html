@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geological Research Matrix - Major Landforms</title>
+    <style>
+        :root {
+            --magma-orange: #ff5500;
+            --matrix-lime: #00ff66;
+            --electric-blue: #00d2ff;
+            --holo-pink: #ff00aa;
+            --abyss-black: #030206;
+            --glass-core: rgba(10, 20, 15, 0.9);
+            --magma-glow: rgba(255, 85, 0, 0.25);
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: radial-gradient(circle at center, #1b0a05 0%, var(--abyss-black) 100%);
+            color: #f1f5f9;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            border: 2px solid var(--magma-orange);
+            padding: 15px 30px;
+            background: rgba(0,0,0,0.5);
+            box-shadow: 0 0 20px var(--magma-orange);
+        }
+
+        h1 {
+            font-size: 2.6rem;
+            margin: 0;
+            background: linear-gradient(90deg, var(--matrix-lime), var(--electric-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .geo-tag {
+            background: var(--magma-orange);
+            color: #000000;
+            padding: 4px 15px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            display: inline-block;
+            margin-top: 8px;
+            box-shadow: 0 0 10px var(--magma-orange);
+            text-transform: uppercase;
+        }
+
+        /* Eco-Grid Layout Menu Selector */
+        .grid-dock {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 10px;
+            width: 100%;
+            max-width: 1050px;
+            margin-bottom: 35px;
+        }
+
+        .grid-node {
+            background: #0d0402;
+            border: 1px solid var(--magma-glow);
+            color: #94a3b8;
+            padding: 14px;
+            font-weight: bold;
+            font-size: 0.8rem;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .grid-node:hover, .grid-node.active {
+            color: #ffffff;
+            background: var(--magma-orange);
+            border-color: var(--matrix-lime);
+            box-shadow: 0 0 20px var(--magma-orange);
+            transform: translateY(-2px);
+        }
+
+        /* Display Screen Panels */
+        .deck-screen {
+            width: 100%;
+            max-width: 1050px;
+            background: var(--glass-core);
+            border: 2px solid var(--matrix-lime);
+            box-shadow: 0 0 35px rgba(0, 255, 102, 0.15);
+            border-radius: 12px;
+            padding: 40px;
+            display: none;
+            box-sizing: border-box;
+        }
+
+        .deck-screen.active {
+            display: block;
+            animation: screenIgnite 0.4s ease-out;
+        }
+
+        @keyframes screenIgnite {
+            from { opacity: 0; transform: scale(0.98); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        h2 {
+            color: var(--electric-blue);
+            font-size: 1.5rem;
+            margin-top: 0;
+            text-transform: uppercase;
+            border-bottom: 1px dashed var(--matrix-lime);
+            padding-bottom: 10px;
+            text-shadow: 0 0 10px rgba(0, 210, 255, 0.3);
+        }
+
+        .console-guide {
+            color: #cbd5e1;
+            font-size: 0.95rem;
+            margin-bottom: 25px;
+        }
+
+        /* Style 1: MCQ Interactive Segments */
+        .quiz-card {
+            background: rgba(0,0,0,0.3);
+            padding: 22px;
+            border-radius: 8px;
+            margin-bottom: 18px;
+            border-left: 4px solid var(--electric-blue);
+        }
+        .options-cluster {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            gap: 12px;
+            margin-top: 15px;
+        }
+        .choice-node {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: #cbd5e1;
+            padding: 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s;
+        }
+        .choice-node:hover {
+            background: rgba(0, 210, 255, 0.15);
+            border-color: var(--electric-blue);
+        }
+
+        /* Style 2: Match Dynamic Matrix */
+        .spine-match {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+        .strip-match {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0,0,0,0.25);
+            padding: 12px 20px;
+            border-radius: 6px;
+        }
+        .anchor-node {
+            color: var(--matrix-lime);
+            font-weight: 600;
+            width: 42%;
+        }
+        .selector-box {
+            background: #05020a;
+            color: var(--electric-blue);
+            border: 1px solid var(--electric-blue);
+            padding: 12px;
+            border-radius: 6px;
+            width: 52%;
+        }
+
+        /* Style 3: Drag & Drop Pods */
+        .pool-dock {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            padding: 20px;
+            background: rgba(0,0,0,0.4);
+            border-radius: 8px;
+            margin-bottom: 30px;
+            min-height: 55px;
+            border: 1px dashed rgba(255,255,255,0.1);
+        }
+        .drag-chip {
+            background: #0f121d;
+            border: 1px solid var(--magma-orange);
+            color: #ffffff;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: grab;
+            font-weight: 600;
+        }
+        .hangar-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+        }
+        .box-pod {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--matrix-lime);
+            padding: 20px;
+            text-align: center;
+            border-radius: 8px;
+        }
+        .box-pod h3 { margin: 0 0 15px 0; color: var(--electric-blue); font-size: 1.15rem; }
+        .receiver-target {
+            background: #000000;
+            border: 1px dashed rgba(255,255,255,0.2);
+            min-height: 100px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+        }
+
+        /* Style 4: Timeline Tracking Track */
+        .rail-track {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .rail-node {
+            background: #07040a;
+            border-left: 4px solid var(--holo-pink);
+            padding: 16px 20px;
+            margin-bottom: 12px;
+            border-radius: 0 8px 8px 0;
+            cursor: move;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .rail-node::before {
+            content: "✦";
+            color: var(--holo-pink);
+            font-weight: bold;
+        }
+
+        /* Style 5: Paragraph Selector */
+        .universe-text {
+            font-size: 1.25rem;
+            line-height: 2.4;
+            background: #000000;
+            padding: 30px;
+            border-radius: 8px;
+        }
+        .menu-universe {
+            background: #07040a;
+            color: var(--matrix-lime);
+            border: 1px solid rgba(0, 255, 102, 0.4);
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-weight: bold;
+        }
+
+        /* Style 6: One-Sentence Lab Component */
+        .lab-card {
+            background: rgba(255,255,255,0.01);
+            border: 1px solid rgba(255,255,255,0.05);
+            padding: 22px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        .lab-input {
+            width: 100%;
+            background: #05020a;
+            border: 1px solid var(--electric-blue);
+            color: var(--matrix-lime);
+            padding: 14px;
+            font-size: 1rem;
+            box-sizing: border-box;
+            border-radius: 6px;
+            margin-top: 10px;
+        }
+        .btn-reveal {
+            background: var(--electric-blue);
+            color: #000000;
+            border: none;
+            padding: 8px 16px;
+            cursor: pointer;
+            margin-top: 12px;
+            font-weight: bold;
+            border-radius: 4px;
+        }
+        .reveal-box {
+            display: none;
+            margin-top: 12px;
+            padding: 14px;
+            background: rgba(0, 255, 102, 0.08);
+            border-left: 4px solid var(--matrix-lime);
+            color: #cbd5e1;
+            line-height: 1.5;
+        }
+
+        /* Style 7: 4-Mark Desk */
+        .card-vault {
+            background: rgba(255,255,255,0.01);
+            border: 1px solid rgba(255,255,255,0.04);
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+        }
+        .btn-lever {
+            background: linear-gradient(90deg, #120514, #220b24);
+            border: 1px solid var(--holo-pink);
+            color: var(--holo-pink);
+            padding: 10px 22px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .stream-secure {
+            display: none;
+            margin-top: 18px;
+            padding: 20px;
+            background: rgba(255, 85, 0, 0.06);
+            border-left: 4px solid var(--magma-orange);
+            border-radius: 8px;
+            line-height: 1.7;
+            color: #cbd5e1;
+        }
+
+        /* Global Control System Buttons */
+        .btn-ignition {
+            background: linear-gradient(90deg, var(--matrix-lime), var(--electric-blue));
+            color: #030206;
+            border: none;
+            padding: 14px 36px;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 30px;
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .btn-ignition:hover {
+            box-shadow: 0 0 25px var(--matrix-lime);
+        }
+        .score-board {
+            margin-top: 25px;
+            font-weight: bold;
+            font-size: 1.3rem;
+            color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Geological Matrix Console</h1>
+        <div class="geo-tag">Chapter 11: Major Landforms</div>
+    </header>
+
+    <div class="grid-dock">
+        <button class="grid-node active" onclick="showScreen(1)">1. Relief Quiz</button>
+        <button class="grid-node" onclick="showScreen(2)">2. Codex Bind</button>
+        <button class="grid-node" onclick="showScreen(3)">3. Form Sorter</button>
+        <button class="grid-node" onclick="showScreen(4)">4. Alti-Track</button>
+        <button class="grid-node" onclick="showScreen(5)">5. Vector Stream</button>
+        <button class="grid-node" onclick="showScreen(6)">6. 1-Sentence Lab</button>
+        <button class="grid-node" onclick="showScreen(7)">7. Expert Vault</button>
+    </div>
+
+    <!-- PANEL 1: MCQ -->
+    <div id="screen1" class="deck-screen active">
+        <h2>Activity 1: Geological Objective Core Mission</h2>
+        <div class="console-guide">Execute mathematically and historically absolute choices based on terrain data layers.</div>
+        <div id="mcq-root"></div>
+        <button class="btn-ignition" onclick="evalQuiz()">Audit Tally Matrix</button>
+        <div id="mcq-score" class="score-board"></div>
+    </div>
+
+    <!-- PANEL 2: MATCH THE FOLLOWING -->
+    <div id="screen2" class="deck-screen">
+        <h2>Activity 2: Global Mountain System Matrix</h2>
+        <div class="console-guide">Bind prominent mountain ranges across continents to their accurate geological identities.</div>
+        <div id="match-root" class="spine-match"></div>
+        <button class="btn-ignition" onclick="evalMatch()">Verify System Map</button>
+        <div id="match-score" class="score-board"></div>
+    </div>
+
+    <!-- PANEL 3: DRAG AND DROP -->
+    <div id="screen3" class="deck-screen">
+        <h2>Activity 3: Structural Terrain Asset Classifier</h2>
+        <div class="guide-memo">Drag the specific topographical assets and drop them into their exact baseline landform pod categories.</div>
+        <div class="pool-dock" id="token-pool"></div>
+        <div class="hangar-grid">
+            <div class="box-pod">
+                <h3>Mountain Structures</h3>
+                <div class="receiver-target" data-form="Mountain"></div>
+            </div>
+            <div class="box-pod">
+                <h3>Plateau Formations</h3>
+                <div class="receiver-target" data-form="Plateau"></div>
+            </div>
+            <div class="box-pod">
+                <h3>Plain Lowlands</h3>
+                <div class="receiver-target" data-form="Plain"></div>
+            </div>
+        </div>
+        <button class="btn-ignition" onclick="evalDragTokens()">Compute Topo Sorter Matrix</button>
+        <div id="drag-score" class="score-board"></div>
+    </div>
+
+    <!-- PANEL 4: REARRANGE DATA ARRAY -->
+    <div id="screen4" class="deck-screen">
+        <h2>Activity 4: Absolute Relief Elevation Track</h2>
+        <div class="console-guide">Reorder the Earth's primary structural landforms sequentially from the lowest altitude baseline to the highest peak.</div>
+        <ul class="rail-track" id="chronology-rail"></ul>
+        <button class="btn-ignition" onclick="evalRailOrder()">Validate Alti-Track</button>
+        <div id="rail-score" class="score-board"></div>
+    </div>
+
+    <!-- PANEL 5: INLINE DROP DOWN -->
+    <div id="screen5" class="deck-screen">
+        <h2>Activity 5: Desert & Island Matrix Solver</h2>
+        <div class="console-guide">Deploy correct parameter nodes from drop-downs to restore the validation text block.</div>
+        <div class="universe-text" id="universe-text-container"></div>
+        <button class="btn-ignition" onclick="evalUniverseMenus()">Execute Stream Audit</button>
+        <div id="universe-score" class="score-board"></div>
+    </div>
+
+    <!-- PANEL 6: ONE-SENTENCE Q&A LAB -->
+    <div id="screen6" class="deck-screen">
+        <h2>Activity 6: Interactive One-Sentence Terrain Lab</h2>
+        <div class="console-guide">Submit your answer vector in the console input field and toggle to audit with the legal key.</div>
+        <div id="one-sentence-root"></div>
+    </div>
+
+    <!-- PANEL 7: 4 MARK DESCRIPTIVE CORNER -->
+    <div id="screen7" class="deck-screen">
+        <h2>Activity 7: High-Level Analytical Codex [4-Mark Parameters]</h2>
+        <div class="console-guide">Decrypt verified structural solutions taken directly from textbook records.</div>
+        <div id="vault-root"></div>
+    </div>
+
+    <script>
+        // Chapter 11 Verified Textbook Content Arrays
+        const mQuizData = [
+            { q: "What are the varied dynamic configurations and relief surfaces of the Earth's layer called?", o: ["Continents", "Landforms", "Oases", "Islands"], a: 1 },
+            { q: "What is the elevated topmost highest point of a massive mountain system called?", o: ["Tableland", "Peak", "Valley", "Hangar"], a: 1 },
+            { q: "Which mountain variety is structurally formed due to the folding of rock layers via internal forces?", o: ["Fold Mountains", "Block Mountains", "Volcanic Mountains", "Erosional Plains"], a: 0 },
+            { q: "Which high-elevation landform is globally recognized as the 'Roof of the World'?", o: ["Deccan Plateau", "Plateau of Tibet", "Bolivian Plateau", "Indo-Gangetic Plain"], a: 1 },
+            { q: "Which structural landforms are mostly formed due to the deposition of silt and mud carried by river channels?", o: ["Plateaus", "Plains", "Fold Mountains", "Deserts"], a: 1 },
+            { q: "What specific name is given to places in dry deserts where underground spring water comes out to the surface?", o: ["Islet", "Oasis", "Eyot", "Lagoon"], a: 1 },
+            { q: "What name is given to an island variety created entirely by the structural accumulation of coral polyps?", o: ["Continental Island", "Coral Island", "Volcanic Island", "Riverine Island"], a: 1 }
+        ];
+
+        const mMatchData = [
+            { left: "The Himalayas", right: "Young Fold Mountain System of Asia", pool: ["Young Fold Mountain System of Asia", "Fold Mountain range situated in Europe", "Massive mountain range of South America", "Mountain track of North America", "Old eroded mountain track of India", "Largest hot desert system in the world"] },
+            { left: "The Alps", right: "Fold Mountain range situated in Europe", pool: ["Young Fold Mountain System of Asia", "Fold Mountain range situated in Europe", "Massive mountain range of South America", "Mountain track of North America", "Old eroded mountain track of India", "Largest hot desert system in the world"] },
+            { left: "The Andes", right: "Massive mountain range of South America", pool: ["Young Fold Mountain System of Asia", "Fold Mountain range situated in Europe", "Massive mountain range of South America", "Mountain track of North America", "Old eroded mountain track of India", "Largest hot desert system in the world"] },
+            { left: "The Aravalli", right: "Old eroded mountain track of India", pool: ["Young Fold Mountain System of Asia", "Fold Mountain range situated in Europe", "Massive mountain range of South America", "Mountain track of North America", "Old eroded mountain track of India", "Largest hot desert system in the world"] },
+            { left: "Sahara Desert", right: "Largest hot desert system in the world", pool: ["Young Fold Mountain System of Asia", "Fold Mountain range situated in Europe", "Massive mountain range of South America", "Mountain track of North America", "Old eroded mountain track of India", "Largest hot desert system in the world"] },
+            { left: "Lakshadweep", right: "Prominent Coral Island system of India", pool: ["Prominent Coral Island system of India", "Young Fold Mountain System of Asia", "Fold Mountain range situated in Europe"] },
+            { left: "Sierra Nevada", right: "Example of a classic Block Mountain structure", pool: ["Example of a classic Block Mountain structure", "Young Fold Mountain System of Asia"] }
+        ];
+
+        const mDragData = [
+            { name: "Mt. Fujiyama (Japan)", cat: "Mountain" },
+            { name: "Mt. Kilimanjaro", cat: "Mountain" },
+            { name: "Deccan Tableland", cat: "Plateau" },
+            { name: "Patagonian Plateau", cat: "Plateau" },
+            { name: "Indo-Gangetic Basin", cat: "Plain" },
+            { name: "Western Siberia Tract", cat: "Plain" }
+        ];
+
+        const mTrackData = [
+            "Ocean Floor / Sea Level baseline",
+            "Depositional River Plain lowlands",
+            "Elevated Flat-Topped Plateaus (Tablelands)",
+            "Mighty Mountain Ranges peaking above 1000m"
+        ];
+
+        // One-Sentence Q&A Content Array
+        const mOneSentenceData = [
+            { q: "What are Landforms?", a: "The different types of elevated, flat, or low configurations on the Earth's surface are known as landforms." },
+            { q: "Name the three major primary types of landforms.", a: "The three major primary types of landforms are Mountains, Plateaus, and Plains." },
+            { q: "What is a Mountain Range?", a: "A continuous linear line of multiple mountains, with or without high peaks, is known as a mountain range." },
+            { q: "What is an Oasis?", a: "An oasis is a fertile spot in a dry desert where underground water reaches the surface through natural springs, supporting plant life." },
+            { q: "What is a Archipelago?", a: "Geographically, a clustered group or chain of multiple adjacent islands is officially called an archipelago." },
+            { q: "What are Natural Regions?", a: "Massive geographical areas having similar natural features like climate, relief, soil, and vegetation are called natural regions." }
+        ];
+
+        const mVaultData = [
+            { q: "Detail the three structural types of Mountains on Earth based on their distinct modes of formation.", a: "According to geographical classification, mountains are divided into three types: 1. Fold Mountains, which are formed when internal forces compress and fold layered rock matrices (e.g., Himalayas and Alps); 2. Block Mountains, which are created when extensive crustal blocks break and get uplifted due to internal forces (e.g., Sierra Nevada); and 3. Volcanic Mountains, formed by the progressive accumulation and solidification of molten volcanic materials erupted from the Earth (e.g., Mt. Fujiyama)." },
+            { q: "Examine the concept of Plateaus and discuss four major economic advantages they provide to civilizations.", a: "Plateaus are elevated, flat-topped lands with steep sides, widely known as tablelands. Four major economic advantages are: 1. They act as rich stores of mineral wealth; 2. Their steep waterfalls are excellent for generating hydro-electricity; 3. Volcanic plateaus provide fertile soil suitable for systematic farming; 4. Grasslands on plateaus are highly useful for animal rearing." },
+            { q: "Analyze the formation of Depositional Plains and explain their profound role in human history.", a: "Depositional plains are extensive lowlands formed over thousands of years when river channels deposit sediments like silt, mud, and sand along valleys and deltas (e.g., the Indo-Gangetic Plain). Historically, because they offer level land, highly fertile soil, and abundant water, they have served as the cradles of ancient civilizations and continue to support dense human populations, cities, and transport links." },
+            { q: "Discuss the climate parameters of Deserts and outline their mineral and economic significance.", a: "Deserts are extensive dry lands that cover one-fifth of the Earth's surface, defined by extremely low rainfall and temperature extremes (very hot days and cold nights). Economically, while desert soil is generally poor for regular crops, many desert tracks contain massive reserves of valuable minerals. A prime example is the extensive petroleum and oil deposits discovered across Kuwait and Saudi Arabia." },
+            { q: "Explain the basic differences between Continental Islands and Oceanic Islands based on textbook entries.", a: "The core difference lies in their origin: Continental Islands were originally part of a mainland continent but became isolated due to geological shifts or rising sea levels (e.g., Greenland). On the other hand, Oceanic Islands arise independently inside deep ocean basins, primarily through volcanic eruptions or the biological build-up of coral polyps (e.g., Sumatra or Lakshadweep)." }
+        ];
+
+        // Panel Navigator
+        function showScreen(num) {
+            document.querySelectorAll('.deck-screen').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.grid-node').forEach(b => b.classList.remove('active'));
+            document.getElementById('screen' + num).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // Module 1 MCQ Builder
+        const mcqRoot = document.getElementById('mcq-root');
+        mQuizData.forEach((node, qIdx) => {
+            let card = document.createElement('div');
+            card.className = 'quiz-card';
+            card.innerHTML = `<p><strong>Terrain Question Node ${qIdx+1}:</strong> ${node.q}</p>`;
+            let container = document.createElement('div');
+            container.className = 'options-cluster';
+            node.o.forEach((opt, oIdx) => {
+                container.innerHTML += `<button class="choice-node" data-q="${qIdx}" data-o="${oIdx}" onclick="logQuizChoice(this)">${opt}</button>`;
+            });
+            card.appendChild(container);
+            mcqRoot.appendChild(card);
+        });
+
+        let quizUserSelections = {};
+        function logQuizChoice(btn) {
+            let q = btn.getAttribute('data-q');
+            let o = parseInt(btn.getAttribute('data-o'));
+            quizUserSelections[q] = o;
+            btn.parentElement.querySelectorAll('.choice-node').forEach(b => b.style.background = 'rgba(255,255,255,0.04)');
+            btn.style.background = 'rgba(0, 210, 255, 0.2)';
+            btn.style.borderColor = 'var(--electric-blue)';
+        }
+
+        function evalQuiz() {
+            let score = 0;
+            mQuizData.forEach((data, idx) => {
+                if(quizUserSelections[idx] === data.a) score++;
+            });
+            document.getElementById('mcq-score').innerText = `Console Validation Tally: Verified Nodes = ${score} / ${mQuizData.length}`;
+        }
+
+        // Module 2 Match Builder
+        const matchRoot = document.getElementById('match-root');
+        mMatchData.forEach((node, idx) => {
+            let strip = document.createElement('div');
+            strip.className = 'strip-match';
+            strip.innerHTML = `<div class="anchor-node">${node.left}</div>`;
+            let select = document.createElement('select');
+            select.className = 'selector-box';
+            select.id = `matrix-match-node-${idx}`;
+            select.innerHTML = '<option value="">-- Bind Range Identity --</option>';
+            
+            let scrambledChoices = [...new Set(mMatchData.map(m => m.right))].sort(() => Math.random() - 0.5);
+            scrambledChoices.forEach(choice => {
+                select.innerHTML += `<option value="${choice}">${choice}</option>`;
+            });
+            strip.appendChild(select);
+            matchRoot.appendChild(strip);
+        });
+
+        function evalMatch() {
+            let score = 0;
+            mMatchData.forEach((data, idx) => {
+                if(document.getElementById(`matrix-match-node-${idx}`).value === data.right) score++;
+            });
+            document.getElementById('match-score').innerText = `Orogeny System Readout: Aligned Ranges = ${score} / ${mMatchData.length}`;
+        }
+
+        // Module 3 Drag & Drop Builder
+        const tokenPool = document.getElementById('token-pool');
+        mDragData.sort(() => Math.random() - 0.5).forEach((data, idx) => {
+            let chip = document.createElement('div');
+            chip.className = 'drag-chip';
+            chip.id = `topo-chip-${idx}`;
+            chip.draggable = true;
+            chip.innerText = data.name;
+            chip.setAttribute('data-form', data.cat);
+            chip.ondragstart = (e) => { e.dataTransfer.setData("text/plain", e.target.id); };
+            tokenPool.appendChild(chip);
+        });
+
+        document.querySelectorAll('.receiver-target').forEach(receiver => {
+            receiver.ondragover = (e) => e.preventDefault();
+            receiver.ondrop = (e) => {
+                e.preventDefault();
+                let tokenId = e.dataTransfer.getData("text/plain");
+                let tokenElement = document.getElementById(tokenId);
+                if(e.target.classList.contains('receiver-target')) {
+                    e.target.appendChild(tokenElement);
+                }
+            };
+        });
+
+        function evalDragTokens() {
+            let score = 0;
+            document.querySelectorAll('.receiver-target').forEach(receiver => {
+                let currentFormTarget = receiver.getAttribute('data-form');
+                receiver.querySelectorAll('.drag-chip').forEach(c => {
+                    if(c.getAttribute('data-form') === currentFormTarget) score++;
+                });
+            });
+            document.getElementById('drag-score').innerText = `Quantum Topo Sorter Output: Successfully Classified = ${score} / ${mDragData.length}`;
+        }
+
+        // Module 4 Timeline/Rail Reorder Builder
+        const chronologyRail = document.getElementById('chronology-rail');
+        let scrambledRail = [...mTrackData].sort(() => Math.random() - 0.5);
+        scrambledRail.forEach((text, idx) => {
+            let li = document.createElement('li');
+            li.className = 'rail-node';
+            li.draggable = true;
+            li.innerText = text;
+            li.id = `rail-node-id-${idx}`;
+            
+            li.ondragstart = (e) => {
+                e.dataTransfer.setData("text/plain", e.target.id);
+                setTimeout(() => li.style.opacity = '0.3', 0);
+            };
+            li.ondragend = () => li.style.opacity = '1';
+            chronologyRail.appendChild(li);
+        });
+
+        chronologyRail.ondragover = (e) => {
+            e.preventDefault();
+            const draggingNode = document.querySelector('.rail-node[style*="opacity: 0.3"]');
+            if(!draggingNode) return;
+            const parallelNodes = [...chronologyRail.querySelectorAll('.rail-node:not([style*="opacity: 0.3"])')];
+            let exactSpot = parallelNodes.find(node => {
+                return e.clientY <= node.getBoundingClientRect().top + node.offsetHeight / 2;
+            });
+            chronologyRail.insertBefore(draggingNode, exactSpot);
+        };
+
+        function evalRailOrder() {
+            let userTrackArray = [...chronologyRail.querySelectorAll('.rail-node')].map(li => li.innerText);
+            let score = 0;
+            userTrackArray.forEach((val, idx) => {
+                if(mTrackData[idx] === val) score++;
+            });
+            document.getElementById('rail-score').innerText = `Altitude Index Diagnostic Result: Verified Sequences = ${score} / ${mTrackData.length}`;
+        }
+
+        // Module 5 Paragraph Builder
+        const universeContainer = document.getElementById('universe-text-container');
+        universeContainer.innerHTML = `
+            The Earth's crust contains dynamic ecological variances. In highly arid environments, extensive dry terrains with sparse rainfall are classified as 
+            <select class="menu-universe" id="uni-drop-0"><option value="">?</option><option value="Deserts">Deserts</option><option value="Plains">Plains</option></select>. 
+            The largest single desert grid covering the planet is the famous 
+            <select class="menu-universe" id="uni-drop-1"><option value="">?</option><option value="Sahara Desert">Sahara Desert</option><option value="Thar Desert">Thar Desert</option></select>. 
+            When analyzing detached land masses, a specific layout entirely enclosed by water channels is an 
+            <select class="menu-universe" id="uni-drop-2"><option value="">?</option><option value="Island">Island</option><option value="Oasis">Oasis</option></select>, 
+            and a clustered chain of adjacent islands forms a unique 
+            <select class="menu-universe" id="uni-drop-3"><option value="">?</option><option value="Archipelago">Archipelago</option><option value="Tableland">Tableland</option></select> 
+            formation, demonstrating the amazing spatial matrix of our dynamic planet.
+        `;
+
+        const universeSolutions = ["Deserts", "Sahara Desert", "Island", "Archipelago"];
+        function evalUniverseMenus() {
+            let tally = 0;
+            universeSolutions.forEach((sol, idx) => {
+                if(document.getElementById(`uni-drop-${idx}`).value === sol) tally++;
+            });
+            document.getElementById('universe-score').innerText = `Linguistic Vector Match Tally: Approved Alignments = ${tally} / ${universeSolutions.length}`;
+        }
+
+        // Module 6 One-Sentence Lab Builder
+        const oneSentenceRoot = document.getElementById('one-sentence-root');
+        mOneSentenceData.forEach((node, idx) => {
+            oneSentenceRoot.innerHTML += `
+                <div class="lab-card">
+                    <p><strong>Lab Query ${idx+1}:</strong> ${node.q}</p>
+                    <input type="text" class="lab-input" placeholder="Type your terrain analysis text response here...">
+                    <button class="btn-reveal" onclick="toggleRevealBox(${idx})">Audit Answer Key</button>
+                    <div class="reveal-box" id="reveal-box-${idx}"><strong>Ideal Standard Key:</strong> ${node.a}</div>
+                </div>`;
+        });
+
+        function toggleRevealBox(idx) {
+            let target = document.getElementById(`reveal-box-${idx}`);
+            target.style.display = (target.style.display === 'block') ? 'none' : 'block';
+        }
+
+        // Module 7 Vault Builder
+        const vaultRoot = document.getElementById('vault-root');
+        mVaultData.forEach((node, idx) => {
+            vaultRoot.innerHTML += `
+                <div class="card-vault">
+                    <p><strong>Descriptive Element ${idx+1} [4 Marks Standard Parameters]:</strong> ${node.q}</p>
+                    <button class="btn-lever" onclick="toggleVaultStream(${idx})">Decrypt Data Entry</button>
+                    <div class="stream-secure" id="stream-secure-${idx}">${node.a}</div>
+                </div>`;
+        });
+
+        function toggleVaultStream(idx) {
+            let target = document.getElementById(`stream-secure-${idx}`);
+            target.style.display = (target.style.display === 'block') ? 'none' : 'block';
+        }
+    </script>
+</body>
+</html>

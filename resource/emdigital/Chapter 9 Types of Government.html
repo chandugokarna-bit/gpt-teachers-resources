@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quantum Civics - Types of Government</title>
+    <style>
+        :root {
+            --neon-lava: #ff2a00;
+            --neon-volt: #ffff00;
+            --neon-cyber: #00f2fe;
+            --neon-pulse: #bc00ff;
+            --matrix-dark: #04020a;
+            --glass-core: rgba(18, 10, 36, 0.9);
+            --grid-glow: rgba(0, 242, 254, 0.2);
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: radial-gradient(circle at center, #14052b 0%, var(--matrix-dark) 100%);
+            color: #f8fafc;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 25px;
+            border: 2px solid var(--neon-lava);
+            padding: 10px 25px;
+            background: rgba(0,0,0,0.4);
+            box-shadow: 0 0 15px var(--neon-lava);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin: 0;
+            background: linear-gradient(90deg, var(--neon-volt), var(--neon-lava));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .civics-tag {
+            background: var(--neon-pulse);
+            color: #ffffff;
+            padding: 3px 14px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            display: inline-block;
+            margin-top: 5px;
+            box-shadow: 0 0 10px var(--neon-pulse);
+        }
+
+        /* Neon Grid Layout Menu Selector */
+        .grid-dock {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 10px;
+            width: 100%;
+            max-width: 1000px;
+            margin-bottom: 30px;
+        }
+
+        .grid-node {
+            background: #0d061a;
+            border: 1px solid var(--grid-glow);
+            color: #94a3b8;
+            padding: 12px;
+            font-weight: bold;
+            font-size: 0.8rem;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: all 0.2s ease;
+        }
+
+        .grid-node:hover, .grid-node.active {
+            color: #000000;
+            background: var(--neon-cyber);
+            border-color: var(--neon-volt);
+            box-shadow: 0 0 20px var(--neon-cyber);
+            transform: translateY(-2px);
+        }
+
+        /* Matrix Display Terminal Screens */
+        .matrix-screen {
+            width: 100%;
+            max-width: 1000px;
+            background: var(--glass-core);
+            border: 2px solid var(--neon-cyber);
+            box-shadow: 0 0 30px rgba(0, 242, 254, 0.15);
+            border-radius: 8px;
+            padding: 35px;
+            display: none;
+            box-sizing: border-box;
+        }
+
+        .matrix-screen.active {
+            display: block;
+            animation: paneActivate 0.4s ease-out;
+        }
+
+        @keyframes paneActivate {
+            from { opacity: 0; transform: scale(0.99); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        h2 {
+            color: var(--neon-volt);
+            font-size: 1.5rem;
+            margin-top: 0;
+            text-transform: uppercase;
+            border-bottom: 1px dashed var(--neon-border);
+            padding-bottom: 10px;
+        }
+
+        .guide-memo {
+            color: #cbd5e1;
+            font-size: 0.95rem;
+            margin-bottom: 25px;
+        }
+
+        /* Style 1: MCQ Options System */
+        .mission-card {
+            background: rgba(0,0,0,0.3);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-left: 4px solid var(--neon-pulse);
+        }
+        .cluster-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 12px;
+            margin-top: 15px;
+        }
+        .choice-node {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            color: #e2e8f0;
+            padding: 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s;
+        }
+        .choice-node:hover {
+            background: rgba(188, 0, 255, 0.15);
+            border-color: var(--neon-pulse);
+        }
+
+        /* Style 2: Match Selector Rows */
+        .spine-match {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+        .strip-match {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0,0,0,0.2);
+            padding: 12px 18px;
+            border-radius: 6px;
+        }
+        .anchor-node {
+            color: #ffffff;
+            font-weight: 600;
+            width: 40%;
+        }
+        .selector-box {
+            background: #05020a;
+            color: var(--neon-cyber);
+            border: 1px solid var(--neon-cyber);
+            padding: 10px;
+            border-radius: 6px;
+            width: 55%;
+        }
+
+        /* Style 3: Drag & Drop Zones */
+        .shelf-pool {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            padding: 15px;
+            background: rgba(0,0,0,0.4);
+            margin-bottom: 25px;
+            min-height: 50px;
+            border: 1px dashed rgba(255,255,255,0.1);
+        }
+        .chip-token {
+            background: #0f172a;
+            border: 1px solid var(--neon-pulse);
+            color: #ffffff;
+            padding: 8px 16px;
+            cursor: grab;
+            font-weight: bold;
+        }
+        .hangar-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+        .box-pod {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--neon-cyber);
+            padding: 15px;
+            text-align: center;
+            border-radius: 8px;
+        }
+        .box-pod h3 { margin: 0 0 15px 0; color: var(--neon-volt); font-size: 1.1rem; }
+        .receiver-target {
+            background: #000000;
+            border: 1px dashed rgba(255,255,255,0.2);
+            min-height: 90px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+        }
+
+        /* Style 4: Timeline Sequence Rail */
+        .track-rail {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .node-rail {
+            background: #06030f;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            padding: 15px;
+            margin-bottom: 10px;
+            cursor: move;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .node-rail::before {
+            content: "⚏";
+            color: var(--neon-lava);
+            font-weight: bold;
+        }
+
+        /* Style 5: Paragraph Dropdowns */
+        .universe-text {
+            font-size: 1.2rem;
+            line-height: 2.4;
+            background: #000000;
+            padding: 25px;
+            border-radius: 8px;
+        }
+        .menu-universe {
+            background: #0c0517;
+            color: var(--neon-cyber);
+            border: 1px solid var(--neon-cyber);
+            padding: 4px;
+            font-weight: bold;
+        }
+
+        /* Style 6: NEW! One-Sentence Q&A Module */
+        .one-sentence-card {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.05);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        .one-sentence-card p { margin: 0 0 12px 0; font-size: 1.1rem; color: #ffffff; }
+        .user-input-box {
+            width: 100%;
+            background: #000000;
+            border: 1px solid var(--neon-pulse);
+            color: var(--neon-volt);
+            padding: 12px;
+            font-size: 1rem;
+            box-sizing: border-box;
+            border-radius: 6px;
+        }
+        .show-key-btn {
+            background: var(--neon-pulse);
+            color: #ffffff;
+            border: none;
+            padding: 6px 14px;
+            cursor: pointer;
+            margin-top: 10px;
+            font-weight: bold;
+            font-size: 0.8rem;
+        }
+        .key-reveal-box {
+            display: none;
+            margin-top: 10px;
+            padding: 12px;
+            background: rgba(0, 242, 254, 0.08);
+            border-left: 3px solid var(--neon-cyber);
+            color: #cbd5e1;
+        }
+
+        /* Style 7: 4-Mark Desk */
+        .card-vault {
+            background: rgba(0,0,0,0.2);
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            padding: 20px 0;
+        }
+        .btn-lever {
+            background: linear-gradient(90deg, #1e293b, #334155);
+            border: 1px solid var(--neon-cyber);
+            color: var(--neon-cyber);
+            padding: 8px 16px;
+            cursor: pointer;
+            margin-top: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .stream-secure {
+            display: none;
+            margin-top: 15px;
+            padding: 15px;
+            background: rgba(255, 42, 0, 0.05);
+            border-left: 4px solid var(--neon-lava);
+            line-height: 1.7;
+            color: #cbd5e1;
+        }
+
+        /* Global Control Buttons */
+        .btn-ignition {
+            background: linear-gradient(90deg, var(--neon-cyber), var(--neon-pulse));
+            color: #ffffff;
+            border: none;
+            padding: 12px 30px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 25px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-radius: 4px;
+        }
+        .btn-ignition:hover {
+            box-shadow: 0 0 20px var(--neon-cyber);
+        }
+        .score-board {
+            margin-top: 20px;
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: var(--neon-cyber);
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Quantum Civics Console</h1>
+        <div class="civics-tag">Chapter 9: Types of Government</div>
+    </header>
+
+    <div class="grid-dock">
+        <button class="grid-node active" onclick="switchScreen(1)">1. Core Quiz</button>
+        <button class="grid-node" onclick="switchScreen(2)">2. System Bind</button>
+        <button class="grid-node" onclick="switchScreen(3)">3. Type Sorter</button>
+        <button class="grid-node" onclick="switchScreen(4)">4. Liberty Rail</button>
+        <button class="grid-node" onclick="switchScreen(5)">5. Text Solver</button>
+        <button class="grid-node" onclick="switchScreen(6)">6. 1-Sentence Lab</button>
+        <button class="grid-node" onclick="switchScreen(7)">7. Expert Vault</button>
+    </div>
+
+    <!-- PANEL 1: MCQ -->
+    <div id="screen1" class="matrix-screen active">
+        <h2>Activity 1: Governance Objective Core</h2>
+        <div class="guide-memo">Lock the contextually validated parameters based on standard civic structures.</div>
+        <div id="mcq-root"></div>
+        <button class="btn-ignition" onclick="evalQuiz()">Audit Coin Inputs</button>
+        <div id="mcq-score" class="score-board"></div>
+    </div>
+
+    <!-- PANEL 2: MATCH THE FOLLOWING -->
+    <div id="screen2" class="matrix-screen">
+        <h2>Activity 2: Philosophical Correlation Matrix</h2>
+        <div class="guide-memo">Integrate prominent philosophers and quotes with their systemic definitions.</div>
+        <div id="match-root" class="spine-match"></div>
+        <button class="btn-ignition" onclick="evalMatch()">Verify System Map</button>
+        <div id="match-score" class="score-board"></div>
+    </div>
+
+    <!-- PANEL 3: DRAG AND DROP -->
+    <div id="screen3" class="matrix-screen">
+        <h2>Activity 3: Ideological System Classifier</h2>
+        <div class="guide-memo">Drag the operational characteristics and filter them into Democracy or Dictatorship commands.</div>
+        <div class="shelf-pool" id="token-pool"></div>
+        <div class="hangar-grid">
+            <div class="box-pod">
+                <h3>Democratic System</h3>
+                <div class="receiver-target" data-system="Democracy"></div>
+            </div>
+            <div class="box-pod">
+                <h3>Dictatorial System</h3>
+                <div class="receiver-target" data-system="Dictatorship"></div>
+            </div>
+        </div>
+        <button class="btn-ignition" onclick="evalDragTokens()">Compute Core Map</button>
+        <div id="drag-score" class="score-board"></div>
+    </div>
+
+    <!-- PANEL 4: REARRANGE DATA ARRAY -->
+    <div id="screen4" class="matrix-screen">
+        <h2>Activity 4: Democratic Liberty Tracking Rail</h2>
+        <div class="game-guide">Order the parameters of a democratic election workflow sequentially from start to execution.</div>
+        <ul class="track-rail" id="chrono-rail"></ul>
+        <button class="btn-ignition" onclick="evalRailOrder()">Validate Track Index</button>
+        <div id="rail-score" class="score-board"></div>
+    </div>
+
+    <!-- PANEL 5: INLINE DROP DOWN -->
+    <div id="screen5" class="matrix-screen">
+        <h2>Activity 5: Political Manifestation Fulfiller</h2>
+        <div class="guide-memo">Deploy correct systemic terminology nodes to process text stream validation.</div>
+        <div class="universe-text" id="universe-text-container"></div>
+        <button class="btn-ignition" onclick="evalUniverseMenus()">Execute Stream Audit</button>
+        <div id="universe-score" class="score-board"></div>
+    </div>
+
+    <!-- PANEL 6: ONE-SENTENCE Q&A ROOM -->
+    <div id="screen6" class="matrix-screen">
+        <h2>Activity 6: Interactive One-Sentence Q&A Lab</h2>
+        <div class="guide-memo">Formulate your response in the console field and toggle to audit with the official answer key.</div>
+        <div id="one-sentence-root"></div>
+    </div>
+
+    <!-- PANEL 7: 4 MARK DESCRIPTIVE CORNER -->
+    <div id="screen7" class="matrix-screen">
+        <h2>Activity 7: High-Level Analytical Codex [4-Mark Parameters]</h2>
+        <div class="guide-memo">Decrypt verified structural solutions taken directly from textbook records.</div>
+        <div id="vault-root"></div>
+    </div>
+
+    <script>
+        // Chapter 9 Verified Textbook Content Arrays
+        const cQuizData = [
+            { q: "An organization structured to enforce discipline, social justice, and systemic governance is called what?", o: ["Market", "Government", "Society", "Gotra"], a: 1 },
+            { q: "Which type of government operates via representatives systematically elected by the citizens?", o: ["Democratic Government", "Dictatorship Government", "Communist Government", "Monarchy"], a: 0 },
+            { q: "In which type of government system is the entire sovereign power concentrated inside a single person?", o: ["Democracy", "Dictatorship", "Communism", "Republic"], a: 1 },
+            { q: "Which philosophy completely rejects private property to eliminate the gap between rich and poor?", o: ["Feudalism", "Capitalism", "Communism", "Monarchy"], a: 2 },
+            { q: "Freedom of individual choices to select political representatives functions as the life of which system?", o: ["Dictatorship", "Democracy", "Anarchy", "Oligarchy"], a: 1 },
+            { q: "In which government system are justice, religious, and economic policies decided solely by one person's command?", o: ["Democratic System", "Dictatorial System", "Communist Society", "Vedic Assembly"], a: 1 },
+            { q: "According to Abraham Lincoln's definition, democracy is a government of the people, by the people, and for whom?", o: ["The Monarchy", "The Aristocrats", "The People", "The Dictators"], a: 2 }
+        ];
+
+        const cMatchData = [
+            { left: "Abraham Lincoln", right: "Defined democracy 'for the people, by the people'", pool: ["Defined democracy 'for the people, by the people'", "German philosopher who propounded Communism", "Example country following democratic systems", "Example country ruled under historic dictatorship", "Community-owned system without rich/poor gaps", "Absolute concentration of unrestricted authority"] },
+            { left: "Karl Marx", right: "German philosopher who propounded Communism", pool: ["Defined democracy 'for the people, by the people'", "German philosopher who propounded Communism", "Example country following democratic systems", "Example country ruled under historic dictatorship", "Community-owned system without rich/poor gaps", "Absolute concentration of unrestricted authority"] },
+            { left: "India / America", right: "Example country following democratic systems", pool: ["Defined democracy 'for the people, by the people'", "German philosopher who propounded Communism", "Example country following democratic systems", "Example country ruled under historic dictatorship", "Community-owned system without rich/poor gaps", "Absolute concentration of unrestricted authority"] },
+            { left: "Hitler's Era", right: "Example country ruled under historic dictatorship", pool: ["Defined democracy 'for the people, by the people'", "German philosopher who propounded Communism", "Example country following democratic systems", "Example country ruled under historic dictatorship", "Community-owned system without rich/poor gaps", "Absolute concentration of unrestricted authority"] },
+            { left: "Communism Goal", right: "Community-owned system without rich/poor gaps", pool: ["Defined democracy 'for the people, by the people'", "German philosopher who propounded Communism", "Example country following democratic systems", "Example country ruled under historic dictatorship", "Community-owned system without rich/poor gaps", "Absolute concentration of unrestricted authority"] },
+            { left: "Dictator Command", right: "Absolute concentration of unrestricted authority", pool: ["Absolute concentration of unrestricted authority", "German philosopher who propounded Communism", "Example country following democratic systems"] },
+            { left: "Elected Representatives", right: "The dynamic core mechanism of democratic rule", pool: ["The dynamic core mechanism of democratic rule", "Absolute concentration of unrestricted authority"] }
+        ];
+
+        const cDragData = [
+            { name: "Guarantees Individual Freedom", tag: "Democracy" },
+            { name: "Freedom of Expression Allowed", tag: "Democracy" },
+            { name: "Freedom to Establish Associations", tag: "Democracy" },
+            { name: "Citizens choose representatives", tag: "Democracy" },
+            { name: "Entire power inside one person", tag: "Dictatorship" },
+            { name: "Opposes individual liberty", tag: "Dictatorship" },
+            { name: "Citizens cannot oppose commands", tag: "Dictatorship" },
+            { name: "Absence of public restrictions", tag: "Dictatorship" }
+        ];
+
+        const cTrackData = [
+            "Citizens evaluate candidates and individual freedom options",
+            "Voters exercise conscience choices at local polling stations",
+            "Counting of public tokens and declaration of winning representatives",
+            "Formation of a strong representative government bounded by rules"
+        ];
+
+        // NEW! One-Sentence Q&A Content Array
+        const cOneSentenceData = [
+            { q: "What is a Democratic Government?", a: "A type of government managed through representatives systematically elected by the people is called a democratic government." },
+            { q: "What is a Dictatorship Government?", a: "A system where the entire power of the state is concentrated without restrictions inside one single person or small group is called a dictatorship government." },
+            { q: "What is a Communist Government?", a: "A system which advocates that all sources of production belong to the community, where each person works according to ability and receives according to needs, is called a communist government." },
+            { q: "Who was the primary global proponent and philosopher of the Communist Government system?", a: "The primary proponent and philosopher of the communist system was Karl Marx, a German philosopher." },
+            { q: "Name any two major modern nations that follow the democratic system of government.", a: "India, America, and England are prominent examples of modern nations following a democratic system." },
+            { q: "What is the core life mechanism of a true democracy?", a: "The absolute freedom of choice for citizens to choose their representatives functions as the life of democracy." }
+        ];
+
+        const cVaultData = [
+            { q: "Define the fundamental meaning of government and state its core responsibilities toward citizens.", a: "A systematic administrative framework is completely necessary for a happy, secure, and peaceful life of a country's citizens. This systematic organization of governance is called a system of government. Its core responsibilities include creating and implementing laws for the citizens, maintaining internal peace, managing law and order, and promoting social justice and economic security." },
+            { q: "Analyze Abraham Lincoln's classic definition of democracy and outline its main characteristics.", a: "Abraham Lincoln famously defined democracy as 'a government of the people, by the people, and for the people'. Its main characteristics include: 1. Systemic governance through representatives elected by the citizens; 2. Guarantees individual freedom and liberty; 3. Ensures freedom of expression and open criticism; and 4. Allows citizens to establish professional associations and shape state policies safely." },
+            { q: "Examine the operational mechanics of a Dictatorial Government, highlighting the position of its citizens.", a: "In a dictatorial government system, the entire sovereign power of the state is heavily concentrated without any constitutional restrictions inside a single individual or a small elite group. The dictator rules purely as he pleases, deciding justice, social policies, and economic rules by direct command. Crucially, individual liberty is opposed, and citizens hold absolutely no power to question, criticize, or oppose the dictator's commands." },
+            { q: "Discuss the primary principles of a Communist Government as formulated by the philosopher Karl Marx.", a: "Formulated by Karl Marx, a communist government is built on absolute equality without distinctions between rich and poor. It operates on the principle that all sources of production—land, labor, and capital—belong directly to the community rather than private owners. Private property is strictly banned because it widens social gaps and creates inequality. It builds a culture where everyone works according to ability and receives according to needs." },
+            { q: "Evaluate why the freedom of choice functions as the absolute life support of any democratic framework.", a: "Freedom of choice is the ultimate baseline of democracy because true popular sovereignty cannot exist without it. It allows citizens to safely evaluate political options and vote out incompetent representatives during periodic elections. Without this freedom, power stagnates, transforming the state into a centralized autocracy, making individual choice the core element that keeps democracy pro-human." }
+        ];
+
+        // Navigation Controller
+        function switchScreen(num) {
+            document.querySelectorAll('.matrix-screen').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.grid-node').forEach(b => b.classList.remove('active'));
+            document.getElementById('screen' + num).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // Module 1 MCQ Builder
+        const mcqRoot = document.getElementById('mcq-root');
+        cQuizData.forEach((node, qIdx) => {
+            let block = document.createElement('div');
+            block.className = 'mission-card';
+            block.innerHTML = `<p><strong>Core Question ${qIdx+1}:</strong> ${node.q}</p>`;
+            let container = document.createElement('div');
+            container.className = 'cluster-options';
+            node.o.forEach((opt, oIdx) => {
+                container.innerHTML += `<button class="choice-node" data-q="${qIdx}" data-o="${oIdx}" onclick="logQuizNode(this)">${opt}</button>`;
+            });
+            block.appendChild(container);
+            mcqRoot.appendChild(block);
+        });
+
+        let quizUserSelections = {};
+        function logQuizNode(btn) {
+            let q = btn.getAttribute('data-q');
+            let o = parseInt(btn.getAttribute('data-o'));
+            quizUserSelections[q] = o;
+            btn.parentElement.querySelectorAll('.choice-node').forEach(b => b.style.background = 'rgba(255,255,255,0.03)');
+            btn.style.background = 'rgba(188, 0, 255, 0.2)';
+            btn.style.borderColor = 'var(--neon-pulse)';
+        }
+
+        function evalQuiz() {
+            let tally = 0;
+            cQuizData.forEach((data, idx) => {
+                if(quizUserSelections[idx] === data.a) tally++;
+            });
+            document.getElementById('mcq-score').innerText = `Console Validation Status: Approved Codes = ${tally} / ${cQuizData.length}`;
+        }
+
+        // Module 2 Match Builder
+        const matchRoot = document.getElementById('match-root');
+        cMatchData.forEach((node, idx) => {
+            let strip = document.createElement('div');
+            strip.className = 'strip-match';
+            strip.innerHTML = `<div class="anchor-node">${node.left}</div>`;
+            let select = document.createElement('select');
+            select.className = 'selector-box';
+            select.id = `matrix-match-node-${idx}`;
+            select.innerHTML = '<option value="">-- Bind System Definition --</option>';
+            
+            let scrambledChoices = [...new Set(cMatchData.map(m => m.right))].sort(() => Math.random() - 0.5);
+            scrambledChoices.forEach(choice => {
+                select.innerHTML += `<option value="${choice}">${choice}</option>`;
+            });
+            strip.appendChild(select);
+            matchRoot.appendChild(strip);
+        });
+
+        function evalMatch() {
+            let score = 0;
+            cMatchData.forEach((data, idx) => {
+                if(document.getElementById(`matrix-match-node-${idx}`).value === data.right) score++;
+            });
+            document.getElementById('match-score').innerText = `Matrix Synergy Readout: Linked Elements = ${score} / ${cMatchData.length}`;
+        }
+
+        // Module 3 Drag & Drop Builder
+        const tokenPool = document.getElementById('token-pool');
+        cDragData.sort(() => Math.random() - 0.5).forEach((data, idx) => {
+            let chip = document.createElement('div');
+            chip.className = 'chip-token';
+            chip.id = `civic-chip-${idx}`;
+            chip.draggable = true;
+            chip.innerText = data.name;
+            chip.setAttribute('data-system', data.tag);
+            chip.ondragstart = (e) => { e.dataTransfer.setData("text/plain", e.target.id); };
+            tokenPool.appendChild(chip);
+        });
+
+        document.querySelectorAll('.receiver-target').forEach(receiver => {
+            receiver.ondragover = (e) => e.preventDefault();
+            receiver.ondrop = (e) => {
+                e.preventDefault();
+                let tokenId = e.dataTransfer.getData("text/plain");
+                let tokenElement = document.getElementById(tokenId);
+                if(e.target.classList.contains('receiver-target')) {
+                    e.target.appendChild(tokenElement);
+                }
+            };
+        });
+
+        function evalDragTokens() {
+            let score = 0;
+            document.querySelectorAll('.receiver-target').forEach(receiver => {
+                let currentSystemTarget = receiver.getAttribute('data-system');
+                receiver.querySelectorAll('.chip-token').forEach(c => {
+                    if(c.getAttribute('data-system') === currentSystemTarget) score++;
+                });
+            });
+            document.getElementById('drag-score').innerText = `Quantum Sorter Compute: Successfully Classified = ${score} / ${cDragData.length}`;
+        }
+
+        // Module 4 Timeline/Rail Reorder Builder
+        const chronoRail = document.getElementById('chrono-rail');
+        let scrambledRail = [...cTrackData].sort(() => Math.random() - 0.5);
+        scrambledRail.forEach((text, idx) => {
+            let li = document.createElement('li');
+            li.className = 'node-rail';
+            li.draggable = true;
+            li.innerText = text;
+            li.id = `rail-node-id-${idx}`;
+            
+            li.ondragstart = (e) => {
+                e.dataTransfer.setData("text/plain", e.target.id);
+                setTimeout(() => li.style.opacity = '0.3', 0);
+            };
+            li.ondragend = () => li.style.opacity = '1';
+            chronoRail.appendChild(li);
+        });
+
+        chronoRail.ondragover = (e) => {
+            e.preventDefault();
+            const draggingNode = document.querySelector('.node-rail[style*="opacity: 0.3"]');
+            if(!draggingNode) return;
+            const parallelNodes = [...chronoRail.querySelectorAll('.node-rail:not([style*="opacity: 0.3"])')];
+            let exactSpot = parallelNodes.find(node => {
+                return e.clientY <= node.getBoundingClientRect().top + node.offsetHeight / 2;
+            });
+            chronoRail.insertBefore(draggingNode, exactSpot);
+        };
+
+        function evalRailOrder() {
+            let userTrackArray = [...chronoRail.querySelectorAll('.node-rail')].map(li => li.innerText);
+            let score = 0;
+            userTrackArray.forEach((val, idx) => {
+                if(cTrackData[idx] === val) score++;
+            });
+            document.getElementById('rail-score').innerText = `Track Realignment Diagnostic: Verified Inclusions = ${score} / ${cTrackData.length}`;
+        }
+
+        // Module 5 Paragraph Builder
+        const universeContainer = document.getElementById('universe-text-container');
+        universeContainer.innerHTML = `
+            To manage state discipline and welfare, citizens establish an administrative system called 
+            <select class="menu-universe" id="uni-drop-0"><option value="">?</option><option value="Government">Government</option><option value="Varna setup">Varna setup</option></select>. 
+            When power is held entirely by representatives elected by the citizens, it functions as a 
+            <select class="menu-universe" id="uni-drop-1"><option value="">?</option><option value="Democracy">Democracy</option><option value="Dictatorship">Dictatorship</option></select>. 
+            Conversely, a system that concentrates absolute state power inside a single leader without public restrictions is classified as a 
+            <select class="menu-universe" id="uni-drop-2"><option value="">?</option><option value="Dictatorial government">Dictatorial government</option><option value="Communist society">Communist society</option></select>. 
+            To solve class conflict, the alternative model of 
+            <select class="menu-universe" id="uni-drop-3"><option value="">?</option><option value="Communism">Communism</option><option value="Monarchy">Monarchy</option></select> 
+            was introduced by the philosopher Karl Marx, aiming to build a pro-human society where private property is entirely removed to ensure equal happiness.
+        `;
+
+        const universeSolutions = ["Government", "Democracy", "Dictatorial government", "Communism"];
+        function evalUniverseMenus() {
+            let tally = 0;
+            universeSolutions.forEach((sol, idx) => {
+                if(document.getElementById(`uni-drop-${idx}`).value === sol) tally++;
+            });
+            document.getElementById('universe-score').innerText = `Linguistic Flow Validation Score: ${tally} / ${universeSolutions.length}`;
+        }
+
+        // NEW! Module 6 One-Sentence Lab Builder
+        const oneSentenceRoot = document.getElementById('one-sentence-root');
+        cOneSentenceData.forEach((node, idx) => {
+            oneSentenceRoot.innerHTML += `
+                <div class="one-sentence-card">
+                    <p><strong>Q${idx+1}:</strong> ${node.q}</p>
+                    <input type="text" class="user-input-box" placeholder="Type your one-sentence answer console input here...">
+                    <button class="show-key-btn" onclick="toggleRevealKey(${idx})">Audit Answer Key</button>
+                    <div class="key-reveal-box" id="key-box-${idx}"><strong>Ideal Standard Key:</strong> ${node.a}</div>
+                </div>`;
+        });
+
+        function toggleRevealKey(idx) {
+            let target = document.getElementById(`key-box-${idx}`);
+            target.style.display = (target.style.display === 'block') ? 'none' : 'block';
+        }
+
+        // Module 7 Vault Builder
+        const vaultRoot = document.getElementById('vault-root');
+        cVaultData.forEach((node, idx) => {
+            vaultRoot.innerHTML += `
+                <div class="card-vault">
+                    <p><strong>Codex Element ${idx+1} [4 Marks Standard Parameters]:</strong> ${node.q}</p>
+                    <button class="btn-lever" onclick="toggleVaultStream(${idx})">Decrypt Data Entry</button>
+                    <div class="stream-secure" id="stream-secure-${idx}">${node.a}</div>
+                </div>`;
+        });
+
+        function toggleVaultStream(idx) {
+            let target = document.getElementById(`stream-secure-${idx}`);
+            target.style.display = (target.style.display === 'block') ? 'none' : 'block';
+        }
+    </script>
+</body>
+</html>

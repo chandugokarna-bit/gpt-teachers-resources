@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quantum Geography Lab - Karnataka State</title>
+    <style>
+        :root {
+            --neon-amber: #ffaa00;
+            --neon-ruby: #ff0055;
+            --neon-emerald: #00ffaa;
+            --neon-electric: #00bcff;
+            --deep-vault: #060913;
+            --card-glass: rgba(13, 20, 38, 0.9);
+            --border-glow: rgba(0, 188, 255, 0.25);
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: radial-gradient(circle at 20% 20%, #0d1527 0%, var(--deep-vault) 80%);
+            color: #f1f5f9;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 2.8rem;
+            margin: 0;
+            background: linear-gradient(135deg, var(--neon-amber), var(--neon-ruby));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            filter: drop-shadow(0 0 15px rgba(255, 170, 0, 0.3));
+        }
+
+        .geo-badge {
+            background: rgba(0, 255, 170, 0.15);
+            border: 1px solid var(--neon-emerald);
+            color: var(--neon-emerald);
+            padding: 6px 18px;
+            border-radius: 30px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            display: inline-block;
+            margin-top: 8px;
+            box-shadow: 0 0 10px rgba(0, 255, 170, 0.2);
+        }
+
+        /* Hexagonal Grid Layout Menu */
+        .menu-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            width: 100%;
+            max-width: 1000px;
+            margin-bottom: 35px;
+        }
+
+        .menu-node {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-glow);
+            color: #94a3b8;
+            padding: 14px 20px;
+            border-radius: 14px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+        }
+
+        .menu-node:hover, .menu-node.active {
+            color: #ffffff;
+            background: rgba(0, 188, 255, 0.1);
+            border-color: var(--neon-electric);
+            box-shadow: 0 0 20px rgba(0, 188, 255, 0.4);
+            transform: translateY(-3px);
+        }
+
+        /* Interactive Dynamic Panel */
+        .workspace {
+            width: 100%;
+            max-width: 1000px;
+            background: var(--card-glass);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 24px;
+            padding: 35px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+            display: none;
+            backdrop-filter: blur(25px);
+        }
+
+        .workspace.active {
+            display: block;
+            animation: paneFade 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes paneFade {
+            from { opacity: 0; transform: scale(0.98) translateY(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        h2 {
+            color: var(--neon-electric);
+            margin-top: 0;
+            font-size: 1.6rem;
+            border-left: 5px solid var(--neon-amber);
+            padding-left: 12px;
+        }
+
+        .sub-instructions {
+            color: #94a3b8;
+            font-size: 0.95rem;
+            margin-bottom: 25px;
+        }
+
+        /* MCQ Spectrum Layout */
+        .quiz-card {
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+        .quiz-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 12px;
+            margin-top: 12px;
+        }
+        .option-node {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: #cbd5e1;
+            padding: 12px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s;
+        }
+        .option-node:hover {
+            background: rgba(255, 0, 85, 0.1);
+            border-color: var(--neon-ruby);
+        }
+
+        /* Match Column Fluid Flow */
+        .match-row-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+        .match-strip {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .left-anchor {
+            background: rgba(255, 255, 255, 0.03);
+            border-right: 4px solid var(--neon-emerald);
+            padding: 12px 18px;
+            border-radius: 8px;
+            width: 42%;
+        }
+        .right-dropdown {
+            background: #0f172a;
+            color: var(--neon-emerald);
+            border: 1px solid rgba(0, 255, 170, 0.4);
+            padding: 12px;
+            border-radius: 8px;
+            width: 48%;
+            font-weight: bold;
+        }
+
+        /* Drag & Drop Sorting Dock */
+        .pool-shelf {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            padding: 18px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            margin-bottom: 25px;
+            min-height: 50px;
+            border: 1px dashed rgba(255,255,255,0.15);
+        }
+        .drag-chip {
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            border: 1px solid rgba(0, 188, 255, 0.3);
+            padding: 8px 18px;
+            border-radius: 30px;
+            cursor: grab;
+            font-weight: 500;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        .dock-hangar {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+        }
+        .bay-container {
+            background: rgba(255,255,255,0.01);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 16px;
+            padding: 15px;
+            text-align: center;
+        }
+        .bay-container h3 { margin: 0 0 12px 0; font-size: 1rem; color: var(--neon-amber); }
+        .target-receiver {
+            background: rgba(0,0,0,0.2);
+            border: 2px dashed rgba(255, 170, 0, 0.3);
+            border-radius: 10px;
+            min-height: 90px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+        }
+
+        /* Timeline Reordering Track */
+        .track-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .track-slot {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            padding: 14px 20px;
+            margin-bottom: 10px;
+            border-radius: 10px;
+            cursor: move;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .track-slot::before {
+            content: "✥";
+            color: var(--neon-electric);
+            font-size: 1.2rem;
+        }
+
+        /* Fill Text Flow */
+        .story-stream {
+            font-size: 1.2rem;
+            line-height: 2.3;
+        }
+        .inline-menu {
+            background: #090d16;
+            color: var(--neon-ruby);
+            border: 1px solid rgba(255, 0, 85, 0.4);
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-weight: bold;
+        }
+
+        /* Descriptive Vault Layout */
+        .vault-tile {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.06);
+            padding: 22px;
+            border-radius: 14px;
+            margin-bottom: 15px;
+        }
+        .reveal-lever {
+            background: linear-gradient(90deg, #1e293b, #334155);
+            border: 1px solid rgba(255, 170, 0, 0.4);
+            color: var(--neon-amber);
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 10px;
+            font-weight: 600;
+        }
+        .secure-data {
+            display: none;
+            margin-top: 15px;
+            padding: 15px;
+            background: rgba(0, 188, 255, 0.08);
+            border-left: 4px solid var(--neon-electric);
+            border-radius: 8px;
+            line-height: 1.6;
+            color: #e2e8f0;
+        }
+
+        /* Interface Ignition Controls */
+        .terminal-btn {
+            background: linear-gradient(135deg, var(--neon-electric), var(--neon-emerald));
+            color: #020617;
+            border: none;
+            padding: 14px 32px;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-top: 25px;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 15px rgba(0, 255, 170, 0.2);
+        }
+        .terminal-btn:hover {
+            box-shadow: 0 0 25px var(--neon-emerald);
+        }
+        .score-panel {
+            margin-top: 20px;
+            font-weight: bold;
+            font-size: 1.25rem;
+            color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Geo-Quantum Virtual Console</h1>
+        <div class="geo-badge">Chapter 3: Our Pride Our State - Karnataka</div>
+    </header>
+
+    <div class="menu-grid">
+        <button class="menu-node active" onclick="activatePane(1)">1. Core Quiz</button>
+        <button class="menu-node" onclick="activatePane(2)">2. Division Binder</button>
+        <button class="menu-node" onclick="activatePane(3)">3. Eco Zone Sorter</button>
+        <button class="menu-node" onclick="activatePane(4)">4. Area Vector Scale</button>
+        <button class="menu-node" onclick="activatePane(5)">5. Data Fulfiller</button>
+        <button class="menu-node" onclick="activatePane(6)">6. Analytical Desk</button>
+    </div>
+
+    <div id="pane1" class="workspace active">
+        <h2>Activity 1: High-Response Objective Hub</h2>
+        <div class="sub-instructions">Isolate and submit the contextually correct parameters from state archives.</div>
+        <div id="quiz-anchor"></div>
+        <button class="terminal-btn" onclick="evalQuiz()">Execute Audit Check</button>
+        <div id="quiz-score-display" class="score-panel"></div>
+    </div>
+
+    <div id="pane2" class="workspace">
+        <h2>Activity 2: Regional Correlation Matrix</h2>
+        <div class="sub-instructions">Integrate historical data points across revenue and cultural nodes.</div>
+        <div id="match-anchor" class="match-row-grid"></div>
+        <button class="terminal-btn" onclick="evalMatch()">Verify System Map</button>
+        <div id="match-score-display" class="score-panel"></div>
+    </div>
+
+    <div id="pane3" class="workspace">
+        <h2>Activity 3: Environmental Resource Classifier</h2>
+        <div class="sub-instructions">Allocate rivers, waterfalls, and mineral ores to their exact structural revenue divisions.</div>
+        <div class="pool-shelf" id="chip-pool"></div>
+        <div class="dock-hangar">
+            <div class="bay-container">
+                <h3>Bengaluru Division</h3>
+                <div class="target-receiver" data-div="Bengaluru"></div>
+            </div>
+            <div class="bay-container">
+                <h3>Mysuru Division</h3>
+                <div class="target-receiver" data-div="Mysuru"></div>
+            </div>
+            <div class="bay-container">
+                <h3>Belagavi Division</h3>
+                <div class="target-receiver" data-div="Belagavi"></div>
+            </div>
+        </div>
+        <button class="terminal-btn" onclick="evalDocks()">Compute Cluster Accuracy</button>
+        <div id="dock-score-display" class="score-panel"></div>
+    </div>
+
+    <div id="pane4" class="workspace">
+        <h2>Activity 4: District Area Density Sorting Track</h2>
+        <div class="sub-instructions">Arrange the designated administrative tiers of Karnataka from the smallest division to the largest based on total district count.</div>
+        <ul class="track-list" id="sorting-track"></ul>
+        <button class="terminal-btn" onclick="evalTrackOrder()">Analyze Structural Sequence</button>
+        <div id="track-score-display" class="score-panel"></div>
+    </div>
+
+    <div id="pane5" class="workspace">
+        <h2>Activity 5: State Synthesis Stream Completion</h2>
+        <div class="sub-instructions">Deploy the specific contextual nomenclature keys to process textual accuracy.</div>
+        <div class="story-stream" id="text-stream-container"></div>
+        <button class="terminal-btn" onclick="evalStreamMenus()">Audit Text Vector</button>
+        <div id="stream-score-display" class="score-panel"></div>
+    </div>
+
+    <div id="pane6" class="workspace">
+        <h2>Activity 6: Expert Analytical Vault [4-Mark Parameters]</h2>
+        <div class="sub-instructions">Evaluate advanced state-level historical, geographical, and industrial developments.</div>
+        <div id="vault-anchor"></div>
+    </div>
+
+    <script>
+        // Chapter 3 Verified Textbook Arrays
+        const coreQuizData = [
+            { q: "How many major administrative Revenue Divisions exist within the State of Karnataka?", o: ["Three Divisions", "Four Divisions", "Five Divisions", "Six Divisions"], a: 1 },
+            { q: "Which specific dynasty acts as the earliest recorded historical rulers of the Bengaluru division region?", o: ["The Kadamba Dynasty", "The Ganga Dynasty", "The Chola Dynasty", "Adil Shahi of Bijapur"], a: 1 },
+            { q: "Where is the world-renowned Jog Falls, engineered by the flow of River Sharavathi, situated?", o: ["Kolar District", "Chitradurga District", "Shivamogga District", "Tumakuru District"], a: 2 },
+            { q: "The first ever recorded coffee plantation in the Indian Subcontinent was initiated in which district?", o: ["Mandya District", "Chikkamagaluru District", "Kodagu District", "Udupi District"], a: 1 },
+            { q: "Which historic location functions as the primary headquarters for the modern Kalaburagi Division?", o: ["Bidar City", "Kalaburagi City", "Hampi City", "Ballari City"], a: 1 },
+            { q: "The historic Halmidi inscription, verified as the earliest recorded specimen of written Kannada, belongs to which division?", o: ["Belagavi Division", "Mysuru Division", "Bengaluru Division", "Kalaburagi Division"], a: 0 },
+            { q: "Who was the legendary builder of the state's industrial sector and chief architect of the Krishna Raja Sagar dam?", o: ["Kengal Hanumanthaiah", "Sir M. Vishveshwaraiah", "S. Nijalingappa", "K. Sheshadri Iyer"], a: 1 }
+        ];
+
+        const coreMatchData = [
+            { left: "Kuvalalapura", right: "Ancient Capital of Ganga Dynasty", pool: ["Ancient Capital of Ganga Dynasty", "Capital of Wodeyar Kings", "Capital city of Rashtrakutas", "Capital of Kadamba Dynasty", "Commercial Centre of Karnataka", "Synonym for environment protection"] },
+            { left: "Mysuru City", right: "Capital of Wodeyar Kings", pool: ["Ancient Capital of Ganga Dynasty", "Capital of Wodeyar Kings", "Capital city of Rashtrakutas", "Capital of Kadamba Dynasty", "Commercial Centre of Karnataka", "Synonym for environment protection"] },
+            { left: "Manyakheta", right: "Capital city of Rashtrakutas", pool: ["Ancient Capital of Ganga Dynasty", "Capital of Wodeyar Kings", "Capital city of Rashtrakutas", "Capital of Kadamba Dynasty", "Commercial Centre of Karnataka", "Synonym for environment protection"] },
+            { left: "Banavasi", right: "Capital of Kadamba Dynasty", pool: ["Ancient Capital of Ganga Dynasty", "Capital of Wodeyar Kings", "Capital city of Rashtrakutas", "Capital of Kadamba Dynasty", "Commercial Centre of Karnataka", "Synonym for environment protection"] },
+            { left: "Hubballi", right: "Commercial Centre of Karnataka", pool: ["Ancient Capital of Ganga Dynasty", "Capital of Wodeyar Kings", "Capital city of Rashtrakutas", "Capital of Kadamba Dynasty", "Commercial Centre of Karnataka", "Synonym for environment protection"] },
+            { left: "Salumarada Thimmakka", right: "Synonym for environment protection", pool: ["Ancient Capital of Ganga Dynasty", "Capital of Wodeyar Kings", "Capital city of Rashtrakutas", "Capital of Kadamba Dynasty", "Commercial Centre of Karnataka", "Synonym for environment protection"] },
+            { left: "Gubbi Veeranna", right: "Eternal name in history of theatre", pool: ["Eternal name in history of theatre", "Capital city of Rashtrakutas", "Capital of Kadamba Dynasty", "Commercial Centre of Karnataka", "Synonym for environment protection"] }
+        ];
+
+        const coreDragData = [
+            { name: "Kolar Gold Mine", slot: "Bengaluru" },
+            { name: "Vanivilas Sagar Dam", slot: "Bengaluru" },
+            { name: "Jogimatti Sanctuary", slot: "Bengaluru" },
+            { name: "Bannur Sheep Breed", slot: "Mysuru" },
+            { name: "Krishnarajasagar Dam", slot: "Mysuru" },
+            { name: "Abbe Waterfalls", slot: "Mysuru" },
+            { name: "Gokak Waterfalls", slot: "Belagavi" },
+            { name: "Anshi National Park", slot: "Belagavi" }
+        ];
+
+        const coreTrackData = [
+            "Belagavi Division (Contains 7 Districts total)",
+            "Kalaburagi Division (Contains 7 Districts total)",
+            "Mysuru Division (Contains 8 Districts total)",
+            "Bengaluru Division (Contains 9 Districts total)"
+        ];
+
+        const coreVaultData = [
+            { q: "Detail the administrative divisions of Karnataka state and state the primary officials responsible for their management.", a: "For the absolute convenience of public administration, the State of Karnataka is divided systematically into four revenue divisions: Bengaluru Division, Mysuru Division, Belagavi Division, and Kalaburagi Division, comprising 31 districts overall. At the district level, the system is headed by a Deputy Commissioner, whereas each entire revenue division is managed and controlled by a Divisional Commissioner." },
+            { q: "Analyze the core differences in climate and water distribution among different districts of the Bengaluru Division.", a: "The Bengaluru division generally experiences a tropical monsoon climate, but water availability varies greatly. Shivamogga district, located in the Malnad region, receives the highest rainfall and contains the world-famous Jog Falls. Conversely, Chitradurga district receives the lowest rainfall in the division. Kolar has a hot climate, while the remaining districts receive moderate rainfall." },
+            { q: "Explain the historical significance of the Vachana Movement of the 12th century and its geographical link to the Kalaburagi Division.", a: "The Vachana Movement was a massive social and religious reform movement led by radical Vachanakaras like Basavanna, Allamaprabhu, and Akkamahadevi. It took place primarily in Basavakalyana, located within the Kalaburagi Division. The movement utilized simple Kannada poetry to attack social evils like untouchability and gender inequality, establishing spiritual and social equality for all human beings." },
+            { q: "Examine the rich musical and literary contributions of the modern Belagavi Division to Kannada culture.", a: "The Belagavi division has uniquely enriched Karnataka's cultural legacy. Dharwad acts as a legendary global node for Hindustani classical music, producing legends like Pandit Bhimsen Joshi and Gangubai Hangal. In literature, the division has produced four Jnanapith Award laureates: Da. Ra. Bendre, V.K. Gokak, Girish Karnad, and Chandrashekara Kambara, who profoundly elevated modern Kannada literature." },
+            { q: "Discuss the expansion of economic and commercial crops in the Mysuru division, highlighting key agricultural nodes.", a: "The varied climate of the Mysuru division allows for highly prosperous commercial farming. Chikkamagaluru stands out as the historic cradle where coffee was first cultivated in India. Mandya is dominated by extensive sugarcane farming supported by the KRS dam network. The coastal districts of Udupi and Dakshina Kannada focus heavily on cashewnut processing, pepper, rubber, and inter-continental marine trade." }
+        ];
+
+        // Core UI Navigation Control
+        function activatePane(num) {
+            document.querySelectorAll('.workspace').forEach(w => w.classList.remove('active'));
+            document.querySelectorAll('.menu-node').forEach(m => m.classList.remove('active'));
+            document.getElementById('pane' + num).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // Module 1 Rendering
+        const quizAnchor = document.getElementById('quiz-anchor');
+        coreQuizData.forEach((node, qIdx) => {
+            let card = document.createElement('div');
+            card.className = 'quiz-card';
+            card.innerHTML = `<p><strong>Q${qIdx+1}:</strong> ${node.q}</p>`;
+            let container = document.createElement('div');
+            container.className = 'quiz-options';
+            node.o.forEach((opt, oIdx) => {
+                container.innerHTML += `<button class="option-node" data-q="${qIdx}" data-o="${oIdx}" onclick="logQuizChoice(this)">${opt}</button>`;
+            });
+            card.appendChild(container);
+            quizAnchor.appendChild(card);
+        });
+
+        let quizUserLog = {};
+        function logQuizChoice(btn) {
+            let q = btn.getAttribute('data-q');
+            let o = parseInt(btn.getAttribute('data-o'));
+            quizUserLog[q] = o;
+            btn.parentElement.querySelectorAll('.option-node').forEach(b => b.style.background = 'rgba(255,255,255,0.04)');
+            btn.style.background = 'rgba(255, 0, 85, 0.2)';
+            btn.style.borderColor = 'var(--neon-ruby)';
+        }
+
+        function evalQuiz() {
+            let tally = 0;
+            coreQuizData.forEach((data, idx) => {
+                if(quizUserLog[idx] === data.a) tally++;
+            });
+            document.getElementById('quiz-score-display').innerText = `System Response: Core Matches Validated = ${tally} / ${coreQuizData.length}`;
+        }
+
+        // Module 2 Rendering
+        const matchAnchor = document.getElementById('match-anchor');
+        coreMatchData.forEach((node, idx) => {
+            let item = document.createElement('div');
+            item.className = 'match-strip';
+            item.innerHTML = `<div class="left-anchor">${node.left}</div>`;
+            let selector = document.createElement('select');
+            selector.className = 'right-dropdown';
+            selector.id = `dropdown-match-node-${idx}`;
+            selector.innerHTML = '<option value="">-- Bind Definition Matrix --</option>';
+            
+            let randomMix = [...new Set(coreMatchData.map(m => m.right))].sort(() => Math.random() - 0.5);
+            randomMix.forEach(def => {
+                selector.innerHTML += `<option value="${def}">${def}</option>`;
+            });
+            item.appendChild(selector);
+            matchAnchor.appendChild(item);
+        });
+
+        function evalMatch() {
+            let points = 0;
+            coreMatchData.forEach((data, idx) => {
+                let selection = document.getElementById(`dropdown-match-node-${idx}`).value;
+                if(selection === data.right) points++;
+            });
+            document.getElementById('match-score-display').innerText = `Matrix Evaluation: Integrated Linkages = ${points} / ${coreMatchData.length}`;
+        }
+
+        // Module 3 Rendering
+        const chipPool = document.getElementById('chip-pool');
+        coreDragData.sort(() => Math.random() - 0.5).forEach((data, idx) => {
+            let chip = document.createElement('div');
+            chip.className = 'drag-chip';
+            chip.id = `eco-chip-${idx}`;
+            chip.draggable = true;
+            chip.innerText = data.name;
+            chip.setAttribute('data-div', data.slot);
+            chip.ondragstart = (e) => { e.dataTransfer.setData("text/plain", e.target.id); };
+            chipPool.appendChild(chip);
+        });
+
+        document.querySelectorAll('.target-receiver').forEach(receiver => {
+            receiver.ondragover = (e) => e.preventDefault();
+            receiver.ondrop = (e) => {
+                e.preventDefault();
+                let draggedId = e.dataTransfer.setData ? "text/plain" : e.dataTransfer.getData("text/plain");
+                let draggedNode = document.getElementById(draggedId);
+                if(e.target.classList.contains('target-receiver')) {
+                    e.target.appendChild(draggedNode);
+                }
+            };
+        });
+
+        function evalDocks() {
+            let netScore = 0;
+            document.querySelectorAll('.target-receiver').forEach(receiver => {
+                let assignedDiv = receiver.getAttribute('data-div');
+                receiver.querySelectorAll('.drag-chip').forEach(c => {
+                    if(c.getAttribute('data-div') === assignedDiv) netScore++;
+                });
+            });
+            document.getElementById('dock-score-display').innerText = `Quantum Sorter Compute: Successfully Mapped = ${netScore} / ${coreDragData.length}`;
+        }
+
+        // Module 4 Rendering
+        const sortingTrack = document.getElementById('sorting-track');
+        let scrambledTrack = [...coreTrackData].sort(() => Math.random() - 0.5);
+        scrambledTrack.forEach((text, idx) => {
+            let li = document.createElement('li');
+            li.className = 'track-slot';
+            li.draggable = true;
+            li.innerText = text;
+            li.id = `track-node-item-${idx}`;
+            
+            li.ondragstart = (e) => {
+                e.dataTransfer.setData("text/plain", e.target.id);
+                setTimeout(() => li.style.opacity = '0.3', 0);
+            };
+            li.ondragend = () => li.style.opacity = '1';
+            sortingTrack.appendChild(li);
+        });
+
+        sortingTrack.ondragover = (e) => {
+            e.preventDefault();
+            const activeNode = document.querySelector('.track-slot[style*="opacity: 0.3"]');
+            if(!activeNode) return;
+            const staticNodes = [...sortingTrack.querySelectorAll('.track-slot:not([style*="opacity: 0.3"])')];
+            let exactPlacement = staticNodes.find(node => {
+                return e.clientY <= node.getBoundingClientRect().top + node.offsetHeight / 2;
+            });
+            sortingTrack.insertBefore(activeNode, exactPlacement);
+        };
+
+        function evalTrackOrder() {
+            let userOrder = [...sortingTrack.querySelectorAll('.track-slot')].map(li => li.innerText);
+            let matches = 0;
+            userOrder.forEach((val, idx) => {
+                if(coreTrackData[idx] === val) matches++;
+            });
+            document.getElementById('track-score-display').innerText = `Sorting Operational Check: Correct Indexes = ${matches} / ${coreTrackData.length}`;
+        }
+
+        // Module 5 Rendering
+        const streamContainer = document.getElementById('text-stream-container');
+        streamContainer.innerHTML = `
+            Our spectacular homeland is Karnataka, and our proud linguistic expression is 
+            <select class="inline-menu" id="menu-node-0"><option value="">?</option><option value="Kannada">Kannada</option><option value="Prakrit">Prakrit</option></select>. 
+            For supreme management convenience, the state is mapped into 
+            <select class="inline-menu" id="menu-node-1"><option value="">?</option><option value="4 Revenue Divisions">4 Revenue Divisions</option><option value="6 Districts">6 Districts</option></select>. 
+            The chief architect of our monumental Vidhana Soudha was 
+            <select class="inline-menu" id="menu-node-2"><option value="">?</option><option value="Kengal Hanumanthaiah">Kengal Hanumanthaiah</option><option value="Sir M. Vishveshwaraiah">Sir M. Vishveshwaraiah</option></select>, 
+            while the modern literary world was enriched by Rashtrakavi 
+            <select class="inline-menu" id="menu-node-3"><option value="">?</option><option value="Kuvempu">Kuvempu</option><option value="Pampa">Pampa</option></select>. 
+            Geographically, the prominent 
+            <select class="inline-menu" id="menu-node-4"><option value="">?</option><option value="Kolar Gold Mine">Kolar Gold Mine</option><option value="Hatti Mine">Hatti Mine</option></select> 
+            gained global fame within the Bengaluru division, proving that our cultural and economic landscape remains an eternal matrix of human achievement.
+        `;
+
+        const streamSolutions = ["Kannada", "4 Revenue Divisions", "Kengal Hanumanthaiah", "Kuvempu", "Kolar Gold Mine"];
+        function evalStreamMenus() {
+            let finalTally = 0;
+            streamSolutions.forEach((sol, idx) => {
+                if(document.getElementById(`menu-node-${idx}`).value === sol) finalTally++;
+            });
+            document.getElementById('stream-score-display').innerText = `Linguistic Vector Evaluation: Verified Integrity = ${finalTally} / ${streamSolutions.length}`;
+        }
+
+        // Module 6 Rendering
+        const vaultAnchor = document.getElementById('vault-anchor');
+        coreVaultData.forEach((node, idx) => {
+            vaultAnchor.innerHTML += `
+                <div class="vault-tile">
+                    <p><strong>Q${idx+1} [4-Mark Standard]:</strong> ${node.q}</p>
+                    <button class="reveal-lever" onclick="toggleSecureVault(${idx})">De-crypt Ideal Solution Key</button>
+                    <div class="secure-data" id="secure-vault-${idx}">${node.a}</div>
+                </div>`;
+        });
+
+        function toggleSecureVault(idx) {
+            let target = document.getElementById(`secure-vault-${idx}`);
+            target.style.display = (target.style.display === 'block') ? 'none' : 'block';
+        }
+    </script>
+</body>
+</html>

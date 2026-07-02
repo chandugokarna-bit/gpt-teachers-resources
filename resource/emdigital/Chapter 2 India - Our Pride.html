@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ultra-Modern History Lab: India Our Pride</title>
+    <style>
+        :root {
+            --neon-pink: #ff007f;
+            --neon-cyan: #00f2fe;
+            --neon-green: #00ff88;
+            --neon-purple: #7f00ff;
+            --dark-space: #080c14;
+            --card-glass: rgba(15, 23, 42, 0.85);
+            --text-glow: #e2e8f0;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, Helvetica, sans-serif;
+            background: radial-gradient(circle at 50% 50%, #1a103c 0%, var(--dark-space) 100%);
+            color: var(--text-glow);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 25px;
+            animation: pulseGlow 2s infinite alternate;
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin: 0;
+            background: linear-gradient(90deg, var(--neon-cyan), var(--neon-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .chapter-badge {
+            background: var(--neon-purple);
+            box-shadow: 0 0 15px var(--neon-purple);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            display: inline-block;
+            margin-top: 5px;
+        }
+
+        .nav-matrix {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+            width: 100%;
+            max-width: 950px;
+            margin-bottom: 30px;
+        }
+
+        .matrix-btn {
+            background: rgba(255, 255, 255, 0.03);
+            border: 2px solid rgba(0, 242, 254, 0.3);
+            color: #94a3b8;
+            padding: 12px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-transform: uppercase;
+            font-size: 0.8rem;
+        }
+
+        .matrix-btn:hover, .matrix-btn.active {
+            color: #fff;
+            background: linear-gradient(135deg, var(--neon-purple), var(--neon-pink));
+            border-color: transparent;
+            box-shadow: 0 0 20px rgba(255, 0, 127, 0.6);
+            transform: scale(1.05);
+        }
+
+        .panel {
+            width: 100%;
+            max-width: 950px;
+            background: var(--card-glass);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 35px;
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.7);
+            display: none;
+            backdrop-filter: blur(20px);
+        }
+
+        .panel.active {
+            display: block;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        h2 {
+            color: var(--neon-cyan);
+            text-shadow: 0 0 10px rgba(0, 242, 254, 0.5);
+            margin-top: 0;
+            font-size: 1.8rem;
+        }
+
+        .guide-text {
+            color: #a5b4fc;
+            font-style: italic;
+            margin-bottom: 25px;
+        }
+
+        /* MCQ */
+        .quiz-item {
+            background: rgba(255,255,255,0.02);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border-left: 4px solid var(--neon-pink);
+        }
+        .options-cluster {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 12px;
+            margin-top: 15px;
+        }
+        .opt-node {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: var(--text-glow);
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s;
+        }
+        .opt-node:hover {
+            background: rgba(0, 242, 254, 0.15);
+            border-color: var(--neon-cyan);
+        }
+
+        /* Match Matrix */
+        .match-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .match-pair {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+        }
+        .match-term {
+            background: rgba(255,255,255,0.05);
+            padding: 12px;
+            border-radius: 8px;
+            width: 45%;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .match-selector {
+            background: #111827;
+            color: var(--neon-green);
+            border: 1px solid var(--neon-green);
+            padding: 12px;
+            border-radius: 8px;
+            width: 45%;
+            font-weight: bold;
+        }
+
+        /* Drag and Drop Space */
+        .token-bay {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            padding: 20px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 12px;
+            margin-bottom: 25px;
+            min-height: 60px;
+            border: 1px dashed rgba(255,255,255,0.2);
+        }
+        .token {
+            background: linear-gradient(135deg, #3b82f6, var(--neon-purple));
+            padding: 10px 20px;
+            border-radius: 30px;
+            cursor: grab;
+            font-weight: 500;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+        .drop-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+        .bucket {
+            background: rgba(255,255,255,0.02);
+            border: 2px dashed var(--neon-cyan);
+            border-radius: 16px;
+            padding: 20px;
+            min-height: 120px;
+            text-align: center;
+        }
+        .bucket h3 { margin-top: 0; color: var(--neon-cyan); }
+        .drop-zone {
+            min-height: 80px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Sequence Reorder */
+        .chronology-list {
+            list-style: none;
+            padding: 0;
+        }
+        .chronology-node {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 10px;
+            cursor: move;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        }
+        .chronology-node::before {
+            content: "☰";
+            color: var(--neon-pink);
+            font-size: 1.2rem;
+        }
+
+        /* Inline Sentence */
+        .flow-text {
+            font-size: 1.15rem;
+            line-height: 2.2;
+        }
+        .flow-select {
+            background: #0f172a;
+            color: var(--neon-pink);
+            border: 1px solid var(--neon-pink);
+            padding: 6px;
+            border-radius: 6px;
+            font-weight: bold;
+        }
+
+        /* 4 Mark Flashcard */
+        .flash-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+        }
+        .reveal-lever {
+            background: linear-gradient(90deg, var(--neon-purple), #3b82f6);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 12px;
+            font-weight: bold;
+        }
+        .vault-content {
+            display: none;
+            margin-top: 15px;
+            padding: 15px;
+            background: rgba(0, 255, 136, 0.08);
+            border-left: 4px solid var(--neon-green);
+            border-radius: 6px;
+            line-height: 1.6;
+        }
+
+        /* Control Buttons */
+        .ignition-btn {
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-green));
+            color: #000;
+            border: none;
+            padding: 14px 30px;
+            font-weight: bold;
+            border-radius: 12px;
+            cursor: pointer;
+            margin-top: 25px;
+            font-size: 1rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        .ignition-btn:hover {
+            box-shadow: 0 0 25px var(--neon-green);
+        }
+        .score-board {
+            margin-top: 20px;
+            font-weight: bold;
+            font-size: 1.3rem;
+            text-shadow: 0 0 10px rgba(255,255,255,0.3);
+        }
+
+        @keyframes pulseGlow {
+            from { filter: drop-shadow(0 0 5px rgba(0, 242, 254, 0.2)); }
+            to { filter: drop-shadow(0 0 20px rgba(255, 0, 127, 0.5)); }
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Matrix Knowledge Engine</h1>
+        <div class="chapter-badge">Chapter 2: India - Our Pride</div>
+    </header>
+
+    <div class="nav-matrix">
+        <button class="matrix-btn active" onclick="triggerTab(1)">1. Core Quiz</button>
+        <button class="matrix-btn" onclick="triggerTab(2)">2. Match Hub</button>
+        <button class="matrix-btn" onclick="triggerTab(3)">3. Geo Classifier</button>
+        <button class="matrix-btn" onclick="triggerTab(4)">4. Horizon Sort</button>
+        <button class="matrix-btn" onclick="triggerTab(5)">5. Text Solver</button>
+        <button class="matrix-btn" onclick="triggerTab(6)">6. Expert Vault</button>
+    </div>
+
+    <!-- MODULE 1: MULTIPLE CHOICE QUIZ -->
+    <div id="panel1" class="panel active">
+        <h2>Activity 1: Conceptual Multiple Choice Hub</h2>
+        <div class="guide-text">Choose the scientifically proven option based on textbook sources.</div>
+        <div id="mcq-box"></div>
+        <button class="ignition-btn" onclick="evalQuiz()">Validate Matrix Response</button>
+        <div id="mcq-score" class="score-board"></div>
+    </div>
+
+    <!-- MODULE 2: MATCH THE FOLLOWING -->
+    <div id="panel2" class="panel">
+        <h2>Activity 2: Correlation Integration Engine</h2>
+        <div class="guide-text">Map the left source columns accurately with their historical definitions.</div>
+        <div id="match-box" class="match-grid"></div>
+        <button class="ignition-btn" onclick="evalMatch()">Verify Correlation Data</button>
+        <div id="match-score" class="score-board"></div>
+    </div>
+
+    <!-- MODULE 3: DRAG AND DROP -->
+    <div id="panel3" class="panel">
+        <h2>Activity 3: Global Heritage Classification Space</h2>
+        <div class="guide-text">Drag each item and classify it into its corresponding domestic or global sphere.</div>
+        <div class="token-bay" id="token-pool"></div>
+        <div class="drop-grid">
+            <div class="bucket">
+                <h3>Domestic Indian Landmark</h3>
+                <div class="drop-zone" data-sphere="Domestic"></div>
+            </div>
+            <div class="bucket">
+                <h3>Global Influence Node</h3>
+                <div class="drop-zone" data-sphere="Global"></div>
+            </div>
+        </div>
+        <button class="ignition-btn" onclick="evalDragMatrix()">Evaluate Cultural Map</button>
+        <div id="drag-score-board" class="score-board"></div>
+    </div>
+
+    <!-- MODULE 4: REARRANGE TIMELINE -->
+    <div id="panel4" class="panel">
+        <h2>Activity 4: Evolution & Geo-Political Sequencing</h2>
+        <div class="guide-text">Drag items to arrange the historical evolution of Indian society from smaller to larger scale.</div>
+        <ul class="chronology-list" id="chrono-sort-pool"></ul>
+        <button class="ignition-btn" onclick="evalChronology()">Audit Chronology Array</button>
+        <div id="chrono-score" class="score-board"></div>
+    </div>
+
+    <!-- MODULE 5: INLINE DROP DOWN -->
+    <div id="panel5" class="panel">
+        <h2>Activity 5: Linguistic Context Solver</h2>
+        <div class="guide-text">Isolate and deploy correct terminology keys from drop-downs to fulfill text accuracy.</div>
+        <div class="flow-text" id="interactive-paragraph-stream"></div>
+        <button class="ignition-btn" onclick="evalParagraphDrops()">Validate Context Array</button>
+        <div id="paragraph-score" class="score-board"></div>
+    </div>
+
+    <!-- MODULE 6: 4 MARK EXERCISES -->
+    <div id="panel6" class="panel">
+        <h2>Activity 6: Analytical 4-Mark Knowledge Vault</h2>
+        <div class="guide-text">Examine high-level descriptive responses based on standard textbook parameters.</div>
+        <div id="descriptive-vault"></div>
+    </div>
+
+    <script>
+        // Textbook Data Streams
+        const matrixQuizData = [
+            { q: "Who established the Asiatic Society in 1784 C.E. to introduce India's unique glory?", o: ["Sir William Jones", "Max Muller", "Copernicus", "Alexander Cunningham"], a: 0 },
+            { q: "Which ancient Indian mathematician utilized the concept of 'Zero' for the first time as a numeral?", o: ["Aryabhata", "Bodhayana", "Kanaada", "Bhaskara"], a: 0 },
+            { q: "The indivisible basic unit of matter called the 'Atom' (Anu) was propounded 27 centuries ago by which Indian sage?", o: ["Socrates", "Sage Kanaada", "Varahamihira", "Charaka"], a: 1 },
+            { q: "The world's tallest historic Buddha statue before its tragic loss was located in which region?", o: ["Borobudur", "Bamiyan (Afghanistan)", "Angkor Wat", "Lumbini"], a: 1 },
+            { q: "Which famous text was the very first work translated from the Sanskrit language directly into English?", o: ["Shakuntala", "The Rigveda", "Bhagavad Gita", "The Puranas"], a: 2 },
+            { q: "Which Indian leader successfully utilized the eternal philosophy of Non-violence to gain Independence?", o: ["Kengal Hanumanthaiah", "Mahatma Gandhiji", "S. Nijalingappa", "Sir M. Vishveshwaraiah"], a: 1 },
+            { q: "Where in ancient India did sailors and scientists establish precise longitudinal maps?", o: ["Surat", "Ujjain", "Pataliputra", "Kashi"], a: 1 }
+        ];
+
+        const matrixMatchData = [
+            { left: "Jananee Janmabhumischa", right: "Motherland greater than heavens", choices: ["Motherland greater than heavens", "Supreme Court Judge & Sanskrit expert", "Whole world is one family", "Let all people be happy", "Teacher is equivalent to God", "Shipbuilding port city"] },
+            { left: "William Jones", right: "Supreme Court Judge & Sanskrit expert", choices: ["Motherland greater than heavens", "Supreme Court Judge & Sanskrit expert", "Whole world is one family", "Let all people be happy", "Teacher is equivalent to God", "Shipbuilding port city"] },
+            { left: "Vasudhaiva Kutumbakam", right: "Whole world is one family", choices: ["Motherland greater than heavens", "Supreme Court Judge & Sanskrit expert", "Whole world is one family", "Let all people be happy", "Teacher is equivalent to God", "Shipbuilding port city"] },
+            { left: "Sarve Janah Sukhino Bhavantu", right: "Let all people be happy", choices: ["Motherland greater than heavens", "Supreme Court Judge & Sanskrit expert", "Whole world is one family", "Let all people be happy", "Teacher is equivalent to God", "Shipbuilding port city"] },
+            { left: "Aacharya Devo Bhava", right: "Teacher is equivalent to God", choices: ["Motherland greater than heavens", "Supreme Court Judge & Sanskrit expert", "Whole world is one family", "Let all people be happy", "Teacher is equivalent to God", "Shipbuilding port city"] },
+            { left: "Surat (Gujarat)", right: "Shipbuilding port city", choices: ["Motherland greater than heavens", "Supreme Court Judge & Sanskrit expert", "Whole world is one family", "Let all people be happy", "Teacher is equivalent to God", "Shipbuilding port city"] },
+            { left: "Bodhayana", right: "Known for Pythagoras Theorem earlier", choices: ["Known for Pythagoras Theorem earlier", "Motherland greater than heavens", "Whole world is one family", "Let all people be happy", "Teacher is equivalent to God", "Shipbuilding port city"] }
+        ];
+
+        const matrixDragData = [
+            { label: "Ujjain Observatory", space: "Domestic" },
+            { label: "Surat Shipyards", space: "Domestic" },
+            { label: "Edicts of Ashoka", space: "Domestic" },
+            { label: "Angkor Wat (Cambodia)", space: "Global" },
+            { label: "Borobudur Temple (Java)", space: "Global" },
+            { label: "Bamiyan Statues (Afghanistan)", space: "Global" },
+            { label: "Asiatic Society of Bengal", space: "Domestic" }
+        ];
+
+        const matrixChronoData = [
+            "Nomadic early phase of human life",
+            "Establishment of convenient local village settlements",
+            "Integration of villages into regional Janapadas",
+            "Evolution of Janapadas into sovereign Mahajanapadas",
+            "Combination of great kingdoms into massive Empires",
+            "Emergence of integrated modern constitutional Republic"
+        ];
+
+        const matrixDescriptiveData = [
+            { q: "Detail India's extraordinary contributions to the field of mathematics and science as documented in antiquity.", r: "Ancient India made structural contributions to science. The edicts of Emperor Ashoka demonstrate the rich utilization of numeral characters over 2300 years ago, long before European countries understood them. Furthermore, Indians invented numerals, the decimal notation system, fractions, algebra, and the monumental usage of 'Zero' as a legal numeral. In astronomy, Aryabhata stated that the 'Earth is round' and 'Earth goes round the Sun' ten centuries before Copernicus." },
+            { q: "Examine the geographic diffusion and structural impact of Indian cultural values across ancient Asian nations.", r: "Indian culture expanded beyond domestic borders through peaceful channels. Buddhism travelled smoothly across borders to Afghanistan, Tibet, Mongolia, China, Korea, and Japan, while Sri Lanka officially adopted it. In South-East Asia, this synthesis generated architectural heritage sites like the magnificent Hindu temple complex of Angkor Wat in Cambodia and the massive Buddhist temple structure of Borobudur in Java, both recognized today as World Heritage Sites." },
+            { q: "Analyze the fundamental ethical guidelines contained within the ancient value parameter of 'Aacharya Devo Bhava'.", r: "The parameter of 'Aacharya Devo Bhava' establishes that education is a sacred service rather than a commercial business. Initiated over three thousand years ago, it commands pupils to: (1) Speak the absolute truth, (2) Walk the path of absolute righteousness, (3) Eradicate personal arrogance, (4) Continuous learning without self-satisfaction, and (5) Treat your mother, father, teacher, and visiting guest as equal to living Gods." },
+            { q: "How did different foreign civilizations interact with the Sindhu Valley, giving rise to names like Hindustan and India?", r: "About 3000 years ago, ancient Persian civilizations established trade relations with the Sindhu River Valley. In their native language, they pronounced the word 'Sindhu' as 'Hindu'. Consequently, they designated the geographical territory as 'Hindustan' and its people as Hindus. Later, when Greek civilizations interacted with the region, they modified 'Hindu' into 'Sindus' or 'Indu', which under British rule evolved systematically into 'India'." },
+            { q: "Discuss the unique perspective of global unity embedded in the Vedic principle of 'Vasudhaiva Kutumbakam'.", r: "Unlike narrow geopolitical definitions of territory, Indian philosophy developed an open mindset. The core phrase 'Vasudhaiva Kutumbakam' directly translates to 'the whole world is one single family'. It removes mutual distrust and encourages global social harmony. This framework states that light and wisdom are universal, establishing that while names are many, the ultimate reality is unified." }
+        ];
+
+        // Tab Switching Mechanism
+        function triggerTab(index) {
+            document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.matrix-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('panel' + index).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // Render MCQ Module
+        const mcqBox = document.getElementById('mcq-box');
+        matrixQuizData.forEach((node, idx) => {
+            let item = document.createElement('div');
+            item.className = 'quiz-item';
+            item.innerHTML = `<p><strong>Q${idx+1}:</strong> ${node.q}</p>`;
+            let cluster = document.createElement('div');
+            cluster.className = 'options-cluster';
+            node.o.forEach((opt, oIdx) => {
+                cluster.innerHTML += `<button class="opt-node" data-q="${idx}" data-o="${oIdx}" onclick="selectMatrixQuiz(this)">${opt}</button>`;
+            });
+            item.appendChild(cluster);
+            mcqBox.appendChild(item);
+        });
+
+        let mcqAnswersLog = {};
+        function selectMatrixQuiz(btn) {
+            let q = btn.getAttribute('data-q');
+            let o = parseInt(btn.getAttribute('data-o'));
+            mcqAnswersLog[q] = o;
+            btn.parentElement.querySelectorAll('.opt-node').forEach(b => b.style.background = 'rgba(255,255,255,0.05)');
+            btn.style.background = 'var(--neon-purple)';
+        }
+
+        function evalQuiz() {
+            let points = 0;
+            matrixQuizData.forEach((data, i) => {
+                if(mcqAnswersLog[i] === data.a) points++;
+            });
+            document.getElementById('mcq-score').innerText = `Engine Audit: Correct Answers = ${points} / ${matrixQuizData.length}`;
+        }
+
+        // Render Match Hub
+        const matchBox = document.getElementById('match-box');
+        matrixMatchData.forEach((pair, idx) => {
+            let row = document.createElement('div');
+            row.className = 'match-pair';
+            row.innerHTML = `<div class="match-term">${pair.left}</div>`;
+            let selector = document.createElement('select');
+            selector.className = 'match-selector';
+            selector.id = `matrix-match-${idx}`;
+            selector.innerHTML = '<option value="">-- Bind Target Definition --</option>';
+            
+            let scrambledChoices = [...new Set(matrixMatchData.map(m => m.right))].sort(() => Math.random() - 0.5);
+            scrambledChoices.forEach(choice => {
+                selector.innerHTML += `<option value="${choice}">${choice}</option>`;
+            });
+            row.appendChild(selector);
+            matchBox.appendChild(row);
+        });
+
+        function evalMatch() {
+            let validationPoints = 0;
+            matrixMatchData.forEach((data, i) => {
+                let userChoice = document.getElementById(`matrix-match-${i}`).value;
+                if(userChoice === data.right) validationPoints++;
+            });
+            document.getElementById('match-score').innerText = `Matrix Synergy: Integrity Level = ${validationPoints} / ${matrixMatchData.length}`;
+        }
+
+        // Render Drag Matrix
+        const tokenPool = document.getElementById('token-pool');
+        matrixDragData.sort(() => Math.random() - 0.5).forEach((item, index) => {
+            let div = document.createElement('div');
+            div.className = 'token';
+            div.draggable = true;
+            div.id = `matrix-token-${index}`;
+            div.innerText = item.label;
+            div.setAttribute('data-sphere', item.space);
+            div.ondragstart = (e) => { e.dataTransfer.setData("text/plain", e.target.id); };
+            tokenPool.appendChild(div);
+        });
+
+        document.querySelectorAll('.drop-zone').forEach(zone => {
+            zone.ondragover = (e) => e.preventDefault();
+            zone.ondrop = (e) => {
+                e.preventDefault();
+                let tokenId = e.dataTransfer.getData("text/plain");
+                let tokenNode = document.getElementById(tokenId);
+                if(e.target.classList.contains('drop-zone')) {
+                    e.target.appendChild(tokenNode);
+                }
+            };
+        });
+
+        function evalDragMatrix() {
+            let points = 0;
+            document.querySelectorAll('.drop-zone').forEach(zone => {
+                let assignedSphere = zone.getAttribute('data-sphere');
+                zone.querySelectorAll('.token').forEach(t => {
+                    if(t.getAttribute('data-sphere') === assignedSphere) points++;
+                });
+            });
+            document.getElementById('drag-score-board').innerText = `Classification Accuracy: ${points} / ${matrixDragData.length}`;
+        }
+
+        // Render Chronology
+        const chronoPool = document.getElementById('chrono-sort-pool');
+        let scrambledChrono = [...matrixChronoData].sort(() => Math.random() - 0.5);
+        scrambledChrono.forEach((text, idx) => {
+            let li = document.createElement('li');
+            li.className = 'chronology-node';
+            li.draggable = true;
+            li.innerText = text;
+            li.id = `chrono-item-${idx}`;
+            
+            li.ondragstart = (e) => {
+                e.dataTransfer.setData("text/plain", e.target.id);
+                setTimeout(() => li.style.opacity = '0.4', 0);
+            };
+            li.ondragend = () => li.style.opacity = '1';
+            chronoPool.appendChild(li);
+        });
+
+        chronoPool.ondragover = (e) => {
+            e.preventDefault();
+            const activeMovingItem = document.querySelector('.chronology-node[style*="opacity: 0.4"]');
+            if(!activeMovingItem) return;
+            const parallelNodes = [...chronoPool.querySelectorAll('.chronology-node:not([style*="opacity: 0.4"])')];
+            let targetPlacementNode = parallelNodes.find(node => {
+                return e.clientY <= node.getBoundingClientRect().top + node.offsetHeight / 2;
+            });
+            chronoPool.insertBefore(activeMovingItem, targetPlacementNode);
+        };
+
+        function evalChronology() {
+            let currentSequenceArray = [...chronoPool.querySelectorAll('.chronology-node')].map(li => li.innerText);
+            let perfectMatches = 0;
+            currentSequenceArray.forEach((text, i) => {
+                if(matrixChronoData[i] === text) perfectMatches++;
+            });
+            document.getElementById('chrono-score').innerText = `Chronology Alignment Score: ${perfectMatches} / ${matrixChronoData.length}`;
+        }
+
+        // Render Paragraph System
+        const paraBox = document.getElementById('interactive-paragraph-stream');
+        paraBox.innerHTML = `
+            Our motherland is referred to as 
+            <select class="flow-select" id="para-drop-0"><option value="">?</option><option value="Bharata Varsha">Bharata Varsha</option><option value="Persia">Persia</option></select>
+            within historical puranic literature. Long ago, the 
+            <select class="flow-select" id="para-drop-1"><option value="">?</option><option value="Greeks">Greeks</option><option value="Persians">Persians</option></select>
+            came into contact with the Sindhu Valley and modified the word into 'Hindu'. In the field of science, Indian scientist Aryabhata stated that the 
+            <select class="flow-select" id="para-drop-2"><option value="">?</option><option value="Earth goes round the Sun">Earth goes round the Sun</option><option value="Earth is flat">Earth is flat</option></select>
+            nearly ten centuries before Copernicus. Culturally, Indian ideas diffused to South Asia, establishing the magnificent 
+            <select class="flow-select" id="para-drop-3"><option value="">?</option><option value="Angkor Wat">Angkor Wat</option><option value="Bamiyan">Bamiyan</option></select>
+            temple complex in Cambodia. The core value of 
+            <select class="flow-select" id="para-drop-4"><option value="">?</option><option value="Non-violence">Non-violence</option><option value="Exploitation">Exploitation</option></select>
+            became a powerful weapon during our freedom struggle under Mahatma Gandhiji, proving the eternal statement that the whole world functions as 
+            <select class="flow-select" id="para-drop-5"><option value="">?</option><option value="One Family">One Family</option><option value="Separate Empires">Separate Empires</option></select>.
+        `;
+
+        const paraSolutions = ["Bharata Varsha", "Persians", "Earth goes round the Sun", "Angkor Wat", "Non-violence", "One Family"];
+        function evalParagraphDrops() {
+            let correctDrops = 0;
+            paraSolutions.forEach((ans, i) => {
+                if(document.getElementById(`para-drop-${i}`).value === ans) correctDrops++;
+            });
+            document.getElementById('paragraph-score').innerText = `Context Validation: ${correctDrops} / ${paraSolutions.length}`;
+        }
+
+        // Render Knowledge Vault
+        const descriptiveVault = document.getElementById('descriptive-vault');
+        descriptiveVault.innerHTML = matrixDescriptiveData.map((qa, i) => `
+            <div class="flash-card">
+                <p><strong>Q${i+1} [4 Marks Standard]:</strong> ${qa.q}</p>
+                <button class="reveal-lever" onclick="toggleSecretAns(${i})">Toggle Analytical Solutions</button>
+                <div class="vault-content" id="descript-ans-${i}">${qa.r}</div>
+            </div>
+        `).join('');
+
+        function toggleSecretAns(idx) {
+            let targetEl = document.getElementById(`descript-ans-${idx}`);
+            targetEl.style.display = (targetEl.style.display === 'block') ? 'none' : 'block';
+        }
+    </script>
+</body>
+</html>

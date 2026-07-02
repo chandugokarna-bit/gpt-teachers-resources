@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Civics Interface - Citizen & Citizenship</title>
+    <style>
+        :root {
+            --cyan-glow: #00f2fe;
+            --purple-laser: #9d4edd;
+            --emerald-matrix: #00ff88;
+            --amber-warn: #ffaa00;
+            --console-dark: #050814;
+            --glass-base: rgba(10, 25, 47, 0.85);
+            --electric-border: rgba(0, 242, 254, 0.2);
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: radial-gradient(circle at 50% 50%, #0f172a 0%, var(--console-dark) 100%);
+            color: #e2e8f0;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 2.6rem;
+            margin: 0;
+            background: linear-gradient(135deg, var(--cyan-glow), var(--purple-laser));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            filter: drop-shadow(0 0 15px rgba(0, 242, 254, 0.4));
+        }
+
+        .civics-badge {
+            background: rgba(0, 242, 254, 0.1);
+            border: 1px solid var(--cyan-glow);
+            color: var(--cyan-glow);
+            padding: 5px 18px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            display: inline-block;
+            margin-top: 10px;
+            box-shadow: 0 0 10px rgba(0, 242, 254, 0.2);
+        }
+
+        /* Glass Hexagonal Menu Controller */
+        .console-dock {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            width: 100%;
+            max-width: 1000px;
+            margin-bottom: 35px;
+        }
+
+        .dock-node {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--electric-border);
+            color: #94a3b8;
+            padding: 12px 24px;
+            font-weight: bold;
+            font-size: 0.85rem;
+            border-radius: 8px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .dock-node:hover, .dock-node.active {
+            color: #ffffff;
+            background: rgba(0, 242, 254, 0.12);
+            border-color: var(--cyan-glow);
+            box-shadow: 0 0 20px rgba(0, 242, 254, 0.4);
+            transform: scale(1.03);
+        }
+
+        /* Holographic Interface Panels */
+        .matrix-panel {
+            width: 100%;
+            max-width: 1000px;
+            background: var(--glass-base);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 40px;
+            display: none;
+            box-sizing: border-box;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+
+        .matrix-panel.active {
+            display: block;
+            animation: panelSlideIn 0.5s cubic-bezier(0.1, 1, 0.1, 1);
+        }
+
+        @pragma-keyframes panelSlideIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 {
+            color: var(--cyan-glow);
+            font-size: 1.6rem;
+            margin-top: 0;
+            border-left: 4px solid var(--purple-laser);
+            padding-left: 12px;
+        }
+
+        .guide-memo {
+            color: #a5b4fc;
+            font-size: 0.95rem;
+            margin-bottom: 25px;
+            font-style: italic;
+        }
+
+        /* Style 1: MCQ Interactive Blocks */
+        .matrix-card {
+            background: rgba(255, 255, 255, 0.02);
+            padding: 22px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255,255,255,0.04);
+        }
+        .cluster-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            gap: 12px;
+            margin-top: 15px;
+        }
+        .choice-btn {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: #cbd5e1;
+            padding: 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s;
+        }
+        .choice-btn:hover {
+            background: rgba(157, 78, 221, 0.15);
+            border-color: var(--purple-laser);
+            color: #ffffff;
+        }
+
+        /* Style 2: Match Selector Grid */
+        .match-spine {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .match-strip {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255,255,255,0.01);
+            padding: 14px 20px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.04);
+        }
+        .term-node {
+            color: #f1f5f9;
+            font-weight: 600;
+            width: 40%;
+        }
+        .dropdown-menu {
+            background: #090d1a;
+            color: var(--emerald-matrix);
+            border: 1px solid rgba(0, 255, 136, 0.4);
+            padding: 12px;
+            border-radius: 8px;
+            width: 52%;
+            font-weight: bold;
+        }
+
+        /* Style 3: Drag & Drop Pods */
+        .dock-bay {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            padding: 20px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 14px;
+            margin-bottom: 30px;
+            min-height: 55px;
+            border: 1px dashed rgba(255,255,255,0.1);
+        }
+        .drag-token {
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            border: 1px solid var(--cyan-glow);
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: grab;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        .hangar-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+        }
+        .hangar-box {
+            background: rgba(255,255,255,0.01);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+        }
+        .hangar-box h3 { margin: 0 0 15px 0; color: var(--amber-warn); font-size: 1.1rem; }
+        .receiver-zone {
+            background: rgba(0,0,0,0.2);
+            border: 2px dashed rgba(0, 242, 254, 0.2);
+            border-radius: 10px;
+            min-height: 100px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+        }
+
+        /* Style 4: Timeline Rail */
+        .rail-track {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .rail-node {
+            background: rgba(255,255,255,0.03);
+            border-left: 4px solid var(--cyan-glow);
+            padding: 15px 20px;
+            margin-bottom: 12px;
+            border-radius: 0 10px 10px 0;
+            cursor: move;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .rail-node::before {
+            content: "✦";
+            color: var(--cyan-glow);
+        }
+
+        /* Style 5: Paragraph Selector */
+        .stream-text {
+            font-size: 1.2rem;
+            line-height: 2.4;
+            background: rgba(0,0,0,0.2);
+            padding: 25px;
+            border-radius: 16px;
+        }
+        .menu-stream {
+            background: #050814;
+            color: var(--cyan-glow);
+            border: 1px solid rgba(0, 242, 254, 0.4);
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-weight: bold;
+        }
+
+        /* Style 6: 4-Mark Desk */
+        .tile-vault {
+            background: rgba(255,255,255,0.01);
+            border: 1px solid rgba(255,255,255,0.04);
+            padding: 22px;
+            border-radius: 14px;
+            margin-bottom: 15px;
+        }
+        .btn-lever {
+            background: linear-gradient(90deg, #1e293b, #334155);
+            border: 1px solid var(--purple-laser);
+            color: #ffffff;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+        }
+        .stream-secure {
+            display: none;
+            margin-top: 15px;
+            padding: 18px;
+            background: rgba(0, 255, 136, 0.06);
+            border-left: 4px solid var(--emerald-matrix);
+            border-radius: 6px;
+            line-height: 1.7;
+            color: #cbd5e1;
+        }
+
+        /* Terminal Ignition Processors */
+        .btn-ignition {
+            background: linear-gradient(90deg, var(--cyan-glow), var(--emerald-matrix));
+            color: #050814;
+            border: none;
+            padding: 14px 35px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 30px;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .btn-ignition:hover {
+            box-shadow: 0 0 25px rgba(0, 242, 254, 0.6);
+        }
+        .monitor-score {
+            margin-top: 25px;
+            font-weight: bold;
+            font-size: 1.3rem;
+            color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Civic-Matrix Terminal</h1>
+        <div class="civics-badge">Chapter 7: Citizen and Citizenship</div>
+    </header>
+
+    <div class="console-dock">
+        <button class="dock-node active" onclick="triggerPane(1)">1. Franchise Quiz</button>
+        <button class="dock-node" onclick="triggerPane(2)">2. Legal Binder</button>
+        <button class="dock-node" onclick="triggerPane(3)">3. Status Sorter</button>
+        <button class="dock-node" onclick="triggerPane(4)">4. Civic Duty Rail</button>
+        <button class="dock-node" onclick="triggerPane(5)">5. Codex Stream</button>
+        <button class="dock-node" onclick="triggerPane(6)">6. Analytical Vault</button>
+    </div>
+
+    <!-- PANEL 1: MCQ -->
+    <div id="pane1" class="matrix-panel active">
+        <h2>Activity 1: Legal Constitutional Core Quiz</h2>
+        <div class="guide-memo">Lock the contextually validated parameter regarding citizenship rules.</div>
+        <div id="mcq-root"></div>
+        <button class="btn-ignition" onclick="runQuizAudit()">Execute Integrity Check</button>
+        <div id="mcq-score" class="monitor-score"></div>
+    </div>
+
+    <!-- PANEL 2: MATCH THE FOLLOWING -->
+    <div id="pane2" class="matrix-panel">
+        <h2>Activity 2: Citizenship Loss Matrix Correlation</h2>
+        <div class="guide-memo">Integrate specific criteria with their correct constitutional modes of termination.</div>
+        <div id="match-root" class="match-spine"></div>
+        <button class="btn-ignition" onclick="runMatchAudit()">Verify Legal Vector</button>
+        <div id="match-score" class="monitor-score"></div>
+    </div>
+
+    <!-- PANEL 3: DRAG AND DROP -->
+    <div id="pane3" class="matrix-panel">
+        <h2>Activity 3: Acquisition Parameter Classifier</h2>
+        <div class="guide-memo">Drag the individual scenarios and filter them between Natural or Naturalized citizenship categories.</div>
+        <div class="dock-bay" id="token-pool"></div>
+        <div class="hangar-grid">
+            <div class="hangar-box">
+                <h3>Natural Citizenship Sphere</h3>
+                <div class="receiver-zone" data-cat="Natural"></div>
+            </div>
+            <div class="hangar-box">
+                <h3>Naturalized Citizenship Sphere</h3>
+                <div class="receiver-zone" data-cat="Naturalized"></div>
+            </div>
+        </div>
+        <button class="btn-ignition" onclick="runDragAudit()">Compute Cluster Accuracy</button>
+        <div id="drag-score" class="monitor-score"></div>
+    </div>
+
+    <!-- PANEL 4: REARRANGE DATA ARRAY -->
+    <div id="pane4" class="matrix-panel">
+        <h2>Activity 4: Ideal Responsible Civic Track Selection</h2>
+        <div class="guide-memo">Prioritize the specific actions of a good citizen based on the constitutional framework from highest to supportive role.</div>
+        <ul class="rail-track" id="duty-rail"></ul>
+        <button class="btn-ignition" onclick="runRailAudit()">Validate Duty Array</button>
+        <div id="rail-score" class="monitor-score"></div>
+    </div>
+
+    <!-- PANEL 5: INLINE DROP DOWN -->
+    <div id="pane5" class="matrix-panel">
+        <h2>Activity 5: Constitutional Context Solver</h2>
+        <div class="guide-memo">Deploy exact civil engineering terms to process text stream validation.</div>
+        <div class="stream-text" id="stream-text-container"></div>
+        <button class="btn-ignition" onclick="runStreamAudit()">Audit Text Vector</button>
+        <div id="stream-score" class="monitor-score"></div>
+    </div>
+
+    <!-- PANEL 6: 4 MARK DESCRIPTIVE CORNER -->
+    <div id="pane6" class="matrix-panel">
+        <h2>Activity 6: Advanced Civic Analysis Vault [4-Mark Parameters]</h2>
+        <div class="guide-memo">Examine definitive descriptive parameters based directly on standard textbook syllabus.</div>
+        <div id="vault-root"></div>
+    </div>
+
+    <script>
+        // Chapter 7 Verified Textbook Content Arrays
+        const civicQuizData = [
+            { q: "What is legally defined as the legal membership of an individual within a specific country?", o: ["Tourism Permit", "Citizenship", "Varnashrama", "Gotra"], a: 1 },
+            { q: "A person born in independent India on or after which historical date automatically acquires legal citizenship by birth?", o: ["August 15, 1947", "January 26, 1950", "November 1, 1956", "September 17, 1948"], a: 1 },
+            { q: "How many common tiers of citizenship are officially permitted under the Indian Constitution?", o: ["Dual Citizenship", "Single Common Citizenship", "Triple Citizenship", "State-wise Citizenship"], a: 1 },
+            { q: "What minimum duration of continuous residency is required in India to apply for citizenship via registration?", o: ["At least 2 years", "At least 5 years", "At least 10 years", "At least 1 year"], a: 1 },
+            { q: "What age threshold officially grants a citizen the democratic right to vote (Universal Adult Franchise)?", o: ["Above 16 years", "Above 18 years", "Above 21 years", "Above 15 years"], a: 1 },
+            { q: "Under what condition can the Sovereign Government forcibly reject or take away a person's citizenship?", o: ["Voluntary Travel", "Involvement in anti-national activities", "Changing Profession", "Not paying local bills"], a: 1 },
+            { q: "Every parent or guardian holds the core responsibility to enable school education for children of what age group?", o: ["3 to 6 years", "6 to 14 years", "14 to 18 years", "5 to 10 years"], a: 1 }
+        ];
+
+        const civicMatchData = [
+            { left: "Renunciation", right: "Voluntarily refusing one's native citizenship", pool: ["Voluntarily refusing one's native citizenship", "Legal termination upon acquiring foreign status", "Forced rejection due to deceptive/fraudulent means", "Responsible members settled permanently", "Tourists traveling temporarily from abroad", "The right to vote and choose representatives"] },
+            { left: "Termination", right: "Legal termination upon acquiring foreign status", pool: ["Voluntarily refusing one's native citizenship", "Legal termination upon acquiring foreign status", "Forced rejection due to deceptive/fraudulent means", "Responsible members settled permanently", "Tourists traveling temporarily from abroad", "The right to vote and choose representatives"] },
+            { left: "Deprivation", right: "Forced rejection due to deceptive/fraudulent means", pool: ["Voluntarily refusing one's native citizenship", "Legal termination upon acquiring foreign status", "Forced rejection due to deceptive/fraudulent means", "Responsible members settled permanently", "Tourists traveling temporarily from abroad", "The right to vote and choose representatives"] },
+            { left: "Citizens", right: "Responsible members settled permanently", pool: ["Voluntarily refusing one's native citizenship", "Legal termination upon acquiring foreign status", "Forced rejection due to deceptive/fraudulent means", "Responsible members settled permanently", "Tourists traveling temporarily from abroad", "The right to vote and choose representatives"] },
+            { left: "Foreigners", right: "Tourists traveling temporarily from abroad", pool: ["Voluntarily refusing one's native citizenship", "Legal termination upon acquiring foreign status", "Forced rejection due to deceptive/fraudulent means", "Responsible members settled permanently", "Tourists traveling temporarily from abroad", "The right to vote and choose representatives"] },
+            { left: "Universal Franchise", right: "The right to vote and choose representatives", pool: ["The right to vote and choose representatives", "Responsible members settled permanently", "Tourists traveling temporarily from abroad"] },
+            { left: "Civics Study", right: "Teaches rights, duties, and social development roles", pool: ["Teaches rights, duties, and social development roles", "Responsible members settled permanently"] }
+        ];
+
+        const civicDragData = [
+            { name: "Acquisition strictly By Birth", cat: "Natural" },
+            { name: "Acquisition via Inheritance rules", cat: "Natural" },
+            { name: "Granted regardless of parents' nationality", cat: "Natural" },
+            { name: "Acquisition through Registration forms", cat: "Naturalized" },
+            { name: "Living in the country for 5 years", cat: "Naturalized" },
+            { name: "Applying directly at the concerned office", cat: "Naturalized" }
+        ];
+
+        const civicTrackData = [
+            "Honouring the Constitution, National Flag, and Anthem",
+            "Obeying the state laws and paying taxes regularly",
+            "Protection of public property and renouncing violence",
+            "Helping senior citizens and enabling children's schooling"
+        ];
+
+        const civicVaultData = [
+            { q: "Define the concept of a citizen and explain what is meant by the legal parameter of citizenship.", a: "Citizens are the responsible members who are permanently settled in a country, acting as permanent residents who have been born there or lived across generations. The legal membership of an individual within a specific country is officially designated as citizenship. It binds the relationship of the individual with the state, enabling specific constitutional privileges." },
+            { q: "Contrast the basic differences between the legal status of native citizens and visiting foreigners within a country.", a: "Native or registered citizens are permanent members of the country who possess all constitutional rights, including voting in elections, contesting for public offices, and serving in national defense frameworks. Conversely, foreigners are citizens of other nations visiting temporarily for tourism or work. Foreigners do not possess these political rights and are subject to specific entry regulations." },
+            { q: "Detail the three structural methods through which an individual can completely lose their legal citizenship status.", a: "According to legal parameters, citizenship is lost via three methods: 1. Renunciation, where a citizen voluntarily refuses their citizenship upon acquiring a foreign status; 2. Termination, where a person's native citizenship is automatically terminated by law the moment they secure foreign status; and 3. Deprivation, which is a forced rejection by the Government if the status was obtained fraudulently or if the individual involves themselves in anti-national activities." },
+            { q: "Analyze the core characteristics and daily responsibilities that define a truly good and responsible citizen.", a: "A good citizen must practice specific values: honoring the Constitution, National Flag, and National Anthem; respecting laws and paying government taxes regularly; protecting public property while completely renouncing social violence; possessing a scientific temper and humanism; viewing everyone as brothers regardless of caste or language; and actively helping senior citizens." },
+            { q: "Explain the mandatory duty imposed by the modern civic framework on parents or guardians regarding educational access.", a: "The framework establishes that every mother, father, or legal guardian holds an absolute, non-negotiable educational duty toward their children. They must systematically enable and ensure that their children access formal schooling up to the age group of 6 to 14 years, creating a foundational base for responsible, educated future citizens." }
+        ];
+
+        // Panel Navigator
+        function triggerPane(num) {
+            document.querySelectorAll('.matrix-panel').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.dock-node').forEach(b => b.classList.remove('active'));
+            document.getElementById('pane' + num).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // Module 1 MCQ Builder
+        const mcqRoot = document.getElementById('mcq-root');
+        civicQuizData.forEach((node, qIdx) => {
+            let card = document.createElement('div');
+            card.className = 'matrix-card';
+            card.innerHTML = `<p><strong>Question Vector ${qIdx+1}:</strong> ${node.q}</p>`;
+            let container = document.createElement('div');
+            container.className = 'cluster-options';
+            node.o.forEach((opt, oIdx) => {
+                container.innerHTML += `<button class="choice-btn" data-q="${qIdx}" data-o="${oIdx}" onclick="logQuizChoice(this)">${opt}</button>`;
+            });
+            card.appendChild(container);
+            mcqRoot.appendChild(card);
+        });
+
+        let quizUserSelections = {};
+        function logQuizChoice(btn) {
+            let q = btn.getAttribute('data-q');
+            let o = parseInt(btn.getAttribute('data-o'));
+            quizUserSelections[q] = o;
+            btn.parentElement.querySelectorAll('.choice-btn').forEach(b => b.style.background = 'rgba(255,255,255,0.04)');
+            btn.style.background = 'rgba(157, 78, 221, 0.2)';
+            btn.style.borderColor = 'var(--purple-laser)';
+        }
+
+        function runQuizAudit() {
+            let score = 0;
+            civicQuizData.forEach((data, i) => {
+                if(quizUserSelections[i] === data.a) score++;
+            });
+            document.getElementById('mcq-score').innerText = `Console Compute Status: Verified Nodes = ${score} / ${civicQuizData.length}`;
+        }
+
+        // Module 2 Match Builder
+        const matchRoot = document.getElementById('match-root');
+        civicMatchData.forEach((pair, idx) => {
+            let strip = document.createElement('div');
+            strip.className = 'match-strip';
+            strip.innerHTML = `<div class="term-node">${pair.left}</div>`;
+            let selector = document.createElement('select');
+            selector.className = 'dropdown-menu';
+            selector.id = `dropdown-civic-match-${idx}`;
+            selector.innerHTML = '<option value="">-- Select Legal Entry --</option>';
+            
+            let mixedOptions = [...new Set(civicMatchData.map(m => m.right))].sort(() => Math.random() - 0.5);
+            mixedOptions.forEach(opt => {
+                selector.innerHTML += `<option value="${opt}">${opt}</option>`;
+            });
+            strip.appendChild(selector);
+            matchRoot.appendChild(strip);
+        });
+
+        function runMatchAudit() {
+            let score = 0;
+            civicMatchData.forEach((data, idx) => {
+                if(document.getElementById(`dropdown-civic-match-${idx}`).value === data.right) score++;
+            });
+            document.getElementById('match-score').innerText = `Synergy Output: Verified Linkages = ${score} / ${civicMatchData.length}`;
+        }
+
+        // Module 3 Drag & Drop Builder
+        const tokenPool = document.getElementById('token-pool');
+        civicDragData.sort(() => Math.random() - 0.5).forEach((data, idx) => {
+            let token = document.createElement('div');
+            token.className = 'drag-token';
+            token.id = `civic-token-id-${idx}`;
+            token.draggable = true;
+            token.innerText = data.name;
+            token.setAttribute('data-cat', data.cat);
+            token.ondragstart = (e) => { e.dataTransfer.setData("text/plain", e.target.id); };
+            tokenPool.appendChild(token);
+        });
+
+        document.querySelectorAll('.receiver-zone').forEach(receiver => {
+            receiver.ondragover = (e) => e.preventDefault();
+            receiver.ondrop = (e) => {
+                e.preventDefault();
+                let tokenId = e.dataTransfer.getData("text/plain");
+                let tokenNode = document.getElementById(tokenId);
+                if(e.target.classList.contains('receiver-zone')) {
+                    e.target.appendChild(tokenNode);
+                }
+            };
+        });
+
+        function runDragAudit() {
+            let score = 0;
+            document.querySelectorAll('.receiver-zone').forEach(receiver => {
+                let currentCategory = receiver.getAttribute('data-cat');
+                receiver.querySelectorAll('.drag-token').forEach(t => {
+                    if(t.getAttribute('data-cat') === currentCategory) score++;
+                });
+            });
+            document.getElementById('drag-score').innerText = `Quantum Classifier Matrix: Mapped Nodes = ${score} / ${civicDragData.length}`;
+        }
+
+        // Module 4 Timeline/Reorder Track Builder
+        const dutyRail = document.getElementById('duty-rail');
+        let scrambledTrack = [...civicTrackData].sort(() => Math.random() - 0.5);
+        scrambledTrack.forEach((text, idx) => {
+            let li = document.createElement('li');
+            li.className = 'rail-node';
+            li.draggable = true;
+            li.innerText = text;
+            li.id = `rail-node-idx-${idx}`;
+            
+            li.ondragstart = (e) => {
+                e.dataTransfer.setData("text/plain", e.target.id);
+                setTimeout(() => li.style.opacity = '0.3', 0);
+            };
+            li.ondragend = () => li.style.opacity = '1';
+            dutyRail.appendChild(li);
+        });
+
+        dutyRail.ondragover = (e) => {
+            e.preventDefault();
+            const floatingNode = document.querySelector('.rail-node[style*="opacity: 0.3"]');
+            if(!floatingNode) return;
+            const restingNodes = [...dutyRail.querySelectorAll('.rail-node:not([style*="opacity: 0.3"])')];
+            let exactSpot = restingNodes.find(node => {
+                return e.clientY <= node.getBoundingClientRect().top + node.offsetHeight / 2;
+            });
+            dutyRail.insertBefore(floatingNode, exactSpot);
+        };
+
+        function runRailAudit() {
+            let userSequence = [...dutyRail.querySelectorAll('.rail-node')].map(li => li.innerText);
+            let score = 0;
+            userSequence.forEach((val, idx) => {
+                if(civicTrackData[idx] === val) score++;
+            });
+            document.getElementById('rail-score').innerText = `Priority Array Check: Valid Placements = ${score} / ${civicTrackData.length}`;
+        }
+
+        // Module 5 Paragraph Builder
+        const streamContainer = document.getElementById('stream-text-container');
+        streamContainer.innerHTML = `
+            Our great sovereign nation is India, and we all share a common legal identity known as 
+            <select class="menu-stream" id="stream-drop-0"><option value="">?</option><option value="Indian Citizenship">Indian Citizenship</option><option value="Dual Status">Dual Status</option></select>. 
+            Unlike some nations, the Indian Constitution officially rejects state-wise divisions and permits only a 
+            <select class="menu-stream" id="stream-drop-1"><option value="">?</option><option value="Single common citizenship">Single common citizenship</option><option value="Dual common citizenship">Dual common citizenship</option></select>. 
+            To participate actively in national progress, every individual who crosses the age parameter of 
+            <select class="menu-stream" id="stream-drop-2"><option value="">?</option><option value="18 Years">18 Years</option><option value="21 Years">21 Years</option></select> 
+            grows eligible to vote in general elections. Responsible members must also pay their 
+            <select class="menu-stream" id="stream-drop-3"><option value="">?</option><option value="Taxes regularly">Taxes regularly</option><option value="Foreign dues">Foreign bills</option></select> 
+            without fail and prioritize the preservation of the public environment, proving that true freedom coexists with deep social duties.
+        `;
+
+        const streamSolutions = ["Indian Citizenship", "Single common citizenship", "18 Years", "Taxes regularly"];
+        function runStreamAudit() {
+            let score = 0;
+            streamSolutions.forEach((sol, idx) => {
+                if(document.getElementById(`stream-drop-${idx}`).value === sol) score++;
+            });
+            document.getElementById('stream-score').innerText = `Context Validation Output: Verified Level = ${score} / ${streamSolutions.length}`;
+        }
+
+        // Module 6 Vault Builder
+        const vaultRoot = document.getElementById('vault-root');
+        civicVaultData.forEach((node, idx) => {
+            vaultRoot.innerHTML += `
+                <div class="tile-vault">
+                    <p><strong>Descriptive Target Node ${idx+1} [4 Marks Standard]:</strong> ${node.q}</p>
+                    <button class="btn-lever" onclick="toggleVaultStream(${idx})">Decrypt Data Stream</button>
+                    <div class="stream-secure" id="stream-secure-${idx}">${node.a}</div>
+                </div>`;
+        });
+
+        function toggleVaultStream(idx) {
+            let target = document.getElementById(`stream-secure-${idx}`);
+            target.style.display = (target.style.display === 'block') ? 'none' : 'block';
+        }
+    </script>
+</body>
+</html>

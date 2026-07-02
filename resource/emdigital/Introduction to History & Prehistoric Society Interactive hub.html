@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Futuristic History Classroom - Chapter 1</title>
+    <style>
+        :root {
+            --bg-color: #0b0f19;
+            --card-bg: rgba(23, 28, 41, 0.85);
+            --primary: #00f2fe;
+            --secondary: #4facfe;
+            --accent: #7f00ff;
+            --text-color: #e0e6ed;
+            --success: #00e676;
+            --error: #ff1744;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            color: transparent;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            text-shadow: 0 0 30px rgba(0, 242, 254, 0.3);
+            font-size: 2.5rem;
+            margin-bottom: 5px;
+            text-align: center;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: #94a3b8;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+        }
+
+        .navigation {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 10px;
+            margin-bottom: 30px;
+            width: 100%;
+        }
+
+        .nav-btn {
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid rgba(0, 242, 254, 0.2);
+            color: #94a3b8;
+            padding: 12px 8px;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-size: 0.85rem;
+            text-align: center;
+        }
+
+        .nav-btn:hover, .nav-btn.active {
+            background: linear-gradient(135deg, var(--secondary), var(--accent));
+            color: #fff;
+            box-shadow: 0 0 15px rgba(79, 172, 254, 0.4);
+            border-color: transparent;
+            transform: translateY(-2px);
+        }
+
+        .activity-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(12px);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            display: none;
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        .activity-card.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 {
+            color: var(--primary);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+
+        .instructions {
+            font-style: italic;
+            color: #38bdf8;
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+        }
+
+        /* MCQ Style */
+        .question-block {
+            margin-bottom: 25px;
+            background: rgba(255,255,255,0.02);
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 3px solid var(--secondary);
+        }
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .option-btn {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: var(--text-color);
+            padding: 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            text-align: left;
+            transition: background 0.2s;
+        }
+        .option-btn:hover {
+            background: rgba(79, 172, 254, 0.2);
+        }
+
+        /* Match Style */
+        .match-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            gap: 20px;
+        }
+        .match-left {
+            background: rgba(255,255,255,0.05);
+            padding: 10px;
+            border-radius: 6px;
+            width: 45%;
+        }
+        .match-right-select {
+            background: #1e293b;
+            color: #fff;
+            border: 1px solid var(--secondary);
+            padding: 10px;
+            border-radius: 6px;
+            width: 45%;
+        }
+
+        /* Drag and Drop Style */
+        .drag-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(255,255,255,0.02);
+            border-radius: 8px;
+            min-height: 50px;
+        }
+        .drag-item {
+            background: linear-gradient(135deg, #1e293b, #334155);
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: grab;
+            border: 1px solid rgba(255,255,255,0.1);
+            user-select: none;
+        }
+        .drop-zone-box {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(255,255,255,0.03);
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+        }
+        .drop-zone {
+            border: 2px dashed var(--secondary);
+            border-radius: 6px;
+            min-width: 150px;
+            min-height: 35px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 10px;
+        }
+
+        /* Rearrange Style */
+        .sortable-list {
+            list-style: none;
+            padding: 0;
+        }
+        .sortable-item {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 12px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            cursor: move;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Inline Dropdown Style */
+        .inline-text {
+            line-height: 2;
+            font-size: 1.1rem;
+        }
+        .inline-select {
+            background: #1e293b;
+            color: var(--primary);
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 4px;
+            border-radius: 4px;
+            margin: 0 5px;
+        }
+
+        /* Written Q&A Style */
+        .qa-box {
+            margin-bottom: 20px;
+            background: rgba(255,255,255,0.03);
+            padding: 15px;
+            border-radius: 8px;
+        }
+        .reveal-btn {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .answer-text {
+            display: none;
+            margin-top: 10px;
+            padding: 10px;
+            background: rgba(0, 230, 118, 0.1);
+            border-left: 3px solid var(--success);
+            border-radius: 4px;
+        }
+
+        /* Global Control Buttons */
+        .action-btn {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: #0b0f19;
+            border: none;
+            padding: 12px 25px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 20px;
+            font-size: 1rem;
+            text-transform: uppercase;
+        }
+        .action-btn:hover {
+            box-shadow: 0 0 20px rgba(0, 242, 254, 0.6);
+        }
+        .result {
+            margin-top: 15px;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Interactive Module: Introduction to History & Prehistoric Society</h1>
+    <div class="subtitle">GPT TEACHERS EDUCATIONAL RESOURCES, UTTARA KANNADA</div>
+
+    <div class="container">
+        <div class="navigation">
+            <button class="nav-btn active" onclick="showTab(1)">1. Multiple Choice</button>
+            <button class="nav-btn" onclick="showTab(2)">2. Match Following</button>
+            <button class="nav-btn" onclick="showTab(3)">3. Drag & Drop</button>
+            <button class="nav-btn" onclick="showTab(4)">4. Timeline Order</button>
+            <button class="nav-btn" onclick="showTab(5)">5. Inline Dropdown</button>
+            <button class="nav-btn" onclick="showTab(6)">6. Descriptive Q&A</button>
+        </div>
+
+        <div id="act1" class="activity-card active">
+            <h2>Activity 1: Multiple Choice Quiz</h2>
+            <div class="instructions">Select the most accurate answer for each question.</div>
+            <div id="mcq-container"></div>
+            <button class="action-btn" onclick="checkMCQ()">Evaluate MCQ</button>
+            <div id="mcq-result" class="result"></div>
+        </div>
+
+        <div id="act2" class="activity-card">
+            <h2>Activity 2: Match the Concepts</h2>
+            <div class="instructions">Match the items in the left column to their correct definitions.</div>
+            <div id="match-container"></div>
+            <button class="action-btn" onclick="checkMatch()">Evaluate Match</button>
+            <div id="match-result" class="result"></div>
+        </div>
+
+        <div id="act3" class="activity-card">
+            <h2>Activity 3: Site Classification</h2>
+            <div class="instructions">Drag the archaeological sites and drop them into their correct Stone Age periods.</div>
+            <div class="drag-container" id="drag-items-pool"></div>
+            <div id="drag-targets-container"></div>
+            <button class="action-btn" onclick="checkDragDrop()">Evaluate Classification</button>
+            <div id="drag-result" class="result"></div>
+        </div>
+
+        <div id="act4" class="activity-card">
+            <h2>Activity 4: Chronological Rearrangement</h2>
+            <div class="instructions">Drag and drop items to arrange the human evolutionary and material stages from oldest to newest.</div>
+            <ul class="sortable-list" id="sortable-list-container"></ul>
+            <button class="action-btn" onclick="checkSequence()">Evaluate Timeline</button>
+            <div id="sequence-result" class="result"></div>
+        </div>
+
+        <div id="act5" class="activity-card">
+            <h2>Activity 5: Dropdown Paragraph Completion</h2>
+            <div class="instructions">Choose the correct historical terms from the dropdown menus to complete the sentences.</div>
+            <div class="inline-text" id="dropdown-paragraph"></div>
+            <button class="action-btn" onclick="checkDropdowns()">Evaluate Text</button>
+            <div id="dropdown-result" class="result"></div>
+        </div>
+
+        <div id="act6" class="activity-card">
+            <h2>Activity 6: Analytical 4-Mark Corner</h2>
+            <div class="instructions">Review these crucial high-level questions. Practice writing them and click to review ideal solutions.</div>
+            <div id="qa-container"></div>
+        </div>
+    </div>
+
+    <script>
+        // Data Definitions
+        const mcqData = [
+            { q: "Who is traditionally recognized as the 'Father of History'?", o: ["Socrates", "Herodotus", "Aristotle", "Ashoka"], a: 1 },
+            { q: "What is the systematic presentation of past events called?", o: ["Mythology", "Story", "History", "Folklore"], a: 2 },
+            { q: "Which ancient region stands out as the location where the earliest traces of Indian subcontinent farming were traced?", o: ["Hunasagi", "Meharghar", "Burjhome", "Halluru"], a: 1 },
+            { q: "What crucial feature is used by historians to differentiate the Pre-historic period from the Historic period?", o: ["Discovery of Fire", "Knowledge of Script", "Use of Copper", "Sedentary Village Life"], a: 1 },
+            { q: "What was the very first metal discovered and utilized by human beings?", o: ["Iron", "Bronze", "Gold", "Copper"], a: 3 },
+            { q: "The Mesolithic Age is widely called the Micro Age because of the use of what tools?", o: ["Polished Bone Axes", "Skillful Small Stone Weapons", "Large Pebble Hammers", "Heavy Bronze Ploughs"], a: 1 }
+        ];
+
+        const matchData = [
+            { left: "Herodotus", right: "Father of History", options: ["Father of History", "scientific method of digging out remains", "Systematic record of past with dates", "Oral literature like folktales", "Unfamiliarity with written script"] },
+            { left: "Prehistoric Period", right: "Unfamiliarity with written script", options: ["Father of History", "scientific method of digging out remains", "Systematic record of past with dates", "Oral literature like folktales", "Unfamiliarity with written script"] },
+            { left: "History Statement", right: "Systematic record of past with dates", options: ["Father of History", "scientific method of digging out remains", "Systematic record of past with dates", "Oral literature like folktales", "Unfamiliarity with written script"] },
+            { left: "Excavation", right: "scientific method of digging out remains", options: ["Father of History", "scientific method of digging out remains", "Systematic record of past with dates", "Oral literature like folktales", "Unfamiliarity with written script"] },
+            { left: "Ballads & Lavani", right: "Oral literature like folktales", options: ["Father of History", "scientific method of digging out remains", "Systematic record of past with dates", "Oral literature like folktales", "Unfamiliarity with written script"] },
+            { left: "Archaeological Sources", right: "Pot shards, coins, inscriptions and monuments", options: ["Pot shards, coins, inscriptions and monuments", "Father of History", "Oral literature", "Unfamiliarity with written script", "Scientific digging"] }
+        ];
+
+        const dragData = [
+            { item: "Bolan Valley (MP)", group: "Palaeolithic" },
+            { item: "Attirampakkam (TN)", group: "Palaeolithic" },
+            { item: "Bhimbetka Caves (MP)", group: "Mesolithic" },
+            { item: "Bagor (Rajasthan)", group: "Mesolithic" },
+            { item: "Sanganakallu (Karnataka)", group: "Neolithic" },
+            { item: "Meharghar (Pakistan)", group: "Neolithic" }
+        ];
+
+        const sequenceData = [
+            "Palaeolithic Nomadic Hunting & Gathering",
+            "Mesolithic Skillful Small Weapon Crafting & Herding",
+            "Neolithic Systematic Agriculture & Ceramic Pottery Making",
+            "Copper and Bronze Alloy Metallic Tools Development",
+            "Harappan River Valley First Urbanization Progress",
+            "Hard Iron Weaponry Optimization & Sovereign Republics Emergence"
+        ];
+
+        const descriptiveData = [
+            { q: "Why does history require absolute parameters of time, place, and person? Explain the difference between a story and history.", a: "History is built on scientific accuracy, requiring answers to when, where, and by whom an incident occurred. Without this specificity, narratives lose authenticity and degrade into dynamic stories. For example, a story vaguely states, 'Once upon a time there was a king who fought a battle.' History converts this into structured truth: 'In 261 BC, King Ashoka of Pataliputra fought a battle against Kalinga.' Hence, parameters prevent fabrications." },
+            { q: "Detail the structural and behavioral shifts that took place when humans transitioned from the Mesolithic to the Neolithic Age.", a: "During the Mesolithic period, humans were mainly nomadic hunters and herders utilizing small microlithic weapons, facing chronic food shortfalls. In the Neolithic Age, a major transformation occurred as communities established base camps to focus heavily on domestic food production. They innovated specialized polished hand-axes, constructed durable dry brick houses, engineered the wheel for high-quality pottery fabrication, and built the earliest permanent agrarian villages." },
+            { q: "How did the invention of Bronze toolsets optimize ancient food economics and eventually trigger the first urbanization?", a: "The development of bronze—an alloy created by combining copper and tin—yielded a structural metal far harder than raw copper. Bronze tools allowed early farmers to clear thick old forests and plough alluvial soils deeply. This caused a massive surge in agricultural production surplus. This surplus initiated complex inter-regional commodity trade, transforming small farming communities into major urban hubs like the Harappan Civilization." },
+            { q: "Explain the structural categorization of historical sources and outline how archeologists perform scientific excavations.", a: "Historical sources are divided into Literary Sources (Written Native/Foreign books and Oral folklore) and Archaeological Sources (Pot shards, coins, inscriptions, and monuments). Excavation is the scientific procedure of carefully digging out ancient materials embedded deep inside the soil matrix. Archaeologists systematically use specialized equipment like precision knives, trowels, wooden needles, and brushes to secure delicate artifacts and fossils without degradation." },
+            { q: "Describe the changes that occurred in human life during the Metal Age, specifically highlighting the significance of Iron.", a: "The introduction of metals revolutionized human progress. While copper and bronze laid the groundwork for early farming and urbanization, it was the Iron Age that initiated massive structural changes. Iron, being a very hard and abundant metal, allowed for the mass production of superior agricultural tools and weapons. This led to hyper-surplus food items, expansion of kingdoms like Nanda and Maurya, and the creation of systematic socio-political empires." }
+        ];
+
+        // Tab Controller
+        function showTab(num) {
+            document.querySelectorAll('.activity-card').forEach(card => card.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(btn => card = btn.classList.remove('active'));
+            document.getElementById('act' + num).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // Initialize MCQ
+        const mcqContainer = document.getElementById('mcq-container');
+        mcqData.forEach((data, index) => {
+            let qDiv = document.createElement('div');
+            qDiv.className = 'question-block';
+            qDiv.innerHTML = `<p><strong>Q${index+1}:</strong> ${data.q}</p>`;
+            let optDiv = document.createElement('div');
+            optDiv.className = 'options-grid';
+            data.o.forEach((opt, oIdx) => {
+                optDiv.innerHTML += `<button class="option-btn" data-q="${index}" data-o="${oIdx}" onclick="selectOption(this)">${opt}</button>`;
+            });
+            qDiv.appendChild(optDiv);
+            mcqContainer.appendChild(qDiv);
+        });
+
+        let selectedMCQ = {};
+        function selectOption(btn) {
+            let q = btn.getAttribute('data-q');
+            let o = btn.getAttribute('data-o');
+            selectedMCQ[q] = parseInt(o);
+            btn.parentElement.querySelectorAll('.option-btn').forEach(b => b.style.background = 'rgba(255,255,255,0.05)');
+            btn.style.background = 'var(--accent)';
+        }
+
+        function checkMCQ() {
+            let score = 0;
+            mcqData.forEach((data, index) => {
+                if(selectedMCQ[index] === data.a) score++;
+            });
+            document.getElementById('mcq-result').innerText = `Score: ${score} / ${mcqData.length}`;
+        }
+
+        // Initialize Match
+        const matchContainer = document.getElementById('match-container');
+        matchData.forEach((data, index) => {
+            let row = document.createElement('div');
+            row.className = 'match-row';
+            row.innerHTML = `<div class="match-left">${data.left}</div>`;
+            let select = document.createElement('select');
+            select.className = 'match-right-select';
+            select.id = `match-sel-${index}`;
+            select.innerHTML = '<option value="">--Select Match--</option>';
+            // Shuffle choices slightly for pedagogical fun
+            let uniqueOpts = [...new Set(matchData.map(m => m.right))];
+            uniqueOpts.forEach(opt => {
+                select.innerHTML += `<option value="${opt}">${opt}</option>`;
+            });
+            row.appendChild(select);
+            matchContainer.appendChild(row);
+        });
+
+        function checkMatch() {
+            let score = 0;
+            matchData.forEach((data, index) => {
+                let sel = document.getElementById(`match-sel-${index}`).value;
+                if(sel === data.right) score++;
+            });
+            document.getElementById('match-result').innerText = `Score: ${score} / ${matchData.length}`;
+        }
+
+        // Initialize Drag and Drop
+        const dragPool = document.getElementById('drag-items-pool');
+        const dragTargetsContainer = document.getElementById('drag-targets-container');
+        
+        // Render Targets
+        const targetGroups = ["Palaeolithic", "Mesolithic", "Neolithic"];
+        targetGroups.forEach(g => {
+            dragTargetsContainer.innerHTML += `
+                <div class="drop-zone-box">
+                    <strong>${g} Sites Zone:</strong>
+                    <div class="drop-zone" data-group="${g}" ondragover="allowDrop(event)" ondrop="dropItem(event)">Drop Here</div>
+                </div>`;
+        });
+
+        // Render Shuffled Items
+        let shuffledDrag = [...dragData].sort(() => Math.random() - 0.5);
+        shuffledDrag.forEach((d, i) => {
+            let item = document.createElement('div');
+            item.className = 'drag-item';
+            item.draggable = true;
+            item.id = `drag-item-${i}`;
+            item.innerText = d.item;
+            item.setAttribute('data-group', d.group);
+            item.ondragstart = (e) => { e.dataTransfer.setData("text", e.target.id); };
+            dragPool.appendChild(item);
+        });
+
+        function allowDrop(e) { e.preventDefault(); }
+        function dropItem(e) {
+            e.preventDefault();
+            let data = e.dataTransfer.getData("text");
+            let draggedNode = document.getElementById(data);
+            if (e.target.classList.contains('drop-zone')) {
+                e.target.appendChild(draggedNode);
+            }
+        }
+
+        function checkDragDrop() {
+            let score = 0;
+            let zones = document.querySelectorAll('.drop-zone');
+            zones.forEach(zone => {
+                let targetGroup = zone.getAttribute('data-group');
+                let children = zone.querySelectorAll('.drag-item');
+                children.forEach(child => {
+                    if(child.getAttribute('data-group') === targetGroup) score++;
+                });
+            });
+            document.getElementById('drag-result').innerText = `Correctly Classified: ${score} / ${dragData.length}`;
+        }
+
+        // Initialize Sequence
+        const sortContainer = document.getElementById('sortable-list-container');
+        let shuffledSeq = [...sequenceData].sort(() => Math.random() - 0.5);
+        shuffledSeq.forEach((itemText, i) => {
+            let li = document.createElement('li');
+            li.className = 'sortable-item';
+            li.draggable = true;
+            li.innerText = itemText;
+            li.id = `seq-${i}`;
+            
+            li.ondragstart = (e) => {
+                e.dataTransfer.setData("text/plain", e.target.id);
+                setTimeout(() => li.style.opacity = '0.5', 0);
+            };
+            li.ondragend = () => li.style.opacity = '1';
+            
+            sortContainer.appendChild(li);
+        });
+
+        sortContainer.ondragover = (e) => {
+            e.preventDefault();
+            const draggingItem = document.querySelector('.sortable-item[style*="opacity: 0.5"]');
+            if(!draggingItem) return;
+            const siblings = [...sortContainer.querySelectorAll('.sortable-item:not([style*="opacity: 0.5"])')];
+            let nextSibling = siblings.find(sibling => {
+                return e.clientY <= sibling.getBoundingClientRect().top + sibling.offsetHeight / 2;
+            });
+            sortContainer.insertBefore(draggingItem, nextSibling);
+        };
+
+        function checkSequence() {
+            let currentOrder = [...sortContainer.querySelectorAll('.sortable-item')].map(li => li.innerText);
+            let score = 0;
+            currentOrder.forEach((text, idx) => {
+                if(sequenceData[idx] === text) score++;
+            });
+            document.getElementById('sequence-result').innerText = `Alignment Accuracy: ${score} / ${sequenceData.length}`;
+        }
+
+        // Initialize Inline Dropdowns
+        const paraContainer = document.getElementById('dropdown-paragraph');
+        paraContainer.innerHTML = `
+            History is not a simple fantasy narration. While a 
+            <select class="inline-select" id="inline-0"><option value="">?</option><option value="Story">Story</option><option value="Chronology">Chronology</option></select> 
+            vaguely states 'Once upon a time there was a king', true history maintains strict details regarding 
+            <select class="inline-select" id="inline-1"><option value="">?</option><option value="Time & Place">Time & Place</option><option value="Scripts">Scripts</option></select>. 
+            The human trajectory spans generations; the legendary period when the knowledge of script was absent is recognized as the 
+            <select class="inline-select" id="inline-2"><option value="">?</option><option value="Prehistoric Period">Prehistoric Period</option><option value="Historic Period">Historic Period</option></select>. 
+            During the Old Stone Age, humans lived as 
+            <select class="inline-select" id="inline-3"><option value="">?</option><option value="Nomads">Nomads</option><option value="Farmers">Farmers</option></select> 
+            inside remote caves. In the revolutionary transition into the 
+            <select class="inline-select" id="inline-4"><option value="">?</option><option value="Neolithic Age">Neolithic Age</option><option value="Palaeolithic Age">Palaeolithic Age</option></select>, 
+            communities settled on riverbeds to pioneer active 
+            <select class="inline-select" id="inline-5"><option value="">?</option><option value="Agriculture">Agriculture</option><option value="Iron Mining">Iron Mining</option></select>.
+        `;
+
+        const inlineAnswers = ["Story", "Time & Place", "Prehistoric Period", "Nomads", "Neolithic Age", "Agriculture"];
+        function checkDropdowns() {
+            let score = 0;
+            inlineAnswers.forEach((ans, idx) => {
+                let val = document.getElementById(`inline-${idx}`).value;
+                if(val === ans) score++;
+            });
+            document.getElementById('dropdown-result').innerText = `Result: ${score} / ${inlineAnswers.length}`;
+        }
+
+        // Initialize written Q&A
+        const qaContainer = document.getElementById('qa-container');
+        descriptiveData.forEach((qa, idx) => {
+            qaContainer.innerHTML += `
+                <div class="qa-box">
+                    <p><strong>Q${idx+1} [4 Marks]:</strong> ${qa.q}</p>
+                    <button class="reveal-btn" onclick="toggleAns(${idx})">Toggle Ideal Answer Key</button>
+                    <div class="answer-text" id="ans-${idx}">${qa.a}</div>
+                </div>`;
+        });
+
+        function toggleAns(idx) {
+            let box = document.getElementById(`ans-${idx}`);
+            box.style.display = box.style.display === 'block' ? 'none' : 'block';
+        }
+    </script>
+</body>
+</html>
