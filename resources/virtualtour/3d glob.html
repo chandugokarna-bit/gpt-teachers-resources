@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>3D ಇಂಟರಾಕ್ಟಿವ್ ಇಂಗ್ಲಿಷ್ ಶೈಕ್ಷಣಿಕ ಭೂಗೋಳ</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      background: #090d16;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      touch-action: none; /* ಮೊಬೈಲ್ ಬ್ರೌಸರ್‌ನ ಡಿಫಾಲ್ಟ್ ಸ್ಕ್ರಾಲ್ ಬ್ಲಾಕ್ ಮಾಡಲು */
+    }
+    #earth-canvas {
+      width: 100%;
+      height: 100%;
+      cursor: grab;
+    }
+    #earth-canvas:active {
+      cursor: grabbing;
+    }
+  </style>
+  <!-- 🌐 3D ಗ್ಲೋಬ್ ವೆಬ್-ಜಿಎಲ್ ತಂತ್ರಜ್ಞಾನ -->
+  <script src="https://www.webglearth.com/v2/api.js"></script>
+</head>
+<body>
+
+  <div id="earth-canvas"></div>
+
+  <script>
+    var earth;
+
+    function initializeEarth() {
+      // 3D ಗ್ಲೋಬ್ ಸೆಟಪ್
+      earth = new WE.map('earth-canvas', {
+        center: [20.0, 78.0], // ಭಾರತ ಮಧ್ಯದಲ್ಲಿ ಕಾಣಿಸಲು
+        zoom: 2.5,
+        minZoom: 1.5,
+        maxZoom: 6,
+        sky: true,
+        atmosphere: true,
+        dragging: true,
+        tilting: false // ಮೊಬೈಲ್‌ನಲ್ಲಿ ಸ್ಕ್ರೀನ್ ಕಂಟ್ರೋಲ್ ತಪ್ಪದಿರಲು ಟಿಲ್ಟಿಂಗ್ ಆಫ್ ಮಾಡಲಾಗಿದೆ
+      });
+
+      // 🌍 ಇಡೀ ಜಗತ್ತಿನ ಎಲ್ಲಾ ಖಂಡಗಳ ಹೆಸರುಗಳನ್ನು ಕೇವಲ ಇಂಗ್ಲಿಷ್‌ನಲ್ಲಿ ತೋರಿಸುವ ಅಂತರರಾಷ್ಟ್ರೀಯ ಲೇಯರ್
+      WE.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+        attribution: '' 
+      }).addTo(earth);
+
+      // 📱 ಮೊಬೈಲ್ ಮಲ್ಟಿ-ಟಚ್ (Pinch to Zoom) ಸಕ್ರಿಯಗೊಳಿಸುವ ಸ್ಮಾರ್ಟ್ ಕೋಡ್
+      setupMobileTouchZoom();
+    }
+
+    function setupMobileTouchZoom() {
+      var el = document.getElementById('earth-canvas');
+      var startDist = 0;
+      var startZoom = 2.5;
+
+      el.addEventListener('touchstart', function(e) {
+        if (e.touches.length === 2) {
+          // ಎರಡು ಬೆರಳುಗಳು ತಗುಲಿದಾಗ ಅವುಗಳ ನಡುವಿನ ಅಂತರ ಲೆಕ್ಕ ಹಾಕುವುದು
+          startDist = Math.hypot(
+            e.touches[0].pageX - e.touches[1].pageX,
+            e.touches[0].pageY - e.touches[1].pageY
+          );
+          startZoom = earth.getZoom();
+        }
+      }, { passive: true });
+
+      el.addEventListener('touchmove', function(e) {
+        if (e.touches.length === 2 && startDist > 0) {
+          var dist = Math.hypot(
+            e.touches[0].pageX - e.touches[1].pageX,
+            e.touches[0].pageY - e.touches[1].pageY
+          );
+          
+          // ಜೂಮ್ ಫ್ಯಾಕ್ಟರ್ ಲೆಕ್ಕಾಚಾರ
+          var factor = dist / startDist;
+          var newZoom = startZoom + Math.log2(factor);
+          
+          // ಮಿತಿಗಳ ಒಳಗಡೆ ಜೂಮ್ ಅಪ್ಲೈ ಮಾಡುವುದು
+          if (newZoom >= 1.5 && newZoom <= 6) {
+            earth.setZoom(newZoom);
+          }
+        }
+      }, { passive: true });
+
+      el.addEventListener('touchend', function(e) {
+        if (e.touches.length < 2) {
+          startDist = 0;
+        }
+      }, { passive: true });
+    }
+    
+    window.onload = initializeEarth;
+  </script>
+
+</body>
+</html>
