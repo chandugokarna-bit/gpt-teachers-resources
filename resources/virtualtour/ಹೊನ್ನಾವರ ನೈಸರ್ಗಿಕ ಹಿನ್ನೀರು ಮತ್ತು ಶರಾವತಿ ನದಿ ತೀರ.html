@@ -1,108 +1,131 @@
 <!DOCTYPE html>
 <html lang="kn">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>ಹೊನ್ನಾವರ ಹಿನ್ನೀರು 360° ಆಡಿಯೋ ಪ್ರವಾಸ</title>
-    <!-- A-Frame VR ಲೈಬ್ರರಿ -->
-    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಹೊನ್ನಾವರ ಹಿನ್ನೀರು - 360° ಆಡಿಯೋ ಪ್ರವಾಸ</title>
+    <!-- Pannellum 360 ಲೈಬ್ರರಿ -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.7/build/pannellum.css"/>
+    <script src="https://cdn.jsdelivr.net/npm/pannellum@2.5.7/build/pannellum.js"></script>
     <style>
-        /* ಮಾಹಿತಿ ಫಲಕ */
-        #info-panel {
-            position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
-            width: 85%; max-width: 650px; background: rgba(15, 23, 42, 0.95); color: #f8fafc;
-            padding: 20px; border-radius: 15px; font-family: sans-serif; text-align: center;
-            font-size: 18px; line-height: 1.6; border: 2px solid #06b6d4; /* Teal/Cyan Border for Water Theme */
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
-            z-index: 999; pointer-events: none;
-        }
+        body { margin: 0; padding: 0; font-family: sans-serif; }
+        #panorama { width: 100vw; height: 100vh; }
+        
         /* ಶೀರ್ಷಿಕೆ ಫಲಕ */
         #title-panel {
             position: absolute; top: 20px; left: 20px; color: white;
             background: rgba(15, 23, 42, 0.85); padding: 15px; border-radius: 10px;
-            border-left: 5px solid #06b6d4; z-index: 999;
+            border-left: 5px solid #06b6d4; z-index: 999; pointer-events: none;
         }
-        #title-panel h1 { margin: 0; font-size: 22px; color: #06b6d4; }
+        #title-panel h1 { margin: 0; font-size: 20px; color: #06b6d4; }
+        #title-panel p { margin: 5px 0 0 0; font-size: 14px; color: #e2e8f0; }
+
+        /* ಕೆಳಗಿನ ಸುಂದರ ಮಾಹಿತಿ ಫಲಕ (ಆಡಿಯೋ ಮತ್ತು ಪಠ್ಯಕ್ಕಾಗಿ) */
+        #info-panel {
+            position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
+            width: 85%; max-width: 650px; background: rgba(15, 23, 42, 0.95); color: #f8fafc;
+            padding: 20px; border-radius: 15px; text-align: center;
+            font-size: 17px; line-height: 1.6; border: 2px solid #06b6d4; /* ಹಿನ್ನೀರಿನ ಥೀಮ್‌ಗೆ ಸಯಾನ್/ನೀಲಿ ಬಣ್ಣ */
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+            z-index: 999; pointer-events: none;
+        }
+
+        /* 🎯 ದೊಡ್ಡದಾಗಿರುವ ಕಸ್ಟಮ್ ಹಾಟ್‌ಸ್ಪಾಟ್‌ ಬಬಲ್ಸ್ */
+        .custom-hotspot {
+            height: 32px;
+            width: 32px;
+            background: #eab308; /* ಹೊಳೆಯುವ ಚಿನ್ನದ ಬಣ್ಣ */
+            border: 3px solid #ffffff;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 12px rgba(234, 179, 8, 0.8);
+            transition: all 0.3s ease;
+        }
+        /* ಅದರ ಮೇಲೆ ಬೆರಳು ಇಟ್ಟಾಗ ಕೆಂಪು ಬಣ್ಣಕ್ಕೆ ತಿರುಗಲು */
+        .custom-hotspot:hover {
+            background: #ef4444; 
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.9);
+            transform: scale(1.2);
+        }
     </style>
 </head>
 <body>
 
-    <div id="title-panel">
-        <h1>ಹೊನ್ನಾವರ: ನೈಸರ್ಗಿಕ ಹಿನ್ನೀರು ಮತ್ತು ಶರಾವತಿ ನದಿ ತೀರ</h1>
-        <p>ಚಿನ್ನದ ಬಣ್ಣದ ವರ್ತುಲಗಳ ಮೇಲೆ ನೇರವಾಗಿ ಕ್ಲಿಕ್ ಮಾಡಿ ಆಡಿಯೋ ಮಾಹಿತಿ ಪಡೆಯಿರಿ</p>
-    </div>
+<div id="title-panel">
+    <h1>ಹೊನ್ನಾವರ: ನೈಸರ್ಗಿಕ ಹಿನ್ನೀರು ಮತ್ತು ಶರಾವತಿ ನದಿ ತೀರ</h1>
+    <p>ದೊಡ್ಡದಾಗಿರುವ ಚಿನ್ನದ ಬಣ್ಣದ ವರ್ತುಲಗಳ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ ಆಡಿಯೋ ವಿವರ ಪಡೆಯಿರಿ</p>
+</div>
 
-    <div id="info-panel">
-        ಸ್ವಾಗತ! ಉತ್ತರ ಕನ್ನಡದ ಪ್ರಕೃತಿ ಸೌಂದರ್ಯ ಮತ್ತು ಹೊನ್ನಾವರದ ಶಾಂತ ಇಕೋ-ಟೂರಿಸಂ ತಿಳಿಯಲು ಆವರಣದಲ್ಲಿರುವ ಚಿನ್ನದ ಬಣ್ಣದ ಹಾಟ್‌ಸ್ಪಾಟ್‌ಗಳ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ...
-    </div>
+<div id="panorama"></div>
 
-    <!-- VR ಬಟನ್ ಸಂಪೂರ್ಣವಾಗಿ ತೆಗೆದುಹಾಕಲಾಗಿದೆ -->
-    <a-scene vr-mode-ui="enabled: false" cursor="rayOrigin: mouse">
-        <a-assets>
-            <img id="honnavara-scene" src="https://raw.githubusercontent.com/chandugokarna-bit/gpt-teachers-resources/main/resources/virtual/honnavara%20backwater360.jpg" crossorigin="anonymous">
-        </a-assets>
+<div id="info-panel">
+    ಸ್ವಾಗತ! ಉತ್ತರ ಕನ್ನಡದ ಪ್ರಕೃತಿ ಸೌಂದರ್ಯ ಮತ್ತು ಹೊನ್ನಾವರದ ಶಾಂತ ಇಕೋ-ಟೂರಿಸಂ ತಿಳಿಯಲು ಆವರಣದಲ್ಲಿರುವ ದೊಡ್ಡ ಹಾಟ್‌ಸ್ಪಾಟ್‌ಗಳ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ...
+</div>
 
-        <!-- ಹಿನ್ನೆಲೆ 360 ಚಿತ್ರ -->
-        <a-sky src="#honnavara-scene"></a-sky>
+<script>
+// ಕನ್ನಡ ಧ್ವನಿ ಕಾರ್ಯವಿಧಾನ
+function speakKannada(title, infoText) {
+    document.getElementById('info-panel').innerHTML = `<strong>${title}</strong><br>${infoText}`;
+    
+    if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel(); // ಹಳೆಯ ಧ್ವನಿ ನಿಲ್ಲಿಸಲು
+        
+        const speech = new SpeechSynthesisUtterance();
+        speech.text = title + ". " + infoText;
+        speech.lang = 'kn-IN'; // ಕನ್ನಡ ಭಾಷೆ
+        speech.rate = 0.85; // ಸ್ಪಷ್ಟ ಧ್ವನಿ ವೇಗ
+        
+        window.speechSynthesis.speak(speech);
+    }
+}
 
-        <!-- ಫೋನ್ ಮೊಬೈಲ್ ಸೆನ್ಸರ್ ಟ್ರ್ಯಾಕಿಂಗ್ ನಿಷ್ಕ್ರಿಯಗೊಳಿಸಲಾಗಿದೆ - ಕೇವಲ ಕಂಟ್ರೋಲ್ ಬ್ರೌಸರ್ ಟಚ್ -->
-        <a-entity camera look-controls="magicWindowTrackingEnabled: false" position="0 1.6 0"></a-entity>
+// Pannellum ವೀಕ್ಷಕ ಸೆಟ್ಟಿಂಗ್ಸ್
+pannellum.viewer('panorama', {
+    "type": "equirectangular",
+    "panorama": "https://raw.githubusercontent.com/chandugokarna-bit/gpt-teachers-resources/main/resources/virtual/honnavara%20backwater360.jpg",
+    "autoLoad": true,
+    "title": "ಹಿನ್ನೀರು, ಹೊನ್ನಾವರ",
+    "author": "ನೈಸರ್ಗಿಕ ಇಕೋ-ಟೂರಿಸಂ ತಾಣ",
+    "hotSpots": [
+        {
+            "pitch": 0,
+            "yaw": -35,
+            "cssClass": "custom-hotspot", // ನಮ್ಮ ಕಸ್ಟಮ್ ದೊಡ್ಡ ಹಾಟ್‌ಸ್ಪಾಟ್
+            "createTooltipFunc": function(hotSpotDiv) { hotSpotDiv.setAttribute("title", "ಶರಾವತಿ ಹಿನ್ನೀರು"); },
+            "clickHandlerFunc": function() {
+                speakKannada(
+                    "ಹೊನ್ನಾವರದ ಶಾಂತ ಹಿನ್ನೀರು", 
+                    "ವಿಶ್ವಪ್ರಸಿದ್ಧ ಜೋಗ ಜಲಪಾತವನ್ನು ಸೃಷ್ಟಿಸುವ ಶರಾವತಿ ನದಿಯು ಸಮುದ್ರವನ್ನು ಸೇರುವ ಮುನ್ನ ಹೊನ್ನಾವರದಲ್ಲಿ ವಿಶಾಲವಾದ ಹಿನ್ನೀರನ್ನು ಸೃಷ್ಟಿಸುತ್ತದೆ. ಇದು ಅನೇಕ ಸಣ್ಣ ಸಣ್ಣ ಹಸಿರು ದ್ವೀಪಗಳಿಂದ ಕೂಡಿದ್ದು, ವಿಶಿಷ್ಟ ಜೀವವೈವಿಧ್ಯತೆಗೆ ಆಶ್ರಯ ನೀಡಿದೆ."
+                );
+            }
+        },
+        {
+            "pitch": 5,
+            "yaw": 15,
+            "cssClass": "custom-hotspot",
+            "createTooltipFunc": function(hotSpotDiv) { hotSpotDiv.setAttribute("title", "ಕಾಂಡ್ಲಾ ವನ"); },
+            "clickHandlerFunc": function() {
+                speakKannada(
+                    "ಕಾಂಡ್ಲಾ ವನ (Mangrove Forests)", 
+                    "ಹೊನ್ನಾವರದ ಹಿನ್ನೀರಿನಲ್ಲಿ ಕರ್ನಾಟಕದ ಅತಿ ದೊಡ್ಡ ಮತ್ತು ಸುಂದರವಾದ ಕಾಂಡ್ಲಾ ವನಗಳಿವೆ. ಈ ಮ್ಯಾಂಗ್ರೋವ್ ಸಸ್ಯಗಳ ಬೇರುಗಳು ನೀರಿನಲ್ಲಿ ಮುಳುಗಿದ್ದು, ತೀರಪ್ರದೇಶವನ್ನು ಕೊಚ್ಚಿ ಹೋಗದಂತೆ ರಕ್ಷಿಸುತ್ತವೆ. ಇವು ಸಮುದ್ರದ ಜೀವಿಗಳ ಸಂತಾನೋತ್ಪತ್ತಿಗೆ ಪ್ರಮುಖ ತಾಣಗಳಾಗಿವೆ."
+                );
+            }
+        },
+        {
+            "pitch": -5,
+            "yaw": 45,
+            "cssClass": "custom-hotspot",
+            "createTooltipFunc": function(hotSpotDiv) { hotSpotDiv.setAttribute("title", "ಪರಿಸರ ಪ್ರವಾಸೋದ್ಯಮ"); },
+            "clickHandlerFunc": function() {
+                speakKannada(
+                    "ದೋಣಿ ವಿಹಾರ ಮತ್ತು ಕರಾವಳಿ ಪ್ರವಾಸೋದ್ಯಮ", 
+                    "ಇತ್ತೀಚಿನ ವರ್ಷಗಳಲ್ಲಿ ಹೊನ್ನಾವರದ ಹಿನ್ನೀರು ಪರಿಸರಸ್ನೇಹಿ ಪ್ರವಾಸೋದ್ಯಮಕ್ಕೆ ಜಗತ್ಪ್ರಸಿದ್ಧಿಯಾಗಿದೆ. ಇಲ್ಲಿನ ಶರಾವತಿ ಬೋರ್ಡ್‌ವಾಕ್ ಮತ್ತು ಸಾಂಪ್ರದಾಯಿಕ ದೋಣಿ ವಿಹಾರದ ಮೂಲಕ ಪ್ರವಾಸಿಗರು ಸೂರ್ಯಾಸ್ತ ಹಾಗೂ ಕರಾವಳಿಯ ಸುಂದರ ಸಮ್ಮಿಲನವನ್ನು ಕಣ್ಣುಂಬಿಕೊಳ್ಳಬಹುದು."
+                );
+            }
+        }
+    ]
+});
+</script>
 
-        <!-- ================= ಇಂಟರಾಕ್ಟಿವ್ ಹಾಟ್‌ಸ್ಪಾಟ್‌ಗಳು ================= -->
-
-        <!-- 1. ಶರಾವತಿ ಹಿನ್ನೀರು ಮತ್ತು ಭೌಗೋಳಿಕತೆ -->
-        <a-sphere id="hotspot-honnavara-backwater" position="-2 1.5 -4" radius="0.35" color="#eab308" class="hotspot"
-                  data-title="ಹೊನ್ನಾವರದ ಶಾಂತ ಹಿನ್ನೀರು"
-                  data-info="ವಿಶ್ವಪ್ರಸಿದ್ಧ ಜೋಗ ಜಲಪಾತವನ್ನು ಸೃಷ್ಟಿಸುವ ಶರಾವತಿ ನದಿಯು ಸಮುದ್ರವನ್ನು ಸೇರುವ ಮುನ್ನ ಹೊನ್ನಾವರದಲ್ಲಿ ವಿಶಾಲವಾದ ಹಿನ್ನೀರನ್ನು ಸೃಷ್ಟಿಸುತ್ತದೆ. ಇದು ಅನೇಕ ಸಣ್ಣ ಸಣ್ಣ ಹಸಿರು ದ್ವೀಪಗಳಿಂದ ಕೂಡಿದ್ದು, ವಿಶಿಷ್ಟ ಜೀವವೈವಿಧ್ಯತೆಗೆ ಆಶ್ರಯ ನೀಡಿದೆ.">
-        </a-sphere>
-
-        <!-- 2. ಕಾಂಡ್ಲಾ ವನ / ಕಂಡ್ಲಾ ಮ್ಯಾಂಗ್ರೋವ್ಸ್ -->
-        <a-sphere id="hotspot-honnavara-mangroves" position="0 1.5 -4" radius="0.35" color="#eab308" class="hotspot"
-                  data-title="ಕಾಂಡ್ಲಾ ವನ (Mangrove Forests)"
-                  data-info="ಹೊನ್ನಾವರದ ಹಿನ್ನೀರಿನಲ್ಲಿ ಕರ್ನಾಟಕದ ಅತಿ ದೊಡ್ಡ ಮತ್ತು ಸುಂದರವಾದ ಕಾಂಡ್ಲಾ ವನಗಳಿವೆ. ಈ ಮ್ಯಾಂಗ್ರೋವ್ ಸಸ್ಯಗಳ ಬೇರುಗಳು ನೀರಿನಲ್ಲಿ ಮುಳುಗಿದ್ದು, ತೀರಪ್ರದೇಶವನ್ನು ಕೊಚ್ಚಿ ಹೋಗದಂತೆ ರಕ್ಷಿಸುತ್ತವೆ. ಇವು ಸಮುದ್ರದ ಜೀವಿಗಳ ಸಂತಾನೋತ್ಪತ್ತಿಗೆ ಪ್ರಮುಖ ತಾಣಗಳಾಗಿವೆ.">
-        </a-sphere>
-
-        <!-- 3. ಬೋಟಿಂಗ್ ಮತ್ತು ಪ್ರವಾಸೋದ್ಯಮ -->
-        <a-sphere id="hotspot-honnavara-boating" position="2 1.5 -4" radius="0.35" color="#eab308" class="hotspot"
-                  data-title="ದೋಣಿ ವಿಹಾರ ಮತ್ತು ಕರಾವಳಿ ಪ್ರವಾಸೋದ್ಯಮ"
-                  data-info="ಇತ್ತೀಚಿನ ವರ್ಷಗಳಲ್ಲಿ ಹೊನ್ನಾವರದ ಹಿನ್ನೀರು ಪರಿಸರಸ್ನೇಹಿ ಪ್ರವಾಸೋದ್ಯಮಕ್ಕೆ ಜಗತ್ಪ್ರಸಿದ್ಧಿಯಾಗಿದೆ. ಇಲ್ಲಿನ ಶರಾವತಿ ಬೋರ್ಡ್‌ವಾಕ್ ಮತ್ತು ಸಾಂಪ್ರದಾಯಿಕ ದೋಣಿ ವಿಹಾರದ ಮೂಲಕ ಪ್ರವಾಸಿಗರು ಸೂರ್ಯಾಸ್ತ ಹಾಗೂ ಕರಾವಳಿಯ ಸುಂದರ ಸಮ್ಮಿಲನವನ್ನು ಕಣ್ಣುಂಬಿಕೊಳ್ಳಬಹುದು.">
-        </a-sphere>
-
-    </a-scene>
-
-    <script>
-        const hotspots = document.querySelectorAll('.hotspot');
-        const infoPanel = document.getElementById('info-panel');
-
-        hotspots.forEach(hotspot => {
-            // ಮೌಸ್/ಟಚ್ Hover ಇಫೆಕ್ಟ್
-            hotspot.addEventListener('mouseenter', function () {
-                this.setAttribute('color', '#ef4444'); 
-            });
-
-            hotspot.addEventListener('mouseleave', function () {
-                this.setAttribute('color', '#eab308'); 
-            });
-
-            // ಕ್ಲಿಕ್/ಟಚ್ ಇವೆಂಟ್ ಮತ್ತು ಆಡಿಯೋ ಪ್ಲೇಬ್ಯಾಕ್
-            hotspot.addEventListener('click', function () {
-                const title = this.getAttribute('data-title');
-                const info = this.getAttribute('data-info');
-                
-                infoPanel.innerHTML = `<strong>${title}</strong><br>${info}`;
-
-                if ('speechSynthesis' in window) {
-                    window.speechSynthesis.cancel(); 
-                    
-                    const speech = new SpeechSynthesisUtterance();
-                    speech.text = title + ". " + info;
-                    speech.lang = 'kn-IN'; 
-                    speech.rate = 0.85; 
-                    
-                    window.speechSynthesis.speak(speech);
-                }
-            });
-        });
-    </script>
 </body>
 </html>
