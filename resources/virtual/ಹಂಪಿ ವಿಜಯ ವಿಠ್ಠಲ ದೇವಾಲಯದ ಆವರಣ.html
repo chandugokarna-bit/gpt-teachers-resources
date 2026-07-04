@@ -1,107 +1,131 @@
 <!DOCTYPE html>
 <html lang="kn">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>ಹಂಪಿ ವಿಜಯನಗರ ಸಾಮ್ರಾಜ್ಯ 360° ಆಡಿಯೋ ಪ್ರವಾಸ</title>
-    <!-- A-Frame VR ಲೈಬ್ರರಿ -->
-    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಹಂಪಿ ವಿಜಯನಗರ ಸಾಮ್ರಾಜ್ಯ - 360° ಆಡಿಯೋ ಪ್ರವಾಸ</title>
+    <!-- Pannellum 360 ಲೈಬ್ರರಿ -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.7/build/pannellum.css"/>
+    <script src="https://cdn.jsdelivr.net/npm/pannellum@2.5.7/build/pannellum.js"></script>
     <style>
-        /* ಮಾಹಿತಿ ಫಲಕ */
-        #info-panel {
-            position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
-            width: 85%; max-width: 650px; background: rgba(24, 24, 27, 0.95); color: #f4f4f5;
-            padding: 20px; border-radius: 15px; font-family: sans-serif; text-align: center;
-            font-size: 18px; line-height: 1.6; border: 2px solid #eab308; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
-            z-index: 999; pointer-events: none;
-        }
+        body { margin: 0; padding: 0; font-family: sans-serif; }
+        #panorama { width: 100vw; height: 100vh; }
+        
         /* ಶೀರ್ಷಿಕೆ ಫಲಕ */
         #title-panel {
             position: absolute; top: 20px; left: 20px; color: white;
-            background: rgba(24, 24, 27, 0.85); padding: 15px; border-radius: 10px;
-            border-left: 5px solid #eab308; z-index: 999;
+            background: rgba(15, 23, 42, 0.85); padding: 15px; border-radius: 10px;
+            border-left: 5px solid #eab308; z-index: 999; pointer-events: none;
         }
-        #title-panel h1 { margin: 0; font-size: 22px; color: #eab308; }
+        #title-panel h1 { margin: 0; font-size: 20px; color: #eab308; }
+        #title-panel p { margin: 5px 0 0 0; font-size: 14px; color: #e2e8f0; }
+
+        /* ಕೆಳಗಿನ ಸುಂದರ ಮಾಹಿತಿ ಫಲಕ (ಆಡಿಯೋ ಮತ್ತು ಪಠ್ಯಕ್ಕಾಗಿ) */
+        #info-panel {
+            position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
+            width: 85%; max-width: 650px; background: rgba(15, 23, 42, 0.95); color: #f8fafc;
+            padding: 20px; border-radius: 15px; text-align: center;
+            font-size: 17px; line-height: 1.6; border: 2px solid #eab308; /* ವಿಜಯನಗರದ ಭವ್ಯತೆಗೆ ಚಿನ್ನದ ಬಣ್ಣ */
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+            z-index: 999; pointer-events: none;
+        }
+
+        /* 🎯 ದೊಡ್ಡದಾಗಿರುವ ಕಸ್ಟಮ್ ಹಾಟ್‌ಸ್ಪಾಟ್‌ ಬಬಲ್ಸ್ */
+        .custom-hotspot {
+            height: 32px;
+            width: 32px;
+            background: #eab308; /* ಹೊಳೆಯುವ ಚಿನ್ನದ ಬಣ್ಣ */
+            border: 3px solid #ffffff;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 12px rgba(234, 179, 8, 0.8);
+            transition: all 0.3s ease;
+        }
+        /* ಅದರ ಮೇಲೆ ಬೆರಳು ಇಟ್ಟಾಗ ಕೆಂಪು ಬಣ್ಣಕ್ಕೆ ತಿರುಗಲು */
+        .custom-hotspot:hover {
+            background: #ef4444; 
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.9);
+            transform: scale(1.2);
+        }
     </style>
 </head>
 <body>
 
-    <div id="title-panel">
-        <h1>ಹಂಪಿ: ಭವ್ಯ ವಿಜಯನಗರ ಸಾಮ್ರಾಜ್ಯದ ವರ್ಚುವಲ್ ದರ್ಶನ</h1>
-        <p>ಚಿನ್ನದ ಬಣ್ಣದ ವರ್ತುಲಗಳ ಮೇಲೆ ನೇರವಾಗಿ ಕ್ಲಿಕ್ ಮಾಡಿ ಆಡಿಯೋ ಮಾಹಿತಿ ಪಡೆಯಿರಿ</p>
-    </div>
+<div id="title-panel">
+    <h1>ಹಂಪಿ: ಭವ್ಯ ವಿಜಯನಗರ ಸಾಮ್ರಾಜ್ಯದ ವರ್ಚುವಲ್ ದರ್ಶನ</h1>
+    <p>ದೊಡ್ಡದಾಗಿರುವ ಚಿನ್ನದ ಬಣ್ಣದ ವರ್ತುಲಗಳ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ ಆಡಿಯೋ ವಿವರ ಪಡೆಯಿರಿ</p>
+</div>
 
-    <div id="info-panel">
-        ಸ್ವಾಗತ! ಯುನೆಸ್ಕೋ (UNESCO) ವಿಶ್ವ ಪಾರಂಪರಿಕ ತಾಣವಾಗಿರುವ ಹಂಪಿಯ ಭವ್ಯ ಇತಿಹಾಸ ಮತ್ತು ಶಿಲ್ಪಕಲೆಯನ್ನು ತಿಳಿಯಲು ಆವರಣದಲ್ಲಿರುವ ಚಿನ್ನದ ಬಣ್ಣದ ಹಾಟ್‌ಸ್ಪಾಟ್‌ಗಳ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ...
-    </div>
+<div id="panorama"></div>
 
-    <!-- VR ಬಟನ್ ಸಂಪೂರ್ಣವಾಗಿ ತೆಗೆದುಹಾಕಲಾಗಿದೆ -->
-    <a-scene vr-mode-ui="enabled: false" cursor="rayOrigin: mouse">
-        <a-assets>
-            <img id="hampi-scene" src="https://raw.githubusercontent.com/chandugokarna-bit/gpt-teachers-resources/main/resources/virtual/hampi360.jpg" crossorigin="anonymous">
-        </a-assets>
+<div id="info-panel">
+    ಸ್ವಾಗತ! ಯುನೆಸ್ಕೋ (UNESCO) ವಿಶ್ವ ಪಾರಂಪರಿಕ ತಾಣವಾಗಿರುವ ಹಂಪಿಯ ಭವ್ಯ ಇತಿಹಾಸ ಮತ್ತು ಶಿಲ್ಪಕಲೆಯನ್ನು ತಿಳಿಯಲು ಆವರಣದಲ್ಲಿರುವ ದೊಡ್ಡ ಹಾಟ್‌ಸ್ಪಾಟ್‌ಗಳ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ...
+</div>
 
-        <!-- ಹಿನ್ನೆಲೆ 360 ಚಿತ್ರ -->
-        <a-sky src="#hampi-scene"></a-sky>
+<script>
+// ಕನ್ನಡ ಧ್ವನಿ ಕಾರ್ಯವಿಧಾನ
+function speakKannada(title, infoText) {
+    document.getElementById('info-panel').innerHTML = `<strong>${title}</strong><br>${infoText}`;
+    
+    if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel(); // ಹಳೆಯ ಧ್ವನಿ ನಿಲ್ಲಿಸಲು
+        
+        const speech = new SpeechSynthesisUtterance();
+        speech.text = title + ". " + infoText;
+        speech.lang = 'kn-IN'; // ಕನ್ನಡ ಭಾಷೆ
+        speech.rate = 0.85; // ಸ್ಪಷ್ಟ ಧ್ವನಿ ವೇಗ
+        
+        window.speechSynthesis.speak(speech);
+    }
+}
 
-        <!-- ಫೋನ್ ಮೊಬೈಲ್ ಸೆನ್ಸರ್ ಟ್ರ್ಯಾಕಿಂಗ್ ನಿಷ್ಕ್ರಿಯಗೊಳಿಸಲಾಗಿದೆ - ಕೇವಲ ಕಂಟ್ರೋಲ್ ಬ್ರೌಸರ್ ಟಚ್ -->
-        <a-entity camera look-controls="magicWindowTrackingEnabled: false" position="0 1.6 0"></a-entity>
+// Pannellum ವೀಕ್ಷಕ ಸೆಟ್ಟಿಂಗ್ಸ್
+pannellum.viewer('panorama', {
+    "type": "equirectangular",
+    "panorama": "https://raw.githubusercontent.com/chandugokarna-bit/gpt-teachers-resources/main/resources/virtual/hampi360.jpg",
+    "autoLoad": true,
+    "title": "ಹಂಪಿ, ಬಳ್ಳಾರಿ/ವಿಜಯನಗರ",
+    "author": "ವಿಜಯನಗರ ವಾಸ್ತುಶಿಲ್ಪ ವೈಭವ",
+    "hotSpots": [
+        {
+            "pitch": 5,
+            "yaw": -35,
+            "cssClass": "custom-hotspot", // ನಮ್ಮ ಕಸ್ಟಮ್ ದೊಡ್ಡ ಹಾಟ್‌ಸ್ಪಾಟ್
+            "createTooltipFunc": function(hotSpotDiv) { hotSpotDiv.setAttribute("title", "ವಿರೂಪಾಕ್ಷ ದೇವಾಲಯ"); },
+            "clickHandlerFunc": function() {
+                speakKannada(
+                    "ಭವ್ಯ ಶ್ರೀ ವಿರೂಪಾಕ್ಷ ದೇವಾಲಯ", 
+                    "ತುಂಗಭದ್ರಾ ನದಿಯ ದಂಡೆಯ ಮೇಲಿರುವ ವಿರೂಪಾಕ್ಷ ದೇವಾಲಯವು ಹಂಪಿಯ ಅತ್ಯಂತ ಪವಿತ್ರ ಮತ್ತು ಹಳೆಯ ದೇವಸ್ಥಾನವಾಗಿದೆ. ಇದರ ಭವ್ಯವಾದ ರಾಜಗೋಪುರವು ಸುಮಾರು 50 ಮೀಟರ್ ಎತ್ತರವಿದ್ದು, ವಿಜಯನಗರ ಸಾಮ್ರಾಜ್ಯದ ಸ್ಥಾಪನೆಗೂ ಮುನ್ನವೇ ಅಸ್ತಿತ್ವದಲ್ಲಿದ್ದ ಈ ಕ್ಷೇತ್ರವನ್ನು ಕೃಷ್ಣದೇವರಾಯನ ಕಾಲದಲ್ಲಿ ಮತ್ತಷ್ಟು ವಿಸ್ತರಿಸಲಾಯಿತು."
+                );
+            }
+        },
+        {
+            "pitch": 0,
+            "yaw": 15,
+            "cssClass": "custom-hotspot",
+            "createTooltipFunc": function(hotSpotDiv) { hotSpotDiv.setAttribute("title", "ಕಲ್ಲಿನ ರಥ"); },
+            "clickHandlerFunc": function() {
+                speakKannada(
+                    "ವಿಜಯ ವಿಠಲ ದೇವಾಲಯದ ಕಲ್ಲಿನ ರಥ", 
+                    "ಹಂಪಿಯ ಪ್ರಮುಖ ಆಕರ್ಷಣೆಯಾದ ಈ ಕಲ್ಲಿನ ರಥವು ಭಾರತೀಯ ಕರೆನ್ಸಿ ನೋಟಿನ ಮೇಲೂ ಸ್ಥಾನ ಪಡೆದಿದೆ. ಬೃಹತ್ ಬಂಡೆಗಲ್ಲುಗಳನ್ನು ಕತ್ತರಿಸಿ ರಥದ ಆಕಾರದಲ್ಲಿ ಜೋಡಿಸಲಾದ ಈ ಅದ್ಭುತ ಶಿಲ್ಪಕಲೆ ವಿಜಯನಗರದ ವಾಸ್ತುಶಿಲ್ಪದ ಚಮತ್ಕಾರಕ್ಕೆ ಸಾಕ್ಷಿಯಾಗಿದೆ. ಇದರ ಮುಂಭಾಗದಲ್ಲಿರುವ ಕಲ್ಲಿನ ಆನೆಗಳು ರಥವನ್ನು ಎಳೆಯುವಂತೆ ಕೆತ್ತಲಾಗಿದೆ."
+                );
+            }
+        },
+        {
+            "pitch": -5,
+            "yaw": 45,
+            "cssClass": "custom-hotspot",
+            "createTooltipFunc": function(hotSpotDiv) { hotSpotDiv.setAttribute("title", "ಏಕಶಿಲಾ ನರಸಿಂಹ"); },
+            "clickHandlerFunc": function() {
+                speakKannada(
+                    "ಲಕ್ಷ್ಮಿ ನರಸಿಂಹ ಏಕಶಿಲಾ ವಿಗ್ರಹ", 
+                    "ಒಂದೇ ಕಲ್ಲಿನಲ್ಲಿ ಕೆತ್ತಲಾದ ಹಂಪಿಯ ಅತಿ ದೊಡ್ಡ ಏಕಶಿಲಾ ವಿಗ್ರಹಗಳಲ್ಲಿ ಲಕ್ಷ್ಮಿ ನರಸಿಂಹ ಅಥವಾ ಉಗ್ರ ನರಸಿಂಹ ಮೂರ್ತಿಯೂ ಒಂದು. ಸುಮಾರು 6.7 ಮೀಟರ್ ಎತ್ತರವಿರುವ ಈ ಭವ್ಯ ಮೂರ್ತಿಯನ್ನು ಕ್ರಿ.ಶ 1528 ರಲ್ಲಿ ಕೃಷ್ಣದೇವರಾಯನ ಆಳ್ವಿಕೆಯಲ್ಲಿ ಕೆತ್ತಲಾಯಿತು. ಸಿಂಹದ ಮುಖ ಮತ್ತು ಭೀಕರ ಕಣ್ಣುಗಳುಳ್ಳ ಈ ವಿಗ್ರಹವು ವಿಜಯನಗರದ ಕಲಾ ವೈಭವವನ್ನು ಸಾರುತ್ತದೆ."
+                );
+            }
+        }
+    ]
+});
+</script>
 
-        <!-- ================= ಇಂಟರಾಕ್ಟಿವ್ ಹಾಟ್‌ಸ್ಪಾಟ್‌ಗಳು ================= -->
-
-        <!-- 1. ವಿರೂಪಾಕ್ಷ ದೇವಾಲಯ ಮತ್ತು ಗೋಪುರ -->
-        <a-sphere id="hotspot-hampi-virupaksha" position="-2 1.5 -4" radius="0.35" color="#eab308" class="hotspot"
-                  data-title="ಭವ್ಯ ಶ್ರೀ ವಿರೂಪಾಕ್ಷ ದೇವಾಲಯ"
-                  data-info="ತುಂಗಭದ್ರಾ ನದಿಯ ದಂಡೆಯ ಮೇಲಿರುವ ವಿರೂಪಾಕ್ಷ ದೇವಾಲಯವು ಹಂಪಿಯ ಅತ್ಯಂತ ಪವಿತ್ರ ಮತ್ತು ಹಳೆಯ ದೇವಸ್ಥಾನವಾಗಿದೆ. ಇದರ ಭವ್ಯವಾದ ರಾಜಗೋಪುರವು ಸುಮಾರು 50 ಮೀಟರ್ ಎತ್ತರವಿದ್ದು, ವಿಜಯನಗರ ಸಾಮ್ರಾಜ್ಯದ ಸ್ಥಾಪನೆಗೂ ಮುನ್ನವೇ ಅಸ್ತಿತ್ವದಲ್ಲಿದ್ದ ಈ ಕ್ಷೇತ್ರವನ್ನು ಕೃಷ್ಣದೇವರಾಯನ ಕಾಲದಲ್ಲಿ ಮತ್ತಷ್ಟು ವಿಸ್ತರಿಸಲಾಯಿತು.">
-        </a-sphere>
-
-        <!-- 2. ಜಗತ್ಪ್ರಸಿದ್ಧ ಕಲ್ಲಿನ ರಥ -->
-        <a-sphere id="hotspot-hampi-chariot" position="0 1.5 -4" radius="0.35" color="#eab308" class="hotspot"
-                  data-title="ವಿಜಯ ವಿಠಲ ದೇವಾಲಯದ ಕಲ್ಲಿನ ರಥ"
-                  data-info="ಹಂಪಿಯ ಪ್ರಮುಖ ಆಕರ್ಷಣೆಯಾದ ಈ ಕಲ್ಲಿನ ರಥವು ಭಾರತೀಯ ಕರೆನ್ಸಿ ನೋಟಿನ ಮೇಲೂ ಸ್ಥಾನ ಪಡೆದಿದೆ. ಬೃಹತ್ ಬಂಡೆಗಲ್ಲುಗಳನ್ನು ಕತ್ತರಿಸಿ ರಥದ ಆಕಾರದಲ್ಲಿ ಜೋಡಿಸಲಾದ ಈ ಅದ್ಭುತ ಶಿಲ್ಪಕಲೆ ವಿಜಯನಗರದ ವಾಸ್ತುಶಿಲ್ಪದ ಚಮತ್ಕಾರಕ್ಕೆ ಸಾಕ್ಷಿಯಾಗಿದೆ. ಇದರ ಮುಂಭಾಗದಲ್ಲಿರುವ ಕಲ್ಲಿನ ಆನೆಗಳು ರಥವನ್ನು ಎಳೆಯುವಂತೆ ಕೆತ್ತಲಾಗಿದೆ.">
-        </a-sphere>
-
-        <!-- 3. ಉಗ್ರ ನರಸಿಂಹ ಮತ್ತು ಸಾಸಿವೆಕಾಳು ಗಣೇಶ -->
-        <a-sphere id="hotspot-hampi-monoliths" position="2 1.5 -4" radius="0.35" color="#eab308" class="hotspot"
-                  data-title="ಲಕ್ಷ್ಮಿ ನರಸಿಂಹ ಏಕಶಿಲಾ ವಿಗ್ರಹ"
-                  data-info="ಒಂದೇ ಕಲ್ಲಿನಲ್ಲಿ ಕೆತ್ತಲಾದ ಹಂಪಿಯ ಅತಿ ದೊಡ್ಡ ಏಕಶಿಲಾ ವಿಗ್ರಹಗಳಲ್ಲಿ ಲಕ್ಷ್ಮಿ ನರಸಿಂಹ ಅಥವಾ ಉಗ್ರ ನರಸಿಂಹ ಮೂರ್ತಿಯೂ ಒಂದು. ಸುಮಾರು 6.7 ಮೀಟರ್ ಎತ್ತರವಿರುವ ಈ ಭವ್ಯ ಮೂರ್ತಿಯನ್ನು ಕ್ರಿ.ಶ 1528 ರಲ್ಲಿ ಕೃಷ್ಣದೇವರಾಯನ ಆಳ್ವಿಕೆಯಲ್ಲಿ ಕೆತ್ತಲಾಯಿತು. ಸಿಂಹದ ಮುಖ ಮತ್ತು ಭೀಕರ ಕಣ್ಣುಗಳುಳ್ಳ ಈ ವಿಗ್ರಹವು ವಿಜಯನಗರದ ಕಲಾ ವೈಭವವನ್ನು ಸಾರುತ್ತದೆ.">
-        </a-sphere>
-
-    </a-scene>
-
-    <script>
-        const hotspots = document.querySelectorAll('.hotspot');
-        const infoPanel = document.getElementById('info-panel');
-
-        hotspots.forEach(hotspot => {
-            // ಮೌಸ್/ಟಚ್ Hover ಇಫೆಕ್ಟ್
-            hotspot.addEventListener('mouseenter', function () {
-                this.setAttribute('color', '#ef4444'); 
-            });
-
-            hotspot.addEventListener('mouseleave', function () {
-                this.setAttribute('color', '#eab308'); 
-            });
-
-            // ಕ್ಲಿಕ್/ಟಚ್ ಇವೆಂಟ್ ಮತ್ತು ಆಡಿಯೋ ಪ್ಲೇಬ್ಯಾಕ್
-            hotspot.addEventListener('click', function () {
-                const title = this.getAttribute('data-title');
-                const info = this.getAttribute('data-info');
-                
-                infoPanel.innerHTML = `<strong>${title}</strong><br>${info}`;
-
-                if ('speechSynthesis' in window) {
-                    window.speechSynthesis.cancel(); 
-                    
-                    const speech = new SpeechSynthesisUtterance();
-                    speech.text = title + ". " + info;
-                    speech.lang = 'kn-IN'; 
-                    speech.rate = 0.85; 
-                    
-                    window.speechSynthesis.speak(speech);
-                }
-            });
-        });
-    </script>
 </body>
 </html>
