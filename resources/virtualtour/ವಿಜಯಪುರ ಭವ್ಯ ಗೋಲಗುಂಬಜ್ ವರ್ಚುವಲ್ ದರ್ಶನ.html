@@ -1,108 +1,131 @@
 <!DOCTYPE html>
 <html lang="kn">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>ವಿಜಯಪುರ ಗೋಲಗುಂಬಜ್ 360° ಆಡಿಯೋ ಪ್ರವಾಸ</title>
-    <!-- A-Frame VR ಲೈಬ್ರರಿ -->
-    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ವಿಜಯಪುರ ಗೋಲಗುಂಬಜ್ - 360° ಆಡಿಯೋ ಪ್ರವಾಸ</title>
+    <!-- Pannellum 360 ಲೈಬ್ರರಿ -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.7/build/pannellum.css"/>
+    <script src="https://cdn.jsdelivr.net/npm/pannellum@2.5.7/build/pannellum.js"></script>
     <style>
-        /* ಮಾಹಿತಿ ಫಲಕ */
-        #info-panel {
-            position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
-            width: 85%; max-width: 650px; background: rgba(15, 23, 42, 0.95); color: #f8fafc;
-            padding: 20px; border-radius: 15px; font-family: sans-serif; text-align: center;
-            font-size: 18px; line-height: 1.6; border: 2px solid #06b6d4; /* Cyan/Blue Border */
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
-            z-index: 999; pointer-events: none;
-        }
+        body { margin: 0; padding: 0; font-family: sans-serif; }
+        #panorama { width: 100vw; height: 100vh; }
+        
         /* ಶೀರ್ಷಿಕೆ ಫಲಕ */
         #title-panel {
             position: absolute; top: 20px; left: 20px; color: white;
             background: rgba(15, 23, 42, 0.85); padding: 15px; border-radius: 10px;
-            border-left: 5px solid #06b6d4; z-index: 999;
+            border-left: 5px solid #06b6d4; z-index: 999; pointer-events: none;
         }
-        #title-panel h1 { margin: 0; font-size: 22px; color: #06b6d4; }
+        #title-panel h1 { margin: 0; font-size: 20px; color: #06b6d4; }
+        #title-panel p { margin: 5px 0 0 0; font-size: 14px; color: #e2e8f0; }
+
+        /* ಕೆಳಗಿನ ಸುಂದರ ಮಾಹಿತಿ ಫಲಕ (ಆಡಿಯೋ ಮತ್ತು ಪಠ್ಯಕ್ಕಾಗಿ) */
+        #info-panel {
+            position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
+            width: 85%; max-width: 650px; background: rgba(15, 23, 42, 0.95); color: #f8fafc;
+            padding: 20px; border-radius: 15px; text-align: center;
+            font-size: 17px; line-height: 1.6; border: 2px solid #06b6d4; /* ಗೋಲಗುಂಬಜ್ ಥೀಮ್‌ಗೆ ಸಯಾನ್ ಬಣ್ಣ */
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+            z-index: 999; pointer-events: none;
+        }
+
+        /* 🎯 ದೊಡ್ಡದಾಗಿರುವ ಕಸ್ಟಮ್ ಹಾಟ್‌ಸ್ಪಾಟ್‌ ಬಬಲ್ಸ್ */
+        .custom-hotspot {
+            height: 32px;
+            width: 32px;
+            background: #eab308; /* ಹೊಳೆಯುವ ಚಿನ್ನದ ಬಣ್ಣ */
+            border: 3px solid #ffffff;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 12px rgba(234, 179, 8, 0.8);
+            transition: all 0.3s ease;
+        }
+        /* ಅದರ ಮೇಲೆ ಬೆರಳು ಇಟ್ಟಾಗ ಕೆಂಪು ಬಣ್ಣಕ್ಕೆ ತಿರುಗಲು */
+        .custom-hotspot:hover {
+            background: #ef4444; 
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.9);
+            transform: scale(1.2);
+        }
     </style>
 </head>
 <body>
 
-    <div id="title-panel">
-        <h1>ವಿಜಯಪುರ: ಭವ್ಯ ಗೋಲಗುಂಬಜ್ ವರ್ಚುವಲ್ ದರ್ಶನ</h1>
-        <p>ಚಿನ್ನದ ಬಣ್ಣದ ವರ್ತುಲಗಳ ಮೇಲೆ ನೇರವಾಗಿ ಕ್ಲಿಕ್ ಮಾಡಿ ಆಡಿಯೋ ಮಾಹಿತಿ ಪಡೆಯಿರಿ</p>
-    </div>
+<div id="title-panel">
+    <h1>ವಿಜಯಪುರ: ಭವ್ಯ ಗೋಲಗುಂಬಜ್ ವರ್ಚುವಲ್ ದರ್ಶನ</h1>
+    <p>ದೊಡ್ಡದಾಗಿರುವ ಚಿನ್ನದ ಬಣ್ಣದ ವರ್ತುಲಗಳ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ ಆಡಿಯೋ ವಿವರ ಪಡೆಯಿರಿ</p>
+</div>
 
-    <div id="info-panel">
-        ಸ್ವಾಗತ! ಬಿಜಾಪುರ ಸುಲ್ತಾನರ ಭವ್ಯ ವಾಸ್ತುಶಿಲ್ಪವನ್ನು ತಿಳಿಯಲು ಆವರಣದಲ್ಲಿರುವ ಚಿನ್ನದ ಬಣ್ಣದ ಹಾಟ್‌ಸ್ಪಾಟ್‌ಗಳ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ...
-    </div>
+<div id="panorama"></div>
 
-    <!-- VR ಬಟನ್ ಸಂಪೂರ್ಣವಾಗಿ ತೆಗೆದುಹಾಕಲಾಗಿದೆ -->
-    <a-scene vr-mode-ui="enabled: false" cursor="rayOrigin: mouse">
-        <a-assets>
-            <img id="golgumbaz-scene" src="https://raw.githubusercontent.com/chandugokarna-bit/gpt-teachers-resources/main/resources/virtual/Golgumbaz1360.jpg" crossorigin="anonymous">
-        </a-assets>
+<div id="info-panel">
+    ಸ್ವಾಗತ! ಆದಿಲ್ ಶಾಹಿಗಳ ಭವ್ಯ ವಾಸ್ತುಶಿಲ್ಪ ಮತ್ತು ಗೋಲಗುಂಬಜ್‌ನ ವಿಸ್ಮಯವನ್ನು ತಿಳಿಯಲು ಆವರಣದಲ್ಲಿರುವ ದೊಡ್ಡ ಹಾಟ್‌ಸ್ಪಾಟ್‌ಗಳ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ...
+</div>
 
-        <!-- ಹಿನ್ನೆಲೆ 360 ಚಿತ್ರ -->
-        <a-sky src="#golgumbaz-scene"></a-sky>
+<script>
+// ಕನ್ನಡ ಧ್ವನಿ ಕಾರ್ಯವಿಧಾನ
+function speakKannada(title, infoText) {
+    document.getElementById('info-panel').innerHTML = `<strong>${title}</strong><br>${infoText}`;
+    
+    if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel(); // ಹಳೆಯ ಧ್ವನಿ ನಿಲ್ಲಿಸಲು
+        
+        const speech = new SpeechSynthesisUtterance();
+        speech.text = title + ". " + infoText;
+        speech.lang = 'kn-IN'; // ಕನ್ನಡ ಭಾಷೆ
+        speech.rate = 0.85; // ಸ್ಪಷ್ಟ ಧ್ವನಿ ವೇಗ
+        
+        window.speechSynthesis.speak(speech);
+    }
+}
 
-        <!-- ಫೋನ್ ಮೊಬೈಲ್ ಸೆನ್ಸರ್ ಟ್ರ್ಯಾಕಿಂಗ್ ನಿಷ್ಕ್ರಿಯಗೊಳಿಸಲಾಗಿದೆ - ಕೇವಲ ಕಂಟ್ರೋಲ್ ಬ್ರೌಸರ್ ಟಚ್ -->
-        <a-entity camera look-controls="magicWindowTrackingEnabled: false" position="0 1.6 0"></a-entity>
+// Pannellum ವೀಕ್ಷಕ ಸೆಟ್ಟಿಂಗ್ಸ್
+pannellum.viewer('panorama', {
+    "type": "equirectangular",
+    "panorama": "https://raw.githubusercontent.com/chandugokarna-bit/gpt-teachers-resources/main/resources/virtual/Golgumbaz1360.jpg",
+    "autoLoad": true,
+    "title": "ಗೋಲಗುಂಬಜ್, ವಿಜಯಪುರ",
+    "author": "ಭವ್ಯ ಐತಿಹಾಸಿಕ ತಾಣ",
+    "hotSpots": [
+        {
+            "pitch": 12,
+            "yaw": -30,
+            "cssClass": "custom-hotspot", // ನಮ್ಮ ಕಸ್ಟಮ್ ದೊಡ್ಡ ಹಾಟ್‌ಸ್ಪಾಟ್
+            "createTooltipFunc": function(hotSpotDiv) { hotSpotDiv.setAttribute("title", "ಭವ್ಯ ಗುಮ್ಮಟ"); },
+            "clickHandlerFunc": function() {
+                speakKannada(
+                    "ಭವ್ಯವಾದ ಕೇಂದ್ರ ಗುಮ್ಮಟ", 
+                    "ಗೋಲಗುಂಬಜ್ ಮಹಮ್ಮದ್ ಆದಿಲ್ ಶಾ ಅವರ ಸಮಾಧಿಯಾಗಿದ್ದು, ಇದರ ಕೇಂದ್ರ ಗುಮ್ಮಟವು ವಿಶ್ವದ ಅತ್ಯಂತ ದೊಡ್ಡ ಗುಮ್ಮಟಗಳಲ್ಲಿ ಒಂದಾಗಿದೆ. ವಿಶೇಷವೆಂದರೆ, ಈ ಬೃಹತ್ ಗುಮ್ಮಟವನ್ನು ಯಾವುದೇ ಕಂಬಗಳ ಆಧಾರವಿಲ್ಲದೆ ಕೇವಲ ವಾಸ್ತುಶಿಲ್ಪದ ವಿಶಿಷ್ಟ ತಂತ್ರಜ್ಞಾನದಿಂದ ನಿರ್ಮಿಸಲಾಗಿದೆ."
+                );
+            }
+        },
+        {
+            "pitch": 5,
+            "yaw": 20,
+            "cssClass": "custom-hotspot",
+            "createTooltipFunc": function(hotSpotDiv) { hotSpotDiv.setAttribute("title", "ಬಿಸುಗುಟ್ಟುವ ಗ್ಯಾಲರಿ"); },
+            "clickHandlerFunc": function() {
+                speakKannada(
+                    "ಬಿಸುಗುಟ್ಟುವ ಗ್ಯಾಲರಿ (Whispering Gallery)", 
+                    "ಗುಮ್ಮಟದ ಒಳಗಿರುವ ವೃತ್ತಾಕಾರದ ಗ್ಯಾಲರಿಯಲ್ಲಿ ನಿಂತು ಒಂದು ಕಡೆ ಅತ್ಯಂತ ಸಣ್ಣ ಧ್ವನಿಯಲ್ಲಿ ಪಿಸುಗುಟ್ಟಿದರೂ, ಅದು ಇಡೀ ಗ್ಯಾಲರಿಯ ಇನ್ನೊಂದು ಬದಿಗೆ ಅತ್ಯಂತ ಸ್ಪಷ್ಟವಾಗಿ ಕೇಳಿಸುತ್ತದೆ. ಇಲ್ಲಿ ಉಂಟಾಗುವ ಧ್ವನಿಯು ಪ್ರತಿಧ್ವನಿಯಾಗಿ ಸುಮಾರು 7 ರಿಂದ 10 ಬಾರಿ ಮರುಕಳಿಸುತ್ತದೆ!"
+                );
+            }
+        },
+        {
+            "pitch": -5,
+            "yaw": 50,
+            "cssClass": "custom-hotspot",
+            "createTooltipFunc": function(hotSpotDiv) { hotSpotDiv.setAttribute("title", "ಮಿನಾರ್ ಗೋಪುರಗಳು"); },
+            "clickHandlerFunc": function() {
+                speakKannada(
+                    "ಏಳು ಅಂತಸ್ತಿನ ಮಿನಾರ್ ಗೋಪುರಗಳು", 
+                    "ಗೋಲಗುಂಬಜ್ ಕಟ್ಟಡದ ನಾಲ್ಕೂ ಮೂಲೆಗಳಲ್ಲಿ ಏಳು ಅಂತಸ್ತುಗಳ ವಿಶಿಷ್ಟವಾದ ಅಷ್ಟಕೋನಾಕೃತಿಯ ಮಿನಾರ್ ಗೋಪುರಗಳಿವೆ. ಈ ಗೋಪುರಗಳ ಒಳಗಿರುವ ಮೆಟ್ಟಿಲುಗಳ ಮೂಲಕ ನಾವು ಮೇಲಿರುವ ಗ್ಯಾಲರಿಯನ್ನು ತಲುಪಬಹುದು."
+                );
+            }
+        }
+    ]
+});
+</script>
 
-        <!-- ================= ಇಂಟರಾಕ್ಟಿವ್ ಹಾಟ್‌ಸ್ಪಾಟ್‌ಗಳು ================= -->
-
-        <!-- 1. ಬೃಹತ್ गुಮ್ಮಟ -->
-        <a-sphere id="hotspot-dome" position="-2 1.5 -4" radius="0.35" color="#eab308" class="hotspot"
-                  data-title="ಭವ್ಯವಾದ ಕೇಂದ್ರ ಗುಮ್ಮಟ"
-                  data-info="ಗೋಲಗುಂಬಜ್ ಮಹಮ್ಮದ್ ಆದಿಲ್ ಶಾ ಅವರ ಸಮಾಧಿಯಾಗಿದ್ದು, ಇದರ ಕೇಂದ್ರ ಗುಮ್ಮಟವು ವಿಶ್ವದ ಅತ್ಯಂತ ದೊಡ್ಡ ಗುಮ್ಮಟಗಳಲ್ಲಿ ಒಂದಾಗಿದೆ. ವಿಶೇಷವೆಂದರೆ, ಈ ಬೃಹತ್ ಗುಮ್ಮಟವನ್ನು ಯಾವುದೇ ಕಂಬಗಳ ಆಧಾರವಿಲ್ಲದೆ ಕೇವಲ ವಾಸ್ತುಶಿಲ್ಪದ ತಂತ್ರಜ್ಞಾನದಿಂದ ನಿರ್ಮಿಸಲಾಗಿದೆ.">
-        </a-sphere>
-
-        <!-- 2. ಬಿಸುಗುಟ್ಟುವ ಗ್ಯಾಲರಿ -->
-        <a-sphere id="hotspot-whisper" position="0 1.5 -4" radius="0.35" color="#eab308" class="hotspot"
-                  data-title="ಬಿಸುಗುಟ್ಟುವ ಗ್ಯಾಲರಿ (Whispering Gallery)"
-                  data-info="ಗುಮ್ಮಟದ ಒಳಗಿರುವ ವೃತ್ತಾಕಾರದ ಗ್ಯಾಲರಿಯಲ್ಲಿ ನಿಂತು ಒಂದು ಕಡೆ ಅತ್ಯಂತ ಸಣ್ಣ ಧ್ವನಿಯಲ್ಲಿ ಪಿಸುಗುಟ್ಟಿದರೂ, ಅದು ಇಡೀ ಗ್ಯಾಲರಿಯ ಇನ್ನೊಂದು ಬದಿಗೆ ಅತ್ಯಂತ ಸ್ಪಷ್ಟವಾಗಿ ಕೇಳಿಸುತ್ತದೆ. ಇಲ್ಲಿ ಉಂಟಾಗುವ ಧ್ವನಿಯು ಪ್ರತಿಧ್ವನಿಯಾಗಿ ಸುಮಾರು 7 ರಿಂದ 10 ಬಾರಿ ಮರುಕಳಿಸುತ್ತದೆ!">
-        </a-sphere>
-
-        <!-- 3. ಸಪ್ತ ಅಂತಸ್ತಿನ ಮಿನಾರ್ ಗೋಪುರಗಳು -->
-        <a-sphere id="hotspot-minars" position="2 1.5 -4" radius="0.35" color="#eab308" class="hotspot"
-                  data-title="ಏಳು ಅಂತಸ್ತಿನ ಮಿನಾರ್ ಗೋಪುರಗಳು"
-                  data-info="ಗೋಲಗುಂಬಜ್ ಕಟ್ಟಡದ ನಾಲ್ಕೂ ಮೂಲೆಗಳಲ್ಲಿ ಏಳು ಅಂತಸ್ತುಗಳ ವಿಶಿಷ್ಟವಾದ ಅಷ್ಟಕೋನಾಕೃತಿಯ (Octagonal) ಮಿನಾರ್ ಗೋಪುರಗಳಿವೆ. ಈ ಗೋಪುರಗಳ ಒಳಗಿರುವ ಮೆಟ್ಟಿಲುಗಳ ಮೂಲಕ ನಾವು ಮೇಲಿರುವ ಗ್ಯಾಲರಿಯನ್ನು ತಲುಪಬಹುದು.">
-        </a-sphere>
-
-    </a-scene>
-
-    <script>
-        const hotspots = document.querySelectorAll('.hotspot');
-        const infoPanel = document.getElementById('info-panel');
-
-        hotspots.forEach(hotspot => {
-            // ಮೌಸ್/ಟಚ್ Hover ಇಫೆಕ್ಟ್
-            hotspot.addEventListener('mouseenter', function () {
-                this.setAttribute('color', '#ef4444'); 
-            });
-
-            hotspot.addEventListener('mouseleave', function () {
-                this.setAttribute('color', '#eab308'); 
-            });
-
-            // ಕ್ಲಿಕ್/ಟಚ್ ಇವೆಂಟ್ ಮತ್ತು ಆಡಿಯೋ ಪ್ಲೇಬ್ಯಾಕ್
-            hotspot.addEventListener('click', function () {
-                const title = this.getAttribute('data-title');
-                const info = this.getAttribute('data-info');
-                
-                infoPanel.innerHTML = `<strong>${title}</strong><br>${info}`;
-
-                if ('speechSynthesis' in window) {
-                    window.speechSynthesis.cancel(); 
-                    
-                    const speech = new SpeechSynthesisUtterance();
-                    speech.text = title + ". " + info;
-                    speech.lang = 'kn-IN'; 
-                    speech.rate = 0.85; 
-                    
-                    window.speechSynthesis.speak(speech);
-                }
-            });
-        });
-    </script>
 </body>
 </html>
