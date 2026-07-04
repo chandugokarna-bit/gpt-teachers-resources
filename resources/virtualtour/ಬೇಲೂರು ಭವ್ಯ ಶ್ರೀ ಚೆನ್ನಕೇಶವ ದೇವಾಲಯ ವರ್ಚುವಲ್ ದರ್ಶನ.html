@@ -1,107 +1,131 @@
 <!DOCTYPE html>
 <html lang="kn">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>ಬೇಲೂರು ಚೆನ್ನಕೇಶವ ದೇವಾಲಯ 360° ಆಡಿಯೋ ಪ್ರವಾಸ</title>
-    <!-- A-Frame VR ಲೈಬ್ರರಿ -->
-    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಬೇಲೂರು ಚೆನ್ನಕೇಶವ ದೇವಾಲಯ - 360° ಆಡಿಯೋ ಪ್ರವಾಸ</title>
+    <!-- Pannellum 360 ಲೈಬ್ರರಿ -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.7/build/pannellum.css"/>
+    <script src="https://cdn.jsdelivr.net/npm/pannellum@2.5.7/build/pannellum.js"></script>
     <style>
-        /* ಮಾಹಿತಿ ಫಲಕ */
-        #info-panel {
-            position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
-            width: 85%; max-width: 650px; background: rgba(24, 24, 27, 0.95); color: #f4f4f5;
-            padding: 20px; border-radius: 15px; font-family: sans-serif; text-align: center;
-            font-size: 18px; line-height: 1.6; border: 2px solid #eab308; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
-            z-index: 999; pointer-events: none;
-        }
+        body { margin: 0; padding: 0; font-family: sans-serif; }
+        #panorama { width: 100vw; height: 100vh; }
+        
         /* ಶೀರ್ಷಿಕೆ ಫಲಕ */
         #title-panel {
             position: absolute; top: 20px; left: 20px; color: white;
-            background: rgba(24, 24, 27, 0.85); padding: 15px; border-radius: 10px;
-            border-left: 5px solid #eab308; z-index: 999;
+            background: rgba(15, 23, 42, 0.85); padding: 15px; border-radius: 10px;
+            border-left: 5px solid #eab308; z-index: 999; pointer-events: none;
         }
-        #title-panel h1 { margin: 0; font-size: 22px; color: #eab308; }
+        #title-panel h1 { margin: 0; font-size: 20px; color: #eab308; }
+        #title-panel p { margin: 5px 0 0 0; font-size: 14px; color: #e2e8f0; }
+
+        /* ಕೆಳಗಿನ ಸುಂದರ ಮಾಹಿತಿ ಫಲಕ (ಆಡಿಯೋ ಮತ್ತು ಪಠ್ಯಕ್ಕಾಗಿ) */
+        #info-panel {
+            position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
+            width: 85%; max-width: 650px; background: rgba(15, 23, 42, 0.95); color: #f8fafc;
+            padding: 20px; border-radius: 15px; text-align: center;
+            font-size: 17px; line-height: 1.6; border: 2px solid #eab308; /* ಹೊಯ್ಸಳರ ವೈಭವಕ್ಕೆ ಚಿನ್ನದ ಬಣ್ಣ */
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+            z-index: 999; pointer-events: none;
+        }
+
+        /* 🎯 ದೊಡ್ಡದಾಗಿರುವ ಕಸ್ಟಮ್ ಹಾಟ್‌ಸ್ಪಾಟ್‌ ಬಬಲ್ಸ್ */
+        .custom-hotspot {
+            height: 32px;
+            width: 32px;
+            background: #eab308; /* ಹೊಳೆಯುವ ಚಿನ್ನದ ಬಣ್ಣ */
+            border: 3px solid #ffffff;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 12px rgba(234, 179, 8, 0.8);
+            transition: all 0.3s ease;
+        }
+        /* ಅದರ ಮೇಲೆ ಬೆರಳು ಇಟ್ಟಾಗ ಕೆಂಪು ಬಣ್ಣಕ್ಕೆ ತಿರುಗಲು */
+        .custom-hotspot:hover {
+            background: #ef4444; 
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.9);
+            transform: scale(1.2);
+        }
     </style>
 </head>
 <body>
 
-    <div id="title-panel">
-        <h1>ಬೇಲೂರು: ಭವ್ಯ ಶ್ರೀ ಚೆನ್ನಕೇಶವ ದೇವಾಲಯ ವರ್ಚುವಲ್ ದರ್ಶನ</h1>
-        <p>ಚಿನ್ನದ ಬಣ್ಣದ ವರ್ತುಲಗಳ ಮೇಲೆ ನೇರವಾಗಿ ಕ್ಲಿಕ್ ಮಾಡಿ ಆಡಿಯೋ ಮಾಹಿತಿ ಪಡೆಯಿರಿ</p>
-    </div>
+<div id="title-panel">
+    <h1>ಬೇಲೂರು: ಭವ್ಯ ಶ್ರೀ ಚೆನ್ನಕೇಶವ ದೇವಾಲಯ ವರ್ಚುವಲ್ ದರ್ಶನ</h1>
+    <p>ದೊಡ್ಡದಾಗಿರುವ ಚಿನ್ನದ ಬಣ್ಣದ ವರ್ತುಲಗಳ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ ಆಡಿಯೋ ವಿವರ ಪಡೆಯಿರಿ</p>
+</div>
 
-    <div id="info-panel">
-        ಸ್ವಾಗತ! ಯುನೆಸ್ಕೋ (UNESCO) ವಿಶ್ವ ಪಾರಂಪರಿಕ ತಾಣವಾಗಿರುವ ಬೇಲೂರಿನ ಜಗತ್ಪ್ರಸಿದ್ಧ ಶಿಲ್ಪಕಲೆಯನ್ನು ತಿಳಿಯಲು ಆವರಣದಲ್ಲಿರುವ ಚಿನ್ನದ ಬಣ್ಣದ ಹಾಟ್‌ಸ್ಪಾಟ್‌ಗಳ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ...
-    </div>
+<div id="panorama"></div>
 
-    <!-- VR ಬಟನ್ ಸಂಪೂರ್ಣವಾಗಿ ತೆಗೆದುಹಾಕಲಾಗಿದೆ -->
-    <a-scene vr-mode-ui="enabled: false" cursor="rayOrigin: mouse">
-        <a-assets>
-            <img id="belur-scene" src="https://raw.githubusercontent.com/chandugokarna-bit/gpt-teachers-resources/main/resources/virtual/belur360.jpg" crossorigin="anonymous">
-        </a-assets>
+<div id="info-panel">
+    ಸ್ವಾಗತ! ಯುನೆಸ್ಕೋ (UNESCO) ವಿಶ್ವ ಪಾರಂಪರಿಕ ತಾಣವಾಗಿರುವ ಬೇಲೂರಿನ ಜಗತ್ಪ್ರಸಿದ್ಧ ಶಿಲ್ಪಕಲೆಯನ್ನು ತಿಳಿಯಲು ಆವರಣದಲ್ಲಿರುವ ದೊಡ್ಡ ಹಾಟ್‌ಸ್ಪಾಟ್‌ಗಳ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ...
+</div>
 
-        <!-- ಹಿನ್ನೆಲೆ 360 ಚಿತ್ರ -->
-        <a-sky src="#belur-scene"></a-sky>
+<script>
+// ಕನ್ನಡ ಧ್ವನಿ ಕಾರ್ಯವಿಧಾನ
+function speakKannada(title, infoText) {
+    document.getElementById('info-panel').innerHTML = `<strong>${title}</strong><br>${infoText}`;
+    
+    if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel(); // ಹಳೆಯ ಧ್ವನಿ ನಿಲ್ಲಿಸಲು
+        
+        const speech = new SpeechSynthesisUtterance();
+        speech.text = title + ". " + infoText;
+        speech.lang = 'kn-IN'; // ಕನ್ನಡ ಭಾಷೆ
+        speech.rate = 0.85; // ಬಿಡುಗಡೆಯಾದ ಸ್ಪಷ್ಟ ಧ್ವನಿ
+        
+        window.speechSynthesis.speak(speech);
+    }
+}
 
-        <!-- ಫೋನ್ ಮೊಬೈಲ್ ಸೆನ್ಸರ್ ಟ್ರ್ಯಾಕಿಂಗ್ ನಿಷ್ಕ್ರಿಯಗೊಳಿಸಲಾಗಿದೆ - ಕೇವಲ ಕಂಟ್ರೋಲ್ ಬ್ರೌಸರ್ ಟಚ್ -->
-        <a-entity camera look-controls="magicWindowTrackingEnabled: false" position="0 1.6 0"></a-entity>
+// Pannellum ವೀಕ್ಷಕ ಸೆಟ್ಟಿಂಗ್ಸ್
+pannellum.viewer('panorama', {
+    "type": "equirectangular",
+    "panorama": "https://raw.githubusercontent.com/chandugokarna-bit/gpt-teachers-resources/main/resources/virtual/belur360.jpg",
+    "autoLoad": true,
+    "title": "ಚೆನ್ನಕೇಶವ ದೇವಾಲಯ, ಬೇಲೂರು",
+    "author": "ಹೊಯ್ಸಳ ವಾಸ್ತುಶಿಲ್ಪ ತಾಣ",
+    "hotSpots": [
+        {
+            "pitch": 0,
+            "yaw": -35,
+            "cssClass": "custom-hotspot", // ನಮ್ಮ ಕಸ್ಟಮ್ ದೊಡ್ಡ ಹಾಟ್‌ಸ್ಪಾಟ್
+            "createTooltipFunc": function(hotSpotDiv) { hotSpotDiv.setAttribute("title", "ಬೇಲೂರು ಇತಿಹಾಸ"); },
+            "clickHandlerFunc": function() {
+                speakKannada(
+                    "ಹೊಯ್ಸಳರ ಹೆಮ್ಮೆಯ ಬೇಲೂರು ಕ್ಷೇತ್ರ", 
+                    "ಯಗಚಿ ನದಿಯ ದಂಡೆಯ ಮೇಲಿರುವ ಬೇಲೂರನ್ನು ಹಿಂದೆ 'ವೇಲಾಪುರಿ' ಎಂದು ಕರೆಯಲಾಗುತ್ತಿತ್ತು. ಹೊಯ್ಸಳ ಸಾಮ್ರಾಜ್ಯದ ಪ್ರಸಿದ್ಧ ದೊರೆ ವಿಷ್ಣುವರ್ಧನನು ಚೋಳರ ಮೇಲಿನ ವಿಜಯದ ಸವಿನೆನಪಿಗಾಗಿ ಕ್ರಿ.ಶ 1117 ರಲ್ಲಿ ಈ ಭವ್ಯ ಚೆನ್ನಕೇಶವ ದೇವಾಲಯವನ್ನು ನಿರ್ಮಿಸಿದನು. ಇದರ ನಿರ್ಮಾಣಕ್ಕೆ ಬರೋಬ್ಬರಿ 103 years ಬೇಕಾದವು!"
+                );
+            }
+        },
+        {
+            "pitch": 8,
+            "yaw": 15,
+            "cssClass": "custom-hotspot",
+            "createTooltipFunc": function(hotSpotDiv) { hotSpotDiv.setAttribute("title", "ಶಿಲಾಬಾಲಿಕೆಯರು"); },
+            "clickHandlerFunc": function() {
+                speakKannada(
+                    "ದರ್ಪಣ ಸುಂದರಿ ಮತ್ತು ಶಿಲಾಬಾಲಿಕೆಯರು", 
+                    "ದೇವಾಲಯದ ಸೂರು ಮತ್ತು ಕಂಬಗಳ ನಡುವೆ ಇರುವ 'ಮದನಿಕೆಯರ' (ಶಿಲಾಬಾಲಿಕೆಯರು) ಕೆತ್ತನೆಗಳು ಜಗತ್ಪ್ರಸಿದ್ಧವಾಗಿವೆ. ಕನ್ನಡಿ ನೋಡುತ್ತಿರುವ ದರ್ಪಣ ಸುಂದರಿ, ನಟನಾ ಸುಂದರಿ ಸೇರಿದಂತೆ ಇಲ್ಲಿರುವ 42 ಮದನಿಕೆಯರ ವಿಗ್ರಹಗಳು ಹೊಯ್ಸಳರ ಅತ್ಯುನ್ನತ ಕಲಾ ಕೌಶಲ್ಯಕ್ಕೆ ಶ್ರೇಷ್ಠ ಉದಾಹರಣೆಯಾಗಿದೆ."
+                );
+            }
+        },
+        {
+            "pitch": -5,
+            "yaw": 45,
+            "cssClass": "custom-hotspot",
+            "createTooltipFunc": function(hotSpotDiv) { hotSpotDiv.setAttribute("title", "ಗುರುತ್ವಾಕರ್ಷಣೆ ಸ್ತಂಭ"); },
+            "clickHandlerFunc": function() {
+                speakKannada(
+                    "ಆಧಾರವಿಲ್ಲದೆ ನಿಂತಿರುವ ವಿಜಯ ಸ್ತಂಭ", 
+                    "ದೇವಾಲಯದ ಆವರಣದಲ್ಲಿ ಸುಮಾರು 42 ಅಡಿ ಎತ್ತರದ ಬೃಹತ್ ಕಲ್ಲಿನ ದೀಪಸ್ತಂಭವಿದೆ (Gravity Pillar). ವಿಶೇಷವೆಂದರೆ, ಈ ಸ್ತಂಭಕ್ಕೆ ನೆಲದಲ್ಲಿ ಯಾವುದೇ ಆಳವಾದ ತಳಪಾಯದ ಆಧಾರವಿಲ್ಲ! ಇದು ಕೇವಲ ತನ್ನ ಸ್ವಂತ ಗುರುತ್ವಾಕರ್ಷಣೆಯ ತೂಕದ ಬಲದಿಂದ ನೇರವಾಗಿ ನಿಂತಿದ್ದು, ಹೊಯ್ಸಳ ಇಂಜಿನಿಯರಿಂಗ್ ತಂತ್ರಜ್ಞಾನಕ್ಕೆ ಸಾಕ್ಷಿಯಾಗಿದೆ."
+                );
+            }
+        }
+    ]
+});
+</script>
 
-        <!-- ================= ಇಂಟರಾಕ್ಟಿವ್ ಹಾಟ್‌ಸ್ಪಾಟ್‌ಗಳು ================= -->
-
-        <!-- 1. ಚೆನ್ನಕೇಶವ ದೇವಾಲಯ ಮತ್ತು ವಿಷ್ಣುವರ್ಧನ -->
-        <a-sphere id="hotspot-belur-history" position="-2 1.5 -4" radius="0.35" color="#eab308" class="hotspot"
-                  data-title="ಹೊಯ್ಸಳರ ಹೆಮ್ಮೆಯ ಬೇಲೂರು ಕ್ಷೇತ್ರ"
-                  data-info="ಯಗಚಿ ನದಿಯ ದಂಡೆಯ ಮೇಲಿರುವ ಬೇಲೂರನ್ನು ಹಿಂದೆ 'ವೇಲಾಪುರಿ' ಎಂದು ಕರೆಯಲಾಗುತ್ತಿತ್ತು. ಹೊಯ್ಸಳ ಸಾಮ್ರಾಜ್ಯದ ಪ್ರಸಿದ್ಧ ದೊರೆ ವಿಷ್ಣುವರ್ಧನನು ಚೋಳರ ಮೇಲಿನ ವಿಜಯದ ಸವಿನೆನಪಿಗಾಗಿ ಕ್ರಿ.ಶ 1117 ರಲ್ಲಿ ಈ ಭವ್ಯ ಚೆನ್ನಕೇಶವ (ಸುಂದರ ವಿಷ್ಣು) ದೇವಾಲಯವನ್ನು ನಿರ್ಮಿಸಿದನು. ಇದರ ನಿರ್ಮಾಣಕ್ಕೆ ಬರೋಬ್ಬರಿ 103 ವರ್ಷಗಳು ಬೇಕಾದವು!">
-        </a-sphere>
-
-        <!-- 2. ಜಗತ್ಪ್ರಸಿದ್ಧ ಶಿಲಾಬಾಲಿಕೆಯರು / ಮದನಿಕೆಯರು -->
-        <a-sphere id="hotspot-belur-madanikaru" position="0 1.5 -4" radius="0.35" color="#eab308" class="hotspot"
-                  data-title="ದರ್ಪಣ ಸುಂದರಿ ಮತ್ತು ಶಿಲಾಬಾಲಿಕೆಯರು"
-                  data-info="ದೇವಾಲಯದ ಸೂರು ಮತ್ತು ಕಂಬಗಳ ನಡುವೆ ಇರುವ 'ಮದನಿಕೆಯರ' (ಶಿಲಾಬಾಲಿಕೆಯರು) ಕೆತ್ತನೆಗಳು ಜಗತ್ಪ್ರಸಿದ್ಧವಾಗಿವೆ. ಕನ್ನಡಿ ನೋಡುತ್ತಿರುವ ದರ್ಪಣ ಸುಂದರಿ, ನಟನಾ ಸುಂದರಿ, ಶುಕಭಾಷಿಣಿ ಸೇರಿದಂತೆ ಇಲ್ಲಿರುವ 42 ಮದನಿಕೆಯರ ವಿಗ್ರಹಗಳು ಹೊಯ್ಸಳರ ಅತ್ಯುನ್ನತ ಕಲಾ ಕೌಶಲ್ಯಕ್ಕೆ ಮತ್ತು ಸೂಕ್ಷ್ಮ ಕೆತ್ತನೆಗೆ ಜಗತ್ತಿನಲ್ಲೇ ಶ್ರೇಷ್ಠ ಉದಾಹರಣೆಯಾಗಿದೆ.">
-        </a-sphere>
-
-        <!-- 3. ಗುರುತ್ವಾಕರ್ಷಣೆ ದೀಪಸ್ತಂಭ / ಧ್ವಜಸ್ತಂಭ -->
-        <a-sphere id="hotspot-belur-pillar" position="2 1.5 -4" radius="0.35" color="#eab308" class="hotspot"
-                  data-title="ಆಧಾರವಿಲ್ಲದೆ ನಿಂತಿರುವ ವಿಜಯ ಸ್ತಂಭ"
-                  data-info="ದೇವಾಲಯದ ಆವರಣದಲ್ಲಿ ಸುಮಾರು 42 ಅಡಿ ಎತ್ತರದ ಬೃಹತ್ ಕಲ್ಲಿನ ದೀಪಸ್ತಂಭವಿದೆ (Gravity Pillar). ವಿಶೇಷವೆಂದರೆ, ಈ ಸ್ತಂಭಕ್ಕೆ ನೆಲದಲ್ಲಿ ಯಾವುದೇ ಆಳವಾದ ತಳಪಾಯದ ಆಧಾರವಿಲ್ಲ! ಇದು ಕೇವಲ ತನ್ನ ಸ್ವಂತ ಗುರುತ್ವಾಕರ್ಷಣೆಯ ತೂಕದ ಬಲದಿಂದ ನೇರವಾಗಿ ನಿಂತಿದ್ದು, ಹೊಯ್ಸಳ ಇಂಜಿನಿಯರಿಂಗ್ ತಂತ್ರಜ್ಞಾನಕ್ಕೆ ಸಾಕ್ಷಿಯಾಗಿದೆ.">
-        </a-sphere>
-
-    </a-scene>
-
-    <script>
-        const hotspots = document.querySelectorAll('.hotspot');
-        const infoPanel = document.getElementById('info-panel');
-
-        hotspots.forEach(hotspot => {
-            // ಮೌಸ್/ಟಚ್ Hover ಇಫೆಕ್ಟ್
-            hotspot.addEventListener('mouseenter', function () {
-                this.setAttribute('color', '#ef4444'); 
-            });
-
-            hotspot.addEventListener('mouseleave', function () {
-                this.setAttribute('color', '#eab308'); 
-            });
-
-            // ಕ್ಲಿಕ್/ಟಚ್ ಇವೆಂಟ್ ಮತ್ತು ಆಡಿಯೋ ಪ್ಲೇಬ್ಯಾಕ್
-            hotspot.addEventListener('click', function () {
-                const title = this.getAttribute('data-title');
-                const info = this.getAttribute('data-info');
-                
-                infoPanel.innerHTML = `<strong>${title}</strong><br>${info}`;
-
-                if ('speechSynthesis' in window) {
-                    window.speechSynthesis.cancel(); 
-                    
-                    const speech = new SpeechSynthesisUtterance();
-                    speech.text = title + ". " + info;
-                    speech.lang = 'kn-IN'; 
-                    speech.rate = 0.85; 
-                    
-                    window.speechSynthesis.speak(speech);
-                }
-            });
-        });
-    </script>
 </body>
 </html>
