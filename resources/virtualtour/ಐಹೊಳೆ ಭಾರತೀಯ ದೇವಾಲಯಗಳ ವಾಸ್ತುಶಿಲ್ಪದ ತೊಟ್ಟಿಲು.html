@@ -1,106 +1,131 @@
 <!DOCTYPE html>
 <html lang="kn">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ಐಹೊಳೆ ಚಾಲುಕ್ಯ ವಾಸ್ತುಶಿಲ್ಪ 360° ಆಡಿಯೋ ಪ್ರವಾಸ</title>
-    <!-- A-Frame VR ಲೈಬ್ರರಿ -->
-    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+    <title>ಐಹೊಳೆ ಚಾಲುಕ್ಯ ವಾಸ್ತುಶಿಲ್ಪ - 360° ಆಡಿಯೋ ಪ್ರವಾಸ</title>
+    <!-- Pannellum 360 ಲೈಬ್ರರಿ -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.7/build/pannellum.css"/>
+    <script src="https://cdn.jsdelivr.net/npm/pannellum@2.5.7/build/pannellum.js"></script>
     <style>
-        /* ಮಾಹಿತಿ ಫಲಕ */
-        #info-panel {
-            position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
-            width: 85%; max-width: 650px; background: rgba(24, 24, 27, 0.95); color: #f4f4f5;
-            padding: 20px; border-radius: 15px; font-family: sans-serif; text-align: center;
-            font-size: 18px; line-height: 1.6; border: 2px solid #eab308; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
-            z-index: 999; pointer-events: none;
-        }
+        body { margin: 0; padding: 0; font-family: sans-serif; }
+        #panorama { width: 100vw; height: 100vh; }
+        
         /* ಶೀರ್ಷಿಕೆ ಫಲಕ */
         #title-panel {
             position: absolute; top: 20px; left: 20px; color: white;
-            background: rgba(24, 24, 27, 0.85); padding: 15px; border-radius: 10px;
-            border-left: 5px solid #eab308; z-index: 999;
+            background: rgba(15, 23, 42, 0.85); padding: 15px; border-radius: 10px;
+            border-left: 5px solid #eab308; z-index: 999; pointer-events: none;
         }
-        #title-panel h1 { margin: 0; font-size: 22px; color: #eab308; }
+        #title-panel h1 { margin: 0; font-size: 20px; color: #eab308; }
+        #title-panel p { margin: 5px 0 0 0; font-size: 14px; color: #e2e8f0; }
+
+        /* ಕೆಳಗಿನ ಸುಂದರ ಮಾಹಿತಿ ಫಲಕ (ಆಡಿಯೋ ಮತ್ತು ಪಠ್ಯಕ್ಕಾಗಿ) */
+        #info-panel {
+            position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
+            width: 85%; max-width: 650px; background: rgba(15, 23, 42, 0.95); color: #f8fafc;
+            padding: 20px; border-radius: 15px; text-align: center;
+            font-size: 17px; line-height: 1.6; border: 2px solid #eab308; /* ಚಾಲುಕ್ಯರ ಭವ್ಯತೆಗೆ ಚಿನ್ನದ ಬಣ್ಣ */
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+            z-index: 999; pointer-events: none;
+        }
+
+        /* 🎯 ದೊಡ್ಡದಾಗಿರುವ ಕಸ್ಟಮ್ ಹಾಟ್‌ಸ್ಪಾಟ್‌ ಬಬಲ್ಸ್ */
+        .custom-hotspot {
+            height: 32px;
+            width: 32px;
+            background: #eab308; /* ಹೊಳೆಯುವ ಚಿನ್ನದ ಬಣ್ಣ */
+            border: 3px solid #ffffff;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 12px rgba(234, 179, 8, 0.8);
+            transition: all 0.3s ease;
+        }
+        /* ಅದರ ಮೇಲೆ ಬೆರಳು ಇಟ್ಟಾಗ ಕೆಂಪು ಬಣ್ಣಕ್ಕೆ ತಿರುಗಲು */
+        .custom-hotspot:hover {
+            background: #ef4444; 
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.9);
+            transform: scale(1.2);
+        }
     </style>
 </head>
 <body>
 
-    <div id="title-panel">
-        <h1>ಐಹೊಳೆ: ಭಾರತೀಯ ದೇವcluster ವಾಸ್ತುಶಿಲ್ಪದ ತೊಟ್ಟಿಲು</h1>
-        <p>ಚಿನ್ನದ ಬಣ್ಣದ ವರ್ತುಲಗಳ ಮೇಲೆ ನೇರವಾಗಿ ಕ್ಲಿಕ್ ಮಾಡಿ ಆಡಿಯೋ ಮಾಹಿತಿ ಪಡೆಯಿರಿ</p>
-    </div>
+<div id="title-panel">
+    <h1>ಐಹೊಳೆ: ಭಾರತೀಯ ದೇವಸ್ಥಾನ ವಾಸ್ತುಶಿಲ್ಪದ ತೊಟ್ಟಿಲು</h1>
+    <p>ದೊಡ್ಡದಾಗಿರುವ ಚಿನ್ನದ ಬಣ್ಣದ ವರ್ತುಲಗಳ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ ಆಡಿಯೋ ವಿವರ ಪಡೆಯಿರಿ</p>
+</div>
 
-    <div id="info-panel">
-        ಸ್ವಾಗತ! ಚಾಲುಕ್ಯರ ಅದ್ಭುತ ಕಲಾ ನಗರಿ ಐಹೊಳೆಯ ಇತಿಹಾಸವನ್ನು ತಿಳಿಯಲು ಆವರಣದಲ್ಲಿರುವ ಚಿನ್ನದ ಬಣ್ಣದ ಹಾಟ್‌ಸ್ಪಾಟ್‌ಗಳ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ...
-    </div>
+<div id="panorama"></div>
 
-    <!-- ನೇರ ಮೌಸ್ ಕ್ಲಿಕ್ ಸಿಸ್ಟಮ್ -->
-    <a-scene cursor="rayOrigin: mouse">
-        <a-assets>
-            <img id="aihole-scene" src="https://raw.githubusercontent.com/chandugokarna-bit/gpt-teachers-resources/main/resources/virtual/aihole360.jpg" crossorigin="anonymous">
-        </a-assets>
+<div id="info-panel">
+    ಸ್ವಾಗತ! ಚಾಲುಕ್ಯರ ಅದ್ಭುತ ಕಲಾ ನಗರಿ ಐಹೊಳೆಯ ಇತಿಹಾಸವನ್ನು ತಿಳಿಯಲು ಆವರಣದಲ್ಲಿರುವ ದೊಡ್ಡ ಹಾಟ್‌ಸ್ಪಾಟ್‌ಗಳ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ...
+</div>
 
-        <!-- ಹಿನ್ನೆಲೆ 360 ಚಿತ್ರ -->
-        <a-sky src="#aihole-scene"></a-sky>
+<script>
+// ಕನ್ನಡ ಧ್ವನಿ ಕಾರ್ಯವಿಧಾನ
+function speakKannada(title, infoText) {
+    document.getElementById('info-panel').innerHTML = `<strong>${title}</strong><br>${infoText}`;
+    
+    if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel(); // ಹಳೆಯ ಧ್ವನಿ ನಿಲ್ಲಿಸಲು
+        
+        const speech = new SpeechSynthesisUtterance();
+        speech.text = title + ". " + infoText;
+        speech.lang = 'kn-IN'; // ಕನ್ನಡ ಭಾಷೆ
+        speech.rate = 0.85; // ಸ್ಪಷ್ಟ ಧ್ವನಿ ವೇಗ
+        
+        window.speechSynthesis.speak(speech);
+    }
+}
 
-        <a-entity camera look-controls position="0 1.6 0"></a-entity>
+// Pannellum ವೀಕ್ಷಕ ಸೆಟ್ಟಿಂಗ್ಸ್
+pannellum.viewer('panorama', {
+    "type": "equirectangular",
+    "panorama": "https://raw.githubusercontent.com/chandugokarna-bit/gpt-teachers-resources/main/resources/virtual/aihole360.jpg",
+    "autoLoad": true,
+    "title": "ಐಹೊಳೆ, ಬಾಗಲಕೋಟೆ",
+    "author": "ಚಾಲುಕ್ಯ ವಾಸ್ತುಶಿಲ್ಪ ಕ್ಷೇತ್ರ",
+    "hotSpots": [
+        {
+            "pitch": 0,
+            "yaw": -40,
+            "cssClass": "custom-hotspot", // ನಮ್ಮ ಕಸ್ಟಮ್ ದೊಡ್ಡ ಹಾಟ್‌ಸ್ಪಾಟ್
+            "createTooltipFunc": function(hotSpotDiv) { hotSpotDiv.setAttribute("title", "ಐಹೊಳೆ ಇತಿಹಾಸ"); },
+            "clickHandlerFunc": function() {
+                speakKannada(
+                    "ಭಾರತೀಯ ದೇವಸ್ಥಾನ ವಾಸ್ತುಶಿಲ್ಪದ ತೊಟ್ಟಿಲು", 
+                    "ಐಹೊಳೆ ಬಾದಾಮಿ ಚಾಲುಕ್ಯರ ಮೊದಲ ರಾಜಧಾನಿಯಾಗಿತ್ತು. ಇಲ್ಲಿ 125 ಕ್ಕೂ ಹೆಚ್ಚು ಕಲ್ಲಿನ ದೇವಸ್ಥಾನಗಳಿರುವುದರಿಂದ ಇದನ್ನು 'ಭಾರತೀಯ ದೇವಸ್ಥಾನ ವಾಸ್ತುಶಿಲ್ಪದ ತೊಟ್ಟಿಲು' ಎಂದು ಕರೆಯಲಾಗುತ್ತದೆ. ಇಲ್ಲಿ ಚಾಲುಕ್ಯ ಶಿಲ್ಪಿಗಳು ವಿವಿಧ ಶೈಲಿಯ ಕಟ್ಟಡಗಳನ್ನು ಕಟ್ಟಿ ಪ್ರಯೋಗ ನಡೆಸುತ್ತಿದ್ದರು."
+                );
+            }
+        },
+        {
+            "pitch": 8,
+            "yaw": 0,
+            "cssClass": "custom-hotspot",
+            "createTooltipFunc": function(hotSpotDiv) { hotSpotDiv.setAttribute("title", "ದುರ್ಗಾ ದೇವಸ್ಥಾನ"); },
+            "clickHandlerFunc": function() {
+                speakKannada(
+                    "ಭವ್ಯ ದುರ್ಗಾ ದೇವಸ್ಥಾನ", 
+                    "ಐಹೊಳೆಯ ಅತ್ಯಂತ ಪ್ರಸಿದ್ಧ ಮತ್ತು ಸುಂದರ ಕಟ್ಟಡವೇ ದುರ್ಗಾ ದೇವಸ್ಥಾನ. ಇದು ಬೌದ್ಧ ಚೈತ್ಯಾಲಯವನ್ನು ಹೋಲುವ ವಿಶಿಷ್ಟವಾದ ಅರೆ-ವೃತ್ತಾಕಾರದ ಅಥವಾ 'ಗಜಪೃಷ್ಠಾಕಾರದ' ತಳಪಾಯವನ್ನು ಹೊಂದಿದೆ. ಇದರ ಕಾರಿಡಾರ್ ಮತ್ತು ಕಂಬಗಳ ಮೇಲಿರುವ ಕೆತ್ತನೆಗಳು ಅತ್ಯಂತ ಮೋಹಕವಾಗಿವೆ."
+                );
+            }
+        },
+        {
+            "pitch": -5,
+            "yaw": 40,
+            "cssClass": "custom-hotspot",
+            "createTooltipFunc": function(hotSpotDiv) { hotSpotDiv.setAttribute("title", "ಲಡ್ ಖಾನ್ ದೇವಸ್ಥಾನ"); },
+            "clickHandlerFunc": function() {
+                speakKannada(
+                    "ಲಡ್ ಖಾನ್ ದೇವಸ್ಥಾನ ಮತ್ತು ಐಹೊಳೆ ಶಾಸನ", 
+                    "ಇಲ್ಲಿನ ಅತ್ಯಂತ ಹಳೆಯ ದೇವಸ್ಥಾನಗಳಲ್ಲಿ ಲಡ್ ಖಾನ್ ದೇವಸ್ಥಾನವೂ ಒಂದು, ಇದನ್ನು ಆರಂಭದಲ್ಲಿ ಸಭಾಭವನವಾಗಿ ಬಳಸಲಾಗುತ್ತಿತ್ತು. ಇದರ ಜೊತೆಗೆ, ಐಹೊಳೆಯ ಮೇಗುತಿ ಜೈನ ದೇವಾಲಯದಲ್ಲಿ ಪ್ರಸಿದ್ಧ ಕವಿ ರವಿಕೀರ್ತಿ ಬರೆದ 'ಐಹೊಳೆ ಶಾಸನ'ವಿದೆ. ಇದು ಇಮ್ಮಡಿ ಪುಲಕೇಶಿಯು ಹರ್ಷವರ್ಧನನ್ನು ಸೋಲಿಸಿದ ಭವ್ಯ ವಿಜಯದ ಇತಿಹಾಸವನ್ನು ಸಾರುತ್ತದೆ."
+                );
+            }
+        }
+    ]
+});
+</script>
 
-        <!-- ================= ಇಂಟರಾಕ್ಟಿವ್ ಹಾಟ್‌ಸ್ಪಾಟ್‌ಗಳು (ಆರಂಭಿಕ ಸುರಕ್ಷಿತ ಸ್ಥಾನ) ================= -->
-
-        <!-- 1. ಐಹೊಳೆ ಇತಿಹಾಸ ಮತ್ತು ಚಾಲುಕ್ಯರ ತೊಟ್ಟಿಲು (ಎಡಭಾಗ) -->
-        <a-sphere id="hotspot-aihole-history" position="-2 1.5 -4" radius="0.35" color="#eab308" class="hotspot"
-                  data-title="ಭಾರತೀಯ ದೇವಸ್ಥಾನ ವಾಸ್ತುಶಿಲ್ಪದ ತೊಟ್ಟಿಲು"
-                  data-info="ಐಹೊಳೆ ಬಾದಾಮಿ ಚಾಲುಕ್ಯರ ಮೊದಲ ರಾಜಧಾನಿಯಾಗಿತ್ತು. ಇಲ್ಲಿ 125 ಕ್ಕೂ ಹೆಚ್ಚು ಕಲ್ಲಿನ ದೇವಸ್ಥಾನಗಳಿರುವುದರಿಂದ ಇದನ್ನು 'ಭಾರತೀಯ ದೇವಸ್ಥಾನ ವಾಸ್ತುಶಿಲ್ಪದ ತೊಟ್ಟಿಲು' (Cradle of Indian Temple Architecture) ಎಂದು ಕರೆಯಲಾಗುತ್ತದೆ. ಇಲ್ಲಿ ಚಾಲುಕ್ಯ ಶಿಲ್ಪಿಗಳು ವಿವಿಧ ಶೈಲಿಯ ಕಟ್ಟಡಗಳನ್ನು ಕಟ್ಟಿ ಪ್ರಯೋಗ ನಡೆಸುತ್ತಿದ್ದರು.">
-        </a-sphere>
-
-        <!-- 2. ವಿಶಿಷ್ಟ ದುರ್ಗಾ ದೇವಸ್ಥಾನ (ಮಧ್ಯದಲ್ಲಿದೆ) -->
-        <a-sphere id="hotspot-aihole-durga" position="0 1.5 -4" radius="0.35" color="#eab308" class="hotspot"
-                  data-title="ಭವ್ಯ ದುರ್ಗಾ ದೇವಸ್ಥಾನ"
-                  data-info="ಐಹೊಳೆಯ ಅತ್ಯಂತ ಪ್ರಸಿದ್ಧ ಮತ್ತು ಸುಂದರ ಕಟ್ಟಡವೇ ದುರ್ಗಾ ದೇವಸ್ಥಾನ. ಇದು ಬೌದ್ಧ ಚೈತ್ಯಾಲಯವನ್ನು ಹೋಲುವ ವಿಶಿಷ್ಟವಾದ ಅರೆ-ವೃತ್ತಾಕಾರದ ಅಥವಾ 'ಗಜಪೃಷ್ಠಾಕಾರದ' (Apsidal) ತಳಪಾಯವನ್ನು ಹೊಂದಿದೆ. ಇದರ ಕಾರಿಡಾರ್ ಮತ್ತು ಕಂಬಗಳ ಮೇಲಿರುವ ಸುರಸುಂದರಿಯರ ಹಾಗೂ ದೇವತೆಗಳ ಕೆತ್ತನೆಗಳು ಅತ್ಯಂತ ಮೋಹಕವಾಗಿವೆ.">
-        </a-sphere>
-
-        <!-- 3. ಲಡ್ ಖಾನ್ ದೇವಸ್ಥಾನ ಮತ್ತು ಶಾಸನಗಳು (ಬಲಭಾಗದಲ್ಲಿದೆ) -->
-        <a-sphere id="hotspot-aihole-ladkhan" position="2 1.5 -4" radius="0.35" color="#eab308" class="hotspot"
-                  data-title="ಲಡ್ ಖಾನ್ ದೇವಸ್ಥಾನ ಮತ್ತು ಐಹೊಳೆ ಶಾಸನ"
-                  data-info="ಇಲ್ಲಿನ ಅತ್ಯಂತ ಹಳೆಯ ದೇವಸ್ಥಾನಗಳಲ್ಲಿ ಲಡ್ ಖಾನ್ ದೇವಸ್ಥಾನವೂ ಒಂದು, ಇದನ್ನು ಆರಂಭದಲ್ಲಿ ಸಭಾಭವನವಾಗಿ ಬಳಸಲಾಗುತ್ತಿತ್ತು. ಇದರ ಜೊತೆಗೆ, ಐಹೊಳೆಯ ಮೇಗುತಿ ಜೈನ ದೇವಾಲಯದಲ್ಲಿ ಪ್ರಸಿದ್ಧ ಕವಿ ರವಿಕೀರ್ತಿ ಬರೆದ 'ಐಹೊಳೆ ಶಾಸನ'ವಿದೆ. ಇದು ಇಮ್ಮಡಿ ಪುಲಕೇಶಿಯು ಹರ್ಷವರ್ಧನನ್ನು ಸೋಲಿಸಿದ ಭವ್ಯ ವಿಜಯದ ಇತಿಹಾಸವನ್ನು ಸಾರುತ್ತದೆ.">
-        </a-sphere>
-
-    </a-scene>
-
-    <script>
-        const hotspots = document.querySelectorAll('.hotspot');
-        const infoPanel = document.getElementById('info-panel');
-
-        hotspots.forEach(hotspot => {
-            // ಮೌಸ್ Hover ಇಫೆಕ್ಟ್
-            hotspot.addEventListener('mouseenter', function () {
-                this.setAttribute('color', '#ef4444'); // ಕೆಂಪು ಬಣ್ಣ
-            });
-
-            hotspot.addEventListener('mouseleave', function () {
-                this.setAttribute('color', '#eab308'); // ಮರಳಿ ಚಿನ್ನದ ಬಣ್ಣ
-            });
-
-            // ಕ್ಲಿಕ್ ಇವೆಂಟ್ ಮತ್ತು ಆಡಿಯೋ ಪ್ಲೇಬ್ಯಾಕ್
-            hotspot.addEventListener('click', function () {
-                const title = this.getAttribute('data-title');
-                const info = this.getAttribute('data-info');
-                
-                infoPanel.innerHTML = `<strong>${title}</strong><br>${info}`;
-
-                if ('speechSynthesis' in window) {
-                    window.speechSynthesis.cancel(); // ಹಳೆಯ ಧ್ವನಿ ನಿಲ್ಲಿಸಲು
-                    
-                    const speech = new SpeechSynthesisUtterance();
-                    speech.text = title + ". " + info;
-                    speech.lang = 'kn-IN'; // ಕನ್ನಡ ಭಾಷೆ
-                    speech.rate = 0.85; // ಸ್ಪಷ್ಟ ಧ್ವನಿ ವೇಗ
-                    
-                    window.speechSynthesis.speak(speech);
-                }
-            });
-        });
-    </script>
 </body>
 </html>
