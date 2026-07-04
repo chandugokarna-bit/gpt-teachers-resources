@@ -1,108 +1,131 @@
 <!DOCTYPE html>
 <html lang="kn">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>ಶ್ರವಣಬೆಳಗೊಳ ಗೊಮ್ಮಟೇಶ್ವರ 360° ಆಡಿಯೋ ಪ್ರವಾಸ</title>
-    <!-- A-Frame VR ಲೈಬ್ರರಿ -->
-    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಶ್ರವಣಬೆಳಗೊಳ ಗೊಮ್ಮಟೇಶ್ವರ - 360° ಆಡಿಯೋ ಪ್ರವಾಸ</title>
+    <!-- Pannellum 360 ಲೈಬ್ರರಿ -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.7/build/pannellum.css"/>
+    <script src="https://cdn.jsdelivr.net/npm/pannellum@2.5.7/build/pannellum.js"></script>
     <style>
-        /* ಮಾಹಿತಿ ಫಲಕ */
-        #info-panel {
-            position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
-            width: 85%; max-width: 650px; background: rgba(24, 24, 27, 0.95); color: #f4f4f5;
-            padding: 20px; border-radius: 15px; font-family: sans-serif; text-align: center;
-            font-size: 18px; line-height: 1.6; border: 2px solid #f59e0b; /* Orange/Amber Border for Spiritual Theme */
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
-            z-index: 999; pointer-events: none;
-        }
+        body { margin: 0; padding: 0; font-family: sans-serif; }
+        #panorama { width: 100vw; height: 100vh; }
+        
         /* ಶೀರ್ಷಿಕೆ ಫಲಕ */
         #title-panel {
             position: absolute; top: 20px; left: 20px; color: white;
             background: rgba(24, 24, 27, 0.85); padding: 15px; border-radius: 10px;
-            border-left: 5px solid #f59e0b; z-index: 999;
+            border-left: 5px solid #f59e0b; z-index: 999; pointer-events: none;
         }
-        #title-panel h1 { margin: 0; font-size: 22px; color: #f59e0b; }
+        #title-panel h1 { margin: 0; font-size: 20px; color: #f59e0b; }
+        #title-panel p { margin: 5px 0 0 0; font-size: 14px; color: #e2e8f0; }
+
+        /* ಕೆಳಗಿನ ಸುಂದರ ಮಾಹಿತಿ ಫಲಕ (ಆಡಿಯೋ ಮತ್ತು ಪಠ್ಯಕ್ಕಾಗಿ) */
+        #info-panel {
+            position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
+            width: 85%; max-width: 650px; background: rgba(24, 24, 27, 0.95); color: #f4f4f5;
+            padding: 20px; border-radius: 15px; text-align: center;
+            font-size: 17px; line-height: 1.6; border: 2px solid #f59e0b; /* ಆಧ್ಯಾತ್ಮಿಕ ಹಿನ್ನೆಲೆಗೆ ಕೇಸರಿ ಬಣ್ಣ */
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+            z-index: 999; pointer-events: none;
+        }
+
+        /* 🎯 ದೊಡ್ಡದಾಗಿರುವ ಕಸ್ಟಮ್ ಹಾಟ್‌ಸ್ಪಾಟ್‌ ಬಬಲ್ಸ್ */
+        .custom-hotspot {
+            height: 32px;
+            width: 32px;
+            background: #eab308; /* ಹೊಳೆಯುವ ಚಿನ್ನದ ಬಣ್ಣ */
+            border: 3px solid #ffffff;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 12px rgba(234, 179, 8, 0.8);
+            transition: all 0.3s ease;
+        }
+        /* ಅದರ ಮೇಲೆ ಬೆರಳು ಇಟ್ಟಾಗ ಕೆಂಪು ಬಣ್ಣಕ್ಕೆ ತಿರುಗಲು */
+        .custom-hotspot:hover {
+            background: #ef4444; 
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.9);
+            transform: scale(1.2);
+        }
     </style>
 </head>
 <body>
 
-    <div id="title-panel">
-        <h1>ಶ್ರವಣಬೆಳಗೊಳ: ಭವ್ಯ ಶ್ರೀ ಗೊಮ್ಮಟೇಶ್ವರ ಬಾಹುಬಲಿ ಸ್ವಾಮಿ ದರ್ಶನ</h1>
-        <p>ಚಿನ್ನದ ಬಣ್ಣದ ವರ್ತುಲಗಳ ಮೇಲೆ ನೇರವಾಗಿ ಕ್ಲಿಕ್ ಮಾಡಿ ಆಡಿಯೋ ಮಾಹಿತಿ ಪಡೆಯಿರಿ</p>
-    </div>
+<div id="title-panel">
+    <h1>ಶ್ರವಣಬೆಳಗೊಳ: ಭವ್ಯ ಶ್ರೀ ಗೊಮ್ಮಟೇಶ್ವರ ಬಾಹುಬಲಿ ಸ್ವಾಮಿ ದರ್ಶನ</h1>
+    <p>ದೊಡ್ಡದಾಗಿರುವ ಚಿನ್ನದ ಬಣ್ಣದ ವರ್ತುಲಗಳ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ ಆಡಿಯೋ ವಿವರ ಪಡೆಯಿರಿ</p>
+</div>
 
-    <div id="info-panel">
-        ಸ್ವಾಗತ! ಜಗತ್ತಿನ ಅತಿ ಎತ್ತರದ ಏಕಶಿಲಾ ಮೂರ್ತಿಗಳಲ್ಲಿ ಒಂದಾದ ಗೊಮ್ಮಟೇಶ್ವರನ ಇತಿಹಾಸ ತಿಳಿಯಲು ಆವರಣದಲ್ಲಿರುವ ಚಿನ್ನದ ಬಣ್ಣದ ಹಾಟ್‌ಸ್ಪಾಟ್‌ಗಳ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ...
-    </div>
+<div id="panorama"></div>
 
-    <!-- VR ಬಟನ್ ಸಂಪೂರ್ಣವಾಗಿ ತೆಗೆದುಹಾಕಲಾಗಿದೆ -->
-    <a-scene vr-mode-ui="enabled: false" cursor="rayOrigin: mouse">
-        <a-assets>
-            <img id="gommateshvar-scene" src="https://raw.githubusercontent.com/chandugokarna-bit/gpt-teachers-resources/main/resources/virtual/Gommateshwar360.jpg" crossorigin="anonymous">
-        </a-assets>
+<div id="info-panel">
+    ಸ್ವಾಗತ! ಜಗತ್ತಿನ ಅತಿ ಎತ್ತರದ ಏಕಶಿಲಾ ಮೂರ್ತಿಗಳಲ್ಲಿ ಒಂದಾದ ಗೊಮ್ಮಟೇಶ್ವರನ ಇತಿಹಾಸ ತಿಳಿಯಲು ಆವರಣದಲ್ಲಿರುವ ದೊಡ್ಡ ಹಾಟ್‌ಸ್ಪಾಟ್‌ಗಳ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ...
+</div>
 
-        <!-- ಹಿನ್ನೆಲೆ 360 ಚಿತ್ರ -->
-        <a-sky src="#gommateshvar-scene"></a-sky>
+<script>
+// ಕನ್ನಡ ಧ್ವನಿ ಕಾರ್ಯವಿಧಾನ
+function speakKannada(title, infoText) {
+    document.getElementById('info-panel').innerHTML = `<strong>${title}</strong><br>${infoText}`;
+    
+    if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel(); // ಹಳೆಯ ಧ್ವನಿ ನಿಲ್ಲಿಸಲು
+        
+        const speech = new SpeechSynthesisUtterance();
+        speech.text = title + ". " + infoText;
+        speech.lang = 'kn-IN'; // ಕನ್ನಡ ಭಾಷೆ
+        speech.rate = 0.85; // ಸ್ಪಷ್ಟ ಧ್ವನಿ ವೇಗ
+        
+        window.speechSynthesis.speak(speech);
+    }
+}
 
-        <!-- ಫೋನ್ ಮೊಬೈಲ್ ಸೆನ್ಸರ್ ಟ್ರ್ಯಾಕಿಂಗ್ ನಿಷ್ಕ್ರಿಯಗೊಳಿಸಲಾಗಿದೆ - ಕೇವಲ ಕಂಟ್ರೋಲ್ ಬ್ರೌಸರ್ ಟಚ್ -->
-        <a-entity camera look-controls="magicWindowTrackingEnabled: false" position="0 1.6 0"></a-entity>
+// Pannellum ವೀಕ್ಷಕ ಸೆಟ್ಟಿಂಗ್ಸ್
+pannellum.viewer('panorama', {
+    "type": "equirectangular",
+    "panorama": "https://raw.githubusercontent.com/chandugokarna-bit/gpt-teachers-resources/main/resources/virtual/Gommateshwar360.jpg",
+    "autoLoad": true,
+    "title": "ಗೊಮ್ಮಟೇಶ್ವರ, ಶ್ರವಣಬೆಳಗೊಳ",
+    "author": "ಜಗತ್ಪ್ರಸಿದ್ಧ ಏಕಶಿಲಾ ತಾಣ",
+    "hotSpots": [
+        {
+            "pitch": 15,
+            "yaw": -25,
+            "cssClass": "custom-hotspot", // ನಮ್ಮ ಕಸ್ಟಮ್ ದೊಡ್ಡ ಹಾಟ್‌ಸ್ಪಾಟ್
+            "createTooltipFunc": function(hotSpotDiv) { hotSpotDiv.setAttribute("title", "ಏಕಶಿಲಾ ವಿಗ್ರಹ"); },
+            "clickHandlerFunc": function() {
+                speakKannada(
+                    "ಶ್ರೀ ಗೊಮ್ಮಟೇಶ್ವರ ಏಕಶಿಲಾ ವಿಗ್ರಹ", 
+                    "ವಿಂಧ್ಯಗಿರಿ ಬೆಟ್ಟದ ಮೇಲಿರುವ ಈ ಬಾಹುಬಲಿ ಮೂರ್ತಿಯು ಸುಮಾರು 57 ಅಡಿ ಎತ್ತರವಿದ್ದು, ಒಂದೇ ಕಲ್ಲಿನಲ್ಲಿ ಕೆತ್ತಲಾದ ಜಗತ್ತಿನ ಅತಿ ದೊಡ್ಡ ಮುಕ್ತ ವಿಗ್ರಹಗಳಲ್ಲಿ ಒಂದಾಗಿದೆ. ಕ್ರಿ.ಶ. 981 ರಲ್ಲಿ ಗಂಗ ವಂಶದ ಪ್ರಧಾನಿ ಮತ್ತು ದಂಡನಾಯಕ ಚಾವುಂಡರಾಯನು ಇದನ್ನು ನಿರ್ಮಿಸಿದನು."
+                );
+            }
+        },
+        {
+            "pitch": 5,
+            "yaw": 25,
+            "cssClass": "custom-hotspot",
+            "createTooltipFunc": function(hotSpotDiv) { hotSpotDiv.setAttribute("title", "ಮಹಾಮಸ್ತಾಕಾಭಿಷೇಕ"); },
+            "clickHandlerFunc": function() {
+                speakKannada(
+                    "ಮಹಾಮಸ್ತಾಕಾಭಿಷೇಕ ಮಹೋತ್ಸವ", 
+                    "ಪ್ರತಿ 12 ವರ್ಷಗಳಿಗೊಮ್ಮೆ ಇಲ್ಲಿ ಗೊಮ್ಮಟೇಶ್ವರನಿಗೆ ಜಗತ್ಪ್ರಸಿದ್ಧ 'ಮಹಾಮಸ್ತಾಕಾಭಿಷೇಕ' ನಡೆಯುತ್ತದೆ. ಈ ಸಂದರ್ಭದಲ್ಲಿ ಮೂರ್ತಿಗೆ ಹಾಲು, ಮೊಸರು, ತುಪ್ಪ, ಕೇಸರಿ, ಕಬ್ಬಿನ ಹಾಲು ಮತ್ತು ಬಂಗಾರದ ನಾಣ್ಯಗಳಿಂದ ದಿವ್ಯ ಅಭಿಷೇಕ ಮಾಡಲಾಗುತ್ತದೆ. ಇದನ್ನು ನೋಡಲು ಜಗತ್ತಿನಾದ್ಯಂತ ಲಕ್ಷಾಂತರ ಭಕ್ತರು ಬರುತ್ತಾರೆ."
+                );
+            }
+        },
+        {
+            "pitch": -8,
+            "yaw": 0,
+            "cssClass": "custom-hotspot",
+            "createTooltipFunc": function(hotSpotDiv) { hotSpotDiv.setAttribute("title", "ಐತಿಹಾಸಿಕ ಹಿನ್ನೆಲೆ"); },
+            "clickHandlerFunc": function() {
+                speakKannada(
+                    "ವಿಂಧ್ಯಗಿರಿ ಬೆಟ್ಟ ಮತ್ತು ಜೈನ ತಾಣ", 
+                    "ಶ್ರವಣಬೆಳಗೊಳದಲ್ಲಿ ವಿಂಧ್ಯಗಿರಿ ಮತ್ತು ಚಂದ್ರಗಿರಿ ಎಂಬ ಎರಡು ಪ್ರಮುಖ ಬೆಟ್ಟಗಳಿವೆ. ಮೌರ್ಯ ಸಾಮ್ರಾಜ್ಯದ ಸ್ಥಾಪಕ ಚಂದ್ರಗುಪ್ತ ಮೌರ್ಯನು ತನ್ನ ಗುರು ಭದ್ರಬಾಹುವಿನ ಜೊತೆ ಇಲ್ಲಿಗೆ ಬಂದು ಶ್ರವಣ ಧರ್ಮ ಸ್ವೀಕರಿಸಿ, ಸಲ್ಲೇಖನ ವ್ರತದ ಮೂಲಕ ಪ್ರಾಣತ್ಯಾಗ ಮಾಡಿದನು ಎಂಬ ಇತಿಹಾಸವಿದೆ."
+                );
+            }
+        }
+    ]
+});
+</script>
 
-        <!-- ================= ಇಂಟರಾಕ್ಟಿವ್ ಹಾಟ್‌ಸ್ಪಾಟ್‌ಗಳು ================= -->
-
-        <!-- 1. ಬಾಹುಬಲಿ ಏಕಶಿಲಾ ಮೂರ್ತಿ -->
-        <a-sphere id="hotspot-gommata-statue" position="-2 1.5 -4" radius="0.35" color="#eab308" class="hotspot"
-                  data-title="ಶ್ರೀ ಗೊಮ್ಮಟೇಶ್ವರ ಏಕಶಿಲಾ ವಿಗ್ರಹ"
-                  data-info="ವಿಂಧ್ಯಗಿರಿ ಬೆಟ್ಟದ ಮೇಲಿರುವ ಈ ಬಾಹುಬಲಿ ಮೂರ್ತಿಯು ಸುಮಾರು 57 ಅಡಿ ಎತ್ತರವಿದ್ದು, ಒಂದೇ ಕಲ್ಲಿನಲ್ಲಿ ಕೆತ್ತಲಾದ ಜಗತ್ತಿನ ಅತಿ ದೊಡ್ಡ ಮುಕ್ತ ವಿಗ್ರಹಗಳಲ್ಲಿ ಒಂದಾಗಿದೆ. ಕ್ರಿ.ಶ. 981 ರಲ್ಲಿ ಗಂಗ ವಂಶದ ಪ್ರಧಾನಿ ಮತ್ತು ದಂಡನಾಯಕ ಚಾವುಂಡರಾಯನು ಇದನ್ನು ನಿರ್ಮಿಸಿದನು.">
-        </a-sphere>
-
-        <!-- 2. ಮಹಾಮಸ್ತಾಕಾಭಿಷೇಕ ಮತ್ತು ಸಂಸ್ಕೃತಿ -->
-        <a-sphere id="hotspot-gommata-festival" position="0 1.5 -4" radius="0.35" color="#eab308" class="hotspot"
-                  data-title="ಮಹಾಮಸ್ತಾಕಾಭಿಷೇಕ ಮಹೋತ್ಸವ"
-                  data-info="ಪ್ರತಿ 12 ವರ್ಷಗಳಿಗೊಮ್ಮೆ ಇಲ್ಲಿ ಗೊಮ್ಮಟೇಶ್ವರನಿಗೆ ಜಗತ್ಪ್ರಸಿದ್ಧ 'ಮಹಾಮಸ್ತಾಕಾಭಿಷೇಕ' ನಡೆಯುತ್ತದೆ. ಈ ಸಂದರ್ಭದಲ್ಲಿ ಮೂರ್ತಿಗೆ ಹಾಲು, ಮೊಸರು, ತುಪ್ಪ, ಕೇಸರಿ, ಕಬ್ಬಿನ ಹಾಲು ಮತ್ತು ಬಂಗಾರದ ನಾಣ್ಯಗಳಿಂದ ದಿವ್ಯ ಅಭಿಷೇಕ ಮಾಡಲಾಗುತ್ತದೆ. ಇದನ್ನು ನೋಡಲು ಜಗತ್ತಿನಾದ್ಯಂತ ಲಕ್ಷಾಂತರ ಭಕ್ತರು ಬರುತ್ತಾರೆ.">
-        </a-sphere>
-
-        <!-- 3. ವಿಂಧ್ಯಗಿರಿ ಮತ್ತು ಚಂದ್ರಗಿರಿ ಬೆಟ್ಟಗಳು -->
-        <a-sphere id="hotspot-gommata-hills" position="2 1.5 -4" radius="0.35" color="#eab308" class="hotspot"
-                  data-title="ವಿಂಧ್ಯಗಿರಿ ಬೆಟ್ಟ ಮತ್ತು ಜೈನ ತಾಣ"
-                  data-info="ಶ್ರವಣಬೆಳಗೊಳದಲ್ಲಿ ವಿಂಧ್ಯಗಿರಿ ಮತ್ತು ಚಂದ್ರಗಿರಿ ಎಂಬ ಎರಡು ಪ್ರಮುಖ ಬೆಟ್ಟಗಳಿವೆ. ಮೌರ್ಯ ಸಾಮ್ರಾಜ್ಯದ ಸ್ಥಾಪಕ ಚಂದ್ರಗುಪ್ತ ಮೌರ್ಯನು ತನ್ನ ಗುರು ಭದ್ರಬಾಹುವಿನ ಜೊತೆ ಇಲ್ಲಿಗೆ ಬಂದು ಶ್ರವಣ ಧರ್ಮ ಸ್ವೀಕರಿಸಿ, ಸಲ್ಲೇಖನ ವ್ರತದ ಮೂಲಕ ಪ್ರಾಣತ್ಯಾಗ ಮಾಡಿದನು ಎಂಬ ಇತಿಹಾಸವಿದೆ.">
-        </a-sphere>
-
-    </a-scene>
-
-    <script>
-        const hotspots = document.querySelectorAll('.hotspot');
-        const infoPanel = document.getElementById('info-panel');
-
-        hotspots.forEach(hotspot => {
-            // ಮೌಸ್/ಟಚ್ Hover ಇಫೆಕ್ಟ್
-            hotspot.addEventListener('mouseenter', function () {
-                this.setAttribute('color', '#ef4444'); 
-            });
-
-            hotspot.addEventListener('mouseleave', function () {
-                this.setAttribute('color', '#eab308'); 
-            });
-
-            // ಕ್ಲಿಕ್/ಟಚ್ ಇವೆಂಟ್ ಮತ್ತು ಆಡಿಯೋ ಪ್ಲೇಬ್ಯಾಕ್
-            hotspot.addEventListener('click', function () {
-                const title = this.getAttribute('data-title');
-                const info = this.getAttribute('data-info');
-                
-                infoPanel.innerHTML = `<strong>${title}</strong><br>${info}`;
-
-                if ('speechSynthesis' in window) {
-                    window.speechSynthesis.cancel(); 
-                    
-                    const speech = new SpeechSynthesisUtterance();
-                    speech.text = title + ". " + info;
-                    speech.lang = 'kn-IN'; 
-                    speech.rate = 0.85; 
-                    
-                    window.speechSynthesis.speak(speech);
-                }
-            });
-        });
-    </script>
 </body>
 </html>
