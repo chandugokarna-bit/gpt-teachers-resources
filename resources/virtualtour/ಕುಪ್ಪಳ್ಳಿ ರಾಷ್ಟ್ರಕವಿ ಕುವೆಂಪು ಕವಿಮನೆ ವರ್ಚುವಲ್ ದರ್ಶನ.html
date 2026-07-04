@@ -1,108 +1,131 @@
 <!DOCTYPE html>
 <html lang="kn">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>ಕುಪ್ಪಳ್ಳಿ ಕವಿಮನೆ 360° ಆಡಿಯೋ ಪ್ರವಾಸ</title>
-    <!-- A-Frame VR ಲೈಬ್ರರಿ -->
-    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಕುಪ್ಪಳ್ಳಿ ಕವಿಮನೆ - 360° ಆಡಿಯೋ ಪ್ರವಾಸ</title>
+    <!-- Pannellum 360 ಲೈಬ್ರರಿ -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.7/build/pannellum.css"/>
+    <script src="https://cdn.jsdelivr.net/npm/pannellum@2.5.7/build/pannellum.js"></script>
     <style>
-        /* ಮಾಹಿತಿ ಫಲಕ */
-        #info-panel {
-            position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
-            width: 85%; max-width: 650px; background: rgba(24, 24, 27, 0.95); color: #f4f4f5;
-            padding: 20px; border-radius: 15px; font-family: sans-serif; text-align: center;
-            font-size: 18px; line-height: 1.6; border: 2px solid #16a34a; /* Green Border for Malnad Theme */
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
-            z-index: 999; pointer-events: none;
-        }
+        body { margin: 0; padding: 0; font-family: sans-serif; }
+        #panorama { width: 100vw; height: 100vh; }
+        
         /* ಶೀರ್ಷಿಕೆ ಫಲಕ */
         #title-panel {
             position: absolute; top: 20px; left: 20px; color: white;
-            background: rgba(24, 24, 27, 0.85); padding: 15px; border-radius: 10px;
-            border-left: 5px solid #16a34a; z-index: 999;
+            background: rgba(15, 23, 42, 0.85); padding: 15px; border-radius: 10px;
+            border-left: 5px solid #16a34a; z-index: 999; pointer-events: none;
         }
-        #title-panel h1 { margin: 0; font-size: 22px; color: #16a34a; }
+        #title-panel h1 { margin: 0; font-size: 20px; color: #16a34a; }
+        #title-panel p { margin: 5px 0 0 0; font-size: 14px; color: #e2e8f0; }
+
+        /* ಕೆಳಗಿನ ಸುಂದರ ಮಾಹಿತಿ ಫಲಕ (ಆಡಿಯೋ ಮತ್ತು ಪಠ್ಯಕ್ಕಾಗಿ) */
+        #info-panel {
+            position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
+            width: 85%; max-width: 650px; background: rgba(15, 23, 42, 0.95); color: #f8fafc;
+            padding: 20px; border-radius: 15px; text-align: center;
+            font-size: 17px; line-height: 1.6; border: 2px solid #16a34a; /* ಮಲೆನಾಡಿನ ಹಸಿರು ಬಣ್ಣ */
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+            z-index: 999; pointer-events: none;
+        }
+
+        /* 🎯 ದೊಡ್ಡದಾಗಿರುವ ಕಸ್ಟಮ್ ಹಾಟ್‌ಸ್ಪಾಟ್‌ ಬಬಲ್ಸ್ */
+        .custom-hotspot {
+            height: 32px;
+            width: 32px;
+            background: #eab308; /* ಹೊಳೆಯುವ ಚಿನ್ನದ ಬಣ್ಣ */
+            border: 3px solid #ffffff;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 12px rgba(234, 179, 8, 0.8);
+            transition: all 0.3s ease;
+        }
+        /* ಅದರ ಮೇಲೆ ಬೆರಳು ಇಟ್ಟಾಗ ಕೆಂಪು ಬಣ್ಣಕ್ಕೆ ತಿರುಗಲು */
+        .custom-hotspot:hover {
+            background: #ef4444; 
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.9);
+            transform: scale(1.2);
+        }
     </style>
 </head>
 <body>
 
-    <div id="title-panel">
-        <h1>ಕುಪ್ಪಳ್ಳಿ: ರಾಷ್ಟ್ರಕವಿ ಕುವೆಂಪು ಕವಿಮನೆ ವರ್ಚುವಲ್ ದರ್ಶನ</h1>
-        <p>ಚಿನ್ನದ ಬಣ್ಣದ ವರ್ತುಲಗಳ ಮೇಲೆ ನೇರವಾಗಿ ಕ್ಲಿಕ್ ಮಾಡಿ ಆಡಿಯೋ ಮಾಹಿತಿ ಪಡೆಯಿರಿ</p>
-    </div>
+<div id="title-panel">
+    <h1>ಕುಪ್ಪಳ್ಳಿ: ರಾಷ್ಟ್ರಕವಿ ಕುವೆಂಪು ಕವಿಮನೆ ವರ್ಚುವಲ್ ದರ್ಶನ</h1>
+    <p>ದೊಡ್ಡದಾಗಿರುವ ಚಿನ್ನದ ಬಣ್ಣದ ವರ್ತುಲಗಳ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ ಆಡಿಯೋ ವಿವರ ಪಡೆಯಿರಿ</p>
+</div>
 
-    <div id="info-panel">
-        ಸ್ವಾಗತ! ಜ್ಞಾನಪೀಠ ಪ್ರಶಸ್ತಿ ಪುರಸ್ಕೃತ ಕುವೆಂಪು ಅವರ ಸ್ಮರಣೀಯ ಕವಿಮನೆಯನ್ನು ತಿಳಿಯಲು ಆವರಣದಲ್ಲಿರುವ ಚಿನ್ನದ ಬಣ್ಣದ ಹಾಟ್‌ಸ್ಪಾಟ್‌ಗಳ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ...
-    </div>
+<div id="panorama"></div>
 
-    <!-- VR ಬಟನ್ ಸಂಪೂರ್ಣವಾಗಿ ತೆಗೆದುಹಾಕಲಾಗಿದೆ -->
-    <a-scene vr-mode-ui="enabled: false" cursor="rayOrigin: mouse">
-        <a-assets>
-            <img id="kavimane-scene" src="https://raw.githubusercontent.com/chandugokarna-bit/gpt-teachers-resources/main/resources/virtual/kavimane360.jpg" crossorigin="anonymous">
-        </a-assets>
+<div id="info-panel">
+    ಸ್ವಾಗತ! ಜ್ಞಾನಪೀಠ ಪ್ರಶಸ್ತಿ ಪುರಸ್ಕೃತ ಕುವೆಂಪು ಅವರ ಸ್ಮರಣೀಯ ಕವಿಮನೆಯನ್ನು ತಿಳಿಯಲು ಆವರಣದಲ್ಲಿರುವ ದೊಡ್ಡ ಹಾಟ್‌ಸ್ಪಾಟ್‌ಗಳ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ...
+</div>
 
-        <!-- ಹಿನ್ನೆಲೆ 360 ಚಿತ್ರ -->
-        <a-sky src="#kavimane-scene"></a-sky>
+<script>
+// ಕನ್ನಡ ಧ್ವನಿ ಕಾರ್ಯವಿಧಾನ
+function speakKannada(title, infoText) {
+    document.getElementById('info-panel').innerHTML = `<strong>${title}</strong><br>${infoText}`;
+    
+    if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel(); // ಹಳೆಯ ಧ್ವನಿ ನಿಲ್ಲಿಸಲು
+        
+        const speech = new SpeechSynthesisUtterance();
+        speech.text = title + ". " + infoText;
+        speech.lang = 'kn-IN'; // ಕನ್ನಡ ಭಾಷೆ
+        speech.rate = 0.85; // ಸ್ಪಷ್ಟ ಧ್ವನಿ ವೇಗ
+        
+        window.speechSynthesis.speak(speech);
+    }
+}
 
-        <!-- ಫೋನ್ ಮೊಬೈಲ್ ಸೆನ್ಸರ್ ಟ್ರ್ಯಾಕಿಂಗ್ ನಿಷ್ಕ್ರಿಯಗೊಳಿಸಲಾಗಿದೆ - ಕೇವಲ ಕಂಟ್ರೋಲ್ ಬ್ರೌಸರ್ ಟಚ್ -->
-        <a-entity camera look-controls="magicWindowTrackingEnabled: false" position="0 1.6 0"></a-entity>
+// Pannellum ವೀಕ್ಷಕ ಸೆಟ್ಟಿಂಗ್ಸ್
+pannellum.viewer('panorama', {
+    "type": "equirectangular",
+    "panorama": "https://raw.githubusercontent.com/chandugokarna-bit/gpt-teachers-resources/main/resources/virtual/kavimane360.jpg",
+    "autoLoad": true,
+    "title": "ಕವಿಮನೆ, ಕುಪ್ಪಳ್ಳಿ",
+    "author": "ರಾಷ್ಟ್ರಕವಿ ಸ್ಮಾರಕ ತಾಣ",
+    "hotSpots": [
+        {
+            "pitch": 0,
+            "yaw": -35,
+            "cssClass": "custom-hotspot", // ನಮ್ಮ ಕಸ್ಟಮ್ ದೊಡ್ಡ ಹಾಟ್‌ಸ್ಪಾಟ್
+            "createTooltipFunc": function(hotSpotDiv) { hotSpotDiv.setAttribute("title", "ಕವಿಮನೆ ಇತಿಹಾಸ"); },
+            "clickHandlerFunc": function() {
+                speakKannada(
+                    "ಕವಿಮನೆಯ ಭವ್ಯ ಇತಿಹಾಸ ಮತ್ತು ಹಟ್ಟಿಮನೆ", 
+                    "ಶಿವಮೊಗ್ಗ ಜಿಲ್ಲೆಯ ತೀರ್ಥಹಳ್ಳಿ ತಾಲ್ಲೂಕಿನ ಕುಪ್ಪಳ್ಳಿಯಲ್ಲಿರುವ ಈ ಮನೆ ರಾಷ್ಟ್ರಕವಿ ಕುವೆಂಪು ಅವರ ಜನ್ಮಸ್ಥಳ. ಮಲೆನಾಡಿನ ಸಾಂಪ್ರದಾಯಿಕ ಶೈಲಿಯ ಮೂರು ಅಂತಸ್ತಿನ ಈ ಹಟ್ಟಿಮನೆಯನ್ನು ಈಗ ಸುಂದರವಾದ ಸ್ಮಾರಕ ಸಂಗ್ರಹಾಲಯವಾಗಿ ಮಾರ್ಪಡಿಸಲಾಗಿದೆ."
+                );
+            }
+        },
+        {
+            "pitch": 5,
+            "yaw": 10,
+            "cssClass": "custom-hotspot",
+            "createTooltipFunc": function(hotSpotDiv) { hotSpotDiv.setAttribute("title", "ವಸ್ತುಸಂಗ್ರಹಾಲಯ"); },
+            "clickHandlerFunc": function() {
+                speakKannada(
+                    "ಕವಿಮನೆ ವಸ್ತುಸಂಗ್ರಹಾಲಯ", 
+                    "ಈ ಮನೆಯ ಒಳಗಡೆ ಕುವೆಂಪು ಅವರು ಬಳಸುತ್ತಿದ್ದ ಪೆನ್ನು, ಬರೆದ ಕಾಗದಗಳು, ಜ್ಞಾನಪೀಠ ಪ್ರಶಸ್ತಿಯ ಪ್ರತಿಕೃತಿ ಹಾಗೂ ಅವರ ವಿವಾಹದ ಆಮಂತ್ರಣ ಪತ್ರಿಕೆಯಂತಹ ಅಪರೂಪದ ವಸ್ತುಗಳನ್ನು ಸಂರಕ್ಷಿಸಿಡಲಾಗಿದೆ. ಇಲ್ಲಿ ಅವರ ಸಾಹಿತ್ಯದ ಭವ್ಯ ಪ್ರಪಂಚವೇ ತೆರೆದುಕೊಳ್ಳುತ್ತದೆ."
+                );
+            }
+        },
+        {
+            "pitch": -5,
+            "yaw": 45,
+            "cssClass": "custom-hotspot",
+            "createTooltipFunc": function(hotSpotDiv) { hotSpotDiv.setAttribute("title", "ಕವಿಶೈಲ"); },
+            "clickHandlerFunc": function() {
+                speakKannada(
+                    "ಮಲೆನಾಡಿನ ಪರಿಸರ ಮತ್ತು ಕವಿಶೈಲ", 
+                    "ಕವಿಮನೆಯ ಸುತ್ತಲೂ ದಟ್ಟವಾದ ಪಶ್ಚಿಮ ಘಟ್ಟಗಳ ಹಸಿರು ಕಾನನವಿದೆ. ಇದರ ಸಮೀಪದಲ್ಲೇ ಕವಿಶೈಲವಿದ್ದು, ಅಲ್ಲಿ ಕುವೆಂಪು ಅವರು ಪ್ರಕೃತಿಯನ್ನು ಸವಿಯುತ್ತಾ ಕುಳಿತುಕೊಳ್ಳುತ್ತಿದ್ದ ಕಲ್ಲಿನ ಆಸನಗಳಿವೆ. ಅಲ್ಲಿಯೇ ಅವರ ಸ್ಮಾರಕವಾದ ಸಮಾಧಿ ಸ್ಥಳವೂ ಇದೆ."
+                );
+            }
+        }
+    ]
+});
+</script>
 
-        <!-- ================= ಇಂಟರಾಕ್ಟಿವ್ ಹಾಟ್‌ಸ್ಪಾಟ್‌ಗಳು ================= -->
-
-        <!-- 1. ಕವಿಮನೆ ಮಹಾದ್ವಾರ ಮತ್ತು ವಾಸ್ತುಶಿಲ್ಪ -->
-        <a-sphere id="hotspot-kavi-arch" position="-3.796 2.693 4.503" radius="0.35" color="#eab308" class="hotspot"
-                  data-title="ಕವಿಮನೆಯ ಭವ್ಯ ಇತಿಹಾಸ ಮತ್ತು ಹಟ್ಟಿಮನೆ"
-                  data-info="ಶಿವಮೊಗ್ಗ ಜಿಲ್ಲೆಯ ತೀರ್ಥಹಳ್ಳಿ ತಾಲ್ಲೂಕಿನ ಕುಪ್ಪಳ್ಳಿಯಲ್ಲಿರುವ ಈ ಮನೆ ರಾಷ್ಟ್ರಕವಿ ಕುವೆಂಪು ಅವರ ಜನ್ಮಸ್ಥಳ. ಮಲೆನಾಡಿನ ಸಾಂಪ್ರದಾಯಿಕ ಶೈಲಿಯ ಮೂರು ಅಂತಸ್ತಿನ ಈ ಹಟ್ಟಿಮನೆಯನ್ನು ಈಗ ಸುಂದರವಾದ ಸ್ಮಾರಕ ಸಂಗ್ರಹಾಲಯವಾಗಿ ಮಾರ್ಪಡಿಸಲಾಗಿದೆ.">
-        </a-sphere>
-
-        <!-- 2. ಕುವೆಂಪು ಅವರ ನೆನಪುಗಳು ಮತ್ತು ವಸ್ತುಸಂಗ್ರಹಾಲಯ -->
-        <a-sphere id="hotspot-kavi-museum" position="-1.530 1.857 1.600" radius="0.35" color="#eab308" class="hotspot"
-                  data-title="ಕವಿಮನೆ ವಸ್ತುಸಂಗ್ರಹಾಲಯ"
-                  data-info="ಈ ಮನೆಯ ಒಳಗಡೆ ಕುವೆಂಪು ಅವರು ಬಳಸುತ್ತಿದ್ದ ಪೆನ್ನು, ಬರೆದ ಕಾಗದಗಳು, ಜ್ಞಾನಪೀಠ ಪ್ರಶಸ್ತಿಯ ಪ್ರತಿಕೃತಿ ಹಾಗೂ ಅವರ ವಿವಾಹದ ಆಮಂತ್ರಣ ಪತ್ರಿಕೆಯಂತಹ ಅಪರೂಪದ ವಸ್ತುಗಳನ್ನು ಸಂರಕ್ಷಿಸಿಡಲಾಗಿದೆ. ಇಲ್ಲಿ ಅವರ ಸಾಹಿತ್ಯದ ಭವ್ಯ ಪ್ರಪಂಚವೇ ತೆರೆದುಕೊಳ್ಳುತ್ತದೆ.">
-        </a-sphere>
-
-        <!-- 3. ಸುತ್ತಲಿನ ಮಲೆನಾಡ ಪರಿಸರ ಮತ್ತು ಕವಿಶೈಲ -->
-        <a-sphere id="hotspot-kavi-nature" position="2.016 -2.940 -8.237" radius="0.35" color="#eab308" class="hotspot"
-                  data-title="ಮಲೆನಾಡಿನ ಪರಿಸರ ಮತ್ತು ಕವಿಶೈಲ"
-                  data-info="ಕವಿಮನೆಯ ಸುತ್ತಲೂ ದಟ್ಟವಾದ ಪಶ್ಚಿಮ ಘಟ್ಟಗಳ ಹಸಿರು ಕಾನನವಿದೆ. ಇದರ ಸಮೀಪದಲ್ಲೇ ಕವಿಶೈಲವಿದ್ದು, ಅಲ್ಲಿ ಕುವೆಂಪು ಅವರು ಪ್ರಕೃತಿಯನ್ನು ಸವಿಯುತ್ತಾ ಕುಳಿತುಕೊಳ್ಳುತ್ತಿದ್ದ ಕಲ್ಲಿನ ಆಸನಗಳಿವೆ. ಅಲ್ಲಿಯೇ ಅವರ ಸ್ಮಾರಕವಾದ ಸಮಾಧಿ ಸ್ಥಳವೂ ಇದೆ.">
-        </a-sphere>
-
-    </a-scene>
-
-    <script>
-        const hotspots = document.querySelectorAll('.hotspot');
-        const infoPanel = document.getElementById('info-panel');
-
-        hotspots.forEach(hotspot => {
-            // ಮೌಸ್/ಟಚ್ Hover ಇಫೆಕ್ಟ್
-            hotspot.addEventListener('mouseenter', function () {
-                this.setAttribute('color', '#ef4444'); 
-            });
-
-            hotspot.addEventListener('mouseleave', function () {
-                this.setAttribute('color', '#eab308'); 
-            });
-
-            // ಕ್ಲಿಕ್/ಟಚ್ ಇವೆಂಟ್ ಮತ್ತು ಆಡಿಯೋ ಪ್ಲೇಬ್ಯಾಕ್
-            hotspot.addEventListener('click', function () {
-                const title = this.getAttribute('data-title');
-                const info = this.getAttribute('data-info');
-                
-                infoPanel.innerHTML = `<strong>${title}</strong><br>${info}`;
-
-                if ('speechSynthesis' in window) {
-                    window.speechSynthesis.cancel(); 
-                    
-                    const speech = new SpeechSynthesisUtterance();
-                    speech.text = title + ". " + info;
-                    speech.lang = 'kn-IN'; 
-                    speech.rate = 0.85; 
-                    
-                    window.speechSynthesis.speak(speech);
-                }
-            });
-        });
-    </script>
 </body>
 </html>
