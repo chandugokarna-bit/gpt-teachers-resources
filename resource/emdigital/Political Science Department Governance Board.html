@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Political Science Simulator 8.0 - Democracy Knowledge Hub</title>
+    <style>
+        :root {
+            --gov-blue: #0984e3;
+            --gov-navy: #2c3e50;
+            --democracy-gold: #fdcb6e;
+            --neon-green: #00b894;
+            --neon-red: #d63031;
+            --card-dark: #1e272e;
+            --bg-space: #0f172a;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Verdana, sans-serif; }
+
+        body {
+            background: var(--bg-space);
+            background-image: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #ffffff;
+        }
+
+        header.gov-panel-header {
+            text-align: center;
+            padding: 25px;
+            background: rgba(30, 41, 59, 0.7);
+            border: 2px solid var(--gov-blue);
+            border-radius: 20px;
+            box-shadow: 0 0 25px rgba(9, 132, 227, 0.3);
+            margin-bottom: 25px;
+        }
+
+        header.gov-panel-header h1 {
+            color: var(--gov-blue);
+            font-size: 2.3rem;
+            text-shadow: 0 0 10px rgba(9, 132, 227, 0.5);
+            margin-bottom: 5px;
+        }
+
+        header.gov-panel-header p { color: #cbd5e1; font-size: 1.2rem; }
+
+        /* NEW HUD: CITIZEN HAPPINESS INDEX */
+        .gov-hud-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #1e293b;
+            padding: 15px 25px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            border-left: 5px solid var(--democracy-gold);
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .happiness-container {
+            background: #334155;
+            width: 45%;
+            height: 18px;
+            border-radius: 9px;
+            overflow: hidden;
+            border: 1px solid var(--democracy-gold);
+        }
+
+        .happiness-fill {
+            background: linear-gradient(90deg, var(--democracy-gold), var(--neon-green));
+            height: 100%;
+            width: 100%;
+            transition: width 0.4s ease;
+        }
+
+        /* Simulator Level Steppers */
+        .gov-stepper-track {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 35px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .gov-badge {
+            padding: 12px 20px;
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .gov-badge.passed {
+            background: var(--gov-blue);
+            color: white;
+            box-shadow: 0 0 12px rgba(9, 132, 227, 0.4);
+        }
+
+        .gov-badge.active-law {
+            background: var(--democracy-gold);
+            color: #000000;
+            border-color: #ffffff;
+            transform: scale(1.04);
+            box-shadow: 0 0 15px var(--democracy-gold);
+        }
+
+        /* Simulator Screen Arena */
+        .gov-arena-box {
+            background: rgba(30, 41, 59, 0.85);
+            border: 2px solid #334155;
+            border-radius: 24px;
+            padding: 35px;
+            min-height: 520px;
+            display: none;
+            box-shadow: 0 20px 45px rgba(0,0,0,0.5);
+        }
+
+        .gov-arena-box.active-arena { display: block; animation: bootGlow 0.4s ease; }
+
+        @keyframes bootGlow {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2.arena-heading {
+            font-size: 1.65rem;
+            color: var(--democracy-gold);
+            margin-bottom: 25px;
+            border-bottom: 1px dashed rgba(253, 203, 110, 0.3);
+            padding-bottom: 12px;
+        }
+
+        /* Interactive Grid Nodes */
+        .node-selection-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .gov-node {
+            background: #1e293b;
+            padding: 18px;
+            border-radius: 14px;
+            cursor: pointer;
+            border: 2px solid #334155;
+            font-weight: bold;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .gov-node:hover { border-color: var(--gov-blue); background: #223047; }
+        .gov-node.selected { background: var(--gov-blue); color: white; border-color: white; }
+
+        /* Quiz Buttons */
+        .gov-quiz-row {
+            background: #1e293b;
+            border: 2px solid #334155;
+            padding: 16px;
+            margin: 12px 0;
+            border-radius: 14px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+        }
+
+        .gov-quiz-row:hover { border-color: var(--gov-blue); transform: translateX(5px); }
+        .gov-quiz-row.correct-glow { background: rgba(0, 184, 148, 0.2); border-color: var(--neon-green); color: var(--neon-green); }
+        .gov-quiz-row.wrong-glow { background: rgba(214, 48, 49, 0.2); border-color: var(--neon-red); color: var(--neon-red); }
+
+        /* Custom Inputs */
+        .gov-smart-input {
+            background: #0f172a;
+            border: 2px solid #334155;
+            border-radius: 10px;
+            padding: 12px;
+            font-size: 1.1rem;
+            color: var(--democracy-gold);
+            font-weight: bold;
+            outline: none;
+            width: 100%;
+            max-width: 320px;
+            margin-top: 8px;
+        }
+
+        .gov-smart-input:focus { border-color: var(--gov-blue); }
+
+        /* Level 5 State Elements */
+        .state-mining-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        .state-ore-card {
+            background: #1e293b;
+            border: 2px solid #334155;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .state-ore-card.activated { background: #6c5ce7; border-color: white; }
+
+        .gov-btn {
+            background: linear-gradient(135deg, var(--democracy-gold), #e67e22);
+            color: black;
+            border: none;
+            padding: 14px 35px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 25px;
+            box-shadow: 0 5px 15px rgba(253, 203, 110, 0.3);
+        }
+
+        .gov-btn:hover { transform: scale(1.02); box-shadow: 0 8px 25px rgba(253, 203, 110, 0.5); }
+
+        .gov-alert-status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 12px;
+            font-weight: bold;
+            display: none;
+            font-size: 1.1rem;
+            border: 1px solid transparent;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="gov-panel-header">
+        <h1>Political Science Department: Governance Board</h1>
+        <p>Simulator Model 8.0 • Digital Games on the Core Concepts of Democracy</p>
+    </div>
+
+    <div class="gov-hud-bar">
+        <span>Citizen Happiness Index:</span>
+        <div class="happiness-container"><div class="happiness-fill" id="happyFill"></div></div>
+        <span style="color: var(--democracy-gold);" id="liveXPCount">Democracy Points: 0000 DP</span>
+    </div>
+
+    <div class="gov-stepper-track">
+        <div class="gov-badge active-law" id="lvlBtn1" onclick="loadLevel(1)">Level 1</div>
+        <div class="gov-badge" id="lvlBtn2" onclick="loadLevel(2)">Level 2</div>
+        <div class="gov-badge" id="lvlBtn3" onclick="loadLevel(3)">Level 3 (10 Qs)</div>
+        <div class="gov-badge" id="lvlBtn4" onclick="loadLevel(4)">Level 4</div>
+        <div class="gov-badge" id="lvlBtn5" onclick="loadLevel(5)">Level 5</div>
+        <div class="gov-badge" id="lvlBtn6" onclick="loadLevel(6)">Level 6</div>
+        <div class="gov-badge" id="lvlBtn7" onclick="loadLevel(7)">Level 7</div>
+    </div>
+
+    <div id="level1" class="gov-arena-box active-arena">
+        <h2 class="arena-heading">Level 1: Origins of Political Science Grid (Origins of Politics)</h2>
+        <p style="margin-bottom: 15px;">Pair the father of Political Science with his famous work to begin governance:</p>
+        <div class="node-selection-grid">
+            <div>
+                <div class="gov-node" id="l1_nodeL1" onclick="connectLaws('L', 'l1_nodeL1', 1)">Aristotle</div>
+                <div class="gov-node" id="l1_nodeL2" style="margin-top:15px;" onclick="connectLaws('L', 'l1_nodeL2', 2)">Plato</div>
+            </div>
+            <div>
+                <div class="gov-node" id="l1_nodeR1" onclick="connectLaws('R', 'l1_nodeR1', 2)">The Republic</div>
+                <div class="gov-node" id="l1_nodeR2" style="margin-top:15px;" onclick="connectLaws('R', 'l1_nodeR2', 1)">Politics</div>
+            </div>
+        </div>
+        <div class="gov-alert-status" id="alert1"></div>
+    </div>
+
+    <div id="level2" class="gov-arena-box">
+        <h2 class="arena-heading">Level 2: Kautilya's Contribution to Indian Politics (Kautilya's Crypt)</h2>
+        <div style="display:flex; flex-direction:column; gap:20px;">
+            <div class="fib-q">1. What is the world-famous work written by Kautilya (Chanakya) that laid the foundation for Indian politics during the Mauryan period? <br><input type="text" class="gov-smart-input" id="cryptIn1" placeholder="Enter the name of the book"></div>
+            <div class="fib-q">2. From which Greek root word does the term 'Political Science' originate? <br><input type="text" class="gov-smart-input" id="cryptIn2" placeholder="Enter the Greek word (e.g., Polis)"></div>
+            <div class="fib-q">3. What do the Greek city-states called 'Polis' mean in today's context? <br><input type="text" class="gov-smart-input" id="cryptIn3" placeholder="City-State / Big Country?"></div>
+        </div>
+        <button class="gov-btn" onclick="verifyLevel2()">Crack Political Code</button>
+        <div class="gov-alert-status" id="alert2"></div>
+    </div>
+
+    <div id="level3" class="gov-arena-box">
+        <h2 class="arena-heading">Level 3: Great Battle of Democracy (Epic 10 Democracy Quiz)</h2>
+        <div style="font-weight: bold; margin-bottom: 15px; color: var(--democracy-gold);" id="quizTrackTxt">Question Code: 1 / 10</div>
+        <div id="quizQuestionText" style="font-size: 1.25rem; font-weight: bold; margin-bottom: 20px;">Loading...</div>
+        <div id="quizOptionsContainer"></div>
+        <button class="gov-btn" id="nextQuizBtn" style="display:none;" onclick="nextGovQuestion()">Move to Next Statute ➔</button>
+        <div class="gov-alert-status" id="alert3"></div>
+    </div>
+
+    <div id="level4" class="gov-arena-box">
+        <h2 class="arena-heading">Level 4: Importance and Definition of Political Science (Thinkers Statements)</h2>
+        <div style="display:flex; flex-direction:column; gap:20px;">
+            <div class="fib-q">1. Who defined Political Science as "the science that deals with the origin and development of the State"? <br><input type="text" class="gov-smart-input" id="thinkIn1" placeholder="Garner / Bluntschli?"></div>
+            <div class="fib-q">2. Who was the world's first philosopher to declare that "Man is a social and political animal"? <br><input type="text" class="gov-smart-input" id="thinkIn2" placeholder="Aristotle / Socrates?"></div>
+        </div>
+        <button class="gov-btn" onclick="verifyLevel4()">Confirm Definition</button>
+        <div class="gov-alert-status" id="alert4"></div>
+    </div>
+
+    <div id="level5" class="gov-arena-box">
+        <h2 class="arena-heading">Level 5: Discovering the Four Essential Elements of a State (State Elements Mining)</h2>
+        <p style="margin-bottom: 15px;">Select only the **four essential constituent elements** required to form a State as mentioned in the textbook:</p>
+        <div class="state-mining-grid">
+            <div class="state-ore-card" id="state1" onclick="toggleStateOre('state1', true)">1. Population</div>
+            <div class="state-ore-card" id="state2" onclick="toggleStateOre('state2', false)">2. Big Bank</div>
+            <div class="state-ore-card" id="state3" onclick="toggleStateOre('state3', true)">3. Definite Territory</div>
+            <div class="state-ore-card" id="state4" onclick="toggleStateOre('state4', true)">4. Government</div>
+            <div class="state-ore-card" id="state5" onclick="toggleStateOre('state5', false)">5. Television</div>
+            <div class="state-ore-card" id="state6" onclick="toggleStateOre('state6', true)">6. Sovereignty</div>
+            <div class="state-ore-card" id="state7" onclick="toggleStateOre('state7', false)">7. Military Vehicle</div>
+        </div>
+        <button class="gov-btn" onclick="verifyLevel5()">Confirm Elements</button>
+        <div class="gov-alert-status" id="alert5"></div>
+    </div>
+
+    <div id="level6" class="gov-arena-box">
+        <h2 class="arena-heading">Level 6: Design of the Three Pillars of Government (Organs of Government)</h2>
+        <p style="margin-bottom: 15px;">Drag and assign the organs that make, execute, and judge laws to their respective boxes:</p>
+        <div style="display:flex; gap:25px;">
+            <div style="flex:1; display:flex; flex-direction:column; gap:10px;" id="organSource">
+                <div style="background:#2c3e50; padding:12px; border-radius:10px; cursor:grab; font-weight:bold;" draggable="true" id="org1" ondragstart="startOrganDrag(event)">Legislature</div>
+                <div style="background:#2c3e50; padding:12px; border-radius:10px; cursor:grab; font-weight:bold;" draggable="true" id="org2" ondragstart="startOrganDrag(event)">Executive</div>
+                <div style="background:#2c3e50; padding:12px; border-radius:10px; cursor:grab; font-weight:bold;" draggable="true" id="org3" ondragstart="startOrganDrag(event)">Judiciary</div>
+            </div>
+            <div style="flex:2; display:flex; flex-direction:column; gap:15px;">
+                <div style="background:rgba(0,0,0,0.3); border:2px dashed var(--gov-blue); padding:15px; border-radius:12px;" ondragover="allowOrganDrop(event)" ondrop="handleOrganDrop(event, 'make')">
+                    <h3>The organ that frames or makes laws</h3>
+                </div>
+                <div style="background:rgba(0,0,0,0.3); border:2px dashed var(--gov-blue); padding:15px; border-radius:12px;" ondragover="allowOrganDrop(event)" ondrop="handleOrganDrop(event, 'run')">
+                    <h3>The organ that executes or implements laws</h3>
+                </div>
+                <div style="background:rgba(0,0,0,0.3); border:2px dashed var(--gov-blue); padding:15px; border-radius:12px;" ondragover="allowOrganDrop(event)" ondrop="handleOrganDrop(event, 'judge')">
+                    <h3>The organ that interprets laws and administers justice</h3>
+                </div>
+            </div>
+        </div>
+        <button class="gov-btn" onclick="verifyLevel6()">Verify Government Structure</button>
+        <div class="gov-alert-status" id="alert6"></div>
+    </div>
+
+    <div id="level7" class="gov-arena-box">
+        <h2 class="arena-heading">Level 7: Global Political Thinkers and Regions (Global Matrix Map)</h2>
+        <p style="margin-bottom: 15px;">Final stage! Pair the famous political philosophers with their respective regions to complete the simulation:</p>
+        <div class="node-selection-grid">
+            <div class="gov-node" id="matL1" onclick="selectFinalMatrix('L', 'matL1', 'greeko')">Socrates, Plato, Aristotle</div>
+            <div class="gov-node" id="matR1" onclick="selectFinalMatrix('R', 'matR1', 'greeko')">Philosophers of Ancient Greece</div>
+            <div class="gov-node" id="matL2" onclick="selectFinalMatrix('L', 'matL2', 'indiano')">Kautilya and Kamandaka</div>
+            <div class="gov-node" id="matR2" onclick="selectFinalMatrix('R', 'matR2', 'indiano')">Political experts of Ancient India</div>
+        </div>
+        <button class="gov-btn" onclick="verifyLevel7()">Complete Governance Matrix</button>
+        <div class="gov-alert-status" id="alert7"></div>
+    </div>
+
+    <script>
+        let democracyPoints = 0; let citizenHappiness = 100;
+        function modifyHUDTracker(dpChange, happyDamage) {
+            democracyPoints += dpChange;
+            citizenHappiness = Math.max(10, citizenHappiness - happyDamage);
+            document.getElementById("liveXPCount").innerText = `Democracy Points: ${democracyPoints.toString().padStart(4, '0')} DP`;
+            document.getElementById("happyFill").style.width = `${citizenHappiness}%`;
+        }
+
+        function loadLevel(levelIdx) {
+            document.querySelectorAll('.gov-arena-box').forEach(el => el.classList.remove('active-arena'));
+            document.querySelectorAll('.gov-badge').forEach(el => el.classList.remove('active-law'));
+            
+            document.getElementById('level' + levelIdx).classList.add('active-arena');
+            document.getElementById('lvlBtn' + levelIdx).classList.add('active-law');
+        }
+
+        // Level 1 Logic
+        let nodeL = null; let nodeR = null;
+        function connectLaws(side, id, matchVal) {
+            if(side === 'L') {
+                if(nodeL) document.getElementById(nodeL.id).classList.remove('selected');
+                nodeL = { id: id, match: matchVal };
+            } else {
+                if(nodeR) document.getElementById(nodeR.id).classList.remove('selected');
+                nodeR = { id: id, match: matchVal };
+            }
+            document.getElementById(id).classList.add('selected');
+
+            if(nodeL && nodeR) {
+                if(nodeL.match === nodeR.match) {
+                    document.getElementById(nodeL.id).style.background = "var(--neon-green)";
+                    document.getElementById(nodeR.id).style.background = "var(--neon-green)";
+                    modifyHUDTracker(100, 0);
+                    showGovAlert(1, "Correct pairing! The first-level statute has passed successfully.", true);
+                    document.getElementById('lvlBtn1').classList.add('passed');
+                } else {
+                    modifyHUDTracker(0, 10);
+                    showGovAlert(1, "Incorrect pairing, the citizens are displeased! Please reconsider.", false);
+                }
+                nodeL = null; nodeR = null;
+            }
+        }
+
+        // Level 2 Logic
+        function verifyLevel2() {
+            let c1 = document.getElementById("cryptIn1").value.trim().toLowerCase();
+            let c2 = document.getElementById("cryptIn2").value.trim().toLowerCase();
+            let c3 = document.getElementById("cryptIn3").value.trim().toLowerCase();
+
+            if(c1 === "arthashastra" && c2 === "polis" && (c3 === "city-state" || c3 === "city state")) {
+                modifyHUDTracker(150, 0);
+                document.getElementById('lvlBtn2').classList.add('passed');
+                showGovAlert(2, "Amazing! Kautilya's Arthashastra code has unlocked successfully.", true);
+            } else {
+                modifyHUDTracker(0, 10);
+                showGovAlert(2, "Incorrect code! Hints: Arthashastra, Polis, City-State.", false);
+            }
+        }
+
+        // Level 3: 10 Questions Grid Quiz Data
+        const politicalQuiz = [
+            { q: "1. Which region first developed the branch of knowledge called 'Political Science' as an independent science?", o: ["India", "Rome", "Ancient Greece"], c: 2 },
+            { q: "2. Who systematically studied politics for the first time in the world and is called the 'Father of Political Science'?", o: ["Socrates", "Aristotle", "Plato"], c: 1 },
+            { q: "3. Aristotle was a student of which famous university/institution in Greece?", o: ["Plato's Academy", "Lyceum", "Nalanda"], c: 0 },
+            { q: "4. What does Political Science primarily study regarding its origin, development, and administration?", o: ["Only Banks", "State and Government", "Only Forests"], c: 1 },
+            { q: "5. In a democratic form of government, where does the ultimate and supreme power reside?", o: ["Military General", "The People", "Prince"], c: 1 },
+            { q: "6. What vital sentiment and awareness does the study of Political Science arouse among citizens?", o: ["Good patriotism and civic consciousness", "Selfish sentiment", "Intentions to break laws"], c: 0 },
+            { q: "7. What was the name of the famous research institute or school founded independently by Aristotle?", o: ["Lyceum", "Academy", "Vedapathashala"], c: 0 },
+            { q: "8. Which prominent language contributed significantly to strengthening the legal and administrative system in the Roman Empire?", o: ["Latin", "Greek", "Kannada"], c: 0 },
+            { q: "9. Which written document protects the ultimate structural framework of our country's governance and the fundamental rights of citizens?", o: ["Fourth Veda", "The Constitution of India", "Arthashastra Text"], c: 1 },
+            { q: "10. According to political scientists, what should be the primary objective of a modern Welfare State?", o: ["Waging wars", "Achieving the all-round welfare of the people", "Levying higher taxes"], c: 1 }
+        ];
+
+        let qIdx = 0; let qScore = 0; let isQuizActive = true;
+        function loadGovQuestion() {
+            isQuizActive = true;
+            document.getElementById("nextQuizBtn").style.display = "none";
+            document.getElementById("alert3").style.display = "none";
+            let qData = politicalQuiz[qIdx];
+            document.getElementById("quizTrackTxt").innerText = `Question Code: ${qIdx + 1} / 10`;
+            document.getElementById("quizQuestionText").innerText = qData.q;
+            
+            let container = document.getElementById("quizOptionsContainer");
+            container.innerHTML = "";
+            qData.o.forEach((opt, idx) => {
+                let div = document.createElement("div");
+                div.classList.add("gov-quiz-row");
+                div.innerText = opt;
+                div.onclick = function() {
+                    if(!isQuizActive) return;
+                    isQuizActive = false;
+                    if(idx === qData.c) {
+                        this.classList.add("correct-glow");
+                        qScore++; modifyHUDTracker(30, 0);
+                        showGovAlert(3, "Correct statute! The citizens are happy.", true);
+                    } else {
+                        this.classList.add("wrong-glow");
+                        container.children[qData.c].classList.add("correct-glow");
+                        modifyHUDTracker(0, 10);
+                        showGovAlert(3, "Incorrect statute! The public happiness index has fallen.", false);
+                    }
+                    document.getElementById("nextQuizBtn").style.display = "inline-block";
+                };
+                container.appendChild(div);
+            });
+        }
+        function nextGovQuestion() {
+            qIdx++;
+            if(qIdx < politicalQuiz.length) {
+                loadGovQuestion();
+            } else {
+                document.getElementById("quizTrackTxt").innerText = "Simulation Finished!";
+                document.getElementById("quizQuestionText").innerText = `Total Class Score: ${qScore} / 10`;
+                document.getElementById("quizOptionsContainer").innerHTML = "";
+                document.getElementById("nextQuizBtn").style.display = "none";
+                document.getElementById('lvlBtn3').classList.add('passed');
+                showGovAlert(3, qScore >= 7 ? "An outstanding guardian of democracy!" : "Good attempt!", true);
+            }
+        }
+        loadGovQuestion();
+
+        // Level 4 Logic
+        function verifyLevel4() {
+            let t1 = document.getElementById("thinkIn1").value.trim().toLowerCase();
+            let t2 = document.getElementById("thinkIn2").value.trim().toLowerCase();
+
+            if(t1 === "garner" && t2 === "aristotle") {
+                modifyHUDTracker(150, 0);
+                document.getElementById('lvlBtn4').classList.add('passed');
+                showGovAlert(4, "Wow! The thinkers' definitions are perfectly accurate.", true);
+            } else {
+                modifyHUDTracker(0, 10);
+                showGovAlert(4, "Incorrect definition. Hints: Write Garner, Aristotle.", false);
+            }
+        }
+
+        // Level 5 Logic
+        let selectedOres = {};
+        function toggleStateOre(id, isCoreElement) {
+            let node = document.getElementById(id);
+            if(node.classList.contains('activated')) {
+                node.classList.remove('activated');
+                delete selectedOres[id];
+            } else {
+                node.classList.add('activated');
+                selectedOres[id] = isCoreElement;
+            }
+        }
+        function verifyLevel5() {
+            let win = true; let count = 0;
+            for(let id in selectedOres) {
+                if(selectedOres[id] === false) win = false;
+                count++;
+            }
+            if(count !== 4) win = false; // 4 essential elements
+
+            if(win) {
+                modifyHUDTracker(150, 0);
+                document.getElementById('lvlBtn5').classList.add('passed');
+                showGovAlert(5, "Excellent! The 4 core constituent elements of a State (Population, Territory, Government, Sovereignty) are correct.", true);
+            } else {
+                modifyHUDTracker(0, 10);
+                showGovAlert(5, "Incorrect selection! Select only the four fundamental core elements (omit military, bank).", false);
+            }
+        }
+
+        // Level 6 Logic
+        function allowOrganDrop(ev) { ev.preventDefault(); }
+        function startOrganDrag(ev) { ev.dataTransfer.setData("text", ev.target.id); }
+        function handleOrganDrop(ev, cat) {
+            ev.preventDefault();
+            let id = ev.dataTransfer.getData("text");
+            let el = document.getElementById(id);
+            el.dataset.cat = cat;
+            ev.target.appendChild(el);
+        }
+        function verifyLevel6() {
+            let o1 = document.getElementById("org1").dataset.cat;
+            let o2 = document.getElementById("org2").dataset.cat;
+            let o3 = document.getElementById("org3").dataset.cat;
+
+            if(o1 === "make" && o2 === "run" && o3 === "judge") {
+                modifyHUDTracker(200, 0);
+                document.getElementById('lvlBtn6').classList.add('passed');
+                showGovAlert(6, "The functions of all three branches of government are one hundred percent accurate!", true);
+            } else {
+                modifyHUDTracker(0, 10);
+                showGovAlert(6, "Incorrect classification! Legislature makes laws, Executive implements them, and Judiciary administers justice.", false);
+            }
+        }
+
+        // Level 7 Logic
+        let finalL = null; let finalR = null;
+        function selectFinalMatrix(side, id, key) {
+            if(side === 'L') {
+                finalL = { id: id, key: key };
+                document.getElementById("matL1").classList.remove('selected');
+                document.getElementById("matL2").classList.remove('selected');
+            } else {
+                finalR = { id: id, key: key };
+                document.getElementById("matR1").classList.remove('selected');
+                document.getElementById("matR2").classList.remove('selected');
+            }
+            document.getElementById(id).classList.add('selected');
+        }
+        function verifyLevel7() {
+            if(finalL && finalR && finalL.key === finalR.key) {
+                modifyHUDTracker(250, 0);
+                document.getElementById('lvlBtn7').classList.add('passed');
+                showGovAlert(7, "Excellent job! The whole Political Science first chapter simulation is fully successful. Victory is yours!", true);
+            } else {
+                modifyHUDTracker(0, 10);
+                showGovAlert(7, "Matrix link failed. Please observe the thinkers and countries once again.", false);
+            }
+        }
+
+        function showGovAlert(lvlNum, text, success) {
+            let box = document.getElementById("alert" + lvlNum);
+            box.style.display = "block";
+            box.innerText = text;
+            box.style.background = success ? "rgba(0, 184, 148, 0.15)" : "rgba(214, 48, 49, 0.1)";
+            box.style.color = success ? "var(--neon-green)" : "var(--neon-red)";
+            box.style.borderColor = success ? "var(--neon-green)" : "var(--neon-red)";
+        }
+    </script>
+</body>
+</html>

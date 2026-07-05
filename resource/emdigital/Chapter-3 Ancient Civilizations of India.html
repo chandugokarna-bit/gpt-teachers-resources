@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ancient Civilizations of India - Neon Gaming Class</title>
+    <style>
+        :root {
+            --neon-blue: #0984e3;
+            --neon-green: #00b894;
+            --neon-purple: #6c5ce7;
+            --neon-pink: #fd79a8;
+            --dark-card: #ffffff;
+            --text-dark: #2d3436;
+            --body-bg: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%);
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: var(--body-bg);
+            min-height: 100vh;
+            padding: 25px;
+            color: var(--text-dark);
+        }
+
+        /* Modern Dashboard Header */
+        .game-header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 25px;
+            border-radius: 24px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+            border: 2px solid var(--neon-blue);
+        }
+
+        .game-header h1 {
+            color: var(--neon-purple);
+            font-size: 2.4rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .game-header p {
+            color: #636e72;
+            font-size: 1.2rem;
+            font-weight: 500;
+        }
+
+        /* Gaming Grid Menu */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 35px;
+        }
+
+        .panel-card {
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            padding: 18px;
+            border-radius: 18px;
+            cursor: pointer;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1rem;
+            color: var(--text-dark);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .panel-card:hover, .panel-card.active-panel {
+            background: var(--neon-purple);
+            color: #ffffff;
+            transform: translateY(-8px);
+            box-shadow: 0 15px 25px rgba(108, 92, 231, 0.4);
+        }
+
+        /* Main Arena Container */
+        .game-arena {
+            background: var(--dark-card);
+            border-radius: 30px;
+            padding: 35px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.2);
+            min-height: 550px;
+            display: none;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .game-arena.visible-arena {
+            display: block;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        h2.arena-title {
+            font-size: 1.8rem;
+            color: var(--neon-purple);
+            margin-bottom: 25px;
+            padding-bottom: 12px;
+            border-bottom: 2px dashed #dfe6e9;
+        }
+
+        /* New Components Styling */
+        .action-btn {
+            background: linear-gradient(135deg, var(--neon-purple), #a29bfe);
+            color: white;
+            border: none;
+            padding: 14px 35px;
+            border-radius: 14px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 10px 20px rgba(108, 92, 231, 0.3);
+            transition: all 0.3s;
+            margin-top: 25px;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 25px rgba(108, 92, 231, 0.5);
+        }
+
+        .alert-box {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 12px;
+            font-weight: bold;
+            display: none;
+            font-size: 1.1rem;
+        }
+
+        /* Act 1: 3D Grid */
+        .grid-3d {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        .card-3d {
+            background: #f1f2f6;
+            height: 110px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.1rem;
+            cursor: pointer;
+            box-shadow: inset 0 -5px 0 #ced6e0;
+            transition: all 0.2s;
+            text-align: center;
+            padding: 10px;
+        }
+
+        .card-3d.flipped {
+            background: linear-gradient(135deg, #74b9ff, var(--neon-blue));
+            color: white;
+            box-shadow: inset 0 -5px 0 #0984e3;
+        }
+
+        .card-3d.matched {
+            background: linear-gradient(135deg, #55efc4, var(--neon-green));
+            color: white;
+            box-shadow: inset 0 -5px 0 #00b894;
+        }
+
+        /* Act 2: Interactive Sorting */
+        .flex-sort {
+            display: flex;
+            gap: 25px;
+        }
+
+        .pool-box {
+            flex: 1;
+            background: #f5f6fa;
+            border: 2px solid #dfe6e9;
+            padding: 15px;
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .sort-pill {
+            background: white;
+            padding: 12px;
+            border-radius: 10px;
+            cursor: grab;
+            border-left: 5px solid var(--neon-pink);
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        .target-box {
+            flex: 1;
+            background: #f5f6fa;
+            border: 3px dashed var(--neon-purple);
+            padding: 20px;
+            border-radius: 20px;
+            min-height: 150px;
+        }
+
+        .target-box h3 { margin-bottom: 15px; color: var(--neon-purple); }
+
+        /* Act 3: Modern Quiz Interface */
+        .progress-bar-container {
+            background: #dfe6e9;
+            height: 10px;
+            border-radius: 5px;
+            margin-bottom: 25px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            background: var(--neon-green);
+            height: 100%;
+            width: 10%;
+            transition: width 0.4s;
+        }
+
+        .choice-row {
+            background: #f8f9fa;
+            padding: 16px;
+            margin: 12px 0;
+            border-radius: 14px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+            border: 2px solid #dfe6e9;
+        }
+
+        .choice-row:hover {
+            border-color: var(--neon-purple);
+            background: #f1f0ff;
+            transform: scale(1.01);
+        }
+
+        .choice-row.correct-ans {
+            background: #e8f5e9;
+            border-color: var(--neon-green);
+            color: #2e7d32;
+        }
+
+        .choice-row.wrong-ans {
+            background: #ffe9e9;
+            border-color: var(--neon-danger);
+            color: #c62828;
+        }
+
+        /* Act 4: Inputs Grid */
+        .inputs-block {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .modern-input {
+            border: 2px solid #dfe6e9;
+            border-radius: 12px;
+            padding: 10px 15px;
+            font-size: 1.1rem;
+            outline: none;
+            width: 280px;
+            font-weight: bold;
+            color: var(--neon-purple);
+            transition: border 0.3s;
+        }
+
+        .modern-input:focus {
+            border-color: var(--neon-purple);
+        }
+
+        /* Act 5: Toggle Rows */
+        .toggle-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f8f9fa;
+            padding: 18px;
+            border-radius: 14px;
+            margin-bottom: 15px;
+        }
+
+        .choice-btn-group button {
+            padding: 10px 22px;
+            border: 2px solid #dfe6e9;
+            background: white;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-left: 10px;
+            transition: all 0.2s;
+        }
+
+        .choice-btn-group button.active-choice {
+            background: var(--neon-purple);
+            color: white;
+            border-color: var(--neon-purple);
+        }
+
+        /* Act 6: Cipher Block */
+        .cipher-card {
+            background: #f1f2f6;
+            padding: 25px;
+            border-radius: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+            border: 1px dashed var(--neon-pink);
+        }
+
+        .cipher-txt {
+            font-size: 2.2rem;
+            color: var(--neon-pink);
+            font-weight: 800;
+            letter-spacing: 6px;
+            margin-bottom: 15px;
+        }
+
+        /* Act 7: Dropdown Match */
+        .matrix-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .dropdown-select {
+            padding: 12px;
+            border-radius: 12px;
+            border: 2px solid var(--neon-purple);
+            width: 100%;
+            font-weight: 600;
+            outline: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="game-header">
+        <h1>Chapter-3: Ancient Civilizations of India</h1>
+        <p>Gaming Dashboard 2.0 - Ultra-Modern Classroom Interactive Activities</p>
+    </div>
+
+    <div class="dashboard-grid">
+        <button class="panel-card active-panel" onclick="openArena(1)">1. Civilization Quest</button>
+        <button class="panel-card" onclick="openArena(2)">2. Urban Mystery</button>
+        <button class="panel-card" onclick="openArena(3)">3. Epic 10 Quiz</button>
+        <button class="panel-card" onclick="openArena(4)">4. Script & Seals</button>
+        <button class="panel-card" onclick="openArena(5)">5. Decline Facts</button>
+        <button class="panel-card" onclick="openArena(6)">6. Vedic Battle</button>
+        <button class="panel-card" onclick="openArena(7)">7. Connector Mastery</button>
+    </div>
+
+    <div id="arena1" class="game-arena visible-arena">
+        <h2 class="arena-title">Activity 1: World Civilizations and Rivers (3D Match)</h2>
+        <p style="margin-bottom: 20px; font-weight: bold; color: var(--neon-blue);">Flip the cards to match each civilization with the river valley where it originated:</p>
+        <div class="grid-3d" id="grid3DZone"></div>
+        <div class="alert-box" id="alert1"></div>
+    </div>
+
+    <div id="arena2" class="game-arena">
+        <h2 class="arena-title">Activity 2: Harappan Town Planning Analysis (Sorting Pool)</h2>
+        <p style="margin-bottom: 15px;">Drag and drop the unique architectural features of Harappan civilization into the correct town area:</p>
+        <div class="flex-sort">
+            <div class="pool-box" id="poolSource">
+                <div class="sort-pill" draggable="true" id="sp1" ondragstart="startDrag(event)">Granaries for storing grain</div>
+                <div class="sort-pill" draggable="true" id="sp2" ondragstart="startDrag(event)">Residential houses of people</div>
+                <div class="sort-pill" draggable="true" id="sp3" ondragstart="startDrag(event)">The Great Bath</div>
+                <div class="sort-pill" draggable="true" id="sp4" ondragstart="startDrag(event)">Roadside closed drainage system</div>
+                <div class="sort-pill" draggable="true" id="sp5" ondragstart="startDrag(event)">Elevated fort area</div>
+                <div class="sort-pill" draggable="true" id="sp6" ondragstart="startDrag(event)">Quarters for common citizens</div>
+            </div>
+            <div class="drop-targets" style="flex:2; display:flex; flex-direction:column; gap:15px;">
+                <div class="target-box" ondragover="allowDrop(event)" ondrop="handleDrop(event, 'upper')">
+                    <h3>Upper Town (Citadel)</h3>
+                </div>
+                <div class="target-box" ondragover="allowDrop(event)" ondrop="handleDrop(event, 'lower')">
+                    <h3>Lower Town</h3>
+                </div>
+            </div>
+        </div>
+        <button class="action-btn" onclick="verifyArena2()">Verify Classification</button>
+        <div class="alert-box" id="alert2"></div>
+    </div>
+
+    <div id="arena3" class="game-arena">
+        <h2 class="arena-title">Activity 3: Mega Battle of Civilizations (Epic 10 Quiz)</h2>
+        <div class="progress-bar-container"><div class="progress-bar-fill" id="quizBar"></div></div>
+        <div style="font-weight: bold; margin-bottom: 15px;" id="qNumText">Question: 1 / 10</div>
+        <div id="questionText" style="font-size: 1.3rem; font-weight: bold; margin-bottom: 20px;">Loading...</div>
+        <div id="optionsContainer"></div>
+        <button class="action-btn" id="nextQuizBtn" style="display:none;" onclick="goNextQuestion()">Next Challenge ➔</button>
+        <div class="alert-box" id="alert3"></div>
+    </div>
+
+    <div id="arena4" class="game-arena">
+        <h2 class="arena-title">Activity 4: Traces of Harappan Culture (Crypto Puzzle)</h2>
+        <div class="inputs-block">
+            <div class="fib-q">1. In what form is the script used by the Harappans found? <br><input type="text" class="modern-input" id="cr1" placeholder="Pictographic / Brahmi?"></div>
+            <div class="fib-q">2. Which was the famous dockyard / port city of the Harappan civilization? <br><input type="text" class="modern-input" id="cr2" placeholder="Lothal / Kalibangan?"></div>
+            <div class="fib-q">3. The statue of the dancing girl found in the Indus Valley is made of which metal? <br><input type="text" class="modern-input" id="cr3" placeholder="Bronze / Iron?"></div>
+            <div class="fib-q">4. Which animal was worshiped by the Harappans in a sacred form? <br><input type="text" class="modern-input" id="cr4" placeholder="Bull / Horse?"></div>
+        </div>
+        <button class="action-btn" onclick="verifyArena4()">Decipher Secrets</button>
+        <div class="alert-box" id="alert4"></div>
+    </div>
+
+    <div id="arena5" class="game-arena">
+        <h2 class="arena-title">Activity 5: Decline of Civilization and Historical Facts (Decision Gates)</h2>
+        <div class="toggle-row">
+            <span>1. Aryan invasions and devastating floods might be the reasons for the destruction of the Indus Valley civilization.</span>
+            <div class="choice-btn-group"><button id="g1_t" onclick="setGate(1,true)">Yes</button><button id="g1_f" onclick="setGate(1,false)">No</button></div>
+        </div>
+        <div class="toggle-row">
+            <span>2. The people of Harappan civilization had complete knowledge of the metal iron.</span>
+            <div class="choice-btn-group"><button id="g2_t" onclick="setGate(2,true)">Yes</button><button id="g2_f" onclick="setGate(2,false)">No</button></div>
+        </div>
+        <div class="toggle-row">
+            <span>3. The seals of the Harappan culture were predominantly made of Steatite stones.</span>
+            <div class="choice-btn-group"><button id="g3_t" onclick="setGate(3,true)">Yes</button><button id="g3_f" onclick="setGate(3,false)">No</button></div>
+        </div>
+        <div class="toggle-row">
+            <span>4. The early phase of the Vedic period is known as the 'Later Vedic Period'.</span>
+            <div class="choice-btn-group"><button id="g4_t" onclick="setGate(4,true)">Yes</button><button id="g4_f" onclick="setGate(4,false)">No</button></div>
+        </div>
+        <button class="action-btn" onclick="verifyArena5()">Verify Decisions</button>
+        <div class="alert-box" id="alert5"></div>
+    </div>
+
+    <div id="arena6" class="game-arena">
+        <h2 class="arena-title">Activity 6: Words Search of Vedic Literature (Word Cipher)</h2>
+        <p style="margin-bottom: 15px; font-weight: bold;">Rearrange the scrambled English transliterations of key Vedic terms:</p>
+        <div class="cipher-card">
+            <div class="cipher-txt">V E D A R I G</div>
+            <input type="text" class="modern-input" id="ciph1" placeholder="Enter correct word">
+        </div>
+        <div class="cipher-card">
+            <div class="cipher-txt">H A P A T I G R U</div>
+            <input type="text" class="modern-input" id="ciph2" placeholder="Enter correct word">
+        </div>
+        <div class="cipher-card">
+            <div class="cipher-txt">S A M I T I</div>
+            <input type="text" class="modern-input" id="ciph3" placeholder="Enter correct word">
+        </div>
+        <button class="action-btn" onclick="verifyArena6()">End Battle of Words</button>
+        <div class="alert-box" id="alert6"></div>
+    </div>
+
+    <div id="arena7" class="game-arena">
+        <h2 class="arena-title">Activity 7: Vedas and Their Special Features (Connector Matrix)</h2>
+        <div class="matrix-container">
+            <div>
+                <div class="toggle-row">1. Rigveda</div>
+                <div class="toggle-row">2. Samaveda</div>
+                <div class="toggle-row">3. Atharvaveda</div>
+                <div class="toggle-row">4. Political Institutions</div>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:20px; justify-content:center;">
+                <select id="sel1" class="dropdown-select">
+                    <option value="">Match the correct feature</option>
+                    <option value="A">Art of singing and music</option>
+                    <option value="B">The most ancient collection of hymns</option>
+                    <option value="C">Sabha and Samiti</option>
+                    <option value="D">Spells, charms, and curing of diseases</option>
+                </select>
+                <select id="sel2" class="dropdown-select">
+                    <option value="">Match the correct feature</option>
+                    <option value="A">Art of singing and music</option>
+                    <option value="B">The most ancient collection of hymns</option>
+                    <option value="C">Sabha and Samiti</option>
+                    <option value="D">Spells, charms, and curing of diseases</option>
+                </select>
+                <select id="sel3" class="dropdown-select">
+                    <option value="">Match the correct feature</option>
+                    <option value="A">Art of singing and music</option>
+                    <option value="B">The most ancient collection of hymns</option>
+                    <option value="C">Sabha and Samiti</option>
+                    <option value="D">Spells, charms, and curing of diseases</option>
+                </select>
+                <select id="sel4" class="dropdown-select">
+                    <option value="">Match the correct feature</option>
+                    <option value="A">Art of singing and music</option>
+                    <option value="B">The most ancient collection of hymns</option>
+                    <option value="C">Sabha and Samiti</option>
+                    <option value="D">Spells, charms, and curing of diseases</option>
+                </select>
+            </div>
+        </div>
+        <button class="action-btn" onclick="verifyArena7()">Connect Matrix</button>
+        <div class="alert-box" id="alert7"></div>
+    </div>
+
+    <script>
+        function openArena(index) {
+            document.querySelectorAll('.game-arena').forEach(el => el.classList.remove('visible-arena'));
+            document.querySelectorAll('.panel-card').forEach(el => el.classList.remove('active-panel'));
+            document.getElementById('arena' + index).classList.add('visible-arena');
+            event.target.classList.add('active-panel');
+        }
+
+        // Arena 1: 3D Cards Game Data & Logic
+        const dynamicCards = [
+            {t: "Harappan Civilization", m: 1}, {t: "Indus River", m: 1},
+            {t: "Egyptian Civilization", m: 2}, {t: "Nile River", m: 2},
+            {t: "Mesopotamia", m: 3}, {t: "Euphrates River", m: 3},
+            {t: "Chinese Civilization", m: 4}, {t: "Hwang Ho River", m: 4}
+        ];
+        let flippedList = [];
+        function start3DGame() {
+            let zone = document.getElementById("grid3DZone");
+            zone.innerHTML = "";
+            dynamicCards.sort(() => Math.random() - 0.5);
+            dynamicCards.forEach((c, idx) => {
+                let block = document.createElement("div");
+                block.classList.add("card-3d");
+                block.dataset.idx = idx;
+                block.dataset.m = c.m;
+                block.innerText = "★";
+                block.onclick = function() {
+                    if(flippedList.length < 2 && !this.classList.contains('flipped') && !this.classList.contains('matched')) {
+                        this.classList.add('flipped');
+                        this.innerText = dynamicCards[this.dataset.idx].t;
+                        flippedList.push(this);
+                        if(flippedList.length === 2) {
+                            if(flippedList[0].dataset.m === flippedList[1].dataset.m) {
+                                flippedList[0].classList.add('matched');
+                                flippedList[1].classList.add('matched');
+                                flippedList = [];
+                            } else {
+                                setTimeout(() => {
+                                    flippedList[0].classList.remove('flipped'); flippedList[0].innerText = "★";
+                                    flippedList[1].classList.remove('flipped'); flippedList[1].innerText = "★";
+                                    flippedList = [];
+                                }, 1000);
+                            }
+                        }
+                    }
+                };
+                zone.appendChild(block);
+            });
+        }
+        start3DGame();
+
+        // Arena 2: Sorting Logic
+        function allowDrop(ev) { ev.preventDefault(); }
+        function startDrag(ev) { ev.dataTransfer.setData("text", ev.target.id); }
+        function handleDrop(ev, section) {
+            ev.preventDefault();
+            let data = ev.dataTransfer.setData ? ev.dataTransfer.getData("text") : ev.target.id;
+            let targetEl = document.getElementById(ev.dataTransfer.getData("text"));
+            targetEl.dataset.section = section;
+            ev.target.appendChild(targetEl);
+        }
+        function verifyArena2() {
+            let passed = true;
+            const answers = {sp1:'upper', sp2:'lower', sp3:'upper', sp4:'lower', sp5:'upper', sp6:'lower'};
+            for(let id in answers) {
+                let item = document.getElementById(id);
+                if(!item || item.dataset.section !== answers[id]) passed = false;
+            }
+            showAlert(2, passed ? "Superb, Teacher! The students have understood the urban layout brilliantly." : "Classification is incorrect, please try again.", passed);
+        }
+
+        // Arena 3: Epic Quiz System (10 Questions)
+        const arena3Questions = [
+            { q: "1. Who was the British engineer who first noticed the traces of Harappan civilization?", o: ["John Marshall", "Charles Masson", "Cunningham"], c: 1 },
+            { q: "2. Where is the famous public pool known as 'The Great Bath' located?", o: ["Lothal", "Harappa", "Mohenjodaro"], c: 2 },
+            { q: "3. In which modern-day country is the Mesopotamian civilization majorly situated?", o: ["Iraq", "Egypt", "Iran"], c: 0 },
+            { q: "4. What were the kings of Egyptian civilization called?", o: ["Pharaoh", "Emperor", "Sultan"], c: 0 },
+            { q: "5. Who built the magnificent prayer towers/temples named 'Ziggurats'?", o: ["Harappans", "Mesopotamians", "Chinese"], c: 1 },
+            { q: "6. Which is the most ancient and the first Veda of the Vedic period?", o: ["Yajurveda", "Samaveda", "Rigveda"], c: 2 },
+            { q: "7. Who was considered the head of the family during the Rigvedic period?", o: ["Gramini", "Grahapati/Kulapati", "Rajan"], c: 1 },
+            { q: "8. What are the philosophical texts compiled during the last phase of the Vedic period called?", o: ["Upanishads", "Brahmanas", "Aranyakas"], c: 0 },
+            { q: "9. What was the primary occupation of the Aryans?", o: ["Weaving", "Cattle rearing and Agriculture", "Trade"], c: 1 },
+            { q: "10. Which major Harappan site features a massive 'Granary'?", o: ["Kalibangan", "Harappa", "Lothal"], c: 1 }
+        ];
+
+        let qIdx = 0; let scoreTracker = 0; let activeQuiz = true;
+        function fillQuestion() {
+            activeQuiz = true;
+            document.getElementById("nextQuizBtn").style.display = "none";
+            document.getElementById("alert3").style.display = "none";
+            let currentQ = arena3Questions[qIdx];
+            document.getElementById("qNumText").innerText = `Question: ${qIdx + 1} / 10`;
+            document.getElementById("quizBar").style.width = `${(qIdx+1)*10}%`;
+            document.getElementById("questionText").innerText = currentQ.q;
+            
+            let optZone = document.getElementById("optionsContainer");
+            optZone.innerHTML = "";
+            currentQ.o.forEach((option, i) => {
+                let div = document.createElement("div");
+                div.classList.add("choice-row");
+                div.innerText = option;
+                div.onclick = function() {
+                    if(!activeQuiz) return;
+                    activeQuiz = false;
+                    if(i === currentQ.c) {
+                        this.classList.add("correct-ans");
+                        scoreTracker++;
+                        showAlert(3, "Correct choice! Storehouse of knowledge!", true);
+                    } else {
+                        this.classList.add("wrong-ans");
+                        optZone.children[currentQ.c].classList.add("correct-ans");
+                        showAlert(3, "Wrong answer!", false);
+                    }
+                    document.getElementById("nextQuizBtn").style.display = "inline-block";
+                };
+                optZone.appendChild(div);
+            });
+        }
+        function goNextQuestion() {
+            qIdx++;
+            if(qIdx < arena3Questions.length) {
+                fillQuestion();
+            } else {
+                document.getElementById("qNumText").innerText = "Result Ready!";
+                document.getElementById("questionText").innerText = `Total Score: ${scoreTracker} / 10`;
+                document.getElementById("optionsContainer").innerHTML = "";
+                document.getElementById("nextQuizBtn").style.display = "none";
+                showAlert(3, "The chapter quiz has been completed successfully, Teacher!", true);
+            }
+        }
+        fillQuestion();
+
+        // Arena 4: Crypto Logic
+        function verifyArena4() {
+            let r1 = document.getElementById("cr1").value.trim().toLowerCase();
+            let r2 = document.getElementById("cr2").value.trim().toLowerCase();
+            let r3 = document.getElementById("cr3").value.trim().toLowerCase();
+            let r4 = document.getElementById("cr4").value.trim().toLowerCase();
+
+            if(r1 === "pictographic" && r2 === "lothal" && r3 === "bronze" && r4 === "bull") {
+                showAlert(4, "Fantastic! You have unlocked the historical mysteries!", true);
+            } else {
+                showAlert(4, "Some answers are wrong. Hints: Pictographic, Lothal, Bronze, Bull.", false);
+            }
+        }
+
+        // Arena 5: Gates Logic
+        let gateStatus = {1:null, 2:null, 3:null, 4:null};
+        function setGate(gNum, flag) {
+            gateStatus[gNum] = flag;
+            document.getElementById(`g${gNum}_t`).classList.remove('active-choice');
+            document.getElementById(`g${gNum}_f`).classList.remove('active-choice');
+            if(flag) document.getElementById(`g${gNum}_t`).classList.add('active-choice');
+            else document.getElementById(`g${gNum}_f`).classList.add('active-choice');
+        }
+        function verifyArena5() {
+            if(gateStatus[1] === true && gateStatus[2] === false && gateStatus[3] === true && gateStatus[4] === false) {
+                showAlert(5, "All decisions are 100% correct!", true);
+            } else {
+                showAlert(5, "There are wrong decisions! Check again (Harappans didn't know iron, early phase was Rigvedic).", false);
+            }
+        }
+
+        // Arena 6: Cipher Logic
+        function verifyArena6() {
+            let p1 = document.getElementById("ciph1").value.trim().toLowerCase();
+            let p2 = document.getElementById("ciph2").value.trim().toLowerCase();
+            let p3 = document.getElementById("ciph3").value.trim().toLowerCase();
+
+            if(p1 === "rigveda" && p2 === "grahapati" && p3 === "samiti") {
+                showAlert(6, "Victory achieved in the battle of words!", true);
+            } else {
+                showAlert(6, "Recheck the terms (Examples: Rigveda, Grahapati, Samiti).", false);
+            }
+        }
+
+        // Arena 7: Connect Matrix Logic
+        function verifyArena7() {
+            let s1 = document.getElementById("sel1").value;
+            let s2 = document.getElementById("sel2").value;
+            let s3 = document.getElementById("sel3").value;
+            let s4 = document.getElementById("sel4").value;
+
+            if(s1 === 'B' && s2 === 'A' && s3 === 'D' && s4 === 'C') {
+                showAlert(7, "Wonderful, Teacher! The Connector Matrix is successful. The entire chapter is complete!", true);
+            } else {
+                showAlert(7, "Incorrect connection, take another look at the characteristics of the Vedas.", false);
+            }
+        }
+
+        // Unified Alert Function
+        function showAlert(arenaNum, text, success) {
+            let box = document.getElementById("alert" + arenaNum);
+            box.style.display = "block";
+            box.innerText = text;
+            box.style.background = success ? "rgba(0, 184, 148, 0.15)" : "rgba(223, 230, 233, 0.5)";
+            box.style.color = success ? "#00b894" : "#d63031";
+            box.style.border = success ? "1px solid #00b894" : "1px solid #d63031";
+        }
+    </script>
+</body>
+</html>

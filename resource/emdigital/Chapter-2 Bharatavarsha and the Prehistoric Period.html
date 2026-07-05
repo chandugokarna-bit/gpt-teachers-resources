@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bharatavarsha and the Prehistoric Period - Interactive Activity</title>
+    <style>
+        :root {
+            --primary: #ff7675;
+            --secondary: #fdcb6e;
+            --accent: #6c5ce7;
+            --bg-grad: linear-gradient(135deg, #ffeaa7, #fab1a0);
+            --card-bg: #ffffff;
+            --success: #00b894;
+            --danger: #d63031;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: var(--bg-grad);
+            min-height: 100vh;
+            padding: 20px;
+            color: #2d3436;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            color: #d63031;
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            font-size: 1.1rem;
+            color: #636e72;
+        }
+
+        /* Navigation Grid */
+        .nav-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .nav-btn {
+            background: var(--card-bg);
+            color: #2d3436;
+            border: 3px solid var(--primary);
+            padding: 15px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 10px rgba(0,0,0,0.05);
+            text-align: center;
+        }
+
+        .nav-btn:hover, .nav-btn.active {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(255, 118, 117, 0.4);
+        }
+
+        /* Activity Container */
+        .activity-container {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 25px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+            min-height: 500px;
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .activity-container.active-zone {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 {
+            color: #d63031;
+            margin-bottom: 20px;
+            border-bottom: 3px solid var(--secondary);
+            padding-bottom: 10px;
+            font-size: 1.6rem;
+        }
+
+        .btn-check, .btn-next {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-top: 25px;
+            transition: background 0.2s;
+        }
+
+        .btn-check:hover, .btn-next:hover {
+            opacity: 0.9;
+        }
+
+        .feedback {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: bold;
+            display: none;
+        }
+
+        /* Act 1: Memory Game */
+        .memory-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .memory-card {
+            background: var(--secondary);
+            height: 100px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #2d3436;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 1.1rem;
+            text-align: center;
+            padding: 10px;
+            transition: transform 0.3s;
+        }
+
+        .memory-card.flipped {
+            background: var(--primary);
+            color: white;
+            transform: rotateY(180deg);
+        }
+
+        .memory-card.matched {
+            background: var(--success);
+            color: white;
+            cursor: default;
+        }
+
+        /* Act 2: Drag and Drop */
+        .drag-drop-zone {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .drag-items {
+            flex: 1;
+            background: #f1f2f6;
+            padding: 15px;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .drag-item {
+            background: var(--card-bg);
+            padding: 12px;
+            border-radius: 8px;
+            cursor: grab;
+            border: 2px solid var(--primary);
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .drop-targets {
+            flex: 2;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .drop-box {
+            background: #f1f2f6;
+            border: 3px dashed var(--primary);
+            padding: 20px;
+            border-radius: 15px;
+            min-height: 100px;
+        }
+
+        .drop-box h3 { margin-bottom: 10px; color: #d63031; }
+
+        /* Act 3: Quiz Style */
+        .quiz-option {
+            background: #f1f2f6;
+            padding: 15px;
+            margin: 12px 0;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+            border-left: 5px solid var(--primary);
+            font-size: 1.1rem;
+        }
+
+        .quiz-option:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateX(5px);
+        }
+
+        .quiz-option.correct-choice {
+            background: #e8f5e9;
+            border-left: 5px solid var(--success);
+            color: #2e7d32;
+        }
+
+        .quiz-option.wrong-choice {
+            background: #ffe9e9;
+            border-left: 5px solid var(--danger);
+            color: #c62828;
+        }
+
+        .quiz-progress {
+            font-weight: bold;
+            color: #d63031;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        /* Act 4: Fill in blanks */
+        .fib-q {
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+
+        .fib-input {
+            border: 2px solid var(--primary);
+            border-radius: 8px;
+            padding: 5px 10px;
+            font-size: 1.1rem;
+            width: 220px;
+            outline: none;
+            color: #d63031;
+            font-weight: bold;
+        }
+
+        /* Act 5: True/False */
+        .tf-row {
+            background: #f1f2f6;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .tf-btn {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 8px;
+            margin-left: 10px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .tf-true { background: #ffeaa7; color: #d35400; }
+        .tf-false { background: #fab1a0; color: #c0392b; }
+        .tf-btn.selected { background: var(--primary); color: white; }
+
+        /* Act 6: Scramble */
+        .scramble-box {
+            background: #f1f2f6;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .scrambled-word {
+            font-size: 2rem;
+            letter-spacing: 5px;
+            color: var(--accent);
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        /* Act 7: Matching */
+        .match-container {
+            display: flex;
+            gap: 40px;
+            justify-content: center;
+        }
+
+        .match-col {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .match-select {
+            padding: 10px;
+            border-radius: 8px;
+            border: 2px solid var(--primary);
+            outline: none;
+            width: 320px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Chapter-2: Bharatavarsha and the Prehistoric Period</h1>
+        <p>Class 8 Social Science - Ultra-Modern Interactive Learning Activities</p>
+    </header>
+
+    <!-- Navigation Menu -->
+    <div class="nav-grid">
+        <button class="nav-btn active" onclick="switchTab(1)">1. Neighboring Countries</button>
+        <button class="nav-btn" onclick="switchTab(2)">2. Classification of Stone Ages</button>
+        <button class="nav-btn" onclick="switchTab(3)">3. History Epic 10 Quiz</button>
+        <button class="nav-btn" onclick="switchTab(4)">4. Coasts & Settlements</button>
+        <button class="nav-btn" onclick="switchTab(5)">5. Fire & Environment</button>
+        <button class="nav-btn" onclick="switchTab(6)">6. Prehistoric Sites</button>
+        <button class="nav-btn" onclick="switchTab(7)">7. Matching Tools</button>
+    </div>
+
+    <!-- ACTIVITY 1 -->
+    <div id="act1" class="activity-container active-zone">
+        <h2>Activity 1: India and its Neighboring Countries (Memory Card Game)</h2>
+        <p style="margin-bottom: 15px; font-weight: bold; color: var(--primary);">Match India's neighboring countries with their geographical boundaries!</p>
+        <div class="memory-grid" id="memoryGrid"></div>
+        <div class="feedback" id="feedback1"></div>
+    </div>
+
+    <!-- ACTIVITY 2 -->
+    <div id="act2" class="activity-container">
+        <h2>Activity 2: Classification of Stone Age Cultures (Drag & Drop)</h2>
+        <p>Drag and drop the features/characteristics into their respective Stone Age boxes:</p>
+        <div class="drag-drop-zone">
+            <div class="drag-items" id="dragItems">
+                <div class="drag-item" draggable="true" id="item1" ondragstart="drag(event)">Microliths (Sub-miniature tools)</div>
+                <div class="drag-item" draggable="true" id="item2" ondragstart="drag(event)">Use of grinding stones</div>
+                <div class="drag-item" draggable="true" id="item3" ondragstart="drag(event)">Began 2 million years ago</div>
+                <div class="drag-item" draggable="true" id="item4" ondragstart="drag(event)">Learnt weaving of cloth</div>
+                <div class="drag-item" draggable="true" id="item5" ondragstart="drag(event)">Use of tools with saw-like edges</div>
+                <div class="drag-item" draggable="true" id="item6" ondragstart="drag(event)">Nomadic hunting life</div>
+            </div>
+            <div class="drop-targets">
+                <div class="drop-box" ondragover="allowDrop(event)" ondrop="drop(event, 'hale')">
+                    <h3>Palaeolithic Age (Old Stone Age)</h3>
+                </div>
+                <div class="drop-box" ondragover="allowDrop(event)" ondrop="drop(event, 'madhya')">
+                    <h3>Mesolithic Age (Middle Stone Age)</h3>
+                </div>
+                <div class="drop-box" ondragover="allowDrop(event)" ondrop="drop(event, 'nava')">
+                    <h3>Neolithic Age (New Stone Age)</h3>
+                </div>
+            </div>
+        </div>
+        <button class="btn-check" onclick="checkAct2()">Check Answer</button>
+        <div class="feedback" id="feedback2"></div>
+    </div>
+
+    <!-- ACTIVITY 3: 10 QUESTIONS QUIZ -->
+    <div id="act3" class="activity-container">
+        <h2>Activity 3: Geographical Features and History (Epic 10 Quiz)</h2>
+        <div class="quiz-progress" id="quizProgress">Question: 1 / 10</div>
+        <div id="quizZone">
+            <div class="fib-q" id="quizQuestion" style="font-weight: bold; margin-bottom: 20px;">Loading Question...</div>
+            <div id="quizOptions"></div>
+        </div>
+        <button class="btn-next" id="nextQuizBtn" style="display:none;" onclick="nextQuestion()">Next Question ➔</button>
+        <div class="feedback" id="feedback3"></div>
+    </div>
+
+    <!-- ACTIVITY 4 -->
+    <div id="act4" class="activity-container">
+        <h2>Activity 4: Coastlines and Prehistoric Period (Fill in the Blanks)</h2>
+        <div class="fib-q">1. India is a <input type="text" class="fib-input" id="fib1" placeholder="e.g., Peninsula"> because it is surrounded by water on three sides and land on one side.</div>
+        <div class="fib-q">2. The River <input type="text" class="fib-input" id="fib2" placeholder="e.g., Narmada"> separates India into North and South India.</div>
+        <div class="fib-q">3. The eastern coast of India is called the <input type="text" class="fib-input" id="fib3" placeholder="e.g., Coromandel"> coast.</div>
+        <div class="fib-q">4. The period before the invention of the art of writing is known as the <input type="text" class="fib-input" id="fib4" placeholder="e.g., Prehistoric"> period.</div>
+        <div class="fib-q">5. At present, there are a total of <input type="text" class="fib-input" id="fib5" placeholder="e.g., 28"> states in India.</div>
+        <button class="btn-check" onclick="checkAct4()">Check Answer</button>
+        <div class="feedback" id="feedback4"></div>
+    </div>
+
+    <!-- ACTIVITY 5 -->
+    <div id="act5" class="activity-container">
+        <h2>Activity 5: Knowledge of Fire and Changing Environment (True or False)</h2>
+        <div class="tf-row">
+            <span>1. Traces of ash indicating the use of fire by prehistoric humans have been found in the caves of Kurnool.</span>
+            <div>
+                <button class="tf-btn tf-true" id="tf1_t" onclick="setTF(1, true)">True</button>
+                <button class="tf-btn tf-false" id="tf1_f" onclick="setTF(1, false)">False</button>
+            </div>
+        </div>
+        <div class="tf-row">
+            <span>2. Around 12,000 years ago, the global temperature decreased significantly, leading to the beginning of an ice age.</span>
+            <div>
+                <button class="tf-btn tf-true" id="tf2_t" onclick="setTF(2, true)">True</button>
+                <button class="tf-btn tf-false" id="tf2_f" onclick="setTF(2, false)">False</button>
+            </div>
+        </div>
+        <div class="tf-row">
+            <span>3. Due to the increase in temperature, grasslands developed, leading to animal husbandry and herding.</span>
+            <div>
+                <button class="tf-btn tf-true" id="tf3_t" onclick="setTF(3, true)">True</button>
+                <button class="tf-btn tf-false" id="tf3_f" onclick="setTF(3, false)">False</button>
+            </div>
+        </div>
+        <div class="tf-row">
+            <span>4. Stone Age humans never painted any pictures on the walls of caves and rocks.</span>
+            <div>
+                <button class="tf-btn tf-true" id="tf4_t" onclick="setTF(4, true)">True</button>
+                <button class="tf-btn tf-false" id="tf4_f" onclick="setTF(4, false)">False</button>
+            </div>
+        </div>
+        <button class="btn-check" onclick="checkAct5()">Check Answer</button>
+        <div class="feedback" id="feedback5"></div>
+    </div>
+
+    <!-- ACTIVITY 6 -->
+    <div id="act6" class="activity-container">
+        <h2>Activity 6: Industrial Sites and Places (Word Scramble)</h2>
+        <p>Rearrange the letters to name the prehistoric sites:</p>
+        <div class="scramble-box">
+            <div class="scrambled-word">B E H M I T K A B</div>
+            <input type="text" class="fib-input" id="scramble1" placeholder="Your Answer">
+        </div>
+        <div class="scramble-box">
+            <div class="scrambled-word">H U N S A G I</div>
+            <input type="text" class="fib-input" id="scramble2" placeholder="Your Answer">
+        </div>
+        <div class="scramble-box">
+            <div class="scrambled-word">K U R N O O L</div>
+            <input type="text" class="fib-input" id="scramble3" placeholder="Your Answer">
+        </div>
+        <button class="btn-check" onclick="checkAct6()">Check Answer</button>
+        <div class="feedback" id="feedback6"></div>
+    </div>
+
+    <!-- ACTIVITY 7 -->
+    <div id="act7" class="activity-container">
+        <h2>Activity 7: Ages and Technology of Weapons (Match the Following)</h2>
+        <div class="match-container">
+            <div class="match-col">
+                <div class="tf-row" style="width: 350px;">1. Palaeolithic Age</div>
+                <div class="tf-row" style="width: 350px;">2. Mesolithic Age</div>
+                <div class="tf-row" style="width: 350px;">3. Neolithic Age</div>
+                <div class="tf-row" style="width: 350px;">4. Industrial Sites</div>
+            </div>
+            <div class="match-col">
+                <select id="m1" class="match-select">
+                    <option value="">Select Option</option>
+                    <option value="A">Microliths (Sub-miniature stone tools)</option>
+                    <option value="B">Large stone axes and flakes</option>
+                    <option value="C">Places where stones were found and tools were made</option>
+                    <option value="D">Polished tools with sharp cutting edges</option>
+                </select>
+                <select id="m2" class="match-select">
+                    <option value="">Select Option</option>
+                    <option value="A">Microliths (Sub-miniature stone tools)</option>
+                    <option value="B">Large stone axes and flakes</option>
+                    <option value="C">Places where stones were found and tools were made</option>
+                    <option value="D">Polished tools with sharp cutting edges</option>
+                </select>
+                <select id="m3" class="match-select">
+                    <option value="">Select Option</option>
+                    <option value="A">Microliths (Sub-miniature stone tools)</option>
+                    <option value="B">Large stone axes and flakes</option>
+                    <option value="C">Places where stones were found and tools were made</option>
+                    <option value="D">Polished tools with sharp cutting edges</option>
+                </select>
+                <select id="m4" class="match-select">
+                    <option value="">Select Option</option>
+                    <option value="A">Microliths (Sub-miniature stone tools)</option>
+                    <option value="B">Large stone axes and flakes</option>
+                    <option value="C">Places where stones were found and tools were made</option>
+                    <option value="D">Polished tools with sharp cutting edges</option>
+                </select>
+            </div>
+        </div>
+        <button class="btn-check" onclick="checkAct7()">Check Answer</button>
+        <div class="feedback" id="feedback7"></div>
+    </div>
+
+    <script>
+        function switchTab(tabIndex) {
+            document.querySelectorAll('.activity-container').forEach(el => el.classList.remove('active-zone'));
+            document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById('act' + tabIndex).classList.add('active-zone');
+            event.target.classList.add('active');
+        }
+
+        // Act 1: Memory Game Logic
+        const cardsData = [
+            {text: "Pakistan", match: 1}, {text: "North-Western Border", match: 1},
+            {text: "Sri Lanka", match: 2}, {text: "Southern Island", match: 2},
+            {text: "China", match: 3}, {text: "Northern Border", match: 3},
+            {text: "Myanmar", match: 4}, {text: "Eastern Border", match: 4}
+        ];
+        
+        let flippedCards = [];
+        function initMemoryGame() {
+            const grid = document.getElementById('memoryGrid');
+            grid.innerHTML = '';
+            cardsData.sort(() => Math.random() - 0.5);
+            cardsData.forEach((data, index) => {
+                const card = document.createElement('div');
+                card.classList.add('memory-card');
+                card.dataset.index = index;
+                card.dataset.match = data.match;
+                card.innerText = "?";
+                card.addEventListener('click', flipCard);
+                grid.appendChild(card);
+            });
+        }
+        
+        function flipCard() {
+            if (flippedCards.length < 2 && !this.classList.contains('flipped') && !this.classList.contains('matched')) {
+                this.classList.add('flipped');
+                this.innerText = cardsData[this.dataset.index].text;
+                flippedCards.push(this);
+                
+                if (flippedCards.length === 2) {
+                    if (flippedCards[0].dataset.match === flippedCards[1].dataset.match) {
+                        flippedCards[0].classList.add('matched');
+                        flippedCards[1].classList.add('matched');
+                        flippedCards = [];
+                    } else {
+                        setTimeout(() => {
+                            flippedCards[0].classList.remove('flipped');
+                            flippedCards[0].innerText = "?";
+                            flippedCards[1].classList.remove('flipped');
+                            flippedCards[1].innerText = "?";
+                            flippedCards = [];
+                        }, 1000);
+                    }
+                }
+            }
+        }
+        initMemoryGame();
+
+        // Act 2: Drag and Drop Logic
+        function allowDrop(ev) { ev.preventDefault(); }
+        function drag(ev) { ev.dataTransfer.setData("text", ev.target.id); }
+        function drop(ev, cat) {
+            ev.preventDefault();
+            var data = ev.dataTransfer.getData("text");
+            var item = document.getElementById(data);
+            item.dataset.category = cat;
+            ev.target.appendChild(item);
+        }
+        function checkAct2() {
+            let correct = true;
+            const answers = {item1: 'madhya', item2: 'nava', item3: 'hale', item4: 'nava', item5: 'madhya', item6: 'hale'};
+            for (let id in answers) {
+                let el = document.getElementById(id);
+                if (!el || el.dataset.category !== answers[id]) correct = false;
+            }
+            showFeedback(2, correct ? "Excellent! You have classified them perfectly, Teacher!" : "Some entries are incorrect. Please try again.", correct);
+        }
+
+        // Act 3: 10 Questions Quiz
+        const quizQuestions = [
+            { q: "1. Having a vast area in the southern part of the Asian continent, India is considered a what?", options: ["Island", "Subcontinent", "Continent"], correct: 1 },
+            { q: "2. Which northern mountain range is crucial in preserving India's safety and security?", options: ["Vindhya Range", "Himalaya Mountains", "Western Ghats"], correct: 1 },
+            { q: "3. Where did the ancient Indus Valley and Vedic civilizations flourish?", options: ["Deccan Plateau", "Coastal Region", "Indo-Gangetic Plain"], correct: 2 },
+            { q: "4. Through which mountain passes of North-West India did foreign invasions historically take place?", options: ["Khyber and Bolan", "Shipki La", "Nathu La"], correct: 0 },
+            { q: "5. The mainland of India has a coastline extending for about how many kilometers?", options: ["7,516 km", "6,100 km", "5,000 km"], correct: 1 },
+            { q: "6. What is the southern part of the West Coast called?", options: ["Coromandel Coast", "Utkal Coast", "Malabar Coast"], correct: 2 },
+            { q: "7. In historical classification, the period for which written records are available but cannot be deciphered is called what?", options: ["Proto-historic Period", "Prehistoric Period", "Historic Period"], correct: 0 },
+            { q: "8. The long span of the Palaeolithic Age is divided into how many stages?", options: ["Two", "Three", "Four"], correct: 1 },
+            { q: "9. Since the tools of the Mesolithic Age were extremely small, they are called what?", options: ["Megaliths", "Microliths", "Metal tools"], correct: 1 },
+            { q: "10. In which Stone Age period were grinding stones used for crushing grains?", options: ["Palaeolithic Age", "Mesolithic Age", "Neolithic Age"], correct: 2 }
+        ];
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let canAnswer = true;
+
+        function loadQuestion() {
+            canAnswer = true;
+            document.getElementById("nextQuizBtn").style.display = "none";
+            document.getElementById("feedback3").style.display = "none";
+            
+            let qData = quizQuestions[currentQuestionIndex];
+            document.getElementById("quizProgress").innerText = `Question: ${currentQuestionIndex + 1} / 10`;
+            document.getElementById("quizQuestion").innerText = qData.q;
+            
+            let optionsDiv = document.getElementById("quizOptions");
+            optionsDiv.innerHTML = "";
+            
+            qData.options.forEach((opt, idx) => {
+                let optBtn = document.createElement("div");
+                optBtn.classList.add("quiz-option");
+                optBtn.innerText = opt;
+                optBtn.onclick = function() { checkQuizAnswer(idx, optBtn); };
+                optionsDiv.appendChild(optBtn);
+            });
+        }
+
+        function checkQuizAnswer(selectedIdx, element) {
+            if (!canAnswer) return;
+            canAnswer = false;
+            
+            let qData = quizQuestions[currentQuestionIndex];
+            let allOptions = document.getElementById("quizOptions").children;
+            
+            if (selectedIdx === qData.correct) {
+                element.classList.add("correct-choice");
+                score++;
+                showFeedback(3, "Correct Answer!", true);
+            } else {
+                element.classList.add("wrong-choice");
+                allOptions[qData.correct].classList.add("correct-choice");
+                showFeedback(3, "Wrong Answer! The correct answer is shown in Green.", false);
+            }
+            
+            document.getElementById("nextQuizBtn").style.display = "inline-block";
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < quizQuestions.length) {
+                loadQuestion();
+            } else {
+                document.getElementById("quizProgress").innerText = "Quiz Completed!";
+                document.getElementById("quizZone").innerHTML = `<h3 style='color:#d63031; text-align:center; margin-top:20px;'>Total Score: ${score} / 10</h3>`;
+                document.getElementById("nextQuizBtn").style.display = "none";
+                showFeedback(3, score >= 7 ? "Outstanding knowledge! The geographical background is very well understood." : "Good attempt, read the chapter again to improve!", true);
+            }
+        }
+        
+        loadQuestion();
+
+        // Act 4: FIB
+        function checkAct4() {
+            let f1 = document.getElementById('fib1').value.trim().toLowerCase();
+            let f2 = document.getElementById('fib2').value.trim().toLowerCase();
+            let f3 = document.getElementById('fib3').value.trim().toLowerCase();
+            let f4 = document.getElementById('fib4').value.trim().toLowerCase();
+            let f5 = document.getElementById('fib5').value.trim();
+
+            if(f1 === "peninsula" && f2 === "narmada" && f3 === "coromandel" && (f4 === "prehistoric" || f4 === "proto-historic") && f5 === "28") {
+                showFeedback(4, "Superb! All the blanks are filled correctly!", true);
+            } else {
+                showFeedback(4, "Some answers are incorrect. Hints: Peninsula, Narmada, Coromandel, Prehistoric, 28.", false);
+            }
+        }
+
+        // Act 5: True/False
+        let tf_answers = {1: null, 2: null, 3: null, 4: null};
+        function setTF(q, val) {
+            tf_answers[q] = val;
+            document.getElementById(`tf${q}_t`).classList.remove('selected');
+            document.getElementById(`tf${q}_f`).classList.remove('selected');
+            if(val) document.getElementById(`tf${q}_t`).classList.add('selected');
+            else document.getElementById(`tf${q}_f`).classList.add('selected');
+        }
+        function checkAct5() {
+            if(tf_answers[1] === true && tf_answers[2] === false && tf_answers[3] === true && tf_answers[4] === false) {
+                showFeedback(5, "Wonderful analysis! Your knowledge on fire and environmental changes is accurate.", true);
+            } else {
+                showFeedback(5, "Incorrect! Remember: Around 12,000 years ago global temperatures increased, and cave walls have beautiful hunting paintings.", false);
+            }
+        }
+
+        // Act 6: Scramble
+        function checkAct6() {
+            let s1 = document.getElementById('scramble1').value.replace(/\s+/g, '').toLowerCase();
+            let s2 = document.getElementById('scramble2').value.replace(/\s+/g, '').toLowerCase();
+            let s3 = document.getElementById('scramble3').value.replace(/\s+/g, '').toLowerCase();
+
+            if(s1 === "bhimbetka" && s2 === "hunasagi" && s3 === "kurnool") {
+                showFeedback(6, "The names of the sites are perfectly correct! Smart students!", true);
+            } else {
+                showFeedback(6, "Check the arrangement of letters (e.g., Bhimbetka, Hunasagi, Kurnool).", false);
+            }
+        }
+
+        // Act 7: Match
+        function checkAct7() {
+            let m1 = document.getElementById('m1').value;
+            let m2 = document.getElementById('m2').value;
+            let m3 = document.getElementById('m3').value;
+            let m4 = document.getElementById('m4').value;
+
+            if(m1 === 'B' && m2 === 'A' && m3 === 'D' && m4 === 'C') {
+                showFeedback(7, "Wow! The weapon matching is completely correct! Chapter 2 completed successfully.", true);
+            } else {
+                showFeedback(7, "Incorrect, please match the weapons to their correct historic age.", false);
+            }
+        }
+
+        function showFeedback(actNum, text, isSuccess) {
+            const fb = document.getElementById('feedback' + actNum);
+            fb.style.display = "block";
+            fb.innerText = text;
+            fb.style.background = isSuccess ? "rgba(0, 184, 148, 0.2)" : "rgba(214, 48, 49, 0.2)";
+            fb.style.color = isSuccess ? "#00b894" : "#d63031";
+        }
+    </script>
+</body>
+</html>

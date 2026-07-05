@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sources of History - Interactive Activity</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f4f8;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        p.instruction {
+            color: #7f8c8d;
+            font-size: 18px;
+            margin-bottom: 25px;
+        }
+        .container {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        .drop-zone {
+            background-color: #ffffff;
+            border: 3px dashed #3498db;
+            border-radius: 10px;
+            width: 45%;
+            min-height: 250px;
+            padding: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+        .drop-zone h2 {
+            margin-top: 0;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #ecf0f1;
+        }
+        #literary-zone h2 { color: #e67e22; }
+        #archaeological-zone h2 { color: #27ae60; }
+        
+        .drop-zone.drag-over {
+            background-color: #ebf5fb;
+            border-color: #2980b9;
+            transform: scale(1.02);
+        }
+        .items-box {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            max-width: 1000px;
+            margin: 30px auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        .draggable {
+            background-color: #34495e;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: move;
+            font-size: 16px;
+            font-weight: bold;
+            user-select: none;
+            box-shadow: 0 3px 5px rgba(0,0,0,0.2);
+            transition: opacity 0.2s;
+        }
+        .draggable:active {
+            opacity: 0.5;
+        }
+        .correct {
+            background-color: #2ecc71 !important;
+        }
+        .wrong {
+            background-color: #e74c3c !important;
+        }
+        #result-btn {
+            background-color: #2980b9;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        #result-btn:hover { background-color: #1f6391; }
+        #score-text {
+            font-size: 22px;
+            font-weight: bold;
+            margin-top: 20px;
+            color: #2c3e50;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Lesson 1: Sources of History</h1>
+    <p class="instruction">Drag the examples below and drop them into the correct source box!</p>
+
+    <div class="items-box" id="items-container">
+        <div class="draggable" draggable="true" id="item1" data-type="literary">Palm-leaf Manuscripts</div>
+        <div class="draggable" draggable="true" id="item2" data-type="archaeological">Old Coins</div>
+        <div class="draggable" draggable="true" id="item3" data-type="literary">Epics and Poems</div>
+        <div class="draggable" draggable="true" id="item4" data-type="archaeological">Inscriptions</div>
+        <div class="draggable" draggable="true" id="item5" data-type="literary">Writings of Foreign Travellers</div>
+        <div class="draggable" draggable="true" id="item6" data-type="archaeological">Pottery Pieces</div>
+        <div class="draggable" draggable="true" id="item7" data-type="archaeological">Ancient Palaces / Monuments</div>
+        <div class="draggable" draggable="true" id="item8" data-type="literary">Manuscripts</div>
+    </div>
+
+    <div class="container">
+        <div class="drop-zone" id="literary-zone" data-target="literary">
+            <h2>📜 Literary Sources</h2>
+        </div>
+        <div class="drop-zone" id="archaeological-zone" data-target="archaeological">
+            <h2>🏺 Archaeological Sources</h2>
+        </div>
+    </div>
+
+    <button id="result-btn" onclick="checkAnswers()">Check Answers (Submit)</button>
+    <div id="score-text"></div>
+
+    <script>
+        const draggables = document.querySelectorAll('.draggable');
+        const dropZones = document.querySelectorAll('.drop-zone');
+
+        draggables.forEach(draggable => {
+            draggable.addEventListener('dragstart', () => {
+                draggable.classList.add('dragging');
+            });
+
+            draggable.addEventListener('dragend', () => {
+                draggable.classList.remove('dragging');
+            });
+        });
+
+        dropZones.forEach(zone => {
+            zone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                zone.classList.add('drag-over');
+            });
+
+            zone.addEventListener('dragleave', () => {
+                zone.classList.remove('drag-over');
+            });
+
+            zone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                zone.classList.remove('drag-over');
+                const draggingItem = document.querySelector('.dragging');
+                if (draggingItem) {
+                    zone.appendChild(draggingItem);
+                }
+            });
+        });
+
+        function checkAnswers() {
+            let score = 0;
+            let totalItems = draggables.length;
+
+            dropZones.forEach(zone => {
+                const targetType = zone.getAttribute('data-target');
+                const attachedItems = zone.querySelectorAll('.draggable');
+                
+                attachedItems.forEach(item => {
+                    const itemType = item.getAttribute('data-type');
+                    if (itemType === targetType) {
+                        item.classList.remove('wrong');
+                        item.classList.add('correct');
+                        score++;
+                    } else {
+                        item.classList.remove('correct');
+                        item.classList.add('wrong');
+                    }
+                });
+            });
+
+            const remainingItems = document.getElementById('items-container').querySelectorAll('.draggable');
+            remainingItems.forEach(item => {
+                item.classList.remove('correct');
+                item.classList.add('wrong');
+            });
+
+            const scoreDiv = document.getElementById('score-text');
+            scoreDiv.innerHTML = `Your Score: ${score} / ${totalItems} <br> ${score === totalItems ? '🎉 Excellent! All answers are correct.' : '🤔 Some answers are incorrect, please try again!'}`;
+        }
+    </script>
+</body>
+</html>

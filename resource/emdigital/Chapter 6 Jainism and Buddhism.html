@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Level Board Game - Jainism and Buddhism</title>
+    <style>
+        :root {
+            --board-bg: #130cb7;
+            --board-glow: #52e5e7;
+            --accent-orange: #ff7675;
+            --dark-space: #0f0c1b;
+            --success-neon: #00ffcc;
+            --danger-neon: #ff0055;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Verdana, sans-serif; }
+
+        body {
+            background: var(--dark-space);
+            background-image: radial-gradient(circle at 20% 30%, #251c4a 0%, #0f0c1b 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #ffffff;
+        }
+
+        header.board-title-zone {
+            text-align: center;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 2px solid var(--board-glow);
+            border-radius: 20px;
+            box-shadow: 0 0 20px rgba(82, 229, 231, 0.2);
+            margin-bottom: 25px;
+        }
+
+        header.board-title-zone h1 {
+            color: var(--board-glow);
+            font-size: 2.2rem;
+            text-shadow: 0 0 10px rgba(82, 229, 231, 0.5);
+            margin-bottom: 5px;
+        }
+
+        /* NEW PATTERN: ROADMAP BOARD GAME TRACK */
+        .board-game-track {
+            display: flex;
+            justify-content: space-between;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 15px;
+            border-radius: 15px;
+            border: 1px dashed var(--board-glow);
+            margin-bottom: 30px;
+            overflow-x: auto;
+        }
+
+        .board-step {
+            padding: 12px 20px;
+            background: #232038;
+            border: 2px solid #3d396b;
+            border-radius: 50px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            min-width: 120px;
+        }
+
+        .board-step.completed {
+            background: var(--board-glow);
+            color: #000000;
+            border-color: #ffffff;
+            box-shadow: 0 0 15px var(--board-glow);
+        }
+
+        .board-step.current {
+            background: var(--accent-orange);
+            color: white;
+            border-color: #ffffff;
+            box-shadow: 0 0 15px var(--accent-orange);
+            animation: pulseGlow 1.5s infinite;
+        }
+
+        @keyframes pulseGlow {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        /* Main Display Screen */
+        .board-screen {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid #232038;
+            border-radius: 25px;
+            padding: 30px;
+            min-height: 500px;
+            display: none;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+        }
+
+        .board-screen.active-screen { display: block; }
+
+        h2.step-heading {
+            font-size: 1.6rem;
+            color: var(--board-glow);
+            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(82, 229, 231, 0.2);
+            padding-bottom: 10px;
+        }
+
+        /* Pattern Components */
+        .cyber-btn {
+            background: linear-gradient(135deg, #52e5e7, #130cb7);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 25px;
+            box-shadow: 0 5px 15px rgba(19, 12, 183, 0.4);
+        }
+
+        .cyber-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(82, 229, 231, 0.4);
+        }
+
+        .game-status-box {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: bold;
+            display: none;
+            font-size: 1.1rem;
+        }
+
+        /* Level 1 Components (Interactive Node Connector) */
+        .connector-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .node-box {
+            background: #1c1936;
+            padding: 15px;
+            border-radius: 12px;
+            cursor: pointer;
+            border: 2px solid #312b5c;
+            font-weight: bold;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .node-box:hover { border-color: var(--board-glow); background: #252147; }
+        .node-box.selected-node { background: var(--board-glow); color: black; border-color: white; }
+
+        /* Level 2 (Mining Alphabet Grid) */
+        .mining-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .mine-card {
+            background: #232038;
+            border: 2px solid #3d396b;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .mine-card.active-mine { background: var(--accent-orange); border-color: white; }
+
+        /* Level 3 (Battle Quiz) */
+        .battle-quiz-option {
+            background: #1c1936;
+            border: 2px solid #312b5c;
+            padding: 16px;
+            margin: 12px 0;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+        }
+
+        .battle-quiz-option:hover { background: #252147; transform: translateX(5px); }
+        .battle-quiz-option.success-glow { background: rgba(0, 255, 204, 0.2); border-color: var(--success-neon); color: var(--success-neon); }
+        .battle-quiz-option.danger-glow { background: rgba(255, 0, 85, 0.2); border-color: var(--danger-neon); color: var(--danger-neon); }
+
+        /* Level 4 & 5 Controls */
+        .text-smart-input {
+            background: #0f0c1b;
+            border: 2px solid #3d396b;
+            border-radius: 10px;
+            padding: 12px;
+            font-size: 1.1rem;
+            color: var(--success-neon);
+            font-weight: bold;
+            outline: none;
+            width: 100%;
+            max-width: 300px;
+            margin-top: 8px;
+        }
+
+        .text-smart-input:focus { border-color: var(--board-glow); }
+
+        /* Level 6 (Sorting Chrono Order) */
+        .chrono-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-width: 500px;
+        }
+
+        .chrono-item {
+            background: #1c1936;
+            border: 2px dashed #3d396b;
+            padding: 14px;
+            border-radius: 10px;
+            cursor: grab;
+            font-weight: bold;
+        }
+
+        /* Score Display HUD */
+        .hud-top {
+            display: flex;
+            justify-content: space-between;
+            background: #1c1936;
+            padding: 12px 25px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            border: 1px solid #3d396b;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="board-title-zone">
+        <h1>Chapter 6: Jainism and Buddhism</h1>
+        <p>Dynamic Board Game Design 5.0 • Single Board Navigation Map</p>
+    </header>
+
+    <div class="hud-top">
+        <span style="color: var(--board-glow);">Board Mission: Quest for Truth</span>
+        <span style="color: var(--success-neon);" id="liveScoreBoard">Gold Coins Won: 0 Gold</span>
+    </div>
+
+    <div class="board-game-track">
+        <div class="board-step current" id="stepBtn1" onclick="jumpToLevel(1)">Level 1</div>
+        <div class="board-step" id="stepBtn2" onclick="jumpToLevel(2)">Level 2</div>
+        <div class="board-step" id="stepBtn3" onclick="jumpToLevel(3)">Level 3 (10 Qs)</div>
+        <div class="board-step" id="stepBtn4" onclick="jumpToLevel(4)">Level 4</div>
+        <div class="board-step" id="stepBtn5" onclick="jumpToLevel(5)">Level 5</div>
+        <div class="board-step" id="stepBtn6" onclick="jumpToLevel(6)">Level 6</div>
+        <div class="board-step" id="stepBtn7" onclick="jumpToLevel(7)">Level 7</div>
+    </div>
+
+    <div id="level1" class="board-screen active-screen">
+        <h2 class="step-heading">Level 1: Key Founders and Childhood Names (Node Connector)</h2>
+        <p style="margin-bottom: 15px;">Connect the personality on the left with their correct childhood name on the right:</p>
+        <div class="connector-grid">
+            <div>
+                <div class="node-box" id="left1" onclick="selectNode('left', 'left1', 1)">Gautama Buddha</div>
+                <div class="node-box" id="left2" style="margin-top:15px;" onclick="selectNode('left', 'left2', 2)">Vardhamana Mahavira</div>
+            </div>
+            <div>
+                <div class="node-box" id="right1" onclick="selectNode('right', 'right1', 2)">Vardhamana</div>
+                <div class="node-box" id="right2" style="margin-top:15px;" onclick="selectNode('right', 'right2', 1)">Siddhartha</div>
+            </div>
+        </div>
+        <div class="game-status-box" id="status1"></div>
+    </div>
+
+    <div id="level2" class="board-screen">
+        <h2 class="step-heading">Level 2: Mining the Five Great Vows of Jainism (Alphabet Mining)</h2>
+        <p style="margin-bottom: 15px;">Which of the following principles belong to the **Five Great Vows (Pancha Mahavratas)** taught by Mahavira? Click to select:</p>
+        <div class="mining-grid">
+            <div class="mine-card" id="mine1" onclick="toggleMine('mine1', true)">Ahimsa (Non-violence)</div>
+            <div class="mine-card" id="mine2" onclick="toggleMine('mine2', false)">Waging War</div>
+            <div class="mine-card" id="mine3" onclick="toggleMine('mine3', true)">Satya (Truth)</div>
+            <div class="mine-card" id="mine4" onclick="toggleMine('mine4', false)">Amassing Wealth</div>
+            <div class="mine-card" id="mine5" onclick="toggleMine('mine5', true)">Asteya (Non-stealing)</div>
+            <div class="mine-card" id="mine6" onclick="toggleMine('mine6', true)">Aparigraha (Non-possession)</div>
+            <div class="mine-card" id="mine7" onclick="toggleMine('mine7', false)">Committing Violence</div>
+            <div class="mine-card" id="mine8" onclick="toggleMine('mine8', true)">Brahmacharya (Celibacy)</div>
+        </div>
+        <button class="cyber-btn" onclick="verifyLevel2()">Verify Mining</button>
+        <div class="game-status-box" id="status2"></div>
+    </div>
+
+    <div id="level3" class="board-screen">
+        <h2 class="step-heading">Level 3: Great Battle of Knowledge (Epic 10 Battle Quiz)</h2>
+        <div style="font-weight: bold; margin-bottom: 15px; color: var(--board-glow);" id="battleCounter">Question Number: 1 / 10</div>
+        <div id="battleQuestionText" style="font-size: 1.25rem; font-weight: bold; margin-bottom: 20px;">Loading question...</div>
+        <div id="battleOptionsZone"></div>
+        <button class="cyber-btn" id="nextBattleBtn" style="display:none;" onclick="nextBattleQuestion()">Next Challenge ➔</button>
+        <div class="game-status-box" id="status3"></div>
+    </div>
+
+    <div id="level4" class="board-screen">
+        <h2 class="step-heading">Level 4: Historical Sites Geo-Lock (Geo Riddle)</h2>
+        <div style="display:flex; flex-direction:column; gap:20px;">
+            <div class="fib-q">1. What is the place in present-day Uttar Pradesh where Gautama Buddha attained Mahaparinirvana (death)? <br><input type="text" class="text-smart-input" id="geo1" placeholder="Write answer here"></div>
+            <div class="fib-q">2. Which place in Karnataka features the famous colossal statue of Gommateshwara Bahubali of Jainism? <br><input type="text" class="text-smart-input" id="geo2" placeholder="Write answer here"></div>
+            <div class="fib-q">3. Where is the Deer Park located where Buddha delivered his first sermon to his five disciples? <br><input type="text" class="text-smart-input" id="geo3" placeholder="Write answer here"></div>
+        </div>
+        <button class="cyber-btn" onclick="verifyLevel4()">Crack Geo-Lock</button>
+        <div class="game-status-box" id="status4"></div>
+    </div>
+
+    <div id="level5" class="board-screen">
+        <h2 class="step-heading">Level 5: Holy Scriptures Code (Holy Script Input)</h2>
+        <div style="display:flex; flex-direction:column; gap:20px;">
+            <div class="fib-q">1. What is the collective name for the most important religious scriptures of Buddhism? <br><input type="text" class="text-smart-input" id="script1" placeholder="e.g., Tripitakas"></div>
+            <div class="fib-q">2. What are the texts called that contain the core doctrines and teachings of Jainism? <br><input type="text" class="text-smart-input" id="script2" placeholder="e.g., Angas"></div>
+            <div class="fib-q">3. Which popular stories in Buddhist literature narrate the previous births of Buddha? <br><input type="text" class="text-smart-input" id="script3" placeholder="e.g., Jataka tales"></div>
+        </div>
+        <button class="cyber-btn" onclick="verifyLevel5()">Verify Script Code</button>
+        <div class="game-status-box" id="status5"></div>
+    </div>
+
+    <div id="level6" class="board-screen">
+        <h2 class="step-heading">Level 6: Venues of Buddhist Councils (Category Anchor)</h2>
+        <p style="margin-bottom: 15px;">Drag and assign the venues of the following Buddhist Councils (Sangitis) to their correct categories:</p>
+        <div style="display:flex; gap:25px;">
+            <div class="connector-grid" style="flex:1; display:flex; flex-direction:column; gap:10px;" id="chronoSource">
+                <div class="chrono-item" draggable="true" id="ch1" ondragstart="startChoDrag(event)">First Buddhist Council</div>
+                <div class="chrono-item" draggable="true" id="ch2" ondragstart="startChoDrag(event)">Third Buddhist Council</div>
+            </div>
+            <div style="flex:2; display:flex; flex-direction:column; gap:15px;">
+                <div style="background:rgba(0,0,0,0.3); border:2px dashed var(--board-glow); padding:15px; border-radius:12px;" ondragover="allowChoDrop(event)" ondrop="handleChoDrop(event, 'rajagriha')">
+                    <h3>Rajagriha</h3>
+                </div>
+                <div style="background:rgba(0,0,0,0.3); border:2px dashed var(--board-glow); padding:15px; border-radius:12px;" ondragover="allowChoDrop(event)" ondrop="handleChoDrop(event, 'patali')">
+                    <h3>Pataliputra</h3>
+                </div>
+            </div>
+        </div>
+        <button class="cyber-btn" onclick="verifyLevel6()">Confirm Venues</button>
+        <div class="game-status-box" id="status6"></div>
+    </div>
+
+    <div id="level7" class="board-screen">
+        <h2 class="step-heading">Level 7: Sects of Buddhism and Jainism (Ultimate Branch Matrix)</h2>
+        <p style="margin-bottom: 15px;">Final stage! Correctly pair the main sects or branches of the two religions to complete the game:</p>
+        <div class="connector-grid">
+            <div class="node-box" id="matL1" onclick="selectMatrix('L', 'matL1', 'boudha')">Hinayana and Mahayana</div>
+            <div class="node-box" id="matR1" onclick="selectMatrix('R', 'matR1', 'boudha')">Branches of Buddhism</div>
+            <div class="node-box" id="matL2" onclick="selectMatrix('L', 'matL2', 'jaina')">Shvetambara and Digambara</div>
+            <div class="node-box" id="matR2" onclick="selectMatrix('R', 'matR2', 'jaina')">Branches of Jainism</div>
+        </div>
+        <button class="cyber-btn" onclick="verifyLevel7()">Crack Matrix</button>
+        <div class="game-status-box" id="status7"></div>
+    </div>
+
+    <script>
+        let goldCoins = 0;
+        function updateCoins(amount) {
+            goldCoins += amount;
+            document.getElementById("liveScoreBoard").innerText = `Gold Coins Won: ${goldCoins} Gold`;
+        }
+
+        function jumpToLevel(levelIdx) {
+            document.querySelectorAll('.board-screen').forEach(el => el.classList.remove('active-screen'));
+            document.querySelectorAll('.board-step').forEach(el => el.classList.remove('current'));
+            
+            document.getElementById('level' + levelIdx).classList.add('active-screen');
+            document.getElementById('stepBtn' + levelIdx).classList.add('current');
+        }
+
+        // Level 1 Logic
+        let selectedLeft = null; let selectedRight = null;
+        function selectNode(side, id, matchId) {
+            if(side === 'left') {
+                if(selectedLeft) document.getElementById(selectedLeft.id).classList.remove('selected-node');
+                selectedLeft = { id: id, match: matchId };
+                document.getElementById(id).classList.add('selected-node');
+            } else {
+                if(selectedRight) document.getElementById(selectedRight.id).classList.remove('selected-node');
+                selectedRight = { id: id, match: matchId };
+                document.getElementById(id).classList.add('selected-node');
+            }
+
+            if(selectedLeft && selectedRight) {
+                if(selectedLeft.match === selectedRight.match) {
+                    document.getElementById(selectedLeft.id).style.background = "var(--success-neon)";
+                    document.getElementById(selectedRight.id).style.background = "var(--success-neon)";
+                    updateCoins(50);
+                    showLevelStatus(1, "Correct pairing! Move ahead.", true);
+                    document.getElementById('stepBtn1').classList.add('completed');
+                } else {
+                    showLevelStatus(1, "Incorrect link, please try again.", false);
+                }
+                selectedLeft = null; selectedRight = null;
+            }
+        }
+
+        // Level 2 Logic
+        let minedAnswers = {};
+        function toggleMine(id, isValid) {
+            let el = document.getElementById(id);
+            if(el.classList.contains('active-mine')) {
+                el.classList.remove('active-mine');
+                delete minedAnswers[id];
+            } else {
+                el.classList.add('active-mine');
+                minedAnswers[id] = isValid;
+            }
+        }
+        function verifyLevel2() {
+            let isPerfect = true;
+            let count = 0;
+            for(let id in minedAnswers) {
+                if(minedAnswers[id] === false) isPerfect = false;
+                count++;
+            }
+            if(count !== 5) isPerfect = false; // 5 vows
+
+            if(isPerfect) {
+                updateCoins(100);
+                document.getElementById('stepBtn2').classList.add('completed');
+                showLevelStatus(2, "Amazing! The students have perfectly identified the Five Great Vows!", true);
+            } else {
+                showLevelStatus(2, "Mining failed. Select only the 5 genuine vows (do not select violence or war).", false);
+            }
+        }
+
+        // Level 3: 10 Battle Quiz Logic
+        const quizList = [
+            { q: "1. How many Tirthankaras have there been in total in Jainism?", o: ["12 people", "24 people", "100 people"], c: 1 },
+            { q: "2. Who was the first Tirthankara of Jainism?", o: ["Vrishabhanatha (Rishabhadeva)", "Parshvanatha", "Mahavira"], c: 0 },
+            { q: "3. In which village near Vaishali in Bihar was Vardhamana Mahavira born?", o: ["Kundagrama", "Lumbini", "Sarnath"], c: 0 },
+            { q: "4. What was the name of Gautama Buddha's mother?", o: ["Trishala Devi", "Yashodhara", "Mayadevi"], c: 2 },
+            { q: "5. What was Gautama Buddha called after he attained enlightenment?", o: ["Jina", "Buddha (The Enlightened One)", "Maharshi"], c: 1 },
+            { q: "6. Where did Buddha deliver his first sermon?", o: ["Gaya", "Kushinagar", "Deer Park in Sarnath"], c: 2 },
+            { q: "7. How many paths (Noble Truths practices) did Buddha preach for liberation from worldly sorrows?", o: ["Ashtanga Marga (Eightfold Path)", "Triratnas", "Four Noble Truths"], c: 0 },
+            { q: "8. Which emperor of the Mauryan Empire contributed the most to the propagation of Buddhism?", o: ["Chandragupta Maurya", "Emperor Ashoka", "Bimbisara"], c: 1 },
+            { q: "9. How many vows were preached by Parshvanatha, the 23rd Tirthankara of Jainism?", o: ["Four vows", "Five vows", "Three vows"], c: 0 },
+            { q: "10. What is the event of Buddha's death called in Buddhist history?", o: ["Mahabhinishkramana", "Mahaparinirvana", "Dharmachakra Pravartana"], c: 1 }
+        ];
+
+        let bIdx = 0; let bScore = 0; let bActive = true;
+        function loadBattleQuestion() {
+            bActive = true;
+            document.getElementById("nextBattleBtn").style.display = "none";
+            document.getElementById("status3").style.display = "none";
+            let qData = quizList[bIdx];
+            document.getElementById("battleCounter").innerText = `Question Number: ${bIdx + 1} / 10`;
+            document.getElementById("battleQuestionText").innerText = qData.q;
+            
+            let zone = document.getElementById("battleOptionsZone");
+            zone.innerHTML = "";
+            qData.o.forEach((opt, idx) => {
+                let div = document.createElement("div");
+                div.classList.add("battle-quiz-option");
+                div.innerText = opt;
+                div.onclick = function() {
+                    if(!bActive) return;
+                    bActive = false;
+                    if(idx === qData.c) {
+                        this.classList.add("success-glow");
+                        bScore++; updateCoins(20);
+                        showLevelStatus(3, "Correct answer!", true);
+                    } else {
+                        this.classList.add("danger-glow");
+                        zone.children[qData.c].classList.add("success-glow");
+                        showLevelStatus(3, "Wrong answer!", false);
+                    }
+                    document.getElementById("nextBattleBtn").style.display = "inline-block";
+                };
+                zone.appendChild(div);
+            });
+        }
+        function nextBattleQuestion() {
+            bIdx++;
+            if(bIdx < quizList.length) {
+                loadBattleQuestion();
+            } else {
+                document.getElementById("battleCounter").innerText = "Battle Finished!";
+                document.getElementById("battleQuestionText").innerText = `Total Score: ${bScore} / 10`;
+                document.getElementById("battleOptionsZone").innerHTML = "";
+                document.getElementById("nextBattleBtn").style.display = "none";
+                document.getElementById('stepBtn3').classList.add('completed');
+                showLevelStatus(3, "Quiz successfully finished!", true);
+            }
+        }
+        loadBattleQuestion();
+
+        // Level 4 Logic
+        function verifyLevel4() {
+            let g1 = document.getElementById("geo1").value.trim().toLowerCase();
+            let g2 = document.getElementById("geo2").value.trim().toLowerCase();
+            let g3 = document.getElementById("geo3").value.trim().toLowerCase();
+
+            if(g1 === "kushinagar" && (g2 === "shravanabelagola" || g2 === "sravanabelagola") && a3 === "sarnath") {
+                updateCoins(100);
+                document.getElementById('stepBtn4').classList.add('completed');
+                showLevelStatus(4, "Geo-Lock opened! All locations are one hundred percent correct.", true);
+            } else {
+                showLevelStatus(4, "Some site names are incorrect (Hints: Kushinagar, Shravanabelagola, Sarnath).", false);
+            }
+        }
+
+        // Level 5 Logic
+        function verifyLevel5() {
+            let s1 = document.getElementById("script1").value.trim().toLowerCase();
+            let s2 = document.getElementById("script2").value.trim().toLowerCase();
+            let s3 = document.getElementById("script3").value.trim().toLowerCase();
+
+            if((s1 === "tripitakas" || s1 === "tripitaka") && (s2 === "angas" || s2 === "anga") && (s3 === "jataka tales" || s3 === "jataka" || s3 === "jataka stories")) {
+                updateCoins(100);
+                document.getElementById('stepBtn5').classList.add('completed');
+                showLevelStatus(5, "Scriptures code cracked! Fantastic.", true);
+            } else {
+                showLevelStatus(5, "Please check the spelling (Hints: Tripitakas, Angas, Jataka tales).", false);
+            }
+        }
+
+        // Level 6 Logic
+        function allowChoDrop(ev) { ev.preventDefault(); }
+        function startChoDrag(ev) { ev.dataTransfer.setData("text", ev.target.id); }
+        function handleChoDrop(ev, cat) {
+            ev.preventDefault();
+            let id = ev.dataTransfer.getData("text");
+            let el = document.getElementById(id);
+            el.dataset.cat = cat;
+            ev.target.appendChild(el);
+        }
+        function verifyLevel6() {
+            let c1 = document.getElementById("ch1").dataset.cat;
+            let c2 = document.getElementById("ch2").dataset.cat;
+
+            if(c1 === "rajagriha" && c2 === "patali") {
+                updateCoins(150);
+                document.getElementById('stepBtn6').classList.add('completed');
+                showLevelStatus(6, "Correct venue allocation! The councils are perfectly matched.", true);
+            } else {
+                showLevelStatus(6, "Incorrect category! (First Council was at Rajagriha, Third was at Pataliputra).", false);
+            }
+        }
+
+        // Level 7 Logic
+        let matrixL = null; let matrixR = null;
+        function selectMatrix(side, id, type) {
+            let nodes = document.querySelectorAll('#level7 .node-box');
+            if(side === 'L') {
+                matrixL = { id: id, type: type };
+                document.getElementById("matL1").classList.remove('selected-node');
+                document.getElementById("matL2").classList.remove('selected-node');
+            } else {
+                matrixR = { id: id, type: type };
+                document.getElementById("matR1").classList.remove('selected-node');
+                document.getElementById("matR2").classList.remove('selected-node');
+            }
+            document.getElementById(id).classList.add('selected-node');
+        }
+        function verifyLevel7() {
+            if(matrixL && matrixR && matrixL.type === matrixR.type) {
+                updateCoins(200);
+                document.getElementById('stepBtn7').classList.add('completed');
+                showLevelStatus(7, "Wow! The students have successfully finished the entire board game. Victory is yours!", true);
+            } else {
+                showLevelStatus(7, "Matrix connection failed. Check the branches of the respective religions again.", false);
+            }
+        }
+
+        function showLevelStatus(lvlNum, text, isSuccess) {
+            let box = document.getElementById("status" + lvlNum);
+            box.style.display = "block";
+            box.innerText = text;
+            box.style.background = isSuccess ? "rgba(0, 255, 204, 0.15)" : "rgba(255, 0, 85, 0.1)";
+            box.style.color = isSuccess ? "var(--success-neon)" : "var(--danger-neon)";
+            box.style.border = isSuccess ? "1px solid var(--success-neon)" : "1px solid var(--danger-neon)";
+        }
+    </script>
+</body>
+</html>

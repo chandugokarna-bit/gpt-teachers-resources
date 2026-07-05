@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medieval Europe: The Renaissance - Interactive Digital Book</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #1e112a, #3a1c5d, #5c348b);
+            --book-bg: #ffffff;
+            --primary-color: #5c2575;
+            --secondary-color: #0d7068;
+            --accent-color: #ff9f43;
+            --text-color: #2c3e50;
+            --success: #27ae60;
+            --error: #c0392b;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--bg-gradient);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-color);
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 20px;
+            text-shadow: 0 3px 6px rgba(0,0,0,0.4);
+        }
+        .header h1 { font-size: 2.2rem; color: #fff; }
+        .header p { font-size: 1.1rem; color: #f0e6ff; margin-top: 5px; }
+
+        /* Book Box */
+        .book-container {
+            width: 100%;
+            max-width: 950px;
+            background: var(--book-bg);
+            border-radius: 24px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+            border-left: 18px solid var(--primary-color);
+            min-height: 620px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-container { width: 100%; height: 6px; background: #eaedd0; }
+        .progress-bar { height: 100%; width: 20%; background: var(--accent-color); transition: width 0.4s ease; }
+
+        /* Page System */
+        .page { padding: 40px; flex: 1; display: none; animation: slidePage 0.4s ease-out; }
+        .page.active { display: block; }
+        @keyframes slidePage { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+
+        .page-title {
+            font-size: 1.6rem;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px dashed #ddd;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .instruction { font-size: 1.05rem; margin-bottom: 20px; color: #555; font-style: italic; }
+
+        /* Controls */
+        .book-controls {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px 40px;
+            background: #fdfbf7;
+            border-top: 1px solid #eedec4;
+        }
+        .btn {
+            padding: 12px 28px;
+            border: none;
+            border-radius: 40px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: bold;
+        }
+        .btn-prev { background: #e0e0e0; color: #333; }
+        .btn-next { background: var(--primary-color); color: white; }
+        .btn:hover:not(:disabled) { transform: translateY(-3px); box-shadow: 0 6px 15px rgba(0,0,0,0.2); }
+        .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+        .feedback { margin-top: 15px; padding: 15px; border-radius: 8px; font-weight: bold; display: none; }
+
+        /* Act 1: Matrix Matching */
+        .matching-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px; }
+        .match-left, .match-right { display: flex; flex-direction: column; gap: 10px; }
+        .match-card { padding: 12px 18px; background: #f8f9fa; border: 2px solid #e2e8f0; border-radius: 10px; cursor: pointer; text-align: left; transition: 0.2s; }
+        .match-card.selected { background: #e2d5f0; border-color: var(--primary-color); }
+        .match-card.correct { background: #d4edda; border-color: var(--success); color: #155724; cursor: default; }
+
+        /* Act 2: Classification Columns */
+        .columns-container { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-top: 15px; }
+        .col-box { background: #f7f9fa; border: 2px solid #ddd; border-radius: 12px; padding: 12px; min-height: 220px; }
+        .col-box h3 { text-align: center; margin-bottom: 12px; font-size: 1.1rem; color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; }
+        .col-art { border-color: #e74c3c; } .col-lit { border-color: #3498db; } .col-sci { border-color: #2ecc71; }
+        .item-bank { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 15px; background: #eee; padding: 12px; border-radius: 10px; }
+        .drag-chip { padding: 6px 12px; background: white; border: 1px solid #ccc; border-radius: 20px; cursor: grab; font-size: 0.9rem; }
+
+        /* Act 3: Chronology Timeline */
+        .v-timeline { display: flex; flex-direction: column; gap: 12px; margin-top: 15px; }
+        .t-row { display: flex; align-items: center; gap: 15px; background: #fdfdfd; padding: 10px; border-radius: 8px; border: 1px dashed #ccc; }
+        .t-index { width: 35px; height: 35px; background: var(--secondary-color); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+        .t-zone { flex: 1; min-height: 40px; background: #fff; border-radius: 6px; display: flex; align-items: center; padding-left: 10px; }
+
+        /* Act 4: Modern Multiple Choice Quiz */
+        .quiz-box { display: flex; flex-direction: column; gap: 12px; margin-top: 15px; }
+        .opt-btn { padding: 14px 20px; background: #f1f3f5; border: 2px solid #e9ecef; border-radius: 10px; cursor: pointer; text-align: left; font-size: 1rem; transition: 0.2s; }
+        .opt-btn:hover { background: #e9ecef; }
+        .opt-btn.correct { background: #d4edda; border-color: var(--success); color: #155724; }
+        .opt-btn.wrong { background: #f8d7da; border-color: var(--error); color: #721c24; }
+        .q-progress { font-weight: bold; margin-top: 10px; text-align: right; color: #666; }
+
+        /* Act 5: Interactive Text Lab Fillers */
+        .text-passage { background: #fffdf5; border: 1px solid #f3e5ab; padding: 25px; border-radius: 12px; font-size: 1.15rem; line-height: 2; margin-top: 15px; }
+        .blank-select { padding: 4px 8px; border: 2px solid var(--primary-color); border-radius: 6px; font-size: 1rem; font-weight: bold; color: var(--primary-color); background: white; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>Lesson 2: Medieval Europe</h1>
+        <p>Part 1: The Renaissance - Innovative Digital Book</p>
+    </div>
+
+    <div class="book-container">
+        <div class="progress-container">
+            <div class="progress-bar" id="progBar"></div>
+        </div>
+
+        <div class="page active" id="page1">
+            <div class="page-title"><i class="fa-solid fa-wand-magic-sparkles"></i> Activity 1: The Great Convergence of Creators and Works</div>
+            <p class="instruction">Click on the name of the author/artist on the left, then click on their corresponding work on the right to pair them (Total 7 pairs):</p>
+            
+            <div class="matching-grid">
+                <div class="match-left" id="leftContainer">
+                    <div class="match-card" data-id="1">Leonardo da Vinci</div>
+                    <div class="match-card" data-id="2">Michelangelo</div>
+                    <div class="match-card" data-id="3">Dante</div>
+                    <div class="match-card" data-id="4">Shakespeare</div>
+                    <div class="match-card" data-id="5">Machiavelli</div>
+                    <div class="match-card" data-id="6">Thomas More</div>
+                    <div class="match-card" data-id="7">Raphael</div>
+                </div>
+                <div class="match-right" id="rightContainer">
+                    <div class="match-card" data-match="3">Divine Comedy (Literature)</div>
+                    <div class="match-card" data-match="1">Mona Lisa / The Last Supper (Painting)</div>
+                    <div class="match-card" data-match="5">The Prince (Political Literature)</div>
+                    <div class="match-card" data-match="2">The Last Judgment / The Madonna (Sculpture)</div>
+                    <div class="match-card" data-match="6">Utopia (Work)</div>
+                    <div class="match-card" data-match="4">Romeo and Juliet (Play)</div>
+                    <div class="match-card" data-match="7">Sistine Madonna (Painting)</div>
+                </div>
+            </div>
+            <div class="feedback" id="fb1"></div>
+        </div>
+
+        <div class="page" id="page2">
+            <div class="page-title"><i class="fa-solid fa-grip"></i> Activity 2: Classification Table of Branches of Knowledge</div>
+            <p class="instruction">Drag and classify the achievements of the historical figures below into their correct field of knowledge (Art, Literature, Science):</p>
+            
+            <div class="columns-container">
+                <div class="col-box col-art" id="boxArt" data-cat="art"><h3>Painting / Sculpture</h3></div>
+                <div class="col-box col-lit" id="boxLit" data-cat="lit"><h3>Literature</h3></div>
+                <div class="col-box col-sci" id="boxSci" data-cat="sci"><h3>Modern Science</h3></div>
+            </div>
+
+            <div class="item-bank" id="dragBank2">
+                <div class="drag-chip" draggable="true" id="c1" data-target="art">Francesco Petrarch (Paintings)</div>
+                <div class="drag-chip" draggable="true" id="c2" data-target="lit">Geoffrey Chaucer (Canterbury Tales)</div>
+                <div class="drag-chip" draggable="true" id="c3" data-target="sci">Copernicus (Heliocentric Theory)</div>
+                <div class="drag-chip" draggable="true" id="c4" data-target="sci">Galileo (Invention of Telescope)</div>
+                <div class="drag-chip" draggable="true" id="c5" data-target="art">Donatello (Bronze Sculpture)</div>
+                <div class="drag-chip" draggable="true" id="c6" data-target="lit">Boccaccio (Decameron Tales)</div>
+            </div>
+            <button class="btn" style="background:var(--accent-color); color:white; margin-top:15px;" onclick="checkColumns()">Verify Classification</button>
+            <div class="feedback" id="fb2"></div>
+        </div>
+
+        <div class="page" id="page3">
+            <div class="page-title"><i class="fa-solid fa-arrow-down-1-9"></i> Activity 3: Chronological Order of Renaissance Rational Thought</div>
+            <p class="instruction">Arrange the stages of intellectual awakening in the correct logical sequence from first to last:</p>
+            
+            <div class="v-timeline">
+                <div class="t-row"><div class="t-index">1</div><div class="t-zone" id="z1" data-order="Migration of scholars due to the fall of Constantinople"></div></div>
+                <div class="t-row"><div class="t-index">2</div><div class="t-zone" id="z2" data-order="Revival of ancient Greek and Roman literature"></div></div>
+                <div class="t-row"><div class="t-index">3</div><div class="t-zone" id="z3" data-order="Rise of Humanism"></div></div>
+                <div class="t-row"><div class="t-index">4</div><div class="t-zone" id="z4" data-order="Invention of the printing press by Johannes Gutenberg"></div></div>
+                <div class="t-row"><div class="t-index">5</div><div class="t-zone" id="z5" data-order="Creation of literature in regional languages"></div></div>
+                <div class="t-row"><div class="t-index">6</div><div class="t-zone" id="z6" data-order="Opposition to superstition and development of a scientific outlook"></div></div>
+            </div>
+
+            <div class="item-bank" id="dragBank3">
+                <div class="drag-chip" draggable="true" id="t1">Rise of Humanism</div>
+                <div class="drag-chip" draggable="true" id="t2">Migration of scholars due to the fall of Constantinople</div>
+                <div class="drag-chip" draggable="true" id="t3">Invention of the printing press by Johannes Gutenberg</div>
+                <div class="drag-chip" draggable="true" id="t4">Opposition to superstition and development of a scientific outlook</div>
+                <div class="drag-chip" draggable="true" id="t5">Revival of ancient Greek and Roman literature</div>
+                <div class="drag-chip" draggable="true" id="t6">Creation of literature in regional languages</div>
+            </div>
+            <button class="btn" style="background:var(--accent-color); color:white; margin-top:15px;" onclick="checkTimeline()">Confirm Order</button>
+            <div class="feedback" id="fb3"></div>
+        </div>
+
+        <div class="page" id="page4">
+            <div class="page-title"><i class="fa-solid fa-brain"></i> Activity 4: Rationalism and Scientific Temper Quiz</div>
+            <p id="q-text" style="font-size:1.2rem; margin-bottom:15px; font-weight:bold;">Loading question...</p>
+            <div class="quiz-box" id="q-options"></div>
+            <div class="q-progress" id="q-indicator">Question: 1/6</div>
+            <div class="feedback" id="fb4"></div>
+        </div>
+
+        <div class="page" id="page5">
+            <div class="page-title"><i class="fa-solid fa-feather-pointed"></i> Activity 5: Historical Writing on the Effects of the Renaissance</div>
+            <p class="instruction">Complete the following paragraph regarding the key features and effects of the Renaissance by choosing the appropriate options:</p>
+            
+            <div class="text-passage">
+                In Europe, 
+                <select class="blank-select" id="b1" data-ans="Petrarch"><option value="">--Select--</option><option>Dante</option><option>Petrarch</option><option>Galileo</option></select> 
+                is known as the Father of the Renaissance. He nurtured the philosophy of 
+                <select class="blank-select" id="b2" data-ans="Humanism"><option value="">--Select--</option><option>Humanism</option><option>Crusade</option><option>Feudalism</option></select> 
+                which gave importance to independent human thoughts. During this period, instead of just Latin, emphasis was placed on 
+                <select class="blank-select" id="b3" data-ans="Regional language"><option value="">--Select--</option><option>Ancient language</option><option>Regional language</option><option>Divine language</option></select> 
+                literature like Italian and German. In the field of science, while Isaac Newton discovered the 
+                <select class="blank-select" id="b4" data-ans="Law of Gravity"><option value="">--Select--</option><option>Blood circulation</option><option>Law of Gravity</option><option>Law of telescope</option></select> 
+                William Harvey explained the process of 
+                <select class="blank-select" id="b5" data-ans="Blood circulation"><option value="">--Select--</option><option>Skeleton</option><option>Blood circulation</option><option>Nervous system</option></select> 
+                in the human body to the world. Overall, the Renaissance created a new path of knowledge and 
+                <select class="blank-select" id="b6" data-ans="Rationalism"><option value="">--Select--</option><option>Superstition</option><option>Rationalism</option><option>Tradition</option></select> 
+                in humans instead of blind faith.
+            </div>
+            <button class="btn" style="background:var(--accent-color); color:white; margin-top:20px;" onclick="checkBlanks()">Check History Writing</button>
+            <div class="feedback" id="fb5"></div>
+        </div>
+
+        <div class="book-controls">
+            <button class="btn btn-prev" id="prevPageBtn" onclick="movePage(-1)" disabled><i class="fa-solid fa-book-open"></i> Previous Page</button>
+            <button class="btn btn-next" id="nextPageBtn" onclick="movePage(1)">Next Page <i class="fa-solid fa-book"></i></button>
+        </div>
+    </div>
+
+    <script>
+        let pageIdx = 1;
+        const maxPages = 5;
+
+        function movePage(dir) {
+            document.getElementById(`page${pageIdx}`).classList.remove('active');
+            pageIdx += dir;
+            document.getElementById(`page${pageIdx}`).classList.add('active');
+
+            document.getElementById('prevPageBtn').disabled = (pageIdx === 1);
+            document.getElementById('nextPageBtn').disabled = (pageIdx === maxPages);
+
+            document.getElementById('progBar').style.width = `${(pageIdx / maxPages) * 100}%`;
+        }
+
+        // --- Act 1: Matching Logic ---
+        let selectedLeft = null;
+        const leftCards = document.querySelectorAll('#leftContainer .match-card');
+        const rightCards = document.querySelectorAll('#rightContainer .match-card');
+
+        leftCards.forEach(card => {
+            card.addEventListener('click', () => {
+                if(card.classList.contains('correct')) return;
+                leftCards.forEach(c => c.classList.remove('selected'));
+                card.classList.add('selected');
+                selectedLeft = card;
+            });
+        });
+
+        rightCards.forEach(card => {
+            card.addEventListener('click', () => {
+                if(card.classList.contains('correct') || !selectedLeft) return;
+                const matchId = card.getAttribute('data-match');
+                const leftId = selectedLeft.getAttribute('data-id');
+
+                if(matchId === leftId) {
+                    card.classList.add('correct');
+                    selectedLeft.classList.add('correct');
+                    selectedLeft.classList.remove('selected');
+                    selectedLeft = null;
+                    checkAct1Progress();
+                } else {
+                    const fb = document.getElementById('fb1');
+                    fb.style.display = "block"; fb.style.background = "#f8d7da"; fb.style.color = "#c0392b";
+                    fb.innerText = "✗ Incorrect pair! Please think and match the correct answer.";
+                }
+            });
+        });
+
+        function checkAct1Progress() {
+            const finished = document.querySelectorAll('#leftContainer .match-card.correct').length;
+            const fb = document.getElementById('fb1');
+            fb.style.display = "block";
+            if(finished === 7) {
+                fb.style.background = "#d4edda"; fb.style.color = "#27ae60";
+                fb.innerText = "✓ Amazing! You have accurately paired all 7 Renaissance creators and their works.";
+            } else {
+                fb.style.background = "#e2e8f0"; fb.style.color = "#4a5568";
+                fb.innerText = `Progress: ${finished}/7 pairs correct.`;
+            }
+        }
+
+        // --- Drag & Drop Generic Infrastructure ---
+        let currentDraggingItem = null;
+        document.querySelectorAll('.drag-chip').forEach(chip => {
+            chip.addEventListener('dragstart', () => { currentDraggingItem = chip; });
+        });
+
+        const dropBoxes = document.querySelectorAll('.col-box, .t-zone');
+        dropBoxes.forEach(box => {
+            box.addEventListener('dragover', (e) => e.preventDefault());
+            box.addEventListener('drop', () => {
+                if(currentDraggingItem) { box.appendChild(currentDraggingItem); }
+            });
+        });
+
+        // Act 2 Validator
+        function checkColumns() {
+            let faults = 0;
+            const chips = document.querySelectorAll('#dragBank2 .drag-chip');
+            chips.forEach(chip => {
+                const currentParent = chip.parentElement;
+                if(currentParent.classList.contains('col-box')) {
+                    if(chip.getAttribute('data-target') !== currentParent.getAttribute('data-cat')) faults++;
+                } else { faults++; }
+            });
+            const fb = document.getElementById('fb2'); fb.style.display = "block";
+            if(faults === 0) {
+                fb.innerHTML = "✓ Superb! Art, Literature, and Science have been accurately classified into the table.";
+                fb.style.background = "#d4edda"; fb.style.color = "#155724";
+            } else {
+                fb.innerHTML = "✗ Some achievers are in the wrong field of knowledge. Please check again.";
+                fb.style.background = "#f8d7da"; fb.style.color = "#721c24";
+            }
+        }
+
+        // Act 3 Validator
+        function checkTimeline() {
+            let correctCount = 0;
+            for(let i=1; i<=6; i++) {
+                const zone = document.getElementById(`z${i}`);
+                if(zone.firstChild && zone.firstChild.innerText.trim() === zone.getAttribute('data-order')) {
+                    correctCount++;
+                }
+            }
+            const fb = document.getElementById('fb3'); fb.style.display = "block";
+            if(correctCount === 6) {
+                fb.innerHTML = "✓ Perfect! The chronological sequence of intellectual and scientific development is correct.";
+                fb.style.background = "#d4edda"; fb.style.color = "#155724";
+            } else {
+                fb.innerHTML = `✗ ${correctCount}/6 stages are correct. Think about the logical order of the Renaissance.`;
+                fb.style.background = "#f8d7da"; fb.style.color = "#721c24";
+            }
+        }
+
+        // --- Act 4: Modern Quiz Data (6 Questions) ---
+        const mcqCollection = [
+            { q: "What does 'Renaissance' mainly mean in Europe?", opts: ["Establishment of a new religion", "Rebirth or Awakening", "Establishment of industries", "Expansion of monarchy"], ans: 1 },
+            { q: "In which European country did the Renaissance movement first begin?", opts: ["England", "France", "Italy", "Germany"], ans: 2 },
+            { q: "Which theory did the scientist Galileo support using the telescope?", opts: ["Geocentric Theory", "Heliocentric Theory", "Theory of Gravity", "Continental Drift"], ans: 1 },
+            { q: "Scholars laid the foundation for which new thought in the city of Florence, Italy?", opts: ["Superstition", "Feudal system", "Humanism", "Commercialization"], ans: 2 },
+            { q: "Venice and Genoa contributed to the Renaissance by being centers of what?", opts: ["Agricultural centers", "Trade and cultural exchange centers", "Military training centers", "Religious seats"], ans: 1 },
+            { q: "What was the main characteristic of Renaissance art?", opts: ["Purely religious framework", "Realism and expression of human emotions", "Imaginary war scenes", "Vague sketches"], ans: 1 }
+        ];
+
+        let currentQuizIndex = 0;
+        function loadQuizQuestion() {
+            const activeQ = mcqCollection[currentQuizIndex];
+            document.getElementById('q-text').innerText = `${currentQuizIndex + 1}. ${activeQ.q}`;
+            const optWrapper = document.getElementById('q-options');
+            optWrapper.innerHTML = "";
+            document.getElementById('q-indicator').innerText = `Question: ${currentQuizIndex + 1}/${mcqCollection.length}`;
+
+            activeQ.opts.forEach((opt, idx) => {
+                const b = document.createElement('button');
+                b.className = "opt-btn";
+                b.innerText = opt;
+                b.onclick = () => verifyMCQ(idx, activeQ.ans, b);
+                optWrapper.appendChild(b);
+            });
+        }
+
+        function verifyMCQ(selected, right, element) {
+            const fb = document.getElementById('fb4'); fb.style.display = "block";
+            if(selected === right) {
+                element.classList.add('correct');
+                fb.innerHTML = "✓ Excellent! A correct, knowledge-based answer.";
+                fb.style.background = "#d4edda"; fb.style.color = "#155724";
+                setTimeout(() => {
+                    if(currentQuizIndex < mcqCollection.length - 1) {
+                        currentQuizIndex++; loadQuizQuestion(); fb.style.display = "none";
+                    } else {
+                        fb.innerHTML = "🎉 Fantastic! You have successfully answered all 6 questions on rationalism and scientific temper.";
+                    }
+                }, 1500);
+            } else {
+                element.classList.add('wrong');
+                fb.innerHTML = "✗ Incorrect answer. Remember the correct historical evidence.";
+                fb.style.background = "#f8d7da"; fb.style.color = "#721c24";
+            }
+        }
+        loadQuizQuestion();
+
+        // --- Act 5: Interactive Text Lab Fillers ---
+        function checkBlanks() {
+            let miss = 0;
+            const selects = document.querySelectorAll('.blank-select');
+            selects.forEach(sel => {
+                if(sel.value !== sel.getAttribute('data-ans')) {
+                    miss++;
+                    sel.style.borderColor = "var(--error)";
+                } else {
+                    sel.style.borderColor = "var(--success)";
+                }
+            });
+            const fb = document.getElementById('fb5'); fb.style.display = "block";
+            if(miss === 0) {
+                fb.innerHTML = "✓ Congratulations! You have completely and correctly filled out the history paragraph on the effects of the Renaissance.";
+                fb.style.background = "#d4edda"; fb.style.color = "#155724";
+            } else {
+                fb.innerHTML = "✗ Some blanks contain incorrect words. Please make corrections and check again.";
+                fb.style.background = "#f8d7da"; fb.style.color = "#721c24";
+            }
+        }
+    </script>
+</body>
+</html>

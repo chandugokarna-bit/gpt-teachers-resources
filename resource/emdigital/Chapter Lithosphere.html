@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lithosphere Geo-Visual Explorer - Social Science</title>
+    <style>
+        :root {
+            --magma-orange: #ff4757;
+            --crust-brown: #ffb142;
+            --mantle-gold: #f1c40f;
+            --space-dark: #0c0d14;
+            --neon-green: #2ed573;
+            --neon-blue: #1e90ff;
+            --danger-red: #ff4757;
+            --panel-glass: rgba(24, 28, 43, 0.96);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Verdana, sans-serif; }
+
+        body {
+            background: var(--space-dark);
+            background-image: radial-gradient(circle at 50% 50%, #1e1f35 0%, #0c0d14 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #ffffff;
+        }
+
+        .main-geo-banner {
+            background: var(--panel-glass);
+            padding: 25px;
+            border-radius: 24px;
+            text-align: center;
+            border: 2px solid var(--magma-orange);
+            box-shadow: 0 0 30px rgba(255, 71, 87, 0.25);
+            margin-bottom: 25px;
+        }
+
+        .main-geo-banner h1 {
+            color: var(--magma-orange);
+            font-size: 2.3rem;
+            text-shadow: 0 0 12px rgba(255, 71, 87, 0.4);
+            margin-bottom: 5px;
+        }
+
+        /* LIVE HUD */
+        .geo-hud {
+            display: flex;
+            justify-content: space-between;
+            background: rgba(30, 31, 49, 0.6);
+            padding: 15px 25px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            border-left: 5px solid var(--neon-blue);
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        /* Horizontal Track Steppers */
+        .geo-track {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 35px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+
+        .geo-track::-webkit-scrollbar { height: 6px; }
+        .geo-track::-webkit-scrollbar-thumb { background: var(--magma-orange); border-radius: 3px; }
+
+        .geo-pill {
+            background: #1e1f30;
+            border: 1px solid #2c2d4a;
+            padding: 12px 22px;
+            border-radius: 14px;
+            cursor: pointer;
+            font-weight: bold;
+            white-space: nowrap;
+            transition: all 0.3s;
+        }
+
+        .geo-pill:hover, .geo-pill.active-mission {
+            background: var(--magma-orange);
+            color: white;
+            border-color: #ffffff;
+            box-shadow: 0 0 15px var(--magma-orange);
+            transform: translateY(-3px);
+        }
+
+        /* Screen Boxes */
+        .geo-arena {
+            background: var(--panel-glass);
+            border: 2px solid #2c2d4a;
+            border-radius: 28px;
+            padding: 35px;
+            min-height: 530px;
+            display: none;
+            box-shadow: 0 25px 55px rgba(0,0,0,0.6);
+        }
+
+        .geo-arena.active-arena { display: block; animation: flashIn 0.4s ease; }
+
+        @keyframes flashIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2.arena-title {
+            font-size: 1.65rem;
+            color: var(--crust-brown);
+            margin-bottom: 25px;
+            border-left: 6px solid var(--crust-brown);
+            padding-left: 15px;
+        }
+
+        /* IMAGE BASED ACTIVITIES STYLE */
+        .visual-display-box {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .geo-image-frame {
+            flex: 1;
+            background: #000;
+            border: 3px solid var(--crust-brown);
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            max-width: 400px;
+        }
+
+        .geo-image-frame img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .geo-interactive-options {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .box-node {
+            background: #1e1f30;
+            padding: 15px;
+            border-radius: 12px;
+            cursor: pointer;
+            border: 2px solid #2c2d4a;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+        .box-node:hover { border-color: var(--magma-orange); }
+        .active-node-select { border-color: var(--mantle-gold); background: #2c2d4a; }
+
+        /* Quiz UI Elements */
+        .progress-hud-bar {
+            background: #151622;
+            width: 100%;
+            height: 12px;
+            border-radius: 6px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            border: 1px solid #2c2d4a;
+        }
+
+        .progress-bar-fill {
+            background: linear-gradient(90deg, var(--neon-blue), var(--neon-green));
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .quiz-choice-row {
+            background: #1e1f30;
+            border: 2px solid #2c2d4a;
+            padding: 16px;
+            margin: 12px 0;
+            border-radius: 14px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+        }
+        .quiz-choice-row:hover { border-color: var(--mantle-gold); transform: translateX(6px); }
+        .win-glow { background: rgba(46, 204, 113, 0.2); border-color: var(--neon-green); color: #2ed573; }
+        .lose-glow { background: rgba(231, 76, 60, 0.2); border-color: var(--danger-red); color: #ff4757; }
+
+        /* Inputs and Buttons */
+        .geo-btn {
+            background: linear-gradient(135deg, var(--magma-orange), #ff6b81);
+            color: white;
+            border: none;
+            padding: 14px 35px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 25px;
+        }
+
+        .geo-btn:hover { transform: scale(1.02); box-shadow: 0 8px 25px rgba(255, 71, 87, 0.5); }
+
+        .smart-geo-input {
+            background: rgba(0,0,0,0.4);
+            border: 2px solid #2c2d4a;
+            border-radius: 10px;
+            padding: 12px;
+            font-size: 1.1rem;
+            color: var(--crust-brown);
+            font-weight: bold;
+            outline: none;
+            width: 100%;
+            max-width: 320px;
+            margin-top: 8px;
+        }
+
+        .smart-geo-input:focus { border-color: var(--magma-orange); }
+
+        /* Act 5 Mining */
+        .mining-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+
+        .ore-packet {
+            background: #1e1f30;
+            border: 2px solid #2c2d4a;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .ore-packet.active-packet { background: var(--magma-orange); border-color: white; }
+
+        .geo-status-alert {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 12px;
+            font-weight: bold;
+            display: none;
+            font-size: 1.1rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="main-geo-banner">
+        <h1>Chapter: Lithosphere</h1>
+        <p>Visual Model 13.0 • Ultra-Modern Digital Classroom Based on Real Images</p>
+    </div>
+
+    <div class="geo-hud">
+        <span style="color: var(--crust-brown);">Learning Mode: Image Exploration</span>
+        <span style="color: var(--neon-green);" id="liveXPCount">Lithosphere Points: 0000 LXP</span>
+    </div>
+
+    <div class="geo-track">
+        <div class="geo-pill active-mission" id="pill1" onclick="shiftGeoScreen(1)">1. Earth's Interior (IMAGE)</div>
+        <div class="geo-pill" id="pill2" onclick="shiftGeoScreen(2)">2. Three Major Rock Types (IMAGE)</div>
+        <div class="geo-pill" id="pill3" onclick="shiftGeoScreen(3)">3. Epic 10 Geo Quiz</div>
+        <div class="geo-pill" id="pill4" onclick="shiftGeoScreen(4)">4. Exogenic Forces Cipher</div>
+        <div class="geo-pill" id="pill5" onclick="shiftGeoScreen(5)">5. Major Tectonic Plates</div>
+        <div class="geo-pill" id="pill6" onclick="shiftGeoScreen(6)">6. Karst Topography Features</div>
+        <div class="geo-pill" id="pill7" onclick="shiftGeoScreen(7)">7. Volcano Matrix</div>
+    </div>
+
+    <div id="geoArena1" class="geo-arena active-arena">
+        <h2 class="arena-title">Level 1: Identify Earth's Layers from the Real Image (Earth's Crust Core)</h2>
+        <p style="margin-bottom: 20px;">Friend, observe the real interior image of the Earth on the left, then click and match the correct layer option on the right:</p>
+        <div class="visual-display-box">
+            <div class="geo-image-frame">
+                <img src="https://images.unsplash.com/photo-1614730321146-b6fa6a46bcb4?auto=format&fit=crop&w=500&q=80" alt="Earth Core Layer">
+            </div>
+            <div class="geo-interactive-options">
+                <div class="box-node" id="l1_opt1" onclick="checkVisualAct1('l1_opt1', true)">1. Crust (The topmost thin layer)</div>
+                <div class="box-node" id="l1_opt2" style="margin-top:15px;" onclick="checkVisualAct1('l1_opt2', false)">2. Core (The innermost extremely hot section)</div>
+                <div class="box-node" id="l1_opt3" style="margin-top:15px;" onclick="checkVisualAct1('l1_opt3', false)">3. Mantle (The middle layer)</div>
+            </div>
+        </div>
+        <div class="geo-status-alert" id="alert1"></div>
+    </div>
+
+    <div id="geoArena2" class="geo-arena">
+        <h2 class="arena-title">Level 2: Investigation of Real Rock Textures (Rock Classification Visual)</h2>
+        <p style="margin-bottom: 20px;">The image below displays extremely hard basalt and granite rocks formed by the cooling of volcanic magma. What type of rock is this, friend?</p>
+        <div class="visual-display-box">
+            <div class="geo-image-frame">
+                <img src="https://images.unsplash.com/photo-1590055531615-f16d36faa8ec?auto=format&fit=crop&w=500&q=80" alt="Volcanic Igneous Rock">
+            </div>
+            <div class="geo-interactive-options">
+                <div class="box-node" id="l2_opt1" onclick="checkVisualAct2('l2_opt1', false)">A) Sedimentary Rock</div>
+                <div class="box-node" id="l2_opt2" style="margin-top:15px;" onclick="checkVisualAct2('l2_opt2', true)">B) Igneous Rock (Primary Rocks)</div>
+                <div class="box-node" id="l2_opt3" style="margin-top:15px;" onclick="checkVisualAct2('l2_opt3', false)">C) Metamorphic Rock</div>
+            </div>
+        </div>
+        <div class="geo-status-alert" id="alert2"></div>
+    </div>
+
+    <div id="geoArena3" class="geo-arena">
+        <h2 class="arena-title">Level 3: The Great Lithosphere Quiz Battle (Epic 10 Quiz Arena)</h2>
+        <div class="progress-hud-bar"><div class="progress-bar-fill" id="barFill"></div></div>
+        <div style="font-weight: bold; margin-bottom: 15px; color: var(--crust-brown);" id="quizCounterText">Question Code: 1 / 10</div>
+        <div id="quizQuestionText" style="font-size: 1.25rem; font-weight: bold; margin-bottom: 20px;">Loading...</div>
+        <div id="quizOptionsContainer"></div>
+        <button class="geo-btn" id="nextQuizBtn" style="display:none;" onclick="nextLithoQuestion()">Move to Next Step ➔</button>
+        <div class="geo-status-alert" id="alert3"></div>
+    </div>
+
+    <div id="geoArena4" class="geo-arena">
+        <h2 class="arena-title">Level 4: Dissecting Exogenic Forces (Denudation Cipher)</h2>
+        <div style="display:flex; flex-direction:column; gap:20px;">
+            <div class="fib-q">1. What is the natural process called where rocks disintegrate and powder due to temperature, rain, and wind? <br><input type="text" class="smart-geo-input" id="cipherIn1" placeholder="Weathering / River action?"></div>
+            <div class="fib-q">2. What is the action called where a running river cuts through path rocks to deepen its valley? <br><input type="text" class="smart-geo-input" id="cipherIn2" placeholder="Friction / Erosion?"></div>
+        </div>
+        <button class="geo-btn" onclick="verifyLevel4()">Crack Forces Code</button>
+        <div class="geo-status-alert" id="alert4"></div>
+    </div>
+
+    <div id="geoArena5" class="geo-arena">
+        <h2 class="arena-title">Level 5: Discovery of Major International Tectonic Plates (Tectonic Plates Mining)</h2>
+        <p style="margin-bottom: 15px;">Friend, mine only the **Major Tectonic Plates** responsible for the world's earthquakes and mountain building:</p>
+        <div class="mining-grid">
+            <div class="ore-packet" id="ore1" onclick="toggleOreToken('ore1', true)">1. Pacific Plate</div>
+            <div class="ore-packet" id="ore2" onclick="toggleOreToken('ore2', false)">2. Small Pond Inhabitant</div>
+            <div class="ore-packet" id="ore3" onclick="toggleOreToken('ore3', true)">3. Eurasian Plate</div>
+            <div class="ore-packet" id="ore4" onclick="toggleOreToken('ore4', true)">4. African Plate</div>
+            <div class="ore-packet" id="ore5" onclick="toggleOreToken('ore5', false)">5. Ordinary Boulder</div>
+            <div class="ore-packet" id="ore6" onclick="toggleOreToken('ore6', true)">6. North American Plate</div>
+        </div>
+        <button class="geo-btn" onclick="verifyLevel5()">Verify Tectonic Plates</button>
+        <div class="geo-status-alert" id="alert5"></div>
+    </div>
+
+    <div id="geoArena6" class="geo-arena">
+        <h2 class="arena-title">Level 6: Unique Limestone Formations of Groundwater (Karst Topography Sorting)</h2>
+        <p style="margin-bottom: 15px;">Sort the unique landforms sculpted in limestone caves by the chemical action of groundwater into their correct description boxes:</p>
+        <div style="display:flex; gap:25px;">
+            <div style="flex:1; display:flex; flex-direction:column; gap:10px;" id="motionSource">
+                <div style="background:#1e1f30; padding:12px; border-radius:10px; cursor:grab; font-weight:bold; border:1px solid #2c2d4a;" draggable="true" id="kar1" ondragstart="startDrag(event)">Stalactite</div>
+                <div style="background:#1e1f30; padding:12px; border-radius:10px; cursor:grab; font-weight:bold; border:1px solid #2c2d4a;" draggable="true" id="kar2" ondragstart="startDrag(event)">Stalagmite</div>
+            </div>
+            <div style="flex:2; display:flex; flex-direction:column; gap:15px;">
+                <div style="background:rgba(0,0,0,0.3); border:2px dashed var(--magma-orange); padding:15px; border-radius:12px;" ondragover="allowDrop(event)" ondrop="handleDrop(event, 'roof')">
+                    <h3>Limestone pillar hanging downwards from the cave ceiling</h3>
+                </div>
+                <div style="background:rgba(0,0,0,0.3); border:2px dashed var(--magma-orange); padding:15px; border-radius:12px;" ondragover="allowDrop(event)" ondrop="handleDrop(event, 'floor')">
+                    <h3>Limestone pillar growing upwards from the cave floor</h3>
+                </div>
+            </div>
+        </div>
+        <button class="geo-btn" onclick="verifyLevel6()">Verify Cave Formations</button>
+        <div class="geo-status-alert" id="alert6"></div>
+    </div>
+
+    <div id="geoArena7" class="geo-arena">
+        <h2 class="arena-title">Level 7: Volcano Types and Global Distribution (Volcano Matrix Connection)</h2>
+        <p style="margin-bottom: 15px;">Final Matrix! Friend, match the types of volcanoes with their world-famous examples to finish the game:</p>
+        <div class="grid-connector-system" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div class="box-node" id="matL1" onclick="selectFinalMatrix('L', 'matL1', 'active')">Active Volcano</div>
+            <div class="box-node" id="matR1" onclick="selectFinalMatrix('R', 'matR1', 'active')">Stromboli and Mount Etna of Italy</div>
+            <div class="box-node" id="matL2" onclick="selectFinalMatrix('L', 'matL2', 'extinct')">Dormant / Extinct Volcano</div>
+            <div class="box-node" id="matR2" onclick="selectFinalMatrix('R', 'matR2', 'extinct')">Mount Kilimanjaro of Africa</div>
+        </div>
+        <button class="geo-btn" onclick="verifyLevel7()">Complete Lithosphere Matrix</button>
+        <div class="geo-status-alert" id="alert7"></div>
+    </div>
+
+    <script>
+        let lithoXP = 0;
+        function addLithoXP(val) {
+            lithoXP += val;
+            document.getElementById("liveXPCount").innerText = `Lithosphere Points: ${lithoXP.toString().padStart(4, '0')} LXP`;
+        }
+
+        function shiftGeoScreen(idx) {
+            document.querySelectorAll('.geo-arena').forEach(el => el.classList.remove('active-arena'));
+            document.querySelectorAll('.geo-pill').forEach(el => el.classList.remove('active-mission'));
+            
+            document.getElementById('geoArena' + idx).classList.add('active-arena');
+            document.getElementById('pill' + idx).classList.add('active-mission');
+        }
+
+        // Level 1 Visual Check
+        function checkVisualAct1(id, isCorrect) {
+            document.querySelectorAll('#geoArena1 .box-node').forEach(el => el.style.background = "#1e1f30");
+            let target = document.getElementById(id);
+            if(isCorrect) {
+                target.style.background = "var(--neon-green)";
+                target.style.color = "black";
+                addLithoXP(100);
+                showAlertBox(1, "Wow friend! The identification of the Earth's Crust from the real image is completely spot on!", true);
+                document.getElementById('pill1').style.background = "var(--neon-green)";
+            } else {
+                target.style.background = "var(--danger-red)";
+                showAlertBox(1, "Incorrect layer! Observe the visual structure closely again, friend.", false);
+            }
+        }
+
+        // Level 2 Visual Check
+        function checkVisualAct2(id, isCorrect) {
+            document.querySelectorAll('#geoArena2 .box-node').forEach(el => el.style.background = "#1e1f30");
+            let target = document.getElementById(id);
+            if(isCorrect) {
+                target.style.background = "var(--neon-green)";
+                target.style.color = "black";
+                addLithoXP(100);
+                showAlertBox(2, "Amazing! The search for primary igneous rocks formed from volcanic lava is successful.", true);
+                document.getElementById('pill2').style.background = "var(--neon-green)";
+            } else {
+                target.style.background = "var(--danger-red)";
+                showAlertBox(2, "Incorrect rock type! Remember how solidified molten lava creates primary structural rocks.", false);
+            }
+        }
+
+        // Level 3 Quiz Pool
+        const lithoQuizPool = [
+            { q: "1. What is the solid outermost layer of the earth consisting of rocks and soil called?", o: ["Atmosphere", "Hydrosphere", "Lithosphere"], c: 2 },
+            { q: "2. The upper part of the Earth's crust is covered by granitic rocks. Which major minerals compose this layer?", o: ["Silica and Aluminum (SIAL)", "Silica and Magnesium (SIMA)", "Iron and Nickel"], c: 0 },
+            { q: "3. By what name is the innermost, intensely hot core section of the Earth known?", o: ["SIAL", "NIFE (Nickel and Ferrum)", "SIMA"], c: 1 },
+            { q: "4. The world-famous historic monument, the Taj Mahal in Agra, was constructed using which metamorphic rock?", o: ["Limestone", "Marble", "Basalt"], c: 1 },
+            { q: "5. What is the sudden shaking or vibration originating from within the Earth called?", o: ["Tsunami", "Earthquake", "Weathering"], c: 1 },
+            { q: "6. Which world-famous scientific scale/instrument is used to measure the intensity of earthquakes?", o: ["Richter Scale (Seismograph)", "Barometer", "Thermometer"], c: 0 },
+            { q: "7. What is the physical process where rainwater, rivers, and wind wear away the Earth's surface called?", o: ["Denudation / Erosion", "Volcanic Eruption", "Earthquake Tremor"], c: 0 },
+            { q: "8. What is the triangular, fertile landform created by a river at its mouth before entering the sea?", o: ["Gorge", "V-shaped Valley", "Delta / River Mouth"], c: 2 },
+            { q: "9. Which unique rock structure is created by the erosive action of strong winds blowing in desert regions?", o: ["Limestone Pillar", "Mushroom Rock", "Badland Network"], c: 1 },
+            { q: "10. What tunnel-like landform is sculpted by sea waves continuously crashing against coastal cliffs?", o: ["Sea Cave", "Balancing Rock", "Sand Dune"], c: 0 }
+        ];
+
+        let qIdx = 0; let qScore = 0; let isQuizActive = true;
+        function loadQuizQuestion() {
+            isQuizActive = true;
+            document.getElementById("nextQuizBtn").style.display = "none";
+            document.getElementById("alert3").style.display = "none";
+            let qData = lithoQuizPool[qIdx];
+            document.getElementById("quizCounterText").innerText = `Question Code: ${qIdx + 1} / 10`;
+            document.getElementById("barFill").style.width = `${(qIdx + 1) * 10}%`;
+            document.getElementById("quizQuestionText").innerText = qData.q;
+            
+            let container = document.getElementById("quizOptionsContainer");
+            container.innerHTML = "";
+            qData.o.forEach((opt, idx) => {
+                let div = document.createElement("div");
+                div.classList.add("quiz-choice-row");
+                div.innerText = opt;
+                div.onclick = function() {
+                    if(!isQuizActive) return;
+                    isQuizActive = false;
+                    if(idx === qData.c) {
+                        this.classList.add("win-glow");
+                        qScore++; addLithoXP(30);
+                        showAlertBox(3, "Correct answer, friend! Your geological knowledge is superb.", true);
+                    } else {
+                        this.classList.add("lose-glow");
+                        container.children[qData.c].classList.add("win-glow");
+                        showAlertBox(3, "Wrong answer! The right selection is indicated in green.", false);
+                    }
+                    document.getElementById("nextQuizBtn").style.display = "inline-block";
+                };
+                container.appendChild(div);
+            });
+        }
+        function nextLithoQuestion() {
+            qIdx++;
+            if(qIdx < lithoQuizPool.length) {
+                loadQuizQuestion();
+            } else {
+                document.getElementById("quizCounterText").innerText = "Mission Completed!";
+                document.getElementById("quizQuestionText").innerText = `Total Class Score: ${qScore} / 10`;
+                document.getElementById("quizOptionsContainer").innerHTML = "";
+                document.getElementById("nextQuizBtn").style.display = "none";
+                document.getElementById('pill3').style.background = "var(--neon-green)";
+                showAlertBox(3, qScore >= 7 ? "Unmatched Lithosphere Champion, friend!" : "Good attempt!", true);
+            }
+        }
+        loadQuizQuestion();
+
+        // Level 4 Logic
+        function verifyLevel4() {
+            let c1 = document.getElementById("cipherIn1").value.trim().toLowerCase();
+            let c2 = document.getElementById("cipherIn2").value.trim().toLowerCase();
+
+            if((c1 === "weathering") && (c2 === "erosion" || c2 === "river erosion")) {
+                addLithoXP(150);
+                document.getElementById('pill4').style.background = "var(--neon-green)";
+                showAlertBox(4, "Wow friend! The secret code for exogenic forces is entirely correct.", true);
+            } else {
+                showAlertBox(4, "Incorrect entry! Hint: Try typing 'Weathering' and 'Erosion' to crack it.", false);
+            }
+        }
+
+        // Level 5 Logic
+        let minedOres = {};
+        function toggleOreToken(id, isMajorPlate) {
+            let node = document.getElementById(id);
+            if(node.classList.contains('active-packet')) {
+                node.classList.remove('active-packet');
+                delete minedOres[id];
+            } else {
+                node.classList.add('active-packet');
+                minedOres[id] = isMajorPlate;
+            }
+        }
+        function verifyLevel5() {
+            let win = true; let count = 0;
+            for(let id in minedOres) {
+                if(minedOres[id] === false) win = false;
+                count++;
+            }
+            if(count !== 4) win = false;
+
+            if(win) {
+                addLithoXP(150);
+                document.getElementById('pill5').style.background = "var(--neon-green)";
+                showAlertBox(5, "Brilliant! You successfully mined the four primary global tectonic plates.", true);
+            } else {
+                showAlertBox(5, "Incorrect selection! Focus exclusively on selecting the four major structural plates, friend.", false);
+            }
+        }
+
+        // Level 6 Drag Drop
+        function allowDrop(ev) { ev.preventDefault(); }
+        function startDrag(ev) { ev.dataTransfer.setData("text", ev.target.id); }
+        function handleDrop(ev, cat) {
+            ev.preventDefault();
+            let id = ev.dataTransfer.getData("text");
+            let el = document.getElementById(id);
+            el.dataset.cat = cat;
+            ev.target.appendChild(el);
+        }
+        function verifyLevel6() {
+            let k1 = document.getElementById("kar1").dataset.cat;
+            let k2 = document.getElementById("kar2").dataset.cat;
+
+            if(k1 === "roof" && k2 === "floor") {
+                addLithoXP(200);
+                document.getElementById('pill6').style.background = "var(--neon-green)";
+                showAlertBox(6, "The arrangement of the limestone cave features is absolute and 100% correct!", true);
+            } else {
+                showAlertBox(6, "Misaligned sorting! Remember, Stalactites hang from the ceiling while Stalagmites grow upwards from the floor.", false);
+            }
+        }
+
+        // Level 7 Logic
+        let finalL = null; let finalR = null;
+        function selectFinalMatrix(side, id, key) {
+            if(side === 'L') {
+                finalL = { id: id, key: key };
+                document.getElementById("matL1").classList.remove('active-node-select');
+                document.getElementById("matL2").classList.remove('active-node-select');
+            } else {
+                finalR = { id: id, key: key };
+                document.getElementById("matR1").classList.remove('active-node-select');
+                document.getElementById("matR2").classList.remove('active-node-select');
+            }
+            document.getElementById(id).classList.add('active-node-select');
+        }
+        function verifyLevel7() {
+            if(finalL && finalR && finalL.key === finalR.key) {
+                addLithoXP(250);
+                document.getElementById('pill7').style.background = "var(--neon-green)";
+                showAlertBox(7, "Sensational job, friend! The entire 'Lithosphere' matrix mapping is complete. The students are officially Geo-experts now!", true);
+            } else {
+                showAlertBox(7, "The matrix connection failed. Re-evaluate the voluntary alignment of active vs extinct volcanoes, friend.", false);
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            var allElements = document.getElementsByTagName("*");
+            for (var i = 0; i < allElements.length; i++) {
+                var el = allElements[i];
+                if (el.textContent.includes("ಸಮಾಜಶಾಸ್ತ್ರ ವಿಭಾಗ ಸಾಂಸ್ಕೃತಿಕ ಪರಂಪರೆ.html")) {
+                    el.innerHTML = el.innerHTML.replace(/ಸಮಾಜಶಾಸ್ತ್ರ ವಿಭಾಗ ಸಾಂಸ್ಕೃತಿಕ ಪರಂಪರೆ\.html/g, "ಸಮಾಜಶಾಸ್ತ್ರ ವಿಭಾಗ ಸಾಂಸ್ಕೃತಿಕ ಪರಂಪರೆ.html");
+                }
+            }
+        });
+
+        function showAlertBox(lvlNum, text, success) {
+            let box = document.getElementById("alert" + lvlNum);
+            box.style.display = "block";
+            box.innerText = text;
+            box.style.background = success ? "rgba(46, 204, 113, 0.15)" : "rgba(231, 76, 60, 0.1)";
+            box.style.color = success ? "var(--neon-green)" : "var(--danger-red)";
+            box.style.border = success ? "1px solid var(--neon-green)" : "1px solid var(--danger-red)";
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Global Trade Hub 16.0 - Business Studies Simulator</title>
+    <style>
+        :root {
+            --trade-blue: #0fbcf9;
+            --profit-green: #05c46b;
+            --gold-coin: #ffdd59;
+            --neon-pink: #ef5777;
+            --deep-dark: #0f172a;
+            --panel-glass: rgba(30, 41, 59, 0.95);
+            --danger-red: #f53b57;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Verdana, sans-serif; }
+
+        body {
+            background: var(--deep-dark);
+            background-image: linear-gradient(135deg, #0f172a 0%, #030712 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #ffffff;
+        }
+
+        header.trade-header {
+            text-align: center;
+            padding: 25px;
+            background: var(--panel-glass);
+            border: 2px solid var(--trade-blue);
+            border-radius: 24px;
+            box-shadow: 0 0 30px rgba(15, 188, 249, 0.25);
+            margin-bottom: 25px;
+        }
+
+        header.trade-header h1 {
+            color: var(--trade-blue);
+            font-size: 2.4rem;
+            text-shadow: 0 0 12px rgba(15, 188, 249, 0.4);
+            margin-bottom: 5px;
+        }
+
+        header.trade-header p { color: #cbd5e1; font-size: 1.15rem; }
+
+        /* LIVE CLASSROOM HUD: CUSTOMER SATISFACTION INDEX */
+        .trade-hud {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #1e293b;
+            padding: 15px 25px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            border-left: 5px solid var(--gold-coin);
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .satisfaction-bar-container {
+            background: #334155;
+            width: 45%;
+            height: 18px;
+            border-radius: 9px;
+            overflow: hidden;
+            border: 1px solid var(--profit-green);
+        }
+
+        .satisfaction-bar-fill {
+            background: linear-gradient(90deg, var(--profit-green), #4cd137);
+            height: 100%;
+            width: 100%;
+            transition: width 0.4s ease;
+        }
+
+        /* Sub-Menu Slider Steppers */
+        .trade-track-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 35px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+
+        .trade-track-row::-webkit-scrollbar { height: 6px; }
+        .trade-track-row::-webkit-scrollbar-thumb { background: var(--trade-blue); border-radius: 3px; }
+
+        .trade-card {
+            background: #1e293b;
+            border: 1px solid #334155;
+            padding: 12px 25px;
+            border-radius: 14px;
+            cursor: pointer;
+            font-weight: bold;
+            white-space: nowrap;
+            transition: all 0.3s;
+        }
+
+        .trade-card:hover, .trade-card.active-mission {
+            background: var(--trade-blue);
+            color: #000000;
+            border-color: #ffffff;
+            box-shadow: 0 0 15px var(--trade-blue);
+            transform: translateY(-3px);
+        }
+
+        /* Core Screen Box */
+        .trade-arena {
+            background: var(--panel-glass);
+            border: 2px solid #334155;
+            border-radius: 24px;
+            padding: 35px;
+            min-height: 520px;
+            display: none;
+            box-shadow: 0 20px 45px rgba(0,0,0,0.5);
+        }
+
+        .trade-arena.active-arena { display: block; animation: tradeBoot 0.4s ease; }
+
+        @keyframes tradeBoot {
+            from { opacity: 0; transform: scale(0.98); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        h2.arena-title {
+            font-size: 1.65rem;
+            color: var(--gold-coin);
+            margin-bottom: 25px;
+            border-bottom: 1px dashed rgba(255, 221, 89, 0.3);
+            padding-bottom: 12px;
+        }
+
+        /* Grid Connector System */
+        .grid-connector-system {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .trade-node {
+            background: #1e293b;
+            padding: 18px;
+            border-radius: 14px;
+            cursor: pointer;
+            border: 2px solid #334155;
+            font-weight: bold;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .trade-node:hover { border-color: var(--trade-blue); background: #223047; }
+        .trade-node.node-selected { background: var(--trade-blue); color: black; border-color: white; font-weight: bold; box-shadow: 0 0 12px var(--trade-blue); }
+
+        /* Quiz Row Elements */
+        .quiz-box-row {
+            background: #1e293b;
+            border: 2px solid #334155;
+            padding: 16px;
+            margin: 12px 0;
+            border-radius: 14px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+        }
+
+        .quiz-box-row:hover { border-color: var(--trade-blue); transform: translateX(5px); }
+        .quiz-box-row.correct-glow { background: rgba(5, 196, 107, 0.2); border-color: var(--profit-green); color: #55efc4; }
+        .quiz-box-row.wrong-glow { background: rgba(245, 59, 87, 0.2); border-color: var(--danger-red); color: #ff7675; }
+
+        /* Inputs Base styling */
+        .smart-trade-input {
+            background: #030712;
+            border: 2px solid #334155;
+            border-radius: 10px;
+            padding: 12px;
+            font-size: 1.1rem;
+            color: var(--gold-coin);
+            font-weight: bold;
+            outline: none;
+            width: 100%;
+            max-width: 320px;
+            margin-top: 8px;
+        }
+
+        .smart-trade-input:focus { border-color: var(--trade-blue); }
+
+        /* Mining Grid */
+        .mining-card-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        .ore-token {
+            background: #1e293b;
+            border: 2px solid #334155;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .ore-token.active-token, .ore-token.activated { background: #aafd0f; color: black; border-color: white; }
+
+        /* Progress Bar UI Element */
+        .progress-hud-bar {
+            background: #030712;
+            width: 100%;
+            height: 12px;
+            border-radius: 6px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            border: 1px solid #334155;
+        }
+        .progress-bar-fill {
+            background: linear-gradient(90deg, var(--trade-blue), var(--profit-green));
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* Universal Action Buttons */
+        .action-btn {
+            background: linear-gradient(135deg, var(--trade-blue), #45aaf2);
+            color: black;
+            border: none;
+            padding: 14px 35px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 25px;
+            box-shadow: 0 5px 15px rgba(15, 188, 249, 0.3);
+        }
+
+        .action-btn:hover { transform: scale(1.02); box-shadow: 0 8px 25px rgba(15, 188, 249, 0.5); }
+
+        .trade-alert-box {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 12px;
+            font-weight: bold;
+            display: none;
+            font-size: 1.1rem;
+            border: 1px solid transparent;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="trade-header">
+        <h1>Business Studies: Global Trade Lab</h1>
+        <p>Simulator Model 16.0 • Digital Games on Entrepreneurship, Markets, and Consumer Rights</p>
+    </div>
+
+    <div class="trade-hud">
+        <span>Customer Satisfaction Index:</span>
+        <div class="satisfaction-bar-container"><div class="satisfaction-bar-fill" id="satisfactionFill"></div></div>
+        <span style="color: var(--gold-coin);" id="liveXPCount">Business Coins: 0000 BC</span>
+    </div>
+
+    <div class="trade-track-row">
+        <div class="trade-card active-mission" id="lvlBtn1" onclick="loadLevel(1)">1. True Meaning of Business</div>
+        <div class="trade-card" id="lvlBtn2" onclick="loadLevel(2)">2. The Barter System</div>
+        <div class="trade-card" id="lvlBtn3" onclick="loadLevel(3)">3. Epic 10 Business Quiz</div>
+        <div class="trade-card" id="lvlBtn4" onclick="loadLevel(4)">4. Types of Human Activities</div>
+        <div class="trade-card" id="lvlBtn5" onclick="loadLevel(5)">5. Major Components of Trade</div>
+        <div class="trade-card" id="lvlBtn6" onclick="loadLevel(6)">6. Supply Chain Sorting</div>
+        <div class="trade-card" id="lvlBtn7" onclick="loadLevel(7)">7. Core Objectives of Business</div>
+    </div>
+
+    <div id="level1" class="trade-arena active-arena">
+        <h2 class="arena-title">Level 1: Origin and Concept of the Word 'Business' (Meaning of Business Node)</h2>
+        <p style="margin-bottom: 15px;">Friend, correctly link the literal origin of the English word 'Business' with its primary financial objective:</p>
+        <div class="grid-connector-system">
+            <div>
+                <div class="trade-node" id="l1_nodeL1" onclick="connectTradeNodes('L', 'l1_nodeL1', 1)">Literal root meaning of 'Business'</div>
+                <div class="trade-node" id="l1_nodeL2" style="margin-top:15px;" onclick="connectTradeNodes('L', 'l1_nodeL2', 2)">Ultimate core objective of business</div>
+            </div>
+            <div>
+                <div class="trade-node" id="l1_nodeR1" onclick="connectTradeNodes('R', 'l1_nodeR1', 2)">Profit Earning</div>
+                <div class="trade-node" id="l1_nodeR2" style="margin-top:15px;" onclick="connectTradeNodes('R', 'l1_nodeR2', 1)">Being Busy (State of activity)</div>
+            </div>
+        </div>
+        <div class="trade-alert-box" id="alert1"></div>
+    </div>
+
+    <div id="level2" class="trade-arena">
+        <h2 class="arena-title">Level 2: History of the Ancient Barter System (The Barter System Crypt)</h2>
+        <div style="display:flex; flex-direction:column; gap:20px;">
+            <div class="fib-q">1. Before the invention of currency, what was the old system called where goods were directly exchanged for other goods? <br><input type="text" class="smart-trade-input" id="cryptIn1" placeholder="Enter system name (e.g., Barter System)"></div>
+            <div class="fib-q">2. The biggest drawback of the barter system was the lack of a standard double coincidence of wants and a common ____. <br><input type="text" class="smart-trade-input" id="cryptIn2" placeholder="Measure of value / Excess money?"></div>
+        </div>
+        <button class="action-btn" onclick="verifyLevel2()">Crack the Code of History</button>
+        <div class="trade-alert-box" id="alert2"></div>
+    </div>
+
+    <div id="level3" class="trade-arena">
+        <h2 class="arena-title">Level 3: The Great Battle of Markets and Entrepreneurship (Epic 10 Business Quiz)</h2>
+        <div class="progress-hud-bar"><div class="progress-bar-fill" id="barFill"></div></div>
+        <div style="font-weight: bold; margin-bottom: 15px; color: var(--gold-coin);" id="quizTrackTxt">Question Code: 1 / 10</div>
+        <div id="quizQuestionText" style="font-size: 1.25rem; font-weight: bold; margin-bottom: 20px;">Loading...</div>
+        <div id="quizOptionsContainer"></div>
+        <button class="action-btn" id="nextQuizBtn" style="display:none;" onclick="nextTradeQuestion()">Advance to Next Market Stage ➔</button>
+        <div class="trade-alert-box" id="alert3"></div>
+    </div>
+
+    <div id="level4" class="trade-arena">
+        <h2 class="arena-title">Level 4: Economic and Non-Economic Human Activities (Human Activities Matrix)</h2>
+        <div style="display:flex; flex-direction:column; gap:20px;">
+            <div class="fib-q">1. What activities are agriculture, trade, and jobs classified under since their main goal is to earn income and money? <br><input type="text" class="smart-trade-input" id="thinkIn1" placeholder="Economic activities / Service activities?"></div>
+            <div class="fib-q">2. When a mother feeds her child or a volunteer treats patients out of pure love, affection, and social duty, what activity is this? <br><input type="text" class="smart-trade-input" id="thinkIn2" placeholder="Non-economic activities / Banking work?"></div>
+        </div>
+        <button class="action-btn" onclick="verifyLevel4()">Confirm Activities</button>
+        <div class="trade-alert-box" id="alert4"></div>
+    </div>
+
+    <div id="level5" class="trade-arena">
+        <h2 class="arena-title">Level 5: Core Trade Components and Divisions (Core Trade Components Mining)</h2>
+        <p style="margin-bottom: 15px;">Friend, select and mine **only the legitimate components** of domestic and international trade:</p>
+        <div class="mining-card-grid">
+            <div class="ore-token" id="state1" onclick="toggleStateOre('state1', true)">1. Internal Trade</div>
+            <div class="ore-token" id="state2" onclick="toggleStateOre('state2', false)">2. Running a Black Market</div>
+            <div class="ore-token" id="state3" onclick="toggleStateOre('state3', true)">3. Foreign Trade</div>
+            <div class="ore-token" id="state4" onclick="toggleStateOre('state4', true)">4. Wholesale Trade</div>
+            <div class="ore-token" id="state5" onclick="toggleStateOre('state5', false)">5. Television Ads Only</div>
+            <div class="ore-token" id="state6" onclick="toggleStateOre('state6', true)">6. Retail Trade</div>
+        </div>
+        <button class="action-btn" onclick="verifyLevel5()">Verify Trade Components</button>
+        <div class="trade-alert-box" id="alert5"></div>
+    </div>
+
+    <div id="level6" class="trade-arena">
+        <h2 class="arena-title">Level 6: Interlinking the Producer, Wholesaler, and Retailer (Supply Chain Sorting)</h2>
+        <p style="margin-bottom: 15px;">Sort the structural links of the market distribution supply chain into their respective domains of responsibility:</p>
+        <div style="display:flex; gap:25px;">
+            <div style="flex:1; display:flex; flex-direction:column; gap:10px;" id="organSource">
+                <div style="background:#2c3e50; padding:12px; border-radius:10px; cursor:grab; font-weight:bold;" draggable="true" id="org1" ondragstart="startOrganDrag(event)">Producer</div>
+                <div style="background:#2c3e50; padding:12px; border-radius:10px; cursor:grab; font-weight:bold;" draggable="true" id="org2" ondragstart="startOrganDrag(event)">Wholesaler</div>
+                <div style="background:#2c3e50; padding:12px; border-radius:10px; cursor:grab; font-weight:bold;" draggable="true" id="org3" ondragstart="startOrganDrag(event)">Retailer</div>
+            </div>
+            <div style="flex:2; display:flex; flex-direction:column; gap:15px;">
+                <div style="background:rgba(0,0,0,0.3); border:2px dashed var(--trade-blue); padding:15px; border-radius:12px;" ondragover="allowOrganDrop(event)" ondrop="handleOrganDrop(event, 'factory')">
+                    <h3>One who manufactures or prepares goods directly in factories or fields</h3>
+                </div>
+                <div style="background:rgba(0,0,0,0.3); border:2px dashed var(--trade-blue); padding:15px; border-radius:12px;" ondragover="allowOrganDrop(event)" ondrop="handleOrganDrop(event, 'bulk')">
+                    <h3>The intermediary who purchases goods in massive quantities from producers</h3>
+                </div>
+                <div style="background:rgba(0,0,0,0.3); border:2px dashed var(--trade-blue); padding:15px; border-radius:12px;" ondragover="allowOrganDrop(event)" ondrop="handleOrganDrop(event, 'consumer')">
+                    <h3>One who stocks small quantities of goods to sell directly to the final consumer</h3>
+                </div>
+            </div>
+        </div>
+        <button class="action-btn" onclick="verifyLevel6()">Verify Supply Chain Layout</button>
+        <div class="trade-alert-box" id="alert6"></div>
+    </div>
+
+    <div id="level7" class="trade-arena">
+        <h2 class="arena-title">Level 7: Social Objectives of Business and Consumer Rights (Business Objectives Matrix)</h2>
+        <p style="margin-bottom: 15px;">Final Level! Match the importance of core business philosophies and customer safety metrics to finalize the simulation:</p>
+        <div class="grid-connector-system">
+            <div class="trade-node" id="matL1" onclick="selectFinalMatrix('L', 'matL1', 'objective')">Supplying quality items at a fair and reasonable price</div>
+            <div class="trade-node" id="matR1" onclick="selectFinalMatrix('R', 'matR1', 'objective')">The most vital and core social objective of a business</div>
+            <div class="trade-node" id="matL2" onclick="selectFinalMatrix('L', 'matL2', 'right')">Protecting interests and seeking redressal when defrauded</div>
+            <div class="trade-node" id="matR2" onclick="selectFinalMatrix('R', 'matR2', 'right')">Consumer forums and essential pillars of consumer rights</div>
+        </div>
+        <button class="action-btn" onclick="verifyLevel7()">Complete Trade Matrix</button>
+        <div class="trade-alert-box" id="alert7"></div>
+    </div>
+
+    <script>
+        let tradePoints = 0; let customerSatisfaction = 100;
+        function modifyHUDTracker(bcChange, satDamage) {
+            tradePoints += bcChange;
+            customerSatisfaction = Math.max(10, customerSatisfaction - satDamage);
+            document.getElementById("liveXPCount").innerText = `Business Coins: ${tradePoints.toString().padStart(4, '0')} BC`;
+            document.getElementById("satisfactionFill").style.width = `${customerSatisfaction}%`;
+        }
+
+        function loadLevel(levelIdx) {
+            document.querySelectorAll('.trade-arena').forEach(el => el.classList.remove('active-arena'));
+            document.querySelectorAll('.trade-card').forEach(el => el.classList.remove('active-mission'));
+            
+            document.getElementById('level' + levelIdx).classList.add('active-arena');
+            document.getElementById('lvlBtn' + levelIdx).classList.add('active-mission');
+        }
+
+        // Level 1 Logic
+        let nodeL = null; let nodeR = null;
+        function connectTradeNodes(side, id, matchVal) {
+            if(side === 'L') {
+                if(nodeL) document.getElementById(nodeL.id).classList.remove('node-selected');
+                nodeL = { id: id, match: matchVal };
+            } else {
+                if(nodeR) document.getElementById(nodeR.id).classList.remove('node-selected');
+                nodeR = { id: id, match: matchVal };
+            }
+            document.getElementById(id).classList.add('node-selected');
+
+            if(nodeL && nodeR) {
+                if(nodeL.match === nodeR.match) {
+                    document.getElementById(nodeL.id).style.background = "var(--profit-green)";
+                    document.getElementById(nodeR.id).style.background = "var(--profit-green)";
+                    modifyHUDTracker(100, 0);
+                    showTradeAlert(1, "Correct pairing, friend! The literal root of business matches perfectly.", true);
+                    document.getElementById('lvlBtn1').style.background = "var(--profit-green)";
+                } else {
+                    modifyHUDTracker(0, 10);
+                    showTradeAlert(1, "Incorrect pairing! Customers are displeased. Try again.", false);
+                }
+                nodeL = null; nodeR = null;
+            }
+        }
+
+        // Level 2 Logic
+        function verifyLevel2() {
+            let c1 = document.getElementById("cryptIn1").value.trim().toLowerCase();
+            let c2 = document.getElementById("cryptIn2").value.trim().toLowerCase();
+
+            if((c1.includes("barter")) && c2.includes("measure")) {
+                modifyHUDTracker(150, 0);
+                document.getElementById('lvlBtn2').style.background = "var(--profit-green)";
+                showTradeAlert(2, "Superb! The historical crypt of the old Barter System has been solved.", true);
+            } else {
+                modifyHUDTracker(0, 10);
+                showTradeAlert(2, "Incorrect code entry! Hint: Try keywords related to 'Barter System' and 'Measure of value'.", false);
+            }
+        }
+
+        // Level 3: 10 Questions Quiz Data
+        const businessQuizPool = [
+            { q: "1. What is the major economic activity of earning money through the production, purchase, and sale of goods and services called?", o: ["An casual hobby", "Business", "Social reformation"], c: 1 },
+            { q: "2. Which revolutionary development completely eradicated the structural trading limitations faced under the old barter system?", o: ["Large cargo vessels", "Invention of Money", "Highways networks"], c: 1 },
+            { q: "3. What type of commerce describes trade operations conducted strictly inside the geographical borders of a country?", o: ["Foreign trade", "Internal Trade", "Export trade"], c: 1 },
+            { q: "4. What form of commerce describes global trade operations conducted by India with nations like the US or UAE?", o: ["Retail trade", "Wholesale trade", "Foreign Trade"], c: 2 },
+            { q: "5. What is the explicit process of purchasing essential commodities or goods from foreign nations into our home country called?", o: ["Import", "Export", "Entrepot"], c: 0 },
+            { q: "6. What term describes the operation of selling surplus goods produced in our home country to foreign buyers?", o: ["Export", "Import", "Local market"], c: 0 },
+            { q: "7. Which piece of legislation was introduced by the Indian government to protect consumers against adulteration and weight fraud?", o: ["The Banking Regulation Act", "Consumer Protection Act", "The Forest Act"], c: 1 },
+            { q: "8. Which market operator acts as a crucial structural bridge between the original producer and the local neighborhood retailer?", o: ["Wholesaler", "Consumer", "Factory master"], c: 0 },
+            { q: "9. What is the core economic objective without which a commercial enterprise cannot survive long-term in a market ecosystem?", o: ["Distributing everything for free", "Earning fair profit", "Bearing sustained losses"], c: 1 },
+            { q: "10. On what date is 'World Consumer Rights Day' celebrated annually on a global level to boost customer rights awareness?", o: ["January 26th", "March 15th", "December 5th"], c: 1 }
+        ];
+
+        let qIdx = 0; let qScore = 0; let isQuizActive = true;
+        function loadQuizQuestion() {
+            isQuizActive = true;
+            document.getElementById("nextQuizBtn").style.display = "none";
+            document.getElementById("alert3").style.display = "none";
+            let qData = businessQuizPool[qIdx];
+            document.getElementById("quizTrackTxt").innerText = `Question Code: ${qIdx + 1} / 10`;
+            document.getElementById("barFill").style.width = `${(qIdx + 1) * 10}%`;
+            document.getElementById("quizQuestionText").innerText = qData.q;
+            
+            let container = document.getElementById("quizOptionsContainer");
+            container.innerHTML = "";
+            qData.o.forEach((opt, idx) => {
+                let div = document.createElement("div");
+                div.classList.add("quiz-box-row");
+                div.innerText = opt;
+                div.onclick = function() {
+                    if(!isQuizActive) return;
+                    isQuizActive = false;
+                    if(idx === qData.c) {
+                        this.classList.add("correct-glow");
+                        qScore++; modifyHUDTracker(30, 0);
+                        showTradeAlert(3, "Correct choice! Your company's market rating has increased.", true);
+                    } else {
+                        this.classList.add("wrong-glow");
+                        container.children[qData.c].classList.add("correct-glow");
+                        modifyHUDTracker(0, 10);
+                        showTradeAlert(3, "Flawed choice! Consumers are unhappy and losses have been recorded.", false);
+                    }
+                    document.getElementById("nextQuizBtn").style.display = "inline-block";
+                };
+                container.appendChild(div);
+            });
+        }
+        function nextTradeQuestion() {
+            qIdx++;
+            if(qIdx < businessQuizPool.length) {
+                loadQuizQuestion();
+            } else {
+                document.getElementById("quizTrackTxt").innerText = "Simulation Finalized!";
+                document.getElementById("quizQuestionText").innerText = `Total Classroom Score: ${qScore} / 10`;
+                document.getElementById("quizOptionsContainer").innerHTML = "";
+                document.getElementById("nextQuizBtn").style.display = "none";
+                document.getElementById('lvlBtn3').style.background = "var(--profit-green)";
+                showTradeAlert(3, qScore >= 7 ? "Uncontested Emperor of the Business Empire, friend!" : "Good attempt!", true);
+            }
+        }
+        loadQuizQuestion();
+
+        // Level 4 Logic
+        function verifyLevel4() {
+            let t1 = document.getElementById("thinkIn1").value.trim().toLowerCase();
+            let t2 = document.getElementById("thinkIn2").value.trim().toLowerCase();
+
+            if(t1.includes("economic") && !t1.includes("non") && t2.includes("non-economic")) {
+                modifyHUDTracker(150, 0);
+                document.getElementById('lvlBtn4').style.background = "var(--profit-green)";
+                showTradeAlert(4, "Excellent! The distinction between economic and non-economic processes is completely spot on.", true);
+            } else {
+                modifyHUDTracker(0, 10);
+                showTradeAlert(4, "Incorrect classification! Hint: Fill in 'Economic activities' and 'Non-economic activities'.", false);
+            }
+        }
+
+        // Level 5 Logic
+        let selectedOres = {};
+        function toggleStateOre(id, isCoreComponent) {
+            let node = document.getElementById(id);
+            if(node.classList.contains('activated')) {
+                node.classList.remove('activated');
+                delete selectedOres[id];
+            } else {
+                node.classList.add('activated');
+                selectedOres[id] = isCoreComponent;
+            }
+        }
+        function verifyLevel5() {
+            let win = true; let count = 0;
+            for(let id in selectedOres) {
+                if(selectedOres[id] === false) win = false;
+                count++;
+            }
+            if(count !== 4) win = false; 
+
+            if(win) {
+                modifyHUDTracker(150, 0);
+                document.getElementById('lvlBtn5').style.background = "var(--profit-green)";
+                showTradeAlert(5, "Phenomenal! All four core structural pillars of trade are correctly identified.", true);
+            } else {
+                modifyHUDTracker(0, 10);
+                showTradeAlert(5, "Incorrect layout choice! Select exclusively the four valid methods of trade operation, friend.", false);
+            }
+        }
+
+        // Level 6 Logic
+        function allowOrganDrop(ev) { ev.preventDefault(); }
+        function startOrganDrag(ev) { ev.dataTransfer.setData("text", ev.target.id); }
+        function handleOrganDrop(ev, cat) {
+            ev.preventDefault();
+            let id = ev.dataTransfer.getData("text");
+            let el = document.getElementById(id);
+            el.dataset.cat = cat;
+            ev.target.appendChild(el);
+        }
+        function verifyLevel6() {
+            let o1 = document.getElementById("org1").dataset.cat;
+            let o2 = document.getElementById("org2").dataset.cat;
+            let o3 = document.getElementById("org3").dataset.cat;
+
+            if(o1 === "factory" && o2 === "bulk" && o3 === "consumer") {
+                modifyHUDTracker(200, 0);
+                document.getElementById('lvlBtn6').style.background = "var(--profit-green)";
+                showTradeAlert(6, "The logistics framework distribution links have been matched with 100% precision, friend!", true);
+            } else {
+                modifyHUDTracker(0, 10);
+                showTradeAlert(6, "Misaligned sorting! The producer crafts items, the wholesaler buys in bulk, and the retailer serves the end consumer.", false);
+            }
+        }
+
+        // Level 7 Logic
+        let finalL = null; let finalR = null;
+        function selectFinalMatrix(side, id, key) {
+            if(side === 'L') {
+                finalL = { id: id, key: key };
+                document.getElementById("matL1").classList.remove('node-selected');
+                document.getElementById("matL2").classList.remove('node-selected');
+            } else {
+                finalR = { id: id, key: key };
+                document.getElementById("matR1").classList.remove('node-selected');
+                document.getElementById("matR2").classList.remove('node-selected');
+            }
+            document.getElementById(id).classList.add('node-selected');
+        }
+        function verifyLevel7() {
+            if(finalL && finalR && finalL.key === finalR.key) {
+                modifyHUDTracker(250, 0);
+                document.getElementById('lvlBtn7').style.background = "var(--profit-green)";
+                showTradeAlert(7, "Wow friend! The simulation for the entire 'Meaning and Importance of Business' unit is completely successful. Part-1 of the textbook syllabus is completed!", true);
+            } else {
+                modifyHUDTracker(0, 10);
+                showTradeAlert(7, "The matrix connection failed. Re-evaluate the socio-ethical parameters of the enterprise, friend.", false);
+            }
+        }
+
+        function showTradeAlert(lvlNum, text, success) {
+            let box = document.getElementById("alert" + lvlNum);
+            box.style.display = "block";
+            box.innerText = text;
+            box.style.background = success ? "rgba(5, 196, 107, 0.15)" : "rgba(245, 59, 87, 0.1)";
+            box.style.color = success ? "#05c46b" : "#f53b57";
+            box.style.borderColor = success ? "var(--profit-green)" : "var(--danger-red)";
+        }
+    </script>
+</body>
+</html>

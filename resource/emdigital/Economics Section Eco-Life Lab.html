@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eco-Life Simulator 15.0 - Introduction to Economics</title>
+    <style>
+        :root {
+            --eco-purple: #6c5ce7;
+            --money-green: #00b894;
+            --gold-bright: #f1c40f;
+            --dark-space: #090a0f;
+            --pink-neon: #ff007f;
+            --panel-glass: rgba(20, 24, 39, 0.96);
+            --danger-red: #d63031;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Verdana, sans-serif; }
+
+        body {
+            background: var(--dark-space);
+            background-image: linear-gradient(135deg, #0f172a 0%, #020617 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #ffffff;
+        }
+
+        header.eco-header {
+            text-align: center;
+            padding: 25px;
+            background: var(--panel-glass);
+            border: 2px solid var(--money-green);
+            border-radius: 24px;
+            box-shadow: 0 0 30px rgba(0, 184, 148, 0.25);
+            margin-bottom: 25px;
+        }
+
+        header.eco-header h1 {
+            color: var(--money-green);
+            font-size: 2.4rem;
+            text-shadow: 0 0 12px rgba(0, 184, 148, 0.4);
+            margin-bottom: 5px;
+        }
+
+        header.eco-header p { color: #cbd5e1; font-size: 1.15rem; }
+
+        /* NEW CLASSROOM HUD: FAMILY BUDGET HEALTH */
+        .eco-hud {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #1e293b;
+            padding: 15px 25px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            border-left: 5px solid var(--gold-bright);
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .budget-bar-container {
+            background: #334155;
+            width: 45%;
+            height: 18px;
+            border-radius: 9px;
+            overflow: hidden;
+            border: 1px solid var(--money-green);
+        }
+
+        .budget-bar-fill {
+            background: linear-gradient(90deg, var(--money-green), #55efc4);
+            height: 100%;
+            width: 100%;
+            transition: width 0.4s ease;
+        }
+
+        /* Horizontal Track Row Menu */
+        .eco-track-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 35px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+
+        .eco-track-row::-webkit-scrollbar { height: 6px; }
+        .eco-track-row::-webkit-scrollbar-thumb { background: var(--money-green); border-radius: 3px; }
+
+        .eco-card {
+            background: #1e293b;
+            border: 1px solid #334155;
+            padding: 12px 25px;
+            border-radius: 14px;
+            cursor: pointer;
+            font-weight: bold;
+            white-space: nowrap;
+            transition: all 0.3s;
+        }
+
+        .eco-card:hover, .eco-card.active-mission {
+            background: var(--money-green);
+            color: #000000;
+            border-color: #ffffff;
+            box-shadow: 0 0 15px var(--money-green);
+            transform: translateY(-3px);
+        }
+
+        /* Core Screen Box */
+        .eco-arena {
+            background: var(--panel-glass);
+            border: 2px solid #334155;
+            border-radius: 24px;
+            padding: 35px;
+            min-height: 520px;
+            display: none;
+            box-shadow: 0 20px 45px rgba(0,0,0,0.5);
+        }
+
+        .eco-arena.active-arena { display: block; animation: budgetBoot 0.4s ease; }
+
+        @keyframes budgetBoot {
+            from { opacity: 0; transform: scale(0.98); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        h2.arena-title {
+            font-size: 1.65rem;
+            color: var(--gold-bright);
+            margin-bottom: 25px;
+            border-bottom: 1px dashed rgba(241, 196, 15, 0.3);
+            padding-bottom: 12px;
+        }
+
+        /* Grid Connector System */
+        .grid-connector-system {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .eco-node {
+            background: #1e293b;
+            padding: 18px;
+            border-radius: 14px;
+            cursor: pointer;
+            border: 2px solid #334155;
+            font-weight: bold;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .eco-node:hover { border-color: var(--money-green); background: #223047; }
+        .eco-node.node-selected { background: var(--money-green); color: black; border-color: white; font-weight: bold; box-shadow: 0 0 12px var(--money-green); }
+
+        /* Quiz Row Elements */
+        .quiz-box-row {
+            background: #1e293b;
+            border: 2px solid #334155;
+            padding: 16px;
+            margin: 12px 0;
+            border-radius: 14px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+        }
+
+        .quiz-box-row:hover { border-color: var(--money-green); transform: translateX(5px); }
+        .quiz-box-row.correct-glow { background: rgba(0, 184, 148, 0.2); border-color: var(--money-green); color: #55efc4; }
+        .quiz-box-row.wrong-glow { background: rgba(214, 48, 49, 0.2); border-color: var(--danger-red); color: #ff7675; }
+
+        /* Inputs Base styling */
+        .smart-eco-input {
+            background: #05070c;
+            border: 2px solid #334155;
+            border-radius: 10px;
+            padding: 12px;
+            font-size: 1.1rem;
+            color: var(--gold-bright);
+            font-weight: bold;
+            outline: none;
+            width: 100%;
+            max-width: 320px;
+            margin-top: 8px;
+        }
+
+        .smart-eco-input:focus { border-color: var(--money-green); }
+
+        /* Mining Grid */
+        .mining-card-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        .ore-token {
+            background: #1e293b;
+            border: 2px solid #334155;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .ore-token.active-token { background: #6c5ce7; border-color: white; }
+
+        /* Universal Action Buttons */
+        .action-btn {
+            background: linear-gradient(135deg, var(--money-green), #55efc4);
+            color: black;
+            border: none;
+            padding: 14px 35px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 25px;
+            box-shadow: 0 5px 15px rgba(0, 184, 148, 0.3);
+        }
+
+        .action-btn:hover { transform: scale(1.02); box-shadow: 0 8px 25px rgba(0, 184, 148, 0.5); }
+
+        .eco-alert-box {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 12px;
+            font-weight: bold;
+            display: none;
+            font-size: 1.1rem;
+            border: 1px solid transparent;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="eco-header">
+        <h1>Economics Section: Eco-Life Lab</h1>
+        <p>Simulator Model 15.0 • Digital Games on Resource Optimization and Budget Management</p>
+    </div>
+
+    <div class="eco-hud">
+        <span>Family Financial Budget Health:</span>
+        <div class="budget-bar-container"><div class="budget-bar-fill" id="budgetFill"></div></div>
+        <span style="color: var(--gold-bright);" id="liveXPCount">Eco Coins: 0000 EC</span>
+    </div>
+
+    <div class="eco-track-row">
+        <div class="eco-card active-mission" id="lvlBtn1" onclick="loadLevel(1)">1. Greek Origin of Word</div>
+        <div class="eco-card" id="lvlBtn2" onclick="loadLevel(2)">2. Wants Vs Resources</div>
+        <div class="eco-card" id="lvlBtn3" onclick="loadLevel(3)">3. Epic 10 Eco Quiz</div>
+        <div class="eco-card" id="lvlBtn4" onclick="loadLevel(4)">4. Thinkers' Definitions</div>
+        <div class="eco-card" id="lvlBtn5" onclick="loadLevel(5)">5. 4 Core Economic Activities</div>
+        <div class="eco-card" id="lvlBtn6" onclick="loadLevel(6)">6. Priority Budget Allocation</div>
+        <div class="eco-card" id="lvlBtn7" onclick="loadLevel(7)">7. Economic Significance Matrix</div>
+    </div>
+
+    <div id="level1" class="eco-arena active-arena">
+        <h2 class="arena-title">Level 1: Linguistic Origin of the Word 'Economics' (Language Node Connector)</h2>
+        <p style="margin-bottom: 15px;">My friend, correctly link the original Greek words of the English word 'Economics' and their actual meaning:</p>
+        <div class="grid-connector-system">
+            <div>
+                <div class="eco-node" id="l1_nodeL1" onclick="connectEcoNodes('L', 'l1_nodeL1', 1)">Original Greek Words</div>
+                <div class="eco-node" id="l1_nodeL2" style="margin-top:15px;" onclick="connectEcoNodes('L', 'l1_nodeL2', 2)">Real Meaning of Economics</div>
+            </div>
+            <div>
+                <div class="eco-node" id="l1_nodeR1" onclick="connectEcoNodes('R', 'l1_nodeR1', 2)">Household Management</div>
+                <div class="eco-node" id="l1_nodeR2" style="margin-top:15px;" onclick="connectEcoNodes('R', 'l1_nodeR2', 1)">Oikos and Nomos</div>
+            </div>
+        </div>
+        <div class="eco-alert-box" id="alert1"></div>
+    </div>
+
+    <div id="level2" class="eco-arena">
+        <h2 class="arena-title">Level 2: Human Wants and the Reality of Scarcity (Scarcity & Choice Crypt)</h2>
+        <div style="display:flex; flex-direction:column; gap:20px;">
+            <div class="fib-q">1. What is the extent of human wants and aspirations? <br><input type="text" class="smart-eco-input" id="cryptIn1" placeholder="Unlimited / Very low?"></div>
+            <div class="fib-q">2. What kind of resources are available in nature and as income to satisfy these wants? <br><input type="text" class="smart-eco-input" id="cryptIn2" placeholder="Limited / Scarce?"></div>
+            <div class="fib-q">3. Due to scarcity of resources, what is the act of selecting our priorities from the limited resources called? <br><input type="text" class="smart-eco-input" id="cryptIn3" placeholder="Choice / War?"></div>
+        </div>
+        <button class="action-btn" onclick="verifyLevel2()">Crack the Scarcity Code</button>
+        <div class="eco-alert-box" id="alert2"></div>
+    </div>
+
+    <div id="level3" class="eco-arena">
+        <h2 class="arena-title">Level 3: The Great Battle of Economic Awareness (Epic 10 Economics Quiz)</h2>
+        <div class="progress-hud-bar"><div class="progress-bar-fill" id="barFill"></div></div>
+        <div style="font-weight: bold; margin-bottom: 15px; color: var(--gold-bright);" id="quizTrackTxt">Question Code: 1 / 10</div>
+        <div id="quizQuestionText" style="font-size: 1.25rem; font-weight: bold; margin-bottom: 20px;">Loading...</div>
+        <div id="quizOptionsContainer"></div>
+        <button class="action-btn" id="nextQuizBtn" style="display:none;" onclick="nextEcoQuestion()">Move to Next Economic Level ➔</button>
+        <div class="eco-alert-box" id="alert3"></div>
+    </div>
+
+    <div id="level4" class="eco-arena">
+        <h2 class="arena-title">Level 4: Famous Definitions of Global Economics (Thinkers Core Grid)</h2>
+        <div style="display:flex; flex-direction:column; gap:20px;">
+            <div class="fib-q">1. Who is the father of economics who wrote 'Wealth of Nations' in 1776 and defined economics as the 'Science of Wealth'? <br><input type="text" class="smart-eco-input" id="thinkIn1" placeholder="Adam Smith / Alfred Marshall?"></div>
+            <div class="fib-q">2. Who is the British thinker who defined economics as the 'Science of Welfare' focused on human well-being? <br><input type="text" class="smart-eco-input" id="thinkIn2" placeholder="Alfred Marshall / Robbins?"></div>
+        </div>
+        <button class="action-btn" onclick="verifyLevel4()">Verify Definitions</button>
+        <div class="eco-alert-box" id="alert4"></div>
+    </div>
+
+    <div id="level5" class="eco-arena">
+        <h2 class="arena-title">Level 5: 4 Core Economic Activities (Core Economic Activities Mining)</h2>
+        <p style="margin-bottom: 15px;">My friend, click and mine only the **four core economic activities** of human beings as stated in the textbook:</p>
+        <div class="mining-card-grid">
+            <div class="ore-token" id="state1" onclick="toggleStateOre('state1', true)">1. Production</div>
+            <div class="ore-token" id="state2" onclick="toggleStateOre('state2', false)">2. Stealing</div>
+            <div class="ore-token" id="state3" onclick="toggleStateOre('state3', true)">3. Consumption</div>
+            <div class="ore-token" id="state4" onclick="toggleStateOre('state4', true)">4. Exchange</div>
+            <div class="ore-token" id="state5" onclick="toggleStateOre('state5', false)">5. Watching Television</div>
+            <div class="ore-token" id="state6" onclick="toggleStateOre('state6', true)">6. Distribution</div>
+        </div>
+        <button class="action-btn" onclick="verifyLevel5()">Verify Economic Activities</button>
+        <div class="eco-alert-box" id="alert5"></div>
+    </div>
+
+    <div id="level6" class="eco-arena">
+        <h2 class="arena-title">Level 6: Family Budget Sorting Based on Priorities (Budget Priority Sorting)</h2>
+        <p style="margin-bottom: 15px;">To keep a family happy on a limited salary, which items should be allocated budget first? Arrange them, my friend:</p>
+        <div style="display:flex; gap:25px;">
+            <div style="flex:1; display:flex; flex-direction:column; gap:10px;" id="organSource">
+                <div style="background:#2c3e50; padding:12px; border-radius:10px; cursor:grab; font-weight:bold;" draggable="true" id="org1" ondragstart="startOrganDrag(event)">Nutritious Food and Health</div>
+                <div style="background:#2c3e50; padding:12px; border-radius:10px; cursor:grab; font-weight:bold;" draggable="true" id="org2" ondragstart="startOrganDrag(event)">Children's School Fees</div>
+                <div style="background:#2c3e50; padding:12px; border-radius:10px; cursor:grab; font-weight:bold;" draggable="true" id="org3" ondragstart="startOrganDrag(event)">Expensive Mobile and Movies</div>
+            </div>
+            <div style="flex:2; display:flex; flex-direction:column; gap:15px;">
+                <div style="background:rgba(0,0,0,0.3); border:2px dashed var(--money-green); padding:15px; border-radius:12px;" ondragover="allowOrganDrop(event)" ondrop="handleOrganDrop(event, 'first')">
+                    <h3>Primary Priority (Essential for Survival)</h3>
+                </div>
+                <div style="background:rgba(0,0,0,0.3); border:2px dashed var(--money-green); padding:15px; border-radius:12px;" ondragover="allowOrganDrop(event)" ondrop="handleOrganDrop(event, 'second')">
+                    <h3>Secondary Priority (Important for Future Growth)</h3>
+                </div>
+                <div style="background:rgba(0,0,0,0.3); border:2px dashed var(--money-green); padding:15px; border-radius:12px;" ondragover="allowOrganDrop(event)" ondrop="handleOrganDrop(event, 'luxury')">
+                    <h3>Tertiary Priority (Luxury / Debt-inducing Expenses)</h3>
+                </div>
+            </div>
+        </div>
+        <button class="action-btn" onclick="verifyLevel6()">Verify Budget Design</button>
+        <div class="eco-alert-box" id="alert6"></div>
+    </div>
+
+    <div id="level7" class="eco-arena">
+        <h2 class="arena-title">Level 7: Significance of Economics in Daily Life (Economic Significance Matrix)</h2>
+        <p style="margin-bottom: 15px;">Final level! Match the benefits society gets from economic understanding and complete the simulation, my friend:</p>
+        <div class="grid-connector-system">
+            <div class="eco-node" id="matL1" onclick="selectFinalMatrix('L', 'matL1', 'home')">Managing budget in the family</div>
+            <div class="eco-node" id="matR1" onclick="selectFinalMatrix('R', 'matR1', 'home')">Way to get maximum satisfaction with limited income</div>
+            <div class="eco-node" id="matL2" onclick="selectFinalMatrix('L', 'matL2', 'govt')">Government formulating taxes and plans</div>
+            <div class="eco-node" id="matR2" onclick="selectFinalMatrix('R', 'matR2', 'govt')">Path to country's poverty alleviation and economic progress</div>
+        </div>
+        <button class="action-btn" onclick="verifyLevel7()">Complete Eco Matrix</button>
+        <div class="eco-alert-box" id="alert7"></div>
+    </div>
+
+    <script>
+        let ecoPoints = 0; let budgetHealth = 100;
+        function modifyHUDTracker(epChange, budgetDamage) {
+            ecoPoints += epChange;
+            budgetHealth = Math.max(10, budgetHealth - budgetDamage);
+            document.getElementById("liveXPCount").innerText = `Eco Coins: ${ecoPoints.toString().padStart(4, '0')} EC`;
+            document.getElementById("budgetFill").style.width = `${budgetHealth}%`;
+        }
+
+        function loadLevel(levelIdx) {
+            document.querySelectorAll('.eco-arena').forEach(el => el.classList.remove('active-arena'));
+            document.querySelectorAll('.eco-card').forEach(el => el.classList.remove('active-mission'));
+            
+            document.getElementById('level' + levelIdx).classList.add('active-arena');
+            document.getElementById('lvlBtn' + levelIdx).classList.add('active-mission');
+        }
+
+        // Level 1 Logic
+        let nodeL = null; let nodeR = null;
+        function connectEcoNodes(side, id, matchVal) {
+            if(side === 'L') {
+                if(nodeL) document.getElementById(nodeL.id).classList.remove('node-selected');
+                nodeL = { id: id, match: matchVal };
+            } else {
+                if(nodeR) document.getElementById(nodeR.id).classList.remove('node-selected');
+                nodeR = { id: id, match: matchVal };
+            }
+            document.getElementById(id).classList.add('node-selected');
+
+            if(nodeL && nodeR) {
+                if(nodeL.match === nodeR.match) {
+                    document.getElementById(nodeL.id).style.background = "var(--money-green)";
+                    document.getElementById(nodeR.id).style.background = "var(--money-green)";
+                    modifyHUDTracker(100, 0);
+                    showEcoAlert(1, "Correct match, my friend! The Greek origin of the word matches perfectly.", true);
+                    document.getElementById('lvlBtn1').style.background = "var(--money-green)";
+                } else {
+                    modifyHUDTracker(0, 10);
+                    showEcoAlert(1, "Incorrect match, budget health decreased! Think again.", false);
+                }
+                nodeL = null; nodeR = null;
+            }
+        }
+
+        // Level 2 Logic
+        function verifyLevel2() {
+            let c1 = document.getElementById("cryptIn1").value.trim().toLowerCase();
+            let c2 = document.getElementById("cryptIn2").value.trim().toLowerCase();
+            let c3 = document.getElementById("cryptIn3").value.trim().toLowerCase();
+
+            if(c1 === "unlimited" && (c2 === "limited" || c2 === "scarce") && c3 === "choice") {
+                modifyHUDTracker(150, 0);
+                document.getElementById('lvlBtn2').style.background = "var(--money-green)";
+                showEcoAlert(2, "Awesome! The code for the relationship between wants and scarcity has been successfully unlocked.", true);
+            } else {
+                modifyHUDTracker(0, 10);
+                showEcoAlert(2, "Code is incorrect, my friend! Hint: Unlimited, Limited, Choice.", false);
+            }
+        }
+
+        // Level 3: 10 Questions Quiz Data
+        const economicsQuizPool = [
+            { q: "1. Which science studies human daily economic life, earning, and spending of money?", o: ["Political Science", "Sociology", "Economics"], c: 2 },
+            { q: "2. Who is known as the 'Father of Economics' for systematically presenting economic thoughts to the world?", o: ["Kautilya", "Adam Smith", "Alfred Marshall"], c: 1 },
+            { q: "3. Which famous economic book published by Adam Smith in 1776 changed the entire world?", o: ["The Republic", "Wealth of Nations", "Politics"], c: 1 },
+            { q: "4. What is the act of buying goods and services with money to directly satisfy our wants called?", o: ["Production", "Exchange", "Consumption"], c: 2 },
+            { q: "5. Which link or business activity is used to deliver goods from producers to consumers in the market?", o: ["Exchange", "Distribution", "Consumption"], c: 0 },
+            { q: "6. Which activity distributes the total income from production among land, labor, and capital (rent, wages, interest)?", o: ["Production", "Distribution", "Exchange"], c: 1 },
+            { q: "7. Out of our economic expenses, which one is most important for our future financial security?", o: ["Watching Movies", "Savings and Investment", "Taking Loans"], c: 1 },
+            { q: "8. In India, when does the Financial Year begin every year?", o: ["On January 1st", "On April 1st", "On June 1st"], c: 1 },
+            { q: "9. What is the best plan suggested to balance a family's income and expenses?", o: ["Family Budget", "Taking more loans", "Increasing expenses"], c: 0 },
+            { q: "10. Through the deep study of economics, which major social problem in the country can be eliminated?", o: ["Only Industry", "Poverty and Unemployment", "Population Growth"], c: 1 }
+        ];
+
+        let qIdx = 0; let qScore = 0; let isQuizActive = true;
+        function loadQuizQuestion() {
+            isQuizActive = true;
+            document.getElementById("nextQuizBtn").style.display = "none";
+            document.getElementById("alert3").style.display = "none";
+            let qData = economicsQuizPool[qIdx];
+            document.getElementById("quizTrackTxt").innerText = `Question Code: ${qIdx + 1} / 10`;
+            document.getElementById("barFill").style.width = `${(qIdx + 1) * 10}%`;
+            document.getElementById("quizQuestionText").innerText = qData.q;
+            
+            let container = document.getElementById("quizOptionsContainer");
+            container.innerHTML = "";
+            qData.o.forEach((opt, idx) => {
+                let div = document.createElement("div");
+                div.classList.add("quiz-box-row");
+                div.innerText = opt;
+                div.onclick = function() {
+                    if(!isQuizActive) return;
+                    isQuizActive = false;
+                    if(idx === qData.c) {
+                        this.classList.add("correct-glow");
+                        qScore++; modifyHUDTracker(30, 0);
+                        showEcoAlert(3, "Correct economic decision! Your budget is healthy.", true);
+                    } else {
+                        this.classList.add("wrong-glow");
+                        container.children[qData.c].classList.add("correct-glow");
+                        modifyHUDTracker(0, 10);
+                        showEcoAlert(3, "Wrong economic decision! Family budget health decreased.", false);
+                    }
+                    document.getElementById("nextQuizBtn").style.display = "inline-block";
+                };
+                container.appendChild(div);
+            });
+        }
+        function nextEcoQuestion() {
+            qIdx++;
+            if(qIdx < economicsQuizPool.length) {
+                loadQuizQuestion();
+            } else {
+                document.getElementById("quizTrackTxt").innerText = "Simulation Complete!";
+                document.getElementById("quizQuestionText").innerText = `Total Score: ${qScore} / 10`;
+                document.getElementById("quizOptionsContainer").innerHTML = "";
+                document.getElementById("nextQuizBtn").style.display = "none";
+                document.getElementById('lvlBtn3').style.background = "var(--money-green)";
+                showEcoAlert(3, qScore >= 7 ? "Excellent Economist, my friend!" : "Good attempt!", true);
+            }
+        }
+        loadQuizQuestion();
+
+        // Level 4 Logic
+        function verifyLevel4() {
+            let t1 = document.getElementById("thinkIn1").value.trim().toLowerCase();
+            let t2 = document.getElementById("thinkIn2").value.trim().toLowerCase();
+
+            if((t1 === "adam smith") && (t2 === "alfred marshall")) {
+                modifyHUDTracker(150, 0);
+                document.getElementById('lvlBtn4').style.background = "var(--money-green)";
+                showEcoAlert(4, "Wow, my friend! The thinkers' definitions are perfectly correct.", true);
+            } else {
+                modifyHUDTracker(0, 10);
+                showEcoAlert(4, "Incorrect definition. Hint: Write Adam Smith, Alfred Marshall.", false);
+            }
+        }
+
+        // Level 5 Logic
+        let selectedOres = {};
+        function toggleStateOre(id, isCoreActivity) {
+            let node = document.getElementById(id);
+            if(node.classList.contains('activated')) {
+                node.classList.remove('activated');
+                delete selectedOres[id];
+            } else {
+                node.classList.add('activated');
+                selectedOres[id] = isCoreActivity;
+            }
+        }
+        function verifyLevel5() {
+            let win = true; let count = 0;
+            for(let id in selectedOres) {
+                if(selectedOres[id] === false) win = false;
+                count++;
+            }
+            if(count !== 4) win = false; // 4 essential activities
+
+            if(win) {
+                modifyHUDTracker(150, 0);
+                document.getElementById('lvlBtn5').style.background = "var(--money-green)";
+                showEcoAlert(5, "Wonderful! The 4 core economic activities (Production, Consumption, Exchange, Distribution) are absolutely correct.", true);
+            } else {
+                modifyHUDTracker(0, 10);
+                showEcoAlert(5, "Incorrect! Select only the four core economic activities, my friend.", false);
+            }
+        }
+
+        // Level 6 Logic
+        function allowOrganDrop(ev) { ev.preventDefault(); }
+        function startOrganDrag(ev) { ev.dataTransfer.setData("text", ev.target.id); }
+        function handleOrganDrop(ev, cat) {
+            ev.preventDefault();
+            let id = ev.dataTransfer.getData("text");
+            let el = document.getElementById(id);
+            el.dataset.cat = cat;
+            ev.target.appendChild(el);
+        }
+        function verifyLevel6() {
+            let o1 = document.getElementById("org1").dataset.cat;
+            let o2 = document.getElementById("org2").dataset.cat;
+            let o3 = document.getElementById("org3").dataset.cat;
+
+            if(o1 === "first" && o2 === "second" && o3 === "luxury") {
+                modifyHUDTracker(200, 0);
+                document.getElementById('lvlBtn6').style.background = "var(--money-green)";
+                showEcoAlert(6, "The family budget allocation priorities are 100% smart!", true);
+            } else {
+                modifyHUDTracker(0, 10);
+                showEcoAlert(6, "Wrong category! Food is primary, education is secondary, and expensive mobiles belong to the luxury category.", false);
+            }
+        }
+
+        // Level 7 Logic
+        let finalL = null; let finalR = null;
+        function selectFinalMatrix(side, id, key) {
+            if(side === 'L') {
+                finalL = { id: id, key: key };
+                document.getElementById("matL1").classList.remove('node-selected');
+                document.getElementById("matL2").classList.remove('node-selected');
+            } else {
+                finalR = { id: id, key: key };
+                document.getElementById("matR1").classList.remove('node-selected');
+                document.getElementById("matR2").classList.remove('node-selected');
+            }
+            document.getElementById(id).classList.add('node-selected');
+        }
+        function verifyLevel7() {
+            if(finalL && finalR && finalL.key === finalR.key) {
+                modifyHUDTracker(250, 0);
+                document.getElementById('lvlBtn7').style.background = "var(--money-green)";
+                showEcoAlert(7, "Wow Chandrakant, my friend! The entire 'Economics and its Significance' lesson simulation is successful. Victory is yours!", true);
+            } else {
+                modifyHUDTracker(0, 10);
+                showEcoAlert(7, "Matrix link is incorrect. Please pay attention to the benefits of economics again, my friend.", false);
+            }
+        }
+
+        function showEcoAlert(lvlNum, text, success) {
+            let box = document.getElementById("alert" + lvlNum);
+            box.style.display = "block";
+            box.innerText = text;
+            box.style.background = success ? "rgba(0, 184, 148, 0.15)" : "rgba(214, 48, 49, 0.1)";
+            box.style.color = success ? "var(--money-green)" : "var(--danger-red)";
+            box.style.borderColor = success ? "var(--money-green)" : "var(--danger-red)";
+        }
+    </script>
+</body>
+</html>

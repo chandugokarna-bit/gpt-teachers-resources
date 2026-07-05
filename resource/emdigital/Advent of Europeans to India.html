@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advent of Europeans to India - Interactive Digital Book</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #114b5f, #1a936f, #88d49e);
+            --book-bg: #ffffff;
+            --primary-color: #114b5f;
+            --secondary-color: #1a936f;
+            --accent-color: #f39c12;
+            --text-color: #2c3e50;
+            --success: #27ae60;
+            --error: #c0392b;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--bg-gradient);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-color);
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 20px;
+            text-shadow: 0 3px 6px rgba(0,0,0,0.3);
+        }
+        .header h1 { font-size: 2.2rem; color: #fff; }
+        .header p { font-size: 1.1rem; color: #f0fdf4; margin-top: 5px; }
+
+        /* Book Structure */
+        .book-container {
+            width: 100%;
+            max-width: 950px;
+            background: var(--book-bg);
+            border-radius: 24px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.4);
+            border-left: 18px solid var(--primary-color);
+            min-height: 650px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-container { width: 100%; height: 6px; background: #e0e0e0; }
+        .progress-bar { height: 100%; width: 14.28%; background: var(--accent-color); transition: width 0.4s ease; }
+
+        /* Page System */
+        .page { padding: 40px; flex: 1; display: none; animation: slidePage 0.4s ease-out; }
+        .page.active { display: block; }
+        @keyframes slidePage { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+
+        .page-title {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px dashed #ddd;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .instruction { font-size: 1.05rem; margin-bottom: 20px; color: #555; font-style: italic; }
+
+        /* Controls Link */
+        .book-controls {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px 40px;
+            background: #f8f9fa;
+            border-top: 1px solid #ddd;
+        }
+        .btn {
+            padding: 12px 28px;
+            border: none;
+            border-radius: 40px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: bold;
+        }
+        .btn-prev { background: #e0e0e0; color: #333; }
+        .btn-next { background: var(--primary-color); color: white; }
+        .btn:hover:not(:disabled) { transform: translateY(-3px); box-shadow: 0 6px 15px rgba(0,0,0,0.2); }
+        .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+        .feedback { margin-top: 15px; padding: 15px; border-radius: 8px; font-weight: bold; display: none; }
+
+        /* Act 1: MCQ */
+        .quiz-box { display: flex; flex-direction: column; gap: 12px; margin-top: 15px; }
+        .opt-btn { padding: 14px 20px; background: #f1f3f5; border: 2px solid #e9ecef; border-radius: 10px; cursor: pointer; text-align: left; font-size: 1rem; transition: 0.2s; }
+        .opt-btn:hover { background: #e9ecef; }
+        .opt-btn.correct { background: #d4edda; border-color: var(--success); color: #155724; }
+        .opt-btn.wrong { background: #f8d7da; border-color: var(--error); color: #721c24; }
+
+        /* Act 2: Click to Open Answer Accordion */
+        .accordion-container { display: flex; flex-direction: column; gap: 12px; }
+        .acc-item { border: 1px solid #ddd; border-radius: 10px; overflow: hidden; }
+        .acc-header { background: #fdfdfd; padding: 15px; font-weight: bold; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+        .acc-header:hover { background: #f1f3f5; }
+        .acc-body { background: #f4fbf7; padding: 15px; display: none; border-top: 1px solid #eee; line-height: 1.6; color: var(--primary-color); font-weight: 500; }
+
+        /* Act 3: Drag & Drop Matching */
+        .matching-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .match-left, .match-right { display: flex; flex-direction: column; gap: 10px; }
+        .match-card { padding: 12px 18px; background: #f8f9fa; border: 2px solid #e2e8f0; border-radius: 10px; cursor: pointer; transition: 0.2s; }
+        .match-card.selected { background: #e1f5fe; border-color: var(--secondary-color); }
+        .match-card.correct { background: #d4edda; border-color: var(--success); color: #155724; cursor: default; }
+
+        /* Act 4: Innovative Blanks */
+        .text-passage { background: #fffdf5; border: 1px solid #f3e5ab; padding: 25px; border-radius: 12px; font-size: 1.15rem; line-height: 2; }
+        .blank-select { padding: 4px 8px; border: 2px solid var(--secondary-color); border-radius: 6px; font-size: 1rem; font-weight: bold; color: var(--secondary-color); background: white; cursor: pointer; }
+
+        /* Act 5: Chronology Sorting */
+        .v-timeline { display: flex; flex-direction: column; gap: 12px; }
+        .t-row { display: flex; align-items: center; gap: 15px; background: #fafafa; padding: 10px; border-radius: 8px; border: 1px dashed #ccc; }
+        .t-index { width: 35px; height: 35px; background: var(--primary-color); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+        .t-zone { flex: 1; min-height: 40px; background: #fff; border-radius: 6px; display: flex; align-items: center; padding-left: 10px; }
+        .item-bank { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 15px; background: #eee; padding: 12px; border-radius: 10px; }
+        .drag-chip { padding: 8px 15px; background: white; border: 1px solid #ccc; border-radius: 20px; cursor: grab; font-size: 0.95rem; font-weight: bold; }
+
+        /* Act 6: Trade Center Fleet Matrix */
+        .grid-fleet { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
+        .fleet-card { background: #f4fbf9; border: 2px solid #b2dfdb; padding: 20px; text-align: center; border-radius: 15px; cursor: pointer; transition: 0.3s; }
+        .fleet-card:hover { transform: scale(1.04); background: #e0f2f1; }
+        .fleet-card i { font-size: 2.3rem; color: var(--secondary-color); margin-bottom: 10px; }
+
+        /* Act 7: Scenario Decision */
+        .story-box { background: #fdf6e2; border-left: 5px solid #dfb031; padding: 20px; border-radius: 8px; font-style: italic; font-size: 1.1rem; line-height: 1.6; margin-bottom: 15px; }
+        .choice-btn { width: 100%; text-align: left; padding: 15px; background: white; border: 2px solid #ddd; margin-top: 10px; border-radius: 8px; cursor: pointer; font-size: 1rem; transition: 0.2s; }
+        .choice-btn:hover { background: #f8f9fa; border-color: var(--primary-color); }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>Advent of Europeans to India</h1>
+        <p>Ultra-Modern Interactive Learning Book</p>
+    </div>
+
+    <div class="book-container">
+        <div class="progress-container">
+            <div class="progress-bar" id="progBar"></div>
+        </div>
+
+        <div class="page active" id="page1">
+            <div class="page-title"><i class="fa-solid fa-list-check"></i> Activity 1: Single-Sentence Question Multiple Choice Series</div>
+            <p class="instruction">Select and click the correct answer for the questions related to the core aspects of the lesson:</p>
+            <p id="q-text" style="font-size:1.2rem; margin-bottom:15px; font-weight:bold; color:var(--primary-color);"></p>
+            <div class="quiz-box" id="q-options"></div>
+            <div style="font-weight: bold; margin-top: 15px; text-align: right; color: #666;" id="q-indicator">Question: 1/6</div>
+            <div class="feedback" id="fb1"></div>
+        </div>
+
+        <div class="page" id="page2">
+            <div class="page-title"><i class="fa-solid fa-folder-open"></i> Activity 2: Conceptual Group Questions (Click Box Activity)</div>
+            <p class="instruction">Click on the key descriptive questions below to open and study their accurate answer frameworks:</p>
+            
+            <div class="accordion-container">
+                <div class="acc-item">
+                    <div class="acc-header" onclick="toggleAcc(this)">1. What was the main circumstance that led to the discovery of a new sea route to India? <i class="fa-solid fa-plus"></i></div>
+                    <div class="acc-body">When the Ottoman Turks captured the city of Constantinople in 1453 CE, the traditional land route used by Europeans was closed. This made finding a new sea route unavoidable.</div>
+                </div>
+                <div class="acc-item">
+                    <div class="acc-header" onclick="toggleAcc(this)">2. Between whom was the Battle of Plassey fought and what was its result? <i class="fa-solid fa-plus"></i></div>
+                    <div class="acc-body">It was fought in 1757 CE between the Nawab of Bengal, Siraj-ud-Daulah, and Robert Clive of the British. Due to the treachery of Mir Jafar, the British emerged victorious.</div>
+                </div>
+                <div class="acc-item">
+                    <div class="acc-header" onclick="toggleAcc(this)">3. Why holds the Battle of Buxar immense significance in history? <i class="fa-solid fa-plus"></i></div>
+                    <div class="acc-body">In this battle fought in 1764 CE, the British defeated the combined forces of three Indian rulers. This secured the real 'Diwani' rights (revenue collection rights) over Bengal for the British, consolidating their hegemony.</div>
+                </div>
+                <div class="acc-item">
+                    <div class="acc-header" onclick="toggleAcc(this)">4. Who introduced the system of 'Dual Government' and what did it mean? <i class="fa-solid fa-plus"></i></div>
+                    <div class="acc-body">Robert Clive introduced this system. Under this, while the British held the right to collect land revenue (Diwani), the Nawab retained the responsibility for general administration and the maintenance of justice.</div>
+                </div>
+                <div class="acc-item">
+                    <div class="acc-header" onclick="toggleAcc(this)">5. What was the primary objective of the British 'Subsidiary Alliance System'? <i class="fa-solid fa-plus"></i></div>
+                    <div class="acc-body">The primary objective of this system brought by Lord Wellesley was to bring Indian princely states under British sovereignty and to completely curtail French political influence in India.</div>
+                </div>
+                <div class="acc-item">
+                    <div class="acc-header" onclick="toggleAcc(this)">6. Which major states were annexed into the British Empire due to the 'Doctrine of Lapse'? <i class="fa-solid fa-plus"></i></div>
+                    <div class="acc-body">Under this policy introduced by Lord Dalhousie, states like Satara, Jaipur, Sambalpur, Udaipur, Jhansi, and Nagpur were annexed by the British.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="page" id="page3">
+            <div class="page-title"><i class="fa-solid fa-arrows-spin"></i> Activity 3: Linking European Companies and Key Centers</div>
+            <p class="instruction">Click on the company or governor's name on the left, then match it to the appropriate description on the right:</p>
+            
+            <div class="matching-grid">
+                <div class="match-left" id="leftContainer">
+                    <div class="match-card" data-id="1">The Portuguese</div>
+                    <div class="match-card" data-id="2">The Dutch</div>
+                    <div class="match-card" data-id="3">The French</div>
+                    <div class="match-card" data-id="4">Francisco de Almeida</div>
+                    <div class="match-card" data-id="5">Albuquerque</div>
+                    <div class="match-card" data-id="6">Dupleix</div>
+                </div>
+                <div class="match-right" id="rightContainer">
+                    <div class="match-card" data-match="2">People from the Netherlands who established factories in Pulicat and Surat</div>
+                    <div class="match-card" data-match="1">The first Europeans to arrive in India by sea and the last to leave</div>
+                    <div class="match-card" data-match="4">The governor who introduced the famous 'Blue Water Policy'</div>
+                    <div class="match-card" data-match="3">The ones who made Pondicherry their primary commercial center in India</div>
+                    <div class="match-card" data-match="6">Ambitious French Governor and the mastermind behind the Carnatic Wars</div>
+                    <div class="match-card" data-match="5">The one who conquered Goa from the Sultan of Bijapur and established the Portuguese empire</div>
+                </div>
+            </div>
+            <div class="feedback" id="fb3"></div>
+        </div>
+
+        <div class="page" id="page4">
+            <div class="page-title"><i class="fa-solid fa-feather-pointed"></i> Activity 4: Analysis of European Political Chess History</div>
+            <p class="instruction">Fill in the blanks of the historical paragraph below using the most appropriate choices:</p>
+            
+            <div class="text-passage">
+                The wars fought between the British and the French for political monopoly in India are known as the 
+                <select class="blank-select" id="b1" data-ans="Carnatic Wars"><option value="">--Select--</option><option>Carnatic Wars</option><option>Mysore Wars</option><option>Maratha Wars</option></select> 
+                . The Queen of England who granted a Royal Charter to the British East India Company to trade was Queen 
+                <select class="blank-select" id="b2" data-ans="Elizabeth"><option value="">--Select--</option><option>Victoria</option><option>Elizabeth</option><option>Mary</option></select> 
+                . The British ambassador who visited the court of Mughal Emperor जहांगीर and obtained trading permissions was 
+                <select class="blank-select" id="b3" data-ans="Sir Thomas Roe"><option value="">--Select--</option><option>Captain Hawkins</option><option>Sir Thomas Roe</option><option>Lord Clive</option></select> 
+                . The highly controversial administrative measure implemented in Bengal in 1765 CE is the 
+                <select class="blank-select" id="b4" data-ans="Dual Government System"><option value="">--Select--</option><option>Dual Government System</option><option>Permanent Settlement</option><option>Ryotwari System</option></select> 
+                . The first administrative agreement accepted by the Nizam of Hyderabad for British protection was the 
+                <select class="blank-select" id="b5" data-ans="Subsidiary Alliance"><option value="">--Select--</option><option>Doctrine of Lapse</option><option>Subsidiary Alliance</option><option>Lord Cornwallis Policy</option></select> 
+                . Lastly, the famous queen who fell victim to the British Doctrine of Lapse and fought valiantly was 
+                <select class="blank-select" id="b6" data-ans="Rani Lakshmibai of Jhansi"><option value="">--Select--</option><option>Kittur Chennamma</option><option>Rani Lakshmibai of Jhansi</option><option>Keladi Chennamma</option></select> 
+                .
+            </div>
+            <button class="btn" style="background:var(--accent-color); color:white; margin-top:20px;" onclick="checkBlanks()">Verify History Text</button>
+            <div class="feedback" id="fb4"></div>
+        </div>
+
+        <div class="page" id="page5">
+            <div class="page-title"><i class="fa-solid fa-arrow-down-1-9"></i> Activity 5: Chronological Event Sequence Game</div>
+            <p class="instruction">Arrange the following events that altered the history of India sequentially from oldest to newest based on time:</p>
+            
+            <div class="v-timeline">
+                <div class="t-row"><div class="t-index">1</div><div class="t-zone" id="z1" data-order="Arrival of Vasco da Gama at Calicut, India"></div></div>
+                <div class="t-row"><div class="t-index">2</div><div class="t-zone" id="z2" data-order="Establishment of the English East India Company"></div></div>
+                <div class="t-row"><div class="t-index">3</div><div class="t-zone" id="z3" data-order="Battle of Plassey between Siraj-ud-Daulah and Clive"></div></div>
+                <div class="t-row"><div class="t-index">4</div><div class="t-zone" id="z4" data-order="Battle of Buxar against Mir Qasim"></div></div>
+                <div class="t-row"><div class="t-index">5</div><div class="t-zone" id="z5" data-order="Implementation of Subsidiary Alliance by Wellesley"></div></div>
+                <div class="t-row"><div class="t-index">6</div><div class="t-zone" id="z6" data-order="Implementation of Doctrine of Lapse by Dalhousie"></div></div>
+            </div>
+
+            <div class="item-bank" id="dragBank5">
+                <div class="drag-chip" draggable="true" id="t1">Battle of Buxar against Mir Qasim</div>
+                <div class="drag-chip" draggable="true" id="t2">Arrival of Vasco da Gama at Calicut, India</div>
+                <div class="drag-chip" draggable="true" id="t3">Implementation of Subsidiary Alliance by Wellesley</div>
+                <div class="drag-chip" draggable="true" id="t4">Establishment of the English East India Company</div>
+                <div class="drag-chip" draggable="true" id="t5">Implementation of Doctrine of Lapse by Dalhousie</div>
+                <div class="drag-chip" draggable="true" id="t6">Battle of Plassey between Siraj-ud-Daulah and Clive</div>
+            </div>
+            <button class="btn" style="background:var(--accent-color); color:white; margin-top:15px;" onclick="checkTimeline()">Check Chronology</button>
+            <div class="feedback" id="fb5"></div>
+        </div>
+
+        <div class="page" id="page6">
+            <div class="page-title"><i class="fa-solid fa-ship"></i> Activity 6: Commercial Spice Treasure Hunt</div>
+            <p class="instruction">Open only the boxes containing highly valuable commercial items that Europeans primarily imported from India (4 correct treasures in total):</p>
+            
+            <div class="grid-fleet">
+                <div class="fleet-card" data-correct="yes" data-info="Black Pepper was in exceptionally high demand in Europe for meat preservation."><i class="fa-solid fa-clover"></i><h5>Black Pepper</h5></div>
+                <div class="fleet-card" data-correct="no" data-info="Certainly not, this was an invention of China and Europeans did not head to India searching for it."><i class="fa-solid fa-scroll"></i><h5>Paper Technology</h5></div>
+                <div class="fleet-card" data-correct="yes" data-info="India's exquisite cardamom was a major attraction in the cuisine of European royalty."><i class="fa-solid fa-seedling"></i><h5>Cardamom</h5></div>
+                <div class="fleet-card" data-correct="yes" data-info="High-quality Indian cotton textiles triggered an intense market war among European traders."><i class="fa-solid fa-shirt"></i><h5>Cotton Textiles</h5></div>
+                <div class="fleet-card" data-correct="no" data-info="No, modern machinery began flowing from Europe to India only after the Industrial Revolution."><i class="fa-solid fa-gears"></i><h5>Modern Machinery</h5></div>
+                <div class="fleet-card" data-correct="yes" data-info="Cinnamon was a major spice exported extensively from the coastal regions of India."><i class="fa-solid fa-leaf"></i><h5>Cinnamon</h5></div>
+            </div>
+            <div class="feedback" id="fb6" style="background:#fff3cd; color:#856404;"></div>
+        </div>
+
+        <div class="page" id="page7">
+            <div class="page-title"><i class="fa-solid fa-chess-knight"></i> Activity 7: Scenario-Based Diplomatic Decision Making</div>
+            <p class="instruction">Read the historical scenario below and choose the course of action you would take if you were the Nawab of Bengal:</p>
+            
+            <div class="story-box">
+                "You are in the shoes of Siraj-ud-Daulah, the Nawab of Bengal. The British are fortifying Fort William in Calcutta without your permission and are causing immense losses to your treasury by abusing the Dastaks (free trade licenses). What is your next move?"
+            </div>
+
+            <button class="choice-btn" onclick="makeDecision(false, 'This is a weak decision. The British will interpret this as helplessness and become even more aggressive.')">Option A: Do nothing or refrain from any discussion with the British out of fear, considering them too powerful a force.</button>
+            <button class="choice-btn" onclick="makeDecision(true, 'A historically accurate and courageous decision! Siraj-ud-Daulah warned the British, marched on their fortification, and captured Calcutta, which eventually led to the Battle of Plassey.')">Option B: Order the British to immediately halt the renovation of the fort, and launch an attack to seize the Calcutta fortification if they breach the rules.</button>
+            <button class="choice-btn" onclick="makeDecision(false, 'This compromises national sovereignty. It amounts to completely surrendering to British authority as a Nawab.')">Option C: Pay whatever sum of money the British demand, sign a treaty with them, and capitulate.</button>
+            
+            <div class="feedback" id="fb7"></div>
+        </div>
+
+        <div class="book-controls">
+            <button class="btn btn-prev" id="prevPageBtn" onclick="movePage(-1)" disabled><i class="fa-solid fa-book-open"></i> Previous Page</button>
+            <button class="btn btn-next" id="nextPageBtn" onclick="movePage(1)">Next Page <i class="fa-solid fa-book"></i></button>
+        </div>
+    </div>
+
+    <script>
+        let pageIdx = 1;
+        const maxPages = 7;
+
+        function movePage(dir) {
+            document.getElementById(`page${pageIdx}`).classList.remove('active');
+            pageIdx += dir;
+            document.getElementById(`page${pageIdx}`).classList.add('active');
+
+            document.getElementById('prevPageBtn').disabled = (pageIdx === 1);
+            document.getElementById('nextPageBtn').disabled = (pageIdx === maxPages);
+
+            document.getElementById('progBar').style.width = `${(pageIdx / maxPages) * 100}%`;
+        }
+
+        // --- Act 1: MCQ Data Base (6 items) ---
+        const mcqCollection = [
+            { q: "In which year did the Portuguese navigator Vasco da Gama arrive at Calicut, discovering a new sea route to India?", opts: ["1492 CE", "1498 CE", "1502 CE", "1600 CE"], ans: 1 },
+            { q: "Which was the very first secure fort built by the British in India?", opts: ["Fort William", "Fort St. George (Madras)", "Grand Fort", "Bombay Fort"], ans: 1 },
+            { q: "Who was the most famous and ambitious Governor of the French East India Company?", opts: ["Robert Clive", "Dupleix", "Lord Cornwallis", "Count de Lally"], ans: 1 },
+            { q: "Who was the Nawab of Bengal when the historic Battle of Plassey took place?", opts: ["Mir Jafar", "Mir Qasim", "Siraj-ud-Daulah", "Alivardi Khan"], ans: 2 },
+            { q: "In which year did the Battle of Buxar take place against the British forces?", opts: ["1757 CE", "1761 CE", "1764 CE", "1799 CE"], ans: 2 },
+            { q: "Which British Governor-General introduced the brutal imperial policy of the 'Doctrine of Lapse'?", opts: ["Lord Wellesley", "Lord Dalhousie", "Lord William Bentinck", "Lord Warren Hastings"], ans: 1 }
+        ];
+
+        let currentQIdx = 0;
+        function loadMCQ() {
+            const data = mcqCollection[currentQIdx];
+            document.getElementById('q-text').innerText = `${currentQIdx + 1}. ${data.q}`;
+            const container = document.getElementById('q-options');
+            container.innerHTML = "";
+            document.getElementById('q-indicator').innerText = `Question: ${currentQIdx + 1}/${mcqCollection.length}`;
+
+            data.opts.forEach((opt, idx) => {
+                const b = document.createElement('button');
+                b.className = "opt-btn";
+                b.innerText = opt;
+                b.onclick = () => verifyMCQ(idx, data.ans, b);
+                container.appendChild(b);
+            });
+        }
+
+        function verifyMCQ(sel, right, element) {
+            const fb = document.getElementById('fb1'); fb.style.display = "block";
+            if(sel === right) {
+                element.classList.add('correct');
+                fb.innerHTML = "✓ Great job! Correct answer.";
+                fb.style.background = "#d4edda"; fb.style.color = "#155724";
+                setTimeout(() => {
+                    if(currentQIdx < mcqCollection.length - 1) {
+                        currentQIdx++; loadMCQ(); fb.style.display = "none";
+                    } else { fb.innerHTML = "🎉 Fantastic! You have answered all 6 questions accurately."; }
+                }, 1500);
+            } else {
+                element.classList.add('wrong');
+                fb.innerHTML = "✗ Wrong answer, recall the historical facts again.";
+                fb.style.background = "#f8d7da"; fb.style.color = "#721c24";
+            }
+        }
+        loadMCQ();
+
+        // --- Act 2: Accordion Open Toggle ---
+        function toggleAcc(header) {
+            const body = header.nextElementSibling;
+            const icon = header.querySelector('i');
+            if(body.style.display === "block") {
+                body.style.display = "none";
+                icon.className = "fa-solid fa-plus";
+            } else {
+                body.style.display = "block";
+                icon.className = "fa-solid fa-minus";
+            }
+        }
+
+        // --- Act 3: Matching Logic ---
+        let selectedLeft = null;
+        const leftCards = document.querySelectorAll('#leftContainer .match-card');
+        const rightCards = document.querySelectorAll('#rightContainer .match-card');
+
+        leftCards.forEach(card => {
+            card.addEventListener('click', () => {
+                if(card.classList.contains('correct')) return;
+                leftCards.forEach(c => c.classList.remove('selected'));
+                card.classList.add('selected');
+                selectedLeft = card;
+            });
+        });
+
+        rightCards.forEach(card => {
+            card.addEventListener('click', () => {
+                if(card.classList.contains('correct') || !selectedLeft) return;
+                const matchId = card.getAttribute('data-match');
+                const leftId = selectedLeft.getAttribute('data-id');
+
+                if(matchId === leftId) {
+                    card.classList.add('correct');
+                    selectedLeft.classList.add('correct');
+                    selectedLeft.classList.remove('selected');
+                    selectedLeft = null;
+                    checkAct3Progress();
+                } else {
+                    const fb = document.getElementById('fb3');
+                    fb.style.display = "block"; fb.style.background = "#f8d7da"; fb.style.color = "#c0392b";
+                    fb.innerText = "✗ Incorrect pair! Match the correct profile of the European company or governor.";
+                }
+            });
+        });
+
+        function checkAct3Progress() {
+            const finished = document.querySelectorAll('#leftContainer .match-card.correct').length;
+            const fb = document.getElementById('fb3'); fb.style.display = "block";
+            if(finished === 6) {
+                fb.style.background = "#d4edda"; fb.style.color = "#27ae60";
+                fb.innerText = "✓ Brilliant achievement! All 6 companies and their governors descriptions are perfectly matched.";
+            } else {
+                fb.style.background = "#e2e8f0"; fb.style.color = "#4a5568";
+                fb.innerText = `Progress: ${finished}/6 pairs correct.`;
+            }
+        }
+
+        // --- Drag & Drop Core infrastructure for Act 5 ---
+        let currentDraggingChip = null;
+        document.querySelectorAll('.drag-chip').forEach(chip => {
+            chip.addEventListener('dragstart', () => { currentDraggingChip = chip; });
+        });
+
+        document.querySelectorAll('.t-zone').forEach(zone => {
+            zone.addEventListener('dragover', (e) => e.preventDefault());
+            zone.addEventListener('drop', () => {
+                if(currentDraggingChip) zone.appendChild(currentDraggingChip);
+            });
+        });
+
+        function checkTimeline() {
+            let correct = 0;
+            for(let i=1; i<=6; i++) {
+                const zone = document.getElementById(`z${i}`);
+                if(zone.firstChild && zone.firstChild.innerText.trim() === zone.getAttribute('data-order')) {
+                    correct++;
+                }
+            }
+            const fb = document.getElementById('fb5'); fb.style.display = "block";
+            if(correct === 6) {
+                fb.innerHTML = "✓ Awesome! You have arranged the 6 defining events of Indian history in flawless order.";
+                fb.style.background = "#d4edda"; fb.style.color = "#155724";
+            } else {
+                fb.innerHTML = `✗ ${correct}/6 steps are correct. Re-evaluate the timeline from the arrival of navigators down to the lapse policy.`;
+                fb.style.background = "#f8d7da"; fb.style.color = "#721c24";
+            }
+        }
+
+        // --- Act 4: Blanks Validator ---
+        function checkBlanks() {
+            let miss = 0;
+            const selects = document.querySelectorAll('.blank-select');
+            selects.forEach(sel => {
+                if(sel.value !== sel.getAttribute('data-ans')) {
+                    miss++; sel.style.borderColor = "var(--error)";
+                } else { sel.style.borderColor = "var(--success)"; }
+            });
+            const fb = document.getElementById('fb4'); fb.style.display = "block";
+            if(miss === 0) {
+                fb.innerHTML = "✓ Superb! You have successfully completed the text block on European political history.";
+                fb.style.background = "#d4edda"; fb.style.color = "#155724";
+            } else {
+                fb.innerHTML = "✗ A few blanks contain incorrect diplomatic terms. Reconsider and fix them.";
+                fb.style.background = "#f8d7da"; fb.style.color = "#721c24";
+            }
+        }
+
+        // --- Act 6: Fleet Grid Picker ---
+        document.querySelectorAll('.fleet-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const isCorrect = card.getAttribute('data-correct') === 'yes';
+                const info = card.getAttribute('data-info');
+                const fb = document.getElementById('fb6'); fb.style.display = "block";
+                if(isCorrect) {
+                    card.style.background = "#c8e6c9";
+                    card.querySelector('i').className = "fa-solid fa-box-open";
+                    fb.innerHTML = `🎯 Commercial treasure found! Details: ${info}`;
+                    fb.style.backgroundColor = "#d4edda"; fb.style.color = "#155724";
+                } else {
+                    card.style.background = "#ffcdd2";
+                    fb.innerHTML = `⚠️ Wrong item! Details: ${info}`;
+                    fb.style.backgroundColor = "#f8d7da"; fb.style.color = "#721c24";
+                }
+            });
+        });
+
+        // --- Act 7: Scenario Decision Logic ---
+        function makeDecision(isRight, txt) {
+            const fb = document.getElementById('fb7'); fb.style.display = "block";
+            fb.innerHTML = txt;
+            if(isRight) {
+                fb.style.background = "#d4edda"; fb.style.color = "#155724";
+            } else {
+                fb.style.background = "#f8d7da"; fb.style.color = "#721c24";
+            }
+        }
+    </script>
+</body>
+</html>

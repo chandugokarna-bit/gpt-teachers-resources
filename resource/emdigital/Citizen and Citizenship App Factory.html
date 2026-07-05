@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Citizen App Factory 9.0 - Responsible Citizen Games</title>
+    <style>
+        :root {
+            --citizen-blue: #0984e3;
+            --saffron-bright: #ff9f43;
+            --white-glow: #ffffff;
+            --flag-green: #10ac84;
+            --cyber-dark: #0f172a;
+            --panel-bg: rgba(30, 41, 59, 0.9);
+            --danger-red: #ee5253;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Verdana, sans-serif; }
+
+        body {
+            background: var(--cyber-dark);
+            background-image: radial-gradient(circle at 50% 50%, #1e1b4b 0%, #0f172a 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #ffffff;
+        }
+
+        header.citizen-header {
+            text-align: center;
+            padding: 25px;
+            background: var(--panel-bg);
+            border: 2px solid var(--saffron-bright);
+            border-radius: 20px;
+            box-shadow: 0 0 25px rgba(255, 159, 67, 0.2);
+            margin-bottom: 25px;
+        }
+
+        header.citizen-header h1 {
+            color: var(--saffron-bright);
+            font-size: 2.3rem;
+            text-shadow: 0 0 10px rgba(255, 159, 67, 0.4);
+            margin-bottom: 5px;
+        }
+
+        header.citizen-header p { color: #cbd5e1; font-size: 1.2rem; }
+
+        /* NEW HUD: NATIONAL PRIDE INDEX */
+        .citizen-hud-display {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #1e293b;
+            padding: 15px 25px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            border-left: 5px solid var(--flag-green);
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .pride-bar-container {
+            background: #334155;
+            width: 45%;
+            height: 18px;
+            border-radius: 9px;
+            overflow: hidden;
+            border: 1px solid var(--flag-green);
+        }
+
+        .pride-bar-fill {
+            background: linear-gradient(90deg, var(--flag-green), #55efc4);
+            height: 100%;
+            width: 100%;
+            transition: width 0.4s ease;
+        }
+
+        /* Factory Level Selector Cards */
+        .factory-menu-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 35px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+
+        .factory-menu-row::-webkit-scrollbar { height: 6px; }
+        .factory-menu-row::-webkit-scrollbar-thumb { background: var(--saffron-bright); border-radius: 3px; }
+
+        .factory-card {
+            background: #1e293b;
+            border: 1px solid #334155;
+            padding: 12px 25px;
+            border-radius: 14px;
+            cursor: pointer;
+            font-weight: bold;
+            white-space: nowrap;
+            transition: all 0.3s;
+        }
+
+        .factory-card:hover, .factory-card.active-mission {
+            background: var(--saffron-bright);
+            color: #000000;
+            border-color: #ffffff;
+            box-shadow: 0 0 15px var(--saffron-bright);
+            transform: translateY(-3px);
+        }
+
+        /* Game Core Factory Arena */
+        .factory-arena {
+            background: var(--panel-bg);
+            border: 2px solid #334155;
+            border-radius: 24px;
+            padding: 35px;
+            min-height: 520px;
+            display: none;
+            box-shadow: 0 20px 45px rgba(0,0,0,0.5);
+        }
+
+        .factory-arena.active-arena { display: block; animation: powerOn 0.4s ease-in-out; }
+
+        @keyframes powerOn {
+            from { opacity: 0; transform: scale(0.98); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        h2.arena-title {
+            font-size: 1.65rem;
+            color: var(--saffron-bright);
+            margin-bottom: 25px;
+            border-bottom: 1px dashed rgba(255, 159, 67, 0.3);
+            padding-bottom: 12px;
+        }
+
+        /* Interactive Connecting Grid Nodes */
+        .connector-grid-system {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .citizen-node {
+            background: #1e293b;
+            padding: 18px;
+            border-radius: 14px;
+            cursor: pointer;
+            border: 2px solid #334155;
+            font-weight: bold;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .citizen-node:hover { border-color: var(--citizen-blue); background: #223047; }
+        .citizen-node.node-selected { background: var(--citizen-blue); color: white; border-color: white; }
+
+        /* Quiz UI Elements */
+        .choice-box-row {
+            background: #1e293b;
+            border: 2px solid #334155;
+            padding: 16px;
+            margin: 12px 0;
+            border-radius: 14px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+        }
+
+        .choice-box-row:hover { border-color: var(--saffron-bright); transform: translateX(5px); }
+        .choice-box-row.correct-glow { background: rgba(16, 172, 132, 0.2); border-color: var(--flag-green); color: #55efc4; }
+        .choice-box-row.wrong-glow { background: rgba(238, 82, 83, 0.2); border-color: var(--danger-red); color: #ff7675; }
+
+        /* Text Input Styling */
+        .smart-citizen-input {
+            background: #0f172a;
+            border: 2px solid #334155;
+            border-radius: 10px;
+            padding: 12px;
+            font-size: 1.1rem;
+            color: var(--saffron-bright);
+            font-weight: bold;
+            outline: none;
+            width: 100%;
+            max-width: 320px;
+            margin-top: 8px;
+        }
+
+        .smart-citizen-input:focus { border-color: var(--saffron-bright); }
+
+        /* Mining Elements */
+        .mining-card-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        .ore-token {
+            background: #1e293b;
+            border: 2px solid #334155;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .ore-token.active-token { background: var(--flag-green); border-color: white; }
+
+        /* Universal Action Buttons */
+        .factory-btn {
+            background: linear-gradient(135deg, var(--saffron-bright), #e67e22);
+            color: black;
+            border: none;
+            padding: 14px 35px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 25px;
+            box-shadow: 0 5px 15px rgba(255, 159, 67, 0.3);
+        }
+
+        .factory-btn:hover { transform: scale(1.02); box-shadow: 0 8px 25px rgba(255, 159, 67, 0.5); }
+
+        .factory-alert-box {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 12px;
+            font-weight: bold;
+            display: none;
+            font-size: 1.1rem;
+            border: 1px solid transparent;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="citizen-header">
+        <h1>Citizen and Citizenship App Factory</h1>
+        <p>Simulator Model 9.0 • Digital Games Shaping Responsible Citizens of the Nation</p>
+    </div>
+
+    <div class="citizen-hud-display">
+        <span>National Pride Index:</span>
+        <div class="pride-bar-container"><div class="pride-bar-fill" id="prideFill"></div></div>
+        <span style="color: var(--saffron-bright);" id="livePassportPoints">Passport Points: 0000 PP</span>
+    </div>
+
+    <div class="factory-menu-row">
+        <div class="factory-card active-mission" id="facBtn1" onclick="shiftFactoryLevel(1)">1. Citizen & State Link</div>
+        <div class="factory-card" id="facBtn2" onclick="shiftFactoryLevel(2)">2. Meaning Code of Citizenship</div>
+        <div class="factory-card" id="facBtn3" onclick="shiftFactoryLevel(3)">3. Epic 10 Quiz</div>
+        <div class="factory-card" id="facBtn4" onclick="shiftFactoryLevel(4)">4. Major Types of Citizenship</div>
+        <div class="factory-card" id="facBtn5" onclick="shiftFactoryLevel(5)">5. 4 Ways to Acquire Citizenship</div>
+        <div class="factory-card" id="facBtn6" onclick="shiftFactoryLevel(6)">6. 3 Ways to Lose Citizenship</div>
+        <div class="factory-card" id="facBtn7" onclick="shiftFactoryLevel(7)">7. Qualities of a Good Citizen</div>
+    </div>
+
+    <div id="factory1" class="factory-arena active-arena">
+        <h2 class="arena-title">Level 1: Inseparable Relationship between Citizen and State (Core Relation Node)</h2>
+        <p style="margin-bottom: 15px;">Pair the type of inhabitant with their correct description to establish the rule:</p>
+        <div class="connector-grid-system">
+            <div>
+                <div class="citizen-node" id="l1_nodeL1" onclick="connectCitizenNodes('L', 'l1_nodeL1', 1)">Citizen</div>
+                <div class="citizen-node" id="l1_nodeL2" style="margin-top:15px;" onclick="connectCitizenNodes('L', 'l1_nodeL2', 2)">Foreign Resident</div>
+            </div>
+            <div>
+                <div class="citizen-node" id="l1_nodeR1" onclick="connectCitizenNodes('R', 'l1_nodeR1', 2)">One who comes to the country temporarily and has no rights</div>
+                <div class="citizen-node" id="l1_nodeR2" style="margin-top:15px;" onclick="connectCitizenNodes('R', 'l1_nodeR2', 1)">One who has acquired membership of the state and exercises rights</div>
+            </div>
+        </div>
+        <div class="factory-alert-box" id="alert1"></div>
+    </div>
+
+    <div id="factory2" class="factory-arena">
+        <h2 class="arena-title">Level 2: Importance and Linguistic Origin of Citizenship (Language Crypt)</h2>
+        <div style="display:flex; flex-direction:column; gap:20px;">
+            <div class="fib-q">1. What is the system called that grants a person the highest legal status and protection in their country? <br><input type="text" class="smart-citizen-input" id="cryptIn1" placeholder="Enter answer here (e.g., Citizenship)"></div>
+            <div class="fib-q">2. Which rights does the Supreme Court and the Constitution of the country guarantee to citizens holding citizenship? <br><input type="text" class="smart-citizen-input" id="cryptIn2" placeholder="Fundamental Rights / Only Tax?"></div>
+        </div>
+        <button class="factory-btn" onclick="verifyFactoryLevel2()">Crack Citizenship Code</button>
+        <div class="factory-alert-box" id="alert2"></div>
+    </div>
+
+    <div id="factory3" class="factory-arena">
+        <h2 class="arena-title">Level 3: Great Battle of Constitution and Civil Rights (Epic 10 Battle Quiz)</h2>
+        <div style="font-weight: bold; margin-bottom: 15px; color: var(--saffron-bright);" id="quizCounterText">Question Code: 1 / 10</div>
+        <div id="quizQuestionText" style="font-size: 1.25rem; font-weight: bold; margin-bottom: 20px;">Loading...</div>
+        <div id="quizOptionsContainer"></div>
+        <button class="factory-btn" id="nextQuizBtn" style="display:none;" onclick="nextCitizenQuestion()">Move to Next Citizen Challenge ➔</button>
+        <div class="factory-alert-box" id="alert3"></div>
+    </div>
+
+    <div id="factory4" class="factory-arena">
+        <h2 class="arena-title">Level 4: Types of Citizenship - Single and Dual Citizenship (Global Citizenship Rules)</h2>
+        <div style="display:flex; flex-direction:column; gap:20px;">
+            <div class="fib-q">1. In our country India, there is only one uniform citizenship for the entire country. What is this citizenship called? <br><input type="text" class="smart-citizen-input" id="typeIn1" placeholder="Single Citizenship / Dual Citizenship?"></div>
+            <div class="fib-q">2. In the United States of America (USA), citizens possess both state citizenship and national citizenship. What citizenship is that? <br><input type="text" class="smart-citizen-input" id="typeIn2" placeholder="Single Citizenship / Dual Citizenship?"></div>
+        </div>
+        <button class="factory-btn" onclick="verifyFactoryLevel4()">Confirm Types Code</button>
+        <div class="factory-alert-box" id="alert4"></div>
+    </div>
+
+    <div id="factory5" class="factory-arena">
+        <h2 class="arena-title">Level 5: 4 Major Ways to Acquire Citizenship (Citizenship Acquisition Mining)</h2>
+        <p style="margin-bottom: 15px;">Select only the **four legitimate methods to acquire citizenship** according to the laws of our country:</p>
+        <div class="mining-card-grid">
+            <div class="ore-token" id="ore1" onclick="toggleOreToken('ore1', true)">1. By Birth</div>
+            <div class="ore-token" id="ore2" onclick="toggleOreToken('ore2', false)">2. By Illegal Routes</div>
+            <div class="ore-token" id="ore3" onclick="toggleOreToken('ore3', true)">3. By Descent</div>
+            <div class="ore-token" id="ore4" onclick="toggleOreToken('ore4', true)">4. By Registration</div>
+            <div class="ore-token" id="ore5" onclick="toggleOreToken('ore5', false)">5. False Documentation</div>
+            <div class="ore-token" id="ore6" onclick="toggleOreToken('ore6', true)">6. By Incorporation of Territory</div>
+        </div>
+        <button class="factory-btn" onclick="verifyFactoryLevel5()">Confirm Methods</button>
+        <div class="factory-alert-box" id="alert5"></div>
+    </div>
+
+    <div id="factory6" class="factory-arena">
+        <h2 class="arena-title">Level 6: 3 Major Ways to Lose Citizenship (Loss of Citizenship Sorting)</h2>
+        <p style="margin-bottom: 15px;">Drag and assign the 3 methods by which a citizen loses citizenship to their correct operational definitions:</p>
+        <div style="display:flex; gap:25px;">
+            <div style="flex:1; display:flex; flex-direction:column; gap:10px;" id="lossSource">
+                <div style="background:#2c3e50; padding:12px; border-radius:10px; cursor:grab; font-weight:bold;" draggable="true" id="loss1" ondragstart="startLossDrag(event)">Renunciation</div>
+                <div style="background:#2c3e50; padding:12px; border-radius:10px; cursor:grab; font-weight:bold;" draggable="true" id="loss2" ondragstart="startLossDrag(event)">Termination</div>
+                <div style="background:#2c3e50; padding:12px; border-radius:10px; cursor:grab; font-weight:bold;" draggable="true" id="loss3" ondragstart="startLossDrag(event)">Deprivation</div>
+            </div>
+            <div style="flex:2; display:flex; flex-direction:column; gap:15px;">
+                <div style="background:rgba(0,0,0,0.3); border:2px dashed var(--saffron-bright); padding:15px; border-radius:12px;" ondragover="allowLossDrop(event)" ondrop="handleLossDrop(event, 'self')">
+                    <h3>Voluntarily acquiring citizenship of another country and giving up this one</h3>
+                </div>
+                <div style="background:rgba(0,0,0,0.3); border:2px dashed var(--saffron-bright); padding:15px; border-radius:12px;" ondragover="allowLossDrop(event)" ondrop="handleLossDrop(event, 'auto')">
+                    <h3>Citizenship getting automatically cancelled upon acquiring citizenship of another country</h3>
+                </div>
+                <div style="background:rgba(0,0,0,0.3); border:2px dashed var(--saffron-bright); padding:15px; border-radius:12px;" ondragover="allowLossDrop(event)" ondrop="handleLossDrop(event, 'force')">
+                    <h3>Government compulsory cancellation due to treason or submission of fake documents</h3>
+                </div>
+            </div>
+        </div>
+        <button class="factory-btn" onclick="verifyFactoryLevel6()">Verify Path of Loss</button>
+        <div class="factory-alert-box" id="alert6"></div>
+    </div>
+
+    <div id="factory7" class="factory-arena">
+        <h2 class="arena-title">Level 7: Highest Features of an Ideal Citizen (The Ideal Citizen Matrix)</h2>
+        <p style="margin-bottom: 15px;">Final stage! Pair the qualities and structural behaviors of citizens with their matrix labels to complete the simulation:</p>
+        <div class="connector-grid-system">
+            <div class="citizen-node" id="matL1" onclick="selectFinalCitizenMatrix('L', 'matL1', 'duty')">Respecting the laws of the country</div>
+            <div class="citizen-node" id="matR1" onclick="selectFinalCitizenMatrix('R', 'matR1', 'duty')">Core feature of a responsible good citizen</div>
+            <div class="citizen-node" id="matL2" onclick="selectFinalCitizenMatrix('L', 'matL2', 'bad')">Giving bribes and destroying public property</div>
+            <div class="citizen-node" id="matR2" onclick="selectFinalCitizenMatrix('R', 'matR2', 'bad')">Feature of a bad citizen or anti-law behavior</div>
+        </div>
+        <button class="factory-btn" onclick="verifyFactoryLevel7()">Complete Citizen Matrix</button>
+        <div class="factory-alert-box" id="alert7"></div>
+    </div>
+
+    <script>
+        let passportPoints = 0; let nationalPride = 100;
+        function modifyCitizenHUD(ppChange, prideDamage) {
+            passportPoints += ppChange;
+            nationalPride = Math.max(10, nationalPride - prideDamage);
+            document.getElementById("livePassportPoints").innerText = `Passport Points: ${passportPoints.toString().padStart(4, '0')} PP`;
+            document.getElementById("prideFill").style.width = `${nationalPride}%`;
+        }
+
+        // Renamed to match prompt file context structure references
+        function shiftFactoryLevel(levelIdx) {
+            document.querySelectorAll('.factory-arena').forEach(el => el.classList.remove('active-arena'));
+            document.querySelectorAll('.factory-card').forEach(el => el.classList.remove('active-mission'));
+            
+            document.getElementById('factory' + levelIdx).classList.add('active-arena');
+            document.getElementById('facBtn' + levelIdx).classList.add('active-mission');
+        }
+
+        // Level 1 Logic
+        let nodeL = null; let nodeR = null;
+        function connectCitizenNodes(side, id, matchVal) {
+            if(side === 'L') {
+                if(nodeL) document.getElementById(nodeL.id).classList.remove('node-selected');
+                nodeL = { id: id, match: matchVal };
+            } else {
+                if(nodeR) document.getElementById(nodeR.id).classList.remove('node-selected');
+                nodeR = { id: id, match: matchVal };
+            }
+            document.getElementById(id).classList.add('node-selected');
+
+            if(nodeL && nodeR) {
+                if(nodeL.match === nodeR.match) {
+                    document.getElementById(nodeL.id).style.background = "var(--flag-green)";
+                    document.getElementById(nodeR.id).style.background = "var(--flag-green)";
+                    modifyCitizenHUD(100, 0);
+                    showCitizenAlert(1, "Correct pairing! The first primary rule of citizenship aligns perfectly.", true);
+                    document.getElementById('facBtn1').style.background = "var(--flag-green)";
+                } else {
+                    modifyCitizenHUD(0, 10);
+                    showCitizenAlert(1, "Incorrect pairing, the national pride level dropped! Reconsider.", false);
+                }
+                nodeL = null; nodeR = null;
+            }
+        }
+
+        // Level 2 Logic
+        function verifyFactoryLevel2() {
+            let c1 = document.getElementById("cryptIn1").value.trim().toLowerCase();
+            let c2 = document.getElementById("cryptIn2").value.trim().toLowerCase();
+
+            if(c1 === "citizenship" && (c2 === "fundamental rights" || c2 === "fundamental right")) {
+                modifyCitizenHUD(150, 0);
+                document.getElementById('facBtn2').style.background = "var(--flag-green)";
+                showCitizenAlert(2, "Wonderful! The core definition and core rights code are correct.", true);
+            } else {
+                modifyCitizenHUD(0, 10);
+                showCitizenAlert(2, "Code incorrect! Hints: Citizenship, Fundamental Rights.", false);
+            }
+        }
+
+        // Level 3: 10 Questions Grid Quiz Data
+        const citizenshipQuiz = [
+            { q: "1. In which year did the Parliament of the country implement the Citizenship Act of India for the first time?", o: ["Act of 1947", "Citizenship Act of 1955", "Act of 2020"], c: 1 },
+            { q: "2. What is the citizenship called that a person acquires by virtue of being born within the territory of India?", o: ["Through Registration", "Citizenship by Birth", "Deprivation Method"], c: 1 },
+            { q: "3. What is the method of acquiring citizenship for children of parents of Indian origin even if they are born abroad?", o: ["Citizenship by Descent", "Incorporation of Territory", "Illegal Way"], c: 0 },
+            { q: "4. Which part of the Constitution of India completely describes the rules of citizenship of the country?", o: ["Part 1", "Part 3", "Part 2"], c: 2 },
+            { q: "5. When any citizen of our country betrays the security of the nation, what does the government do to their citizenship?", o: ["Gives a reward", "Deprives them (Deprivation)", "Transfers it"], c: 1 },
+            { q: "6. In British India, before achieving independence, what were the subjects called instead of citizens?", o: ["Kings", "Subjects / Servants of the British Empire", "Independent Citizens"], c: 1 },
+            { q: "7. In which of the following countries is the system of Dual Citizenship still in practice today?", o: ["India", "Switzerland and America (USA)", "Sri Lanka"], c: 1 },
+            { q: "8. Which method of citizenship did the people of Goa or Pondicherry get when they joined the Indian Union?", o: ["By Incorporation of Territory", "By Birth", "By Registration"], c: 0 },
+            { q: "9. What is the application method according to regulations for a foreign citizen who wants citizenship of India?", o: ["Renunciation Method", "By Descent", "Citizenship through Registration"], c: 2 },
+            { q: "10. What is the noble concept that all humans are equal at a global level called?", o: ["Global Citizenship", "Single Citizenship", "Nationality"], c: 0 }
+        ];
+
+        let qIdx = 0; let qScore = 0; let isQuizActive = true;
+        function loadCitizenQuestion() {
+            isQuizActive = true;
+            document.getElementById("nextQuizBtn").style.display = "none";
+            document.getElementById("alert3").style.display = "none";
+            let qData = citizenshipQuiz[qIdx];
+            document.getElementById("quizCounterText").innerText = `Question Code: ${qIdx + 1} / 10`;
+            document.getElementById("quizQuestionText").innerText = qData.q;
+            
+            let container = document.getElementById("quizOptionsContainer");
+            container.innerHTML = "";
+            qData.o.forEach((opt, idx) => {
+                let div = document.createElement("div");
+                div.classList.add("choice-box-row");
+                div.innerText = opt;
+                div.onclick = function() {
+                    if(!isQuizActive) return;
+                    isQuizActive = false;
+                    if(idx === qData.c) {
+                        this.classList.add("correct-glow");
+                        qScore++; modifyCitizenHUD(30, 0);
+                        showCitizenAlert(3, "Correct civic decision! National pride has increased.", true);
+                    } else {
+                        this.classList.add("wrong-glow");
+                        container.children[qData.c].classList.add("correct-glow");
+                        modifyCitizenHUD(0, 10);
+                        showCitizenAlert(3, "Wrong decision! The national pride index has decreased.", false);
+                    }
+                    document.getElementById("nextQuizBtn").style.display = "inline-block";
+                };
+                container.appendChild(div);
+            });
+        }
+        function nextCitizenQuestion() {
+            qIdx++;
+            if(qIdx < citizenshipQuiz.length) {
+                loadCitizenQuestion();
+            } else {
+                document.getElementById("quizCounterText").innerText = "Factory Results Ready!";
+                document.getElementById("quizQuestionText").innerText = `Total Class Score: ${qScore} / 10`;
+                document.getElementById("quizOptionsContainer").innerHTML = "";
+                document.getElementById("nextQuizBtn").style.display = "none";
+                document.getElementById('facBtn3').style.background = "var(--flag-green)";
+                showCitizenAlert(3, qScore >= 7 ? "Unmatched patriots and highly responsible citizens!" : "Good attempt!", true);
+            }
+        }
+        loadCitizenQuestion();
+
+        // Level 4 Logic
+        function verifyFactoryLevel4() {
+            let t1 = document.getElementById("typeIn1").value.trim().toLowerCase();
+            let t2 = document.getElementById("typeIn2").value.trim().toLowerCase();
+
+            if((t1 === "single citizenship" || t1 === "single") && (t2 === "dual citizenship" || t2 === "dual")) {
+                modifyCitizenHUD(150, 0);
+                document.getElementById('facBtn4').style.background = "var(--flag-green)";
+                showCitizenAlert(4, "Wow! The conceptual framework of Single and Dual citizenship is perfectly correct.", true);
+            } else {
+                modifyCitizenHUD(0, 10);
+                showCitizenAlert(4, "Incorrect entry! Hints: Single Citizenship, Dual Citizenship.", false);
+            }
+        }
+
+        // Level 5 Logic
+        let minedTokens = {};
+        function toggleOreToken(id, isAcquisitionMethod) {
+            let node = document.getElementById(id);
+            if(node.classList.contains('active-token')) {
+                node.classList.remove('active-token');
+                delete minedTokens[id];
+            } else {
+                node.classList.add('active-token');
+                minedTokens[id] = isAcquisitionMethod;
+            }
+        }
+        function verifyFactoryLevel5() {
+            let win = true; let count = 0;
+            for(let id in minedTokens) {
+                if(minedTokens[id] === false) win = false;
+                count++;
+            }
+            if(count !== 4) win = false; // 4 acquisition methods
+
+            if(win) {
+                modifyCitizenHUD(150, 0);
+                document.getElementById('facBtn5').style.background = "var(--flag-green)";
+                showCitizenAlert(5, "Excellent! The 4 pathways to acquire citizenship (Birth, Descent, Registration, Incorporation of Territory) are fully correct.", true);
+            } else {
+                modifyCitizenHUD(0, 10);
+                showCitizenAlert(5, "Incorrect selection! Choose only the 4 legitimate pathways (omit illegal routes).", false);
+            }
+        }
+
+        // Level 6 Logic
+        function allowLossDrop(ev) { ev.preventDefault(); }
+        function startLossDrag(ev) { ev.dataTransfer.setData("text", ev.target.id); }
+        function handleLossDrop(ev, cat) {
+            ev.preventDefault();
+            let id = ev.dataTransfer.getData("text");
+            let el = document.getElementById(id);
+            el.dataset.cat = cat;
+            ev.target.appendChild(el);
+        }
+        function verifyFactoryLevel6() {
+            let l1 = document.getElementById("loss1").dataset.cat;
+            let l2 = document.getElementById("loss2").dataset.cat;
+            let l3 = document.getElementById("loss3").dataset.cat;
+
+            if(l1 === "self" && l2 === "auto" && l3 === "force") {
+                modifyCitizenHUD(200, 0);
+                document.getElementById('facBtn6').style.background = "var(--flag-green)";
+                showCitizenAlert(6, "The definitions of all three methods of losing citizenship are one hundred percent accurate!", true);
+            } else {
+                modifyCitizenHUD(0, 10);
+                showCitizenAlert(6, "Incorrect sorting! Renunciation means voluntary, Termination means automatic cancellation, Deprivation means compulsory loss.", false);
+            }
+        }
+
+        // Level 7 Logic
+        let finalL = null; let finalR = null;
+        function selectFinalCitizenMatrix(side, id, key) {
+            if(side === 'L') {
+                finalL = { id: id, key: key };
+                document.getElementById("matL1").classList.remove('node-selected');
+                document.getElementById("matL2").classList.remove('node-selected');
+            } else {
+                finalR = { id: id, key: key };
+                document.getElementById("matR1").classList.remove('node-selected');
+                document.getElementById("matR2").classList.remove('node-selected');
+            }
+            document.getElementById(id).classList.add('node-selected');
+        }
+        function verifyFactoryLevel7() {
+            if(finalL && finalR && finalL.key === finalR.key) {
+                modifyCitizenHUD(250, 0);
+                document.getElementById('facBtn7').style.background = "var(--flag-green)";
+                showCitizenAlert(7, "Wonderful! The entire core chapter simulation for Citizen and Citizenship is fully successful. A great digital classroom asset!", true);
+            } else {
+                modifyCitizenHUD(0, 10);
+                showCitizenAlert(7, "Matrix link failed. Observe the traits and rules of a citizen once again.", false);
+            }
+        }
+
+        function showCitizenAlert(lvlNum, text, success) {
+            let box = document.getElementById("alert" + lvlNum);
+            box.style.display = "block";
+            box.innerText = text;
+            box.style.background = success ? "rgba(16, 172, 132, 0.15)" : "rgba(238, 82, 83, 0.1)";
+            box.style.color = success ? "#55efc4" : "#ff7675";
+            box.style.borderColor = success ? "var(--flag-green)" : "var(--danger-red)";
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sanatana Dharma - Knowledge Matrix 7.0</title>
+    <style>
+        :root {
+            --temple-orange: #ff7f50;
+            --sacred-gold: #ffb142;
+            --mystic-indigo: #474787;
+            --vedic-white: #ffffff;
+            --glow-green: #2ed573;
+            --alert-red: #ff5252;
+            --space-dark: #0c0d14;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Verdana, sans-serif; }
+
+        body {
+            background: var(--space-dark);
+            background-image: radial-gradient(circle at 50% 50%, #1b1c2a 0%, #0c0d14 100%);
+            min-height: 100vh;
+            padding: 25px;
+            color: #ffffff;
+        }
+
+        .main-temple-banner {
+            background: rgba(255, 255, 255, 0.02);
+            padding: 30px;
+            border-radius: 24px;
+            text-align: center;
+            border: 2px solid var(--sacred-gold);
+            box-shadow: 0 0 30px rgba(255, 177, 66, 0.2);
+            margin-bottom: 30px;
+        }
+
+        .main-temple-banner h1 {
+            color: var(--sacred-gold);
+            font-size: 2.5rem;
+            margin-bottom: 8px;
+            text-shadow: 0 0 15px rgba(255, 177, 66, 0.4);
+        }
+
+        .main-temple-banner p { color: #a4b0be; font-size: 1.2rem; }
+
+        /* HUD Live Progress */
+        .div-hud {
+            display: flex;
+            justify-content: space-between;
+            background: rgba(71, 71, 135, 0.2);
+            padding: 15px 25px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            border-left: 5px solid var(--temple-orange);
+            font-weight: bold;
+            font-size: 1.15rem;
+        }
+
+        /* 3D Wheel/Menu Grid Track */
+        .matrix-menu-track {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+            margin-bottom: 35px;
+        }
+
+        .matrix-node-btn {
+            background: #1e1f30;
+            border: 2px solid #2c2d4a;
+            padding: 15px 10px;
+            border-radius: 14px;
+            cursor: pointer;
+            font-weight: bold;
+            color: #ffffff;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-align: center;
+        }
+
+        .matrix-node-btn:hover, .matrix-node-btn.active-node {
+            background: linear-gradient(135deg, var(--temple-orange), var(--sacred-gold));
+            color: #000000;
+            border-color: #ffffff;
+            box-shadow: 0 0 20px rgba(255, 127, 80, 0.5);
+            transform: translateY(-5px);
+        }
+
+        /* Content Deck Screen */
+        .deck-screen {
+            background: rgba(30, 31, 49, 0.7);
+            border: 2px solid #2c2d4a;
+            border-radius: 28px;
+            padding: 35px;
+            min-height: 530px;
+            display: none;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+
+        .deck-screen.active-screen { display: block; animation: flashEffect 0.5s ease-in-out; }
+
+        @keyframes flashEffect {
+            from { opacity: 0; transform: scale(0.98); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        h2.deck-heading {
+            font-size: 1.7rem;
+            color: var(--sacred-gold);
+            margin-bottom: 25px;
+            padding-bottom: 10px;
+            border-bottom: 2px dashed rgba(255, 177, 62, 0.2);
+        }
+
+        /* General Custom UI Elements */
+        .submit-btn, .next-btn {
+            background: linear-gradient(135deg, var(--temple-orange), #ff6b6b);
+            color: white;
+            border: none;
+            padding: 14px 35px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 10px 20px rgba(255, 127, 80, 0.3);
+            transition: all 0.3s;
+            margin-top: 25px;
+        }
+
+        .submit-btn:hover, .next-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 25px rgba(255, 127, 80, 0.5);
+        }
+
+        .live-alert-box {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 12px;
+            font-weight: bold;
+            display: none;
+            font-size: 1.1rem;
+        }
+
+        /* Act 1 Node Connector Layout */
+        .node-connector-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+
+        .box-node {
+            background: #1e1f30;
+            padding: 16px;
+            border-radius: 12px;
+            cursor: pointer;
+            border: 2px solid #2c2d4a;
+            font-weight: bold;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .box-node:hover { border-color: var(--sacred-gold); }
+        .box-node.active-node-select { background: var(--sacred-gold); color: black; border-color: white; }
+
+        /* Act 3 Quiz Interface */
+        .progress-hud-bar {
+            background: #2c2d4a;
+            height: 10px;
+            border-radius: 5px;
+            margin-bottom: 25px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            background: var(--glow-green);
+            height: 100%;
+            width: 10%;
+            transition: width 0.3s;
+        }
+
+        .quiz-choice-row {
+            background: #1e1f30;
+            border: 2px solid #2c2d4a;
+            padding: 16px;
+            margin: 12px 0;
+            border-radius: 14px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+        }
+
+        .quiz-choice-row:hover { border-color: var(--temple-orange); transform: translateX(5px); }
+        .quiz-choice-row.win-glow { background: rgba(46, 204, 113, 0.2); border-color: var(--glow-green); color: var(--glow-green); }
+        .quiz-choice-row.lose-glow { background: rgba(255, 82, 82, 0.2); border-color: var(--alert-red); color: var(--alert-red); }
+
+        /* Universal Smart Inputs */
+        .smart-text-input {
+            background: rgba(0,0,0,0.4);
+            border: 2px solid #2c2d4a;
+            border-radius: 10px;
+            padding: 12px;
+            font-size: 1.1rem;
+            color: var(--sacred-gold);
+            font-weight: bold;
+            outline: none;
+            width: 100%;
+            max-width: 325px;
+            margin-top: 8px;
+        }
+
+        .smart-text-input:focus { border-color: var(--sacred-gold); }
+
+        /* Act 5 Switch Styles */
+        .switch-container-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255,255,255,0.02);
+            padding: 16px;
+            border-radius: 14px;
+            margin-bottom: 15px;
+            border: 1px solid #2c2d4a;
+        }
+
+        .switch-toggle-buttons button {
+            padding: 9px 22px;
+            border: 1px solid #2c2d4a;
+            background: #1e1f30;
+            color: white;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
+        .switch-toggle-buttons button.triggered {
+            background: var(--temple-orange);
+            color: white;
+            border-color: #ffffff;
+            box-shadow: 0 0 10px var(--temple-orange);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="main-temple-banner">
+        <h1>Chapter-5: Sanatana Dharma</h1>
+        <p>Knowledge Matrix 7.0 • Every concept from the textbook is now an independent activity!</p>
+    </div>
+
+    <div class="div-hud">
+        <span style="color: var(--sacred-gold);">Learning Phase: Exploring Sanatana Knowledge</span>
+        <span style="color: var(--glow-green);" id="liveXPBoard">Knowledge Points Earned: 0000 XP</span>
+    </div>
+
+    <!-- 3D Matrix Menu Track -->
+    <div class="matrix-menu-track">
+        <button class="matrix-node-btn active-node" onclick="shiftScreen(1)">1. Shrutis</button>
+        <button class="matrix-node-btn" onclick="shiftScreen(2)">2. Smritis</button>
+        <button class="matrix-node-btn" onclick="shiftScreen(3)">3. Vedangas (10 Qs)</button>
+        <button class="matrix-node-btn" onclick="shiftScreen(4)">4. Itihasa/Puranas</button>
+        <button class="matrix-node-btn" onclick="shiftScreen(5)">5. Shad Darshanas</button>
+        <button class="matrix-node-btn" onclick="shiftScreen(6)">6. Idol Worship</button>
+        <button class="matrix-node-btn" onclick="shiftScreen(7)">7. Noble Message</button>
+    </div>
+
+    <!-- ACTIVITY 1: Shrutis -->
+    <div id="screen1" class="deck-screen active-screen">
+        <h2 class="deck-heading">Activity 1: Shrutis and Vedic Sections (Veda Connect)</h2>
+        <p style="margin-bottom: 20px;">Connect the four main sections (Samhitas) of the Vedas with their philosophical explanation:</p>
+        <div class="node-connector-grid">
+            <div>
+                <div class="box-node" id="s1_l1" onclick="linkNodes(1, 'l1', 'Samhita', 101)">1. Samhita</div>
+                <div class="box-node" id="s1_l2" style="margin-top:15px;" onclick="linkNodes(1, 'l2', 'Brahmana', 102)">2. Brahmana</div>
+                <div class="box-node" id="s1_l3" style="margin-top:15px;" onclick="linkNodes(1, 'l3', 'Upanishad', 103)">3. Upanishad</div>
+            </div>
+            <div>
+                <div class="box-node" id="s1_r1" onclick="linkNodes(1, 'r1', 'Procedure', 102)">The Vedic part explaining the rules and procedures for performing rituals and sacrifices</div>
+                <div class="box-node" id="s1_r2" style="margin-top:15px;" onclick="linkNodes(1, 'r2', 'Mantra', 101)">Collection of prayers and mantras dedicated to various deities</div>
+                <div class="box-node" id="s1_r3" style="margin-top:15px;" onclick="linkNodes(1, 'r3', 'Philosophical', 103)">Philosophical inquiry regarding creation and human existence</div>
+            </div>
+        </div>
+        <div class="live-alert-box" id="alert1"></div>
+    </div>
+
+    <!-- ACTIVITY 2: Smritis -->
+    <div id="screen2" class="deck-screen">
+        <h2 class="deck-heading">Activity 2: Analysis of Smritis and Dharmasutras (True or False)</h2>
+        <div class="switch-container-row">
+            <span>1. 'Smriti' means that which is remembered, and they are also known as Dharmasutras.</span>
+            <div class="switch-toggle-buttons"><button id="s2_b1_t" onclick="setSwitchAct2(1,true)">True</button><button id="s2_b1_f" onclick="setSwitchAct2(1,false)">False</button></div>
+        </div>
+        <div class="switch-container-row">
+            <span>2. Among the eighteen prominent Smritis, Manusmriti is the most ancient and influential.</span>
+            <div class="switch-toggle-buttons"><button id="s2_b2_t" onclick="setSwitchAct2(2,true)">True</button><button id="s2_b2_f" onclick="setSwitchAct2(2,false)">False</button></div>
+        </div>
+        <div class="switch-container-row">
+            <span>3. For today's modern democratic social outlook, our Constitution serves as the guide text.</span>
+            <div class="switch-toggle-buttons"><button id="s2_b3_t" onclick="setSwitchAct2(3,true)">True</button><button id="s2_b3_f" onclick="setSwitchAct2(3,false)">False</button></div>
+        </div>
+        <button class="submit-btn" onclick="verifyAct2()">Verify Smriti Rules</button>
+        <div class="live-alert-box" id="alert2"></div>
+    </div>
+
+    <!-- ACTIVITY 3: Vedangas (10 QUESTIONS QUIZ) -->
+    <div id="screen3" class="deck-screen">
+        <h2 class="deck-heading">Activity 3: The Six Wheels of Vedangas (Epic 10 Matrix Quiz)</h2>
+        <div class="progress-hud-bar"><div class="progress-bar-fill" id="barFill"></div></div>
+        <div style="font-weight: bold; margin-bottom: 15px; color: var(--sacred-gold);" id="quizCountText">Question Code: 1 / 10</div>
+        <div id="quizQuestionText" style="font-size: 1.25rem; font-weight: bold; margin-bottom: 20px;">Loading...</div>
+        <div id="quizChoicesContainer"></div>
+        <button class="next-btn" id="nextQuizBtn" style="display:none;" onclick="nextVedicQuestion()">Move to Next Cycle ➔</button>
+        <div class="live-alert-box" id="alert3"></div>
+    </div>
+
+    <!-- ACTIVITY 4: Itihasa and Puranas -->
+    <div id="screen4" class="deck-screen">
+        <h2 class="deck-heading">Activity 4: Exploration of Epics and Puranas (Crypto Input)</h2>
+        <div style="display:flex; flex-direction:column; gap:20px;">
+            <div class="fib-q">1. Which are the two greatest epics of India that guide moral and righteous values? <br><input type="text" class="smart-text-input" id="act4_in1" placeholder="Ramayana and Mahabharata"></div>
+            <div class="fib-q">2. What is the total number of Puranas that contain stories of deities and lineages of kings? <br><input type="text" class="smart-text-input" id="act4_in2" placeholder="Write the number (e.g., 18)"></div>
+            <div class="fib-q">3. In which Upanishad is the prayer 'Lead me from untruth to eternal truth, from darkness to light' found? <br><input type="text" class="smart-text-input" id="act4_in3" placeholder="Write the name of the Upanishad"></div>
+        </div>
+        <button class="submit-btn" onclick="verifyAct4()">Crack the Epic Code</button>
+        <div class="live-alert-box" id="alert4"></div>
+    </div>
+
+    <!-- ACTIVITY 5: Darshanas -->
+    <div id="screen5" class="deck-screen">
+        <h2 class="deck-heading">Activity 5: Orthodox and Heterodox Schools of Thought (Darshana Matrix Gate)</h2>
+        <p style="margin-bottom: 15px;">Identify the schools of thought that accept the Vedas as authority as **Orthodox (Astika)** and those that reject them as **Heterodox (Nastika)**:</p>
+        <div class="switch-container-row">
+            <span>1. Nyaya, Vaisheshika, Yoga, Samkhya, Purva Mimamsa, and Uttara Mimamsa philosophies:</span>
+            <div class="switch-toggle-buttons"><button id="s5_b1_t" onclick="setSwitchAct5(1,'astika')">Orthodox</button><button id="s5_b1_f" onclick="setSwitchAct5(1,'nastika')">Heterodox</button></div>
+        </div>
+        <div class="switch-container-row">
+            <span>2. Jain, Buddhist, and Charvaka philosophies:</span>
+            <div class="switch-toggle-buttons"><button id="s5_b2_t" onclick="setSwitchAct5(2,'astika')">Orthodox</button><button id="s5_b2_f" onclick="setSwitchAct5(2,'nastika')">Heterodox</button></div>
+        </div>
+        <div class="switch-container-row">
+            <span>3. What is the total number of major Vedic orthodox schools of thought?</span>
+            <div class="switch-toggle-buttons"><button id="s5_b3_t" onclick="setSwitchAct5(3,'six')">Six (6)</button><button id="s5_b3_f" onclick="setSwitchAct5(3,'four')">Four (4)</button></div>
+        </div>
+        <button class="submit-btn" onclick="verifyAct5()">Submit Darshana Matrix</button>
+        <div class="live-alert-box" id="alert5"></div>
+    </div>
+
+    <!-- ACTIVITY 6: Idol Worship -->
+    <div id="screen6" class="deck-screen">
+        <h2 class="deck-heading">Activity 6: Idol Worship and Agama Literature (Agama Cipher Deck)</h2>
+        <div style="display:flex; flex-direction:column; gap:20px;">
+            <div class="fib-q">1. What is the worship of God possessing both a name (nama) and form (rupa) called? <br><input type="text" class="smart-text-input" id="act6_in1" placeholder="Saguna / Nirguna?"></div>
+            <div class="fib-q">2. Which literature of the Vedic branches provided extensive space for idol worship of God? <br><input type="text" class="smart-text-input" id="act6_in2" placeholder="Agama literature / Shruti literature?"></div>
+            <div class="fib-q">3. What is the name of the major stream within Agama branches that worships Lord Shiva? <br><input type="text" class="smart-text-input" id="act6_in3" placeholder="Shaiva / Vaishnava / Shakta?"></div>
+        </div>
+        <button class="submit-btn" onclick="verifyAct6()">Confirm Agama Code</button>
+        <div class="live-alert-box" id="alert6"></div>
+    </div>
+
+    <!-- ACTIVITY 7: Noble Message -->
+    <div id="screen7" class="deck-screen">
+        <h2 class="deck-heading">Activity 7: Universal Message of Sanatana Dharma (Dropdown Connector)</h2>
+        <div class="node-connector-grid">
+            <div>
+                <div class="switch-container-row">1. Aa no bhadrah kratavo yantu vishwatah</div>
+                <div class="switch-container-row">2. Swami Vivekananda's Chicago Speech</div>
+                <div class="switch-container-row">3. Philosophical Stance of Sanatana Dharma</div>
+                <div class="switch-container-row">4. Sarve bhavantu sukhinah</div>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:20px; justify-content:center;">
+                <select id="dropLink1" class="smart-text-input" style="width:100%; max-width:100%;">
+                    <option value="">Link the correct message</option>
+                    <option value="A">Message of harmony dated 27-9-1893</option>
+                    <option value="B">Let noble thoughts come to us from every side</option>
+                    <option value="C">May all be happy and free from worries</option>
+                    <option value="D">Philosophically accepting pluralism and diversity</option>
+                </select>
+                <select id="dropLink2" class="smart-text-input" style="width:100%; max-width:100%;">
+                    <option value="">Link the correct message</option>
+                    <option value="A">Message of harmony dated 27-9-1893</option>
+                    <option value="B">Let noble thoughts come to us from every side</option>
+                    <option value="C">May all be happy and free from worries</option>
+                    <option value="D">Philosophically accepting pluralism and diversity</option>
+                </select>
+                <select id="dropLink3" class="smart-text-input" style="width:100%; max-width:100%;">
+                    <option value="">Link the correct message</option>
+                    <option value="A">Message of harmony dated 27-9-1893</option>
+                    <option value="B">Let noble thoughts come to us from every side</option>
+                    <option value="C">May all be happy and free from worries</option>
+                    <option value="D">Philosophically accepting pluralism and diversity</option>
+                </select>
+                <select id="dropLink4" class="smart-text-input" style="width:100%; max-width:100%;">
+                    <option value="">Link the correct message</option>
+                    <option value="A">Message of harmony dated 27-9-1893</option>
+                    <option value="B">Let noble thoughts come to us from every side</option>
+                    <option value="C">May all be happy and free from worries</option>
+                    <option value="D">Philosophically accepting pluralism and diversity</option>
+                </select>
+            </div>
+        </div>
+        <button class="submit-btn" onclick="verifyAct7()">Complete Ultimate Knowledge Link</button>
+        <div class="live-alert-box" id="alert7"></div>
+    </div>
+
+    <script>
+        let liveXP = 0;
+        function addXP(value) {
+            liveXP += value;
+            document.getElementById("liveXPBoard").innerText = `Knowledge Points Earned: ${liveXP.toString().padStart(4, '0')} XP`;
+        }
+
+        function shiftScreen(index) {
+            document.querySelectorAll('.deck-screen').forEach(el => el.classList.remove('active-screen'));
+            document.querySelectorAll('.matrix-node-btn').forEach(el => el.classList.remove('active-node'));
+            document.getElementById('screen' + index).classList.add('active-screen');
+            event.target.classList.add('active-node');
+        }
+
+        // Act 1 Connector Logic
+        let selectedL = null; let selectedR = null;
+        function linkNodes(actNum, side, text, matchId) {
+            let elId = `s${actNum}_${side}`;
+            if(side.startsWith('l')) {
+                if(selectedL) document.getElementById(selectedL.id).classList.remove('active-node-select');
+                selectedL = { id: elId, match: matchId };
+            } else {
+                if(selectedR) document.getElementById(selectedR.id) ? document.getElementById(selectedR.id).classList.remove('active-node-select') : null;
+                selectedR = { id: elId, match: matchId };
+            }
+            document.getElementById(elId).classList.add('active-node-select');
+
+            if(selectedL && selectedR) {
+                if(selectedL.match === selectedR.match) {
+                    document.getElementById(selectedL.id).style.background = "var(--glow-green)";
+                    document.getElementById(selectedL.id).style.color = "black";
+                    document.getElementById(selectedR.id).style.background = "var(--glow-green)";
+                    document.getElementById(selectedR.id).style.color = "black";
+                    addXP(100);
+                    triggerAlert(1, "Correct pairing! Your understanding of Shrutis is fantastic.", true);
+                } else {
+                    triggerAlert(1, "Incorrect pairing, please try again.", false);
+                    document.getElementById(selectedL.id).classList.remove('active-node-select');
+                    document.getElementById(selectedR.id).classList.remove('active-node-select');
+                }
+                selectedL = null; selectedR = null;
+            }
+        }
+
+        // Act 2 Logic
+        let act2Switches = {1: null, 2: null, 3: null};
+        function setSwitchAct2(num, val) {
+            act2Switches[num] = val;
+            document.getElementById(`s2_b${num}_t`).classList.remove('triggered');
+            document.getElementById(`s2_b${num}_f`).classList.remove('triggered');
+            if(val) document.getElementById(`s2_b${num}_t`).classList.add('triggered');
+            else document.getElementById(`s2_b${num}_f`).classList.add('triggered');
+        }
+        function verifyAct2() {
+            if(act2Switches[1] === true && act2Switches[2] === true && act2Switches[3] === true) {
+                addXP(150);
+                triggerAlert(2, "Wow! All statements regarding Smriti and Dharmasutras are correct!", true);
+            } else {
+                triggerAlert(2, "There is an error, please check! (Manusmriti is ancient and today the Constitution is our core guiding text)", false);
+            }
+        }
+
+        // Act 3 Quiz Pool (10 Unique Content Questions on Vedangas)
+        const vedangaQuizPool = [
+            { q: "1. What are the auxiliary disciplines designed for the correct pronunciation and application of the Vedas called?", o: ["Upanishads", "Vedangas", "Darshanas"], c: 1 },
+            { q: "2. What is the total number of primary Vedangas that form part of the Vedic literature?", o: ["Four (4)", "Eighteen (18)", "Six (6)"], c: 2 },
+            { q: "3. The first limb of the Vedangas, 'Shiksha', is related to which of the following?", o: ["Ritual procedures", "Pronunciation of words (Phonetics)", "Astrology"], c: 1 },
+            { q: "4. Which Vedanga systematically describes the rules and procedures for rituals and sacrifices?", o: ["Kalpa", "Vyakarana", "Chhandas"], c: 0 },
+            { q: "5. What is the science (Nirukta) that determines the meaning of difficult words occurring in the Vedas called?", o: ["Etymology / Lexicon science", "Chhandashastra", "Astrology"], c: 0 },
+            { q: "6. What is the original name of the sage who famously divided the vast Vedic lore (Vyasa) and became known as 'Vedavyasa'?", o: ["Shuka Muni", "Krishna Dvaipayana", "Kautilya"], c: 1 },
+            { q: "7. Under which category are the philosophies that accept the Vedas as an authority grouped?", o: ["Heterodox philosophies", "Non-Vedic philosophies", "Orthodox philosophies"], c: 2 },
+            { q: "8. What did the worship of deities predominantly emphasize in Vedic Agama literature?", o: ["Idol worship (Iconography)", "Formless meditation", "Sacrifices exclusively"], c: 0 },
+            { q: "9. Which concept of the Vedas describes Brahman without attributes, name, or form?", o: ["Saguna Brahman", "Nirguna Brahman", "Agama Brahman"], c: 1 },
+            { q: "10. Who was the cultural leader of India who roared in Chicago, 'Harmony and not Dissension; Acceptance and not Destruction'?", o: ["Srivijaya", "Vedavyasa", "Swami Vivekananda"], c: 2 }
+        ];
+
+        let quizIdx = 0; let userScore = 0; let quizActive = true;
+        function loadQuizQuestion() {
+            quizActive = true;
+            document.getElementById("nextQuizBtn").style.display = "none";
+            document.getElementById("alert3").style.display = "none";
+            let currentQ = vedangaQuizPool[quizIdx];
+            document.getElementById("quizCountText").innerText = `Question Code: ${quizIdx + 1} / 10`;
+            document.getElementById("barFill").style.width = `${(quizIdx + 1) * 10}%`;
+            document.getElementById("quizQuestionText").innerText = currentQ.q;
+            
+            let optionsDiv = document.getElementById("quizChoicesContainer");
+            optionsDiv.innerHTML = "";
+            currentQ.o.forEach((opt, i) => {
+                let div = document.createElement("div");
+                div.classList.add("quiz-choice-row");
+                div.innerText = opt;
+                div.onclick = function() {
+                    if(!quizActive) return;
+                    quizActive = false;
+                    if(i === currentQ.c) {
+                        this.classList.add("win-glow");
+                        userScore++; addXP(30);
+                        triggerAlert(3, "Excellent answer! Your knowledge of Vedangas is outstanding.", true);
+                    } else {
+                        this.classList.add("lose-glow");
+                        optionsDiv.children[currentQ.c].classList.add("win-glow");
+                        triggerAlert(3, "Incorrect answer! The correct one is highlighted in green.", false);
+                    }
+                    document.getElementById("nextQuizBtn").style.display = "inline-block";
+                };
+                optionsDiv.appendChild(div);
+            });
+        }
+        function nextVedicQuestion() {
+            quizIdx++;
+            if(quizIdx < vedangaQuizPool.length) {
+                loadQuizQuestion();
+            } else {
+                document.getElementById("quizCountText").innerText = "Chakravyuh Finished!";
+                document.getElementById("quizQuestionText").innerText = `Total Class Score: ${userScore} / 10`;
+                document.getElementById("quizChoicesContainer").innerHTML = "";
+                document.getElementById("nextQuizBtn").style.display = "none";
+                triggerAlert(3, userScore >= 7 ? "Unmatched Vedic Scholar!" : "Good attempt, read again to discover more!", true);
+            }
+        }
+        loadQuizQuestion();
+
+        // Act 4 Logic
+        function verifyAct4() {
+            let i1 = document.getElementById("act4_in1").value.trim().toLowerCase();
+            let i2 = document.getElementById("act4_in2").value.trim();
+            let i3 = document.getElementById("act4_in3").value.trim().toLowerCase();
+
+            if((i1 === "ramayana and mahabharata" || i1 === "the ramayana and the mahabharata") && i2 === "18" && (i3 === "brihadaranyaka upanishad" || i3 === "brihadaranyaka")) {
+                addXP(150);
+                triggerAlert(4, "Correct code! Your information on Epics and Puranas is highly accurate.", true);
+            } else {
+                triggerAlert(4, "Some answers are incorrect. Hints: Ramayana and Mahabharata, 18, Brihadaranyaka.", false);
+            }
+        }
+
+        // Act 5 Logic
+        let act5Switches = {1: null, 2: null, 3: null};
+        function setSwitchAct5(num, type) {
+            act5Switches[num] = type;
+            document.getElementById(`s5_b${num}_t`).classList.remove('triggered');
+            document.getElementById(`s5_b${num}_f`).classList.remove('triggered');
+            if(type === 'astika' || type === 'six') document.getElementById(`s5_b${num}_t`).classList.add('triggered');
+            else document.getElementById(`s5_b${num}_f`).classList.add('triggered');
+        }
+        function verifyAct5() {
+            if(act5Switches[1] === 'astika' && act5Switches[2] === 'nastika' && act5Switches[3] === 'six') {
+                addXP(150);
+                triggerAlert(5, "The Darshana Matrix Gate has been successfully unlocked!", true);
+            } else {
+                triggerAlert(5, "There is an error in the classification of philosophies. (Vedic schools are six and Jain/Buddhist belong to the heterodox group)", false);
+            }
+        }
+
+        // Act 6 Logic
+        function verifyAct6() {
+            let i1 = document.getElementById("act6_in1").value.trim().toLowerCase();
+            let i2 = document.getElementById("act6_in2").value.trim().toLowerCase();
+            let i3 = document.getElementById("act6_in3").value.trim().toLowerCase();
+
+            if(i1 === "saguna" && a6_check(i2) && i3 === "shaiva") {
+                addXP(150);
+                triggerAlert(6, "The code for worship systems and Agama streams has been cracked! Perfectly correct.", true);
+            } else {
+                triggerAlert(6, "Incorrect answer! Hints: Saguna, Agama literature, Shaiva.", false);
+            }
+        }
+        function a6_check(val) { return val === "agama literature" || val === "agama" || val === "agamas"; }
+
+        // Act 7 Logic
+        function verifyAct7() {
+            let d1 = document.getElementById("dropLink1").value;
+            let d2 = document.getElementById("dropLink2").value;
+            let d3 = document.getElementById("dropLink3").value;
+            let d4 = document.getElementById("dropLink4").value;
+
+            if(d1 === 'B' && d2 === 'A' && d3 === 'D' && d4 === 'C') {
+                addXP(250);
+                triggerAlert(7, "Wow! The final knowledge link is entirely successful. The whole textbook syllabus has been covered!", true);
+            } else {
+                triggerAlert(7, "The arrangement for the universal message is incorrect, please verify again.", false);
+            }
+        }
+
+        function triggerAlert(screenNum, text, success) {
+            let box = document.getElementById("alert" + screenNum);
+            box.style.display = "block";
+            box.innerText = text;
+            box.style.background = success ? "rgba(46, 204, 113, 0.15)" : "rgba(255, 82, 82, 0.1)";
+            box.style.color = success ? "var(--glow-green)" : "var(--alert-red)";
+            box.style.border = success ? "1px solid var(--glow-green)" : "1px solid var(--alert-red)";
+        }
+    </script>
+</body>
+</html>

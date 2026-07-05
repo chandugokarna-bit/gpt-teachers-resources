@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bhakti Panth and Sufi Movement - Interactive Flip Book</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Noto+Serif:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #4a148c, #880e4f, #ff6f00);
+            --book-bg: #fffdf6;
+            --primary-color: #6a1b9a; /* Devotional Deep Purple */
+            --secondary-color: #e65100; /* Sufi Mystical Saffron Orange */
+            --accent-color: #d4af37; /* Royal Brass Gold */
+            --text-color: #2c3e50;
+            --success: #1b5e20;
+            --error: #b71c1c;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Poppins', 'Noto Serif', serif;
+            background: var(--bg-gradient);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-color);
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 20px;
+            text-shadow: 0 3px 6px rgba(0,0,0,0.4);
+        }
+        .header h1 { font-size: 2.2rem; }
+        .header p { font-size: 1.1rem; color: #fdf2e9; margin-top: 5px; }
+
+        /* Modern Flip Book Container Layout */
+        .book-container {
+            width: 100%;
+            max-width: 1020px;
+            background: var(--book-bg);
+            border-radius: 24px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.5), inset -15px 0 30px rgba(0,0,0,0.05);
+            border-left: 22px solid var(--primary-color);
+            min-height: 690px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+            border-right: 6px solid var(--accent-color);
+        }
+
+        /* Top Progress Indicator */
+        .progress-container { width: 100%; height: 6px; background: #eaedd0; }
+        .progress-bar { height: 100%; width: 11.11%; background: var(--accent-color); transition: width 0.4s ease; }
+
+        /* Page Flip Effect System */
+        .page { padding: 45px; flex: 1; display: none; animation: flipAnimation 0.5s ease-in-out; }
+        .page.active { display: block; }
+        @keyframes flipAnimation {
+            from { opacity: 0; transform: rotateY(-15deg) translateX(30px); }
+            to { opacity: 1; transform: rotateY(0deg) translateX(0); }
+        }
+
+        .page-title {
+            font-size: 1.55rem;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px dashed var(--accent-color);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+        }
+
+        .instruction { font-size: 1.05rem; margin-bottom: 20px; color: #555; font-style: italic; }
+
+        /* Navigation Buttons */
+        .book-controls {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px 45px;
+            background: #fdf5e2;
+            border-top: 1px solid #eedec4;
+        }
+        .btn {
+            padding: 12px 28px;
+            border: none;
+            border-radius: 40px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: bold;
+        }
+        .btn-prev { background: #d0c4af; color: #333; }
+        .btn-next { background: var(--primary-color); color: white; }
+        .btn:hover:not(:disabled) { transform: translateY(-3px); box-shadow: 0 6px 15px rgba(0,0,0,0.15); }
+        .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+        .feedback { margin-top: 15px; padding: 15px; border-radius: 8px; font-weight: bold; display: none; }
+
+        /* Act 1: MCQ Options */
+        .quiz-box { display: flex; flex-direction: column; gap: 12px; }
+        .opt-btn { padding: 14px 20px; background: white; border: 2px solid #e2e8f0; border-radius: 10px; cursor: pointer; text-align: left; font-size: 1.05rem; transition: 0.2s; }
+        .opt-btn:hover { background: #f8f9fa; border-color: var(--primary-color); }
+        .opt-btn.correct { background: #c8e6c9; border-color: var(--success); color: #1b5e20; font-weight: bold; }
+        .opt-btn.wrong { background: #ffcdd2; border-color: var(--error); color: #b71c1c; }
+
+        /* Act 2: Accordion Answers Box */
+        .accordion-container { display: flex; flex-direction: column; gap: 12px; }
+        .acc-item { border: 1px solid #eedec4; border-radius: 10px; overflow: hidden; background: white; }
+        .acc-header { background: #fffdf9; padding: 15px; font-weight: bold; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-size: 1.05rem; }
+        .acc-header:hover { background: #fdf5e2; }
+        .acc-body { background: #faf8f2; padding: 15px; display: none; border-top: 1px solid #eee; line-height: 1.7; color: var(--primary-color); font-weight: bold; }
+
+        /* Act 3: Drag & Drop Matching */
+        .matching-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .match-left, .match-right { display: flex; flex-direction: column; gap: 12px; }
+        .match-card { padding: 12px 18px; background: white; border: 2px solid #eedec4; border-radius: 10px; cursor: pointer; transition: 0.2s; font-weight: 600; }
+        .match-card.selected { background: #f5ebd6; border-color: var(--accent-color); }
+        .match-card.correct { background: #c8e6c9; border-color: var(--success); color: #1b5e20; cursor: default; }
+
+        /* Act 4 & 5: Photo Gallery & Video Avatars Framework */
+        .avatar-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+        .avatar-card { background: white; border: 2px solid #eedec4; border-radius: 15px; padding: 15px; text-align: center; box-shadow: 0 4px 8px rgba(0,0,0,0.02); cursor: pointer; transition: 0.3s; }
+        .avatar-card:hover { transform: translateY(-5px); border-color: var(--primary-color); }
+        .avatar-img-placeholder { width: 100px; height: 100px; background: #fdf2e9; border-radius: 50%; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; color: #718096; font-size: 2.2rem; overflow: hidden; border: 3px solid var(--secondary-color); }
+        .avatar-img-placeholder img { width: 100%; height: 100%; object-fit: cover; }
+        .avatar-card h4 { font-size: 1.15rem; color: var(--primary-color); margin-bottom: 5px; }
+        .avatar-card p { font-size: 0.9rem; color: #718096; }
+        .video-box { width: 100%; height: 150px; background: #000; border-radius: 10px; margin-top: 10px; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.9rem; }
+
+        /* Act 6: Innovative Blanks Dropdown */
+        .text-passage { background: #fffdf9; border: 2px solid #eedec4; padding: 25px; border-radius: 15px; font-size: 1.2rem; line-height: 2.3; }
+        .blank-select { padding: 4px 8px; border: 2px solid var(--primary-color); border-radius: 6px; font-size: 1.05rem; font-weight: bold; color: var(--primary-color); background: white; cursor: pointer; }
+
+        /* Act 7: Chronology Steps */
+        .v-timeline { display: flex; flex-direction: column; gap: 12px; }
+        .t-row { display: flex; align-items: center; gap: 15px; background: white; padding: 12px; border-radius: 10px; border: 2px dashed #eedec4; }
+        .t-index { width: 35px; height: 35px; background: var(--primary-color); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+        .t-zone { flex: 1; min-height: 45px; background: #fffdf9; border-radius: 6px; display: flex; align-items: center; padding-left: 15px; }
+        .item-bank { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; background: #f3ebd6; padding: 15px; border-radius: 12px; }
+        .drag-chip { padding: 8px 15px; background: white; border: 1px solid #cdc0a8; border-radius: 25px; cursor: grab; font-size: 0.95rem; font-weight: bold; box-shadow: 0 3px 6px rgba(0,0,0,0.05); }
+
+        /* Act 8: Devotional Lamp Matrix (Ultra Model 1) */
+        .grid-fleet { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
+        .fleet-card { background: white; border: 2px solid #eedec4; padding: 20px; text-align: center; border-radius: 15px; cursor: pointer; transition: 0.3s; }
+        .fleet-card:hover { transform: scale(1.04); background: #fffdf9; }
+        .fleet-card i { font-size: 2.3rem; color: var(--secondary-color); margin-bottom: 10px; }
+
+        /* Act 9: Devotional Strategy Matrix (Ultra Model 2) */
+        .battle-zone { background: #f9f5eb; border: 1px dashed #d4af37; padding: 25px; border-radius: 12px; text-align: center; font-size: 1.15rem; margin-bottom: 20px; line-height: 1.7; font-weight: 500; }
+        .strategy-btn { width: 100%; text-align: left; padding: 15px; background: white; border: 2px solid #e2d3b5; margin-top: 10px; border-radius: 10px; cursor: pointer; font-size: 1.05rem; transition: 0.2s; }
+        .strategy-btn:hover { background: #fffdf9; border-color: var(--primary-color); }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>Bhakti Movement and Sufi Tradition</h1>
+        <p>Innovative Interactive Digital Flip Book</p>
+    </div>
+
+    <div class="book-container">
+        <div class="progress-container">
+            <div class="progress-bar" id="progBar"></div>
+        </div>
+
+        <div class="page active" id="page1">
+            <div class="page-title"><i class="fa-solid fa-square-poll-horizontal"></i> Activity 1: Single-Sentence Q&A Multiple Choice Series</div>
+            <p class="instruction">Select the correct answer for the questions based on the core concepts of the Bhakti Movement and Sufi Tradition:</p>
+            <p id="q-text" style="font-size:1.25rem; margin-bottom:18px; font-weight:bold; color:var(--primary-color);"></p>
+            <div class="quiz-box" id="q-options"></div>
+            <div style="font-weight: bold; margin-top: 20px; text-align: right; color: #666;" id="q-indicator">Question: 1/6</div>
+            <div class="feedback" id="fb1"></div>
+        </div>
+
+        <div class="page" id="page2">
+            <div class="page-title"><i class="fa-solid fa-folder-open"></i> Activity 2: Group Discussion Questions (Click Box Activity)</div>
+            <p class="instruction">Click on the key historical questions below to reveal and analyze their official answer boxes:</p>
+            
+            <div class="accordion-container">
+                <div class="acc-item">
+                    <div class="acc-header" onclick="toggleAcc(this)">1. What was the primary social context that led to the rise of the Bhakti Movement? <i class="fa-solid fa-plus"></i></div>
+                    <div class="acc-body">The common people in medieval Indian society were exhausted by the rigid caste system, untouchability, elaborate and expensive religious rituals, and superstitions. The Bhakti Movement emerged to proclaim that everyone is equal before God.</div>
+                </div>
+                <div class="acc-item">
+                    <div class="acc-header" onclick="toggleAcc(this)">2. How did Kabir Das's 'Dohas' foster social harmony in society? <i class="fa-solid fa-plus"></i></div>
+                    <div class="acc-body">Through his simple couplets (Dohas), Kabir condemned the external rituals and hypocrisy of both Hinduism and Islam. He proclaimed that Allah and Rama are one and the same, thereby instilling religious harmony among the people.</div>
+                </div>
+                <div class="acc-item">
+                    <div class="acc-header" onclick="toggleAcc(this)">3. What are the core teachings of Guru Nanak, the founder of Sikhism? <i class="fa-solid fa-plus"></i></div>
+                    <div class="acc-body">Guru Nanak preached monotheism (the oneness of God). He strongly opposed the caste system and brought equality to society by introducing congregational prayers (Sangat) and a free community kitchen (Langer).</div>
+                </div>
+                <div class="acc-item">
+                    <div class="acc-header" onclick="toggleAcc(this)">4. What is the contribution of Purandara Dasa and Kanaka Dasa to the Haridasa tradition of Karnataka? <i class="fa-solid fa-plus"></i></div>
+                    <div class="acc-body">Purandara Dasa corrected societal hypocrisy through his devotional songs (Keertanas) and became known as the 'Father of Carnatic Music'. Kanaka Dasa strongly opposed caste discrimination through his metaphorical poems (Mundiges) and Keertanas, proclaiming 'Do not fight over caste, lineage, and creed'.</div>
+                </div>
+                <div class="acc-item">
+                    <div class="acc-header" onclick="toggleAcc(this)">5. What are the main features and teachings of the Sufi tradition? <i class="fa-solid fa-plus"></i></div>
+                    <div class="acc-body">Sufi saints believed that God could be reached not through rigid rules, but through pure love and devotion. They attained spiritual ecstasy through music and dance (Sama) and advocated that service to humanity is the supreme religion.</div>
+                </div>
+                <div class="acc-item">
+                    <div class="acc-header" onclick="toggleAcc(this)">6. Why is Shishunala Sharifa referred to as the 'Kabir of Karnataka'? <i class="fa-solid fa-plus"></i></div>
+                    <div class="acc-body">Born into a Muslim community, Sharifa became a disciple of the Hindu guru Govinda Bhatta and gained spiritual knowledge. Through his philosophical songs (Tatvapadas), he awakened Hindu-Muslim unity. Just like Kabir, he corrected social inequalities, which earned him this title.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="page" id="page3">
+            <div class="page-title"><i class="fa-solid fa-arrows-turn-to-dots"></i> Activity 3: The Great Alliance of Saints and Their Core Philosophies</div>
+            <p class="instruction">Click on the name of the saint or literary work on the left, then click on its matching description on the right:</p>
+            
+            <div class="matching-grid">
+                <div class="match-left" id="leftContainer">
+                    <div class="match-card" data-id="1">Kabir Das</div>
+                    <div class="match-card" data-id="2">Guru Nanak</div>
+                    <div class="match-card" data-id="3">Mirabai</div>
+                    <div class="match-card" data-id="4">Chaitanya Mahaprabhu</div>
+                    <div class="match-card" data-id="5">Khwaja Moinuddin Chishti</div>
+                    <div class="match-card" data-id="6">Guru Granth Sahib</div>
+                </div>
+                <div class="match-right" id="rightContainer">
+                    <div class="match-card" data-match="2">The holy founder of Sikhism and worshipper of one formless God</div>
+                    <div class="match-card" data-match="1">Author of the famous couplets compiled in the work 'Bijak'</div>
+                    <div class="match-card" data-match="4">The saint who started the Krishna-devotional 'Sankirtana' movement in Bengal</div>
+                    <div class="match-card" data-match="3">The royal princess and ultimate devotee of Lord Gididhar Gopala Krishna in Rajasthan</div>
+                    <div class="match-card" data-match="6">The supreme holy scripture of the Sikhs, revered as the eternal Guru</div>
+                    <div class="match-card" data-match="5">The revered saint who established the 'Chishti' Sufi order in Ajmer, India</div>
+                </div>
+            </div>
+            <div class="feedback" id="fb3"></div>
+        </div>
+
+        <div class="page" id="page4">
+            <div class="page-title"><i class="fa-solid fa-image"></i> Activity 4: Digital Portrait Research of Icons of Knowledge</div>
+            <p class="instruction">Click on the photo card of the prominent saints below to discover their philosophical contributions to history (you can link your Google Drive images here):</p>
+            
+            <div class="avatar-grid">
+                <div class="avatar-card" onclick="showAvatarInfo('Kabir Das', 'Raised in a weaver family, he broke through traditional religious boundaries to become the foremost pioneer of Hindu-Muslim harmony.')">
+                    <div class="avatar-img-placeholder"><i class="fa-solid fa-user"></i></div>
+                    <h4>Saint Kabir Das</h4><p>[Google Drive Image Template]</p>
+                </div>
+                <div class="avatar-card" onclick="showAvatarInfo('Guru Nanak', 'The first Guru of Sikhism who strived to build a casteless society through Langer (free community kitchen) and Sangat.')">
+                    <div class="avatar-img-placeholder"><i class="fa-solid fa-user"></i></div>
+                    <h4>Guru Nanak Dev</h4><p>[Google Drive Image Template]</p>
+                </div>
+                <div class="avatar-card" onclick="showAvatarInfo('Purandara Dasa', 'Though born into immense wealth as Navakoti Narayana, he renounced everything to spread devotion through simple Kannada Keertanas.')">
+                    <div class="avatar-img-placeholder"><i class="fa-solid fa-user-tie"></i></div>
+                    <h4>Purandara Dasa</h4><p>[Google Drive Image Template]</p>
+                </div>
+                <div class="avatar-card" onclick="showAvatarInfo('Kanaka Dasa', 'Despite being a chieftain of Baada fort, he embraced renunciation and criticized social inequality under the pretext of food grains in Ramadhanya Charite.')">
+                    <div class="avatar-img-placeholder"><i class="fa-solid fa-user-tie"></i></div>
+                    <h4>Kanaka Dasa</h4><p>[Google Drive Image Template]</p>
+                </div>
+                <div class="avatar-card" onclick="showAvatarInfo('Khwaja Moinuddin Chishti', 'A great Sufi saint who settled in Ajmer and spent his entire life serving the poor, destitute, and downtrodden.')">
+                    <div class="avatar-img-placeholder"><i class="fa-solid fa-user"></i></div>
+                    <h4>Moinuddin Chishti</h4><p>[Google Drive Image Template]</p>
+                </div>
+                <div class="avatar-card" onclick="showAvatarInfo('Saint Shishunala Sharifa', 'The beloved disciple of Govinda Bhatta who composed profound philosophical songs, serving as a beacon of harmony in Karnataka.')">
+                    <div class="avatar-img-placeholder"><i class="fa-solid fa-user"></i></div>
+                    <h4>Shishunala Sharifa</h4><p>[Google Drive Image Template]</p>
+                </div>
+            </div>
+            <div class="feedback" id="fb4" style="background:#fff3cd; color:#856404; border:1px solid #ffeeba;"></div>
+        </div>
+
+        <div class="page" id="page5">
+            <div class="page-title"><i class="fa-solid fa-video"></i> Activity 5: Voices of Religious Harmony (Video Upload Template)</div>
+            <p class="instruction">Click on the saints below to watch and listen to their message or devotional songs (you can upload your videos here):</p>
+            
+            <div class="avatar-grid">
+                <div class="avatar-card" onclick="playVideoAvatar('Recitation of Kabir Dohas', 'Ram and Rahim are one! The one who learns the two alphabets of Love is the true scholar, far above precious pearls!')">
+                    <div class="avatar-img-placeholder"><i class="fa-solid fa-circle-play" style="color:var(--secondary-color);"></i></div>
+                    <h4>Kabir Dohavali</h4><div class="video-box">[Video Player Template]</div>
+                </div>
+                <div class="avatar-card" onclick="playVideoAvatar('Kanaka Dasa Keertana', 'Do not fight over caste and creed! Do you even know the source of your caste? Humanity is one!')">
+                    <div class="avatar-img-placeholder"><i class="fa-solid fa-circle-play" style="color:var(--secondary-color);"></i></div>
+                    <h4>Kanaka Dasa's Song</h4><div class="video-box">[Video Player Template]</div>
+                </div>
+                <div class="avatar-card" onclick="playVideoAvatar('Sufi Qawwali Message', 'Love is the primary path to the Almighty; the union of the soul with the divine is possible through music!')">
+                    <div class="avatar-img-placeholder"><i class="fa-solid fa-circle-play" style="color:var(--secondary-color);"></i></div>
+                    <h4>Sufi Spiritual Raga</h4><div class="video-box">[Video Player Template]</div>
+                </div>
+            </div>
+            <div class="feedback" id="fb5" style="background:#e0f2f1; color:#004d40;"></div>
+        </div>
+
+        <div class="page" id="page6">
+            <div class="page-title"><i class="fa-solid fa-feather-pointed"></i> Activity 6: Textual Analysis of Bhakti and Sufi Movements</div>
+            <p class="instruction">Complete the following paragraph regarding social reforms by choosing the precise terms from the dropdowns:</p>
+            
+            <div class="text-passage">
+                The primary leader who led the Bhakti movement in North India to eradicate discrimination in medieval Indian society was 
+                <select class="blank-select" id="b1" data-ans="Ramananda"><option value="">--Select--</option><option>Ramananda</option><option>Basavanna</option><option>Madhvacharya</option></select>. 
+                The places of worship or resting lodges of the Sufi saints were called 
+                <select class="blank-select" id="b2" data-ans="Khanqah"><option value="">--Select--</option><option>Mosque</option><option>Khanqah</option><option>Gurdwara</option></select> with utmost respect. 
+                Kanaka Dasa's famous literary work 
+                <select class="blank-select" id="b3" data-ans="Ramadhanya Charite"><option value="">--Select--</option><option>Mohana Tarangini</option><option>Ramadhanya Charite</option><option>Haribhaktisara</option></select> 
+                criticizes the class/varna system through a dialogue between ragi (millet) and rice. 
+                The divine musical gatherings conducted by Sufi saints are known as 
+                <select class="blank-select" id="b4" data-ans="Sama"><option value="">--Select--</option><option>Sama</option><option>Bhajan</option><option>Keertana</option></select>. 
+                The highly famous community of disciples of Kabir and their sect is still known in society today as 
+                <select class="blank-select" id="b5" data-ans="Kabir Panthis"><option value="">--Select--</option><option>Nath Panthis</option><option>Kabir Panthis</option><option>Sufi Panthis</option></select>. 
+                Lastly, a major impact of the Sufi and Bhakti movements was that in Indian history, 
+                <select class="blank-select" id="b6" data-ans="regional languages'"><option value="">--Select--</option><option>Latin language'</option><option>regional languages'</option><option>Sanskrit language'</option></select> 
+                literature became immensely enriched.
+            </div>
+            <button class="btn" style="background:var(--accent-color); color:white; margin-top:20px;" onclick="checkBlanks()">Verify History Text</button>
+            <div class="feedback" id="fb6"></div>
+        </div>
+
+        <div class="page" id="page7">
+            <div class="page-title"><i class="fa-solid fa-arrow-down-1-9"></i> Activity 7: Chronological Order of Saints and Social Harmony</div>
+            <p class="instruction">Arrange the historical timelines and developments of the key saints who awakened India, from oldest to newest:</p>
+            
+            <div class="v-timeline">
+                <div class="t-row"><div class="t-index">1</div><div class="t-zone" id="z1" data-order="The beginning of the Sufi movement in India by Khwaja Moinuddin Chishti"></div></div>
+                <div class="t-row"><div class="t-index">2</div><div class="t-zone" id="z2" data-order="Social reform in North India through Dohas by Saint Kabir Das"></div></div>
+                <div class="t-row"><div class="t-index">3</div><div class="t-zone" id="z3" data-order="The rise of Sikhism in the Punjab province by Guru Nanak"></div></div>
+                <div class="t-row"><div class="t-index">4</div><div class="t-zone" id="z4" data-order="The peak of Dasa literature in Karnataka by Purandara Dasa and Kanaka Dasa"></div></div>
+                <div class="t-row"><div class="t-index">5</div><div class="t-zone" id="z5" data-order="Propagation of Harinama Sankirtana by Saint Chaitanya Mahaprabhu in Bengal"></div></div>
+                <div class="t-row"><div class="t-index">6</div><div class="t-zone" id="z6" data-order="Composition of philosophical songs (Tatvapadas) by Saint Shishunala Sharifa in Haveri district of Karnataka"></div></div>
+            </div>
+
+            <div class="item-bank" id="dragBank7">
+                <div class="drag-chip" draggable="true" id="t1">The rise of Sikhism in the Punjab province by Guru Nanak</div>
+                <div class="drag-chip" draggable="true" id="t2">The beginning of the Sufi movement in India by Khwaja Moinuddin Chishti</div>
+                <div class="drag-chip" draggable="true" id="t3">Propagation of Harinama Sankirtana by Saint Chaitanya Mahaprabhu in Bengal</div>
+                <div class="drag-chip" draggable="true" id="t4">Social reform in North India through Dohas by Saint Kabir Das</div>
+                <div class="drag-chip" draggable="true" id="t5">Composition of philosophical songs (Tatvapadas) by Saint Shishunala Sharifa in Haveri district of Karnataka</div>
+                <div class="drag-chip" draggable="true" id="t6">The peak of Dasa literature in Karnataka by Purandara Dasa and Kanaka Dasa</div>
+            </div>
+            <button class="btn" style="background:var(--accent-color); color:white; margin-top:15px;" onclick="checkTimeline()">Check Timeline</button>
+            <div class="feedback" id="fb7"></div>
+        </div>
+
+        <div class="page" id="page8">
+            <div class="page-title"><i class="fa-solid fa-om"></i> Activity 8: Treasure Hunt of Ideological Features of the Bhakti Movement</div>
+            <p class="instruction">Open only the boxes containing genuine, progressive, and harmonious features of the Bhakti and Sufi movements (there are 4 correct treasures in total):</p>
+            
+            <div class="grid-fleet">
+                <div class="fleet-card" data-correct="yes" data-info="All saints strongly condemned the caste system and gender discrimination, preaching that all are equal before God."><i class="fa-solid fa-users-line"></i><h5>Opposition to Caste System</h5></div>
+                <div class="fleet-card" data-correct="no" data-info="Absolutely incorrect; saints opposed expensive rituals and sacrifices, promoting simple devotion instead."><i class="fa-solid fa-fire-burner"></i><h5>Support for Expensive Rituals</h5></div>
+                <div class="fleet-card" data-correct="yes" data-info="Saints did not use complex Sanskrit or Latin; instead, they preached in the common local regional languages."><i class="fa-solid fa-comments"></i><h5>Preaching in Vernacular Languages</h5></div>
+                <div class="fleet-card" data-correct="yes" data-info="They propagated that Allah and Rama are merely different names for the same supreme cosmic entity."><i class="fa-solid fa-handshake-angle"></i><h5>Religious Syncretism</h5></div>
+                <div class="fleet-card" data-correct="no" data-info="No, they emphasized inner purity of heart over the superficial pomp of external idol worship."><i class="fa-solid fa-gopuram"></i><h5>Priority to External Idol Worship</h5></div>
+                <div class="fleet-card" data-correct="yes" data-info="They proclaimed that service to humanity and righteous conduct is the true path to reach God."><i class="fa-solid fa-heart-pulse"></i><h5>Advocacy of Human Values</h5></div>
+            </div>
+            <div class="feedback" id="fb8" style="background:#fff3cd; color:#856404;"></div>
+        </div>
+
+        <div class="page" id="page9">
+            <div class="page-title"><i class="fa-solid fa-brain"></i> Activity 9: Ideological Decisions Against Religious Intolerance</div>
+            <p class="instruction">Read the following social scenario and choose the humane decision you would take as an enlightened citizen of medieval times:</p>
+            
+            <div class="battle-zone">
+                "In your village, differences of opinion regarding rituals have broken out among people of various religions, creating major chaos. Hatred is spreading in the name of caste and religion. Given this situation, what should be your stance based on the teachings of Kabir Das or Guru Nanak?"
+            </div>
+
+            <button class="strategy-btn" onclick="makeDecision(false, 'This is a wrong step that further degrades society. Peace can never be achieved through hatred.')">Option A: Argue that our religion is supreme, fight with others, and break the unity of the village.</button>
+            <button class="strategy-btn" onclick="makeDecision(true, 'Wonderful and harmonious decision, much needed for the nation! Saints like Kabir and Sharifa showed us this exact path. Re-establish love and harmony in the village by making people realize that purity of mind is more important than external rituals, and that Allah and Ishvara are one.')">Option B: Gather people from both sides of the village, cite examples from the philosophical songs and Dohas of the saints, explain that human religion is greater than external rituals, and foster social harmony.</button>
+            <button class="strategy-btn" onclick="makeDecision(false, 'This is an indifferent attitude, running away from social responsibility.')">Option C: Hide inside your house thinking \'why do we need this conflict\' and remain a silent spectator to injustice.</button>
+            
+            <div class="feedback" id="fb9"></div>
+        </div>
+
+        <div class="book-controls">
+            <button class="btn btn-prev" id="prevPageBtn" onclick="movePage(-1)" disabled><i class="fa-solid fa-book-open"></i> Previous Page</button>
+            <button class="btn btn-next" id="nextPageBtn" onclick="movePage(1)">Next Page <i class="fa-solid fa-book"></i></button>
+        </div>
+    </div>
+
+    <script>
+        let pageIdx = 1;
+        const maxPages = 9;
+
+        function movePage(dir) {
+            document.getElementById(`page${pageIdx}`).classList.remove('active');
+            pageIdx += dir;
+            document.getElementById(`page${pageIdx}`).classList.add('active');
+
+            document.getElementById('prevPageBtn').disabled = (pageIdx === 1);
+            document.getElementById('nextPageBtn').disabled = (pageIdx === maxPages);
+
+            document.getElementById('progBar').style.width = `${(pageIdx / maxPages) * 100}%`;
+        }
+
+        // --- Act 1: MCQ Database (6 items) ---
+        const mcqCollection = [
+            { q: "Which Bhakti movement saint fiercely opposed the external rituals of both Hinduism and Islam and gave the literary work 'Bijak'?", opts: ["Chaitanya Mahaprabhu", "Kabir Das", "Guru Nanak", "Mirabai"], ans: 1 },
+            { q: "What is the name of the supreme holy scripture of Sikhism?", opts: ["Bhagavad Gita", "Bijak", "Guru Granth Sahib", "Vachana Sahitya"], ans: 2 },
+            { q: "Which saint of Karnataka sang the Keertana 'Do not fight over caste and lineage' against social inequality?", opts: ["Purandara Dasa", "Kanaka Dasa", "Jagannatha Dasa", "Vijaya Dasa"], ans: 1 },
+            { q: "In which city of Rajasthan was the highly famous 'Chishti' Sufi tradition established in India?", opts: ["Jaipur", "Udaipur", "Ajmer", "Delhi"], ans: 2 },
+            { q: "Which saint became famous as the 'Kabir of Karnataka' by composing exquisite philosophical songs (Tatvapadas) in Kannada?", opts: ["Sarvajna", "Shishunala Sharifa", "Govinda Bhatta", "Manteswami"], ans: 1 },
+            { q: "What are the devotional music gatherings called that were conducted by Sufi saints to attain proximity and ecstasy with God?", opts: ["Sangat", "Khanqah", "Sama", "Dasoha"], ans: 2 }
+        ];
+
+        let currentQIdx = 0;
+        function loadMCQ() {
+            const data = mcqCollection[currentQIdx];
+            document.getElementById('q-text').innerText = `${currentQIdx + 1}. ${data.q}`;
+            const container = document.getElementById('q-options');
+            container.innerHTML = "";
+            document.getElementById('q-indicator').innerText = `Question: ${currentQIdx + 1}/${mcqCollection.length}`;
+
+            data.opts.forEach((opt, idx) => {
+                const b = document.createElement('button');
+                b.className = "opt-btn";
+                b.innerText = opt;
+                b.onclick = () => verifyMCQ(idx, data.ans, b);
+                container.appendChild(b);
+            });
+        }
+
+        function verifyMCQ(sel, right, element) {
+            const fb = document.getElementById('fb1'); fb.style.display = "block";
+            if(sel === right) {
+                element.classList.add('correct');
+                fb.innerHTML = "✓ Excellent! You have selected the correct harmonious answer.";
+                fb.style.background = "#c8e6c9"; fb.style.color = "#1b5e20";
+                setTimeout(() => {
+                    if(currentQIdx < mcqCollection.length - 1) {
+                        currentQIdx++; loadMCQ(); fb.style.display = "none";
+                    } else { fb.innerHTML = "🎉 Congratulations! You have successfully completed all 6 multiple choice questions."; }
+                }, 1500);
+            } else {
+                element.classList.add('wrong');
+                fb.innerHTML = "✗ Incorrect answer. Reflect on the teachings of the saints again.";
+                fb.style.background = "#ffcdd2"; fb.style.color = "#b71c1c";
+            }
+        }
+        loadMCQ();
+
+        // --- Act 2: Accordion Box Toggle ---
+        function toggleAcc(header) {
+            const body = header.nextElementSibling;
+            const icon = header.querySelector('i');
+            if(body.style.display === "block") {
+                body.style.display = "none";
+                icon.className = "fa-solid fa-plus";
+            } else {
+                body.style.display = "block";
+                icon.className = "fa-solid fa-minus";
+            }
+        }
+
+        // --- Act 3: Matching Logic ---
+        let selectedLeft = null;
+        const leftCards = document.querySelectorAll('#leftContainer .match-card');
+        const rightCards = document.querySelectorAll('#rightContainer .match-card');
+
+        leftCards.forEach(card => {
+            card.addEventListener('click', () => {
+                if(card.classList.contains('correct')) return;
+                leftCards.forEach(c => c.classList.remove('selected'));
+                card.classList.add('selected');
+                selectedLeft = card;
+            });
+        });
+
+        rightCards.forEach(card => {
+            card.addEventListener('click', () => {
+                if(card.classList.contains('correct') || !selectedLeft) return;
+                const matchId = card.getAttribute('data-match');
+                const leftId = selectedLeft.getAttribute('data-id');
+
+                if(matchId === leftId) {
+                    card.classList.add('correct');
+                    selectedLeft.classList.add('correct');
+                    selectedLeft.classList.remove('selected');
+                    selectedLeft = null;
+                    checkAct3Progress();
+                } else {
+                    const fb = document.getElementById('fb3');
+                    fb.style.display = "block"; fb.style.background = "#ffcdd2"; fb.style.color = "#b71c1c";
+                    fb.innerText = "✗ Wrong match! Think carefully about the exact contribution of the saint.";
+                }
+            });
+        });
+
+        function checkAct3Progress() {
+            const finished = document.querySelectorAll('#leftContainer .match-card.correct').length;
+            const fb = document.getElementById('fb3'); fb.style.display = "block";
+            if(finished === 6) {
+                fb.style.background = "#c8e6c9"; fb.style.color = "#1b5e20";
+                fb.innerText = "✓ Perfect! All 6 saints and their core concepts have been accurately matched.";
+            } else {
+                fb.style.background = "#fff3cd"; fb.style.color = "#856404";
+                fb.innerText = `Progress: ${finished}/6 pairs matched correctly.`;
+            }
+        }
+
+        // --- Act 4: Photo Gallery Logic ---
+        function showAvatarInfo(name, text) {
+            const fb = document.getElementById('fb4'); fb.style.display = "block";
+            fb.innerHTML = `<strong><i class="fa-solid fa-circle-info"></i> ${name}:</strong> ${text}`;
+        }
+
+        // --- Act 5: Video Avatar Logic ---
+        function playVideoAvatar(title, dialog) {
+            const fb = document.getElementById('fb5'); fb.style.display = "block";
+            fb.innerHTML = `<strong><i class="fa-solid fa-clapperboard"></i> ${title}:</strong> "${dialog}" (Note: Your school student video link can be attached here)`;
+        }
+
+        // --- Drag & Drop Infrastructure for Act 7 Chronology ---
+        let currentDraggingChip = null;
+        document.querySelectorAll('.drag-chip').forEach(chip => {
+            chip.addEventListener('dragstart', () => { currentDraggingChip = chip; });
+        });
+
+        document.querySelectorAll('.t-zone').forEach(zone => {
+            zone.addEventListener('dragover', (e) => e.preventDefault());
+            zone.addEventListener('drop', () => {
+                if(currentDraggingChip) zone.appendChild(currentDraggingChip);
+            });
+        });
+
+        function checkTimeline() {
+            let correct = 0;
+            for(let i=1; i<=6; i++) {
+                const zone = document.getElementById(`z${i}`);
+                if(zone.firstChild && zone.firstChild.innerText.trim() === zone.getAttribute('data-order')) {
+                    correct++;
+                }
+            }
+            const fb = document.getElementById('fb7'); fb.style.display = "block";
+            if(correct === 6) {
+                fb.innerHTML = "✓ Fantastic! You have arranged all 6 major events of the Bhakti and Sufi movements in precise chronological order.";
+                fb.style.background = "#c8e6c9"; fb.style.color = "#1b5e20";
+            } else {
+                fb.innerHTML = `✗ ${correct}/6 steps are correct. Re-evaluate the history from the Sufi movement up to Sharifa and rearrange.`;
+                fb.style.background = "#ffcdd2"; fb.style.color = "#b71c1c";
+            }
+        }
+
+        // --- Act 6: Blanks Validator ---
+        function checkBlanks() {
+            let miss = 0;
+            const selects = document.querySelectorAll('.blank-select');
+            selects.forEach(sel => {
+                if(sel.value !== sel.getAttribute('data-ans')) {
+                    miss++; sel.style.borderColor = "var(--error)";
+                } else { sel.style.borderColor = "var(--success)"; }
+            });
+            const fb = document.getElementById('fb6'); fb.style.display = "block";
+            if(miss === 0) {
+                fb.innerHTML = "✓ Superb! You have successfully completed the historical textual passage of the Bhakti and Sufi movements.";
+                fb.style.background = "#c8e6c9"; fb.style.color = "#1b5e20";
+            } else {
+                fb.innerHTML = "✗ Some blanks contain incorrect literary works or terminologies. Please review and correct them.";
+                fb.style.background = "#ffcdd2"; fb.style.color = "#b71c1c";
+            }
+        }
+
+        // --- Act 8: Devotional Matrix Picker ---
+        document.querySelectorAll('.fleet-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const isCorrect = card.getAttribute('data-correct') === 'yes';
+                const info = card.getAttribute('data-info');
+                const fb = document.getElementById('fb8'); fb.style.display = "block";
+                if(isCorrect) {
+                    card.style.background = "#c8e6c9";
+                    fb.innerHTML = `🎯 Core feature detected! Details: ${info}`;
+                    fb.style.backgroundColor = "#c8e6c9"; fb.style.color = "#1b5e20";
+                } else {
+                    card.style.background = "#ffcdd2";
+                    fb.innerHTML = `⚠️ This is a false statement! Details: ${info}`;
+                    fb.style.backgroundColor = "#ffcdd2"; fb.style.color = "#b71c1c";
+                }
+            });
+        });
+
+        // --- Act 9: Devotional Strategy Scenario Logic ---
+        function makeDecision(isRight, txt) {
+            const fb = document.getElementById('fb9'); fb.style.display = "block";
+            fb.innerHTML = txt;
+            if(isRight) {
+                fb.style.background = "#c8e6c9"; fb.style.color = "#1b5e20";
+            } else {
+                fb.style.background = "#ffcdd2"; fb.style.color = "#b71c1c";
+            }
+        }
+    </script>
+</body>
+</html>

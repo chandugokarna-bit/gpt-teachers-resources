@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>18th Century India - Interactive Digital Flip Book</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #2c3e50, #bdc3c7);
+            --book-bg: #fffbf2;
+            --primary-color: #800020; /* Burgundy Elegant Theme */
+            --secondary-color: #2c3e50;
+            --accent-color: #d4af37; /* Royal Gold */
+            --text-color: #2d3748;
+            --success: #1b5e20;
+            --error: #b71c1c;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--bg-gradient);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-color);
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 20px;
+            text-shadow: 0 3px 6px rgba(0,0,0,0.5);
+        }
+        .header h1 { font-size: 2.3rem; margin-bottom: 5px; color: #fff; }
+        .header p { font-size: 1.1rem; color: #f0f0f0; }
+
+        /* Elegant Flip Book Structure */
+        .book-container {
+            width: 100%;
+            max-width: 980px;
+            background: var(--book-bg);
+            border-radius: 20px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.4), inset 20px 0 30px rgba(0,0,0,0.05);
+            border-left: 22px solid var(--primary-color);
+            min-height: 660px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+            border-right: 4px solid #d4af37;
+        }
+
+        /* Top Progress Indicator */
+        .progress-container { width: 100%; height: 6px; background: #eaedd0; }
+        .progress-bar { height: 100%; width: 14.28%; background: var(--accent-color); transition: width 0.4s ease; }
+
+        /* Page Layout */
+        .page { padding: 45px; flex: 1; display: none; animation: flipPageAnimation 0.5s ease-in-out; }
+        .page.active { display: block; }
+        @keyframes flipPageAnimation {
+            from { opacity: 0; transform: rotateY(-10deg) translateX(30px); }
+            to { opacity: 1; transform: rotateY(0deg) translateX(0); }
+        }
+
+        .page-title {
+            font-size: 1.6rem;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px dashed var(--accent-color);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+        }
+
+        .instruction { font-size: 1.05rem; margin-bottom: 25px; color: #555; font-style: italic; }
+
+        /* Flip Book Controls Buttons */
+        .book-controls {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px 45px;
+            background: #f5ebd6;
+            border-top: 2px solid #e2d3b5;
+        }
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 40px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: bold;
+        }
+        .btn-prev { background: #d0c4af; color: #333; }
+        .btn-next { background: var(--primary-color); color: white; }
+        .btn:hover:not(:disabled) { transform: translateY(-3px); box-shadow: 0 6px 15px rgba(0,0,0,0.2); }
+        .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+        .feedback { margin-top: 15px; padding: 15px; border-radius: 8px; font-weight: bold; display: none; }
+
+        /* Act 1: MCQ Options */
+        .quiz-box { display: flex; flex-direction: column; gap: 12px; margin-top: 15px; }
+        .opt-btn { padding: 14px 20px; background: #fff; border: 2px solid #e2e8f0; border-radius: 10px; cursor: pointer; text-align: left; font-size: 1.05rem; transition: 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .opt-btn:hover { background: #f7fafc; border-color: var(--primary-color); }
+        .opt-btn.correct { background: #c8e6c9; border-color: var(--success); color: #1b5e20; font-weight: bold; }
+        .opt-btn.wrong { background: #ffcdd2; border-color: var(--error); color: #b71c1c; }
+
+        /* Act 2: Accordion Click Boxes */
+        .accordion-container { display: flex; flex-direction: column; gap: 12px; }
+        .acc-item { border: 1px solid #e2d3b5; border-radius: 10px; overflow: hidden; background: white; box-shadow: 0 3px 6px rgba(0,0,0,0.02); }
+        .acc-header { background: #fffdf9; padding: 16px; font-weight: bold; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-size: 1.05rem; color: #4a3728; }
+        .acc-header:hover { background: #fdf5e2; }
+        .acc-body { background: #fbf9f3; padding: 18px; display: none; border-top: 1px solid #eee; line-height: 1.7; color: #78281f; font-weight: bold; font-size: 1.05rem; }
+
+        /* Act 3: Drag & Drop Matching Grid */
+        .matching-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .match-left, .match-right { display: flex; flex-direction: column; gap: 12px; }
+        .match-card { padding: 14px 18px; background: white; border: 2px solid #e2d3b5; border-radius: 10px; cursor: pointer; transition: 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.02); font-size: 1rem; font-weight: 600; }
+        .match-card.selected { background: #f5ebd6; border-color: var(--accent-color); }
+        .match-card.correct { background: #c8e6c9; border-color: var(--success); color: #1b5e20; cursor: default; }
+
+        /* Act 4: Innovative Blanks Dropdown */
+        .text-passage { background: #fffcf5; border: 2px solid #eedec4; padding: 30px; border-radius: 15px; font-size: 1.2rem; line-height: 2.2; color: #333; box-shadow: inset 0 0 10px rgba(0,0,0,0.02); }
+        .blank-select { padding: 5px 10px; border: 2px solid var(--primary-color); border-radius: 6px; font-size: 1.05rem; font-weight: bold; color: var(--primary-color); background: white; cursor: pointer; outline: none; }
+
+        /* Act 5: Chronology Steps */
+        .v-timeline { display: flex; flex-direction: column; gap: 12px; }
+        .t-row { display: flex; align-items: center; gap: 15px; background: white; padding: 12px; border-radius: 10px; border: 2px dashed #eedec4; }
+        .t-index { width: 36px; height: 36px; background: var(--primary-color); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.1rem; }
+        .t-zone { flex: 1; min-height: 45px; background: #fffdf9; border-radius: 6px; display: flex; align-items: center; padding-left: 15px; }
+        .item-bank { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; background: #f3ebd6; padding: 15px; border-radius: 12px; border: 1px solid #e2d3b5; }
+        .drag-chip { padding: 10px 18px; background: white; border: 1px solid #cdc0a8; border-radius: 25px; cursor: grab; font-size: 0.95rem; font-weight: bold; box-shadow: 0 3px 6px rgba(0,0,0,0.05); }
+
+        /* Act 6: Royal Kingdom Fleet Matrix */
+        .grid-fleet { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+        .fleet-card { background: white; border: 2px solid #eedec4; padding: 25px 15px; text-align: center; border-radius: 15px; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 8px rgba(0,0,0,0.02); }
+        .fleet-card:hover { transform: translateY(-5px); border-color: var(--accent-color); background: #fffdf9; }
+        .fleet-card i { font-size: 2.6rem; color: var(--primary-color); margin-bottom: 12px; }
+        .fleet-card h5 { font-size: 1.1rem; font-weight: bold; color: #4a3728; }
+
+        /* Act 7: Battle Strategy Matrix */
+        .battle-zone { background: #f9f5eb; border: 1px dashed #d4af37; padding: 25px; border-radius: 12px; text-align: center; font-size: 1.15rem; margin-bottom: 20px; line-height: 1.7; font-weight: 500; }
+        .strategy-btn { width: 100%; text-align: left; padding: 16px; background: white; border: 2px solid #e2d3b5; margin-top: 12px; border-radius: 10px; cursor: pointer; font-size: 1.05rem; font-weight: 600; transition: 0.2s; }
+        .strategy-btn:hover { background: #fffdf9; border-color: var(--primary-color); }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>18th Century India</h1>
+        <p>Interactive Digital Flip Book - Ultra-Modern Learning Platform</p>
+    </div>
+
+    <div class="book-container">
+        <div class="progress-container">
+            <div class="progress-bar" id="progBar"></div>
+        </div>
+
+        <div class="page active" id="page1">
+            <div class="page-title"><i class="fa-solid fa-layer-group"></i> Activity 1: Single-Sentence Question Multiple Choice Series</div>
+            <p class="instruction">Select and click on the correct answer for the questions related to the major historical events of the 18th century:</p>
+            <p id="q-text" style="font-size:1.25rem; margin-bottom:18px; font-weight:bold; color:var(--primary-color);"></p>
+            <div class="quiz-box" id="q-options"></div>
+            <div style="font-weight: bold; margin-top: 20px; text-align: right; color: #666;" id="q-indicator">Question: 1/7</div>
+            <div class="feedback" id="fb1"></div>
+        </div>
+
+        <div class="page" id="page2">
+            <div class="page-title"><i class="fa-solid fa-envelope-open-text"></i> Activity 2: Conceptual Group Questions (Click Box Activity)</div>
+            <p class="instruction">Click on the highly crucial historical questions below to reveal and analyze their official answer boxes:</p>
+            
+            <div class="accordion-container">
+                <div class="acc-item">
+                    <div class="acc-header" onclick="toggleAcc(this)">1. Why is the 18th century called the 'Period of Political Transition' in Indian history? <i class="fa-solid fa-plus"></i></div>
+                    <div class="acc-body">Because during this period, the powerful Mughal Empire collapsed, leading to the rise of several regional powers like the Marathas, Sikhs, and the Nizams of Hyderabad who became independent, thereby clearing the path for Europeans to assume administrative control.</div>
+                </div>
+                <div class="acc-item">
+                    <div class="acc-header" onclick="toggleAcc(this)">2. How did the Third Battle of Panipat alter the political landscape of India? <i class="fa-solid fa-plus"></i></div>
+                    <div class="acc-body">In this battle fought in 1761 CE, Ahmad Shah Abdali decisively defeated the Marathas. This shattered the Marathas' dream of pan-Indian hegemony and made it easier for the British to capture India.</div>
+                </div>
+                <div class="acc-item">
+                    <div class="acc-header" onclick="toggleAcc(this)">3. How did the rise of Hyder Ali occur in the history of Mysore? <i class="fa-solid fa-plus"></i></div>
+                    <div class="acc-body">Hyder Ali joined the court of the Wodeyar kings of Mysore as an ordinary soldier. Through his exceptional bravery and astuteness, he rose to become the 'Dalaway' (commander), and eventually became the de facto ruler of Mysore in 1761 CE.</div>
+                </div>
+                <div class="acc-item">
+                    <div class="acc-header" onclick="toggleAcc(this)">4. Why is Tipu Sultan referred to as the 'Tiger of Mysore' in history? <i class="fa-solid fa-plus"></i></div>
+                    <div class="acc-body">Tipu was a ruler who fought fiercely against British imperialism without making any compromises. He is highly acclaimed for his valor, military innovations during the Anglo-Mysore wars, and for achieving martyrdom on the battlefield.</div>
+                </div>
+                <div class="acc-item">
+                    <div class="acc-header" onclick="toggleAcc(this)">5. What was the achievement of Maharaja Ranjit Singh, who built the highly influential Sikh Empire? <i class="fa-solid fa-plus"></i></div>
+                    <div class="acc-body">Ranjit Singh unified the scattered Sikh Misls (clans) to establish a formidable Sikh Empire. He organized a modern army on the European model, which deeply alarmed both the Afghans and the British.</div>
+                </div>
+                <div class="acc-item">
+                    <div class="acc-header" onclick="toggleAcc(this)">6. What internal weaknesses led to the decline of the Mughal Empire in the 18th century? <i class="fa-solid fa-plus"></i></div>
+                    <div class="acc-body">The weak rulers who succeeded Aurangzeb, internal conspiracies among court nobles, continuous wars of succession, and economic bankruptcy brought about the downfall of the Mughal Empire.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="page" id="page3">
+            <div class="page-title"><i class="fa-solid fa-arrows-turn-to-dots"></i> Activity 3: Linking Historical Leaders and Power Centers</div>
+            <p class="instruction">Click on the name of the empire or person on the left, then match it to its appropriate historical description on the right:</p>
+            
+            <div class="matching-grid">
+                <div class="match-left" id="leftContainer">
+                    <div class="match-card" data-id="1">Mughal Emperor Bahadur Shah</div>
+                    <div class="match-card" data-id="2">Balaji Vishwanath</div>
+                    <div class="match-card" data-id="3">Ahmad Shah Abdali</div>
+                    <div class="match-card" data-id="4">Hyderabad State</div>
+                    <div class="match-card" data-id="5">Maharaja Ranjit Singh</div>
+                    <div class="match-card" data-id="6">Treaty of Seringapatam</div>
+                </div>
+                <div class="match-right" id="rightContainer">
+                    <div class="match-card" data-match="3">The Afghan ruler who invaded during the Third Battle of Panipat</div>
+                    <div class="match-card" data-match="1">The first Mughal Emperor to succeed Aurangzeb</div>
+                    <div class="match-card" data-match="4">The southern state founded by Asaf Jah (Nizam-ul-Mulk)</div>
+                    <div class="match-card" data-match="2">The first Peshwa who spearheaded the influential Maratha administration</div>
+                    <div class="match-card" data-match="6">The treaty that concluded the Third Anglo-Mysore War</div>
+                    <div class="match-card" data-match="5">The unparalleled Maharaja of the Sikhs belonging to the Sukerchakia Misl</div>
+                </div>
+            </div>
+            <div class="feedback" id="fb3"></div>
+        </div>
+
+        <div class="page" id="page4">
+            <div class="page-title"><i class="fa-solid fa-pen-nib"></i> Activity 4: Textual Analysis of 18th Century Administrative Shifts</div>
+            <p class="instruction">Complete the following highly specific historical paragraph by choosing the precise words:</p>
+            
+            <div class="text-passage">
+                At the beginning of the 18th century, specifically in 1707 CE, the central power in India collapsed after the death of Mughal Emperor 
+                <select class="blank-select" id="b1" data-ans="Aurangzeb"><option value="">--Select--</option><option>Akbar</option><option>Aurangzeb</option><option>Shah Jahan</option></select> 
+                . Under these circumstances, the 
+                <select class="blank-select" id="b2" data-ans="Peshwas"><option value="">--Select--</option><option>Peshwas</option><option>Nayakas</option><option>Sultans</option></select> 
+                holding the political keys emerged as extremely powerful in the Maratha Empire. In the south, Hyder Ali took the assistance of the 
+                <select class="blank-select" id="b3" data-ans="French"><option value="">--Select--</option><option>British</option><option>French</option><option>Portuguese</option></select> 
+                to train his army and established a modern arsenal at Dindigul. Tipu Sultan is credited with being the first in the world to successfully deploy 
+                <select class="blank-select" id="b4" data-ans="rocket technology"><option value="">--Select--</option><option>artillery warfare</option><option>rocket technology</option><option>guerrilla tactics</option></select> 
+                in successive battles against the British. The army that organized the Sikh forces in North India, instilling religious and national unity in them, was called the 
+                <select class="blank-select" id="b5" data-ans="Khalsa army"><option value="">--Select--</option><option>Misl army</option><option>Khalsa army</option><option>Mughal force</option></select> 
+                . Capitalizing on the chaotic environment of this entire century, the British East India Company laid a solid foundation for its 
+                <select class="blank-select" id="b6" data-ans="imperialistic"><option value="">--Select--</option><option>democratic</option><option>imperialistic</option><option>socialist</option></select> 
+                hegemony in India.
+            </div>
+            <select class="btn" style="background:var(--accent-color); color:white; margin-top:20px; display:inline-block;" onclick="checkBlanks()"><option value="">Verify History Text</option></select>
+            <div class="feedback" id="fb4"></div>
+        </div>
+
+        <div class="page" id="page5">
+            <div class="page-title"><i class="fa-solid fa-hourglass-half"></i> Activity 5: Chronological and Sequential Logical Arrangement</div>
+            <p class="instruction">Arrange the major historical events that determined the fate of 18th-century India chronologically from oldest to newest:</p>
+            
+            <div class="v-timeline">
+                <div class="t-row"><div class="t-index">1</div><div class="t-zone" id="z1" data-order="Death of Mughal Emperor Aurangzeb"></div></div>
+                <div class="t-row"><div class="t-index">2</div><div class="t-zone" id="z2" data-order="Invasion of Delhi by Nadir Shah and plundering of the Peacock Throne"></div></div>
+                <div class="t-row"><div class="t-index">3</div><div class="t-zone" id="z3" data-order="Third Battle of Panipat between the Marathas and the Afghans"></div></div>
+                <div class="t-row"><div class="t-index">4</div><div class="t-zone" id="z4" data-order="Assumption of power in Mysore by Hyder Ali"></div></div>
+                <div class="t-row"><div class="t-index">5</div><div class="t-zone" id="z5" data-order="Martyrdom of Tipu Sultan at Seringapatam"></div></div>
+                <div class="t-row"><div class="t-index">6</div><div class="t-zone" id="z6" data-order="Maharaja Ranjit Singh becoming the Emperor of the Sikh Empire"></div></div>
+            </div>
+
+            <div class="item-bank" id="dragBank5">
+                <div class="drag-chip" draggable="true" id="t1">Third Battle of Panipat between the Marathas and the Afghans</div>
+                <div class="drag-chip" draggable="true" id="t2">Death of Mughal Emperor Aurangzeb</div>
+                <div class="drag-chip" draggable="true" id="t3">Martyrdom of Tipu Sultan at Seringapatam</div>
+                <div class="drag-chip" draggable="true" id="t4">Invasion of Delhi by Nadir Shah and plundering of the Peacock Throne</div>
+                <div class="drag-chip" draggable="true" id="t5">Maharaja Ranjit Singh becoming the Emperor of the Sikh Empire</div>
+                <div class="drag-chip" draggable="true" id="t6">Assumption of power in Mysore by Hyder Ali</div>
+            </div>
+            <select class="btn" style="background:var(--accent-color); color:white; margin-top:15px; display:inline-block;" onclick="checkTimeline()"><option value="">Confirm Chronology</option></select>
+            <div class="feedback" id="fb5"></div>
+        </div>
+
+        <div class="page" id="page6">
+            <div class="page-title"><i class="fa-solid fa-gem"></i> Activity 6: 18th Century Cultural and Economic Secret Treasure Hunt</div>
+            <p class="instruction">Open only the boxes containing authentic cultural, technical, and geographical features of 18th-century India (4 correct treasures in total):</p>
+            
+            <div class="grid-fleet">
+                <div class="fleet-card" data-correct="yes" data-info="The sericulture industry promoted by Tipu's court greatly enriched Mysore."><i class="fa-solid fa-shuttle-space"></i><h5>Mysore Silk Industry</h5></div>
+                <div class="fleet-card" data-correct="no" data-info="No, the Taj Mahal was constructed by Shah Jahan in the 17th century."><i class="fa-solid fa-gopuram"></i><h5>Construction of Taj Mahal</h5></div>
+                <div class="fleet-card" data-correct="yes" data-info="The Persian king Nadir Shah plundered the Kohinoor Diamond and the Peacock Throne from India."><i class="fa-solid fa-diamond"></i><h5>Plunder of Kohinoor Diamond</h5></div>
+                <div class="fleet-card" data-correct="yes" data-info="The massive observatory built for astronomical sciences by Maharaja Sawai Jai Singh of Jaipur."><i class="fa-solid fa-star"></i><h5>Establishment of Jantar Mantar</h5></div>
+                <div class="fleet-card" data-correct="no" data-info="Incorrect, the Vijayanagara Empire existed during the 14th-16th centuries and is unrelated to the 18th century."><i class="fa-solid fa-monument"></i><h5>Vijayanagara Architecture</h5></div>
+                <div class="fleet-card" data-correct="yes" data-info="Chauth and Sardeshmukhi were the most crucial taxes collected from the subjects under Maratha rule."><i class="fa-solid fa-coins"></i><h5>Chauth & Sardeshmukhi Taxes</h5></div>
+            </div>
+            <div class="feedback" id="fb6" style="background:#fff3cd; color:#856404;"></div>
+        </div>
+
+        <div class="page" id="page7">
+            <div class="page-title"><i class="fa-solid fa-chess"></i> Activity 7: Scenario-Based Tactical Diplomatic Decision</div>
+            <p class="instruction">Read the highly significant historical scenario below and make the right diplomatic decision as a valiant, patriotic king:</p>
+            
+            <div class="battle-zone">
+                "The year is 1799 CE. It is the time of the Fourth Anglo-Mysore War. The British forces have surrounded your fortress at Seringapatam. The British Governor-General, Lord Wellesley, offers a final ultimatum demanding your submission to British authority by signing the stringent and humiliating 'Subsidiary Alliance'. What is your decision?"
+            </div>
+
+            <button class="strategy-btn" onclick="makeDecision(false, 'This is a submissive decision. Accepting the Subsidiary Alliance means completely relinquishing your political independence.')">Option A: Sign the British Subsidiary Alliance to save your life and continue living as a subordinate king under their control.</button>
+            <button class="strategy-btn" onclick="makeDecision(true, 'An unparalleled heroic and patriotic choice! Tipu Sultan famously asserted: \'It is better to live like a tiger for a single day and die, than to live for a hundred years like a sheep\'. He fought valiantly on the battlefield and achieved martyrdom.')">Option B: Refuse to sign any treaty of enslavement with the British, pick up your sword, and fearlessly enter the battlefield to fight with utmost valor for the defense of the fort.</button>
+            <button class="strategy-btn" onclick="makeDecision(false, 'This is a cowardly choice that leaves the citizens and the motherland completely stranded.')">Option C: Escape secretly through the back gate of the fortress and flee to another country.</button>
+            
+            <div class="feedback" id="fb7"></div>
+        </div>
+
+        <div class="book-controls">
+            <button class="btn btn-prev" id="prevPageBtn" onclick="movePage(-1)" disabled><i class="fa-solid fa-book-open"></i> Previous Page</button>
+            <button class="btn btn-next" id="nextPageBtn" onclick="movePage(1)">Next Page <i class="fa-solid fa-book"></i></button>
+        </div>
+    </div>
+
+    <script>
+        let pageIdx = 1;
+        const maxPages = 7;
+
+        function movePage(dir) {
+            document.getElementById(`page${pageIdx}`).classList.remove('active');
+            pageIdx += dir;
+            document.getElementById(`page${pageIdx}`).classList.add('active');
+
+            document.getElementById('prevPageBtn').disabled = (pageIdx === 1);
+            document.getElementById('nextPageBtn').disabled = (pageIdx === maxPages);
+
+            document.getElementById('progBar').style.width = `${(pageIdx / maxPages) * 100}%`;
+        }
+
+        // --- Act 1: MCQ Database (7 items) ---
+        const mcqCollection = [
+            { q: "Who was the Persian ruler who invaded Delhi in 1739 CE and plundered its immense wealth?", opts: ["Ahmad Shah Abdali", "Nadir Shah", "Mirza Beg", "Shah Alam"], ans: 1 },
+            { q: "In which year did the Third Battle of Panipat take place?", opts: ["1526 CE", "1556 CE", "1761 CE", "1764 CE"], ans: 2 },
+            { q: "With whose assistance did Hyder Ali establish a modern arsenal at Dindigul?", opts: ["The British", "The French", "The Dutch", "The Marathas"], ans: 1 },
+            { q: "Which historical treaty brought the First Anglo-Mysore War to an end?", opts: ["Treaty of Madras", "Treaty of Mangalore", "Treaty of Seringapatam", "Treaty of London"], ans: 0 },
+            { q: "What were the separate clans or confederacies scattered across Sikhism called?", opts: ["Khalsa", "Misls", "Sangat", "Gurdwara"], ans: 1 },
+            { q: "Which diplomatic policy did Lord Wellesley introduce to bring Mysore and other states under control?", opts: ["Doctrine of Lapse", "Subsidiary Alliance System", "Permanent Settlement", "Diarchy"], ans: 1 },
+            { q: "In which Anglo-Mysore war did Tipu Sultan attain martyrdom while fighting against the British?", opts: ["First War", "Second War", "Third War", "Fourth War (1799)"], ans: 3 }
+        ];
+
+        let currentQIdx = 0;
+        function loadMCQ() {
+            const data = mcqCollection[currentQIdx];
+            document.getElementById('q-text').innerText = `${currentQIdx + 1}. ${data.q}`;
+            const container = document.getElementById('q-options');
+            container.innerHTML = "";
+            document.getElementById('q-indicator').innerText = `Question: ${currentQIdx + 1}/${mcqCollection.length}`;
+
+            data.opts.forEach((opt, idx) => {
+                const b = document.createElement('button');
+                b.className = "opt-btn";
+                b.innerText = opt;
+                b.onclick = () => verifyMCQ(idx, data.ans, b);
+                container.appendChild(b);
+            });
+        }
+
+        function verifyMCQ(sel, right, element) {
+            const fb = document.getElementById('fb1'); fb.style.display = "block";
+            if(sel === right) {
+                element.classList.add('correct');
+                fb.innerHTML = "✓ Wonderful! Correct answer.";
+                fb.style.background = "#c8e6c9"; fb.style.color = "#1b5e20";
+                setTimeout(() => {
+                    if(currentQIdx < mcqCollection.length - 1) {
+                        currentQIdx++; loadMCQ(); fb.style.display = "none";
+                    } else { fb.innerHTML = "🎉 Congratulations! You have successfully completed all 7 multiple choice questions."; }
+                }, 1500);
+            } else {
+                element.classList.add('wrong');
+                fb.innerHTML = "✗ Wrong answer, please reconsider the textual facts.";
+                fb.style.background = "#ffcdd2"; fb.style.color = "#b71c1c";
+            }
+        }
+        loadMCQ();
+
+        // --- Act 2: Accordion Click Open Box Logic ---
+        function toggleAcc(header) {
+            const body = header.nextElementSibling;
+            const icon = header.querySelector('i');
+            if(body.style.display === "block") {
+                body.style.display = "none";
+                icon.className = "fa-solid fa-plus";
+            } else {
+                body.style.display = "block";
+                icon.className = "fa-solid fa-minus";
+            }
+        }
+
+        // --- Act 3: Matching Logic ---
+        let selectedLeft = null;
+        const leftCards = document.querySelectorAll('#leftContainer .match-card');
+        const rightCards = document.querySelectorAll('#rightContainer .match-card');
+
+        leftCards.forEach(card => {
+            card.addEventListener('click', () => {
+                if(card.classList.contains('correct')) return;
+                leftCards.forEach(c => c.classList.remove('selected'));
+                card.classList.add('selected');
+                selectedLeft = card;
+            });
+        });
+
+        rightCards.forEach(card => {
+            card.addEventListener('click', () => {
+                if(card.classList.contains('correct') || !selectedLeft) return;
+                const matchId = card.getAttribute('data-match');
+                const leftId = selectedLeft.getAttribute('data-id');
+
+                if(matchId === leftId) {
+                    card.classList.add('correct');
+                    selectedLeft.classList.add('correct');
+                    selectedLeft.classList.remove('selected');
+                    selectedLeft = null;
+                    checkAct3Progress();
+                } else {
+                    const fb = document.getElementById('fb3');
+                    fb.style.display = "block"; fb.style.background = "#ffcdd2"; fb.style.color = "#b71c1c";
+                    fb.innerText = "✗ Incorrect match! Think about the correct historical power center.";
+                }
+            });
+        });
+
+        function checkAct3Progress() {
+            const finished = document.querySelectorAll('#leftContainer .match-card.correct').length;
+            const fb = document.getElementById('fb3'); fb.style.display = "block";
+            if(finished === 6) {
+                fb.style.background = "#c8e6c9"; fb.style.color = "#1b5e20";
+                fb.innerText = "✓ Perfect! All 6 leaders and political events have been accurately matched.";
+            } else {
+                fb.style.background = "#fff3cd"; fb.style.color = "#856404";
+                fb.innerText = `Progress: ${finished}/6 pairs matched correctly.`;
+            }
+        }
+
+        // --- Drag & Drop Infrastructure for Act 5 Chronology ---
+        let currentDraggingChip = null;
+        document.querySelectorAll('.drag-chip').forEach(chip => {
+            chip.addEventListener('dragstart', () => { currentDraggingChip = chip; });
+        });
+
+        document.querySelectorAll('.t-zone').forEach(zone => {
+            zone.addEventListener('dragover', (e) => e.preventDefault());
+            zone.addEventListener('drop', () => {
+                if(currentDraggingChip) zone.appendChild(currentDraggingChip);
+            });
+        });
+
+        function checkTimeline() {
+            let correct = 0;
+            for(let i=1; i<=6; i++) {
+                const zone = document.getElementById(`z${i}`);
+                if(zone.firstChild && zone.firstChild.innerText.trim() === zone.getAttribute('data-order')) {
+                    correct++;
+                }
+            }
+            const fb = document.getElementById('fb5'); fb.style.display = "block";
+            if(correct === 6) {
+                fb.innerHTML = "✓ Fantastic! You have arranged all 6 major events of the 18th century based on accurate dates.";
+                fb.style.background = "#c8e6c9"; fb.style.color = "#1b5e20";
+            } else {
+                fb.innerHTML = `✗ ${correct}/6 steps are correct. Reconsider the sequence starting from the fall of the Mughals up to Ranjit Singh.`;
+                fb.style.background = "#ffcdd2"; fb.style.color = "#b71c1c";
+            }
+        }
+
+        // --- Act 4: Innovative Blanks Validator ---
+        function checkBlanks() {
+            let miss = 0;
+            const selects = document.querySelectorAll('.blank-select');
+            selects.forEach(sel => {
+                if(sel.value !== sel.getAttribute('data-ans')) {
+                    miss++; sel.style.borderColor = "var(--error)";
+                } else { sel.style.borderColor = "var(--success)"; }
+            });
+            const fb = document.getElementById('fb4'); fb.style.display = "block";
+            if(miss === 0) {
+                fb.innerHTML = "✓ Excellent! You have successfully completed the essay on 18th-century administrative history.";
+                fb.style.background = "#c8e6c9"; fb.style.color = "#1b5e20";
+            } else {
+                fb.innerHTML = "✗ A few blanks contain incorrect historical terms. Please check and revise.";
+                fb.style.background = "#ffcdd2"; fb.style.color = "#b71c1c";
+            }
+        }
+
+        // --- Act 6: Royal Fleet Treasure Hunt Picker ---
+        document.querySelectorAll('.fleet-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const isCorrect = card.getAttribute('data-correct') === 'yes';
+                const info = card.getAttribute('data-info');
+                const fb = document.getElementById('fb6'); fb.style.display = "block";
+                if(isCorrect) {
+                    card.style.background = "#c8e6c9";
+                    card.querySelector('i').className = "fa-solid fa-box-open";
+                    fb.innerHTML = `🎯 Historical secret uncovered! Details: ${info}`;
+                    fb.style.backgroundColor = "#c8e6c9"; fb.style.color = "#1b5e20";
+                } else {
+                    card.style.background = "#ffcdd2";
+                    fb.innerHTML = `⚠️ Incorrect choice! Details: ${info}`;
+                    fb.style.backgroundColor = "#ffcdd2"; fb.style.color = "#b71c1c";
+                }
+            });
+        });
+
+        // --- Act 7: Strategic Scenario Matrix Logic ---
+        function makeDecision(isRight, txt) {
+            const fb = document.getElementById('fb7'); fb.style.display = "block";
+            fb.innerHTML = txt;
+            if(isRight) {
+                fb.style.background = "#c8e6c9"; fb.style.color = "#1b5e20";
+            } else {
+                fb.style.background = "#ffcdd2"; fb.style.color = "#b71c1c";
+            }
+        }
+    </script>
+</body>
+</html>

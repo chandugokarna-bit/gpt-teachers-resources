@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eco-Arcade 12.0 - Our Earth and Environment</title>
+    <style>
+        :root {
+            --eco-green: #10ac84;
+            --ocean-blue: #0984e3;
+            --earth-gold: #f1c40f;
+            --space-black: #05070c;
+            --neon-pink: #ff007f;
+            --panel-bg: rgba(15, 23, 42, 0.95);
+            --danger-red: #ee5253;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Verdana, sans-serif; }
+
+        body {
+            background: var(--space-black);
+            background-image: radial-gradient(circle at 50% 50%, #1e293b 0%, #05070c 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #ffffff;
+        }
+
+        header.eco-header {
+            text-align: center;
+            padding: 25px;
+            background: var(--panel-bg);
+            border: 2px solid var(--eco-green);
+            border-radius: 24px;
+            box-shadow: 0 0 30px rgba(16, 172, 132, 0.3);
+            margin-bottom: 25px;
+        }
+
+        header.eco-header h1 {
+            color: var(--eco-green);
+            font-size: 2.4rem;
+            text-shadow: 0 0 12px rgba(16, 172, 132, 0.5);
+            margin-bottom: 5px;
+        }
+
+        header.eco-header p { color: #cbd5e1; font-size: 1.15rem; }
+
+        /* NEW HUD: ECO-SYSTEM HEALTH INDEX */
+        .eco-hud-display {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #1e293b;
+            padding: 15px 25px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            border-left: 5px solid var(--ocean-blue);
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .health-bar-container {
+            background: #334155;
+            width: 45%;
+            height: 18px;
+            border-radius: 9px;
+            overflow: hidden;
+            border: 1px solid var(--eco-green);
+        }
+
+        .health-bar-fill {
+            background: linear-gradient(90deg, var(--eco-green), #55efc4);
+            height: 100%;
+            width: 100%;
+            transition: width 0.4s ease;
+        }
+
+        /* Side Scrolling Level Steppers */
+        .eco-track-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 35px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+
+        .eco-track-row::-webkit-scrollbar { height: 6px; }
+        .eco-track-row::-webkit-scrollbar-thumb { background: var(--eco-green); border-radius: 3px; }
+
+        .eco-card {
+            background: #1e293b;
+            border: 1px solid #334155;
+            padding: 12px 25px;
+            border-radius: 14px;
+            cursor: pointer;
+            font-weight: bold;
+            white-space: nowrap;
+            transition: all 0.3s;
+        }
+
+        .eco-card:hover, .eco-card.active-mission {
+            background: var(--eco-green);
+            color: #000000;
+            border-color: #ffffff;
+            box-shadow: 0 0 15px var(--eco-green);
+            transform: translateY(-3px);
+        }
+
+        /* Game Arena Boxes */
+        .eco-arena {
+            background: var(--panel-bg);
+            border: 2px solid #334155;
+            border-radius: 24px;
+            padding: 35px;
+            min-height: 520px;
+            display: none;
+            box-shadow: 0 20px 45px rgba(0,0,0,0.5);
+        }
+
+        .eco-arena.active-arena { display: block; animation: ecoPowerOn 0.4s ease-in-out; }
+
+        @keyframes ecoPowerOn {
+            from { opacity: 0; transform: scale(0.98); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        h2.arena-title {
+            font-size: 1.65rem;
+            color: var(--earth-gold);
+            margin-bottom: 25px;
+            border-bottom: 1px dashed rgba(241, 196, 15, 0.3);
+            padding-bottom: 12px;
+        }
+
+        /* Nodes Connector System */
+        .grid-connector-system {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .eco-node {
+            background: #1e293b;
+            padding: 18px;
+            border-radius: 14px;
+            cursor: pointer;
+            border: 2px solid #334155;
+            font-weight: bold;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .eco-node:hover { border-color: var(--ocean-blue); background: #223047; }
+        .eco-node.node-selected { background: var(--ocean-blue); color: white; border-color: white; }
+
+        /* Quiz UI Elements */
+        .quiz-box-row {
+            background: #1e293b;
+            border: 2px solid #334155;
+            padding: 16px;
+            margin: 12px 0;
+            border-radius: 14px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+        }
+
+        .quiz-box-row:hover { border-color: var(--eco-green); transform: translateX(5px); }
+        .quiz-box-row.correct-glow { background: rgba(16, 172, 132, 0.2); border-color: var(--eco-green); color: #55efc4; }
+        .quiz-box-row.wrong-glow { background: rgba(238, 82, 83, 0.2); border-color: var(--neon-pink); color: #ff7675; }
+
+        /* Input Deck styling */
+        .smart-eco-input {
+            background: #05070c;
+            border: 2px solid #334155;
+            border-radius: 10px;
+            padding: 12px;
+            font-size: 1.1rem;
+            color: var(--earth-gold);
+            font-weight: bold;
+            outline: none;
+            width: 100%;
+            max-width: 320px;
+            margin-top: 8px;
+        }
+
+        .smart-eco-input:focus { border-color: var(--eco-green); }
+
+        /* Mining Grid */
+        .mining-card-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        .ore-token {
+            background: #1e293b;
+            border: 2px solid #334155;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .ore-token.active-token { background: var(--eco-green); border-color: white; }
+
+        /* Universal Action Buttons */
+        .eco-btn {
+            background: linear-gradient(135deg, var(--eco-green), #00b894);
+            color: white;
+            border: none;
+            padding: 14px 35px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 25px;
+            box-shadow: 0 5px 15px rgba(16, 172, 132, 0.3);
+        }
+
+        .eco-btn:hover { transform: scale(1.02); box-shadow: 0 8px 25px rgba(16, 172, 132, 0.5); }
+
+        .eco-alert-box {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 12px;
+            font-weight: bold;
+            display: none;
+            font-size: 1.1rem;
+            border: 1px solid transparent;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="eco-header">
+        <h1>Geography Section: Eco-Arcade</h1>
+        <p>Simulator Model 12.0 • Our Amazing Earth and Environment Preservation Games</p>
+    </div>
+
+    <div class="eco-hud-display">
+        <span>Environment and Ozone Health Index:</span>
+        <div class="health-bar-container"><div class="health-bar-fill" id="healthFill"></div></div>
+        <span style="color: var(--earth-gold);" id="livePlanetXP">Planet Points: 0000 PXP</span>
+    </div>
+
+    <div class="eco-track-row">
+        <div class="eco-card active-mission" id="ecoBtn1" onclick="shiftEcoLevel(1)">1. Earth in Universe</div>
+        <div class="eco-card" id="ecoBtn2" onclick="shiftEcoLevel(2)">2. Earth's Unique Shape</div>
+        <div class="eco-card" id="ecoBtn3" onclick="shiftEcoLevel(3)">3. Epic 10 Eco Quiz</div>
+        <div class="eco-card" id="ecoBtn4" onclick="shiftEcoLevel(4)">4. Latitude & Longitude</div>
+        <div class="eco-card" id="ecoBtn5" onclick="shiftEcoLevel(5)">5. Continents & Oceans</div>
+        <div class="eco-card" id="ecoBtn6" onclick="shiftEcoLevel(6)">6. Two Earth Movements</div>
+        <div class="eco-card" id="ecoBtn7" onclick="shiftEcoLevel(7)">7. Eco Preservation Link</div>
+    </div>
+
+    <div id="ecoArena1" class="eco-arena active-arena">
+        <h2 class="arena-title">Level 1: Position of Our Earth in Solar System (Space Node Connector)</h2>
+        <p style="margin-bottom: 15px;">My friend, correctly match the distance of our Earth from the Sun and its unique position:</p>
+        <div class="grid-connector-system">
+            <div>
+                <div class="eco-node" id="l1_nodeL1" onclick="connectEcoNodes('L', 'l1_nodeL1', 1)">Earth's Position</div>
+                <div class="eco-node" id="l1_nodeL2" style="margin-top:15px;" onclick="connectEcoNodes('L', 'l1_nodeL2', 2)">Average Distance from Sun</div>
+            </div>
+            <div>
+                <div class="eco-node" id="l1_nodeR1" onclick="connectEcoNodes('R', 'l1_nodeR1', 2)">Around 149.6 Million Kilometers</div>
+                <div class="eco-node" id="l1_nodeR2" style="margin-top:15px;" onclick="connectEcoNodes('R', 'l1_nodeR2', 1)">3rd planet from the Sun and 5th largest in size</div>
+            </div>
+        </div>
+        <div class="eco-alert-box" id="alert1"></div>
+    </div>
+
+    <div id="ecoArena2" class="eco-arena">
+        <h2 class="arena-title">Level 2: The Watery Planet and its True Shape (The Earth Shape Crypt)</h2>
+        <div style="display:flex; flex-direction:column; gap:20px;">
+            <div class="fib-q">1. Since the Earth is slightly flattened at the poles and bulges near the equator, what is its unique shape called? <br><input type="text" class="smart-eco-input" id="cryptIn1" placeholder="Shape Name (e.g., Geoid)"></div>
+            <div class="fib-q">2. Since 70.8% of the Earth's surface area is covered with water, what planet is it called? <br><input type="text" class="smart-eco-input" id="cryptIn2" placeholder="Watery Planet / Dry Planet?"></div>
+        </div>
+        <button class="eco-btn" onclick="verifyEcoLevel2()">Crack Earth's Secret</button>
+        <div class="eco-alert-box" id="alert2"></div>
+    </div>
+
+    <div id="ecoArena3" class="eco-arena">
+        <h2 class="arena-title">Level 3: The Great Battle of Globe and Environmental Awareness (Epic 10 Eco Quiz)</h2>
+        <div style="font-weight: bold; margin-bottom: 15px; color: var(--earth-gold);" id="quizCounterText">Question Code: 1 / 10</div>
+        <div id="quizQuestionText" style="font-size: 1.25rem; font-weight: bold; margin-bottom: 20px;">Loading...</div>
+        <div id="quizOptionsContainer"></div>
+        <button class="eco-btn" id="nextQuizBtn" style="display:none;" onclick="nextGeoQuestion()">Move to Next Knowledge Challenge ➔</button>
+        <div class="eco-alert-box" id="alert3"></div>
+    </div>
+
+    <div id="ecoArena4" class="eco-arena">
+        <h2 class="arena-title">Level 4: Imaginary Net of Latitudes and Longitudes (Global Geo-Grid Lines)</h2>
+        <div style="display:flex; flex-direction:column; gap:20px;">
+            <div class="fib-q">1. What is the largest 0-degree line of latitude passing through the center of the Earth from East to West? <br><input type="text" class="smart-eco-input" id="lineIn1" placeholder="Equator / Tropic of Cancer?"></div>
+            <div class="fib-q">2. What is the name of the 0-degree line of longitude over Greenwich, England, which determines the standard time of the world? <br><input type="text" class="smart-eco-input" id="lineIn2" placeholder="Prime Meridian / International Date Line?"></div>
+        </div>
+        <button class="eco-btn" onclick="verifyEcoLevel4()">Confirm Grid Lines Code</button>
+        <div class="eco-alert-box" id="alert4"></div>
+    </div>
+
+    <div id="ecoArena5" class="eco-arena">
+        <h2 class="arena-title">Level 5: Discovery of World Continents and Oceans (Continents & Oceans Mining)</h2>
+        <p style="margin-bottom: 15px;">My friend, click and mine **only the major vast continents** present on our Earth:</p>
+        <div class="mining-card-grid">
+            <div class="ore-token" id="ore1" onclick="toggleOreToken('ore1', true)">1. Asia</div>
+            <div class="ore-token" id="ore2" onclick="toggleOreToken('ore2', false)">2. Pacific Ocean</div>
+            <div class="ore-token" id="ore3" onclick="toggleOreToken('ore3', true)">3. Africa</div>
+            <div class="ore-token" id="ore4" onclick="toggleOreToken('ore4', true)">4. Europe</div>
+            <div class="ore-token" id="ore5" onclick="toggleOreToken('ore5', false)">5. Indian Ocean</div>
+            <div class="ore-token" id="ore6" onclick="toggleOreToken('ore6', true)">6. Australia</div>
+        </div>
+        <button class="eco-btn" onclick="verifyEcoLevel5()">Lock Continents</button>
+        <div class="eco-alert-box" id="alert5"></div>
+    </div>
+
+    <div id="ecoArena6" class="eco-arena">
+        <h2 class="arena-title">Level 6: Consequences of Earth's Two Major Movements (Earth Motions Sorting)</h2>
+        <p style="margin-bottom: 15px;">Sort the correct results of Earth's rotation (spinning on its axis) and revolution (revolving around the Sun), my friend:</p>
+        <div style="display:flex; gap:25px;">
+            <div style="flex:1; display:flex; flex-direction:column; gap:10px;" id="motionSource">
+                <div style="background:#1e293b; padding:12px; border-radius:10px; cursor:grab; font-weight:bold; border:1px solid #334155;" draggable="true" id="mot1" ondragstart="startMotionDrag(event)">Earth's Daily Motion (Rotation)</div>
+                <div style="background:#1e293b; padding:12px; border-radius:10px; cursor:grab; font-weight:bold; border:1px solid #334155;" draggable="true" id="mot2" ondragstart="startMotionDrag(event)">Earth's Annual Motion (Revolution)</div>
+            </div>
+            <div style="flex:2; display:flex; flex-direction:column; gap:15px;">
+                <div style="background:rgba(0,0,0,0.3); border:2px dashed var(--eco-green); padding:15px; border-radius:12px;" ondragover="allowMotionDrop(event)" ondrop="handleMotionDrop(event, 'daynight')">
+                    <h3>Movement responsible for Days and Nights</h3>
+                </div>
+                <div style="background:rgba(0,0,0,0.3); border:2px dashed var(--eco-green); padding:15px; border-radius:12px;" ondragover="allowMotionDrop(event)" ondrop="handleMotionDrop(event, 'seasons')">
+                    <h3>Movement responsible for changing Seasons (Winter, Summer)</h3>
+                </div>
+            </div>
+        </div>
+        <button class="eco-btn" onclick="verifyEcoLevel6()">Check Motion Consequences</button>
+        <div class="eco-alert-box" id="alert6"></div>
+    </div>
+
+    <div id="ecoArena7" class="eco-arena">
+        <h2 class="arena-title">Level 7: Global Warming and Eco Preservation (The Eco Preservation Matrix)</h2>
+        <p style="margin-bottom: 15px;">Final step! Match the actions harming the environment and the responsibility to protect it to win the arcade, my friend:</p>
+        <div class="grid-connector-system">
+            <div class="eco-node" id="matL1" onclick="selectFinalEcoMatrix('L', 'matL1', 'bad')">Deforestation and Plastic Usage</div>
+            <div class="eco-node" id="matR1" onclick="selectFinalEcoMatrix('R', 'matR1', 'bad')">Causes Global Warming and environmental destruction</div>
+            <div class="eco-node" id="matL2" onclick="selectFinalEcoMatrix('L', 'matL2', 'good')">Planting Trees and Protecting Nature</div>
+            <div class="eco-node" id="matR2" onclick="selectFinalEcoMatrix('R', 'matR2', 'good')">The only way to protect Earth's ozone layer and biosphere</div>
+        </div>
+        <button class="eco-btn" onclick="verifyEcoLevel7()">Complete Eco Matrix</button>
+        <div class="eco-alert-box" id="alert7"></div>
+    </div>
+
+    <script>
+        let planetXP = 0; let ecoHealth = 100;
+        function modifyEcoHUD(pxpChange, healthDamage) {
+            planetXP += pxpChange;
+            ecoHealth = Math.max(10, ecoHealth - healthDamage);
+            document.getElementById("livePlanetXP").innerText = `Planet Points: ${planetXP.toString().padStart(4, '0')} PXP`;
+            document.getElementById("healthFill").style.width = `${ecoHealth}%`;
+        }
+
+        function shiftEcoLevel(levelIdx) {
+            document.querySelectorAll('.eco-arena').forEach(el => el.classList.remove('active-arena'));
+            document.querySelectorAll('.eco-card').forEach(el => el.classList.remove('active-mission'));
+            
+            document.getElementById('ecoArena' + levelIdx).classList.add('active-arena');
+            document.getElementById('ecoBtn' + levelIdx).classList.add('active-mission');
+        }
+
+        // Level 1 Logic
+        let nodeL = null; let nodeR = null;
+        function connectEcoNodes(side, id, matchVal) {
+            if(side === 'L') {
+                if(nodeL) document.getElementById(nodeL.id).classList.remove('node-selected');
+                nodeL = { id: id, match: matchVal };
+            } else {
+                if(nodeR) document.getElementById(nodeR.id).classList.remove('node-selected');
+                nodeR = { id: id, match: matchVal };
+            }
+            document.getElementById(id).classList.add('node-selected');
+
+            if(nodeL && nodeR) {
+                if(nodeL.match === nodeR.match) {
+                    document.getElementById(nodeL.id).style.background = "var(--eco-green)";
+                    document.getElementById(nodeR.id).style.background = "var(--eco-green)";
+                    modifyEcoHUD(100, 0);
+                    showEcoAlert(1, "Correct link, my friend! Earth's position in the solar system is perfectly correct.", true);
+                    document.getElementById('ecoBtn1').style.background = "var(--eco-green)";
+                } else {
+                    modifyEcoHUD(0, 10);
+                    showEcoAlert(1, "Incorrect link, ozone health depleted! Think again, my friend.", false);
+                }
+                nodeL = null; nodeR = null;
+            }
+        }
+
+        // Level 2 Logic
+        function verifyEcoLevel2() {
+            let c1 = document.getElementById("cryptIn1").value.trim().toLowerCase();
+            let c2 = document.getElementById("cryptIn2").value.trim().toLowerCase();
+
+            if((c1 === "geoid") && (c2 === "watery planet" || c2 === "watery")) {
+                modifyEcoHUD(150, 0);
+                document.getElementById('ecoBtn2').style.background = "var(--eco-green)";
+                showEcoAlert(2, "Wonderful! Earth's geoid shape and the concept of watery planet are 100% correct.", true);
+            } else {
+                modifyEcoHUD(0, 10);
+                showEcoAlert(2, "Answer is incorrect, my friend! Hint: Write Geoid, Watery Planet.", false);
+            }
+        }
+
+        // Level 3: 10 Questions Matrix Quiz Data
+        const geographyQuizPool = [
+            { q: "1. By what name is our grand Earth where we live uniquely called in the solar system?", o: ["Gaseous Planet", "Living Planet", "Hot Planet"], c: 1 },
+            { q: "2. What is the total geographical surface area of the Earth in square kilometers?", o: ["510.07 Million Sq. Km", "100 Million Sq. Km", "800 Million Sq. Km"], c: 0 },
+            { q: "3. What is the total percentage proportion of water spread across Earth's surface area?", o: ["50 percent", "29.2 percent", "70.8 percent"], c: 2 },
+            { q: "4. Which continent is the largest in area and the most highly populated in the entire world?", o: ["Africa", "Asia", "Europe"], c: 1 },
+            { q: "5. What are the imaginary vertical lines joining the North Pole and South Pole on the globe called?", o: ["Latitudes", "Longitudes", "Equator Line"], c: 1 },
+            { q: "6. What is the distance or time difference between two longitudes for every single degree?", o: ["4 Minutes", "10 minutes", "60 minutes"], c: 0 },
+            { q: "7. In which ocean is the deepest 'Mariana Trench' on the entire Earth located?", o: ["Indian Ocean", "Pacific Ocean", "Atlantic Ocean"], c: 1 },
+            { q: "8. What is the speed of Earth's rotation on its own axis from West to East near the equator?", o: ["1670 Km per hour", "500 Km per hour", "100 Km per hour"], c: 0 },
+            { q: "9. What major crisis is being caused to the Earth by Carbon Dioxide gas heavily used by humans in today's modern era?", o: ["Blizzard", "Global Warming", "Ozone increase"], c: 1 },
+            { q: "10. Which day is celebrated worldwide on June 5th to protect the environment and stop global warming?", o: ["World Water Day", "World Environment Day", "World Earth Day"], c: 1 }
+        ];
+
+        let qIdx = 0; let qScore = 0; let isQuizActive = true;
+        function loadArkQuestion() {
+            isQuizActive = true;
+            document.getElementById("nextQuizBtn").style.display = "none";
+            document.getElementById("alert3").style.display = "none";
+            let qData = geographyQuizPool[qIdx];
+            document.getElementById("quizCounterText").innerText = `Question Code: ${qIdx + 1} / 10`;
+            document.getElementById("quizQuestionText").innerText = qData.q;
+            
+            let container = document.getElementById("quizOptionsContainer");
+            container.innerHTML = "";
+            qData.o.forEach((opt, idx) => {
+                let div = document.createElement("div");
+                div.classList.add("quiz-box-row");
+                div.innerText = opt;
+                div.onclick = function() {
+                    if(!isQuizActive) return;
+                    isQuizActive = false;
+                    if(idx === qData.c) {
+                        this.classList.add("correct-glow");
+                        qScore++; modifyEcoHUD(30, 0);
+                        showEcoAlert(3, "Correct decision! Earth's ozone layer is safe.", true);
+                    } else {
+                        this.classList.add("wrong-glow");
+                        container.children[qData.c].classList.add("correct-glow");
+                        modifyEcoHUD(0, 10);
+                        showEcoAlert(3, "Wrong decision! Global warming levels have increased.", false);
+                    }
+                    document.getElementById("nextQuizBtn").style.display = "inline-block";
+                };
+                container.appendChild(div);
+            });
+        }
+        function nextGeoQuestion() {
+            qIdx++;
+            if(qIdx < geographyQuizPool.length) {
+                loadArkQuestion();
+            } else {
+                document.getElementById("quizCounterText").innerText = "Mission Complete!";
+                document.getElementById("quizQuestionText").innerText = `Total Score: ${qScore} / 10`;
+                document.getElementById("quizOptionsContainer").innerHTML = "";
+                document.getElementById("nextQuizBtn").style.display = "none";
+                document.getElementById('ecoBtn3').style.background = "var(--eco-green)";
+                showEcoAlert(3, qScore >= 7 ? "An outstanding geography and environmental savior, my friend!" : "Good effort, read and learn once more!", true);
+            }
+        }
+        loadArkQuestion();
+
+        // Level 4 Logic
+        function verifyEcoLevel4() {
+            let e1 = document.getElementById("lineIn1").value.trim().toLowerCase();
+            let e2 = document.getElementById("lineIn2").value.trim().toLowerCase();
+
+            if((e1 === "equator") && (e2 === "prime meridian" || e2 === "greenwich meridian")) {
+                modifyEcoHUD(150, 0);
+                document.getElementById('ecoBtn4').style.background = "var(--eco-green)";
+                showEcoAlert(4, "Wow, my friend! The net of imaginary lines is completely correct.", true);
+            } else {
+                modifyEcoHUD(0, 10);
+                showEcoAlert(4, "Incorrect! Hint: Write Equator, Prime Meridian, my friend.", false);
+            }
+        }
+
+        // Level 5 Logic
+        let minedTokens = {};
+        function toggleOreToken(id, isContinent) {
+            let node = document.getElementById(id);
+            if(node.classList.contains('active-token')) {
+                node.classList.remove('active-token');
+                delete minedTokens[id];
+            } else {
+                node.classList.add('active-token');
+                minedTokens[id] = isContinent;
+            }
+        }
+        function verifyEcoLevel5() {
+            let win = true; let count = 0;
+            for(let id in minedTokens) {
+                if(minedTokens[id] === false) win = false;
+                count++;
+            }
+            if(count !== 4) win = false; // 4 major continents in grid
+
+            if(win) {
+                modifyEcoHUD(150, 0);
+                document.getElementById('ecoBtn5').style.background = "var(--eco-green)";
+                showEcoAlert(5, "Wonderful! The discovery of world continents is a complete success.", true);
+            } else {
+                modifyEcoHUD(0, 10);
+                showEcoAlert(5, "Incorrect! Choose only large landmass continents (do not select oceans).", false);
+            }
+        }
+
+        // Level 6 Logic
+        function allowMotionDrop(ev) { ev.preventDefault(); }
+        function startMotionDrag(ev) { ev.dataTransfer.setData("text", ev.target.id); }
+        function handleMotionDrop(ev, cat) {
+            ev.preventDefault();
+            let id = ev.dataTransfer.getData("text");
+            let el = document.getElementById(id);
+            el.dataset.cat = cat;
+            ev.target.appendChild(el);
+        }
+        function verifyEcoLevel6() {
+            let m1 = document.getElementById("mot1").dataset.cat;
+            let m2 = document.getElementById("mot2").dataset.cat;
+
+            if(m1 === "daynight" && m2 === "seasons") {
+                modifyEcoHUD(200, 0);
+                document.getElementById('ecoBtn6').style.background = "var(--eco-green)";
+                showEcoAlert(6, "Earth's movements and their effects are 100% precise, my friend!", true);
+            } else {
+                modifyEcoHUD(0, 10);
+                showEcoAlert(6, "Wrong category! Rotation causes days and nights, while revolution changes seasons.", false);
+            }
+        }
+
+        // Level 7 Logic
+        let finalL = null; let finalR = null;
+        function selectFinalEcoMatrix(side, id, key) {
+            if(side === 'L') {
+                finalL = { id: id, key: key };
+                document.getElementById("matL1").classList.remove('node-linked');
+                document.getElementById("matL2").classList.remove('node-linked');
+            } else {
+                finalR = { id: id, key: key };
+                document.getElementById("matR1").classList.remove('node-linked');
+                document.getElementById("matR2").classList.remove('node-linked');
+            }
+            document.getElementById(id).classList.add('node-linked');
+        }
+        function verifyEcoLevel7() {
+            if(finalL && finalR && finalL.key === finalR.key) {
+                modifyEcoHUD(250, 0);
+                document.getElementById('ecoBtn7').style.background = "var(--eco-green)";
+                showEcoAlert(7, "Wow, my friend! The entire 'Our Earth' lesson Eco-Arcade is successful. Excellent environmental awareness will grow in students!", true);
+            } else {
+                modifyEcoHUD(0, 10);
+                showEcoAlert(7, "Matrix link is incorrect. Pay attention to the rules of eco preservation again, my friend.", false);
+            }
+        }
+
+        function showEcoAlert(lvlNum, text, success) {
+            let box = document.getElementById("alert" + lvlNum);
+            box.style.display = "block";
+            box.innerText = text;
+            box.style.background = success ? "rgba(16, 172, 132, 0.15)" : "rgba(238, 82, 83, 0.1)";
+            box.style.color = success ? "#55efc4" : "#ff7675";
+            box.style.borderColor = success ? "var(--eco-green)" : "var(--neon-pink)";
+        }
+    </script>
+</body>
+</html>

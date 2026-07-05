@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medieval Europe: Geographical Explorations - Interactive Digital Book</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #0b1e36, #1f4068, #16a085);
+            --book-bg: #ffffff;
+            --primary-color: #0f3057;
+            --secondary-color: #008891;
+            --accent-color: #e43f5a;
+            --text-color: #1b1b2f;
+            --success: #27ae60;
+            --error: #c0392b;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--bg-gradient);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-color);
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 20px;
+            text-shadow: 0 3px 6px rgba(0,0,0,0.4);
+        }
+        .header h1 { font-size: 2.2rem; color: #fff; }
+        .header p { font-size: 1.1rem; color: #e1f5fe; margin-top: 5px; }
+
+        /* Book Box */
+        .book-container {
+            width: 100%;
+            max-width: 950px;
+            background: var(--book-bg);
+            border-radius: 24px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+            border-left: 18px solid var(--primary-color);
+            min-height: 630px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-container { width: 100%; height: 6px; background: #e0e0e0; }
+        .progress-bar { height: 100%; width: 20%; background: var(--accent-color); transition: width 0.4s ease; }
+
+        /* Page System */
+        .page { padding: 40px; flex: 1; display: none; animation: slidePage 0.4s ease-out; }
+        .page.active { display: block; }
+        @keyframes slidePage { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+
+        .page-title {
+            font-size: 1.6rem;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px dashed #ddd;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .instruction { font-size: 1.05rem; margin-bottom: 20px; color: #555; font-style: italic; }
+
+        /* Controls Links */
+        .book-controls {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px 40px;
+            background: #f8f9fa;
+            border-top: 1px solid #ddd;
+        }
+        .btn {
+            padding: 12px 28px;
+            border: none;
+            border-radius: 40px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: bold;
+        }
+        .btn-prev { background: #e0e0e0; color: #333; }
+        .btn-next { background: var(--primary-color); color: white; }
+        .btn:hover:not(:disabled) { transform: translateY(-3px); box-shadow: 0 6px 15px rgba(0,0,0,0.2); }
+        .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+        .feedback { margin-top: 15px; padding: 15px; border-radius: 8px; font-weight: bold; display: none; }
+
+        /* Act 1: Drag & Drop Matching (6 Items) */
+        .matching-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px; }
+        .match-left, .match-right { display: flex; flex-direction: column; gap: 10px; }
+        .match-card { padding: 12px 18px; background: #f8f9fa; border: 2px solid #e2e8f0; border-radius: 10px; cursor: pointer; text-align: left; transition: 0.2s; }
+        .match-card.selected { background: #e1f5fe; border-color: var(--secondary-color); }
+        .match-card.correct { background: #d4edda; border-color: var(--success); color: #155724; cursor: default; }
+
+        /* Act 2: Map Labels Explorer Simulation (6 Pins) */
+        .map-wrapper { position: relative; width: 100%; height: 320px; background: #b2dfdb; border-radius: 15px; margin-top: 15px; border: 2px solid #00695c; background-image: radial-gradient(#80cbc4 1px, transparent 1px); background-size: 20px 20px; }
+        .map-pin { position: absolute; width: 35px; height: 35px; background: var(--accent-color); border-radius: 50% 50% 50% 0; transform: rotate(-45deg); display: flex; align-items: center; justify-content: center; color: white; cursor: pointer; box-shadow: -2px 2px 4px rgba(0,0,0,0.3); }
+        .map-pin span { transform: rotate(45deg); font-size: 0.85rem; font-weight: bold; }
+        .map-labels-container { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 15px; }
+        .map-label-opt { padding: 8px 15px; background: white; border: 2px solid var(--secondary-color); border-radius: 6px; cursor: pointer; font-weight: bold; }
+        .map-label-opt.selected { background: var(--secondary-color); color: white; }
+
+        /* Act 3: Discovery Instruments Grid (6 Items) */
+        .inst-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 15px; }
+        .inst-card { background: #fdfbf7; border: 2px solid #eedec4; padding: 20px; text-align: center; border-radius: 15px; cursor: pointer; transition: 0.3s; }
+        .inst-card:hover { transform: scale(1.04); background: #fdf6e2; }
+        .inst-card i { font-size: 2.5rem; color: var(--secondary-color); margin-bottom: 12px; }
+
+        /* Act 4: Modern Intelligence MCQ Quiz (6 Questions) */
+        .quiz-box { display: flex; flex-direction: column; gap: 12px; margin-top: 15px; }
+        .opt-btn { padding: 14px 20px; background: #f1f3f5; border: 2px solid #e9ecef; border-radius: 10px; cursor: pointer; text-align: left; font-size: 1rem; transition: 0.2s; }
+        .opt-btn:hover { background: #e9ecef; }
+        .opt-btn.correct { background: #d4edda; border-color: var(--success); color: #155724; }
+        .opt-btn.wrong { background: #f8d7da; border-color: var(--error); color: #721c24; }
+        .q-progress { font-weight: bold; margin-top: 10px; text-align: right; color: #666; }
+
+        /* Act 5: Interactive Text Lab (6 Dropdowns) */
+        .text-passage { background: #f4fbfc; border: 1px solid #b2ebf2; padding: 25px; border-radius: 12px; font-size: 1.15rem; line-height: 2; margin-top: 15px; }
+        .blank-select { padding: 4px 8px; border: 2px solid var(--secondary-color); border-radius: 6px; font-size: 1rem; font-weight: bold; color: var(--secondary-color); background: white; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>Lesson 2: Medieval Europe</h1>
+        <p>Part 3: Geographical Explorations - Innovative Digital Book</p>
+    </div>
+
+    <div class="book-container">
+        <div class="progress-container">
+            <div class="progress-bar" id="progBar"></div>
+        </div>
+
+        <div class="page active" id="page1">
+            <div class="page-title"><i class="fa-solid fa-compass"></i> Activity 1: Adventurous Sailors and Discovered Sea Routes</div>
+            <p class="instruction">Click on the name of the famous European navigator on the left, then match it with their adventurous discovery on the right:</p>
+            
+            <div class="matching-grid">
+                <div class="match-left" id="leftContainer">
+                    <div class="match-card" data-id="1">Bartholomew Dias</div>
+                    <div class="match-card" data-id="2">Columbus</div>
+                    <div class="match-card" data-id="3">Vasco da Gama</div>
+                    <div class="match-card" data-id="4">Ferdinand Magellan</div>
+                    <div class="match-card" data-id="5">Amerigo Vespucci</div>
+                    <div class="match-card" data-id="6">Cabral</div>
+                </div>
+                <div class="match-right" id="rightContainer">
+                    <div class="match-card" data-match="2">Discovered the West Indies (islands of the American continent)</div>
+                    <div class="match-card" data-match="1">The sailor who reached the southern tip of Africa, 'Cape of Good Hope'</div>
+                    <div class="match-card" data-match="4">The first adventurer to circumnavigate the globe by ship</div>
+                    <div class="match-card" data-match="3">Discovered a new sea route to Calicut (Kappad) in India</div>
+                    <div class="match-card" data-match="6">Accidentally discovered 'Brazil' in South America</div>
+                    <div class="match-card" data-match="5">Explored the new landmass thoroughly, leading it to be named 'America'</div>
+                </div>
+            </div>
+            <div class="feedback" id="fb1"></div>
+        </div>
+
+        <div class="page" id="page2">
+            <div class="page-title"><i class="fa-solid fa-map-location-dot"></i> Activity 2: Major Halting Points of Global Sea Routes</div>
+            <p class="instruction">First select a place name from below, then click on the correct location pin on the digital map to match it:</p>
+            
+            <div class="map-labels-container" id="mapLabels">
+                <div class="map-label-opt" data-place="lisbon">Lisbon (Portugal)</div>
+                <div class="map-label-opt" data-place="constantinople">Constantinople</div>
+                <div class="map-label-opt" data-place="cape">Cape of Good Hope</div>
+                <div class="map-label-opt" data-place="calicut">Calicut (India)</div>
+                <div class="map-label-opt" data-place="bahamas">Bahama Islands</div>
+                <div class="map-label-opt" data-place="magellan">Strait of Magellan</div>
+            </div>
+
+            <div class="map-wrapper">
+                <div style="position:absolute; top:15px; left:20px; font-weight:bold; color:#004d40;">[ Model Global Map of Navigators ]</div>
+                <div class="map-pin" style="top: 30%; left: 38%;" data-pin="lisbon"><span>1</span></div>
+                <div class="map-pin" style="top: 35%; left: 50%;" data-pin="constantinople"><span>2</span></div>
+                <div class="map-pin" style="top: 75%; left: 45%;" data-pin="cape"><span>3</span></div>
+                <div class="map-pin" style="top: 52%; left: 68%;" data-pin="calicut"><span>4</span></div>
+                <div class="map-pin" style="top: 45%; left: 18%;" data-pin="bahamas"><span>5</span></div>
+                <div class="map-pin" style="top: 85%; left: 22%;" data-pin="magellan"><span>6</span></div>
+            </div>
+            <div class="feedback" id="fb2"></div>
+        </div>
+
+        <div class="page" id="page3">
+            <div class="page-title"><i class="fa-solid fa-anchor"></i> Activity 3: Maritime Technology and Instruments</div>
+            <p class="instruction">Click on the instruments below that made voyages easier to understand their historical functions:</p>
+            
+            <div class="inst-grid">
+                <div class="inst-card" onclick="showInstInfo('Magnetic Compass', 'An invention of Chinese origin that helped locate directions accurately in the middle of the sea during voyages.')">
+                    <i class="fa-solid fa-compass"></i><h5>Magnetic Compass</h5>
+                </div>
+                <div class="inst-card" onclick="showInstInfo('Astrolabe', 'A device used to determine the latitude of a ship based on the position of the sun and stars at sea.')">
+                    <i class="fa-solid fa-star-and-crescent"></i><h5>Astrolabe Instrument</h5>
+                </div>
+                <div class="inst-card" onclick="showInstInfo('Caravel Ships', 'Small, fast-sailing, storm-resilient ships developed by the Portuguese in the late Middle Ages.')">
+                    <i class="fa-solid fa-ship"></i><h5>Caravel Light Ship</h5>
+                </div>
+                <div class="inst-card" onclick="showInstInfo('Gunpowder', 'Ammunition used in ship cannons to protect against sea pirates and attackers from unfamiliar islands.')">
+                    <i class="fa-solid fa-burst"></i><h5>Gunpowder Tech</h5>
+                </div>
+                <div class="inst-card" onclick="showInstInfo('Navigation Charts', 'New maps prepared by various sailors marking sea depths, wind directions, and rocky hazards.')">
+                    <i class="fa-solid fa-map"></i><h5>Nautical Chart</h5>
+                </div>
+                <div class="inst-card" onclick="showInstInfo('Printing Press', 'Helped information about newly discovered landmasses spread rapidly across Europe in the form of books.')">
+                    <i class="fa-solid fa-print"></i><h5>Information Printing</h5>
+                </div>
+            </div>
+            <div class="feedback" id="fb3" style="background:#fff3cd; color:#856404; border:1px solid #ffeeba;"></div>
+        </div>
+
+        <div class="page" id="page4">
+            <div class="page-title"><i class="fa-solid fa-route"></i> Activity 4: Rational Quiz on Causes of Maritime Explorations</div>
+            <p id="q-text" style="font-size:1.2rem; margin-bottom:15px; font-weight:bold;">Loading question...</p>
+            <div class="quiz-box" id="q-options"></div>
+            <div class="q-progress" id="q-indicator">Question: 1/6</div>
+            <div class="feedback" id="fb4"></div>
+        </div>
+
+        <div class="page" id="page5">
+            <div class="page-title"><i class="fa-solid fa-globe-americas"></i> Activity 5: Global Consequences of Geographical Explorations</div>
+            <p class="instruction">Fill in the blanks with precise words to complete this paragraph on how global history changed due to geographical explorations:</p>
+            
+            <div class="text-passage">
+                Following the exploration of new sea routes, European nations established their 
+                <select class="blank-select" id="b1" data-ans="colonies"><option value="">--Select--</option><option>colonies</option><option>armies only</option><option>universities</option></select> 
+                in Asia and America, plundering immense wealth. This expanded commercial trade worldwide and led to the 
+                <select class="blank-select" id="b2" data-ans="Commercial Revolution"><option value="">--Select--</option><option>Green Revolution</option><option>Commercial Revolution</option><option>French Revolution</option></select>. 
+                Along with gold and silver, new crops like potatoes, maize, and 
+                <select class="blank-select" id="b3" data-ans="tobacco"><option value="">--Select--</option><option>silk</option><option>wheat</option><option>tobacco</option></select> 
+                were introduced from America to Europe. However, most tragically, the inhuman 
+                <select class="blank-select" id="b4" data-ans="slave trade"><option value="">--Select--</option><option>slave trade</option><option>feudal system</option><option>zamindari system</option></select> 
+                of capturing Black African people to sell them in America began. European sailors practically proved the geographical truth that the Earth 
+                <select class="blank-select" id="b5" data-ans="is not flat but spherical"><option value="">--Select--</option><option>is flat</option><option>is not flat but spherical</option><option>is triangular</option></select>. 
+                Ultimately, these explorations wrote a strong prologue to capitalism and global 
+                <select class="blank-select" id="b6" data-ans="imperialism"><option value="">--Select--</option><option>socialism</option><option>imperialism</option><option>democracy</option></select> 
+                developments among European nations.
+            </div>
+            <button class="btn" style="background:var(--accent-color); color:white; margin-top:20px;" onclick="checkBlanks()">Confirm Consequences</button>
+            <div class="feedback" id="fb5"></div>
+        </div>
+
+        <div class="book-controls">
+            <button class="btn btn-prev" id="prevPageBtn" onclick="movePage(-1)" disabled><i class="fa-solid fa-book-open"></i> Previous Page</button>
+            <button class="btn btn-next" id="nextPageBtn" onclick="movePage(1)">Next Page <i class="fa-solid fa-book"></i></button>
+        </div>
+    </div>
+
+    <script>
+        let pageIdx = 1;
+        const maxPages = 5;
+
+        function movePage(dir) {
+            document.getElementById(`page${pageIdx}`).classList.remove('active');
+            pageIdx += dir;
+            document.getElementById(`page${pageIdx}`).classList.add('active');
+
+            document.getElementById('prevPageBtn').disabled = (pageIdx === 1);
+            document.getElementById('nextPageBtn').disabled = (pageIdx === maxPages);
+
+            document.getElementById('progBar').style.width = `${(pageIdx / maxPages) * 100}%`;
+        }
+
+        // --- Act 1: Matching Logic ---
+        let selectedLeft = null;
+        const leftCards = document.querySelectorAll('#leftContainer .match-card');
+        const rightCards = document.querySelectorAll('#rightContainer .match-card');
+
+        leftCards.forEach(card => {
+            card.addEventListener('click', () => {
+                if(card.classList.contains('correct')) return;
+                leftCards.forEach(c => c.classList.remove('selected'));
+                card.classList.add('selected');
+                selectedLeft = card;
+            });
+        });
+
+        rightCards.forEach(card => {
+            card.addEventListener('click', () => {
+                if(card.classList.contains('correct') || !selectedLeft) return;
+                const matchId = card.getAttribute('data-match');
+                const leftId = selectedLeft.getAttribute('data-id');
+
+                if(matchId === leftId) {
+                    card.classList.add('correct');
+                    selectedLeft.classList.add('correct');
+                    selectedLeft.classList.remove('selected');
+                    selectedLeft = null;
+                    checkAct1Progress();
+                } else {
+                    const fb = document.getElementById('fb1');
+                    fb.style.display = "block"; fb.style.background = "#f8d7da"; fb.style.color = "#c0392b";
+                    fb.innerText = "✗ Incorrect pair! Recall the correct achievement of the sailor and match.";
+                }
+            });
+        });
+
+        function checkAct1Progress() {
+            const finished = document.querySelectorAll('#leftContainer .match-card.correct').length;
+            const fb = document.getElementById('fb1');
+            fb.style.display = "block";
+            if(finished === 6) {
+                fb.style.background = "#d4edda"; fb.style.color = "#27ae60";
+                fb.innerText = "✓ Amazing! You have accurately paired all 6 adventurous sailors' discoveries.";
+            } else {
+                fb.style.background = "#e2e8f0"; fb.style.color = "#4a5568";
+                fb.innerText = `Progress: ${finished}/6 pairs correct.`;
+            }
+        }
+
+        // --- Act 2: Map Pin Placement Logic ---
+        let selectedLabel = null;
+        const labels = document.querySelectorAll('.map-label-opt');
+        labels.forEach(lbl => {
+            lbl.addEventListener('click', () => {
+                labels.forEach(l => l.classList.remove('selected'));
+                lbl.classList.add('selected');
+                selectedLabel = lbl;
+            });
+        });
+
+        const pins = document.querySelectorAll('.map-pin');
+        pins.forEach(pin => {
+            pin.addEventListener('click', () => {
+                const fb = document.getElementById('fb2');
+                fb.style.display = "block";
+                if(!selectedLabel) {
+                    fb.innerHTML = "⚠️ Please click and select a location name from above first!";
+                    fb.style.backgroundColor = "#fff3cd"; fb.style.color = "#856404";
+                    return;
+                }
+                if(selectedLabel.getAttribute('data-place') === pin.getAttribute('data-pin')) {
+                    pin.style.background = "#2e7d32";
+                    fb.innerHTML = `✓ Correct! The geographical pin for the historical halting point '${selectedLabel.innerText}' is accurate.`;
+                    fb.style.backgroundColor = "#d4edda"; fb.style.color = "#155724";
+                } else {
+                    fb.innerHTML = "✗ Incorrect location pin. Deduce the correct direction of the sea route and try again.";
+                    fb.style.backgroundColor = "#f8d7da"; fb.style.color = "#721c24";
+                }
+            });
+        });
+
+        // --- Act 3: Instruments Clicker ---
+        function showInstInfo(title, text) {
+            const fb = document.getElementById('fb3');
+            fb.style.display = "block";
+            fb.innerHTML = `<strong><i class="fa-solid fa-circle-info"></i> ${title}:</strong> ${text}`;
+        }
+
+        // --- Act 4: Multiple Choice Quiz Data (6 Questions) ---
+        const mcqCollection = [
+            { q: "Due to the capture of which city by Ottoman Turks in 1453 CE was the land route closed to Europeans?", opts: ["Rome", "Lisbon", "Constantinople", "Venice"], ans: 2 },
+            { q: "Who was the navigator from Portugal who discovered a new sea route to India?", opts: ["Columbus", "Vasco da Gama", "Magellan", "Cabral"], ans: 1 },
+            { q: "Which place on the west coast of India did Vasco da Gama reach in 1498 CE?", opts: ["Mumbai", "Goa", "Calicut (Kappad)", "Mangaluru"], ans: 2 },
+            { q: "With the help of the King of Spain, which ocean did Columbus cross to reach the new landmass?", opts: ["Atlantic Ocean", "Pacific Ocean", "Indian Ocean", "Arctic Ocean"], ans: 0 },
+            { q: "Who was the navigator who named the world's largest ocean as the 'Pacific' (peaceful) Ocean?", opts: ["Bartholomew Dias", "Ferdinand Magellan", "Cabral", "Amerigo"], ans: 1 },
+            { q: "What was the main economic reason that drove European nations to look for new sea routes?", opts: ["To propagate a new religion", "To break the trade monopoly over Asian spices", "To develop global tourism", "To search for gold mines"], ans: 1 }
+        ];
+
+        let currentQuizIndex = 0;
+        function loadQuizQuestion() {
+            const activeQ = mcqCollection[currentQuizIndex];
+            document.getElementById('q-text').innerText = `${currentQuizIndex + 1}. ${activeQ.q}`;
+            const optWrapper = document.getElementById('q-options');
+            optWrapper.innerHTML = "";
+            document.getElementById('q-indicator').innerText = `Question: ${currentQuizIndex + 1}/${mcqCollection.length}`;
+
+            activeQ.opts.forEach((opt, idx) => {
+                const b = document.createElement('button');
+                b.className = "opt-btn";
+                b.innerText = opt;
+                b.onclick = () => verifyMCQ(idx, activeQ.ans, b);
+                optWrapper.appendChild(b);
+            });
+        }
+
+        function verifyMCQ(selected, right, element) {
+            const fb = document.getElementById('fb4'); fb.style.display = "block";
+            if(selected === right) {
+                element.classList.add('correct');
+                fb.innerHTML = "✓ Accurate answer! Your exploration of knowledge is excellent.";
+                fb.style.background = "#d4edda"; fb.style.color = "#155724";
+                setTimeout(() => {
+                    if(currentQuizIndex < mcqCollection.length - 1) {
+                        currentQuizIndex++; loadQuizQuestion(); fb.style.display = "none";
+                    } else {
+                        fb.innerHTML = "🎉 Incredible! You have successfully triumphed over all 6 quiz questions on the causes of explorations.";
+                    }
+                }, 1500);
+            } else {
+                element.classList.add('wrong');
+                fb.innerHTML = "✗ Wrong answer. Recall the correct historical cause once again.";
+                fb.style.background = "#f8d7da"; fb.style.color = "#721c24";
+            }
+        }
+        loadQuizQuestion();
+
+        // --- Act 5: Dropdowns Validator ---
+        function checkBlanks() {
+            let miss = 0;
+            const selects = document.querySelectorAll('.blank-select');
+            selects.forEach(sel => {
+                if(sel.value !== sel.getAttribute('data-ans')) {
+                    miss++;
+                    sel.style.borderColor = "var(--error)";
+                } else {
+                    sel.style.borderColor = "var(--success)";
+                }
+            });
+            const fb = document.getElementById('fb5'); fb.style.display = "block";
+            if(miss === 0) {
+                fb.innerHTML = "✓ Perfect! You have beautifully analyzed all 6 global impacts caused by geographical explorations.";
+                fb.style.background = "#d4edda"; fb.style.color = "#155724";
+            } else {
+                fb.innerHTML = "✗ An incorrect historical concept is selected in some fields. Please review and inspect again.";
+                fb.style.background = "#f8d7da"; fb.style.color = "#721c24";
+            }
+        }
+    </script>
+</body>
+</html>

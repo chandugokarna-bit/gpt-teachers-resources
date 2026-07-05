@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Impact of British Rule - Interactive Flip Book</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #1f4068, #16a085, #e43f5a);
+            --book-bg: #fffdf9;
+            --primary-color: #5c2575; /* Deep Royal Purple */
+            --secondary-color: #0f3057;
+            --accent-color: #e67e22; /* Warning/Action Orange */
+            --text-color: #2c3e50;
+            --success: #27ae60;
+            --error: #c0392b;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--bg-gradient);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-color);
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 20px;
+            text-shadow: 0 3px 6px rgba(0,0,0,0.4);
+        }
+        .header h1 { font-size: 2.2rem; }
+        .header p { font-size: 1.1rem; color: #f0fdf4; margin-top: 5px; }
+
+        /* Modern Flip Book Box Structure */
+        .book-container {
+            width: 100%;
+            max-width: 1000px;
+            background: var(--book-bg);
+            border-radius: 24px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.4), inset -15px 0 30px rgba(0,0,0,0.05);
+            border-left: 20px solid var(--primary-color);
+            min-height: 680px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+            border-right: 5px solid var(--accent-color);
+        }
+
+        /* Top Progress Indicator */
+        .progress-container { width: 100%; height: 6px; background: #e0e0e0; }
+        .progress-bar { height: 100%; width: 11.11%; background: var(--accent-color); transition: width 0.4s ease; }
+
+        /* Page Layout with Flip Effect Animation */
+        .page { padding: 45px; flex: 1; display: none; animation: flipAnimation 0.5s ease-in-out; }
+        .page.active { display: block; }
+        @keyframes flipAnimation {
+            from { opacity: 0; transform: rotateY(-15deg) translateX(30px); }
+            to { opacity: 1; transform: rotateY(0deg) translateX(0); }
+        }
+
+        .page-title {
+            font-size: 1.55rem;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px dashed var(--accent-color);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+        }
+
+        .instruction { font-size: 1.05rem; margin-bottom: 20px; color: #555; font-style: italic; }
+
+        /* Navigation Controls */
+        .book-controls {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px 45px;
+            background: #fdf5e2;
+            border-top: 1px solid #eedec4;
+        }
+        .btn {
+            padding: 12px 28px;
+            border: none;
+            border-radius: 40px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: bold;
+        }
+        .btn-prev { background: #d0c4af; color: #333; }
+        .btn-next { background: var(--primary-color); color: white; }
+        .btn:hover:not(:disabled) { transform: translateY(-3px); box-shadow: 0 6px 15px rgba(0,0,0,0.15); }
+        .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+        .feedback { margin-top: 15px; padding: 15px; border-radius: 8px; font-weight: bold; display: none; }
+
+        /* Act 1: MCQ Options */
+        .quiz-box { display: flex; flex-direction: column; gap: 12px; }
+        .opt-btn { padding: 14px 20px; background: white; border: 2px solid #e2e8f0; border-radius: 10px; cursor: pointer; text-align: left; font-size: 1.05rem; transition: 0.2s; }
+        .opt-btn:hover { background: #f8f9fa; border-color: var(--primary-color); }
+        .opt-btn.correct { background: #c8e6c9; border-color: var(--success); color: #1b5e20; font-weight: bold; }
+        .opt-btn.wrong { background: #ffcdd2; border-color: var(--error); color: #b71c1c; }
+
+        /* Act 2: Accordion Answers */
+        .accordion-container { display: flex; flex-direction: column; gap: 12px; }
+        .acc-item { border: 1px solid #eedec4; border-radius: 10px; overflow: hidden; background: white; }
+        .acc-header { background: #fffdf9; padding: 15px; font-weight: bold; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-size: 1.05rem; }
+        .acc-header:hover { background: #fdf5e2; }
+        .acc-body { background: #faf8f2; padding: 15px; display: none; border-top: 1px solid #eee; line-height: 1.7; color: #5c2575; font-weight: bold; }
+
+        /* Act 3: Drag & Drop Matching */
+        .matching-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .match-left, .match-right { display: flex; flex-direction: column; gap: 12px; }
+        .match-card { padding: 12px 18px; background: white; border: 2px solid #eedec4; border-radius: 10px; cursor: pointer; transition: 0.2s; font-weight: 600; }
+        .match-card.selected { background: #f5ebd6; border-color: var(--accent-color); }
+        .match-card.correct { background: #c8e6c9; border-color: var(--success); color: #1b5e20; cursor: default; }
+
+        /* Act 4 & 5: Photo Gallery & Video Avatars Framework */
+        .avatar-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+        .avatar-card { background: white; border: 2px solid #eedec4; border-radius: 15px; padding: 15px; text-align: center; box-shadow: 0 4px 8px rgba(0,0,0,0.02); cursor: pointer; transition: 0.3s; }
+        .avatar-card:hover { transform: translateY(-5px); border-color: var(--primary-color); }
+        .avatar-img-placeholder { width: 100px; height: 100px; background: #e2e8f0; border-radius: 50%; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; color: #718096; font-size: 2.2rem; overflow: hidden; border: 3px solid var(--accent-color); }
+        .avatar-img-placeholder img { width: 100%; height: 100%; object-fit: cover; }
+        .avatar-card h4 { font-size: 1.15rem; color: var(--primary-color); margin-bottom: 5px; }
+        .avatar-card p { font-size: 0.9rem; color: #718096; }
+        .video-box { width: 100%; height: 160px; background: #000; border-radius: 10px; margin-top: 10px; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.9rem; }
+
+        /* Act 6: Innovative Blanks Dropdown */
+        .text-passage { background: #fffdf9; border: 2px solid #eedec4; padding: 25px; border-radius: 15px; font-size: 1.2rem; line-height: 2.3; }
+        .blank-select { padding: 4px 8px; border: 2px solid var(--primary-color); border-radius: 6px; font-size: 1.05rem; font-weight: bold; color: var(--primary-color); background: white; cursor: pointer; }
+
+        /* Act 7: Chronology Steps */
+        .v-timeline { display: flex; flex-direction: column; gap: 12px; }
+        .t-row { display: flex; align-items: center; gap: 15px; background: white; padding: 12px; border-radius: 10px; border: 2px dashed #eedec4; }
+        .t-index { width: 35px; height: 35px; background: var(--primary-color); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+        .t-zone { flex: 1; min-height: 45px; background: #fffdf9; border-radius: 6px; display: flex; align-items: center; padding-left: 15px; }
+        .item-bank { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; background: #f3ebd6; padding: 15px; border-radius: 12px; }
+        .drag-chip { padding: 8px 15px; background: white; border: 1px solid #cdc0a8; border-radius: 25px; cursor: grab; font-size: 0.95rem; font-weight: bold; box-shadow: 0 3px 6px rgba(0,0,0,0.05); }
+
+        /* Act 8: Land System Matrix (Ultra Model 1) */
+        .grid-fleet { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
+        .fleet-card { background: white; border: 2px solid #eedec4; padding: 20px; text-align: center; border-radius: 15px; cursor: pointer; transition: 0.3s; }
+        .fleet-card:hover { transform: scale(1.04); background: #fffdf9; }
+        .fleet-card i { font-size: 2.3rem; color: var(--secondary-color); margin-bottom: 10px; }
+
+        /* Act 9: Education Impact Strategy Matrix (Ultra Model 2) */
+        .battle-zone { background: #f9f5eb; border: 1px dashed #d4af37; padding: 25px; border-radius: 12px; text-align: center; font-size: 1.15rem; margin-bottom: 20px; line-height: 1.7; font-weight: 500; }
+        .strategy-btn { width: 100%; text-align: left; padding: 15px; background: white; border: 2px solid #e2d3b5; margin-top: 10px; border-radius: 10px; cursor: pointer; font-size: 1.05rem; transition: 0.2s; }
+        .strategy-btn:hover { background: #fffdf9; border-color: var(--primary-color); }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>Impact of British Rule</h1>
+        <p>Innovative Interactive Digital Flip Book</p>
+    </div>
+
+    <div class="book-container">
+        <div class="progress-container">
+            <div class="progress-bar" id="progBar"></div>
+        </div>
+
+        <div class="page active" id="page1">
+            <div class="page-title"><i class="fa-solid fa-square-poll-horizontal"></i> Activity 1: Single Sentence Multiple-Choice Series</div>
+            <p class="instruction">Choose the correct answer for the questions based on the economic and social impacts caused by the British rule:</p>
+            <p id="q-text" style="font-size:1.25rem; margin-bottom:18px; font-weight:bold; color:var(--primary-color);"></p>
+            <div class="quiz-box" id="q-options"></div>
+            <div style="font-weight: bold; margin-top: 20px; text-align: right; color: #666;" id="q-indicator">Question: 1/6</div>
+            <div class="feedback" id="fb1"></div>
+        </div>
+
+        <div class="page" id="page2">
+            <div class="page-title"><i class="fa-solid fa-folder-open"></i> Activity 2: Critical Group Discussion Questions (Click Box Activity)</div>
+            <p class="instruction">Click on the key historical questions below to open and analyze their official answer boxes:</p>
+            
+            <div class="accordion-container">
+                <div class="acc-item">
+                    <div class="acc-header" onclick="toggleAcc(this)">1. How did British land revenue policies force Indian farmers into deep debt? <i class="fa-solid fa-plus"></i></div>
+                    <div class="acc-body">The British strictly collected extremely high revenue strictly in the form of cash. No exemptions were granted even during severe famines. To pay taxes on time, farmers had to borrow money at high interest rates from moneylenders, eventually losing their lands and falling into a vicious debt trap.</div>
+                </div>
+                <div class="acc-item">
+                    <div class="acc-header" onclick="toggleAcc(this)">2. What caused the collapse of traditional weaving and cottage industries in India? <i class="fa-solid fa-plus"></i></div>
+                    <div class="acc-body">Due to the Industrial Revolution in England, cheap machine-made clothes produced in its mills flooded the Indian market. Since the British imposed heavy duties on Indian handloom textiles, local artisans could not compete, leading to the destruction of cottage industries.</div>
+                </div>
+                <div class="acc-item">
+                    <div class="acc-header" onclick="toggleAcc(this)">3. What were the main recommendations and goals of the Macaulay Report? <i class="fa-solid fa-plus"></i></div>
+                    <div class="acc-body">Macaulay recommended the implementation of a modern English-medium education system in India. The goal was to create a class of clerical workers to assist British administration, creating individuals who were Indian in blood and color, but British in tastes, opinions, morals, and intellect.</div>
+                </div>
+                <div class="acc-item">
+                    <div class="acc-header" onclick="toggleAcc(this)">4. Why did the British expand railway and telegraph facilities across India? <i class="fa-solid fa-plus"></i></div>
+                    <div class="acc-body">They developed railways to swiftly transport raw materials from rural India to ports, distribute British finished goods to remote corners of the country, and mobilize British military forces rapidly to suppress local rebellions.</div>
+                </div>
+                <div class="acc-item">
+                    <div class="acc-header" onclick="toggleAcc(this)">5. What new social classes emerged in India due to British administration? <i class="fa-solid fa-plus"></i></div>
+                    <div class="acc-body">The British system generated an influential 'modern middle class' comprising English-educated lawyers, doctors, teachers, journalists, and government employees, alongside a vast class of marginalized, landless agricultural laborers.</div>
+                </div>
+                <div class="acc-item">
+                    <div class="acc-header" onclick="toggleAcc(this)">6. What does Dadabhai Naoroji's 'Drain of Wealth Theory' explain? <i class="fa-solid fa-plus"></i></div>
+                    <div class="acc-body">This theory explains how India's immense wealth was systematically siphoned off to England in the form of land revenue, salaries, pensions, and trade profits without getting any proportional returns, reducing India to a completely impoverished nation.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="page" id="page3">
+            <div class="page-title"><i class="fa-solid fa-arrows-turn-to-dots"></i> Activity 3: Matching Acts, Reformers, and Consequences</div>
+            <p class="instruction">Click on a key regulation or person's name on the left, then connect it to its correct description on the right:</p>
+            
+            <div class="matching-grid">
+                <div class="match-left" id="leftContainer">
+                    <div class="match-card" data-id="1">Lord Cornwallis</div>
+                    <div class="match-card" data-id="2">Thomas Munro</div>
+                    <div class="match-card" data-id="3">Lord William Bentinck</div>
+                    <div class="match-card" data-id="4">Dadabhai Naoroji</div>
+                    <div class="match-card" data-id="5">Calcutta, Bombay, Madras</div>
+                    <div class="match-card" data-id="6">Lord Dalhousie</div>
+                </div>
+                <div class="match-right" id="rightContainer">
+                    <div class="match-card" data-match="3">The Governor-General who officially implemented the English Education Policy</div>
+                    <div class="match-card" data-match="1">The official who introduced the 'Permanent Zamindari System' in Bengal</div>
+                    <div class="match-card" data-match="2">The Governor of Madras who implemented the 'Ryotwari System' in South India</div>
+                    <div class="match-card" data-match="4">Author of the book 'Poverty and Un-British Rule in India'</div>
+                    <div class="match-card" data-match="6">The leader who started the first railway line (Bombay to Thane) in India</div>
+                    <div class="match-card" data-match="5">Places where modern universities were first established in 1857 CE</div>
+                </div>
+            </div>
+            <div class="feedback" id="fb3"></div>
+        </div>
+
+        <div class="page" id="page4">
+            <div class="page-title"><i class="fa-solid fa-image"></i> Activity 4: Digital Portrait Research of Prominent Historical Figures</div>
+            <p class="instruction">Click on the photo card of a key historical figure below to learn about their role in history (Google Drive images can be linked here):</p>
+            
+            <div class="avatar-grid">
+                <div class="avatar-card" onclick="showAvatarInfo('Lord Cornwallis', 'He introduced the Permanent Zamindari System in Bengal in 1793, turning landlords into permanent legal owners of land plots.')">
+                    <div class="avatar-img-placeholder"><i class="fa-solid fa-user-tie"></i></div>
+                    <h4>Lord Cornwallis</h4><p>[Google Drive Image Template]</p>
+                </div>
+                <div class="avatar-card" onclick="showAvatarInfo('Thomas Macaulay', 'He laid a strong foundation for Western English education in India through his famous minute presented in 1835.')">
+                    <div class="avatar-img-placeholder"><i class="fa-solid fa-user-tie"></i></div>
+                    <h4>Thomas Macaulay</h4><p>[Google Drive Image Template]</p>
+                </div>
+                <div class="avatar-card" onclick="showAvatarInfo('Dadabhai Naoroji', 'Known as the Grand Old Man of India, he mathematically proved the systematic drainage of Indian resources into England.')">
+                    <div class="avatar-img-placeholder"><i class="fa-solid fa-user"></i></div>
+                    <h4>Dadabhai Naoroji</h4><p>[Google Drive Image Template]</p>
+                </div>
+                <div class="avatar-card" onclick="showAvatarInfo('Lord William Bentinck', 'The liberal Governor-General who accepted Macaulay\'s report and declared English as the official language of instruction.')">
+                    <div class="avatar-img-placeholder"><i class="fa-solid fa-user-tie"></i></div>
+                    <h4>William Bentinck</h4><p>[Google Drive Image Template]</p>
+                </div>
+                <div class="avatar-card" onclick="showAvatarInfo('Raja Ram Mohan Roy', 'The prominent social reformer who strongly advocated that Indians should learn modern Western education and science.')">
+                    <div class="avatar-img-placeholder"><i class="fa-solid fa-user"></i></div>
+                    <h4>Raja Ram Mohan Roy</h4><p>[Google Drive Image Template]</p>
+                </div>
+                <div class="avatar-card" onclick="showAvatarInfo('Charles Wood', 'He submitted a comprehensive review report on Indian education in 1854 from primary to university level, called the Magna Carta of English Education.')">
+                    <div class="avatar-img-placeholder"><i class="fa-solid fa-scroll"></i></div>
+                    <h4>Charles Wood</h4><p>[Google Drive Image Template]</p>
+                </div>
+            </div>
+            <div class="feedback" id="fb4" style="background:#fff3cd; color:#856404; border:1px solid #ffeeba;"></div>
+        </div>
+
+        <div class="page" id="page5">
+            <div class="page-title"><i class="fa-solid fa-video"></i> Activity 5: Speaking Pages of History (Video Upload Template)</div>
+            <p class="instruction">Click on the leaders below to observe animated representations of their historical arguments (School children video clips can be embedded here):</p>
+            
+            <div class="avatar-grid">
+                <div class="avatar-card" onclick="playVideoAvatar('Macaulay\'s Conviction', 'We need a class of clerks in India fluent in English; they will remain loyal to our administrative orders!')">
+                    <div class="avatar-img-placeholder"><i class="fa-solid fa-circle-play" style="color:var(--accent-color);"></i></div>
+                    <h4>Macaulay Speaks</h4><div class="video-box">[Video Player Template]</div>
+                </div>
+                <div class="avatar-card" onclick="playVideoAvatar('Dadabhai Naoroji\'s Anger', 'The British have started bleeding India white! Our valuable wealth is consistently reaching London!')">
+                    <div class="avatar-img-placeholder"><i class="fa-solid fa-circle-play" style="color:var(--accent-color);"></i></div>
+                    <h4>Naoroji\'s Awakening</h4><div class="video-box">[Video Player Template]</div>
+                </div>
+                <div class="avatar-card" onclick="playVideoAvatar('Cornwallis\' Explanation', 'The Permanent Zamindari system yields a fixed revenue for us, and the landlords will stand robustly in our support.')">
+                    <div class="avatar-img-placeholder"><i class="fa-solid fa-circle-play" style="color:var(--accent-color);"></i></div>
+                    <h4>Cornwallis\' Details</h4><div class="video-box">[Video Player Template]</div>
+                </div>
+            </div>
+            <div class="feedback" id="fb5" style="background:#e0f2f1; color:#004d40;"></div>
+        </div>
+
+        <div class="page" id="page6">
+            <div class="page-title"><i class="fa-solid fa-feather-pointed"></i> Activity 6: Contextual Analysis of British Economic Exploitation</div>
+            <p class="instruction">Complete the descriptive paragraph concerning the primary consequences of British rule by picking the accurate terms:</p>
+            
+            <div class="text-passage">
+                The British gave immense thrust to the commercialization of agriculture, forcing farmers to harvest 
+                <select class="blank-select" id="b1" data-ans="cash crops"><option value="">--Select--</option><option>cash crops</option><option>grain crops</option><option>rural crops</option></select> 
+                like indigo, cotton, and opium instead of food crops. As a consequence, devastating 
+                <select class="blank-select" id="b2" data-ans="famines"><option value="">--Select--</option><option>floods</option><option>famines</option><option>industrial revolutions</option></select> 
+                occurred during the 19th century in India, killing millions of lives. The influence of Western education helped trigger a 
+                <select class="blank-select" id="b3" data-ans="rational consciousness"><option value="">--Select--</option><option>rational consciousness</option><option>superstitious mind</option><option>indifference</option></select> 
+                and national awakening against orthodox practices among Indians. The country's very first railway line started running in 1853 CE from Bombay to 
+                <select class="blank-select" id="b4" data-ans="Thane"><option value="">--Select--</option><option>Pune</option><option>Thane</option><option>Madras</option></select>. 
+                Another vital communication asset brought by Lord Dalhousie for modern networking was the 
+                <select class="blank-select" id="b5" data-ans="telegraph"><option value="">--Select--</option><option>telegraph</option><option>radio broadcast</option><option>television</option></select>. 
+                Ultimately, the administrative policies of the British systematically dismantled indigenous Indian crafts, transforming India into a mere 
+                <select class="blank-select" id="b6" data-ans="market"><option value="">--Select--</option><option>production center</option><option>market</option><option>capital hub</option></select> 
+                for goods produced in England's industrial units.
+            </div>
+            <button class="btn" style="background:var(--accent-color); color:white; margin-top:20px;" onclick="checkBlanks()">Confirm Historical Text</button>
+            <div class="feedback" id="fb6"></div>
+        </div>
+
+        <div class="page" id="page7">
+            <div class="page-title"><i class="fa-solid fa-arrow-down-1-9"></i> Activity 7: Chronological Milestone Sequence of British Impacts</div>
+            <p class="instruction">Arrange the administrative and social reforms implemented during the British rule sequentially, from the earliest to the most recent event:</p>
+            
+            <div class="v-timeline">
+                <div class="t-row"><div class="t-index">1</div><div class="t-zone" id="z1" data-order="Implementation of the Permanent Zamindari System by Lord Cornwallis in Bengal"></div></div>
+                <div class="t-row"><div class="t-index">2</div><div class="t-zone" id="z2" data-order="Thomas Macaulay submitting his historic minute on Indian Education"></div></div>
+                <div class="t-row"><div class="t-index">3</div><div class="t-zone" id="z3" data-order="Commencement of India's first railway route between Bombay and Thane"></div></div>
+                <div class="t-row"><div class="t-index">4</div><div class="t-zone" id="z4" data-order="Submission of a comprehensive overview report on Indian Education by Charles Wood"></div></div>
+                <div class="t-row"><div class="t-index">5</div><div class="t-zone" id="z5" data-order="Establishment of modern universities in Calcutta, Bombay, and Madras"></div></div>
+                <div class="t-row"><div class="t-index">6</div><div class="t-zone" id="z6" data-order="Presentation of the Drain of Wealth Theory by Dadabhai Naoroji"></div></div>
+            </div>
+
+            <div class="item-bank" id="dragBank7">
+                <div class="drag-chip" draggable="true" id="t1">Commencement of India's first railway route between Bombay and Thane</div>
+                <div class="drag-chip" draggable="true" id="t2">Implementation of the Permanent Zamindari System by Lord Cornwallis in Bengal</div>
+                <div class="drag-chip" draggable="true" id="t3">Establishment of modern universities in Calcutta, Bombay, and Madras</div>
+                <div class="drag-chip" draggable="true" id="t4">Thomas Macaulay submitting his historic minute on Indian Education</div>
+                <div class="drag-chip" draggable="true" id="t5">Presentation of the Drain of Wealth Theory by Dadabhai Naoroji</div>
+                <div class="drag-chip" draggable="true" id="t6">Submission of a comprehensive overview report on Indian Education by Charles Wood</div>
+            </div>
+            <button class="btn" style="background:var(--accent-color); color:white; margin-top:15px;" onclick="checkTimeline()">Verify Chronology</button>
+            <div class="feedback" id="fb7"></div>
+        </div>
+
+        <div class="page" id="page8">
+            <div class="page-title"><i class="fa-solid fa-wheat-awn"></i> Activity 8: Identifying Special Features of British Land Revenue Policies</div>
+            <p class="instruction">Open only the boxes containing authentic, harsh structural attributes of the distinct land revenue models brought by the British (Total 4 correct treasures):</p>
+            
+            <div class="grid-fleet">
+                <div class="fleet-card" data-correct="yes" data-info="Under the Permanent Zamindari system, if landlords failed to remit the fixed revenue to the British on time, their legal zamindari titles were publicly auctioned."><i class="fa-solid fa-gavel"></i><h5>Zamindari Auction Practice</h5></div>
+                <div class="fleet-card" data-correct="no" data-info="Completely incorrect. Under the Ryotwari system, farmers paid revenue directly to the government without any middlemen or landlords."><i class="fa-solid fa-user-slash"></i><h5>Middlemen Menace in Ryotwari</h5></div>
+                <div class="fleet-card" data-correct="yes" data-info="Under the Mahalwari system, an entire village block or 'Mahal' held collective legal liability to pay tax to the state."><i class="fa-solid fa-people-roof"></i><h5>Collective Mahal Liability</h5></div>
+                <div class="fleet-card" data-correct="yes" data-info="Across all British land tax designs, assessment rates were exceptionally high and collections were strictly made mandatory in cash."><i class="fa-solid fa-money-bill-wave"></i><h5>Mandatory Cash Revenue</h5></div>
+                <div class="fleet-card" data-correct="no" data-info="No. Even during harsh famines, the British gave no tax concessions to farmers and executed collections ruthlessly."><i class="fa-solid fa-hand-holding-hand"></i><h5>Famine Tax Concessions</h5></div>
+                <div class="fleet-card" data-correct="yes" data-info="Revenue systems transformed agricultural fields into a marketable commodity; farmers began mortgaging ancestral plots to clear dues."><i class="fa-solid fa-file-contract"></i><h5>Land Becoming a Commodity</h5></div>
+            </div>
+            <div class="feedback" id="fb8" style="background:#fff3cd; color:#856404;"></div>
+        </div>
+
+        <div class="page" id="page9">
+            <div class="page-title"><i class="fa-solid fa-brain"></i> Activity 9: Critical Resolution on the Impact of English Education</div>
+            <p class="instruction">Read the following socio-educational scenario and decide what path you would pursue as an enlightened 19th-century Indian scholar:</p>
+            
+            <div class="battle-zone">
+                "Year 1835 CE. The British Government, acting on Macaulay's minutes, has cut off state funding for traditional Indian educational systems and is strictly implementing Western English education. The British objective is purely to manufacture subservient clerks. What should be your strategic intellectual stance in this crisis?"
+            </div>
+
+            <button class="strategy-btn" onclick="makeDecision(false, 'This is a regressive step. Refusing to acquire modern universal sciences will keep the country globally backward.')">Option A: Completely boycott the new English education modules and insist on continuing only traditional pedagogical systems.</button>
+            <button class="strategy-btn" onclick="makeDecision(true, 'An exceptionally brilliant and visionary decision! Chieftains like Raja Ram Mohan Roy took exactly this stance. By utilizing English education, Indians mastered global sciences, modern ideas of liberty, and equality, using that very repository of knowledge to contest British exploitation and organize national freedom movements.')">Option B: Acknowledge the British strategy of creating clerks, but capitalize on Western education to absorb modern science, rationalism, and democratic values, using it as an absolute weapon for India\'s liberation struggle.</button>
+            <button class="strategy-btn" onclick="makeDecision(false, 'This reflects a submissive attitude that discards one\'s own cultural legacy and national identity.')">Option C: Completely forget our native culture and become blind admirers of the British Raj, accepting their systemic subjugation completely.</button>
+            
+            <div class="feedback" id="fb9"></div>
+        </div>
+
+        <div class="book-controls">
+            <button class="btn btn-prev" id="prevPageBtn" onclick="movePage(-1)" disabled><i class="fa-solid fa-book-open"></i> Previous Page</button>
+            <button class="btn btn-next" id="nextPageBtn" onclick="movePage(1)">Next Page <i class="fa-solid fa-book"></i></button>
+        </div>
+    </div>
+
+    <script>
+        let pageIdx = 1;
+        const maxPages = 9;
+
+        function movePage(dir) {
+            document.getElementById(`page${pageIdx}`).classList.remove('active');
+            pageIdx += dir;
+            document.getElementById(`page${pageIdx}`).classList.add('active');
+
+            document.getElementById('prevPageBtn').disabled = (pageIdx === 1);
+            document.getElementById('nextPageBtn').disabled = (pageIdx === maxPages);
+
+            document.getElementById('progBar').style.width = `${(pageIdx / maxPages) * 100}%`;
+        }
+
+        // --- Act 1: MCQ Database (6 items) ---
+        const mcqCollection = [
+            { q: "In which year was the 'Permanent Zamindari System' implemented in Bengal, trapping farmers under heavy land revenue?", opts: ["1757 CE", "1773 CE", "1793 CE", "1853 CE"], ans: 2 },
+            { q: "Which land revenue model was introduced in the Madras and Bombay presidencies of South India where farmers paid revenue directly to the government?", opts: ["Mahalwari System", "Permanent Zamindari", "Ryotwari System", "Talukdari System"], ans: 2 },
+            { q: "Which British official laid a firm foundation for the Western English education methodology in India?", opts: ["Lord Cornwallis", "Thomas Macaulay", "Lord Wellesley", "Lord William Hunter"], ans: 1 },
+            { q: "Which highly influential social class emerged in Indian society as a direct result of British educational policies?", opts: ["Feudal Landlord Class", "Modern Educated Middle Class", "Armed Soldier Class", "Industrial Factory Owner Class"], ans: 1 },
+            { q: "From Bombay, to which city did India's very first railway line commence operations in 1853 CE?", opts: ["Pune", "Thane", "Calcutta", "Madras"], ans: 1 },
+            { q: "What did Dadabhai Naoroji call the systematic transport of India's economic wealth by the British into England?", opts: ["Capital Investment Theory", "Drain of Wealth Theory", "Industrial Progress Model", "Free Trade Policy"], ans: 1 }
+        ];
+
+        let currentQIdx = 0;
+        function loadMCQ() {
+            const data = mcqCollection[currentQIdx];
+            document.getElementById('q-text').innerText = `${currentQIdx + 1}. ${data.q}`;
+            const container = document.getElementById('q-options');
+            container.innerHTML = "";
+            document.getElementById('q-indicator').innerText = `Question: ${currentQIdx + 1}/${mcqCollection.length}`;
+
+            data.opts.forEach((opt, idx) => {
+                const b = document.createElement('button');
+                b.className = "opt-btn";
+                b.innerText = opt;
+                b.onclick = () => verifyMCQ(idx, data.ans, b);
+                container.appendChild(b);
+            });
+        }
+
+        function verifyMCQ(sel, right, element) {
+            const fb = document.getElementById('fb1'); fb.style.display = "block";
+            if(sel === right) {
+                element.classList.add('correct');
+                fb.innerHTML = "✓ Spot on! You have successfully identified the correct answer.";
+                fb.style.background = "#c8e6c9"; fb.style.color = "#1b5e20";
+                setTimeout(() => {
+                    if(currentQIdx < mcqCollection.length - 1) {
+                        currentQIdx++; loadMCQ(); fb.style.display = "none";
+                    } else { fb.innerHTML = "🎉 Congratulations! You have successfully completed all 6 multiple-choice questions."; }
+                }, 1500);
+            } else {
+                element.classList.add('wrong');
+                fb.innerHTML = "✗ Incorrect answer. Recall the structural consequences of historical actions.";
+                fb.style.background = "#ffcdd2"; fb.style.color = "#b71c1c";
+            }
+        }
+        loadMCQ();
+
+        // --- Act 2: Accordion Box Toggle ---
+        function toggleAcc(header) {
+            const body = header.nextElementSibling;
+            const icon = header.querySelector('i');
+            if(body.style.display === "block") {
+                body.style.display = "none";
+                icon.className = "fa-solid fa-plus";
+            } else {
+                body.style.display = "block";
+                icon.className = "fa-solid fa-minus";
+            }
+        }
+
+        // --- Act 3: Matching Logic ---
+        let selectedLeft = null;
+        const leftCards = document.querySelectorAll('#leftContainer .match-card');
+        const rightCards = document.querySelectorAll('#rightContainer .match-card');
+
+        leftCards.forEach(card => {
+            card.addEventListener('click', () => {
+                if(card.classList.contains('correct')) return;
+                leftCards.forEach(c => c.classList.remove('selected'));
+                card.classList.add('selected');
+                selectedLeft = card;
+            });
+        });
+
+        rightCards.forEach(card => {
+            card.addEventListener('click', () => {
+                if(card.classList.contains('correct') || !selectedLeft) return;
+                const matchId = card.getAttribute('data-match');
+                const leftId = selectedLeft.getAttribute('data-id');
+
+                if(matchId === leftId) {
+                    card.classList.add('correct');
+                    selectedLeft.classList.add('correct');
+                    selectedLeft.classList.remove('selected');
+                    selectedLeft = null;
+                    checkAct3Progress();
+                } else {
+                    const fb = document.getElementById('fb3');
+                    fb.style.display = "block"; fb.style.background = "#ffcdd2"; fb.style.color = "#b71c1c";
+                    fb.innerText = "✗ Incorrect pair! Think about the proper reform or characteristic and match.";
+                }
+            });
+        });
+
+        function checkAct3Progress() {
+            const finished = document.querySelectorAll('#leftContainer .match-card.correct').length;
+            const fb = document.getElementById('fb3'); fb.style.display = "block";
+            if(finished === 6) {
+                fb.style.background = "#c8e6c9"; fb.style.color = "#1b5e20";
+                fb.innerText = "✓ Perfect! All 6 historical personalities and educational transitions have been correctly paired.";
+            } else {
+                fb.style.background = "#fff3cd"; fb.style.color = "#856404";
+                fb.innerText = `Progress: ${finished}/6 pairs correct.`;
+            }
+        }
+
+        // --- Act 4: Photo Gallery Logic ---
+        function showAvatarInfo(name, text) {
+            const fb = document.getElementById('fb4'); fb.style.display = "block";
+            fb.innerHTML = `<strong><i class="fa-solid fa-circle-info"></i> ${name}:</strong> ${text}`;
+        }
+
+        // --- Act 5: Video Avatar Logic ---
+        function playVideoAvatar(title, dialog) {
+            const fb = document.getElementById('fb5'); fb.style.display = "block";
+            fb.innerHTML = `<strong><i class="fa-solid fa-clapperboard"></i> ${title}:</strong> "${dialog}" (Note: Classroom video assets can be attached here seamlessly)`;
+        }
+
+        // --- Drag & Drop Infrastructure for Act 7 ---
+        let currentDraggingChip = null;
+        document.querySelectorAll('.drag-chip').forEach(chip => {
+            chip.addEventListener('dragstart', () => { currentDraggingChip = chip; });
+        });
+
+        document.querySelectorAll('.t-zone').forEach(zone => {
+            zone.addEventListener('dragover', (e) => e.preventDefault());
+            zone.addEventListener('drop', () => {
+                if(currentDraggingChip) zone.appendChild(currentDraggingChip);
+            });
+        });
+
+        function checkTimeline() {
+            let correct = 0;
+            for(let i=1; i<=6; i++) {
+                const zone = document.getElementById(`z${i}`);
+                if(zone.firstChild && zone.firstChild.innerText.trim() === zone.getAttribute('data-order')) {
+                    correct++;
+                }
+            }
+            const fb = document.getElementById('fb7'); fb.style.display = "block";
+            if(correct === 6) {
+                fb.innerHTML = "✓ Amazing! You have chronologically arranged all 6 key milestones concerning the impacts of British rule.";
+                fb.style.background = "#c8e6c9"; fb.style.color = "#1b5e20";
+            } else {
+                fb.innerHTML = `✗ ${correct}/6 stages are placed correctly. Re-evaluate the progression from Zamindari systems down to the Drain theory.`;
+                fb.style.background = "#ffcdd2"; fb.style.color = "#b71c1c";
+            }
+        }
+
+        // --- Act 6: Blanks Validator ---
+        function checkBlanks() {
+            let miss = 0;
+            const selects = document.querySelectorAll('.blank-select');
+            selects.forEach(sel => {
+                if(sel.value !== sel.getAttribute('data-ans')) {
+                    miss++; sel.style.borderColor = "var(--error)";
+                } else { sel.style.borderColor = "var(--success)"; }
+            });
+            const fb = document.getElementById('fb6'); fb.style.display = "block";
+            if(miss === 0) {
+                fb.innerHTML = "✓ Superb! You have successfully completed the study fragment on British economic exploitation models.";
+                fb.style.background = "#c8e6c9"; fb.style.color = "#1b5e20";
+            } else {
+                fb.innerHTML = "✗ A few blanks contain incorrect economic or social terms. Please inspect and adjust your answers.";
+                fb.style.background = "#ffcdd2"; fb.style.color = "#b71c1c";
+            }
+        }
+
+        // --- Act 8: Land Matrix Picker ---
+        document.querySelectorAll('.fleet-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const isCorrect = card.getAttribute('data-correct') === 'yes';
+                const info = card.getAttribute('data-info');
+                const fb = document.getElementById('fb8'); fb.style.display = "block";
+                if(isCorrect) {
+                    card.style.background = "#c8e6c9";
+                    fb.innerHTML = `🎯 Vault unlocked! Details: ${info}`;
+                    fb.style.backgroundColor = "#c8e6c9"; fb.style.color = "#1b5e20";
+                } else {
+                    card.style.background = "#ffcdd2";
+                    fb.innerHTML = `⚠️ This is an incorrect structural property! Details: ${info}`;
+                    fb.style.backgroundColor = "#ffcdd2"; fb.style.color = "#b71c1c";
+                }
+            });
+        });
+
+        // --- Act 9: Strategy Scenario Logic ---
+        function makeDecision(isRight, txt) {
+            const fb = document.getElementById('fb9'); fb.style.display = "block";
+            fb.innerHTML = txt;
+            if(isRight) {
+                fb.style.background = "#c8e6c9"; fb.style.color = "#1b5e20";
+            } else {
+                fb.style.background = "#ffcdd2"; fb.style.color = "#b71c1c";
+            }
+        }
+    </script>
+</body>
+</html>

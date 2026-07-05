@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sociology Network 10.0 - Man and Society Games</title>
+    <style>
+        :root {
+            --socio-teal: #00d2d3;
+            --socio-purple: #341f97;
+            --socio-pink: #ff007f;
+            --gold-star: #f1c40f;
+            --dark-web: #090a14;
+            --panel-glass: rgba(24, 24, 43, 0.95);
+            --neon-green: #10ac84;
+            --neon-red: #ee5253;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+
+        body {
+            background: var(--dark-web);
+            background-image: radial-gradient(circle at 50% 50%, #1e1b4b 0%, #090a14 100%);
+            min-height: 100vh;
+            padding: 25px;
+            color: #ffffff;
+        }
+
+        header.socio-banner {
+            text-align: center;
+            padding: 25px;
+            background: var(--panel-glass);
+            border: 2px solid var(--socio-teal);
+            border-radius: 24px;
+            box-shadow: 0 0 30px rgba(0, 210, 211, 0.25);
+            margin-bottom: 25px;
+        }
+
+        header.socio-banner h1 {
+            color: var(--socio-teal);
+            font-size: 2.4rem;
+            text-shadow: 0 0 12px rgba(0, 210, 211, 0.4);
+            margin-bottom: 5px;
+        }
+
+        header.socio-banner p { color: #cbd5e1; font-size: 1.15rem; }
+
+        /* NEW CLASSROOM HUD: COMMUNITY BOND INDEX */
+        .socio-hud {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 15px 25px;
+            border-radius: 166px;
+            margin-bottom: 30px;
+            border-left: 5px solid var(--socio-pink);
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .bond-bar-container {
+            background: #222538;
+            width: 45%;
+            height: 16px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--socio-pink);
+        }
+
+        .bond-bar-fill {
+            background: linear-gradient(90deg, var(--socio-pink), #ff6b81);
+            height: 100%;
+            width: 100%;
+            transition: width 0.4s ease;
+        }
+
+        /* Side-Scrolling Matrix Dock */
+        .network-dock {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 35px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+
+        .network-dock::-webkit-scrollbar { height: 6px; }
+        .network-dock::-webkit-scrollbar-thumb { background: var(--socio-teal); border-radius: 3px; }
+
+        .dock-pill {
+            background: #18192b;
+            border: 1px solid #2c2d4a;
+            padding: 12px 24px;
+            border-radius: 14px;
+            cursor: pointer;
+            font-weight: bold;
+            color: #ffffff;
+            white-space: nowrap;
+            transition: all 0.3s;
+        }
+
+        .dock-pill:hover, .dock-pill.active-mission {
+            background: var(--socio-teal);
+            color: #000000;
+            border-color: #ffffff;
+            box-shadow: 0 0 15px var(--socio-teal);
+            transform: translateY(-3px);
+        }
+
+        /* Core Game Arena Screen */
+        .socio-arena {
+            background: var(--panel-glass);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 28px;
+            padding: 35px;
+            min-height: 520px;
+            display: none;
+            box-shadow: 0 25px 55px rgba(0,0,0,0.6);
+        }
+
+        .socio-arena.active-arena { display: block; animation: scaleNetwork 0.4s cubic-bezier(0.1, 0.8, 0.3, 1); }
+
+        @keyframes scaleNetwork {
+            from { opacity: 0; transform: scale(0.97); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        h2.arena-title {
+            font-size: 1.7rem;
+            color: var(--gold-star);
+            margin-bottom: 25px;
+            border-left: 6px solid var(--gold-star);
+            padding-left: 15px;
+        }
+
+        /* Interactive Grid Nodes */
+        .network-grid-connector {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .network-node {
+            background: #18192b;
+            padding: 18px;
+            border-radius: 14px;
+            cursor: pointer;
+            border: 2px solid #2c2d4a;
+            font-weight: bold;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .network-node:hover { border-color: var(--socio-teal); background: #1e203b; }
+        .network-node.node-linked { background: var(--socio-teal); color: black; border-color: white; box-shadow: 0 0 10px var(--socio-teal); }
+
+        /* Quiz UI Layout */
+        .quiz-option-block {
+            background: #18192b;
+            border: 2px solid #2c2d4a;
+            padding: 16px;
+            margin: 12px 0;
+            border-radius: 14px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+        }
+
+        .quiz-option-block:hover { border-color: var(--gold-star); transform: translateX(6px); }
+        .quiz-option-block.correct-glow { background: rgba(16, 172, 132, 0.2); border-color: var(--neon-green); color: #55efc4; }
+        .quiz-option-block.wrong-glow { background: rgba(238, 82, 83, 0.2); border-color: var(--neon-red); color: #ff7675; }
+
+        /* Smart Inputs */
+        .smart-socio-input {
+            background: rgba(0,0,0,0.4);
+            border: 2px solid #2c2d4a;
+            border-radius: 10px;
+            padding: 12px;
+            font-size: 1.1rem;
+            color: var(--gold-star);
+            font-weight: bold;
+            outline: none;
+            width: 100%;
+            max-width: 320px;
+            margin-top: 8px;
+        }
+
+        .smart-socio-input:focus { border-color: var(--socio-teal); }
+
+        /* Mining Grid Components */
+        .mining-deck-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        .mining-packet {
+            background: #18192b;
+            border: 2px solid #2c2d4a;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .mining-packet.active-packet { background: var(--socio-pink); border-color: white; box-shadow: 0 0 10px var(--socio-pink); }
+
+        /* General Action Buttons */
+        .socio-btn {
+            background: linear-gradient(135deg, var(--socio-teal), #48dbfb);
+            color: black;
+            border: none;
+            padding: 14px 35px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 25px;
+            box-shadow: 0 5px 15px rgba(0, 210, 211, 0.3);
+        }
+
+        .socio-btn:hover { transform: scale(1.02); box-shadow: 0 8px 25px rgba(0, 210, 211, 0.5); }
+
+        .socio-status-alert {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 12px;
+            font-weight: bold;
+            display: none;
+            font-size: 1.1rem;
+            border: 1px solid transparent;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="socio-banner">
+        <h1>Sociology Department: Community Hub</h1>
+        <p>Network Model 10.0 • Digital Games on the Unique Relationship Between Man and Society</p>
+    </div>
+
+    <!-- LIVE INDEX HUD -->
+    <div class="socio-hud">
+        <span>Community Bond Index:</span>
+        <div class="bond-bar-container"><div class="bond-bar-fill" id="bondFill"></div></div>
+        <span style="color: var(--gold-star);" id="liveSocioPoints">Social Empathy: 0000 SEP</span>
+    </div>
+
+    <!-- HORIZONTAL MATRIX MENU DOCK -->
+    <div class="network-dock">
+        <div class="dock-pill active-mission" id="pillBtn1" onclick="shiftSocioLevel(1)">1. Word Origin Matching</div>
+        <div class="dock-pill" id="pillBtn2" onclick="shiftSocioLevel(2)">2. Society Definition Code</div>
+        <div class="dock-pill" id="pillBtn3" onclick="shiftSocioLevel(3)">3. Epic 10 Quiz</div>
+        <div class="dock-pill" id="pillBtn4" onclick="shiftSocioLevel(4)">4. True History of Kamala</div>
+        <div class="dock-pill" id="pillBtn5" onclick="shiftSocioLevel(5)">5. Agencies of Socialization</div>
+        <div class="dock-pill" id="pillBtn6" onclick="shiftSocioLevel(6)">6. Man and Language Bond</div>
+        <div class="dock-pill" id="pillBtn7" onclick="shiftSocioLevel(7)">7. Indian Sociologists</div>
+    </div>
+
+    <!-- LEVEL 1 SCREEN -->
+    <div id="socio1" class="socio-arena active-arena">
+        <h2 class="arena-title">Level 1: Linguistic Origin of the Word Sociology (Language Node Connector)</h2>
+        <p style="margin-bottom: 15px;">Correctly link the language from which the word 'Sociology' originated with its core root term:</p>
+        <div class="network-grid-connector">
+            <div>
+                <div class="network-node" id="l1_nodeL1" onclick="connectSocioNodes('L', 'l1_nodeL1', 1)">Latin Root Word</div>
+                <div class="network-node" id="l1_nodeL2" style="margin-top:15px;" onclick="connectSocioNodes('L', 'l1_nodeL2', 2)">Greek Root Word</div>
+            </div>
+            <div>
+                <div class="network-node" id="l1_nodeR1" onclick="connectSocioNodes('R', 'l1_nodeR1', 2)">Logos (Study / Science)</div>
+                <div class="network-node" id="l1_nodeR2" style="margin-top:15px;" onclick="connectSocioNodes('R', 'l1_nodeR2', 1)">Socius (Society / Companion)</div>
+            </div>
+        </div>
+        <div class="socio-status-alert" id="alert1"></div>
+    </div>
+
+    <!-- LEVEL 2 SCREEN -->
+    <div id="socio2" class="socio-arena">
+        <h2 class="arena-title">Level 2: Father of Sociology and Definitions (The Sociology Code)</h2>
+        <div style="display:flex; flex-direction:column; gap:20px;">
+            <div class="fib-q">1. Who is the father of sociology who coined the term 'Sociology' for the science that studies society for the first time in the world? <br><input type="text" class="smart-socio-input" id="cryptIn1" placeholder="Enter scholar's name"></div>
+            <div class="fib-q">2. Who famously stated that "Society is a web of social relations" and defined sociology as the science of social relations? <br><input type="text" class="smart-socio-input" id="cryptIn2" placeholder="MacIver and Page / Auguste Comte?"></div>
+        </div>
+        <button class="socio-btn" onclick="verifySocioLevel2()">Verify Network Code</button>
+        <div class="socio-status-alert" id="alert2"></div>
+    </div>
+
+    <!-- LEVEL 3 SCREEN (10 QUESTIONS BATTLE) -->
+    <div id="socio3" class="socio-arena">
+        <h2 class="arena-title">Level 3: Great Battle of Human Relations (Epic 10 Matrix Quiz)</h2>
+        <div style="font-weight: bold; margin-bottom: 15px; color: var(--gold-star);" id="quizCounterText">Question Code: 1 / 10</div>
+        <div id="quizQuestionText" style="font-size: 1.25rem; font-weight: bold; margin-bottom: 20px;">Loading...</div>
+        <div id="quizOptionsContainer"></div>
+        <button class="socio-btn" id="nextQuizBtn" style="display:none;" onclick="nextSocioQuestion()">Move to Next Social Challenge ➔</button>
+        <div class="socio-status-alert" id="alert3"></div>
+    </div>
+
+    <!-- LEVEL 4 SCREEN -->
+    <div id="socio4" class="socio-arena">
+        <h2 class="arena-title">Level 4: Real History Analysis of Kamala of Midnapore (The Human Environment Quest)</h2>
+        <div style="display:flex; flex-direction:column; gap:20px;">
+            <div class="fib-q">1. What is the name of the girl found in Midnapore in 1920, who grew up with animals in the forest for 9 years and behaved like them? <br><input type="text" class="smart-socio-input" id="envIn1" placeholder="Enter the girl's name"></div>
+            <div class="fib-q">2. What truth was proven by Kamala's real history? "If a human being grows up outside of society and social groups, they turn into a/an ________": <br><input type="text" class="smart-socio-input" id="envIn2" placeholder="animal / angel?"></div>
+        </div>
+        <button class="socio-btn" onclick="verifySocioLevel4()">Confirm Historical Data</button>
+        <div class="socio-status-alert" id="alert4"></div>
+    </div>
+
+    <!-- LEVEL 5 SCREEN -->
+    <div id="socio5" class="socio-arena">
+        <h2 class="arena-title">Level 5: Major Agencies and Institutions of Socialization (Socialization Mining)</h2>
+        <p style="margin-bottom: 15px;">Select only the **four primary agencies of socialization** through which a child learns the languages and rules of society:</p>
+        <div class="mining-deck-grid">
+            <div class="mining-packet" id="packet1" onclick="toggleMiningPacket('packet1', true)">1. Family</div>
+            <div class="mining-packet" id="packet2" onclick="toggleMiningPacket('packet2', false)">2. Railway Station</div>
+            <div class="mining-packet" id="packet3" onclick="toggleMiningPacket('packet3', true)">3. School</div>
+            <div class="mining-packet" id="packet4" onclick="toggleMiningPacket('packet4', true)">4. Peer Group</div>
+            <div class="mining-packet" id="packet5" onclick="toggleMiningPacket('packet5', false)">5. Big Bazaar</div>
+            <div class="mining-packet" id="packet6" onclick="toggleMiningPacket('packet6', true)">6. Mass Media</div>
+        </div>
+        <button class="socio-btn" onclick="verifySocioLevel5()">Lock Agencies</button>
+        <div class="socio-status-alert" id="alert5"></div>
+    </div>
+
+    <!-- LEVEL 6 SCREEN -->
+    <div id="socio6" class="socio-arena">
+        <h2 class="arena-title">Level 6: Relationship Matrix of Man and Language (Language Connection Sorting)</h2>
+        <p style="margin-bottom: 15px;">Drag and assign the facts concerning the absolute importance of language for human survival to their correct descriptive targets:</p>
+        <div style="display:flex; gap:25px;">
+            <div style="flex:1; display:flex; flex-direction:column; gap:10px;" id="langSource">
+                <div style="background:#1e203b; padding:12px; border-radius:10px; cursor:grab; font-weight:bold; border:1px solid #2c2d4a;" draggable="true" id="lang1" ondragstart="startLangDrag(event)">Speech and Verbal Expression</div>
+                <div style="background:#1e203b; padding:12px; border-radius:10px; cursor:grab; font-weight:bold; border:1px solid #2c2d4a;" draggable="true" id="lang2" ondragstart="startLangDrag(event)">Gestures and Physical Signs</div>
+            </div>
+            <div style="flex:2; display:flex; flex-direction:column; gap:15px;">
+                <div style="background:rgba(0,0,0,0.3); border:2px dashed var(--socio-teal); padding:15px; border-radius:12px;" ondragover="allowLangDrop(event)" ondrop="handleLangDrop(event, 'spoken')">
+                    <h3>Expressing internal emotions by articulating words like father, mother, or brother</h3>
+                </div>
+                <div style="background:rgba(0,0,0,0.3); border:2px dashed var(--socio-teal); padding:15px; border-radius:12px;" ondragover="allowLangDrop(event)" ondrop="handleLangDrop(event, 'body')">
+                    <h3>Communicating vital biological instincts like hunger, sleep, or thirst using micro signs</h3>
+                </div>
+            </div>
+        </div>
+        <button class="socio-btn" onclick="verifySocioLevel6()">Verify Language Bond</button>
+        <div class="socio-status-alert" id="alert6"></div>
+    </div>
+
+    <!-- LEVEL 7 SCREEN -->
+    <div id="socio7" class="socio-arena">
+        <h2 class="arena-title">Level 7: Contributions of Eminent Indian Sociologists (Indian Sociologists Matrix)</h2>
+        <p style="margin-bottom: 15px;">Final stage! Correctly pair the pioneer Indian social scholars and global western thinkers to complete the hub module:</p>
+        <div class="network-grid-connector">
+            <div class="network-node" id="matL1" onclick="selectFinalSocioMatrix('L', 'matL1', 'world')">Auguste Comte, Herbert Spencer, Max Weber</div>
+            <div class="network-node" id="matR1" onclick="selectFinalSocioMatrix('R', 'matR1', 'world')">Pioneer Early Thinkers of Global Sociology</div>
+            <div class="network-node" id="matL2" onclick="selectFinalSocioMatrix('L', 'matL2', 'india')">G.S. Ghurye, M.N. Srinivas, Irawati Karve</div>
+            <div class="network-node" id="matR2" onclick="selectFinalSocioMatrix('R', 'matR2', 'india')">Renowned Foundational Indian Sociologists</div>
+        </div>
+        <button class="socio-btn" onclick="verifySocioLevel7()">Complete Sociology Matrix</button>
+        <div class="socio-status-alert" id="alert7"></div>
+    </div>
+
+    <script>
+        let empathyPoints = 0; let communityBond = 100;
+        function modifySocioHUD(sepChange, bondDamage) {
+            empathyPoints += sepChange;
+            communityBond = Math.max(10, communityBond - bondDamage);
+            document.getElementById("liveSocioPoints").innerText = `Social Empathy: ${empathyPoints.toString().padStart(4, '0')} SEP`;
+            document.getElementById("bondFill").style.width = `${communityBond}%`;
+        }
+
+        function shiftSocioLevel(levelIdx) {
+            document.querySelectorAll('.socio-arena').forEach(el => el.classList.remove('active-arena'));
+            document.querySelectorAll('.dock-pill').forEach(el => el.classList.remove('active-mission'));
+            
+            document.getElementById('socio' + levelIdx).classList.add('active-arena');
+            document.getElementById('pillBtn' + levelIdx).classList.add('active-mission');
+        }
+
+        // Level 1 Logic
+        let nodeL = null; let nodeR = null;
+        function connectSocioNodes(side, id, matchVal) {
+            if(side === 'L') {
+                if(nodeL) document.getElementById(nodeL.id).classList.remove('node-linked');
+                nodeL = { id: id, match: matchVal };
+            } else {
+                if(nodeR) document.getElementById(nodeR.id).classList.remove('node-linked');
+                nodeR = { id: id, match: matchVal };
+            }
+            document.getElementById(id).classList.add('node-linked');
+
+            if(nodeL && nodeR) {
+                if(nodeL.match === nodeR.match) {
+                    document.getElementById(nodeL.id).style.background = "var(--neon-green)";
+                    document.getElementById(nodeR.id).style.background = "var(--neon-green)";
+                    modifySocioHUD(100, 0);
+                    showSocioAlert(1, "Correct link! The linguistic root origin matches perfectly.", true);
+                    document.getElementById('pillBtn1').style.background = "var(--neon-green)";
+                } else {
+                    modifySocioHUD(0, 10);
+                    showSocioAlert(1, "Incorrect alignment, the community bond has dropped! Re-evaluate your choice.", false);
+                }
+                nodeL = null; nodeR = null;
+            }
+        }
+
+        // Level 2 Logic
+        function verifySocioLevel2() {
+            let c1 = document.getElementById("cryptIn1").value.trim().toLowerCase();
+            let c2 = document.getElementById("cryptIn2").value.trim().toLowerCase();
+
+            if((c1 === "auguste comte" || c1 === "august comte") && (c2 === "maciver and page" || c2 === "maciver" || c2 === "maciver & page")) {
+                modifySocioHUD(150, 0);
+                document.getElementById('pillBtn2').style.background = "var(--neon-green)";
+                showSocioAlert(2, "Superb! The father of sociology and the structural web definition match up successfully.", true);
+            } else {
+                modifySocioHUD(0, 10);
+                showSocioAlert(2, "Incorrect structural fields! Hints: Auguste Comte, MacIver and Page.", false);
+            }
+        }
+
+        // Level 3: 10 Questions Matrix Quiz Data
+        const sociologyQuizPool = [
+            { q: "1. The independent branch of knowledge called Sociology is fundamentally a vital division of which broader science?", o: ["Natural Science", "Social Science", "Mathematical Science"], c: 1 },
+            { q: "2. What is the fundamental reason human beings alone are designated as 'social beings' across the globe?", o: ["They construct colossal houses", "They think about their purpose of life and possess cognitive consciousness", "They outrun other animals"], c: 1 },
+            { q: "3. Which discipline explores the core statement: 'There is no society without man, and no man without society'?", o: ["Economics", "Geography", "Sociology"], c: 2 },
+            { q: "4. What is the developmental process called where a newborn child systematically acquires the structural values and language of society?", o: ["Socialization", "Urbanization", "Industrialization"], c: 0 },
+            { q: "5. Which foundational micro-institution serves as the absolute first and primary agent of socialization for a newborn?", o: ["School", "Family", "Peer Group"], c: 1 },
+            { q: "6. Which formal institutional landscape provides the child with systematic instruction to gracefully adapt to the outer social framework?", o: ["Bank", "School", "Forest"], c: 1 },
+            { q: "7. Which pioneer 19th-century British scholar scientifically formulated the laws governing social evolution and progress?", o: ["Herbert Spencer", "Max Weber", "Karl Marx"], c: 0 },
+            { q: "8. Which prominent German philosopher extensively expanded the operational landscape and critique of sociology worldwide?", o: ["Emile Durkheim", "G.S. Ghurye", "Karl Marx"], c: 2 },
+            { q: "9. Following the colonial era, which primary educational university first introduced Sociology courses systematically in India?", o: ["University of Bombay (1914)", "University of Mysore", "University of Calcutta"], c: 0 },
+            { q: "10. Who among the following stands out as a highly celebrated female intellectual who contributed immensely to foundational Indian Sociology?", o: ["M.N. Srinivas", "Irawati Karve", "A.R. Desai"], c: 1 }
+        ];
+
+        let qIdx = 0; let qScore = 0; let isQuizActive = true;
+        function loadSocioQuestion() {
+            isQuizActive = true;
+            document.getElementById("nextQuizBtn").style.display = "none";
+            document.getElementById("alert3").style.display = "none";
+            let qData = sociologyQuizPool[qIdx];
+            document.getElementById("quizCounterText").innerText = `Question Code: ${qIdx + 1} / 10`;
+            document.getElementById("quizQuestionText").innerText = qData.q;
+            
+            let container = document.getElementById("quizOptionsContainer");
+            container.innerHTML = "";
+            qData.o.forEach((opt, idx) => {
+                let div = document.createElement("div");
+                div.classList.add("quiz-option-block");
+                div.innerText = opt;
+                div.onclick = function() {
+                    if(!isQuizActive) return;
+                    isQuizActive = false;
+                    if(idx === qData.c) {
+                        this.classList.add("correct-glow");
+                        qScore++; modifySocioHUD(30, 0);
+                        showSocioAlert(3, "Correct answer choice! Your social awareness is outstanding.", true);
+                    } else {
+                        this.classList.add("wrong-glow");
+                        container.children[qData.c].classList.add("correct-glow");
+                        modifySocioHUD(0, 10);
+                        showSocioAlert(3, "Wrong choice! The standard answer layout is marked in green.", false);
+                    }
+                    document.getElementById("nextQuizBtn").style.display = "inline-block";
+                };
+                container.appendChild(div);
+            });
+        }
+        function nextSocioQuestion() {
+            qIdx++;
+            if(qIdx < sociologyQuizPool.length) {
+                loadSocioQuestion();
+            } else {
+                document.getElementById("quizCounterText").innerText = "Module Assessment Done!";
+                document.getElementById("quizQuestionText").innerText = `Total Class Performance: ${qScore} / 10`;
+                document.getElementById("quizOptionsContainer").innerHTML = "";
+                document.getElementById("nextQuizBtn").style.display = "none";
+                document.getElementById('pillBtn3').style.background = "var(--neon-green)";
+                showSocioAlert(3, qScore >= 7 ? "True community mastery accomplished!" : "Good attempt, read your module segments once more!", true);
+            }
+        }
+        loadSocioQuestion();
+
+        // Level 4 Logic
+        function verifySocioLevel4() {
+            let e1 = document.getElementById("envIn1").value.trim().toLowerCase();
+            let e2 = document.getElementById("envIn2").value.trim().toLowerCase();
+
+            if((e1 === "kamala" || e1 === "kamla") && (e2 === "animal" || e2 === "animals")) {
+                modifySocioHUD(150, 0);
+                document.getElementById('pillBtn4').style.background = "var(--neon-green)";
+                showSocioAlert(4, "Excellent! The analytic matrix for Kamala's real case environment is perfectly validated.", true);
+                return;
+            }
+            modifySocioHUD(0, 10);
+            showSocioAlert(4, "Verification failed! Hints: Kamala, animal.", false);
+        }
+
+        // Level 5 Logic
+        let minedPackets = {};
+        function toggleMiningPacket(id, isSocializationAgency) {
+            let node = document.getElementById(id);
+            if(node.classList.contains('active-packet')) {
+                node.classList.remove('active-packet');
+                delete minedPackets[id];
+            } else {
+                node.classList.add('active-packet');
+                minedPackets[id] = isSocializationAgency;
+            }
+        }
+        function verifySocioLevel5() {
+            let win = true; let count = 0;
+            for(let id in minedPackets) {
+                if(minedPackets[id] === false) win = false;
+                count++;
+            }
+            if(count !== 4) win = false; // 4 major agencies
+
+            if(win) {
+                modifySocioHUD(150, 0);
+                document.getElementById('pillBtn5').style.background = "var(--neon-green)";
+                showSocioAlert(5, "Perfect alignment! The 4 authentic agencies of socialization (Family, School, Peer Group, Mass Media) are correct.", true);
+            } else {
+                modifySocioHUD(0, 10);
+                showSocioAlert(5, "Selection failed! Pick only the 4 authentic socialization networks (railway network excluded).", false);
+            }
+        }
+
+        // Level 6 Logic
+        function allowLangDrop(ev) { ev.preventDefault(); }
+        function startLangDrag(ev) { ev.dataTransfer.setData("text", ev.target.id); }
+        function handleLangDrop(ev, cat) {
+            ev.preventDefault();
+            let id = ev.dataTransfer.getData("text");
+            let el = document.getElementById(id);
+            el.dataset.cat = cat;
+            ev.target.appendChild(el);
+        }
+        function verifySocioLevel6() {
+            let l1 = document.getElementById("lang1").dataset.cat;
+            let l2 = document.getElementById("lang2").dataset.cat;
+
+            if(l1 === "spoken" && l2 === "body") {
+                modifySocioHUD(200, 0);
+                document.getElementById('pillBtn6').style.background = "var(--neon-green)";
+                showSocioAlert(6, "The relationship metrics between human communication styles are verified successfully!", true);
+            } else {
+                modifySocioHUD(0, 10);
+                showSocioAlert(6, "Incorrect categorizing! Verbal phrases match speech networks, whereas spatial motions align with sign languages.", false);
+            }
+        }
+
+        // Level 7 Logic
+        let finalL = null; let finalR = null;
+        function selectFinalSocioMatrix(side, id, key) {
+            if(side === 'L') {
+                finalL = { id: id, key: key };
+                document.getElementById("matL1").classList.remove('node-linked');
+                document.getElementById("matL2").classList.remove('node-linked');
+            } else {
+                finalR = { id: id, key: key };
+                document.getElementById("matR1").classList.remove('node-linked');
+                document.getElementById("matR2").classList.remove('node-linked');
+            }
+            document.getElementById(id).classList.add('node-linked');
+        }
+        function verifySocioLevel7() {
+            if(finalL && finalR && finalL.key === finalR.key) {
+                modifySocioHUD(250, 0);
+                document.getElementById('pillBtn7').style.background = "var(--neon-green)";
+                showSocioAlert(7, "Amazing! The entire Community Hub matrix for 'Man and Society' has been successfully completed. An exceptional interactive learning module!", true);
+            } else {
+                modifySocioHUD(0, 10);
+                showSocioAlert(7, "Matrix binding failed. Check the core operational zones of the scholars again.", false);
+            }
+        }
+
+        function showSocioAlert(lvlNum, text, success) {
+            let box = document.getElementById("alert" + lvlNum);
+            box.style.display = "block";
+            box.innerText = text;
+            box.style.background = success ? "rgba(16, 172, 132, 0.15)" : "rgba(238, 82, 83, 0.1)";
+            box.style.color = success ? "#55efc4" : "#ff7675";
+            box.style.borderColor = success ? "var(--socio-teal)" : "var(--neon-red)";
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sanatana Dharma and Vedic Culture - Kingdom of History</title>
+    <style>
+        :root {
+            --royal-gold: #f39c12;
+            --royal-purple: #8e44ad;
+            --mystic-blue: #2c3e50;
+            --glow-green: #2ecc71;
+            --fire-red: #e74c3c;
+            --bg-dark: #0f111a;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Verdana, sans-serif; }
+
+        body {
+            background: var(--bg-dark);
+            background-image: linear-gradient(to bottom, #111827, #0f111a);
+            min-height: 100vh;
+            padding: 20px;
+            color: #ffffff;
+        }
+
+        header.kingdom-header {
+            text-align: center;
+            padding: 25px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 2px solid var(--royal-gold);
+            border-radius: 20px;
+            box-shadow: 0 0 25px rgba(243, 156, 18, 0.2);
+            margin-bottom: 25px;
+        }
+
+        header.kingdom-header h1 {
+            color: var(--royal-gold);
+            font-size: 2.3rem;
+            text-shadow: 0 0 12px rgba(243, 156, 18, 0.4);
+            margin-bottom: 5px;
+        }
+
+        /* NEW PATTERN: HORIZONTAL KINGDOM STEPPERS */
+        .kingdom-stepper {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .step-badge {
+            padding: 12px 22px;
+            background: #1f2937;
+            border: 1px solid #374151;
+            border-radius: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .step-badge.unlocked {
+            background: var(--royal-purple);
+            color: white;
+            border-color: #ffffff;
+            box-shadow: 0 0 15px rgba(142, 68, 173, 0.5);
+        }
+
+        .step-badge.active-mission {
+            background: var(--royal-gold);
+            color: #000000;
+            border-color: #ffffff;
+            box-shadow: 0 0 15px var(--royal-gold);
+            transform: scale(1.05);
+        }
+
+        /* Arena Stage */
+        .kingdom-stage {
+            background: rgba(255, 255, 255, 0.04);
+            border: 2px solid #1f2937;
+            border-radius: 24px;
+            padding: 35px;
+            min-height: 520px;
+            display: none;
+            box-shadow: 0 20px 45px rgba(0,0,0,0.6);
+        }
+
+        .kingdom-stage.active-stage { display: block; animation: fadeStage 0.4s ease-in-out; }
+
+        @keyframes fadeStage {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2.stage-title {
+            font-size: 1.7rem;
+            color: var(--royal-gold);
+            margin-bottom: 25px;
+            border-bottom: 2px dashed rgba(243, 156, 18, 0.3);
+            padding-bottom: 12px;
+        }
+
+        /* Royal Controls */
+        .royal-btn {
+            background: linear-gradient(135deg, var(--royal-gold), #e67e22);
+            color: black;
+            border: none;
+            padding: 14px 35px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 25px;
+            box-shadow: 0 5px 15px rgba(243, 156, 18, 0.3);
+        }
+
+        .royal-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 8px 25px rgba(243, 156, 18, 0.5);
+        }
+
+        .alert-matrix-box {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 12px;
+            font-weight: bold;
+            display: none;
+            font-size: 1.1rem;
+        }
+
+        /* Level 1 Node UI */
+        .matrix-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .interactive-node {
+            background: #1f2937;
+            padding: 18px;
+            border-radius: 14px;
+            cursor: pointer;
+            border: 2px solid #374151;
+            font-weight: bold;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .interactive-node:hover { border-color: var(--royal-gold); }
+        .interactive-node.clicked-node { background: var(--royal-gold); color: black; border-color: white; }
+
+        /* Level 2 Mining Grid */
+        .vedic-mining {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+
+        .gold-ore-card {
+            background: #1f2937;
+            border: 2px solid #374151;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .gold-ore-card.mined-active { background: var(--royal-purple); border-color: white; }
+
+        /* Level 3 Battle Royale Quiz */
+        .battle-choice-btn {
+            background: #1f2937;
+            border: 2px solid #374151;
+            padding: 16px;
+            margin: 12px 0;
+            border-radius: 14px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+        }
+
+        .battle-choice-btn:hover { background: #2d3748; transform: translateX(5px); }
+        .battle-choice-btn.win-glow { background: rgba(46, 204, 113, 0.2); border-color: var(--glow-green); color: var(--glow-green); }
+        .battle-choice-btn.lose-glow { background: rgba(231, 76, 60, 0.2); border-color: var(--fire-red); color: var(--fire-red); }
+
+        /* General Inputs */
+        .royal-smart-input {
+            background: #0f111a;
+            border: 2px solid #374151;
+            border-radius: 10px;
+            padding: 12px;
+            font-size: 1.1rem;
+            color: var(--royal-gold);
+            font-weight: bold;
+            outline: none;
+            width: 100%;
+            max-width: 320px;
+            margin-top: 8px;
+        }
+
+        .royal-smart-input:focus { border-color: var(--royal-gold); }
+
+        /* Level 6 Sort Chrono */
+        .chrono-vessel {
+            background: #1f2937;
+            border: 2px dashed #4b5563;
+            padding: 15px;
+            border-radius: 12px;
+            cursor: grab;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        /* Top HUD */
+        .hud-top-bar {
+            display: flex;
+            justify-content: space-between;
+            background: #1f2937;
+            padding: 14px 25px;
+            border-radius: 16px;
+            margin-bottom: 25px;
+            border: 1px solid #374151;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="kingdom-header">
+        <h1>Chapter 5: Sanatana Dharma (Vedic Culture)</h1>
+        <p>Kingdom of History 6.0 • Engaging Games Covering the Entire Chapter</p>
+    </header>
+
+    <div class="hud-top-bar">
+        <span style="color: var(--royal-gold);">Mission: Quest for Vedic Knowledge</span>
+        <span style="color: var(--glow-green);" id="liveGoldScore">Vedic XP Earned: 0 XP</span>
+    </div>
+
+    <div class="kingdom-stepper">
+        <div class="step-badge active-mission" id="badge1" onclick="loadStage(1)">Mission 1</div>
+        <div class="step-badge" id="badge2" onclick="loadStage(2)">Mission 2</div>
+        <div class="step-badge" id="badge3" onclick="loadStage(3)">Mission 3 (10 Qs)</div>
+        <div class="step-badge" id="badge4" onclick="loadStage(4)">Mission 4</div>
+        <div class="step-badge" id="badge5" onclick="loadStage(5)">Mission 5</div>
+        <div class="step-badge" id="badge6" onclick="loadStage(6)">Mission 6</div>
+        <div class="step-badge" id="badge7" onclick="loadStage(7)">Mission 7</div>
+    </div>
+
+    <div id="stage1" class="kingdom-stage active-stage">
+        <h2 class="stage-title">Mission 1: Concept of the Four Vedas (Veda Connector)</h2>
+        <p style="margin-bottom: 15px;">Connect the name of the Veda on the left with its correct feature on the right:</p>
+        <div class="matrix-grid">
+            <div>
+                <div class="interactive-node" id="leftNode1" onclick="linkNodes('left', 'leftNode1', 1)">Rigveda</div>
+                <div class="interactive-node" id="leftNode2" style="margin-top:15px;" onclick="linkNodes('left', 'leftNode2', 2)">Samaveda</div>
+            </div>
+            <div>
+                <div class="interactive-node" id="rightNode1" onclick="linkNodes('right', 'rightNode1', 2)">Art of musical chanting</div>
+                <div class="interactive-node" id="rightNode2" style="margin-top:15px;" onclick="linkNodes('right', 'rightNode2', 1)">Collection of the most ancient hymns</div>
+            </div>
+        </div>
+        <div class="alert-matrix-box" id="alert1"></div>
+    </div>
+
+    <div id="stage2" class="kingdom-stage">
+        <h2 class="stage-title">Mission 2: Political and Social Institutions of the Vedic Period (Ore Mining)</h2>
+        <p style="margin-bottom: 15px;">Which two options below represent the **political institutions** that checked the power of the king? Click to mine:</p>
+        <div class="vedic-mining">
+            <div class="gold-ore-card" id="ore1" onclick="mineOre('ore1', true)">Sabha</div>
+            <div class="gold-ore-card" id="ore2" onclick="mineOre('ore2', false)">Urban Site</div>
+            <div class="gold-ore-card" id="ore3" onclick="mineOre('ore3', true)">Samiti</div>
+            <div class="gold-ore-card" id="ore4" onclick="mineOre('ore4', false)">Fort Room</div>
+            <div class="gold-ore-card" id="ore5" onclick="mineOre('ore5', false)">Army Palace</div>
+        </div>
+        <button class="royal-btn" onclick="verifyStage2()">Confirm Selection</button>
+        <div class="alert-matrix-box" id="alert2"></div>
+    </div>
+
+    <div id="stage3" class="kingdom-stage">
+        <h2 class="stage-title">Mission 3: Grand Quiz of Sanatana Dharma (Epic 10 Battle Quiz)</h2>
+        <div style="font-weight: bold; margin-bottom: 15px; color: var(--royal-gold);" id="battleProgressTxt">Question Code: 1 / 10</div>
+        <div id="battleQuestionText" style="font-size: 1.25rem; font-weight: bold; margin-bottom: 20px;">Loading...</div>
+        <div id="battleOptionsContainer"></div>
+        <button class="royal-btn" id="nextBattleBtn" style="display:none;" onclick="nextVedicQuestion()">Next Stage ➔</button>
+        <div class="alert-matrix-box" id="alert3"></div>
+    </div>
+
+    <div id="stage4" class="kingdom-stage">
+        <h2 class="stage-title">Mission 4: Secret Codes of Vedic Terms (Vedic Term Crypt)</h2>
+        <div style="display:flex; flex-direction:column; gap:20px;">
+            <div class="fib-q">1. Which animal was the most important form of wealth for Aryans during the Early Vedic period and caused battles? <br><input type="text" class="royal-smart-input" id="term1" placeholder="Write answer here"></div>
+            <div class="fib-q">2. What was the other name given to the king, meaning the protector or lord of cattle? <br><input type="text" class="royal-smart-input" id="term2" placeholder="Write answer here"></div>
+            <div class="fib-q">3. What was the smallest and basic unit of society during the Rigvedic period? <br><input type="text" class="royal-smart-input" id="term3" placeholder="Write answer here"></div>
+        </div>
+        <button class="royal-btn" onclick="verifyStage4()">Verify Code</button>
+        <div class="alert-matrix-box" id="alert4"></div>
+    </div>
+
+    <div id="stage5" class="kingdom-stage">
+        <h2 class="stage-title">Mission 5: Upanishads and Literature (Vedic Script Input)</h2>
+        <div style="display:flex; flex-direction:column; gap:20px;">
+            <div class="fib-q">1. What are the philosophical texts that appear at the end of the Vedic literature called? <br><input type="text" class="royal-smart-input" id="script1" placeholder="e.g., Upanishads"></div>
+            <div class="fib-q">2. Which language was spoken by the Aryans and used to compose the Vedas? <br><input type="text" class="royal-smart-input" id="script2" placeholder="e.g., Sanskrit"></div>
+            <div class="fib-q">3. Which Mandala among the ten prominent Mandalas of the Rigveda mentions the Chaturvarna system? <br><input type="text" class="royal-smart-input" id="script3" placeholder="e.g., Tenth Mandala"></div>
+        </div>
+        <button class="royal-btn" onclick="verifyStage5()">Verify Literature Code</button>
+        <div class="alert-matrix-box" id="alert5"></div>
+    </div>
+
+    <div id="stage6" class="kingdom-stage">
+        <h2 class="stage-title">Mission 6: Sacrifices of the Later Vedic Period (Vedic Sacrifice Base)</h2>
+        <p style="margin-bottom: 15px;">Drag and assign the sacrifices performed by the king to establish sovereignty during the Later Vedic period:</p>
+        <div style="display:flex; gap:25px;">
+            <div style="flex:1; display:flex; flex-direction:column; gap:10px;" id="chronoSource">
+                <div class="chrono-vessel" draggable="true" id="yaga1" ondragstart="startVesselDrag(event)">Ashvamedha Yaga</div>
+                <div class="chrono-vessel" draggable="true" id="yaga2" ondragstart="startVesselDrag(event)">Rajasuya Yaga</div>
+            </div>
+            <div style="flex:2; display:flex; flex-direction:column; gap:15px;">
+                <div style="background:rgba(0,0,0,0.3); border:2px dashed var(--royal-gold); padding:15px; border-radius:12px;" ondragover="allowVesselDrop(event)" ondrop="handleVesselDrop(event, 'horse')">
+                    <h3>Sacrifice involving letting a horse roam to expand borders</h3>
+                </div>
+                <div style="background:rgba(0,0,0,0.3); border:2px dashed var(--royal-gold); padding:15px; border-radius:12px;" ondragover="allowVesselDrop(event)" ondrop="handleVesselDrop(event, 'king')">
+                    <h3>Sacrifice performed during the coronation ceremony</h3>
+                </div>
+            </div>
+        </div>
+        <button class="royal-btn" onclick="verifyStage6()">Confirm Sacrifices</button>
+        <div class="alert-matrix-box" id="alert6"></div>
+    </div>
+
+    <div id="stage7" class="kingdom-stage">
+        <h2 class="stage-title">Mission 7: Ashram System Matrix (Vedic Ashram System)</h2>
+        <p style="margin-bottom: 15px;">Correctly pair the four prominent stages of human life (Ashramas) during the Later Vedic period:</p>
+        <div class="matrix-grid">
+            <div class="interactive-node" id="ashramL1" onclick="selectAshram('L', 'ashramL1', 'brahma')">Brahmacharyashrama</div>
+            <div class="interactive-node" id="ashramR1" onclick="selectAshram('R', 'ashramR1', 'brahma')">The stage of acquiring education in a Gurukula</div>
+            <div class="interactive-node" id="ashramL2" onclick="selectAshram('L', 'ashramL2', 'griha')">Grihasthashrama</div>
+            <div class="interactive-node" id="ashramR2" onclick="selectAshram('R', 'ashramR2', 'griha')">The stage of marriage and leading family life</div>
+        </div>
+        <button class="royal-btn" onclick="verifyStage7()">Crack Final Matrix</button>
+        <div class="alert-matrix-box" id="alert7"></div>
+    </div>
+
+    <script>
+        let vedicXP = 0;
+        function updateXPCoins(amount) {
+            vedicXP += amount;
+            document.getElementById("liveGoldScore").innerText = `Vedic XP Earned: ${vedicXP} XP`;
+        }
+
+        function loadStage(stageIdx) {
+            document.querySelectorAll('.kingdom-stage').forEach(el => el.classList.remove('active-stage'));
+            document.querySelectorAll('.step-badge').forEach(el => el.classList.remove('active-mission'));
+            
+            document.getElementById('stage' + stageIdx).classList.add('active-stage');
+            document.getElementById('badge' + stageIdx).classList.add('active-mission');
+        }
+
+        // Mission 1 Logic
+        let firstNode = null; let secondNode = null;
+        function linkNodes(side, id, matchVal) {
+            if(side === 'left') {
+                if(firstNode) document.getElementById(firstNode.id).classList.remove('clicked-node');
+                firstNode = { id: id, match: matchVal };
+                document.getElementById(id).classList.add('clicked-node');
+            } else {
+                if(secondNode) document.getElementById(secondNode.id).classList.remove('clicked-node');
+                secondNode = { id: id, match: matchVal };
+                document.getElementById(id).classList.add('clicked-node');
+            }
+
+            if(firstNode && secondNode) {
+                if(firstNode.match === secondNode.match) {
+                    document.getElementById(firstNode.id).style.background = "var(--glow-green)";
+                    document.getElementById(secondNode.id).style.background = "var(--glow-green)";
+                    updateXPCoins(50);
+                    showStageAlert(1, "Correct matching! The Vedas are successfully linked.", true);
+                    document.getElementById('badge1').classList.add('unlocked');
+                } else {
+                    showStageAlert(1, "Incorrect match, please think again.", false);
+                }
+                firstNode = null; secondNode = null;
+            }
+        }
+
+        // Mission 2 Logic
+        let minedOreMap = {};
+        function mineOre(id, isTrueVal) {
+            let node = document.getElementById(id);
+            if(node.classList.contains('mined-active')) {
+                node.classList.remove('mined-active');
+                delete minedOreMap[id];
+            } else {
+                node.classList.add('mined-active');
+                minedOreMap[id] = isTrueVal;
+            }
+        }
+        function verifyStage2() {
+            let perfect = true; let count = 0;
+            for(let id in minedOreMap) {
+                if(minedOreMap[id] === false) perfect = false;
+                count++;
+            }
+            if(count !== 2) perfect = false;
+
+            if(perfect) {
+                updateXPCoins(100);
+                document.getElementById('badge2').classList.add('unlocked');
+                showStageAlert(2, "Superb! Sabha and Samiti are indeed the correct political institutions.", true);
+            } else {
+                showStageAlert(2, "Incorrect selection! Choose only the two political institutions (Sabha, Samiti).", false);
+            }
+        }
+
+        // Mission 3: 10 Battle Quiz Data & Logic
+        const sanatanaQuiz = [
+            { q: "1. The word 'Veda' originates from the root word 'Vid'. What does it mean?", o: ["Chanting", "Knowledge", "Rules"], c: 1 },
+            { q: "2. Into how many prominent parts is the timeline of Vedic culture divided?", o: ["Two (Early Vedic and Later Vedic)", "Four", "Three"], c: 0 },
+            { q: "3. Which is the only text available to understand the history of the Early Vedic period?", o: ["Yajurveda", "Atharvaveda", "Rigveda"], c: 2 },
+            { q: "4. What was the king, who acted as the head of a clan or tribe during the Rigvedic period, called?", o: ["Rajan / Gopati", "Gramini", "Kulapati"], c: 0 },
+            { q: "5. Which river held the highest and most sacred status during the Vedic period?", o: ["Ganga River", "Yamuna River", "Saraswati River"], c: 2 },
+            { q: "6. Which social class predominantly performed rituals and sacrifices during the Later Vedic period?", o: ["Kshatriyas", "Brahmins", "Vaishyas"], c: 1 },
+            { q: "7. Which fourth Veda contains topics on sorcery, spells, and charms for curing diseases?", o: ["Samaveda", "Atharvaveda", "Yajurveda"], c: 1 },
+            { q: "8. What was the head of a family called during the Early Vedic period?", o: ["Kulapati / Grihapati", "Rajan", "Gramini"], c: 0 },
+            { q: "9. What was the officer responsible for collecting taxes called during the Later Vedic period?", o: ["Bhagadugha", "Sangrahita", "Gopati"], c: 0 },
+            { q: "10. Which Veda describes the rules, rituals, and procedures for performing sacrifices?", o: ["Rigveda", "Yajurveda", "Samaveda"], c: 1 }
+        ];
+
+        let quizIndex = 0; let quizScore = 0; let activeBattle = true;
+        function loadVedicQuestion() {
+            activeBattle = true;
+            document.getElementById("nextBattleBtn").style.display = "none";
+            document.getElementById("alert3").style.display = "none";
+            let data = sanatanaQuiz[quizIndex];
+            document.getElementById("battleProgressTxt").innerText = `Question Code: ${quizIndex + 1} / 10`;
+            document.getElementById("battleQuestionText").innerText = data.q;
+            
+            let container = document.getElementById("battleOptionsContainer");
+            container.innerHTML = "";
+            data.o.forEach((opt, idx) => {
+                let btn = document.createElement("div");
+                btn.classList.add("battle-choice-btn");
+                btn.innerText = opt;
+                btn.onclick = function() {
+                    if(!activeBattle) return;
+                    activeBattle = false;
+                    if(idx === data.c) {
+                        this.classList.add("win-glow");
+                        quizScore++; updateXPCoins(20);
+                        showStageAlert(3, "Correct answer! Fantastic knowledge.", true);
+                    } else {
+                        this.classList.add("lose-glow");
+                        container.children[data.c].classList.add("win-glow");
+                        showStageAlert(3, "Wrong answer!", false);
+                    }
+                    document.getElementById("nextBattleBtn").style.display = "inline-block";
+                };
+                container.appendChild(btn);
+            });
+        }
+        function nextVedicQuestion() {
+            quizIndex++;
+            if(quizIndex < sanatanaQuiz.length) {
+                loadVedicQuestion();
+            } else {
+                document.getElementById("battleProgressTxt").innerText = "Mission Accomplished!";
+                document.getElementById("battleQuestionText").innerText = `Total Score: ${quizScore} / 10`;
+                document.getElementById("battleOptionsContainer").innerHTML = "";
+                document.getElementById("nextBattleBtn").style.display = "none";
+                document.getElementById('badge3').classList.add('unlocked');
+                showStageAlert(3, "Vedic history quiz successfully completed!", true);
+            }
+        }
+        loadVedicQuestion();
+
+        // Mission 4 Logic
+        function verifyStage4() {
+            let t1 = document.getElementById("term1").value.trim().toLowerCase();
+            let t2 = document.getElementById("term2").value.trim().toLowerCase();
+            let t3 = document.getElementById("term3").value.trim().toLowerCase();
+
+            if((t1 === "cow" || t1 === "cattle") && (t2 === "gopati" || t2 === "rajan") && (t3 === "family" || t3 === "kula" || t3 === "household")) {
+                updateXPCoins(100);
+                document.getElementById('badge4').classList.add('unlocked');
+                showStageAlert(4, "Code cracked! All terms are one hundred percent correct.", true);
+            } else {
+                showStageAlert(4, "Some answers are incorrect. Hints: Cow/Cattle, Gopati, Family.", false);
+            }
+        }
+
+        // Mission 5 Logic
+        function verifyStage5() {
+            let s1 = document.getElementById("script1").value.trim().toLowerCase();
+            let s2 = document.getElementById("script2").value.trim().toLowerCase();
+            let s3 = document.getElementById("script3").value.trim().toLowerCase();
+
+            if((s1 === "upanishads" || s1 === "upanishad") && s2 === "sanskrit" && (s3 === "tenth" || s3 === "10th" || s3 === "10")) {
+                updateXPCoins(100);
+                document.getElementById('badge5').classList.add('unlocked');
+                showStageAlert(5, "Literature database matches perfectly! Great job.", true);
+            } else {
+                showStageAlert(5, "Please check the spelling (Hints: Upanishads, Sanskrit, Tenth Mandala).", false);
+            }
+        }
+
+        // Mission 6 Logic
+        function allowVesselDrop(ev) { ev.preventDefault(); }
+        function startVesselDrag(ev) { ev.dataTransfer.setData("text", ev.target.id); }
+        function handleVesselDrop(ev, type) {
+            ev.preventDefault();
+            let id = ev.dataTransfer.getData("text");
+            let node = document.getElementById(id);
+            node.dataset.type = type;
+            ev.target.appendChild(node);
+        }
+        function verifyStage6() {
+            let y1 = document.getElementById("yaga1").dataset.type;
+            let y2 = document.getElementById("yaga2").dataset.type;
+
+            if(y1 === "horse" && y2 === "king") {
+                updateXPCoins(150);
+                document.getElementById('badge6').classList.add('unlocked');
+                showStageAlert(6, "The classification of Yagas is completely correct!", true);
+            } else {
+                showStageAlert(6, "Incorrect classification! Ashvamedha relates to letting a horse loose, Rajasuya relates to coronation.", false);
+            }
+        }
+
+        // Mission 7 Logic
+        let ashramL = null; let ashramR = null;
+        function selectAshram(side, id, key) {
+            if(side === 'L') {
+                ashramL = { id: id, key: key };
+                document.getElementById("ashramL1").classList.remove('clicked-node');
+                document.getElementById("ashramL2").classList.remove('clicked-node');
+            } else {
+                ashramR = { id: id, key: key };
+                document.getElementById("ashramR1").classList.remove('clicked-node');
+                document.getElementById("ashramR2").classList.remove('clicked-node');
+            }
+            document.getElementById(id).classList.add('clicked-node');
+        }
+        function verifyStage7() {
+            if(ashramL && ashramR && ashramL.key === ashramR.key) {
+                updateXPCoins(200);
+                document.getElementById('badge7').classList.add('unlocked');
+                showStageAlert(7, "Wonderful! The students have successfully conquered the entire Vedic Culture game!", true);
+            } else {
+                showStageAlert(7, "Ashram connection failed. Please recheck the stages of life.", false);
+            }
+        }
+
+        function showStageAlert(stageNum, text, isSuccess) {
+            let box = document.getElementById("alert" + stageNum);
+            box.style.display = "block";
+            box.innerText = text;
+            box.style.background = isSuccess ? "rgba(46, 204, 113, 0.15)" : "rgba(231, 76, 60, 0.1)";
+            box.style.color = isSuccess ? "var(--glow-green)" : "var(--fire-red)";
+            box.style.border = isSuccess ? "1px solid var(--glow-green)" : "1px solid var(--fire-red)";
+        }
+    </script>
+</body>
+</html>

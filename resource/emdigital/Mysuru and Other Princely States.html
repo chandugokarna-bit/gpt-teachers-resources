@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mysuru and Other Princely States - Interactive Flip Book</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #4a0e17, #701c28, #b03a48);
+            --book-bg: #fffdf6;
+            --primary-color: #610c17; /* Royal Silk Red Maroon */
+            --secondary-color: #0b5345; /* Emerald Diwan Green */
+            --accent-color: #d4af37; /* Palace Gold */
+            --text-color: #2c3e50;
+            --success: #196f3d;
+            --error: #922b21;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--bg-gradient);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-color);
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 20px;
+            text-shadow: 0 3px 6px rgba(0,0,0,0.4);
+        }
+        .header h1 { font-size: 2.2rem; }
+        .header p { font-size: 1.1rem; color: #f9ebea; margin-top: 5px; }
+
+        /* Modern Flip Book Container Layout */
+        .book-container {
+            width: 100%;
+            max-width: 1020px;
+            background: var(--book-bg);
+            border-radius: 24px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.5), inset -15px 0 30px rgba(0,0,0,0.05);
+            border-left: 22px solid var(--primary-color);
+            min-height: 690px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+            border-right: 6px solid var(--accent-color);
+        }
+
+        /* Top Progress Indicator */
+        .progress-container { width: 100%; height: 6px; background: #eaedd0; }
+        .progress-bar { height: 100%; width: 11.11%; background: var(--accent-color); transition: width 0.4s ease; }
+
+        /* Page Flip Effect System */
+        .page { padding: 45px; flex: 1; display: none; animation: flipAnimation 0.5s ease-in-out; }
+        .page.active { display: block; }
+        @keyframes flipAnimation {
+            from { opacity: 0; transform: rotateY(-15deg) translateX(30px); }
+            to { opacity: 1; transform: rotateY(0deg) translateX(0); }
+        }
+
+        .page-title {
+            font-size: 1.55rem;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px dashed var(--accent-color);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+        }
+
+        .instruction { font-size: 1.05rem; margin-bottom: 20px; color: #555; font-style: italic; }
+
+        /* Navigation Buttons */
+        .book-controls {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px 45px;
+            background: #fdf5e2;
+            border-top: 1px solid #eedec4;
+        }
+        .btn {
+            padding: 12px 28px;
+            border: none;
+            border-radius: 40px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: bold;
+        }
+        .btn-prev { background: #d0c4af; color: #333; }
+        .btn-next { background: var(--primary-color); color: white; }
+        .btn:hover:not(:disabled) { transform: translateY(-3px); box-shadow: 0 6px 15px rgba(0,0,0,0.15); }
+        .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+        .feedback { margin-top: 15px; padding: 15px; border-radius: 8px; font-weight: bold; display: none; }
+
+        /* Act 1: MCQ */
+        .quiz-box { display: flex; flex-direction: column; gap: 12px; }
+        .opt-btn { padding: 14px 20px; background: white; border: 2px solid #e2e8f0; border-radius: 10px; cursor: pointer; text-align: left; font-size: 1.05rem; transition: 0.2s; }
+        .opt-btn:hover { background: #f8f9fa; border-color: var(--primary-color); }
+        .opt-btn.correct { background: #c8e6c9; border-color: var(--success); color: #1b5e20; font-weight: bold; }
+        .opt-btn.wrong { background: #ffcdd2; border-color: var(--error); color: #b71c1c; }
+
+        /* Act 2: Accordion Answers Box */
+        .accordion-container { display: flex; flex-direction: column; gap: 12px; }
+        .acc-item { border: 1px solid #eedec4; border-radius: 10px; overflow: hidden; background: white; }
+        .acc-header { background: #fffdf9; padding: 15px; font-weight: bold; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-size: 1.05rem; }
+        .acc-header:hover { background: #fdf5e2; }
+        .acc-body { background: #faf8f2; padding: 15px; display: none; border-top: 1px solid #eee; line-height: 1.7; color: var(--primary-color); font-weight: bold; }
+
+        /* Act 3: Drag & Drop Matching */
+        .matching-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .match-left, .match-right { display: flex; flex-direction: column; gap: 12px; }
+        .match-card { padding: 12px 18px; background: white; border: 2px solid #eedec4; border-radius: 10px; cursor: pointer; transition: 0.2s; font-weight: 600; }
+        .match-card.selected { background: #f5ebd6; border-color: var(--accent-color); }
+        .match-card.correct { background: #c8e6c9; border-color: var(--success); color: #1b5e20; cursor: default; }
+
+        /* Act 4 & 5: Photo Gallery & Video Avatars Framework */
+        .avatar-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+        .avatar-card { background: white; border: 2px solid #eedec4; border-radius: 15px; padding: 15px; text-align: center; box-shadow: 0 4px 8px rgba(0,0,0,0.02); cursor: pointer; transition: 0.3s; }
+        .avatar-card:hover { transform: translateY(-5px); border-color: var(--primary-color); }
+        .avatar-img-placeholder { width: 100px; height: 100px; background: #e2e8f0; border-radius: 50%; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; color: #718096; font-size: 2.2rem; overflow: hidden; border: 3px solid var(--accent-color); }
+        .avatar-img-placeholder img { width: 100%; height: 100%; object-fit: cover; }
+        .avatar-card h4 { font-size: 1.15rem; color: var(--primary-color); margin-bottom: 5px; }
+        .avatar-card p { font-size: 0.9rem; color: #718096; }
+        .video-box { width: 100%; height: 150px; background: #000; border-radius: 10px; margin-top: 10px; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.9rem; }
+
+        /* Act 6: Innovative Blanks Dropdown */
+        .text-passage { background: #fffdf9; border: 2px solid #eedec4; padding: 25px; border-radius: 15px; font-size: 1.2rem; line-height: 2.3; }
+        .blank-select { padding: 4px 8px; border: 2px solid var(--primary-color); border-radius: 6px; font-size: 1.05rem; font-weight: bold; color: var(--primary-color); background: white; cursor: pointer; }
+
+        /* Act 7: Chronology Steps */
+        .v-timeline { display: flex; flex-direction: column; gap: 12px; }
+        .t-row { display: flex; align-items: center; gap: 15px; background: white; padding: 12px; border-radius: 10px; border: 2px dashed #eedec4; }
+        .t-index { width: 35px; height: 35px; background: var(--primary-color); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+        .t-zone { flex: 1; min-height: 45px; background: #fffdf9; border-radius: 6px; display: flex; align-items: center; padding-left: 15px; }
+        .item-bank { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; background: #f3ebd6; padding: 15px; border-radius: 12px; }
+        .drag-chip { padding: 8px 15px; background: white; border: 1px solid #cdc0a8; border-radius: 25px; cursor: grab; font-size: 0.95rem; font-weight: bold; box-shadow: 0 3px 6px rgba(0,0,0,0.05); }
+
+        /* Act 8: Palace Treasure Grid */
+        .grid-fleet { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
+        .fleet-card { background: white; border: 2px solid #eedec4; padding: 20px; text-align: center; border-radius: 15px; cursor: pointer; transition: 0.3s; }
+        .fleet-card:hover { transform: scale(1.04); background: #fffdf9; }
+        .fleet-card i { font-size: 2.3rem; color: var(--secondary-color); margin-bottom: 10px; }
+
+        /* Act 9: Diwan Strategy Scenario Matrix */
+        .battle-zone { background: #f9f5eb; border: 1px dashed #d4af37; padding: 25px; border-radius: 12px; text-align: center; font-size: 1.15rem; margin-bottom: 20px; line-height: 1.7; font-weight: 500; }
+        .strategy-btn { width: 100%; text-align: left; padding: 15px; background: white; border: 2px solid #e2d3b5; margin-top: 10px; border-radius: 10px; cursor: pointer; font-size: 1.05rem; transition: 0.2s; }
+        .strategy-btn:hover { background: #fffdf9; border-color: var(--primary-color); }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>Mysuru and Other Princely States</h1>
+        <p>Innovative Interactive Digital Flip Book</p>
+    </div>
+
+    <div class="book-container">
+        <div class="progress-container">
+            <div class="progress-bar" id="progBar"></div>
+        </div>
+
+        <div class="page active" id="page1">
+            <div class="page-title"><i class="fa-solid fa-square-poll-horizontal"></i> Activity 1: Single Sentence Multiple-Choice Series</div>
+            <p class="instruction">Select the correct answer for the questions related to the history and achievements of Mysuru and major princely states of Karnataka:</p>
+            <p id="q-text" style="font-size:1.25rem; margin-bottom:18px; font-weight:bold; color:var(--primary-color);"></p>
+            <div class="quiz-box" id="q-options"></div>
+            <div style="font-weight: bold; margin-top: 20px; text-align: right; color: #666;" id="q-indicator">Question: 1/6</div>
+            <div class="feedback" id="fb1"></div>
+        </div>
+
+        <div class="page" id="page2">
+            <div class="page-title"><i class="fa-solid fa-folder-open"></i> Activity 2: Critical Group Discussion Questions (Click Box Activity)</div>
+            <p class="instruction">Click on the prominent historical questions below to unfold and analyze their official answer boxes:</p>
+            
+            <div class="accordion-container">
+                <div class="acc-item">
+                    <div class="acc-header" onclick="toggleAcc(this)">1. Why is the establishment of the 'Representative Assembly' a milestone in the history of Mysuru? <i class="fa-solid fa-plus"></i></div>
+                    <div class="acc-body">Established in 1881 during the period of Diwan Rangacharlu, the Representative Assembly was the first of its kind among India's princely states to grant citizens a voice in administration, serving as an early harbinger of democracy.</div>
+                </div>
+                <div class="acc-item">
+                    <div class="acc-header" onclick="toggleAcc(this)">2. What is the significance of Sir M. Visvesvaraya's slogan 'Industrialize or Perish'? <i class="fa-solid fa-plus"></i></div>
+                    <div class="acc-body">Realizing that Mysuru could not grow economically if it relied solely on agriculture, Visvesvaraya established the Bhadravati Iron Works, Mysore Sandal Soap Factory, and the State Bank of Mysore, turning Mysuru into an industrial hub.</div>
+                </div>
+                <div class="acc-item">
+                    <div class="acc-header" onclick="toggleAcc(this)">3. Why did Gandhiji call Nalwadi Krishnaraja Wadiyar a 'Rajarshi' (Royal Saint)? <i class="fa-solid fa-plus"></i></div>
+                    <div class="acc-body">Nalwadi Krishnaraja Wadiyar implemented reservations for backward classes (Miller Committee Report), introduced compulsory free primary education, abolished the Devadasi system, and granted voting rights to women, leading Gandhiji to praise Mysuru as a model state.</div>
+                </div>
+                <div class="acc-item">
+                    <div class="acc-header" onclick="toggleAcc(this)">4. What were the contributions of Diwan Sir K. Seshadri Iyer to the modern development of Mysuru? <i class="fa-solid fa-plus"></i></div>
+                    <div class="acc-body">He initiated Asia's first hydroelectric power project at Shivanasamudra across the Kaveri river (1902), supplied power to the Kolar Gold Fields (KGF), and planned the residential extensions of Chamarajapet and Malleshwaram in Bengaluru.</div>
+                </div>
+                <div class="acc-item">
+                    <div class="acc-header" onclick="toggleAcc(this)">5. How did the valor of Madakari Nayaka and Obavva become immortal among the Palegars of Chitradurga? <i class="fa-solid fa-plus"></i></div>
+                    <div class="acc-body">When Hyder Ali besieged the Chitradurga Fort, the brave ruler Madakari Nayaka fought with immense courage. Simultaneously, a courageous common woman named Obavva used a wooden pestle (Onake) to slay enemy soldiers entering through a secret crevice before achieving martyrdom.</div>
+                </div>
+                <div class="acc-item">
+                    <div class="acc-header" onclick="toggleAcc(this)">6. How did aesthetics and industry grow together during the era of Diwan Mirza Ismail? <i class="fa-solid fa-plus"></i></div>
+                    <div class="acc-body">Mirza Ismail constructed the world-famous Brindavan Gardens near the KRS Dam, transforming Mysuru into a garden city. He also vastly expanded Khadi village industries and sugar factories.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="page" id="page3">
+            <div class="page-title"><i class="fa-solid fa-arrows-turn-to-dots"></i> Activity 3: Convergence of Diwans and Historical Contributions</div>
+            <p class="instruction">Click on a prominent Diwan or leader's name on the left, then connect it to their corresponding achievement on the right:</p>
+            
+            <div class="matching-grid">
+                <div class="match-left" id="leftContainer">
+                    <div class="match-card" data-id="1">C. Rangacharlu</div>
+                    <div class="match-card" data-id="2">K. Seshadri Iyer</div>
+                    <div class="match-card" data-id="3">Sir M. Visvesvaraya</div>
+                    <div class="match-card" data-id="4">Sir Mirza Ismail</div>
+                    <div class="match-card" data-id="5">Kempegowda</div>
+                    <div class="match-card" data-id="6">Chikkadevaraja Wadiyar</div>
+                </div>
+                <div class="match-right" id="rightContainer">
+                    <div class="match-card" data-match="2">Shivanasamudra Hydroelectric Project and power connectivity to KGF</div>
+                    <div class="match-card" data-match="1">The first Diwan who established the Mysuru Representative Assembly in 1881</div>
+                    <div class="match-card" data-match="3">Chief Engineer of the Krishna Raja Sagara (KRS) Dam and founder of Kannada Sahitya Parishat</div>
+                    <div class="match-card" data-match="4">Construction of Brindavan Gardens and laying the foundation for Hindustan Aeronautics (HAL)</div>
+                    <div class="match-card" data-match="6">The Mysuru ruler who earned the title 'Navakoti Narayana' and introduced the postal system</div>
+                    <div class="match-card" data-match="5">The famous Magadi Palegar chieftain who founded the city of Bengaluru</div>
+                </div>
+            </div>
+            <div class="feedback" id="fb3"></div>
+        </div>
+
+        <div class="page" id="page4">
+            <div class="page-title"><i class="fa-solid fa-image"></i> Activity 4: Digital Portrait Research of the Architects of Mysuru</div>
+            <p class="instruction">Click on the card of a prominent leader below to read about their historical role (Google Drive image paths can be linked here):</p>
+            
+            <div class="avatar-grid">
+                <div class="avatar-card" onclick="showAvatarInfo('Nalwadi Krishnaraja Wadiyar', 'The benevolent Royal Saint who transformed Mysuru into a \'Model State\' through extensive social reforms.')">
+                    <div class="avatar-img-placeholder"><i class="fa-solid fa-crown"></i></div>
+                    <h4>Nalwadi Krishnaraja Wadiyar</h4><p>[Google Drive Image Template]</p>
+                </div>
+                <div class="avatar-card" onclick="showAvatarInfo('Sir M. Visvesvaraya', 'The legendary engineer-Diwan and Bharat Ratna recipient who is celebrated as the visionary architect of modern Mysuru.')">
+                    <div class="avatar-img-placeholder"><i class="fa-solid fa-user-tie"></i></div>
+                    <h4>Sir M. Visvesvaraya</h4><p>[Google Drive Image Template]</p>
+                </div>
+                <div class="avatar-card" onclick="showAvatarInfo('Sir Mirza Ismail', 'The astute statesman-Diwan who turned Mysuru into a city of beautiful gardens and a hub for cottage industries.')">
+                    <div class="avatar-img-placeholder"><i class="fa-solid fa-user-tie"></i></div>
+                    <h4>Sir Mirza Ismail</h4><p>[Google Drive Image Template]</p>
+                </div>
+                <div class="avatar-card" onclick="showAvatarInfo('Chitradurga\'s Obavva', 'The legendary heroine of Chitradurga who single-handedly neutralized Hyder Ali\'s invading soldiers using a pestle.')">
+                    <div class="avatar-img-placeholder"><i class="fa-solid fa-user-ninja"></i></div>
+                    <h4>Heroic Figure Obavva</h4><p>[Google Drive Image Template]</p>
+                </div>
+                <div class="avatar-card" onclick="showAvatarInfo('Chikkadevaraja Wadiyar', 'Maintained excellent diplomatic relations with Aurangzeb and replenished the state treasury, earning the moniker Navakoti Narayana.')">
+                    <div class="avatar-img-placeholder"><i class="fa-solid fa-crown"></i></div>
+                    <h4>Chikkadevaraja Wadiyar</h4><p>[Google Drive Image Template]</p>
+                </div>
+                <div class="avatar-card" onclick="showAvatarInfo('Diwan Rangacharlu', 'The progressive Diwan who established the Representative Assembly immediately after the rendition of power to the Wadiyars.')">
+                    <div class="avatar-img-placeholder"><i class="fa-solid fa-user-tie"></i></div>
+                    <h4>Diwan Rangacharlu</h4><p>[Google Drive Image Template]</p>
+                </div>
+            </div>
+            <div class="feedback" id="fb4" style="background:#fff3cd; color:#856404; border:1px solid #ffeeba;"></div>
+        </div>
+
+        <div class="page" id="page5">
+            <div class="page-title"><i class="fa-solid fa-video"></i> Activity 5: Speaking Pages of History (Video Upload Template)</div>
+            <p class="instruction">Click on the characters below to view animated representations of their historical stances (Local video URLs can be attached here):</p>
+            
+            <div class="avatar-grid">
+                <div class="avatar-card" onclick="playVideoAvatar('Message from Visvesvaraya', 'Industrialize or Perish! Knowledge cannot be gained without rigorous hard work. Mysuru is my pride!')">
+                    <div class="avatar-img-placeholder"><i class="fa-solid fa-circle-play" style="color:var(--accent-color);"></i></div>
+                    <h4>Visvesvaraya Talks</h4><div class="video-box">[Video Player Template]</div>
+                </div>
+                <div class="avatar-card" onclick="playVideoAvatar('Mission of Nalwadi Krishnaraja Wadiyar', 'Every single child in my kingdom must receive free education. I have introduced institutionalized representation without caste barriers.')">
+                    <div class="avatar-img-placeholder"><i class="fa-solid fa-circle-play" style="color:var(--accent-color);"></i></div>
+                    <h4>Rajarshi Nalwadi Monologue</h4><div class="video-box">[Video Player Template]</div>
+                </div>
+                <div class="avatar-card" onclick="playVideoAvatar('Heroic Proclamation of Obavva', 'Enemies are breaching through the secret opening of the fort wall! Do not underestimate a woman; this pestle shall deal their doom!')">
+                    <div class="avatar-img-placeholder"><i class="fa-solid fa-circle-play" style="color:var(--accent-color);"></i></div>
+                    <h4>Obavva\'s Battle Cry</h4><div class="video-box">[Video Player Template]</div>
+                </div>
+            </div>
+            <div class="feedback" id="fb5" style="background:#e0f2f1; color:#004d40;"></div>
+        </div>
+
+        <div class="page" id="page6">
+            <div class="page-title"><i class="fa-solid fa-feather-pointed"></i> Activity 6: Analyzing the Industrial Revolution of the Model State of Mysuru</div>
+            <p class="instruction">Complete the descriptive paragraph on the structural reforms of Mysuru by selecting the accurate terminology:</p>
+            
+            <div class="text-passage">
+                The famous Maharaja responsible for constructing the Krishna Raja Sagara (KRS) Dam for the state of Mysuru was 
+                <select class="blank-select" id="b1" data-ans="Nalwadi Krishnaraja Wadiyar"><option value="">--Select--</option><option>Chamaraja Wadiyar</option><option>Nalwadi Krishnaraja Wadiyar</option><option>Jayachamaraja Wadiyar</option></select>. 
+                For advancing higher education, Sir M. Visvesvaraya established the historic 
+                <select class="blank-select" id="b2" data-ans="University of Mysore"><option value="">--Select--</option><option>Bangalore University</option><option>University of Mysore</option><option>Karnataka University</option></select> 
+                in 1916 CE. To ensure employment equity for backward classes in Mysuru, the committee appointed was the 
+                <select class="blank-select" id="b3" data-ans="Miller Committee"><option value="">--Select--</option><option>Hunter Commission</option><option>Miller Committee</option><option>Macaulay Committee</option></select>. 
+                Hydroelectric power generation commenced for the first time in all of Asia at Shivanasamudra in the year 
+                <select class="blank-select" id="b4" data-ans="1902"><option value="">--Select--</option><option>1881</option><option>1902</option><option>1947</option></select>. 
+                Sir Mirza Ismail founded the famous 
+                <select class="blank-select" id="b5" data-ans="Paper Mills"><option value="">--Select--</option><option>Paper Mills</option><option>Gold Mines</option><option>Sandalwood Oil Factory</option></select> 
+                at Bhadravati in Shivamogga district. Lastly, the institution set up in Bengaluru under the inspiration of Visvesvaraya for fostering the Kannada language was the 
+                <select class="blank-select" id="b6" data-ans="Kannada Sahitya Parishat"><option value="">--Select--</option><option>Kannada Sahitya Parishat</option><option>Kannada Sahitya Academy</option><option>Kannada University</option></select>.
+            </div>
+            <button class="btn" style="background:var(--accent-color); color:white; margin-top:20px;" onclick="checkBlanks()">Confirm Historical Text</button>
+            <div class="feedback" id="fb6"></div>
+        </div>
+
+        <div class="page" id="page7">
+            <div class="page-title"><i class="fa-solid fa-arrow-down-1-9"></i> Activity 7: Chronological Milestone Sequence of Mysuru's Progress</div>
+            <p class="instruction">Arrange the vital milestones of the Princely State of Mysuru chronologically, from the earliest to the most recent event:</p>
+            
+            <div class="v-timeline">
+                <div class="t-row"><div class="t-index">1</div><div class="t-zone" id="z1" data-order="Establishment of the Mysuru Representative Assembly by Diwan Rangacharlu"></div></div>
+                <div class="t-row"><div class="t-index">2</div><div class="t-zone" id="z2" data-order="Commencement of power generation through the Shivanasamudra Hydroelectric Project"></div></div>
+                <div class="t-row"><div class="t-index">3</div><div class="t-zone" id="z3" data-order="Assumption of administrative reigns of Mysuru by Nalwadi Krishnaraja Wadiyar"></div></div>
+                <div class="t-row"><div class="t-index">4</div><div class="t-zone" id="z4" data-order="Establishment of the University of Mysore initiated by Sir M. Visvesvaraya"></div></div>
+                <div class="t-row"><div class="t-index">5</div><div class="t-zone" id="z5" data-order="Submission of the famous Miller Report for the employment reservation of backward classes"></div></div>
+                <div class="t-row"><div class="t-index">6</div><div class="t-zone" id="z6" data-order="Expansion of industrial production units in Bengaluru by Sir Mirza Ismail"></div></div>
+            </div>
+
+            <div class="item-bank" id="dragBank7">
+                <div class="drag-chip" draggable="true" id="t1">Assumption of administrative reigns of Mysuru by Nalwadi Krishnaraja Wadiyar</div>
+                <div class="drag-chip" draggable="true" id="t2">Establishment of the Mysuru Representative Assembly by Diwan Rangacharlu</div>
+                <div class="drag-chip" draggable="true" id="t3">Establishment of the University of Mysore initiated by Sir M. Visvesvaraya</div>
+                <div class="drag-chip" draggable="true" id="t4">Commencement of power generation through the Shivanasamudra Hydroelectric Project</div>
+                <div class="drag-chip" draggable="true" id="t5">Expansion of industrial production units in Bengaluru by Sir Mirza Ismail</div>
+                <div class="drag-chip" draggable="true" id="t6">Submission of the famous Miller Report for the employment reservation of backward classes</div>
+            </div>
+            <button class="btn" style="background:var(--accent-color); color:white; margin-top:15px;" onclick="checkTimeline()">Verify Chronology</button>
+            <div class="feedback" id="fb7"></div>
+        </div>
+
+        <div class="page" id="page8">
+            <div class="page-title"><i class="fa-solid fa-gopuram"></i> Activity 8: Treasure Hunt of Cultural and Economic Specialities of Mysuru</div>
+            <p class="instruction">Open only the vaults containing authentic cultural, artistic, and economic initiatives established during the reign of the Wadiyars and Diwans of Mysuru (Total 4 correct treasures):</p>
+            
+            <div class="grid-fleet">
+                <div class="fleet-card" data-correct="yes" data-info="The iconic 'Mysuru Style of Painting' flourished under the direct patronage of the art-loving Maharajas in the Palace."><i class="fa-solid fa-palette"></i><h5>Mysuru Traditional Painting</h5></div>
+                <div class="fleet-card" data-correct="no" data-info="Incorrect. The Ajanta caves are located in Maharashtra and have no relation to the Princely State of Mysuru."><i class="fa-solid fa-mountain"></i><h5>Ajanta Cave Art</h5></div>
+                <div class="fleet-card" data-correct="yes" data-info="Visvesvaraya founded the State Bank of Mysore (SBM) in 1913 to provide credit infrastructure to trade sectors."><i class="fa-solid fa-building-columns"></i><h5>State Bank of Mysore</h5></div>
+                <div class="fleet-card" data-correct="yes" data-info="Carnatic classical music reached supreme heights in the royal court under legendary maestros like Veene Sheshanna."><i class="fa-solid fa-music"></i><h5>Carnatic Classical Music</h5></div>
+                <div class="fleet-card" data-correct="no" data-info="No, Gol Gumbaz is an architectural marvel of the Adil Shahis of Vijayapura."><i class="fa-solid fa-monument"></i><h5>Gol Gumbaz Architecture</h5></div>
+                <div class="fleet-card" data-correct="yes" data-info="The commissioning of the Sandalwood Oil Factory and the legendary Mysore Sandal Soap industries spread the fame of Mysuru worldwide."><i class="fa-solid fa-soap"></i><h5>Mysuru Sandalwood Industry</h5></div>
+            </div>
+            <div class="feedback" id="fb8" style="background:#fff3cd; color:#856404;"></div>
+        </div>
+
+        <div class="page" id="page9">
+            <div class="page-title"><i class="fa-solid fa-chess-queen"></i> Activity 9: Diplomatic Decision-Making for Constructing Model Mysuru</div>
+            <p class="instruction">Analyze the challenging historical situation below and select what course of action you would pursue as a patriotic Diwan of Mysuru:</p>
+            
+            <div class="battle-zone">
+                "The British Raj is trying to tightly control the economic progress of Indian princely states. Mysuru has suffered a severe famine, leaving farmers distressed. However, to modernize the state, a massive dam across the Kaveri river (KRS) and robust hydroelectric projects are absolutely critical. What should be your priority in this hour of crisis?"
+            </div>
+
+            <button class="strategy-btn" onclick="makeDecision(false, 'This step stalls development. Simply balancing administrative accounts under external dictate does not build a progressive nation state.')">Option A: Yield to British warnings and refrain from launching any large-scale developmental infrastructure; manage only traditional state routines.</button>
+            <button class="strategy-btn" onclick="makeDecision(true, 'A stellar decision of unmatched visionary foresight! Diwans like Seshadri Iyer and M. Visvesvaraya took exactly this path. They maintained economic discipline, mobilized domestic resources against British bureaucratic resistance, executed the KRS Dam and Shivanasamudra projects, and successfully positioned Mysuru as the primer wealthy state in India.')">Option B: Cleverly navigate discriminatory British economic hurdles, pool state capital reserves, place equal weight on agricultural and industrial sectors, and execute the KRS Dam alongside free public education models.</button>
+            <button class="strategy-btn" onclick="makeDecision(false, 'This amounts to surrendering the hard-earned administrative autonomy of the princely state entirely to British commissioners.')">Option C: Hand over the comprehensive administrative machinery of the kingdom directly to the British Resident Commissioner to avoid liability.</button>
+            
+            <div class="feedback" id="fb9"></div>
+        </div>
+
+        <div class="book-controls">
+            <button class="btn btn-prev" id="prevPageBtn" onclick="movePage(-1)" disabled><i class="fa-solid fa-book-open"></i> Previous Page</button>
+            <button class="btn btn-next" id="nextPageBtn" onclick="movePage(1)">Next Page <i class="fa-solid fa-book"></i></button>
+        </div>
+    </div>
+
+    <script>
+        let pageIdx = 1;
+        const maxPages = 9;
+
+        function movePage(dir) {
+            document.getElementById(`page${pageIdx}`).classList.remove('active');
+            pageIdx += dir;
+            document.getElementById(`page${pageIdx}`).classList.add('active');
+
+            document.getElementById('prevPageBtn').disabled = (pageIdx === 1);
+            document.getElementById('nextPageBtn').disabled = (pageIdx === maxPages);
+
+            document.getElementById('progBar').style.width = `${(pageIdx / maxPages) * 100}%`;
+        }
+
+        // --- Act 1: MCQ Database (6 items) ---
+        const mcqCollection = [
+            { q: "Who took charge as the first Diwan of Mysuru after administrative powers were rendered back to the Wadiyar dynasty by the British in 1881 CE?", opts: ["Sir M. Visvesvaraya", "C. Rangacharlu", "K. Seshadri Iyer", "Mirza Ismail"], ans: 1 },
+            { q: "In which year did the Shivanasamudra Hydroelectric Project across the Kaveri river—the first in Asia—commence operations?", opts: ["1881 CE", "1902 CE", "1913 CE", "1947 CE"], ans: 1 },
+            { q: "Who among the following served as the chief engineer and Diwan of the legendary Krishna Raja Sagara (KRS) Dam project?", opts: ["Diwan Purnaiah", "Sir Seshadri Iyer", "Sir M. Visvesvaraya", "Mirza Ismail"], ans: 2 },
+            { q: "Which Maharaja designed Mysuru into a 'Model State' through comprehensive educational, economic, and socio-political reforms?", opts: ["Chikkadevaraja Wadiyar", "Nalwadi Krishnaraja Wadiyar", "Chamaraja Wadiyar", "Yaduraya Wadiyar"], ans: 1 },
+            { q: "Who was the brave woman who neutralized Hyder Ali's forces with a pestle near the secret opening of the Chitradurga Fort?", opts: ["Kittur Chennamma", "Chitradurga's Obavva", "Keladi Chennamma", "Rani Abbakka"], ans: 1 },
+            { q: "Which Diwan was instrumental in establishing the world-famous Brindavan Gardens and the sugar factories in Mandya?", opts: ["Rangacharlu", "Sir Seshadri Iyer", "Sir Mirza Ismail", "Diwan Arcot Ramasamy"], ans: 2 }
+        ];
+
+        let currentQIdx = 0;
+        function loadMCQ() {
+            const data = mcqCollection[currentQIdx];
+            document.getElementById('q-text').innerText = `${currentQIdx + 1}. ${data.q}`;
+            const container = document.getElementById('q-options');
+            container.innerHTML = "";
+            document.getElementById('q-indicator').innerText = `Question: ${currentQIdx + 1}/${mcqCollection.length}`;
+
+            data.opts.forEach((opt, idx) => {
+                const b = document.createElement('button');
+                b.className = "opt-btn";
+                b.innerText = opt;
+                b.onclick = () => verifyMCQ(idx, data.ans, b);
+                container.appendChild(b);
+            });
+        }
+
+        function verifyMCQ(sel, right, element) {
+            const fb = document.getElementById('fb1'); fb.style.display = "block";
+            if(sel === right) {
+                element.classList.add('correct');
+                fb.innerHTML = "✓ Excellent! You possess precise knowledge regarding the history of Model Mysuru.";
+                fb.style.background = "#c8e6c9"; fb.style.color = "#1b5e20";
+                setTimeout(() => {
+                    if(currentQIdx < mcqCollection.length - 1) {
+                        currentQIdx++; loadMCQ(); fb.style.display = "none";
+                    } else { fb.innerHTML = "🎉 Congratulations! You have successfully completed all 6 multiple-choice questions."; }
+                }, 1500);
+            } else {
+                element.classList.add('wrong');
+                fb.innerHTML = "✗ Incorrect answer. Recall the correct statesman or leader.";
+                fb.style.background = "#ffcdd2"; fb.style.color = "#b71c1c";
+            }
+        }
+        loadMCQ();
+
+        // --- Act 2: Accordion Box Toggle ---
+        function toggleAcc(header) {
+            const body = header.nextElementSibling;
+            const icon = header.querySelector('i');
+            if(body.style.display === "block") {
+                body.style.display = "none";
+                icon.className = "fa-solid fa-plus";
+            } else {
+                body.style.display = "block";
+                icon.className = "fa-solid fa-minus";
+            }
+        }
+
+        // --- Act 3: Matching Logic ---
+        let selectedLeft = null;
+        const leftCards = document.querySelectorAll('#leftContainer .match-card');
+        const rightCards = document.querySelectorAll('#rightContainer .match-card');
+
+        leftCards.forEach(card => {
+            card.addEventListener('click', () => {
+                if(card.classList.contains('correct')) return;
+                leftCards.forEach(c => c.classList.remove('selected'));
+                card.classList.add('selected');
+                selectedLeft = card;
+            });
+        });
+
+        rightCards.forEach(card => {
+            card.addEventListener('click', () => {
+                if(card.classList.contains('correct') || !selectedLeft) return;
+                const matchId = card.getAttribute('data-match');
+                const leftId = selectedLeft.getAttribute('data-id');
+
+                if(matchId === leftId) {
+                    card.classList.add('correct');
+                    selectedLeft.classList.add('correct');
+                    selectedLeft.classList.remove('selected');
+                    selectedLeft = null;
+                    checkAct3Progress();
+                } else {
+                    const fb = document.getElementById('fb3');
+                    fb.style.display = "block"; fb.style.background = "#ffcdd2"; fb.style.color = "#b71c1c";
+                    fb.innerText = "✗ Incorrect pair! Match the correct historical contribution.";
+                }
+            });
+        });
+
+        function checkAct3Progress() {
+            const finished = document.querySelectorAll('#leftContainer .match-card.correct').length;
+            const fb = document.getElementById('fb3'); fb.style.display = "block";
+            if(finished === 6) {
+                fb.style.background = "#c8e6c9"; fb.style.color = "#1b5e20";
+                fb.innerText = "✓ Perfect! All 6 Diwans and princely contributions have been matched accurately.";
+            } else {
+                fb.style.background = "#fff3cd"; fb.style.color = "#856404";
+                fb.innerText = `Progress: ${finished}/6 pairs correct.`;
+            }
+        }
+
+        // --- Act 4: Photo Gallery Logic ---
+        function showAvatarInfo(name, text) {
+            const fb = document.getElementById('fb4'); fb.style.display = "block";
+            fb.innerHTML = `<strong><i class="fa-solid fa-circle-info"></i> ${name}:</strong> ${text}`;
+        }
+
+        // --- Act 5: Video Avatar Logic ---
+        function playVideoAvatar(title, dialog) {
+            const fb = document.getElementById('fb5'); fb.style.display = "block";
+            fb.innerHTML = `<strong><i class="fa-solid fa-clapperboard"></i> ${title}:</strong> "${dialog}" (Note: Local classroom video assets can be linked here)`;
+        }
+
+        // --- Drag & Drop Infrastructure for Act 7 Chronology ---
+        let currentDraggingChip = null;
+        document.querySelectorAll('.drag-chip').forEach(chip => {
+            chip.addEventListener('dragstart', () => { currentDraggingChip = chip; });
+        });
+
+        document.querySelectorAll('.t-zone').forEach(zone => {
+            zone.addEventListener('dragover', (e) => e.preventDefault());
+            zone.addEventListener('drop', () => {
+                if(currentDraggingChip) zone.appendChild(currentDraggingChip);
+            });
+        });
+
+        function checkTimeline() {
+            let correct = 0;
+            for(let i=1; i<=6; i++) {
+                const zone = document.getElementById(`z${i}`);
+                if(zone.firstChild && zone.firstChild.innerText.trim() === zone.getAttribute('data-order')) {
+                    correct++;
+                }
+            }
+            const fb = document.getElementById('fb7'); fb.style.display = "block";
+            if(correct === 6) {
+                fb.innerHTML = "✓ Astonishing! You have accurately ordered all 6 progressive phases of Mysuru history.";
+                fb.style.background = "#c8e6c9"; fb.style.color = "#1b5e20";
+            } else {
+                fb.innerHTML = `✗ ${correct}/6 stages are placed correctly. Re-evaluate the timeline from the Representative Assembly down to Mirza Ismail.`;
+                fb.style.background = "#ffcdd2"; fb.style.color = "#b71c1c";
+            }
+        }
+
+        // --- Act 6: Blanks Validator ---
+        function checkBlanks() {
+            let miss = 0;
+            const selects = document.querySelectorAll('.blank-select');
+            selects.forEach(sel => {
+                if(sel.value !== sel.getAttribute('data-ans')) {
+                    miss++; sel.style.borderColor = "var(--error)";
+                } else { sel.style.borderColor = "var(--success)"; }
+            });
+            const fb = document.getElementById('fb6'); fb.style.display = "block";
+            if(miss === 0) {
+                fb.innerHTML = "✓ Superb! You have successfully completed the core segment on the educational and industrial history of Mysuru.";
+                fb.style.background = "#c8e6c9"; fb.style.color = "#1b5e20";
+            } else {
+                fb.innerHTML = "✗ Some blanks contain incorrect choices regarding dates or institutions. Please cross-check.";
+                fb.style.background = "#ffcdd2"; fb.style.color = "#b71c1c";
+            }
+        }
+
+        // --- Act 8: Fleet Matrix Picker ---
+        document.querySelectorAll('.fleet-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const isCorrect = card.getAttribute('data-correct') === 'yes';
+                const info = card.getAttribute('data-info');
+                const fb = document.getElementById('fb8'); fb.style.display = "block";
+                if(isCorrect) {
+                    card.style.background = "#c8e6c9";
+                    fb.innerHTML = `🎯 Asset located! Details: ${info}`;
+                    fb.style.backgroundColor = "#c8e6c9"; fb.style.color = "#1b5e20";
+                } else {
+                    card.style.background = "#ffcdd2";
+                    fb.innerHTML = `⚠️ This is not an initiative of Mysuru! Details: ${info}`;
+                    fb.style.backgroundColor = "#ffcdd2"; fb.style.color = "#b71c1c";
+                }
+            });
+        });
+
+        // --- Act 9: Strategy Scenario Logic ---
+        function makeDecision(isRight, txt) {
+            const fb = document.getElementById('fb9'); fb.style.display = "block";
+            fb.innerHTML = txt;
+            if(isRight) {
+                fb.style.background = "#c8e6c9"; fb.style.color = "#1b5e20";
+            } else {
+                fb.style.background = "#ffcdd2"; fb.style.color = "#b71c1c";
+            }
+        }
+    </script>
+</body>
+</html>

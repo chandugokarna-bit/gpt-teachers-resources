@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Culture Ark 11.0 - Human and Culture Games</title>
+    <style>
+        :root {
+            --culture-saffron: #ff9f43;
+            --culture-gold: #f1c40f;
+            --culture-teal: #1dd1a1;
+            --culture-purple: #5f27cd;
+            --ark-dark: #0a0b10;
+            --glass-panel: rgba(26, 21, 44, 0.96);
+            --neon-success: #10ac84;
+            --neon-danger: #ee5253;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Verdana, sans-serif; }
+
+        body {
+            background: var(--ark-dark);
+            background-image: radial-gradient(circle at 50% 50%, #221a3a 0%, #0a0b10 100%);
+            min-height: 100vh;
+            padding: 25px;
+            color: #ffffff;
+        }
+
+        header.ark-banner {
+            text-align: center;
+            padding: 25px;
+            background: var(--glass-panel);
+            border: 2px solid var(--culture-saffron);
+            border-radius: 24px;
+            box-shadow: 0 0 35px rgba(255, 159, 67, 0.25);
+            margin-bottom: 25px;
+        }
+
+        header.ark-banner h1 {
+            color: var(--culture-saffron);
+            font-size: 2.4rem;
+            text-shadow: 0 0 12px rgba(255, 159, 67, 0.4);
+            margin-bottom: 5px;
+        }
+
+        header.ark-banner p { color: #cbd5e1; font-size: 1.15rem; }
+
+        /* NEW CLASSROOM HUD: CULTURAL HARMONY INDEX */
+        .ark-hud {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 15px 25px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            border-left: 5px solid var(--culture-teal);
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .harmony-bar-container {
+            background: #1e1932;
+            width: 45%;
+            height: 16px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--culture-teal);
+        }
+
+        .harmony-bar-fill {
+            background: linear-gradient(90deg, var(--culture-teal), #55efc4);
+            height: 100%;
+            width: 100%;
+            transition: width 0.4s ease;
+        }
+
+        /* Side-Scrolling Horizon Deck Tracks */
+        .horizon-track {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 35px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+
+        .horizon-track::-webkit-scrollbar { height: 6px; }
+        .horizon-track::-webkit-scrollbar-thumb { background: var(--culture-saffron); border-radius: 3px; }
+
+        .horizon-pill {
+            background: #1a1631;
+            border: 1px solid #332b5c;
+            padding: 12px 24px;
+            border-radius: 14px;
+            cursor: pointer;
+            font-weight: bold;
+            color: #ffffff;
+            white-space: nowrap;
+            transition: all 0.3s;
+        }
+
+        .horizon-pill:hover, .horizon-pill.active-mission {
+            background: var(--culture-saffron);
+            color: #000000;
+            border-color: #ffffff;
+            box-shadow: 0 0 15px var(--culture-saffron);
+            transform: translateY(-3px);
+        }
+
+        /* Core Ark Game Arena Screen */
+        .ark-arena {
+            background: var(--glass-panel);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            border-radius: 28px;
+            padding: 35px;
+            min-height: 520px;
+            display: none;
+            box-shadow: 0 25px 55px rgba(0,0,0,0.6);
+        }
+
+        .ark-arena.active-arena { display: block; animation: floatArk 0.4s ease-out; }
+
+        @keyframes floatArk {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2.arena-title {
+            font-size: 1.7rem;
+            color: var(--culture-gold);
+            margin-bottom: 25px;
+            border-left: 6px solid var(--culture-gold);
+            padding-left: 15px;
+        }
+
+        /* Interactive Grid Nodes Connector */
+        .ark-grid-connector {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .ark-node {
+            background: #191530;
+            padding: 18px;
+            border-radius: 14px;
+            cursor: pointer;
+            border: 2px solid #322b5c;
+            font-weight: bold;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .ark-node:hover { border-color: var(--culture-saffron); background: #231d45; }
+        .ark-node.node-linked { background: var(--culture-saffron); color: black; border-color: white; box-shadow: 0 0 12px var(--culture-saffron); }
+
+        /* Quiz UI Layout */
+        .ark-option-block {
+            background: #191530;
+            border: 2px solid #322b5c;
+            padding: 16px;
+            margin: 12px 0;
+            border-radius: 14px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+        }
+
+        .ark-option-block:hover { border-color: var(--culture-gold); transform: translateX(6px); }
+        .ark-option-block.correct-glow { background: rgba(16, 172, 132, 0.2); border-color: var(--neon-success); color: #55efc4; }
+        .ark-option-block.wrong-glow { background: rgba(238, 82, 83, 0.2); border-color: var(--neon-danger); color: #ff7675; }
+
+        /* Smart Inputs */
+        .smart-ark-input {
+            background: rgba(0,0,0,0.4);
+            border: 2px solid #322b5c;
+            border-radius: 10px;
+            padding: 12px;
+            font-size: 1.1rem;
+            color: var(--culture-gold);
+            font-weight: bold;
+            outline: none;
+            width: 100%;
+            max-width: 320px;
+            margin-top: 8px;
+        }
+
+        .smart-ark-input:focus { border-color: var(--culture-saffron); }
+
+        /* Mining Grid Components */
+        .ark-mining-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        .ark-packet {
+            background: #191530;
+            border: 2px solid #322b5c;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .ark-packet.active-packet { background: var(--culture-purple); border-color: white; box-shadow: 0 0 12px var(--culture-purple); }
+
+        /* General Action Buttons */
+        .ark-btn {
+            background: linear-gradient(135deg, var(--culture-saffron), #ff6b6b);
+            color: white;
+            border: none;
+            padding: 14px 35px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 25px;
+            box-shadow: 0 5px 15px rgba(255, 159, 67, 0.3);
+        }
+
+        .ark-btn:hover { transform: scale(1.02); box-shadow: 0 8px 25px rgba(255, 159, 67, 0.5); }
+
+        .ark-status-alert {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 12px;
+            font-weight: bold;
+            display: none;
+            font-size: 1.1rem;
+            border: 1px solid transparent;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="ark-banner">
+        <h1>Department of Sociology: Cultural Heritage</h1>
+        <p>Ark Model 11.0 • Ultra-Modern Games exploring the Unique Relationship Between Humans and Culture</p>
+    </div>
+
+    <div class="ark-hud">
+        <span>Cultural Harmony Index:</span>
+        <div class="harmony-bar-container"><div class="harmony-bar-fill" id="harmonyFill"></div></div>
+        <span style="color: var(--culture-gold);" id="liveArkPoints">Heritage Coins: 0000 HC</span>
+    </div>
+
+    <div class="horizon-track">
+        <div class="horizon-pill active-mission" id="horBtn1" onclick="shiftArkLevel(1)">1. Origin of the Word 'Culture'</div>
+        <div class="horizon-pill" id="horBtn2" onclick="shiftArkLevel(2)">2. Cultural Definition Code</div>
+        <div class="horizon-pill" id="horBtn3" onclick="shiftArkLevel(3)">3. Epic 10 Quiz</div>
+        <div class="horizon-pill" id="horBtn4" onclick="shiftArkLevel(4)">4. Key Features of Culture</div>
+        <div class="horizon-pill" id="horBtn5" onclick="shiftArkLevel(5)">5. Material Culture Site</div>
+        <div class="horizon-pill" id="horBtn6" onclick="shiftArkLevel(6)">6. Non-Material Culture Site</div>
+        <div class="horizon-pill" id="horBtn7" onclick="shiftArkLevel(7)">7. Cultural Heritage Bond</div>
+    </div>
+
+    <div id="ark1" class="ark-arena active-arena">
+        <h2 class="arena-title">Level 1: Traditional and Linguistic Origin of the Word 'Culture' (Language Node Connector)</h2>
+        <p style="margin-bottom: 15px;">Hey friend, correctly link the linguistic origin of the word 'Culture' with its essential concept:</p>
+        <div class="ark-grid-connector">
+            <div>
+                <div class="ark-node" id="l1_nodeL1" onclick="connectArkNodes('L', 'l1_nodeL1', 1)">Linguistic Root in Latin</div>
+                <div class="ark-node" id="l1_nodeL2" style="margin-top:15px;" onclick="connectArkNodes('L', 'l1_nodeL2', 2)">True Meaning of Culture</div>
+            </div>
+            <div>
+                <div class="ark-node" id="l1_nodeR1" onclick="connectArkNodes('R', 'l1_nodeR1', 2)">To purify, refine, or transform</div>
+                <div class="ark-node" id="l1_nodeR2" style="margin-top:15px;" onclick="connectArkNodes('R', 'l1_nodeR2', 1)">Colere (To till the soil / Cultivate land)</div>
+            </div>
+        </div>
+        <div class="ark-status-alert" id="alert1"></div>
+    </div>
+
+    <div id="ark2" class="ark-arena">
+        <h2 class="arena-title">Level 2: Definition of Culture and Human Way of Life (The Culture Code)</h2>
+        <div style="display:flex; flex-direction:column; gap:20px;">
+            <div class="fib-q">1. Which thinker stated: "Culture is what we are, and civilization is what we have"? <br><input type="text" class="smart-ark-input" id="cryptIn1" placeholder="Enter thinker's name"></div>
+            <div class="fib-q">2. Culture separates humans from the animal kingdom. What unique human capability is this? <br><input type="text" class="smart-ark-input" id="cryptIn2" placeholder="Cultural power / Physical power?"></div>
+        </div>
+        <button class="ark-btn" onclick="verifyArkLevel2()">Verify Code</button>
+        <div class="ark-status-alert" id="alert2"></div>
+    </div>
+
+    <div id="ark3" class="ark-arena">
+        <h2 class="arena-title">Level 3: The Great Battle of Grand Heritage (Epic 10 Matrix Quiz)</h2>
+        <div style="font-weight: bold; margin-bottom: 15px; color: var(--culture-gold);" id="quizCounterText">Question Code: 1 / 10</div>
+        <div id="quizQuestionText" style="font-size: 1.25rem; font-weight: bold; margin-bottom: 20px;">Loading...</div>
+        <div id="quizOptionsContainer"></div>
+        <button class="ark-btn" id="nextQuizBtn" style="display:none;" onclick="nextArkQuestion()">Move to Next Cultural Challenge ➔</button>
+        <div class="ark-status-alert" id="alert3"></div>
+    </div>
+
+    <div id="ark4" class="ark-arena">
+        <h2 class="arena-title">Level 4: Key Unique Features of Culture (Cultural Traits Quest)</h2>
+        <div style="display:flex; flex-direction:column; gap:20px;">
+            <div class="fib-q">1. Humans do not inherit culture biologically at birth; they learn it by growing up in a community. This means culture is a/an ____ trait. <br><input type="text" class="smart-ark-input" id="traitIn1" placeholder="Acquired / Innate by birth?"></div>
+            <div class="fib-q">2. Culture travels from one generation to another through language and customs. What happens to it? <br><input type="text" class="smart-ark-input" id="traitIn2" placeholder="Transmitted / Destroyed?"></div>
+        </div>
+        <button class="ark-btn" onclick="verifyArkLevel4()">Confirm Traits Data</button>
+        <div class="ark-status-alert" id="alert4"></div>
+    </div>
+
+    <div id="ark5" class="ark-arena">
+        <h2 class="arena-title">Level 5: Visible Elements of Material Culture (Material Culture Mining)</h2>
+        <p style="margin-bottom: 15px;">Hey friend, mine only the **four elements of material culture** created by humans that are visible and tangible:</p>
+        <div class="ark-mining-grid">
+            <div class="ark-packet" id="packet1" onclick="toggleArkPacket('packet1', true)">1. Stone Tools / Weapons</div>
+            <div class="ark-packet" id="packet2" onclick="toggleArkPacket('packet2', false)">2. Superstitions</div>
+            <div class="ark-packet" id="packet3" onclick="toggleArkPacket('packet3', true)">3. Residential Houses</div>
+            <div class="ark-packet" id="packet4" onclick="toggleArkPacket('packet4', true)">4. Clothes / Clothing</div>
+            <div class="ark-packet" id="packet5" onclick="toggleArkPacket('packet5', false)">5. Oral Ballads</div>
+            <div class="ark-packet" id="packet6" onclick="toggleArkPacket('packet6', true)">6. Modern Machinery</div>
+        </div>
+        <button class="ark-btn" onclick="verifyArkLevel5()">Lock Material Elements</button>
+        <div class="ark-status-alert" id="alert5"></div>
+    </div>
+
+    <div id="ark6" class="ark-arena">
+        <h2 class="arena-title">Level 6: Invisible Features of Non-Material Culture (Non-Material Culture Sorting)</h2>
+        <p style="margin-bottom: 15px;">Friend, sort the elements of non-material culture, which represent internal human ideas, into the correct description boxes:</p>
+        <div style="display:flex; gap:25px;">
+            <div style="flex:1; display:flex; flex-direction:column; gap:10px;" id="cultureSource">
+                <div style="background:#191530; padding:12px; border-radius:10px; cursor:grab; font-weight:bold; border:1px solid #322b5c;" draggable="true" id="cult1" ondragstart="startCultDrag(event)">Customs and Beliefs</div>
+                <div style="background:#191530; padding:12px; border-radius:10px; cursor:grab; font-weight:bold; border:1px solid #322b5c;" draggable="true" id="cult2" ondragstart="startCultDrag(event)">Art, Literature, and Music</div>
+            </div>
+            <div style="flex:2; display:flex; flex-direction:column; gap:15px;">
+                <div style="background:rgba(0,0,0,0.3); border:2px dashed var(--culture-saffron); padding:15px; border-radius:12px;" ondragover="allowCultDrop(event)" ondrop="handleCultDrop(event, 'belief')">
+                    <h3>Showing respect to elders and following religious rituals</h3>
+                </div>
+                <div style="background:rgba(0,0,0,0.3); border:2px dashed var(--culture-saffron); padding:15px; border-radius:12px;" ondragover="allowCultDrop(event)" ondrop="handleCultDrop(event, 'art')">
+                    <h3>Composing folk songs, performing dance forms, and writing poetry</h3>
+                </div>
+            </div>
+        </div>
+        <button class="ark-btn" onclick="verifyArkLevel6()">Verify Non-Material Bond</button>
+        <div class="ark-status-alert" id="alert6"></div>
+    </div>
+
+    <div id="ark7" class="ark-arena">
+        <h2 class="arena-title">Level 7: Protection of Our Proud Cultural Heritage (Cultural Heritage Matrix)</h2>
+        <p style="margin-bottom: 15px;">Final Level! Friend, complete the Ark by matching the cultural contributions left by our ancestors with their historical importance:</p>
+        <div class="ark-grid-connector">
+            <div class="ark-node" id="matL1" onclick="selectFinalArkMatrix('L', 'matL1', 'monument')">Hampi, Belur, Pattadakal, and Taj Mahal</div>
+            <div class="ark-node" id="matR1" onclick="selectFinalArkMatrix('R', 'matR1', 'monument')">India's famous tangible cultural monument heritage</div>
+            <div class="gov-node ark-node" id="matL2" onclick="selectFinalArkMatrix('L', 'matL2', 'protect')">Refraining from defacing historical monuments</div>
+            <div class="ark-node" id="matR2" onclick="selectFinalArkMatrix('R', 'matR2', 'protect')">The cultural duty of every responsible citizen</div>
+        </div>
+        <button class="ark-btn" onclick="verifyArkLevel7()">Complete Heritage Matrix</button>
+        <div class="ark-status-alert" id="alert7"></div>
+    </div>
+
+    <script>
+        let arkPoints = 0; let harmonyIndex = 100;
+        function modifyArkHUD(hcChange, harmonyDamage) {
+            arkPoints += hcChange;
+            harmonyIndex = Math.max(10, harmonyIndex - harmonyDamage);
+            document.getElementById("liveArkPoints").innerText = `Heritage Coins: ${arkPoints.toString().padStart(4, '0')} HC`;
+            document.getElementById("harmonyFill").style.width = `${harmonyIndex}%`;
+        }
+
+        function shiftArkLevel(levelIdx) {
+            document.querySelectorAll('.ark-arena').forEach(el => el.classList.remove('active-arena'));
+            document.querySelectorAll('.horizon-pill').forEach(el => el.classList.remove('active-mission'));
+            
+            document.getElementById('ark' + levelIdx).classList.add('active-arena');
+            document.getElementById('horBtn' + levelIdx).classList.add('active-mission');
+        }
+
+        // Level 1 Logic
+        let nodeL = null; let nodeR = null;
+        function connectArkNodes(side, id, matchVal) {
+            if(side === 'L') {
+                if(nodeL) document.getElementById(nodeL.id).classList.remove('node-linked');
+                nodeL = { id: id, match: matchVal };
+            } else {
+                if(nodeR) document.getElementById(nodeR.id).classList.remove('node-linked');
+                nodeR = { id: id, match: matchVal };
+            }
+            document.getElementById(id).classList.add('node-linked');
+
+            if(nodeL && nodeR) {
+                if(nodeL.match === nodeR.match) {
+                    document.getElementById(nodeL.id).style.background = "var(--neon-success)";
+                    document.getElementById(nodeR.id).style.background = "var(--neon-success)";
+                    modifyArkHUD(100, 0);
+                    showArkAlert(1, "Correct link, friend! The linguistic and traditional origin is perfectly right.", true);
+                    document.getElementById('horBtn1').style.background = "var(--neon-success)";
+                } else {
+                    modifyArkHUD(0, 10);
+                    showArkAlert(1, "Incorrect link, cultural harmony has dropped! Think it through again, friend.", false);
+                }
+                nodeL = null; nodeR = null;
+            }
+        }
+
+        // Level 2 Logic
+        function verifyArkLevel2() {
+            let c1 = document.getElementById("cryptIn1").value.trim().toLowerCase();
+            let c2 = document.getElementById("cryptIn2").value.trim().toLowerCase();
+
+            if((c1.includes("maciver") || c1.includes("page")) && (c2.includes("cultural"))) {
+                modifyArkHUD(150, 0);
+                document.getElementById('horBtn2').style.background = "var(--neon-success)";
+                showArkAlert(2, "Excellent! The cultural definition and code for human capability are perfectly correct.", true);
+            } else {
+                modifyArkHUD(0, 10);
+                showArkAlert(2, "Incorrect answer, friend! Hint: Try typing MacIver and Page, and Cultural power.", false);
+            }
+        }
+
+        // Level 3: 10 Questions Matrix Quiz Data
+        const cultureQuizPool = [
+            { q: "1. What is the biggest and most significant difference between humans and the animal world?", o: ["Humans have sharper teeth", "Humans possess culture", "Animals can sprint faster"], c: 1 },
+            { q: "2. What does the term 'Culture' primarily signify in our day-to-day lives?", o: ["Merely earning currency", "The customs, beliefs, and shared way of life of a group", "Just purchasing trendy apparel"], c: 1 },
+            { q: "3. Which of the following is considered the most vital social trait of culture?", o: ["Culture is restricted to a single individual", "Culture is acquired and shared within a society", "Culture is an absolute, unchanging static entity"], c: 1 },
+            { q: "4. What type of culture describes tangible monuments, shelters, and tools created by human intellect?", o: ["Non-material Culture", "Material Culture", "Metal Culture"], c: 1 },
+            { q: "5. Which invisible component of culture encompasses human perspectives, values, melodies, and artistry?", o: ["Material Culture", "Advanced Machinery", "Non-Material Culture"], c: 2 },
+            { q: "6. What term describes the ancestral gifts and traditions transmitted across generations?", o: ["Industrial Complex", "Cultural Heritage", "Commercial Marketplace"], c: 1 },
+            { q: "7. Which famous capital of the Vijayanagara Empire located in Karnataka is registered as a UNESCO World Heritage site?", o: ["Badami", "Hampi", "Mysuru"], c: 1 },
+            { q: "8. What foundational value does cultural heritage foster among the citizens of a country?", o: ["Unity, pride, and mutual respect", "Animosity and divide", "Exclusively self-centered thought processes"], c: 0 },
+            { q: "9. Which act was formulated by the Government of India to preserve historic legacy structures and edicts?", o: ["The Ancient Monuments and Archaeological Sites and Remains Act (1958)", "The Forest Conservation Act", "The Banking Regulation Act"], c: 0 },
+            { q: "10. What is the high ideal and global stance characteristic of Indian cultural philosophy?", o: ["Dominating other nations", "Unity and harmony in diversity", "Eradicating external custom models"], c: 1 }
+        ];
+
+        let qIdx = 0; let qScore = 0; let isQuizActive = true;
+        function loadArkQuestion() {
+            isQuizActive = true;
+            document.getElementById("nextQuizBtn").style.display = "none";
+            document.getElementById("alert3").style.display = "none";
+            let qData = cultureQuizPool[qIdx];
+            document.getElementById("quizCounterText").innerText = `Question Code: ${qIdx + 1} / 10`;
+            document.getElementById("quizQuestionText").innerText = qData.q;
+            
+            let container = document.getElementById("quizOptionsContainer");
+            container.innerHTML = "";
+            qData.o.forEach((opt, idx) => {
+                let div = document.createElement("div");
+                div.classList.add("ark-option-block");
+                div.innerText = opt;
+                div.onclick = function() {
+                    if(!isQuizActive) return;
+                    isQuizActive = false;
+                    if(idx === qData.c) {
+                        this.classList.add("correct-glow");
+                        qScore++; modifyArkHUD(30, 0);
+                        showArkAlert(3, "Correct choice, friend! Exceptional cultural awareness.", true);
+                    } else {
+                        this.classList.add("wrong-glow");
+                        container.children[qData.c].classList.add("correct-glow");
+                        modifyArkHUD(0, 10);
+                        showArkAlert(3, "Wrong choice! The correct option has been illuminated in green.", false);
+                    }
+                    document.getElementById("nextQuizBtn").style.display = "inline-block";
+                };
+                container.appendChild(div);
+            });
+        }
+        function nextArkQuestion() {
+            qIdx++;
+            if(qIdx < cultureQuizPool.length) {
+                loadArkQuestion();
+            } else {
+                document.getElementById("quizCounterText").innerText = "Mission Completed!";
+                document.getElementById("quizQuestionText").innerText = `Total Class Score: ${qScore} / 10`;
+                document.getElementById("quizOptionsContainer").innerHTML = "";
+                document.getElementById("nextQuizBtn").style.display = "none";
+                document.getElementById('horBtn3').style.background = "var(--neon-success)";
+                showArkAlert(3, qScore >= 7 ? "You are an unparalleled guardian of culture, friend!" : "Good attempt! Review the course material to sharpen your knowledge.", true);
+            }
+        }
+        loadArkQuestion();
+
+        // Level 4 Logic
+        function verifyArkLevel4() {
+            let e1 = document.getElementById("traitIn1").value.trim().toLowerCase();
+            let e2 = document.getElementById("traitIn2").value.trim().toLowerCase();
+
+            if((e1.includes("acquire") || e1.includes("learn")) && (e2.includes("transmit") || e2.includes("share"))) {
+                modifyArkHUD(150, 0);
+                document.getElementById('horBtn4').style.background = "var(--neon-success)";
+                showArkAlert(4, "Wow friend! Your analysis of fundamental cultural features is entirely correct.", true);
+            } else {
+                modifyArkHUD(0, 10);
+                showArkAlert(4, "Incorrect trait analysis! Hint: Think along the terms 'acquired' and 'transmitted'.", false);
+            }
+        }
+
+        // Level 5 Logic
+        let minedPackets = {};
+        function toggleArkPacket(id, isMaterialCulture) {
+            let node = document.getElementById(id);
+            if(node.classList.contains('active-packet')) {
+                node.classList.remove('active-packet');
+                delete minedPackets[id];
+            } else {
+                node.classList.add('active-packet');
+                minedPackets[id] = isMaterialCulture;
+            }
+        }
+        function verifyArkLevel5() {
+            let win = true; let count = 0;
+            for(let id in minedPackets) {
+                if(minedPackets[id] === false) win = false;
+                count++;
+            }
+            if(count !== 4) win = false; 
+
+            if(win) {
+                modifyArkHUD(150, 0);
+                document.getElementById('horBtn5').style.background = "var(--neon-success)";
+                showArkAlert(5, "Brilliant! The 4 major components of material culture (tools, shelters, clothing, machinery) are correctly mined.", true);
+            } else {
+                modifyArkHUD(0, 10);
+                showArkAlert(5, "Incorrect selection! Identify only concrete, visible items (omit folklore or beliefs).", false);
+            }
+        }
+
+        // Level 6 Logic
+        function allowCultDrop(ev) { ev.preventDefault(); }
+        function startCultDrag(ev) { ev.dataTransfer.setData("text", ev.target.id); }
+        function handleCultDrop(ev, cat) {
+            ev.preventDefault();
+            let id = ev.dataTransfer.getData("text");
+            let el = document.getElementById(id);
+            el.dataset.cat = cat;
+            ev.target.appendChild(el);
+        }
+        function verifyArkLevel6() {
+            let l1 = document.getElementById("cult1").dataset.cat;
+            let l2 = document.getElementById("cult2").dataset.cat;
+
+            if(l1 === "belief" && l2 === "art") {
+                modifyArkHUD(200, 0);
+                document.getElementById('horBtn6').style.background = "var(--neon-success)";
+                showArkAlert(6, "The categorization of non-material features is absolute and accurate, friend!", true);
+            } else {
+                modifyArkHUD(0, 10);
+                showArkAlert(6, "Misaligned sorting! Customs fit into the belief section; creative expressions align with art.", false);
+            }
+        }
+
+        // Level 7 Logic
+        let finalL = null; let finalR = null;
+        function selectFinalArkMatrix(side, id, key) {
+            if(side === 'L') {
+                finalL = { id: id, key: key };
+                document.getElementById("matL1").classList.remove('node-linked');
+                document.getElementById("matL2").classList.remove('node-linked');
+            } else {
+                finalR = { id: id, key: key };
+                document.getElementById("matR1").classList.remove('node-linked');
+                document.getElementById("matR2").classList.remove('node-linked');
+            }
+            document.getElementById(id).classList.add('node-linked');
+        }
+        function verifyArkLevel7() {
+            if(finalL && finalR && finalL.key === finalR.key) {
+                modifyArkHUD(250, 0);
+                document.getElementById('horBtn7').style.background = "var(--neon-success)";
+                showArkAlert(7, "Sensational job, friend! The Heritage Hub for the 'Human and Culture' chapter is complete. All Sociology syllabus units successfully mapped!", true);
+            } else {
+                modifyArkHUD(0, 10);
+                showArkAlert(7, "The matrix connection failed. Closely observe the heritage markers and re-evaluate.", false);
+            }
+        }
+
+        function showArkAlert(lvlNum, text, success) {
+            let box = document.getElementById("alert" + lvlNum);
+            box.style.display = "block";
+            box.innerText = text;
+            box.style.background = success ? "rgba(16, 172, 132, 0.15)" : "rgba(238, 82, 83, 0.1)";
+            box.style.color = success ? "#55efc4" : "#ff7675";
+            box.style.borderColor = success ? "var(--culture-saffron)" : "var(--neon-danger)";
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Major Civilizations of the World - Neon Arcade 3.0</title>
+    <style>
+        :root {
+            --neon-cyan: #00cec9;
+            --neon-pink: #e84393;
+            --neon-yellow: #fdcb6e;
+            --neon-purple: #6c5ce7;
+            --dark-glass: rgba(255, 255, 255, 0.95);
+            --arcade-dark: #2d3436;
+            --bg-grad: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: var(--bg-grad);
+            min-height: 100vh;
+            padding: 25px;
+            color: #ffffff;
+        }
+
+        /* Arcade Dashboard Header */
+        .arcade-header {
+            background: rgba(30, 41, 59, 0.8);
+            padding: 25px;
+            border-radius: 24px;
+            text-align: center;
+            box-shadow: 0 0 30px rgba(0, 206, 201, 0.3);
+            margin-bottom: 30px;
+            border: 2px solid var(--neon-cyan);
+        }
+
+        .arcade-header h1 {
+            color: var(--neon-cyan);
+            font-size: 2.4rem;
+            text-shadow: 0 0 10px rgba(0, 206, 201, 0.5);
+            margin-bottom: 8px;
+        }
+
+        .arcade-header p {
+            color: #cbd5e1;
+            font-size: 1.2rem;
+        }
+
+        /* Score & Tracker HUD */
+        .hud-display {
+            display: flex;
+            justify-content: space-around;
+            background: #1e293b;
+            padding: 15px;
+            border-radius: 16px;
+            margin-bottom: 25px;
+            border: 1px solid var(--neon-pink);
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: var(--neon-yellow);
+        }
+
+        /* Navigation Grid */
+        .arcade-menu {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 15px;
+            margin-bottom: 35px;
+        }
+
+        .arcade-card {
+            background: #1e293b;
+            border: 2px solid #334155;
+            padding: 18px;
+            border-radius: 18px;
+            cursor: pointer;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1rem;
+            color: #ffffff;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .arcade-card:hover, .arcade-card.active-zone {
+            background: var(--neon-pink);
+            border-color: #ffffff;
+            transform: translateY(-8px) scale(1.03);
+            box-shadow: 0 0 20px rgba(232, 67, 147, 0.6);
+        }
+
+        /* Game Screen Arena */
+        .game-screen {
+            background: var(--dark-glass);
+            color: var(--arcade-dark);
+            border-radius: 30px;
+            padding: 35px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+            min-height: 550px;
+            display: none;
+        }
+
+        .game-screen.active-screen {
+            display: block;
+            animation: bootUp 0.4s ease-out;
+        }
+
+        @keyframes bootUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2.screen-title {
+            font-size: 1.8rem;
+            color: var(--neon-purple);
+            margin-bottom: 25px;
+            border-bottom: 3px double #6c5ce7;
+            padding-bottom: 10px;
+        }
+
+        /* UI Elements */
+        .fire-btn {
+            background: linear-gradient(135deg, var(--neon-pink), #fd79a8);
+            color: white;
+            border: none;
+            padding: 14px 35px;
+            border-radius: 14px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 10px 20px rgba(232, 67, 147, 0.3);
+            transition: all 0.3s;
+            margin-top: 25px;
+        }
+
+        .fire-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 25px rgba(232, 67, 147, 0.5);
+        }
+
+        .game-status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 12px;
+            font-weight: bold;
+            display: none;
+            font-size: 1.1rem;
+        }
+
+        /* Act 1: Cards Grid */
+        .cards-3d-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        .arcade-flip-card {
+            background: #dfe6e9;
+            height: 110px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.1rem;
+            cursor: pointer;
+            box-shadow: 0 6px #b2bec3;
+            transition: all 0.2s;
+            text-align: center;
+            padding: 10px;
+        }
+
+        .arcade-flip-card.flipped {
+            background: linear-gradient(135deg, #a29bfe, var(--neon-purple));
+            color: white;
+            box-shadow: 0 6px #4834d4;
+        }
+
+        .arcade-flip-card.matched {
+            background: linear-gradient(135deg, #55efc4, #00b894);
+            color: white;
+            box-shadow: 0 6px #009432;
+        }
+
+        /* Act 2: Sorting Layout */
+        .sorting-arena {
+            display: flex;
+            gap: 25px;
+        }
+
+        .pool-shelf {
+            flex: 1;
+            background: #f1f2f6;
+            padding: 15px;
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            border: 2px solid #cbd5e1;
+        }
+
+        .pool-token {
+            background: white;
+            padding: 12px;
+            border-radius: 10px;
+            cursor: grab;
+            border-left: 5px solid var(--neon-cyan);
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        .arcade-drop-zone {
+            flex: 1;
+            background: #f1f2f6;
+            border: 3px dashed var(--neon-purple);
+            padding: 20px;
+            border-radius: 20px;
+            min-height: 150px;
+        }
+
+        .arcade-drop-zone h3 { margin-bottom: 15px; color: var(--neon-purple); }
+
+        /* Act 3: Modern Quiz Interface */
+        .progress-hud {
+            background: #dfe6e9;
+            height: 12px;
+            border-radius: 6px;
+            margin-bottom: 25px;
+            overflow: hidden;
+        }
+
+        .progress-hud-fill {
+            background: linear-gradient(90deg, var(--neon-cyan), #00b894);
+            height: 100%;
+            width: 10%;
+            transition: width 0.4s;
+        }
+
+        .quiz-arcade-row {
+            background: #f8f9fa;
+            padding: 16px;
+            margin: 12px 0;
+            border-radius: 14px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+            border: 2px solid #dfe6e9;
+        }
+
+        .quiz-arcade-row:hover {
+            border-color: var(--neon-purple);
+            background: #f1f0ff;
+            transform: translateX(5px);
+        }
+
+        .quiz-arcade-row.correct-glow {
+            background: #e8f5e9;
+            border-color: #00b894;
+            color: #2e7d32;
+        }
+
+        .quiz-arcade-row.wrong-glow {
+            background: #ffe9e9;
+            border-color: #d63031;
+            color: #c62828;
+        }
+
+        /* Act 4: Grid Input */
+        .crypto-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .arcade-input {
+            border: 2px solid #b2bec3;
+            border-radius: 12px;
+            padding: 10px 15px;
+            font-size: 1.1rem;
+            outline: none;
+            width: 260px;
+            font-weight: bold;
+            color: var(--neon-purple);
+            transition: border 0.3s;
+        }
+
+        .arcade-input:focus {
+            border-color: var(--neon-pink);
+        }
+
+        /* Act 5: Binary Switches */
+        .binary-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f8f9fa;
+            padding: 18px;
+            border-radius: 14px;
+            margin-bottom: 15px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .switch-group button {
+            padding: 10px 22px;
+            border: 2px solid #dfe6e9;
+            background: white;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-left: 10px;
+            transition: all 0.2s;
+        }
+
+        .switch-group button.switch-on {
+            background: var(--neon-cyan);
+            color: white;
+            border-color: var(--neon-cyan);
+        }
+
+        /* Act 6: Cipher Block */
+        .cipher-arcade-box {
+            background: #f1f2f6;
+            padding: 25px;
+            border-radius: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+            border: 2px dashed var(--neon-pink);
+        }
+
+        .cipher-big-txt {
+            font-size: 2.2rem;
+            color: var(--neon-pink);
+            font-weight: 800;
+            letter-spacing: 6px;
+            margin-bottom: 15px;
+        }
+
+        /* Act 7: Connect Matrix */
+        .matrix-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .arcade-select {
+            padding: 12px;
+            border-radius: 12px;
+            border: 2px solid var(--neon-purple);
+            width: 100%;
+            font-weight: 600;
+            outline: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="arcade-header">
+        <h1>Chapter-4: Major Civilizations of the World</h1>
+        <p>Neon Gaming Arcade 3.0 - Highly Engaging Ultra Modern Digital Classroom</p>
+    </div>
+
+    <!-- Live HUD -->
+    <div class="hud-display">
+        <span id="hudMission">Mission: Exploring Wonders of the World</span>
+        <span id="hudScore">Arcade Score: 0XP</span>
+    </div>
+
+    <!-- Navigation Architecture -->
+    <div class="arcade-menu">
+        <button class="arcade-card active-zone" onclick="launchScreen(1)">1. Egyptian Mummy</button>
+        <button class="arcade-card" onclick="launchScreen(2)">2. Babylon Gates</button>
+        <button class="arcade-card" onclick="launchScreen(3)">3. Epic 10 Quiz</button>
+        <button class="arcade-card" onclick="launchScreen(4)">4. Great Wall of China</button>
+        <button class="arcade-card" onclick="launchScreen(5)">5. Gladiator Battle</button>
+        <button class="arcade-card" onclick="launchScreen(6)">6. New World Discovery</button>
+        <button class="arcade-card" onclick="launchScreen(7)">7. Contributions Connector</button>
+    </div>
+
+    <!-- SCREEN 1 -->
+    <div id="screen1" class="game-screen active-screen">
+        <h2 class="screen-title">Activity 1: Glory of the Nile (Mummy Flip Quest)</h2>
+        <p style="margin-bottom: 20px; font-weight: bold; color: var(--neon-purple);">Match the key features of the Egyptian Civilization to solve the secret of the Mummy:</p>
+        <div class="cards-3d-grid" id="mummyGrid"></div>
+        <div class="game-status" id="status1"></div>
+    </div>
+
+    <!-- SCREEN 2 -->
+    <div id="screen2" class="game-screen">
+        <h2 class="screen-title">Activity 2: Mesopotamian Valley Sorting (Babylon Gates)</h2>
+        <p style="margin-bottom: 15px;">Assign the historical sites and works of Mesopotamia to their respective rulers:</p>
+        <div class="sorting-arena">
+            <div class="pool-shelf" id="babylonPool">
+                <div class="pool-token" draggable="true" id="tok1" ondragstart="tokenDrag(event)">Hanging Gardens</div>
+                <div class="pool-token" draggable="true" id="tok2" ondragstart="tokenDrag(event)">Eye for an Eye Code</div>
+                <div class="pool-token" draggable="true" id="tok3" ondragstart="tokenDrag(event)">Unparalleled Palace Construction</div>
+                <div class="pool-token" draggable="true" id="tok4" ondragstart="tokenDrag(event)">Encouragement of Scientific Study</div>
+                <div class="pool-token" draggable="true" id="tok5" ondragstart="tokenDrag(event)">Famous Ruler of the Amorites</div>
+                <div class="pool-token" draggable="true" id="tok6" ondragstart="tokenDrag(event)">Cuneiform Records</div>
+            </div>
+            <div class="drop-targets" style="flex:2; display:flex; flex-direction:column; gap:15px;">
+                <div class="arcade-drop-zone" ondragover="allowDrop(event)" ondrop="tokenDrop(event, 'hammu')">
+                    <h3>King Hammurabi</h3>
+                </div>
+                <div class="arcade-drop-zone" ondragover="allowDrop(event)" ondrop="tokenDrop(event, 'nebu')">
+                    <h3>King Nebuchadnezzar</h3>
+                </div>
+            </div>
+        </div>
+        <button class="fire-btn" onclick="verifyScreen2()">Unlock the Gates</button>
+        <div class="game-status" id="status2"></div>
+    </div>
+
+    <!-- SCREEN 3 -->
+    <div id="screen3" class="game-screen">
+        <h2 class="screen-title">Activity 3: Great Battle of World Civilizations (Epic 10 Quiz)</h2>
+        <div class="progress-hud"><div class="progress-hud-fill" id="hudBar"></div></div>
+        <div style="font-weight: bold; margin-bottom: 15px; color: var(--neon-purple);" id="arcadeQText">Question: 1 / 10</div>
+        <div id="arcadeQuestion" style="font-size: 1.3rem; font-weight: bold; margin-bottom: 20px;">Loading...</div>
+        <div id="arcadeOptions"></div>
+        <button class="fire-btn" id="nextArcadeBtn" style="display:none;" onclick="shiftArcadeQuestion()">Next Challenge ➔</button>
+        <div class="game-status" id="status3"></div>
+    </div>
+
+    <!-- SCREEN 4 -->
+    <div id="screen4" class="game-screen">
+        <h2 class="screen-title">Activity 4: Sorrow and Art of China (Great Wall Cipher)</h2>
+        <div class="crypto-grid">
+            <div class="fib-q">1. Which river is known as the 'Sorrow of China'? <br><input type="text" class="arcade-input" id="cry1" placeholder="Narmada / Hwang Ho?"></div>
+            <div class="fib-q">2. Who was the famous emperor who ordered the unification of the Great Wall of China? <br><input type="text" class="arcade-input" id="cry2" placeholder="Qin Shi Huang / Shang?"></div>
+            <div class="fib-q">3. Which exquisite pottery art originated in China and spread across the entire world? <br><input type="text" class="arcade-input" id="cry3" placeholder="Porcelain / Bronze?"></div>
+            <div class="fib-q">4. The early writing of the Chinese started with which script? <br><input type="text" class="arcade-input" id="cry4" placeholder="Pictographic / Cuneiform?"></div>
+        </div>
+        <button class="fire-btn" onclick="verifyScreen4()">Crack the Code</button>
+        <div class="game-status" id="status4"></div>
+    </div>
+
+    <!-- SCREEN 5 -->
+    <div id="screen5" class="game-screen">
+        <h2 class="screen-title">Activity 5: Roman History and Gladiators (Binary Switches)</h2>
+        <div class="binary-row">
+            <span>1. Among the Patricians and Plebeians in Roman society, the Plebeians were the elite landowners of the society.</span>
+            <div class="switch-group"><button id="sw1_t" onclick="toggleSwitch(1,true)">True</button><button id="sw1_f" onclick="toggleSwitch(1,false)">False</button></div>
+        </div>
+        <div class="binary-row">
+            <span>2. The Colosseum during Roman times was a massive amphitheater used for the entertainment of spectators.</span>
+            <div class="switch-group"><button id="sw2_t" onclick="toggleSwitch(2,true)">True</button><button id="sw2_f" onclick="toggleSwitch(2,false)">False</button></div>
+        </div>
+        <div class="binary-row">
+            <span>3. In Rome, Julius Caesar was assassinated within the Senate premises by his friend Brutus and other associates.</span>
+            <div class="switch-group"><button id="sw3_t" onclick="toggleSwitch(3,true)">True</button><button id="sw3_f" onclick="toggleSwitch(3,false)">False</button></div>
+        </div>
+        <div class="binary-row">
+            <span>4. The Roman rule contributed the highly famous Greek language and literature to the world.</span>
+            <div class="switch-group"><button id="sw4_t" onclick="toggleSwitch(4,true)">True</button><button id="sw4_f" onclick="toggleSwitch(4,false)">False</button></div>
+        </div>
+        <button class="fire-btn" onclick="verifyScreen5()">Verify Switches</button>
+        <div class="game-status" id="status5"></div>
+    </div>
+
+    <!-- SCREEN 6 -->
+    <div id="screen6" class="game-screen">
+        <h2 class="screen-title">Activity 6: Pre-Columbian Civilizations of America (Word Cipher)</h2>
+        <div class="cipher-arcade-box">
+            <div class="cipher-big-txt">M A Y A N S</div>
+            <input type="text" class="arcade-input" id="cipInput1" placeholder="Name the correct civilization/people">
+        </div>
+        <div class="cipher-arcade-box">
+            <div class="cipher-big-txt">T E N O C H T I T L A N</div>
+            <input type="text" class="arcade-input" id="cipInput2" placeholder="Name the beautiful Aztec capital">
+        </div>
+        <div class="cipher-arcade-box">
+            <div class="cipher-big-txt">S U N G O D</div>
+            <input type="text" class="arcade-input" id="cipInput3" placeholder="Name the chief deity of the Incas">
+        </div>
+        <button class="fire-btn" onclick="verifyScreen6()">End Word Battle</button>
+        <div class="game-status" id="status6"></div>
+    </div>
+
+    <!-- SCREEN 7 -->
+    <div id="screen7" class="game-screen">
+        <h2 class="screen-title">Activity 7: Scripts of the World and Civilization Matrix (Matrix Connector)</h2>
+        <div class="matrix-layout">
+            <div>
+                <div class="binary-row">1. Egyptian Script</div>
+                <div class="binary-row">2. Sumerian Script</div>
+                <div class="binary-row">3. Julius Caesar</div>
+                <div class="binary-row">4. Roman Language</div>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:20px; justify-content:center;">
+                <select id="matrixSel1" class="arcade-select">
+                    <option value="">Connect the Matrix</option>
+                    <option value="A">Cuneiform</option>
+                    <option value="B">Hieroglyphics</option>
+                    <option value="C">Latin Language and Literature</option>
+                    <option value="D">Dictator of the Roman Empire</option>
+                </select>
+                <select id="matrixSel2" class="arcade-select">
+                    <option value="">Connect the Matrix</option>
+                    <option value="A">Cuneiform</option>
+                    <option value="B">Hieroglyphics</option>
+                    <option value="C">Latin Language and Literature</option>
+                    <option value="D">Dictator of the Roman Empire</option>
+                </select>
+                <select id="matrixSel3" class="arcade-select">
+                    <option value="">Connect the Matrix</option>
+                    <option value="A">Cuneiform</option>
+                    <option value="B">Hieroglyphics</option>
+                    <option value="C">Latin Language and Literature</option>
+                    <option value="D">Dictator of the Roman Empire</option>
+                </select>
+                <select id="matrixSel4" class="arcade-select">
+                    <option value="">Connect the Matrix</option>
+                    <option value="A">Cuneiform</option>
+                    <option value="B">Hieroglyphics</option>
+                    <option value="C">Latin Language and Literature</option>
+                    <option value="D">Dictator of the Roman Empire</option>
+                </select>
+            </div>
+        </div>
+        <button class="fire-btn" onclick="verifyScreen7()">Complete the Matrix</button>
+        <div class="game-status" id="status7"></div>
+    </div>
+
+    <script>
+        let currentXP = 0;
+        function updateXP(amount) {
+            currentXP += amount;
+            document.getElementById("hudScore").innerText = `Arcade Score: ${currentXP}XP`;
+        }
+
+        function launchScreen(idx) {
+            document.querySelectorAll('.game-screen').forEach(el => el.classList.remove('active-screen'));
+            document.querySelectorAll('.arcade-card').forEach(el => el.classList.remove('active-zone'));
+            document.getElementById('screen' + idx).classList.add('active-screen');
+            event.target.classList.add('active-zone');
+        }
+
+        // Screen 1: Mummy Flip Cards Logic
+        const mummyData = [
+            {t: "Hieroglyphics", m: 1}, {t: "Sacred Writing", m: 1},
+            {t: "Mummy", m: 2}, {t: "Preserved Dead Body", m: 2},
+            {t: "Pharaoh", m: 3}, {t: "Resident of Great House", m: 3},
+            {t: "Cleopatra", m: 4}, {t: "Last Queen of Egypt", m: 4}
+        ];
+        let mummyFlipped = [];
+        function initMummyGame() {
+            let zone = document.getElementById("mummyGrid");
+            zone.innerHTML = "";
+            mummyData.sort(() => Math.random() - 0.5);
+            mummyData.forEach((c, idx) => {
+                let div = document.createElement("div");
+                div.classList.add("arcade-flip-card");
+                div.dataset.idx = idx;
+                div.dataset.m = c.m;
+                div.innerText = "𓂀";
+                div.onclick = function() {
+                    if(mummyFlipped.length < 2 && !this.classList.contains('flipped') && !this.classList.contains('matched')) {
+                        this.classList.add('flipped');
+                        this.innerText = mummyData[this.dataset.idx].t;
+                        mummyFlipped.push(this);
+                        if(mummyFlipped.length === 2) {
+                            if(mummyFlipped[0].dataset.m === mummyFlipped[1].dataset.m) {
+                                mummyFlipped[0].classList.add('matched');
+                                mummyFlipped[1].classList.add('matched');
+                                mummyFlipped = [];
+                                updateXP(50);
+                            } else {
+                                setTimeout(() => {
+                                    mummyFlipped[0].classList.remove('flipped'); mummyFlipped[0].innerText = "𓂀";
+                                    mummyFlipped[1].classList.remove('flipped'); mummyFlipped[1].innerText = "𓂀";
+                                    mummyFlipped = [];
+                                }, 1000);
+                            }
+                        }
+                    }
+                };
+                zone.appendChild(div);
+            });
+        }
+        initMummyGame();
+
+        // Screen 2: Babylon Grid Sorting
+        function allowDrop(ev) { ev.preventDefault(); }
+        function tokenDrag(ev) { ev.dataTransfer.setData("text", ev.target.id); }
+        function tokenDrop(ev, section) {
+            ev.preventDefault();
+            let id = ev.dataTransfer.getData("text");
+            let node = document.getElementById(id);
+            node.dataset.section = section;
+            ev.target.appendChild(node);
+        }
+        function verifyScreen2() {
+            let win = true;
+            const key = {tok1:'nebu', tok2:'hammu', tok3:'hammu', tok4:'nebu', tok5:'hammu', tok6:'hammu'};
+            for(let id in key) {
+                let node = document.getElementById(id);
+                if(!node || node.dataset.section !== key[id]) win = false;
+            }
+            if(win) updateXP(150);
+            showStatus(2, win ? "Wonderful! The Babylon Gates are unlocked!" : "There is an error in sorting, please think again.", win);
+        }
+
+        // Screen 3: Epic 10 Quiz System
+        const questionsList = [
+            { q: "1. Where did almost all the great civilizations of the world originate?", o: ["In deserts", "In river valleys", "In mountain ranges"], c: 1 },
+            { q: "2. Which major river in Africa was responsible for the glory and agricultural prosperity of Egypt?", o: ["Nile River", "Congo River", "Limpopo River"], c: 0 },
+            { q: "3. Between which two rivers did the Mesopotamian Civilization flourish?", o: ["Indus and Saraswati", "Euphrates and Tigris", "Hwang Ho and Yangtze"], c: 1 },
+            { q: "4. Who developed 'Cuneiform', the earliest script of the Mesopotamian Civilization?", o: ["Babylonians", "Assyrians", "Sumerians"], c: 2 },
+            { q: "5. Which was the first historical ruling dynasty of the Chinese Civilization?", o: ["Zhou Dynasty", "Shang Dynasty", "Han Dynasty"], c: 1 },
+            { q: "6. Who was the famous king of Macedonia in Greece and a beloved student of Aristotle?", o: ["Julius Caesar", "Alexander", "Augustus"], c: 1 },
+            { q: "7. Which was the political advisory body of the most influential and elite aristocrats in the Roman Republic?", o: ["Senate", "Assembly", "Council"], c: 0 },
+            { q: "8. What was the 118-year war fought by the Romans against Carthage for control over the island of Sicily?", o: ["Peloponnesian War", "Trojan War", "Punic War"], c: 2 },
+            { q: "9. Where was the home of the 'Maya' culture, one of the most advanced among the native American Indians?", o: ["Peru", "Yucatan of Mexico", "Argentina"], c: 1 },
+            { q: "10. Which empire flourished beautifully in Peru, South America during the 15th and 16th centuries?", o: ["Inca Empire", "Aztec Empire", "Maya Empire"], c: 0 }
+        ];
+
+        let qIndex = 0; let arcadeScore = 0; let activeFlag = true;
+        function loadArcadeQuestion() {
+            activeFlag = true;
+            document.getElementById("nextArcadeBtn").style.display = "none";
+            document.getElementById("status3").style.display = "none";
+            let data = questionsList[qIndex];
+            document.getElementById("arcadeQText").innerText = `Question: ${qIndex + 1} / 10`;
+            document.getElementById("hudBar").style.width = `${(qIndex+1)*10}%`;
+            document.getElementById("arcadeQuestion").innerText = data.q;
+            
+            let zone = document.getElementById("arcadeOptions");
+            zone.innerHTML = "";
+            data.o.forEach((opt, idx) => {
+                let div = document.createElement("div");
+                div.classList.add("quiz-arcade-row");
+                div.innerText = opt;
+                div.onclick = function() {
+                    if(!activeFlag) return;
+                    activeFlag = false;
+                    if(idx === data.c) {
+                        this.classList.add("correct-glow");
+                        arcadeScore++;
+                        updateXP(10);
+                        showStatus(3, "Correct answer! Brilliant knowledge.", true);
+                    } else {
+                        this.classList.add("wrong-glow");
+                        zone.children[data.c].classList.add("correct-glow");
+                        showStatus(3, "Wrong answer! The correct one is highlighted in green.", false);
+                    }
+                    document.getElementById("nextArcadeBtn").style.display = "inline-block";
+                };
+                zone.appendChild(div);
+            });
+        }
+        function shiftArcadeQuestion() {
+            qIndex++;
+            if(qIndex < questionsList.length) {
+                loadArcadeQuestion();
+            } else {
+                document.getElementById("arcadeQText").innerText = "Mission Complete!";
+                document.getElementById("arcadeQuestion").innerText = `Total Score: ${arcadeScore} / 10`;
+                document.getElementById("arcadeOptions").innerHTML = "";
+                document.getElementById("nextArcadeBtn").style.display = "none";
+                showStatus(3, arcadeScore >= 7 ? "Outstanding history champion!" : "Good attempt!", true);
+            }
+        }
+        loadArcadeQuestion();
+
+        // Screen 4: Great Wall Cipher
+        function verifyScreen4() {
+            let a1 = document.getElementById("cry1").value.trim().toLowerCase();
+            let a2 = document.getElementById("cry2").value.trim().toLowerCase();
+            let a3 = document.getElementById("cry3").value.trim().toLowerCase();
+            let a4 = document.getElementById("cry4").value.trim().toLowerCase();
+
+            if((a1 === "hwang ho" || a1 === "hwangho") && (a2 === "qin shi huang" || a2 === "qinshihuang") && a3 === "porcelain" && a4 === "pictographic") {
+                updateXP(100);
+                showStatus(4, "Wow! You have completely cracked the secret code of China!", true);
+            } else {
+                showStatus(4, "Some answers are incorrect. Hints: Hwang Ho, Qin Shi Huang, Porcelain, Pictographic.", false);
+            }
+        }
+
+        // Screen 5: Binary Switches
+        let swStatus = {1:null, 2:null, 3:null, 4:null};
+        function toggleSwitch(num, flag) {
+            swStatus[num] = flag;
+            document.getElementById(`sw${num}_t`).classList.remove('switch-on');
+            document.getElementById(`sw${num}_f`).classList.remove('switch-on');
+            if(flag) document.getElementById(`sw${num}_t`).classList.add('switch-on');
+            else document.getElementById(`sw${num}_f`).classList.add('switch-on');
+        }
+        function verifyScreen5() {
+            if(swStatus[1] === false && swStatus[2] === true && swStatus[3] === true && swStatus[4] === false) {
+                updateXP(100);
+                showStatus(5, "Roman switch game successful! All answers are correct.", true);
+            } else {
+                showStatus(5, "There is an error, please check! (Patricians were landowners and Rome contributed the Latin language)", false);
+            }
+        }
+
+        // Screen 6: Word Cipher
+        function verifyScreen6() {
+            let i1 = document.getElementById("cipInput1").value.trim().toLowerCase().replace(/\s+/g, '');
+            let i2 = document.getElementById("cipInput2").value.trim().toLowerCase().replace(/\s+/g, '');
+            let i3 = document.getElementById("cipInput3").value.trim().toLowerCase().replace(/\s+/g, '');
+
+            if(i1 === "mayans" && i2 === "tenochtitlan" && i3 === "sungod") {
+                updateXP(100);
+                showStatus(6, "The students have uncovered the secret words of the New World!", true);
+            } else {
+                showStatus(6, "The letter arrangement is incorrect (Hints: Mayans, Tenochtitlan, Sun God).", false);
+            }
+        }
+
+        // Screen 7: Connector Matrix
+        function verifyScreen7() {
+            let s1 = document.getElementById("matrixSel1").value;
+            let s2 = document.getElementById("matrixSel2").value;
+            let s3 = document.getElementById("matrixSel3").value;
+            let s4 = document.getElementById("matrixSel4").value;
+
+            if(s1 === 'B' && s2 === 'A' && s3 === 'D' && s4 === 'C') {
+                updateXP(200);
+                showStatus(7, "Brilliant! The matrix verification is successful. Chapter 4 is fully completed!", true);
+            } else {
+                showStatus(7, "Incorrect connection, please observe the scripts and historical figures once again.", false);
+            }
+        }
+
+        function showStatus(screenNum, text, isSuccess) {
+            let box = document.getElementById("status" + screenNum);
+            box.style.display = "block";
+            box.innerText = text;
+            box.style.background = isSuccess ? "rgba(0, 184, 148, 0.15)" : "rgba(214, 48, 49, 0.1)";
+            box.style.color = isSuccess ? "#00b894" : "#d63031";
+            box.style.border = isSuccess ? "1px solid #00b894" : "1px solid #d63031";
+        }
+    </script>
+</body>
+</html>
