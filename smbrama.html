@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಸಂಭ್ರಮ ಶನಿವಾರ ಚಟುವಟಿಕೆಗಳು</title>
+    <style>
+        :root {
+            --primary: #ffd700;
+            --bg-dark: #0b132b;
+            --card-bg: #1c2541;
+            --accent: #56cfe1;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            overflow-x: hidden;
+        }
+
+        /* ಮುಖ್ಯ ಹೆಡರ್ */
+        .header-section {
+            text-align: center;
+            padding: 12px 20px;
+            background: linear-gradient(180deg, #111a36 0%, var(--bg-dark) 100%);
+        }
+        .header-section h1 {
+            color: var(--primary);
+            margin: 0 0 5px 0;
+            font-size: 24px;
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+        }
+        .header-section p {
+            color: var(--accent);
+            margin: 0;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        /* ಥಿಯೇಟರ್ ಸ್ಕ್ರೀನ್ ಕಂಟೇನರ್ - ಈಗ ಕಂಪ್ಯೂಟರ್ ಪರದೆಯ ಒಳಗೆ ಫಿಟ್ ಆಗುತ್ತದೆ */
+        .theater-container {
+            width: 96%; 
+            max-width: 1300px; 
+            margin: 0 auto 15px auto;
+            position: relative;
+            background-color: #000814;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 2px solid var(--accent);
+            box-shadow: 0 0 30px rgba(86, 207, 225, 0.25);
+            box-sizing: border-box;
+        }
+
+        /* ಪರಿಹಾರ: ಸ್ಕ್ರೀನ್ ಎತ್ತರವನ್ನು ಸ್ವಲ್ಪ ಕಡಿಮೆ (80vh) ಮಾಡಿ ಇಡೀ ಫ್ರೇಮ್ ಕಣ್ಣಿಗೆ ಬೀಳುವಂತೆ ಮಾಡಲಾಗಿದೆ */
+        .screen-ratio {
+            position: relative;
+            width: 100%;
+            height: 80vh; /* ಈಗ ಯಾವುದೇ ಕಾರಣಕ್ಕೂ ಕೆಳಭಾಗ ಕಟ್ ಆಗುವುದಿಲ್ಲ */
+        }
+
+        .theater-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+            opacity: 0;
+            transition: opacity 0.4s ease-in-out;
+            z-index: 2;
+        }
+
+        /* ಆಕ್ಟಿವಿಟಿ ರೆಡಿಯಾದಾಗ ಸ್ಮೂತ್ ಆಗಿ ಪ್ರದರ್ಶಿಸಲು */
+        .theater-container.ready iframe {
+            opacity: 1;
+        }
+
+        /* ಮಿನಿಮಲ್ ಲೋಡರ್ */
+        .minimal-spinner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 40px;
+            height: 40px;
+            margin: -20px 0 0 -20px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            z-index: 1;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ಪ್ಲೇ ಆಗುತ್ತಿರುವ ಆಕ್ಟಿವಿಟಿ ಟೈಟಲ್ ಬಾರ್ */
+        .current-title-bar {
+            background-color: #111a36;
+            padding: 12px 20px;
+            border-top: 1px solid #23315d;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .current-title-bar h2 {
+            margin: 0;
+            font-size: 16px;
+            color: var(--primary);
+        }
+        .live-tag {
+            background-color: #ff124f;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        /* 2. ಕೆಳಗಡೆ ಇರುವ ಹಳೆಯ ಆಕ್ಟಿವಿಟಿಗಳ ಸ್ಕ್ರಾಲ್ ಸೆಕ್ಷನ್ */
+        .archive-section {
+            width: 95%;
+            max-width: 1300px;
+            margin: 30px auto 50px auto;
+        }
+        .archive-heading {
+            border-bottom: 2px solid #23315d;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            font-size: 18px;
+            color: #e2e8f0;
+        }
+
+        /* ಹಳೆಯ ಆಕ್ಟಿವಿಟಿ ಕಾರ್ಡ್‌ಗಳ ಗ್ರಿಡ್ ಲೇಔಟ್ */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .activity-card {
+            background-color: var(--card-bg);
+            border: 1px solid #23315d;
+            border-radius: 12px;
+            padding: 15px;
+            cursor: pointer;
+            transition: transform 0.2s ease, border-color 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .activity-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--primary);
+        }
+        .card-date { font-size: 11px; color: var(--accent); font-weight: bold; }
+        .card-title { font-size: 14px; font-weight: bold; color: white; margin: 0; line-height: 1.4; }
+        .card-badge { align-self: flex-start; background: rgba(255, 255, 255, 0.05); padding: 2px 8px; border-radius: 4px; font-size: 11px; color: #94a3b8; }
+
+        @media (max-width: 768px) {
+            .screen-ratio { height: 480px; }
+            .cards-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ಹೆಡರ್ ಭಾಗ -->
+    <div class="header-section">
+        <h1>🎉 ಸಂಭ್ರಮ ಶನಿವಾರ ಚಟುವಟಿಕೆಗಳ ಡಿಜಿಟಲ್ ಥಿಯೇಟರ್</h1>
+        <p>ಆನಂದದಾಯಕ ಕಲಿಕೆಯ ಅದ್ಭುತ ಲೋಕ</p>
+    </div>
+
+    <!-- 1. ಬೃಹತ್ ಫುಲ್ ಫ್ರೇಮ್ ಸ್ಕ್ರೀನ್ -->
+    <div class="theater-container" id="docWrapper">
+        <div class="minimal-spinner" id="docSpinner"></div>
+        
+        <div class="screen-ratio">
+            <!-- scrolling="no" ಕೊಟ್ಟಿರುವುದರಿಂದ ಕೆಳಭಾಗದ ಇನ್ಫೋ ಬಾಕ್ಸ್ ಪರ್ಫೆಕ್ಟ್ ಆಗಿ ಕಂಟ್ರೋಲ್ ಒಳಗೆ ಇರುತ್ತದೆ -->
+            <iframe 
+                src="continents.html" 
+                id="docFrame"
+                title="Sambhrama Saturday Live Screen"
+                scrolling="no"
+                allowfullscreen="true">
+            </iframe>
+        </div>
+        
+        <div class="current-title-bar">
+            <h2 id="currentPlayingTitle">ಪ್ರಸ್ತುತ ಪ್ಲೇ ಆಗುತ್ತಿದೆ: ಜಗತ್ತಿನ ಭೂಖಂಡಗಳು 3D + 2D ಆಕ್ಟಿವಿಟಿ</h2>
+            <div class="live-tag" id="screenBadge">ಇವತ್ತಿನ ಚಟುವಟಿಕೆ</div>
+        </div>
+    </div>
+
+    <!-- 2. ಕೆಳಗಡೆ ಇರುವ ಹಳೆಯ ಚಟುವಟಿಕೆಗಳ ಪಟ್ಟಿ -->
+    <div class="archive-section">
+        <div class="archive-heading">📚 ಹಳೆಯ ಶನಿವಾರದ ಚಟುವಟಿಕೆಗಳ ಸಂಗ್ರಹ (Archive)</div>
+        
+        <div class="cards-grid">
+            <!-- ಕಾರ್ಡ್ 1 -->
+            <div class="activity-card" onclick="playInTheater('continents.html', 'ಜಗತ್ತಿನ ಭೂಖಂಡಗಳು 3D + 2D ಆಕ್ಟಿವಿಟಿ', 'ಇವತ್ತಿನ ಚಟುವಟಿಕೆ')">
+                <div class="card-date">ಜುಲೈ 2026</div>
+                <h3 class="card-title">🌍 ಜಗತ್ತಿನ ಭೂಖಂಡಗಳ ಪರಿಶೋಧನೆ</h3>
+                <div class="card-badge">3D ಗ್ಲೋಬ್ ಆಕ್ಟಿವಿಟಿ</div>
+            </div>
+
+            <!-- ಕಾರ್ಡ್ 2 -->
+            <div class="activity-card" onclick="playInTheater('https://online.flippingbook.com/view/611203212/', 'ಜುಲೈ ತಿಂಗಳ ಸಂಭ್ರಮ ಶನಿವಾರ ಕೈಪಿಡಿ', 'ಹಳೆಯ ಆಕ್ಟಿವಿಟಿ')">
+                <div class="card-date">ಜೂನ್ 2026</div>
+                <h3 class="card-title">📖 ಸಂಭ್ರಮ ಶನಿವಾರ ಶಿಕ್ಷಕರ ಕೈಪಿಡಿ</h3>
+                <div class="card-badge">FlippingBook PDF</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const docFrame = document.getElementById('docFrame');
+        const docSpinner = document.getElementById('docSpinner');
+        const docWrapper = document.getElementById('docWrapper');
+        const currentPlayingTitle = document.getElementById('currentPlayingTitle');
+        const screenBadge = document.getElementById('screenBadge');
+
+        // ಸ್ಮೂತ್ ರಿವೀಲ್
+        docFrame.addEventListener('load', function() {
+            docSpinner.style.opacity = '0';
+            setTimeout(function() {
+                docSpinner.style.display = 'none';
+                docWrapper.classList.add('ready');
+            }, 200);
+        });
+
+        // ಕಾರ್ಡ್ ಕ್ಲಿಕ್ ಫಂಕ್ಷನ್
+        function playInTheater(fileUrl, activityName, badgeText) {
+            docWrapper.classList.remove('ready');
+            docSpinner.style.display = 'block';
+            docSpinner.style.opacity = '1';
+            
+            docFrame.src = fileUrl;
+            currentPlayingTitle.innerText = "ಪ್ರಸ್ತುತ ಪ್ಲೇ ಆಗುತ್ತಿದೆ: " + activityName;
+            screenBadge.innerText = badgeText;
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+
+</body>
+</html>
