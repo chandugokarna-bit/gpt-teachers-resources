@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Full Screen Presentation</title>
+    <style>
+        /* ಪೇಜ್‌ನ ಸುತ್ತಲಿನ ಮಾರ್ಜಿನ್ ತೆಗೆದು ಪೂರ್ತಿ ಸ್ಕ್ರೀನ್ ಕರಾರುವಕ್ಕಾಗಿ ಹೊಂದಿಸಲು */
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #fafafa;
+            font-family: sans-serif;
+        }
+
+        /* ಪ್ರೆಸೆಂಟೇಶನ್ ಕಂಟೈನರ್ ಇಡೀ ಸ್ಕ್ರೀನ್ ಆವರಿಸುವಂತೆ ಮಾಡಲು */
+        .presentation-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+
+        /* ಇಫ್ರೇಮ್ ಅನ್ನು ಪೂರ್ತಿ ಸ್ಕ್ರೀನ್ ಗಾತ್ರಕ್ಕೆ ಹೊಂದಿಸುವುದು */
+        .presentation-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+
+        /* ಲೋಡ್ ಆದ ನಂತರ ಸ್ಮೂತ್ ಆಗಿ ಡಿಸ್ಪ್ಲೇ ಮಾಡಲು */
+        .presentation-container.ready iframe {
+            opacity: 1;
+        }
+
+        /* ಸ್ಪಿನ್ನರ್ (Loader) ಡಿಸೈನ್ */
+        .minimal-spinner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 40px;
+            height: 40px;
+            margin: -20px 0 0 -20px;
+            border: 3px solid #e0e0e0;
+            border-top-color: #000000;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            transition: opacity 0.3s ease;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="presentation-container loading" id="docWrapper">
+    <!-- ಲೋಡ್ ಆಗುವಾಗ ತೋರಿಸುವ ಸ್ಪಿನ್ನರ್ -->
+    <div class="minimal-spinner" id="docSpinner"></div>
+    
+    <!-- ನಿಮ್ಮ ಫ್ಲಿಪ್‌ಬುಕ್ ಲಿಂಕ್ ಇಲ್ಲಿದೆ -->
+    <iframe 
+        src="https://online.flippingbook.com/view/611203212/" 
+        id="docFrame"
+        title="July Presentation"
+        allowfullscreen="true">
+    </iframe>
+</div>
+
+<script>
+    // ಫ್ಲಿಪ್‌ಬುಕ್ ಲೋಡ್ ಆದ ತಕ್ಷಣ ಸ್ಪಿನ್ನರ್ ಮರೆಯಾಗಿ, ಬುಕ್ ಪ್ರತ್ಯಕ್ಷವಾಗುತ್ತದೆ
+    document.getElementById('docFrame').addEventListener('load', function() {
+        document.getElementById('docSpinner').style.opacity = '0';
+        setTimeout(function() {
+            document.getElementById('docSpinner').style.display = 'none';
+            document.getElementById('docWrapper').classList.add('ready');
+        }, 300);
+    });
+</script>
+
+</body>
+</html>
