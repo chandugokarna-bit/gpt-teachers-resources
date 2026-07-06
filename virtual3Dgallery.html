@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Virtual 3D Gallery - Next-Gen AI-VR Studio</title>
+  <style>
+    :root {
+      --cyber-cyan: #00f2fe;
+      --cyber-blue: #4facfe;
+      --neon-pink: #f43f5e;
+      --neon-purple: #a855f7;
+      --matrix-glow: rgba(0, 242, 254, 0.25);
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif, "Noto Sans Kannada";
+      background: linear-gradient(135deg, #020617 0%, #090d16 50%, #0f172a 100%);
+      margin: 0;
+      padding: 20px;
+      color: #f8fafc;
+      overflow-x: hidden;
+    }
+
+    .gallery-container {
+      max-width: 1350px;
+      margin: 0 auto;
+    }
+
+    /* 🛸 ಹೊಲೊಗ್ರಾಫಿಕ್ ಕಂಟ್ರೋಲ್ ಹೆಡರ್ ಬ್ಯಾನರ್ */
+    .gallery-header {
+      text-align: center;
+      padding: 35px 20px;
+      background: rgba(30, 41, 59, 0.4);
+      border: 2px solid rgba(0, 242, 254, 0.3);
+      border-radius: 20px;
+      box-shadow: 0 0 30px var(--matrix-glow), inset 0 0 20px rgba(0, 242, 254, 0.1);
+      margin-bottom: 35px;
+      backdrop-filter: blur(12px);
+    }
+
+    .gallery-header span {
+      background: linear-gradient(90deg, var(--cyber-cyan), var(--cyber-blue));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-weight: 800;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      display: inline-block;
+      margin-bottom: 8px;
+    }
+
+    .gallery-header h1 {
+      margin: 0;
+      font-size: 36px;
+      color: #ffffff;
+      text-shadow: 0 0 20px rgba(0, 242, 254, 0.6);
+      letter-spacing: 1px;
+    }
+
+    .gallery-header p {
+      color: #94a3b8;
+      margin: 10px 0 0 0;
+      font-size: 15.5px;
+    }
+
+    /* 🖥️ ಐಮ್ಯಾಕ್ಸ್ ಮಾದರಿಯ ಬೃಹತ್ ವರ್ಚುವಲ್ ಸಿನೆಮಾ ಸ್ಕ್ರೀನ್ (Mega Theater Screen) */
+    .mega-theatre-box {
+      background: #000000;
+      border: 3px solid var(--cyber-cyan);
+      border-radius: 20px;
+      padding: 10px;
+      box-shadow: 0 0 50px rgba(0, 242, 254, 0.3);
+      margin-bottom: 50px;
+      position: relative;
+    }
+
+    /* ಸ್ಕ್ರೀನ್ ಟಾಪ್ ಕರ್ವ್ ಲೈಟಿಂಗ್ ಎಫೆಕ್ಟ್ */
+    .mega-theatre-box::after {
+      content: '';
+      position: absolute;
+      top: -3px; left: 10%; right: 10%; height: 3px;
+      background: linear-gradient(90deg, transparent, var(--cyber-cyan), transparent);
+      filter: blur(2px);
+    }
+
+    .theatre-viewport-wrapper {
+      position: relative;
+      width: 100%;
+      height: 580px; /* ಪ್ರೊಫೆಷನಲ್ ಪ್ರಿವ್ಯೂಗಾಗಿ ಅತ್ಯುತ್ತಮ ಎತ್ತರ */
+      border-radius: 14px;
+      overflow: hidden;
+      background: #030712;
+    }
+
+    .theatre-viewport-wrapper iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+    }
+
+    /* ಆರಂಭದಲ್ಲಿ ಸ್ಕ್ರೀನ್ ಒಳಗೆ ಕಾಣಿಸುವ ಭವ್ಯ ಹೊಲೊಗ್ರಾಮ್ ಪ್ಲೇಸ್‌ಹೋಲ್ಡರ್ */
+    .screen-hologram-placeholder {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: radial-gradient(circle, #0f172a 0%, #020617 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 5;
+      color: #cbd5e1;
+      text-align: center;
+    }
+
+    .hologram-pulse {
+      font-size: 70px;
+      margin-bottom: 20px;
+      animation: floatAnimation 3s ease-in-out infinite;
+    }
+
+    /* 🧩 ಮೆನು ಸೆಕ್ಷನ್ ಟೈಟಲ್ */
+    .matrix-section-title {
+      font-size: 22px;
+      color: var(--royal-gold);
+      margin: 40px 0 20px 0;
+      border-left: 5px solid var(--neon-pink);
+      padding-left: 12px;
+      font-weight: bold;
+      letter-spacing: 0.5px;
+      text-shadow: 0 0 10px rgba(244, 63, 94, 0.2);
+    }
+
+    /* 🎴 ಗ್ಲಾಸ್ಮೋರ್ಫಿಸಂ 3D ಮ್ಯಾಟ್ರಿಕ್ಸ್ ಗ್ರಿಡ್ */
+    .matrix-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 25px;
+      margin-bottom: 40px;
+    }
+
+    .matrix-card {
+      background: rgba(30, 41, 59, 0.45);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 22px;
+      text-align: center;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+    }
+
+    /* ಕಾರ್ಡ್ ಮೇಲೆ ಮೌಸ್ ತಂದಾಗ ಅಲ್ಟ್ರಾ ಗ್ಲೋ ರಿಯಾಕ್ಷನ್ */
+    .matrix-card:hover {
+      transform: translateY(-8px) scale(1.02);
+      background: rgba(30, 41, 59, 0.8);
+      border-color: var(--cyber-cyan);
+      box-shadow: 0 15px 30px rgba(0, 242, 254, 0.2);
+    }
+
+    .matrix-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      border-radius: 16px;
+      background: linear-gradient(45deg, transparent, rgba(0, 242, 254, 0.05), transparent);
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .card-space-icon {
+      font-size: 45px;
+      margin-bottom: 15px;
+      filter: drop-shadow(0 0 10px rgba(255,255,255,0.1));
+    }
+
+    .matrix-card-title {
+      font-size: 18px;
+      font-weight: bold;
+      color: #ffffff;
+      margin: 0 0 8px 0;
+    }
+
+    .matrix-card-desc {
+      font-size: 13px;
+      color: #94a3b8;
+      margin: 0 0 20px 0;
+      line-height: 1.5;
+    }
+
+    .btn-matrix-launch {
+      background: linear-gradient(135deg, #0f172a, #1e293b);
+      border: 1px solid rgba(0, 242, 254, 0.3);
+      color: var(--cyber-cyan);
+      padding: 12px;
+      border-radius: 10px;
+      font-size: 13.5px;
+      font-weight: bold;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      letter-spacing: 0.5px;
+    }
+
+    .matrix-card:hover .btn-matrix-launch {
+      background: linear-gradient(135deg, var(--cyber-blue), var(--cyber-cyan));
+      color: #000000;
+      border-color: var(--cyber-cyan);
+      box-shadow: 0 4px 15px rgba(0, 242, 254, 0.4);
+    }
+
+    /* ಅನಿಮೇಷನ್‌ಗಳು */
+    @keyframes floatAnimation {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-15px); }
+      100% { transform: translateY(0px); }
+    }
+  </style>
+</head>
+<body>
+
+<div class="gallery-container">
+
+  <!-- 🛸 ಹೊಲೊಗ್ರಾಫಿಕ್ ಹೆಡರ್ ಬ್ಯಾನರ್ -->
+  <div class="gallery-header">
+    <span>Next-Generation Immersive Space</span>
+    <h1>🖼️ ವರ್ಚುವಲ್ 3D ಗ್ಯಾಲರಿ സ്റ്റುಡಿಯೋ</h1>
+    <p>ಕೆಳಗಿನ ಯಾವುದೇ ಶೈಕ್ಷಣಿಕ ಚಟುವಟಿಕೆಯನ್ನು ಆಯ್ಕೆ ಮಾಡಿ ಮತ್ತು ನೇರವಾಗಿ ಮೇಲಿನ ಐಮ್ಯಾಕ್ಸ್ ಸ್ಕ್ರೀನ್‌ನಲ್ಲಿ ಲೈವ್ ಆಗಿ ವೀಕ್ಷಿಸಿ!</p>
+  </div>
+
+  <!-- 🖥️ ಬೃಹತ್ ವರ್ಚುವಲ್ ಸಿನೆಮಾ ಸ್ಕ್ರೀನ್ ಕಂಟೇನರ್ -->
+  <div class="mega-theatre-box" id="display-cinema-screen">
+    <div class="theatre-viewport-wrapper">
+      
+      <!-- ಆರಂಭಿಕ ಹೊಲೊಗ್ರಾಮ್ ಸ್ಕ್ರೀನ್ -->
+      <div class="screen-hologram-placeholder" id="studio-placeholder">
+        <div class="hologram-pulse">🛸</div>
+        <h2 style="margin: 0 0 10px 0; text-shadow: 0 0 10px var(--cyber-cyan);">ವರ್ಚುವಲ್ 3D ಹಬ್ ಸಿದ್ಧವಾಗಿದೆ</h2>
+        <p style="opacity: 0.7; max-width: 500px; margin: 0 auto; padding: 0 15px;">ಯಾವುದೇ ಚಟುವಟಿಕೆ ಅಥವಾ ಆಲ್ಬಮ್ ಅನ್ನು ಪ್ಲೇ ಮಾಡಲು ಕೆಳಗಿನ ಮ್ಯಾಟ್ರಿಕ್ಸ್ ಕಾರ್ಡ್‌ನ '👁️ ಲೋಡ್ ಮಾಡಿ' ಬಟನ್ ಕ್ಲಿಕ್ ಮಾಡಿ.</p>
+      </div>
+      
+      <!-- ಲೈವ್ ಲೋಡ್ ಆಗುವ ಫ್ರೇಮ್ -->
+      <iframe id="cinema-live-frame" src="" allowfullscreen></iframe>
+    </div>
+  </div>
+
+  <!-- ==================== ವಿಭಾಗ 1: ಶಾಲಾ ಚಟುವಟಿಕೆಗಳು (School Activities Hub) ==================== -->
+  <div class="matrix-section-title">✨ ಶಾಲಾ ಅತ್ಯುತ್ತಮ ಚಟುವಟಿಕೆಗಳು ಮತ್ತು ಇ-ಪ್ರದರ್ಶನಗಳು</div>
+  
+  <div class="matrix-grid">
+    
+    <!-- ಆಕ್ಟಿವಿಟಿ ಕಾರ್ಡ್ 1 -->
+    <div class="matrix-card" onclick="playActivity('resources/gallery/activity1.html')">
+      <div>
+        <div class="card-space-icon">🏆</div>
+        <h4 class="matrix-card-title">ರಾಷ್ಟ್ರೀಯ ವಿಜ್ಞಾನ ದಿನಾಚರಣೆ</h4>
+        <p class="matrix-card-desc">ಶಾಲಾ ಮಕ್ಕಳ ಅದ್ಭುತ ವಿಜ್ಞಾನ ಮಾದರಿಗಳ ಪ್ರದರ್ಶನ ಮತ್ತು 3D ಡಿಜಿಟಲ್ ನೋಟ.</p>
+      </div>
+      <button class="btn-matrix-launch">👁️ ಲೋಡ್ ಮಾಡಿ</button>
+    </div>
+
+    <!-- ಆಕ್ಟಿವಿಟಿ ಕಾರ್ಡ್ 2 -->
+    <div class="matrix-card" onclick="playActivity('resources/gallery/activity2.html')">
+      <div>
+        <div class="card-space-icon">🎨</div>
+        <h4 class="matrix-card-title">ಮಕ್ಕಳ ಕಲಾ ಪ್ರದರ್ಶನ ಆಲ್ಬಮ್</h4>
+        <p class="matrix-card-desc">ನಮ್ಮ ಶಾಲೆಯ ಪ್ರತಿಭಾವಂತ ವಿದ್ಯಾರ್ಥಿಗಳು ಬಿಡಿಸಿದ ಸುಂದರ ಚಿತ್ರಕಲೆಗಳ ವರ್ಚುವಲ್ ಗ್ಯಾಲರಿ.</p>
+      </div>
+      <button class="btn-matrix-launch">👁️ ಲೋಡ್ ಮಾಡಿ</button>
+    </div>
+
+    <!-- ಆಕ್ಟಿವಿಟಿ ಕಾರ್ಡ್ 3 -->
+    <div class="matrix-card" onclick="playActivity('resources/gallery/activity3.html')">
+      <div>
+        <div class="card-space-icon">🌍</div>
+        <h4 class="matrix-card-title">ಐತಿಹಾಸಿಕ ನಕ್ಷೆಗಳ ಡಿಜಿಟಲ್ ಎಕ್ಸ್‌ಪೋ</h4>
+        <p class="matrix-card-desc">ಭಾರತದ ಪ್ರಮುಖ ರಾಜವಂಶಗಳು ಮತ್ತು ಇತಿಹಾಸವನ್ನು ಬಿಂಬಿಸುವ ಡಿಜಿಟಲ್ ನಕ್ಷೆಗಳ ಗ್ಯಾಲರಿ.</p>
+      </div>
+      <button class="btn-matrix-launch">👁️ ಲೋಡ್ ಮಾಡಿ</button>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- ⚙️ ಸಿನೆಮಾ ಸ್ಕ್ರೀನ್ ನಿಯಂತ್ರಿಸುವ ಅಲ್ಟ್ರಾ-ಸ್ಮಾರ್ಟ್ ಜಾವಾಸ್ಕ್ರಿಪ್ಟ್ -->
+<script>
+  function playActivity(url) {
+    // 1. ಆರಂಭಿಕ ಹೊಲೊಗ್ರಾಮ್ ಸ್ಕ್ರೀನ್ ಹೈಡ್ ಮಾಡುವುದು
+    document.getElementById('studio-placeholder').style.display = 'none';
+    
+    // 2. ಐಫ್ರೇಮ್ ಒಳಗೆ ನೀವು ನೀಡುವ ಲಿಂಕ್ ಅನ್ನು ಇಂಜೆಕ್ಟ್ ಮಾಡುವುದು
+    let cinemaFrame = document.getElementById('cinema-live-frame');
+    cinemaFrame.src = url;
+    
+    // 3. 🚀 ಮ್ಯಾಟರ್ ಆಫ್ ಸೆಕೆಂಡ್: ಕ್ಲಿಕ್ ಮಾಡಿದ ತಕ್ಷಣ ಇಡೀ ಪೇಜ್ ಬೃಹತ್ ಸ್ಕ್ರೀನ್ ಇರುವ ಜಾಗಕ್ಕೆ ಸ್ಮೂತ್ ಆಗಿ ಫ್ಲೈ ಆಗುತ್ತದೆ!
+    document.getElementById('display-cinema-screen').scrollIntoView({ 
+      behavior: 'smooth', 
+      block: 'center' 
+    });
+  }
+</script>
+
+</body>
+</html>
