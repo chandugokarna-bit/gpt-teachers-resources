@@ -3,67 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D ವರ್ಚುವಲ್ ಗ್ಯಾಲರಿ - ಫುಲ್ ಸ್ಕ್ರೀನ್ ಹೈಲೈಟ್</title>
+    <title>3D ವರ್ಚುವಲ್ ಗ್ಯಾಲರಿ - ಪಕ್ಕಾ ಫುಲ್ ಸ್ಕ್ರೀನ್</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
-        body, html { width: 100%; height: 100%; overflow: hidden; background-color: #030306; font-family: 'Segoe UI', sans-serif; color: #fff; }
+        body, html { width: 100%; height: 100%; overflow: hidden; background-color: #010103; font-family: 'Segoe UI', sans-serif; color: #fff; }
         #canvas-container { width: 100%; height: 100%; position: absolute; top: 0; left: 0; z-index: 1; }
         
-        /* UI ಲೇಯರ್ ವಿನ್ಯಾಸ */
-        .ui-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; pointer-events: none; display: flex; flex-direction: column; justify-content: space-between; padding: 25px; }
+        .ui-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; pointer-events: none; display: flex; flex-direction: column; justify-content: flex-end; padding: 20px; }
         .interactive { pointer-events: auto; }
-        header { background: rgba(5, 5, 8, 0.7); backdrop-filter: blur(12px); padding: 15px 35px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.08); max-width: 500px; }
-        h1 { font-size: 22px; color: #ffaa00; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px; }
-        .subtitle { font-size: 13px; color: #bbb; }
-        footer { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; }
-        .nav-btn { background: linear-gradient(135deg, #ffaa00, #ff5500); border: none; color: white; padding: 10px 22px; border-radius: 20px; cursor: pointer; font-weight: bold; transition: 0.3s; box-shadow: 0 4px 15px rgba(255, 85, 0, 0.3); }
-        .nav-btn:hover { transform: scale(1.05); }
+        .nav-btn { background: rgba(255, 170, 0, 0.2); border: 1px solid #ffaa00; color: #ffaa00; padding: 8px 18px; border-radius: 20px; cursor: pointer; font-weight: bold; transition: 0.3s; backdrop-filter: blur(5px); }
+        .nav-btn:hover { background: #ffaa00; color: #000; transform: scale(1.05); }
 
-        /* 🎯 ನಿಮ್ಮ ಐಡಿಯಾ: ಫೋಟೋ ಕ್ಲಿಕ್ ಮಾಡಿದಾಗ ಕೆಳಭಾಗದಲ್ಲಿ ಮಾತ್ರ ಮೂಡುವ ಅತ್ಯಂತ ಸುಂದರ ಸಿನಿಮಾಟಿಕ್ ವಿವರಣೆ ಪಟ್ಟಿ */
+        /* ಕೆಳಭಾಗದ ಅತ್ಯಂತ ನಯವಾದ ಸಿನಿಮಾಟಿಕ್ ವಿವರಣೆ ಪಟ್ಟಿ */
         #cinema-info-bar {
             position: fixed;
-            bottom: -150px; /* ಆರಂಭದಲ್ಲಿ ಅಡಗಿರುತ್ತದೆ */
+            bottom: -150px;
             left: 50%;
             transform: translateX(-50%);
-            width: 90%;
-            max-width: 900px;
-            background: linear-gradient(180deg, rgba(10, 15, 30, 0.85) 0%, rgba(5, 5, 10, 0.98) 100%);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border: 1.5px solid #00ffcc;
+            width: 85%;
+            max-width: 800px;
+            background: rgba(4, 4, 8, 0.92);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(0, 255, 200, 0.35);
             border-bottom: none;
-            border-radius: 20px 20px 0 0;
-            padding: 20px 35px;
+            border-radius: 16px 16px 0 0;
+            padding: 15px 25px;
             z-index: 100;
             transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-            box-shadow: 0 -10px 30px rgba(0, 255, 200, 0.15);
+            box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.7);
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 4px;
+            pointer-events: auto;
         }
-        #cinema-info-bar.active { bottom: 0; } /* ಕ್ಲಿಕ್ ಮಾಡಿದಾಗ ಮೇಲಕ್ಕೆ ಬರುತ್ತದೆ */
+        #cinema-info-bar.active { bottom: 0; }
         
-        #popup-title { font-size: 20px; color: #ffaa00; font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
-        #popup-desc { font-size: 14px; color: #e2e8f0; line-height: 1.6; }
+        #popup-title { font-size: 16px; color: #ffaa00; font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
+        #popup-desc { font-size: 13px; color: #e2e8f0; line-height: 1.5; }
         
-        /* ಕ್ಲೋಸ್ ಬಟನ್ ಶೈಲಿ */
-        .close-x { background: rgba(255, 255, 255, 0.1); border: none; color: #fff; width: 28px; height: 28px; border-radius: 50%; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+        .close-x { background: rgba(255, 255, 255, 0.1); border: none; color: #fff; width: 24px; height: 24px; border-radius: 50%; cursor: pointer; font-size: 11px; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
         .close-x:hover { background: #ff3333; }
         
-        /* ಲೋಡರ್ */
-        #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #050508; z-index: 1000; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 0.5s; }
-        .spinner { width: 45px; height: 45px; border: 3px solid rgba(255, 170, 0, 0.1); border-radius: 50%; border-top-color: #ffaa00; animation: spin 1s infinite linear; }
-        @keyframes spin { to { transform: rotate(360deg); } }
+        #loader { position: fixed; top: 10px; left: 10px; z-index: 1000; background: rgba(0,0,0,0.7); padding: 8px 15px; border-radius: 20px; font-size: 12px; color: #ffaa00; pointer-events: none; }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 </head>
 <body>
 
-    <div id="loader">
-        <div class="spinner"></div>
-        <div style="margin-top: 15px; font-size: 14px; color: #ffaa00;">ಗ್ಯಾಲರಿ ಲೋಡ್ ಆಗುತ್ತಿದೆ...</div>
-    </div>
+    <div id="loader">ಲೋಡ್ ಆಗುತ್ತಿದೆ...</div>
     
     <div id="cinema-info-bar">
         <div id="popup-title">
@@ -76,14 +65,8 @@
     <div id="canvas-container"></div>
 
     <div class="ui-layer">
-        <header class="interactive">
-            <h1>ದಕ್ಷಿಣ ಭಾರತದ ರಾಜವಂಶಗಳು</h1>
-            <p class="subtitle">ಚಿತ್ರದ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ ಫುಲ್ ಸ್ಕ್ರೀನ್‌ನಲ್ಲಿ ವೀಕ್ಷಿಸಿ!</p>
-        </header>
-
-        <footer class="interactive">
-            <span style="color: #666; font-size: 11px;">Interactive Gallery v7 (Cinema Mode)</span>
-            <button class="nav-btn" onclick="resetView()">ಮೂಲ ನೋಟ (Reset View)</button>
+        <footer class="interactive" style="display: flex; justify-content: flex-end; width: 100%;">
+            <button class="nav-btn" onclick="resetView()">Reset View</button>
         </footer>
     </div>
 
@@ -93,7 +76,10 @@
         const clickableObjects = [];
 
         let targetLookAt = new THREE.Vector3(0, 0, 0);
-        let targetFov = 75;
+        let targetCameraPos = new THREE.Vector3(0, 0, 1.5);
+        let isFocused = false;
+
+        const colors = [0xff5555, 0x55ff55, 0x5555ff, 0xffff55, 0xff55ff, 0x55ffff, 0xffaa00, 0xaa00ff, 0x00ffaa, 0xeeff00];
 
         const imagesList = [
             "https://raw.githubusercontent.com/chandugokarna-bit/gpt-teachers-resources/main/images/badami.jpeg", 
@@ -109,25 +95,24 @@
         ];
 
         const historyData = [
-            { title: "🏛️ ಬಾದಾಮಿ ಚಾಲುಕ್ಯರು", desc: "• ಸ್ಥಾಪಕ: ಜಯಸಿಂಹ. ಪ್ರಸಿದ್ಧ ದೊರೆ: ಇಮ್ಮಡಿ ಪುಲಕೇಶಿ. <br>• ಕೊಡುಗೆ: ಬಾದಾಮಿ, ಐಹೊಳೆ ಮತ್ತು ಪಟ್ಟದಕಲ್ಲಿನ ಗುಹಾಂತರ ದೇವಾಲಯಗಳು ಶಿಲ್ಪಕಲೆಯ ತವರೂರು." },
-            { title: "🛡️ ಕದಂಬ ರಾಜವಂಶ", desc: "• ಸ್ಥಾಪಕ: ಮಯೂರಶರ್ಮ. ರಾಜಧಾನಿ: ಬನವಾಸಿ. <br>• ವಿಶೇಷತೆ: ಕನ್ನಡದ ಮೊದಲ ರಾಜವಂಶ. ಹಲ್ಮಿಡಿ ಶಾಸನವು ಇವರ ಕಾಲದ ಅತ್ಯಂತ ಅಮೂಲ್ಯ ಕನ್ನಡ ಸಾಕ್ಷಿಯಾಗಿದೆ." },
-            { title: "🐘 ತಲಕಾಡಿನ ಗಂಗರು", desc: "• ರಾಜಧಾನಿ: ತಲಕಾಡು. <br>• ಕೊಡುಗೆ: ಶ್ರವಣಬೆಳಗೊಳದ ೫೭ ಅಡಿ ಎತ್ತರದ ಭವ್ಯ ಗೊಮ್ಮಟೇಶ್ವರ ಏಕಶಿಲಾ ವಿಗ್ರಹವನ್ನು ಇವರ ಮಂತ್ರಿ ಚಾವುಂಡರಾಯ ಕೆತ್ತಿಸಿದನು." },
-            { title: "🎨 ಕಲ್ಯಾಣ ಚಾಲುಕ್ಯರು", desc: "• ಪ್ರಸಿದ್ಧ ದೊರೆ: ಆರನೇ ವಿಕ್ರಮಾದಿತ್ಯ. <br>• ವಿಶೇಷತೆ: ಸಾಹಿತ್ಯ ಮತ್ತು ಕಲ್ಯಾಣದ ವಚನ ಚಳುವಳಿಗೆ ಈ ಕಾಲವೇ ಪ್ರಮುಖ ಅಡಿಪಾಯವಾಗಿದೆ." },
-            { title: "⚔️ ರಾಷ್ಟ್ರಕೂಟ ಸಾಮ್ರಾಜ್ಯ", desc: "• ಪ್ರಸಿದ್ಧ ದೊರೆ: ಅಮೋಘವರ್ಷ ನೃಪತುಂಗ. <br>• ಕೊಡುಗೆ: ಎಲ್ಲೋರಾದ ಕೈಲಾಸನಾಥ ದೇವಾಲಯ ಮತ್ತು ಕನ್ನಡದ ಪ್ರಥಮ ಗ್ರಂಥ 'ಕವಿರಾಜಮಾರ್ಗ' ರಚನೆಯಾದ ಸುವರ್ಣಯುಗ." },
-            { title: "🔱 ಹೊಯ್ಸಳ ಸಾಮ್ರಾಜ್ಯ", desc: "• ರಾಜಧಾನಿ: ದ್ವಾರಸಮುದ್ರ (ಹಳೇಬೀಡು). <br>• ವಿಶೇಷತೆ: ಬೇಲೂರು, ಹಳೇಬೀಡು ಮತ್ತು ಸೋಮನಾಥಪುರದ ನಕ್ಷತ್ರಾಕಾರದ ಅದ್ಭುತ ದೇವಾಲಯಗಳು ಜಗತ್ಪ್ರಸಿದ್ಧವಾಗಿವೆ." },
-            { title: "🐅 ಚೋಳ ಸಾಮ್ರಾಜ್ಯ", desc: "• ಪ್ರಸಿದ್ಧ ದೊರೆ: ರಾಜರಾಜ ಚೋಳ. <br>• ಕೊಡುಗೆ: ತಂಜಾವೂರಿನ ಬೃಹದೀಶ್ವರ ದೇವಾಲಯ ಹಾಗೂ ಬಲಿಷ್ಠ ನೌಕಾಪಡೆ ಹೊಂದಿದ್ದ ದಕ್ಷಿಣ ಭಾರತದ ಹೆಮ್ಮೆಯ ಸಾಮ್ರಾಜ್ಯ." },
-            { title: "💎 ವಿಜಯನಗರ ಸಾಮ್ರಾಜ್ಯ", desc: "• ಪ್ರಸಿದ್ಧ ದೊರೆ: ಶ್ರೀ ಕೃಷ್ಣದೇವರಾಯ. <br>• ಕೊಡುಗೆ: ಹಂಪಿಯ ವಿಠಲ ಸ್ವಾಮಿ ದೇವಾಲಯ, ಕಲ್ಲಿನ ರಥ ಮತ್ತು ಸಾಹಿತ್ಯ-ಸಂಸ್ಕೃತಿಯ ಪರಮ ವೈಭವದ ಕಾಲ." },
-            { title: "🕌 ಬಹುಮನಿ सुಲ್ತಾನರು", desc: "• ಸ್ಥಾಪಕ: ಅಲ್ಲಾವುದ್ದೀನ್ ಹಸನ್ ಗಂಗು ಬಹಮನ್ ಶಾ. <br>• ಕೊಡುಗೆ: ಬಿದರ್‌ನ ಪ್ರಸಿದ್ಧ ಮೊಹಮ್ಮದ್ ಗವಾನ್ ಮದರಸಾ ಮತ್ತು ಸುಂದರ ಇಂಡೋ-ಇಸ್ಲಾಮಿಕ್ ವಾಸ್ತುಶಿಲ್ಪ." },
-            { title: "👑 ಮೈಸೂರು ಒಡೆಯರು", desc: "• ಪ್ರಸಿದ್ಧ ದೊರೆ: ನಾಲ್ವಡಿ ಕೃಷ್ಣರಾಜ ಒಡೆಯರು. <br>• ಕೊಡುಗೆ: ಮೈಸೂರು ಅರಮನೆ, KRS ಜಲಾಶಯ ಮತ್ತು ಕರ್ನಾಟಕವನ್ನು ಆಧುನಿಕ ಮಾದರಿ ರಾಜ್ಯವನ್ನಾಗಿ ಮಾಡಿದ ಕೀರ್ತಿ ಇವರದ್ದು." }
+            { title: "🏛️ ಬಾದಾಮಿ ಚಾಲುಕ್ಯರು", desc: "• ಸ್ಥಾಪಕ: ಜಯಸಿಂಹ. ಪ್ರಸಿದ್ಧ ದೊರೆ: ಇಮ್ಮಡಿ ಪುಲಕೇಶಿ. ಬಾದಾಮಿ, ಐಹೊಳೆ ಮತ್ತು ಪಟ್ಟದಕಲ್ಲಿನ ಗುಹಾಂತರ ದೇವಾಲಯಗಳು ಇವರ ಕೊಡುಗೆ." },
+            { title: "🛡️ ಕದಂಬ ರಾಜವಂಶ", desc: "• ಸ್ಥಾಪಕ: ಮಯೂರಶರ್ಮ. ರಾಜಧಾನಿ: ಬನವಾಸಿ. ಕನ್ನಡದ ಮೊದಲ ರಾಜವಂಶ. ಹಲ್ಮಿಡಿ ಶಾಸನವು ಇವರ ಕಾಲದ ಅತ್ಯಂತ ಅಮೂಲ್ಯ ಕನ್ನಡ ಸಾಕ್ಷಿ." },
+            { title: "🐘 ತಲಕಾಡಿನ ಗಂಗರು", desc: "• ರಾಜಧಾನಿ: ತಲಕಾಡು. ಶ್ರವಣಬೆಳಗೊಳದ ೫೭ ಅಡಿ ಎತ್ತರದ ಭವ್ಯ ಗೊಮ್ಮಟೇಶ್ವರ ಏಕಶಿಲಾ ವಿಗ್ರಹವನ್ನು ಇವರ ಮಂತ್ರಿ ಚಾವುಂಡರಾಯ ಕೆತ್ತಿಸಿದನು." },
+            { title: "🎨 ಕಲ್ಯಾಣ ಚಾಲುಕ್ಯರು", desc: "• ಪ್ರಸಿದ್ಧ ದೊರೆ: ಆರನೇ ವಿಕ್ರಮಾದಿತ್ಯ. ಸಾಹಿತ್ಯ ಮತ್ತು ಕಲ್ಯಾಣದ ವಚನ ಚಳುವಳಿಗೆ ಈ ಕಾಲವೇ ಪ್ರಮುಖ ಅಡಿಪಾಯವಾಗಿದೆ." },
+            { title: "⚔️ ರಾಷ್ಟ್ರಕೂಟ ಸಾಮ್ರಾಜ್ಯ", desc: "• ಪ್ರಸಿದ್ಧ ದೊರೆ: ಅಮೋಘವರ್ಷ ನೃಪತುಂಗ. ಎಲ್ಲೋರಾದ ಕೈಲಾಸನಾಥ ದೇವಾಲಯ ಮತ್ತು ಕನ್ನಡದ ಪ್ರಥಮ ಗ್ರಂಥ 'ಕವಿರಾಜಮಾರ್ಗ' ರಚನೆಯಾದ ಸುವರ್ಣಯುಗ." },
+            { title: "🔱 ಹೊಯ್ಸಳ ಸಾಮ್ರಾಜ್ಯ", desc: "• ರಾಜಧಾನಿ: ದ್ವಾರಸಮುದ್ರ (ಹಳೇಬೀಡು). ಬೇಲೂರು, ಹಳೇಬೀಡು ಮತ್ತು ಸೋಮನಾಥಪುರದ ನಕ್ಷತ್ರಾಕಾರದ ಅದ್ಭುತ ದೇವಾಲಯಗಳು ಜಗತ್ಪ್ರಸಿದ್ಧವಾಗಿವೆ." },
+            { title: "🐅 ಚೋಳ ಸಾಮ್ರಾಜ್ಯ", desc: "• ಪ್ರಸಿದ್ಧ ದೊರೆ: ರಾಜರಾಜ ಚೋಳ. ತಂಜಾವೂರಿನ ಬೃಹದೀಶ್ವರ ದೇವಾಲಯ ಹಾಗೂ ಬಲಿಷ್ಠ ನೌಕಾಪಡೆ ಹೊಂದಿದ್ದ ದಕ್ಷಿಣ ಭಾರತದ ಹೆಮ್ಮೆಯ ಸಾಮ್ರಾಜ್ಯ." },
+            { title: "💎 ವಿಜಯನಗರ ಸಾಮ್ರಾಜ್ಯ", desc: "• ಪ್ರಸಿದ್ಧ ದೊರೆ: ಶ್ರೀ ಕೃಷ್ಣದೇವರಾಯ. ಹಂಪಿಯ ವಿಠಲ ಸ್ವಾಮಿ ದೇವಾಲಯ, ಕಲ್ಲಿನ ರಥ ಮತ್ತು ಸಾಹಿತ್ಯ-ಸಂಸ್ಕೃತಿಯ ಪರಮ ವೈಭವದ ಕಾಲ." },
+            { title: "🕌 ಬಹುಮನಿ ಸುಲ್ತಾನರು", desc: "• ಸ್ಥಾಪಕ: ಅಲ್ಲಾವುದ್ದೀನ್ ಹಸನ್ ಗಂಗು ಬಹಮನ್ ಶಾ. ಬಿದರ್‌ನ ಪ್ರಸಿದ್ಧ ಮೊಹಮ್ಮದ್ ಗವಾನ್ ಮದರಸಾ ಮತ್ತು ಸುಂದರ ಇಂಡೋ-ಇಸ್ಲಾಮಿಕ್ ವಾಸ್ತುಶಿಲ್ಪ." },
+            { title: "👑 ಮೈಸೂರು ಒಡೆಯರು", desc: "• ಪ್ರಸಿದ್ಧ ದೊರೆ: ನಾಲ್ವಡಿ ಕೃಷ್ಣರಾಜ ಒಡೆಯರು. ಮೈಸೂರು ಅರಮನೆ, KRS ಜಲಾಶಯ ಮತ್ತು ಕರ್ನಾಟಕವನ್ನು ಆಧುನಿಕ ಮಾದರಿ ರಾಜ್ಯವನ್ನಾಗಿ ಮಾಡಿದ ಕೀರ್ತಿ ಇವರದ್ದು." }
         ];
 
         function init() {
             scene = new THREE.Scene();
-            scene.background = new THREE.Color(0x020205);
-            scene.fog = new THREE.FogExp2(0x020205, 0.015);
+            scene.background = new THREE.Color(0x020204);
 
-            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            camera.position.set(0, 0, 1.5); 
+            camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.copy(targetCameraPos); 
 
             renderer = new THREE.WebGLRenderer({ antialias: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
@@ -135,61 +120,53 @@
             container.appendChild(renderer.domElement);
 
             controls = new THREE.OrbitControls(camera, renderer.domElement);
-            controls.enableZoom = false;       
-            controls.enablePan = false;
             controls.enableDamping = true;
-            controls.dampingFactor = 0.05;
+            controls.dampingFactor = 0.07;
+            controls.maxDistance = 18;
+            controls.minDistance = 0.5;
 
             scene.add(new THREE.AmbientLight(0xffffff, 0.95));
             
-            // ಬೃಹತ್ ಹಾಲ್ ಸೆಟಪ್
-            const roomWidth = 32, roomHeight = 12, roomDepth = 32;
-            const roomGeo = new THREE.BoxGeometry(roomWidth, roomHeight, roomDepth);
-            const wallMat = new THREE.MeshStandardMaterial({ color: 0x08080d, roughness: 0.6, side: THREE.BackSide });
-            const floorMat = new THREE.MeshStandardMaterial({ color: 0x020204, roughness: 0.15, metalness: 0.7, side: THREE.BackSide });
-            const ceilingMat = new THREE.MeshStandardMaterial({ color: 0x010102, roughness: 0.9, side: THREE.BackSide });
-            const room = new THREE.Mesh(roomGeo, [wallMat, wallMat, ceilingMat, floorMat, wallMat, wallMat]);
+            // ಬೃಹತ್ ಹಾಲ್
+            const roomGeo = new THREE.BoxGeometry(32, 12, 32);
+            const wallMat = new THREE.MeshStandardMaterial({ color: 0x050508, side: THREE.BackSide });
+            const room = new THREE.Mesh(roomGeo, wallMat);
             scene.add(room);
 
             raycaster = new THREE.Raycaster();
             mouse = new THREE.Vector2();
 
-            const wallX = roomWidth / 2 - 0.05; 
-            const wallZ = roomDepth / 2 - 0.05; 
+            const wallX = 16 - 0.05; 
+            const wallZ = 16 - 0.05; 
 
-            // ಚಿತ್ರಗಳ ಲೇಔಟ್ ಪೊಸಿಷನ್ ಜೋಡಣೆ
             const galleryLayout = [
-                { id: 0, url: imagesList[0], w: 10, h: 5.5, pos: [-4, 0.5, -wallZ], rot: [0, 0, 0] },
-                { id: 1, url: imagesList[1], w: 7.5, h: 5.0, pos: [-wallX, 0.5, -9.5], rot: [0, Math.PI/2, 0] },
-                { id: 2, url: imagesList[2], w: 7.5, h: 5.0, pos: [-wallX, 0.5, 0], rot: [0, Math.PI/2, 0] },
-                { id: 3, url: imagesList[3], w: 7.5, h: 5.0, pos: [-wallX, 0.5, 9.5], rot: [0, Math.PI/2, 0] },
-                { id: 4, url: imagesList[4], w: 7.5, h: 5.0, pos: [-5.5, 0.5, wallZ], rot: [0, Math.PI, 0] },
-                { id: 5, url: imagesList[5], w: 7.5, h: 5.0, pos: [5.5, 0.5, wallZ], rot: [0, Math.PI, 0] },
-                { id: 6, url: imagesList[6], w: 7.5, h: 5.0, pos: [wallX, 0.5, 9.5], rot: [0, -Math.PI/2, 0] },
-                { id: 7, url: imagesList[7], w: 7.5, h: 5.0, pos: [wallX, 0.5, 0], rot: [0, -Math.PI/2, 0] },
-                { id: 8, url: imagesList[8], w: 7.5, h: 5.0, pos: [wallX, 0.5, -9.5], rot: [0, -Math.PI/2, 0] },
-                { id: 9, url: imagesList[9], w: 6.5, h: 4.8, pos: [7.5, 0.5, -wallZ], rot: [0, 0, 0] }
+                { id: 0, url: imagesList[0], w: 10, h: 5.5, pos: [-4, 0.5, -wallZ], rot: [0, 0, 0], normal: [0, 0, 1] },
+                { id: 1, url: imagesList[1], w: 7.5, h: 5.0, pos: [-wallX, 0.5, -9.5], rot: [0, Math.PI/2, 0], normal: [1, 0, 0] },
+                { id: 2, url: imagesList[2], w: 7.5, h: 5.0, pos: [-wallX, 0.5, 0], rot: [0, Math.PI/2, 0], normal: [1, 0, 0] },
+                { id: 3, url: imagesList[3], w: 7.5, h: 5.0, pos: [-wallX, 0.5, 9.5], rot: [0, Math.PI/2, 0], normal: [1, 0, 0] },
+                { id: 4, url: imagesList[4], w: 7.5, h: 5.0, pos: [-5.5, 0.5, wallZ], rot: [0, Math.PI, 0], normal: [0, 0, -1] },
+                { id: 5, url: imagesList[5], w: 7.5, h: 5.0, pos: [5.5, 0.5, wallZ], rot: [0, Math.PI, 0], normal: [0, 0, -1] },
+                { id: 6, url: imagesList[6], w: 7.5, h: 5.0, pos: [wallX, 0.5, 9.5], rot: [0, -Math.PI/2, 0], normal: [-1, 0, 0] },
+                { id: 7, url: imagesList[7], w: 7.5, h: 5.0, pos: [wallX, 0.5, 0], rot: [0, -Math.PI/2, 0], normal: [-1, 0, 0] },
+                { id: 8, url: imagesList[8], w: 7.5, h: 5.0, pos: [wallX, 0.5, -9.5], rot: [0, -Math.PI/2, 0], normal: [-1, 0, 0] },
+                { id: 9, url: imagesList[9], w: 6.5, h: 4.8, pos: [7.5, 0.5, -wallZ], rot: [0, 0, 0], normal: [0, 0, 1] }
             ];
 
             const textureLoader = new THREE.TextureLoader();
-            let loadedCount = 0;
 
-            galleryLayout.forEach((art) => {
-                textureLoader.load(art.url, function(texture) {
-                    createArtwork(art.id, texture, art.w, art.h, new THREE.Vector3(...art.pos), new THREE.Vector3(...art.rot));
-                    loadedCount++;
-                    if(loadedCount === galleryLayout.length) {
-                        document.getElementById('loader').style.opacity = 0;
-                        setTimeout(() => document.getElementById('loader').style.display = 'none', 500);
+            galleryLayout.forEach((art, index) => {
+                textureLoader.load(art.url, 
+                    function(texture) {
+                        createArtwork(art.id, texture, null, art.w, art.h, new THREE.Vector3(...art.pos), new THREE.Vector3(...art.rot), new THREE.Vector3(...art.normal));
+                    },
+                    undefined,
+                    function(err) {
+                        createArtwork(art.id, null, colors[index], art.w, art.h, new THREE.Vector3(...art.pos), new THREE.Vector3(...art.rot), new THREE.Vector3(...art.normal));
                     }
-                });
+                );
             });
 
-            // ಮೌಸ್ ಸ್ಕ್ರಾಲ್ ಜೂಮ್ ಕಂಟ್ರೋಲ್
-            window.addEventListener('wheel', (e) => {
-                targetFov += e.deltaY * 0.04;
-                targetFov = Math.max(12, Math.min(95, targetFov)); 
-            }, { passive: true });
+            setTimeout(() => { document.getElementById('loader').style.display = 'none'; }, 1500);
 
             let startX, startY;
             renderer.domElement.addEventListener('pointerdown', (e) => { startX = e.clientX; startY = e.clientY; });
@@ -202,21 +179,38 @@
             window.addEventListener('resize', onWindowResize, false);
         }
 
-        function createArtwork(id, texture, width, height, position, rotation) {
+        function createArtwork(id, texture, fallbackColor, width, height, position, rotation, normal) {
             const group = new THREE.Group();
             const artGeo = new THREE.PlaneGeometry(width, height);
-            const artMat = new THREE.MeshStandardMaterial({ map: texture, roughness: 0.15, side: THREE.DoubleSide });
+            
+            let artMat = texture 
+                ? new THREE.MeshStandardMaterial({ map: texture, roughness: 0.15, side: THREE.DoubleSide })
+                : new THREE.MeshStandardMaterial({ color: fallbackColor, roughness: 0.4, side: THREE.DoubleSide });
+            
             const artMesh = new THREE.Mesh(artGeo, artMat);
             
-            artMesh.userData = { dynastyId: id, position: position.clone() };
+            // 🎯 ಮ್ಯಾಜಿಕ್ ಲೆಕ್ಕಾಚಾರ: ಫೋಟೋ ಕರಾರುವಕ್ಕಾಗಿ ಸ್ಕ್ರೀನ್ ತುಂಬಾ ವಿಸ್ತರಿಸಲು ಗಣಿತದ ಲೆಕ್ಕಾಚಾರ
+            const vFOV = (camera.fov * Math.PI) / 180;
+            let distance = (height / 2) / Math.tan(vFOV / 2);
+            
+            // ಅಗಲಕ್ಕೂ ಮತ್ತು ಬ್ರೌಸರ್ ರೇಶಿಯೋಗೂ ಹೊಂದಿಕೆ
+            const aspect = window.innerWidth / window.innerHeight;
+            const distanceForWidth = (width / 2) / Math.tan((camera.fov * aspect * Math.PI) / 360);
+            
+            // ಫೋಟೋ ಇಡೀ ಸ್ಕ್ರೀನ್ ತುಂಬಲು ಎರಡರಲ್ಲಿ ಗರಿಷ್ಠ ಹತ್ತಿರದ ದೂರವನ್ನು ಆಯ್ದುಕೊಳ್ಳಲಾಗುತ್ತದೆ
+            distance = Math.max(distance, distanceForWidth) * 0.96; 
+
+            const camPos = position.clone().add(normal.clone().multiplyScalar(distance));
+
+            artMesh.userData = { dynastyId: id, position: position.clone(), cameraPos: camPos };
             clickableObjects.push(artMesh); 
             group.add(artMesh);
 
-            // ಆಕರ್ಷಕ ನಿಯಾನ್ ಫ್ರೇಮ್ ವೈರ್‌ಫ್ರೇಮ್
-            const frameGeo = new THREE.PlaneGeometry(width + 0.15, height + 0.15);
+            // ಸುಂದರ ಬಾರ್ಡರ್ ಫ್ರೇಮ್
+            const frameGeo = new THREE.PlaneGeometry(width + 0.08, height + 0.08);
             const frameMat = new THREE.MeshBasicMaterial({ color: 0x00ffcc, wireframe: true, side: THREE.DoubleSide });
             const frameMesh = new THREE.Mesh(frameGeo, frameMat);
-            frameMesh.position.z = -0.01;
+            frameMesh.position.z = -0.003;
             group.add(frameMesh);
 
             group.position.copy(position);
@@ -236,11 +230,10 @@
                 if(clickedMesh.userData && clickedMesh.userData.dynastyId !== undefined) {
                     const id = clickedMesh.userData.dynastyId;
                     
-                    // 🎯 ಮ್ಯಾಜಿಕ್ ಜೂಮ್: ಕ್ಯಾಮೆರಾವನ್ನು ನೇರವಾಗಿ ಫೋಟೋದ ಮುಂದೆ ತಂದು ಇಡೀ ಫ್ರೇಮ್ ಆವರಿಸುವಂತೆ ಮಾಡುತ್ತದೆ
                     targetLookAt.copy(clickedMesh.userData.position);
-                    targetFov = 24; // ಫೋಟೋ ಪೂರ್ತಿ ಸ್ಕ್ರೀನ್ ತುಂಬಲು ತಕ್ಕನಾದ ಜೂಮ್ ಮೌಲ್ಯ
+                    targetCameraPos.copy(clickedMesh.userData.cameraPos);
+                    isFocused = true;
 
-                    // ಕೆಳಭಾಗದ ಬಾರ್‌ನಲ್ಲಿ ವಿವರಣೆ ಪ್ರದರ್ಶನ
                     document.getElementById('dynasty-name').innerHTML = historyData[id].title;
                     document.getElementById('popup-desc').innerHTML = historyData[id].desc;
                     document.getElementById('cinema-info-bar').classList.add('active');
@@ -250,7 +243,8 @@
 
         function resetView() {
             targetLookAt.set(0, 0, 0); 
-            targetFov = 75; 
+            targetCameraPos.set(0, 0, 1.5);
+            isFocused = false;
             document.getElementById('cinema-info-bar').classList.remove('active');
         }
 
@@ -263,12 +257,9 @@
         function animate() {
             requestAnimationFrame(animate);
             controls.target.lerp(targetLookAt, 0.08);
-
-            if (Math.abs(camera.fov - targetFov) > 0.05) {
-                camera.fov += (targetFov - camera.fov) * 0.08;
-                camera.updateProjectionMatrix();
+            if (isFocused) {
+                camera.position.lerp(targetCameraPos, 0.08);
             }
-
             controls.update();
             renderer.render(scene, camera);
         }
