@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D ನೆಕ್ಸ್ಟ್‌ಜೆನ್ ವರ್ಚುವಲ್ ಲ್ಯಾಬ್: ಕೊಬ್ಬಿನಾಂಶಕ್ಕಾಗಿ ಪಾರದರ್ಶಕ ಚುಕ್ಕೆ ಪರೀಕ್ಷೆ</title>
+    <style>
+        :root {
+            --bg-dark: #090d16;
+            --panel-bg: linear-gradient(135deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.8) 100%);
+            --bench-top: linear-gradient(180deg, #475569 0%, #334155 100%);
+            --bench-lip: #1e293b;
+            --bench-front: #0f172a;
+            --neon-blue: #38bdf8;
+            --neon-amber: #fbbf24;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            user-select: none;
+            perspective: 1000px; /* ಸ್ಕ್ರೀನ್‌ಗೆ 3D ಆಳವನ್ನು ನೀಡುತ್ತದೆ */
+        }
+
+        .lab-container {
+            width: 100%;
+            max-width: 1200px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        header {
+            background: var(--panel-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 1.5rem;
+            background: linear-gradient(to right, #38bdf8, #fbbf24);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hud-banner {
+            background: rgba(56, 189, 248, 0.1);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            color: var(--neon-blue);
+            padding: 15px 20px;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            box-shadow: inset 0 0 15px rgba(56, 189, 248, 0.05);
+        }
+
+        /* 3D ಲ್ಯಾಬ್ ಬೆಂಚ್ ರಚನೆ */
+        .workspace {
+            position: relative;
+            background: var(--panel-bg);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 24px;
+            height: 560px;
+            padding: 30px;
+            box-sizing: border-box;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+        }
+
+        /* 3D ಮೇಲ್ಮೈ ದೃಷ್ಟಿಕೋನ ನಿರ್ಮಾಣ */
+        .bench-surface {
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 220px;
+            background: var(--bench-top);
+            transform: perspective(400px) rotateX(20deg);
+            transform-origin: bottom center;
+            border-top: 3px solid rgba(255, 255, 255, 0.3);
+            box-shadow: inset 0 20px 30px rgba(0,0,0,0.6);
+            z-index: 1;
+        }
+
+        .bench-front-lip {
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 20px;
+            background: var(--bench-lip);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 3;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.8);
+        }
+
+        .station {
+            z-index: 2;
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .food-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+
+        /* 3D ವಾಚ್ ಗ್ಲಾಸ್ ತಟ್ಟೆಗಳು */
+        .watch-glass {
+            width: 100px;
+            height: 45px;
+            background: rgba(255, 255, 255, 0.12);
+            border: 2px solid rgba(255, 255, 255, 0.25);
+            border-radius: 50%;
+            position: relative;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            box-shadow: 
+                inset 0 4px 10px rgba(255,255,255,0.2),
+                0 6px 12px rgba(0,0,0,0.4);
+            transform: rotateX(15deg);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .watch-glass:hover:not(.used) {
+            transform: rotateX(15deg) translateY(-8px);
+            border-color: var(--neon-blue);
+            box-shadow: 
+                inset 0 4px 10px rgba(56, 189, 248, 0.4),
+                0 15px 20px rgba(0,0,0,0.5);
+        }
+        .watch-glass.used { opacity: 0.2; cursor: not-allowed; transform: rotateX(15deg) scale(0.9); }
+
+        .food-item {
+            position: absolute;
+            top: -12px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            text-shadow: 0 4px 8px rgba(0,0,0,0.6);
+            transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+            text-align: center;
+            width: 100%;
+        }
+
+        /* 3D ಬಟರ್ ಪೇಪರ್ ಬ್ಲಾಕ್‌ಗಳು */
+        .paper-holder {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .butter-paper {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.55) 0%, rgba(241, 245, 249, 0.4) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            border-radius: 4px;
+            box-shadow: 
+                -2px 2px 0px rgba(200,200,200,0.5),
+                -4px 4px 0px rgba(150,150,150,0.3),
+                -10px 15px 20px rgba(0,0,0,0.4);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            font-size: 0.75rem;
+            font-weight: 800;
+            color: #0f172a;
+            transform: rotateX(20deg) rotateY(-10deg);
+            transition: all 0.5s ease;
+        }
+
+        .grease-spot {
+            position: absolute;
+            width: 0px;
+            height: 0px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            filter: blur(5px);
+            box-shadow: inset 0 0 10px rgba(255,255,255,0.5);
+            transition: width 1s ease, height 1s ease, background-color 1s ease;
+        }
+
+        /* 3D ಡಯಾಗ್ನೋಸ್ಟಿಕ್ ಲೈಟ್ ಬಾಕ್ಸ್ */
+        .light-box {
+            width: 250px;
+            height: 250px;
+            background: #1e293b;
+            border-left: 6px solid #475569;
+            border-top: 4px solid #475569;
+            border-right: 8px solid #334155;
+            border-bottom: 12px solid #1e293b;
+            border-radius: 16px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            transform: rotateX(10deg) rotateY(-15deg);
+            box-shadow: 
+                -15px 20px 35px rgba(0,0,0,0.6),
+                inset 0 0 30px rgba(0,0,0,0.9);
+        }
+
+        .light-screen {
+            width: 210px;
+            height: 210px;
+            background: #e2e8f0;
+            border-radius: 8px;
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            transition: all 0.4s ease;
+        }
+
+        .station-label {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #38bdf8;
+            letter-spacing: 1px;
+            background: #090d16;
+            padding: 4px 12px;
+            border-radius: 20px;
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        /* 3D ಪೆಸ್ಟಲ್ ಉಪಕರಣ (ಸುತ್ತಿಗೆ/ಕುಟ್ಟಾಣಿ) */
+        .mortar-pestle {
+            position: absolute;
+            font-size: 3.5rem;
+            opacity: 0;
+            z-index: 100;
+            pointer-events: none;
+            filter: drop-shadow(-10px 15px 10px rgba(0,0,0,0.6));
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes crushAction3D {
+            0% { transform: scale(1) translate(0, 0) rotate(0deg); }
+            30% { transform: scale(1.3) translate(-10px, -40px) rotate(-20deg); }
+            50% { transform: scale(0.9) translate(0, 15px) rotate(5deg); }
+            70% { transform: scale(1.1) translate(-2px, -10px) rotate(-5deg); }
+            100% { transform: scale(1) translate(0, 0) rotate(0deg); }
+        }
+
+        /* ಡ್ಯಾಶ್‌ಬೋರ್ಡ್ ಪ್ಯಾನೆಲ್‌ಗಳು */
+        .analysis-dashboard {
+            background: var(--panel-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 25px;
+            display: none;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .metrics-card {
+            background: rgba(9, 13, 22, 0.6);
+            padding: 20px;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            border-left: 5px solid #64748b;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+        }
+
+        .action-btn {
+            background: linear-gradient(185deg, #ef4444 0%, #991b1b 100%);
+            color: var(--text-main);
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            box-shadow: 0 5px 15px rgba(239, 68, 68, 0.4);
+            transition: all 0.2s;
+        }
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(239, 68, 68, 0.6);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="lab-container">
+        <header>
+            <div>
+                <h1>ಕೊಬ್ಬಿನಾಂಶದ ಗುಣಾತ್ಮಕ ವಿಶ್ಲೇಷಣೆ (Qualitative Analysis of Fats)</h1>
+                <p style="margin: 3px 0 0 0; font-size: 0.85rem; color: var(--text-muted);">ಸಂವಾದಾತ್ಮಕ 3D ಪ್ರಾಯೋಗಿಕ ಸಿಮ್ಯುಲೇಶನ್</p>
+            </div>
+            <div style="font-size: 0.8rem; background: rgba(255,255,255,0.05); padding: 5px 12px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1)">
+                ಪರಿಸರ ಶೈಲಿ: <span style="color:var(--neon-blue); font-weight:bold;">Stereoscopic CSS-3D</span>
+            </div>
+        </header>
+
+        <div class="hud-banner" id="hud-alert">
+            ➔ <strong>ಕಾರ್ಯವಿಧಾನ:</strong> <span id="step-desc">ಬಾದಾಮಿ (Almond) ವಾಚ್ ಗ್ಲಾಸ್ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ ಅದನ್ನು ಪುಡಿ ಮಾಡಲು ಪೇಪರ್ A ಮೇಲೆ ಇರಿಸಿ.</span>
+        </div>
+
+        <div class="workspace" id="bench-space">
+            <div class="bench-surface"></div>
+            <div class="bench-front-lip"></div>
+
+            <div class="mortar-pestle" id="lab-pestle">🔨</div>
+
+            <div class="station">
+                <div class="food-grid">
+                    <div class="watch-glass" id="wg-almond" onclick="processFood('almond', 'paper-a')">
+                        <div class="food-item" id="item-almond">ಬಾದಾಮಿ</div>
+                    </div>
+                    <div class="watch-glass" id="wg-groundnut" onclick="processFood('groundnut', 'paper-b')">
+                        <div class="food-item" id="item-groundnut">ಕಡಲೇಕಾಯಿ</div>
+                    </div>
+                    <div class="watch-glass" id="wg-dal" onclick="processFood('dal', 'paper-c')">
+                        <div class="food-item" id="item-dal">ತೊಗರಿಬೇಳೆ</div>
+                    </div>
+                    <div class="watch-glass" id="wg-peas" onclick="processFood('peas', 'paper-d')">
+                        <div class="food-item" id="item-peas">ಹಸಿರು ಬಟಾಣಿ</div>
+                    </div>
+                </div>
+                <div class="station-label">ಆಹಾರದ ಮಾದರಿಗಳು</div>
+            </div>
+
+            <div class="station">
+                <div class="paper-holder">
+                    <div class="butter-paper" id="paper-a">
+                        <div class="grease-spot" id="spot-a"></div>
+                        <span style="z-index:2;">ಪೇಪರ್ A</span>
+                        <span id="label-a" style="font-size:0.65rem; color:#475569; margin-top:4px; font-weight:bold;">ಬಳಸಿಲ್ಲ</span>
+                    </div>
+                    <div class="butter-paper" id="paper-b">
+                        <div class="grease-spot" id="spot-b"></div>
+                        <span style="z-index:2;">ಪೇಪರ್ B</span>
+                        <span id="label-b" style="font-size:0.65rem; color:#475569; margin-top:4px; font-weight:bold;">ಬಳಸಿಲ್ಲ</span>
+                    </div>
+                    <div class="butter-paper" id="paper-c">
+                        <div class="grease-spot" id="spot-c"></div>
+                        <span style="z-index:2;">ಪೇಪರ್ C</span>
+                        <span id="label-c" style="font-size:0.65rem; color:#475569; margin-top:4px; font-weight:bold;">ಬಳಸಿಲ್ಲ</span>
+                    </div>
+                    <div class="butter-paper" id="paper-d">
+                        <div class="grease-spot" id="spot-d"></div>
+                        <span style="z-index:2;">ಪೇಪರ್ D</span>
+                        <span id="label-d" style="font-size:0.65rem; color:#475569; margin-top:4px; font-weight:bold;">ಬಳಸಿಲ್ಲ</span>
+                    </div>
+                </div>
+                <div class="station-label">ಪರೀಕ್ಷಾ ಪೇಪರ್‌ಗಳು</div>
+            </div>
+
+            <div class="station">
+                <div class="light-box" id="box-diagnostic">
+                    <div class="light-screen" id="viewscreen">
+                        <div style="color: #475569; font-size: 0.85rem; font-weight:bold; text-align:center; padding: 10px;">
+                            ಆಪ್ಟಿಕಲ್ ಲೈಟ್ ಸ್ಕ್ರೀನ್<br><span style="font-size:0.7rem; color:#94a3b8; font-weight:normal;">(ಪರೀಕ್ಷಾ ಕಾಗದಗಳಿಗಾಗಿ ಕಾಯಲಾಗುತ್ತಿದೆ)</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="station-label">ಪಾರದರ್ಶಕತೆ ಪರೀಕ್ಷಕ ದೀಪ</div>
+            </div>
+        </div>
+
+        <div class="analysis-dashboard" id="dash-panel">
+            <h3 style="margin: 0; font-size: 1.2rem; color: var(--neon-amber);">ವೀಕ್ಷಣಾ ಕೋಷ್ಟಕ ಮತ್ತು ತೀರ್ಮಾನಗಳು</h3>
+            <div class="card-grid">
+                <div class="metrics-card" style="border-left-color: #22c55e;">
+                    <strong style="color:#22c55e;">ಪೇಪರ್ A (ಬಾದಾಮಿ):</strong><br>
+                    ಕಾಗದದ ನಾರಿನ ನಡುವೆ ಶಾಶ್ವತ ಪಾರದರ್ಶಕ (Translucent) ಎಣ್ಣೆಯ ಜಿಡ್ಡು ಕಂಡುಬಂದಿದೆ. **ಕೊಬ್ಬಿನಾಂಶ ಪ್ರಸ್ತುತವಾಗಿದೆ.**
+                </div>
+                <div class="metrics-card" style="border-left-color: #22c55e;">
+                    <strong style="color:#22c55e;">ಪೇಪರ್ B (ಕಡಲೇಕಾಯಿ):</strong><br>
+                    ಹೆಚ್ಚಿನ ಲಿಪಿಡ್ ಸಾಂದ್ರತೆ ಕಂಡುಬಂದಿದೆ. ಬೆಳಕು ಸುಲಭವಾಗಿ ಹಾದುಹೋಗುತ್ತದೆ. **ಕೊಬ್ಬಿನಾಂಶ ಪ್ರಸ್ತುತವಾಗಿದೆ.**
+                </div>
+                <div class="metrics-card" style="border-left-color: #ef4444;">
+                    <strong style="color:#ef4444;">ಪೇಪರ್ C (ತೊಗರಿಬೇಳೆ):</strong><br>
+                    ನೀರಿನ ತೇವಾಂಶದ ಚುಕ್ಕೆ ಸಂಪೂರ್ಣವಾಗಿ ಒಣಗಿಹೋಗಿದೆ, ಪಾರದರ್ಶಕತೆ ಬದಲಾಗಿಲ್ಲ. **ಕೊಬ್ಬಿನಾಂಶ ಗೈರುಹಾಜರಾಗಿದೆ.**
+                </div>
+                <div class="metrics-card" style="border-left-color: #ef4444;">
+                    <strong style="color:#ef4444;">ಪೇಪರ್ D (ಹಸಿರು ಬಟಾಣಿ):</strong><br>
+                    ಯಾವುದೇ ಪಾರದರ್ಶಕ ವಲಯ ಉಂಟಾಗಿಲ್ಲ. ಕೇವಲ ಪಿಷ್ಟ/ನೀರಿನ ಅಂಶ ಮಾತ್ರ ಇತ್ತು. **ಕೊಬ್ಬಿನಾಂಶ ಗೈರುಹಾಜರಾಗಿದೆ.**
+                </div>
+            </div>
+            <div style="margin-top: 20px; display: flex; justify-content: flex-end;">
+                <button class="action-btn" onclick="resetLab()">ಪ್ರಯೋಗವನ್ನು ಮರುಹೊಂದಿಸಿ (Reset)</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let progress = { almond: false, groundnut: false, dal: false, peas: false };
+        let order = ['almond', 'groundnut', 'dal', 'peas'];
+        let kannadaNames = { almond: 'ಬಾದಾಮಿ', groundnut: 'ಕಡಲೇಕಾಯಿ', dal: 'ತೊಗರಿಬೇಳೆ', peas: 'ಹಸಿರು ಬಟಾಣಿ' };
+        let currentStepIndex = 0;
+
+        function processFood(foodKey, paperId) {
+            if (foodKey !== order[currentStepIndex]) return;
+
+            document.getElementById(`wg-${foodKey}`).classList.add('used');
+            
+            const foodElement = document.getElementById(`item-${foodKey}`);
+            const paperElement = document.getElementById(paperId);
+            const pestle = document.getElementById('lab-pestle');
+            
+            // 3D ಜಾಗಕ್ಕೆ ಹೊಂದಿಸಲು ಆಫ್‌ಸೆಟ್ ಲೆಕ್ಕಾಚಾರಗಳು
+            const targetLeft = paperElement.offsetLeft + 25;
+            const targetTop = paperElement.offsetTop + 10;
+
+            foodElement.style.left = `${targetLeft}px`;
+            foodElement.style.top = `${targetTop}px`;
+            foodElement.style.transform = "scale(0.8) rotateX(0deg)";
+            foodElement.style.zIndex = "5";
+
+            setTimeout(() => {
+                pestle.style.opacity = '1';
+                pestle.style.left = `${targetLeft + 15}px`;
+                pestle.style.top = `${targetTop - 45}px`;
+
+                setTimeout(() => {
+                    pestle.style.animation = "crushAction3D 0.6s ease-in-out 2";
+                    
+                    setTimeout(() => {
+                        pestle.style.opacity = '0';
+                        pestle.style.animation = 'none';
+                        foodElement.style.transform = 'scaleY(0.1) scaleX(1.4)';
+                        foodElement.style.opacity = '0.2';
+                        
+                        const spot = paperElement.querySelector('.grease-spot');
+                        const label = document.getElementById(`label-${paperId.split('-')[1]}`);
+                        
+                        if (foodKey === 'almond' || foodKey === 'groundnut') {
+                            spot.style.width = '60px';
+                            spot.style.height = '60px';
+                            label.innerText = "ಪಾರದರ್ಶಕ ಜಿಡ್ಡು";
+                            label.style.color = "#d97706";
+                        } else {
+                            spot.style.width = '50px';
+                            spot.style.height = '50px';
+                            spot.style.backgroundColor = 'rgba(56, 189, 248, 0.4)';
+                            label.innerText = "ತೇವಾಂಶದ ಚುಕ್ಕೆ";
+                            label.style.color = "#2563eb";
+                            
+                            setTimeout(() => {
+                                spot.style.width = '0px';
+                                spot.style.height = '0px';
+                                label.innerText = "ಆವಿಯಾಗಿದೆ (ಒಣಗಿದೆ)";
+                                label.style.color = "#dc2626";
+                            }, 1400);
+                        }
+
+                        progress[foodKey] = true;
+                        currentStepIndex++;
+                        advanceWorkflow();
+                    }, 1300);
+                }, 500);
+            }, 400);
+        }
+
+        function advanceWorkflow() {
+            if (currentStepIndex < order.length) {
+                const nextFood = order[currentStepIndex];
+                const cleanName = kannadaNames[nextFood];
+                const nextPaper = String.fromCharCode(65 + currentStepIndex); // A, B, C, D ನೀಡುತ್ತದೆ (ಆದರೆ ಕೋಡ್ ಹೆಸರಿಗಾಗಿ ಇರಲಿ)
+                letಕನ್ನಡಪೇಪರ್ = "A";
+                if(nextPaper == 'B') ಕನ್ನಡಪೇಪರ್ = "B";
+                if(nextPaper == 'C') ಕನ್ನಡಪೇಪರ್ = "C";
+                if(nextPaper == 'D') ಕನ್ನಡಪೇಪರ್ = "D";
+
+                document.getElementById('step-desc').innerText = `ಪುಡಿ ಮಾಡುವ ಹಂತ ಮುಗಿದಿದೆ. ಈಗ ${cleanName} ತಟ್ಟೆಯ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ ಪೇಪರ್ ${ಕನ್ನಡಪೇಪರ್} ಮೇಲೆ ಇರಿಸಿ.`;
+            } else {
+                document.getElementById('step-desc').innerText = "ಎಲ್ಲಾ ಮಾದರಿಗಳನ್ನು ಪುಡಿ ಮಾಡಲಾಗಿದೆ. ಪೇಪರ್‌ಗಳನ್ನು ಬೆಳಕಿನ ಪರದೆಯ ಮುಂದೆ ಪರಿಶೀಲಿಸಲಾಗುತ್ತಿದೆ...";
+                setTimeout(triggerOpticalAnalysis, 1800);
+            }
+        }
+
+        function triggerOpticalAnalysis() {
+            const screen = document.getElementById('viewscreen');
+            screen.style.background = '#fef08a'; 
+            screen.style.boxShadow = "inset 0 0 40px #eab308, 0 0 30px rgba(234, 179, 8, 0.6)";
+            
+            screen.innerHTML = `
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; transform: scale(0.8) rotateX(10deg);">
+                    <div class="butter-paper" style="background:rgba(255,255,255,0.1); border:2px solid #a1a1aa; transform:none; box-shadow:none;">
+                        <div class="grease-spot" style="width:50px; height:50px; background:rgba(255,255,255,0.95); filter:blur(2px);"></div>
+                        <span>ಪೇಪರ್ A</span>
+                    </div>
+                    <div class="butter-paper" style="background:rgba(255,255,255,0.1); border:2px solid #a1a1aa; transform:none; box-shadow:none;">
+                        <div class="grease-spot" style="width:50px; height:50px; background:rgba(255,255,255,0.95); filter:blur(2px);"></div>
+                        <span>ಪೇಪರ್ B</span>
+                    </div>
+                    <div class="butter-paper" style="background:rgba(15,23,42,0.4); border:1px dashed #71717a; color:#71717a; transform:none; box-shadow:none;">
+                        <span>ಪೇಪರ್ C</span>
+                    </div>
+                    <div class="butter-paper" style="background:rgba(15,23,42,0.4); border:1px dashed #71717a; color:#71717a; transform:none; box-shadow:none;">
+                        <span>ಪೇಪರ್ D</span>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('step-desc').innerText = "ಪಾರದರ್ಶಕತೆಯ ವಿಶ್ಲೇಷಣೆ ಪೂರ್ಣಗೊಂಡಿದೆ. ಕೊಬ್ಬಿನಾಂಶವಿರುವ ಎಣ್ಣೆಕಾಳುಗಳ ದತ್ತಾಂಶವನ್ನು ದಾಖಲಿಸಲಾಗಿದೆ.";
+            document.getElementById('dash-panel').style.display = 'block';
+        }
+
+        function resetLab() {
+            progress = { almond: false, groundnut: false, dal: false, peas: false };
+            currentStepIndex = 0;
+            
+            document.getElementById('step-desc').innerText = "ಬಾದಾಮಿ (Almond) ವಾಚ್ ಗ್ಲಾಸ್ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ ಅದನ್ನು ಪುಡಿ ಮಾಡಲು ಪೇಪರ್ A ಮೇಲೆ ಇರಿಸಿ.";
+            document.getElementById('dash-panel').style.display = 'none';
+            
+            order.forEach(f => {
+                document.getElementById(`wg-${f}`).classList.remove('used');
+                const el = document.getElementById(`item-${f}`);
+                el.style = '';
+                el.style.top = '-12px';
+            });
+
+            ['a', 'b', 'c', 'd'].forEach(letter => {
+                const spot = document.getElementById(`spot-${letter}`);
+                spot.style = '';
+                const lbl = document.getElementById(`label-${letter}`);
+                lbl.innerText = "ಬಳಸಿಲ್ಲ";
+                lbl.style.color = "#475569";
+            });
+
+            const screen = document.getElementById('viewscreen');
+            screen.style = '';
+            screen.innerHTML = `
+                <div style="color: #475569; font-size: 0.85rem; font-weight:bold; text-align:center; padding: 10px;">
+                    ಆಪ್ಟಿಕಲ್ ಲೈಟ್ ಸ್ಕ್ರೀನ್<br><span style="font-size:0.7rem; color:#94a3b8; font-weight:normal;">(ಪರೀಕ್ಷಾ ಕಾಗದಗಳಿಗಾಗಿ ಕಾಯಲಾಗುತ್ತಿದೆ)</span>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>

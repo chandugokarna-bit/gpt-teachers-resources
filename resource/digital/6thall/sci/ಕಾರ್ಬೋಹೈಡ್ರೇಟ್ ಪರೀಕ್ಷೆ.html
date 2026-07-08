@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ನೆಕ್ಸ್ಟ್‌ಜೆನ್ 3D ವರ್ಚುವಲ್ ಲ್ಯಾಬ್: ಅಯೋಡಿನ್ ಕಾರ್ಬೋಹೈಡ್ರೇಟ್ ಮ್ಯಾಟ್ರಿಕ್ಸ್</title>
+    <style>
+        :root {
+            --bg-dark: #090d16;
+            --panel-bg: linear-gradient(135deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.8) 100%);
+            --bench-top: linear-gradient(180deg, #475569 0%, #1e293b 100%);
+            --bench-lip: #0f172a;
+            --neon-blue: #38bdf8;
+            --neon-amber: #f59e0b;
+            --accent-success: #4ade80;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            user-select: none;
+            perspective: 1200px;
+        }
+
+        .lab-container {
+            width: 100%;
+            max-width: 1200px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        header {
+            background: var(--panel-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 1.6rem;
+            background: linear-gradient(to right, #38bdf8, #818cf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hud-banner {
+            background: rgba(56, 189, 248, 0.08);
+            border: 1px solid rgba(56, 189, 248, 0.25);
+            color: var(--neon-blue);
+            padding: 15px 20px;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            box-shadow: inset 0 0 15px rgba(56, 189, 248, 0.05);
+        }
+
+        /* 3D ವರ್ಕ್‌ಸ್ಪೇಸ್ ಎಂಜಿನ್ */
+        .workspace {
+            position: relative;
+            background: var(--panel-bg);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 24px;
+            height: 520px;
+            padding: 30px;
+            box-sizing: border-box;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+        }
+
+        /* 3D ಮೇಜಿನ ಮೇಲ್ಮೈ */
+        .bench-surface {
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 180px;
+            background: var(--bench-top);
+            transform: perspective(400px) rotateX(15deg);
+            transform-origin: bottom center;
+            border-top: 3px solid rgba(255, 255, 255, 0.25);
+            box-shadow: inset 0 20px 30px rgba(0,0,0,0.6);
+            z-index: 1;
+        }
+
+        .bench-lip {
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 16px;
+            background: var(--bench-lip);
+            z-index: 3;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.8);
+        }
+
+        .glass-station {
+            z-index: 2;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: flex-end;
+            gap: 25px;
+        }
+
+        /* 3D ಬೀಕರ್‌ಗಳು */
+        .beaker {
+            width: 75px;
+            height: 95px;
+            border: 2px solid rgba(255,255,255,0.4);
+            border-top: none;
+            border-radius: 0 0 16px 16px;
+            position: relative;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(4px);
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: flex-end;
+            box-shadow: 
+                inset 0 4px 12px rgba(255,255,255,0.15),
+                0 10px 15px rgba(0,0,0,0.4);
+            transform: rotateX(10deg);
+        }
+
+        .beaker:hover:not(.empty) {
+            transform: rotateX(10deg) translateY(-12px);
+            border-color: var(--neon-blue);
+            box-shadow: 
+                inset 0 4px 12px rgba(56, 189, 248, 0.3),
+                0 20px 25px rgba(56, 189, 248, 0.25);
+        }
+
+        .beaker.empty { opacity: 0.15; cursor: not-allowed; transform: scale(0.9); }
+
+        .beaker-fluid {
+            width: 100%;
+            height: 70%;
+            border-radius: 0 0 14px 14px;
+            transition: height 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 0.85;
+        }
+
+        .hud-tag {
+            position: absolute;
+            bottom: -35px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--neon-blue);
+            background: #090d16;
+            padding: 4px 10px;
+            border-radius: 20px;
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+            white-space: nowrap;
+        }
+
+        /* 3D ಅಯೋಡಿನ್ ಬಾಟಲಿ */
+        .reagent-bottle {
+            width: 70px;
+            height: 120px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 16px 16px 8px 8px;
+            background: rgba(245, 158, 11, 0.08);
+            position: relative;
+            cursor: pointer;
+            display: flex;
+            align-items: flex-end;
+            transition: all 0.4s ease;
+            box-shadow: 0 12px 20px rgba(0,0,0,0.4);
+            transform: rotateX(10deg);
+        }
+
+        .reagent-bottle:hover:not(.locked) {
+            transform: rotateX(10deg) translateY(-12px);
+            border-color: var(--neon-amber);
+            box-shadow: 0 20px 30px rgba(245, 158, 11, 0.3);
+        }
+
+        .reagent-bottle.locked { opacity: 0.15; cursor: not-allowed; }
+
+        .reagent-bottle::before {
+            content: '';
+            position: absolute;
+            top: -18px; left: 50%; transform: translateX(-50%);
+            width: 22px; height: 18px;
+            background: #27272a; border-radius: 4px 4px 2px 2px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .bottle-fluid { 
+            width: 100%; 
+            height: 60%; 
+            border-radius: 0 0 6px 6px; 
+            background: linear-gradient(180deg, #b45309, #78350f);
+            box-shadow: 0 0 15px rgba(245,158,11,0.4);
+        }
+
+        /* 3D ಟೆಸ್ಟ್ ಟ್ಯೂಬ್ ರಾಕ್ ಸಿಸ್ಟಮ್ */
+        .rack-system {
+            width: 340px;
+            height: 160px;
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            background: rgba(30, 41, 59, 0.4);
+            backdrop-filter: blur(8px);
+            border-radius: 16px;
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-end;
+            padding: 0 15px;
+            position: relative;
+            z-index: 2;
+            margin-bottom: 25px;
+            box-shadow: 
+                inset 0 4px 25px rgba(0,0,0,0.6),
+                0 15px 30px rgba(0,0,0,0.5);
+            transform: rotateX(5deg);
+        }
+
+        .rack-system::before {
+            content: '';
+            position: absolute;
+            top: 35px; left: 0; right: 0;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-top: 1px solid rgba(255,255,255,0.1);
+            border-bottom: 1px solid rgba(0,0,0,0.4);
+        }
+
+        .test-tube {
+            width: 38px;
+            height: 200px;
+            border: 2px solid rgba(255, 255, 255, 0.35);
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+            position: relative;
+            background: rgba(255, 255, 255, 0.04);
+            margin-bottom: 12px;
+            box-shadow: inset -3px 0 6px rgba(255,255,255,0.1);
+        }
+
+        .tube-fluid-layer {
+            position: absolute;
+            bottom: 0; width: 100%; height: 0%;
+            border-bottom-left-radius: 16px;
+            border-bottom-right-radius: 16px;
+            transition: height 0.7s cubic-bezier(0.4, 0, 0.2, 1), background-color 1.5s ease;
+        }
+
+        .rack-tag {
+            position: absolute;
+            bottom: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.75rem;
+            font-weight: 800;
+            color: var(--text-muted);
+        }
+
+        /* 3D ಆಟೋಮೇಟೆಡ್ ದ್ರವ ಡ್ರಾಪರ್ (Pipette) */
+        .pipette-dropper {
+            position: absolute;
+            width: 10px;
+            height: 80px;
+            background: rgba(255, 255, 255, 0.4);
+            border-radius: 4px;
+            opacity: 0;
+            z-index: 10;
+            pointer-events: none;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+            transition: left 0.8s cubic-bezier(0.25, 1, 0.5, 1), top 0.4s ease, opacity 0.2s;
+        }
+        .pipette-dropper::after {
+            content: '';
+            position: absolute;
+            bottom: -18px; left: 3px;
+            width: 4px; height: 18px;
+            background: rgba(255,255,255,0.6);
+            border-radius: 0 0 2px 2px;
+        }
+        .pipette-bulb {
+            position: absolute;
+            top: -18px; left: -3px;
+            width: 16px; height: 22px;
+            background: #ef4444;
+            border-radius: 50% 50% 4px 4px;
+        }
+
+        /* ಹನಿ ಬೀಳುವ ಅನಿಮೇಷನ್ ಕಣ */
+        .fluid-drop {
+            position: absolute;
+            width: 6px;
+            height: 14px;
+            border-radius: 50%;
+            opacity: 0;
+            z-index: 9;
+        }
+
+        @keyframes fallingDropAction {
+            0% { transform: translateY(0) scaleY(1); opacity: 1; }
+            90% { transform: translateY(105px) scaleY(1.3); opacity: 1; }
+            100% { transform: translateY(110px) scaleY(0.4); opacity: 0; }
+        }
+
+        /* ವಿಶ್ಲೇಷಣಾತ್ಮಕ ಪ್ರದರ್ಶನ ಫಲಕ */
+        .analysis-dashboard {
+            background: var(--panel-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 25px;
+            display: none;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            animation: slideUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .metrics-card {
+            background: rgba(9, 13, 22, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+        }
+
+        .footer-action {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 5px;
+        }
+
+        .action-btn {
+            background: transparent;
+            color: var(--text-main);
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 12px 28px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+        }
+        .action-btn:hover {
+            background: rgba(255,255,255,0.08);
+            border-color: var(--text-main);
+            transform: translateY(-1px);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="lab-container">
+        <header>
+            <div>
+                <h1>ಜೈವಿಕ ರಾಸಾಯನಿಕ ವಿಶ್ಲೇಷಣಾ ಕನ್ಸೋಲ್</h1>
+                <p style="margin: 3px 0 0 0; font-size: 0.85rem; color: #64748b;">ಆಹಾರದ ಮಾದರಿಗಳಲ್ಲಿ ಕಾರ್ಬೋಹೈಡ್ರೇಟ್ (ಸ್ಟಾರ್ಚ್) ಪರೀಕ್ಷೆ</p>
+            </div>
+            <div style="font-size: 0.8rem; background: rgba(255,255,255,0.05); padding: 5px 12px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1)">
+                ಸ್ಥಿತಿ: <span id="status-tag" style="color:var(--neon-blue); font-weight:bold;">ಸಕ್ರಿಯ</span>
+            </div>
+        </header>
+
+        <div class="hud-banner" id="hud-alert">
+            ⚡ <strong>ವಿಧಾನ ಟ್ರ್ಯಾಕರ್:</strong> <span id="step-desc">ಮೂರು ಆಹಾರ ಮಾದರಿಯ ಬೀಕರ್‌ಗಳನ್ನು ಅವುಗಳ ಸಂಬಂಧಿತ ಪ್ರನಾಳಗಳಿಗೆ ಸುರಿಯಲು ಪ್ರತಿಯೊಂದರ ಮೇಲೂ ಕ್ಲಿಕ್ ಮಾಡಿ.</span>
+        </div>
+
+        <div class="workspace" id="bench-space">
+            <div class="bench-surface"></div>
+            <div class="bench-lip"></div>
+            
+            <div class="pipette-dropper" id="lab-pipette">
+                <div class="pipette-bulb"></div>
+            </div>
+            <div class="fluid-drop" id="gravity-drop"></div>
+
+            <div class="glass-station">
+                <div class="beaker" id="bk-rice" onclick="executePourSequence('rice', 1, 'rgba(240, 243, 244, 0.85)')">
+                    <div class="beaker-fluid" style="background: #e2e8f0; box-shadow: inset 0 0 10px rgba(0,0,0,0.1);"></div>
+                    <div class="hud-tag">ಅಕ್ಕಿ ಪುಡಿ ದ್ರಾವಣ</div>
+                </div>
+                <div class="beaker" id="bk-ragi" onclick="executePourSequence('ragi', 2, 'rgba(210, 180, 140, 0.75)')">
+                    <div class="beaker-fluid" style="background: #d2b48c;"></div>
+                    <div class="hud-tag">ರಾಗಿ ಸಾರ</div>
+                </div>
+                <div class="beaker" id="bk-milk" onclick="executePourSequence('milk', 3, 'rgba(255, 255, 255, 0.95)')">
+                    <div class="beaker-fluid" style="background: #ffffff;"></div>
+                    <div class="hud-tag">ತಾಜಾ ಹಾಲು</div>
+                </div>
+            </div>
+
+            <div class="rack-system" id="central-rack">
+                <div class="test-tube" id="tube-box-1"><div class="tube-fluid-layer" id="lyr-1"></div><div class="rack-tag">ಪ್ರನಾಳ 1</div></div>
+                <div class="test-tube" id="tube-box-2"><div class="tube-fluid-layer" id="lyr-2"></div><div class="rack-tag">ಪ್ರನಾಳ 2</div></div>
+                <div class="test-tube" id="tube-box-3"><div class="tube-fluid-layer" id="lyr-3"></div><div class="rack-tag">ಪ್ರನಾಳ 3</div></div>
+            </div>
+
+            <div class="glass-station">
+                <div class="reagent-bottle locked" id="bt-iodine" onclick="executeReagentSequence('iodine', '#b45309')">
+                    <div class="bottle-fluid"></div>
+                    <div class="hud-tag">ಅಯೋಡಿನ್ ಕಾರಕ</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="analysis-dashboard" id="dash-panel">
+            <h3 style="margin: 0; font-size: 1.1rem; color: var(--accent-success);">🧪 ವಿಶ್ಲೇಷಣಾತ್ಮಕ ರೋಗನಿರ್ಣಯದ ಫಲಿತಾಂಶಗಳು</h3>
+            <div class="card-grid">
+                <div class="metrics-card" style="border-top: 3px solid #818cf8;">
+                    <span style="color:#818cf8; font-weight:700;">ಪ್ರನಾಳ 1 (ಅಕ್ಕಿ ಪುಡಿ ದ್ರಾವಣ)</span><br><br>
+                    ಫಲಿತಾಂಶ: <strong style="color:#818cf8">ತೀವ್ರ ನೀಲಿ-ಕಪ್ಪು (Blue-Black)</strong><br>
+                    ತೀರ್ಮಾನ: ಪಾಸಿಟಿವ್. ಅಮೈಲೋಸ್/ಅಮೈಲೋಪೆಕ್ಟಿನ್ ಸ್ಟಾರ್ಚ್ ಮ್ಯಾಟ್ರಿಕ್ಸ್‌ನ ಹೆಚ್ಚಿನ ಸಾಂದ್ರತೆ ಪತ್ತೆಯಾಗಿದೆ.
+                </div>
+                <div class="metrics-card" style="border-top: 3px solid #22d3ee;">
+                    <span style="color:#22d3ee; font-weight:700;">ಪ್ರನಾಳ 2 (ರಾಗಿ ಸಾರ)</span><br><br>
+                    ಫಲಿತಾಂಶ: <strong style="color:#22d3ee">ಗಾಢ ನೀಲಿ-ಕಪ್ಪು (Deep Blue-Black)</strong><br>
+                    ತೀರ್ಮಾನ: ಪಾಸಿಟಿವ್. ಸ್ಟಾರ್ಚ್ ಇರುವುದು ದೃಢಪಟ್ಟಿದೆ (ರಾಗಿ ಕಾರ್ಬೋಹೈಡ್ರೇಟ್ ಭರಿತ ಧಾನ್ಯವಾಗಿದೆ).
+                </div>
+                <div class="metrics-card" style="border-top: 3px solid #fbbf24;">
+                    <span style="color:#fbbf24; font-weight:700;">ಪ್ರನಾಳ 3 (ತಾಜಾ ಹಾಲು)</span><br><br>
+                    ಫಲಿತಾಂಶ: <strong style="color:#fbbf24">ಹಳದಿ-ಕಂದು (Yellowish-Brown)</strong><br>
+                    ತೀರ್ಮಾನ: ನೆೆಗೆಟಿವ್. ಸ್ಟಾರ್ಚ್ ಇಲ್ಲ. ಹಾಲಿನಲ್ಲಿರುವ ಪ್ರಾಥಮಿಕ ಕಾರ್ಬೋಹೈಡ್ರೇಟ್ ಲ್ಯಾಕ್ಟೋಸ್ ಡೈಸ್ಯಾಕರೈಡ್ ಆಗಿದೆ.
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-action">
+            <button class="action-btn" onclick="resetAllElements()">ಸಿಮ್ಯುಲೇಶನ್ ಮರುಹೊಂದಿಸಿ</button>
+        </div>
+    </div>
+
+    <script>
+        let runtimeState = { loadedSamples: { rice: false, ragi: false, milk: false }, stepPhase: 'samples' };
+
+        function getAbsoluteTubePositions() {
+            const rack = document.getElementById('central-rack');
+            const rackLeft = rack.offsetLeft;
+            
+            return {
+                1: rackLeft + document.getElementById('tube-box-1').offsetLeft + 14,
+                2: rackLeft + document.getElementById('tube-box-2').offsetLeft + 14,
+                3: rackLeft + document.getElementById('tube-box-3').offsetLeft + 14
+            };
+        }
+
+        function executePourSequence(sampleId, tubeIndex, coreColor) {
+            if (runtimeState.stepPhase !== 'samples' || runtimeState.loadedSamples[sampleId]) return;
+
+            runtimeState.loadedSamples[sampleId] = true;
+            
+            const beaker = document.getElementById(`bk-${sampleId}`);
+            beaker.classList.add('empty');
+            beaker.querySelector('.beaker-fluid').style.height = '10%';
+
+            const targetLayer = document.getElementById(`lyr-${tubeIndex}`);
+            targetLayer.style.height = '45%';
+            targetLayer.style.backgroundColor = coreColor;
+
+            if (Object.values(runtimeState.loadedSamples).every(status => status === true)) {
+                runtimeState.stepPhase = 'iodine';
+                document.getElementById('bt-iodine').classList.remove('locked');
+                document.getElementById('step-desc').innerText = "ಅತ್ಯುತ್ತಮ. ಎಲ್ಲಾ ಮಾದರಿಗಳನ್ನು ತುಂಬಿಸಲಾಗಿದೆ. ಈಗ ಡ್ರಾಪರ್ ಮೂಲಕ ಸ್ವಯಂಚಾಲಿತ ರಾಸಾಯನಿಕ ಪ್ರಕ್ರಿಯೆಯನ್ನು ಸಕ್ರಿಯಗೊಳಿಸಲು ಅಯೋಡಿನ್ ಕಾರಕದ ಬಾಟಲಿಯ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ.";
+            }
+        }
+
+        function executeReagentSequence(reagentKey, dripColor) {
+            if (runtimeState.stepPhase !== reagentKey) return;
+
+            const pipette = document.getElementById('lab-pipette');
+            const activeBottle = document.getElementById(`bt-${reagentKey}`);
+            
+            activeBottle.classList.add('locked');
+            pipette.style.opacity = '1';
+
+            const coordinates = getAbsoluteTubePositions();
+            let processChain = Promise.resolve();
+
+            [1, 2, 3].forEach((tubeId) => {
+                processChain = processChain.then(() => {
+                    return new Promise((resolve) => {
+                        pipette.style.left = `${coordinates[tubeId]}px`;
+                        pipette.style.top = '120px';
+
+                        setTimeout(() => {
+                            const particle = document.getElementById('gravity-drop');
+                            particle.style.backgroundColor = dripColor;
+                            particle.style.left = `${coordinates[tubeId] + 3}px`;
+                            particle.style.top = '200px';
+                            particle.style.opacity = '1';
+                            particle.style.animation = 'fallingDropAction 0.4s cubic-bezier(0.55, 0.055, 0.675, 0.19) forwards';
+
+                            setTimeout(() => {
+                                particle.style.animation = 'none';
+                                particle.style.opacity = '0';
+                                computeTubeColorShift(tubeId);
+                                resolve();
+                            }, 400);
+
+                        }, 600);
+                    });
+                });
+            });
+
+            processChain.then(() => {
+                pipette.style.opacity = '0';
+                runtimeState.stepPhase = 'complete';
+                document.getElementById('status-tag').innerText = "ಪೂರ್ಣಗೊಂಡಿದೆ";
+                document.getElementById('status-tag').style.color = "var(--accent-success)";
+                document.getElementById('step-desc').innerText = "ರಾಸಾಯನಿಕ ಪರೀಕ್ಷೆಯ ಪ್ರಕ್ರಿಯೆ ಮುಗಿದಿದೆ. ಕೆಳಗಿನ ಇಂಟರ್ಫೇಸ್‌ನಲ್ಲಿ ಫಲಿತಾಂಶಗಳನ್ನು ಪರಿಶೀಲಿಸಿ.";
+                document.getElementById('dash-panel').style.display = 'block';
+            });
+        }
+
+        function computeTubeColorShift(id) {
+            const layer = document.getElementById(`lyr-${id}`);
+            const currentHeight = parseInt(layer.style.height || 0);
+            layer.style.height = `${currentHeight + 6}%`;
+
+            if (id === 1) layer.style.backgroundColor = 'rgba(15, 23, 70, 0.95)';
+            if (id === 2) layer.style.backgroundColor = 'rgba(20, 20, 55, 0.95)';
+            if (id === 3) layer.style.backgroundColor = 'rgba(245, 158, 11, 0.55)';
+        }
+
+        function resetAllElements() {
+            runtimeState = { loadedSamples: { rice: false, ragi: false, milk: false }, stepPhase: 'samples' };
+            document.getElementById('status-tag').innerText = "ಸಕ್ರಿಯ";
+            document.getElementById('status-tag').style.color = "var(--neon-blue)";
+            document.getElementById('step-desc').innerText = "ಮೂರು ಆಹಾರ ಮಾದರಿಯ ಬೀಕರ್‌ಗಳನ್ನು ಅವುಗಳ ಸಂಬಂಧಿತ ಪ್ರನಾಳಗಳಿಗೆ ಸುರಿಯಲು ಪ್ರತಿಯೊಂದರ ಮೇಲೂ ಕ್ಲಿಕ್ ಮಾಡಿ.";
+            document.getElementById('dash-panel').style.display = 'none';
+            document.getElementById('bt-iodine').classList.add('locked');
+
+            ['rice', 'ragi', 'milk'].forEach(s => {
+                const bk = document.getElementById(`bk-${s}`);
+                bk.classList.remove('empty');
+                bk.querySelector('.beaker-fluid').style.height = '70%';
+            });
+
+            [1, 2, 3].forEach(id => {
+                const layer = document.getElementById(`lyr-${id}`);
+                layer.style.height = '0%';
+                layer.style.backgroundColor = 'transparent';
+            });
+        }
+
+        window.addEventListener('resize', () => {
+            if (runtimeState.stepPhase === 'complete' || runtimeState.stepPhase === 'samples') return;
+            getAbsoluteTubePositions();
+        });
+    </script>
+</body>
+</html>
