@@ -4,127 +4,259 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ವಿಜಯಪುರ ಗೋಲಗುಂಬಜ್ - 360° ಆಡಿಯೋ ಪ್ರವಾಸ</title>
-    <!-- Pannellum 360 ಲೈಬ್ರರಿ -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.7/build/pannellum.css"/>
-    <script src="https://cdn.jsdelivr.net/npm/pannellum@2.5.7/build/pannellum.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <style>
-        body { margin: 0; padding: 0; font-family: sans-serif; }
-        #panorama { width: 100vw; height: 100vh; }
-        
-        /* ಶೀರ್ಷಿಕೆ ಫಲಕ */
+        :root {
+            --primary: #06b6d4; /* ಗೋಲಗುಂಬಜ್ ಥೀಮ್‌ಗೆ ಸಯಾನ್ ಬಣ್ಣ */
+            --accent: #eab308;  /* ಹಾಟ್‌ಸ್ಪಾಟ್‌ಗೆ ಚಿನ್ನದ ಬಣ್ಣ */
+            --bg-dark: rgba(15, 23, 42, 0.9);
+        }
+        body { margin: 0; padding: 0; overflow: hidden; font-family: system-ui, -apple-system, sans-serif; background: #000; }
+        #canvas-container { width: 100vw; height: 100vh; cursor: grab; }
+        #canvas-container:active { cursor: grabbing; }
+
+        /* ಭವ್ಯ ಶೀರ್ಷಿಕೆ ಫಲಕ */
         #title-panel {
             position: absolute; top: 20px; left: 20px; color: white;
-            background: rgba(15, 23, 42, 0.85); padding: 15px; border-radius: 10px;
-            border-left: 5px solid #06b6d4; z-index: 999; pointer-events: none;
+            background: var(--bg-dark); padding: 18px; border-radius: 12px;
+            border-left: 6px solid var(--primary); z-index: 10;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); pointer-events: none;
         }
-        #title-panel h1 { margin: 0; font-size: 20px; color: #06b6d4; }
-        #title-panel p { margin: 5px 0 0 0; font-size: 14px; color: #e2e8f0; }
+        #title-panel h1 { margin: 0; font-size: 22px; color: var(--primary); font-weight: 700; }
+        #title-panel p { margin: 6px 0 0 0; font-size: 14px; color: #cbd5e1; }
 
-        /* ಕೆಳಗಿನ ಸುಂದರ ಮಾಹಿತಿ ಫಲಕ (ಆಡಿಯೋ ಮತ್ತು ಪಠ್ಯಕ್ಕಾಗಿ) */
+        /* ಸುಂದರ ಆಡಿಯೋ ಮಾಹಿತಿ ಫಲಕ */
         #info-panel {
             position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
-            width: 85%; max-width: 650px; background: rgba(15, 23, 42, 0.95); color: #f8fafc;
-            padding: 20px; border-radius: 15px; text-align: center;
-            font-size: 17px; line-height: 1.6; border: 2px solid #06b6d4; /* ಗೋಲಗುಂಬಜ್ ಥೀಮ್‌ಗೆ ಸಯಾನ್ ಬಣ್ಣ */
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
-            z-index: 999; pointer-events: none;
+            width: 85%; max-width: 650px; background: var(--bg-dark); color: #f8fafc;
+            padding: 22px; border-radius: 16px; text-align: center;
+            font-size: 18px; line-height: 1.6; border: 2px solid var(--primary);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6); z-index: 10;
+            backdrop-filter: blur(10px);
         }
 
-        /* 🎯 ದೊಡ್ಡದಾಗಿರುವ ಕಸ್ಟಮ್ ಹಾಟ್‌ಸ್ಪಾಟ್‌ ಬಬಲ್ಸ್ */
-        .custom-hotspot {
-            height: 32px;
-            width: 32px;
-            background: #eab308; /* ಹೊಳೆಯುವ ಚಿನ್ನದ ಬಣ್ಣ */
-            border: 3px solid #ffffff;
-            border-radius: 50%;
-            cursor: pointer;
-            box-shadow: 0 0 12px rgba(234, 179, 8, 0.8);
+        /* ಹೊಳೆಯುವ ಮಾಡರ್ನ್ ಹಾಟ್‌ಸ್ಪಾಟ್‌ಗಳು */
+        .hotspot-label {
+            position: absolute; z-index: 5; transform: translate(-50%, -50%);
+            color: white; font-size: 12px; cursor: pointer; pointer-events: auto;
+        }
+        .hotspot-circle {
+            width: 34px; height: 34px; background: var(--accent);
+            border: 3px solid #ffffff; border-radius: 50%;
+            box-shadow: 0 0 18px var(--accent);
             transition: all 0.3s ease;
         }
-        /* ಅದರ ಮೇಲೆ ಬೆರಳು ಇಟ್ಟಾಗ ಕೆಂಪು ಬಣ್ಣಕ್ಕೆ ತಿರುಗಲು */
-        .custom-hotspot:hover {
-            background: #ef4444; 
-            box-shadow: 0 0 15px rgba(239, 68, 68, 0.9);
-            transform: scale(1.2);
+        .hotspot-circle:hover {
+            background: #ef4444; transform: scale(1.2);
+            box-shadow: 0 0 22px #ef4444;
         }
+
+        /* ಕನ್ನಡ ಟೂಲ್‌ಟಿಪ್ (ಮಾಹಿತಿ ಬಬಲ್) */
+        .hotspot-text {
+            position: absolute; bottom: 42px; left: 50%; transform: translateX(-50%);
+            background: #0f172a; color: var(--accent); border: 1px solid var(--accent);
+            padding: 6px 12px; border-radius: 6px; white-space: nowrap;
+            font-size: 14px; font-weight: bold; opacity: 0; transition: opacity 0.3s; pointer-events: none;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+        }
+        .hotspot-label:hover .hotspot-text { opacity: 1; }
     </style>
 </head>
 <body>
 
 <div id="title-panel">
     <h1>ವಿಜಯಪುರ: ಭವ್ಯ ಗೋಲಗುಂಬಜ್ ವರ್ಚುವಲ್ ದರ್ಶನ</h1>
-    <p>ದೊಡ್ಡದಾಗಿರುವ ಚಿನ್ನದ ಬಣ್ಣದ ವರ್ತುಲಗಳ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ ಆಡಿಯೋ ವಿವರ ಪಡೆಯಿರಿ</p>
+    <p>ಚಿತ್ರವನ್ನು ಎಡ-ಬಲಕ್ಕೆ ಚಲಿಸಿ. ಚಿನ್ನದ ಬಣ್ಣದ ಹಾಟ್‌ಸ್ಪಾಟ್‌ಗಳ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ ಆಡಿಯೋ ವಿವರ ಪಡೆಯಿರಿ</p>
 </div>
-
-<div id="panorama"></div>
 
 <div id="info-panel">
-    ಸ್ವಾಗತ! ಆದಿಲ್ ಶಾಹಿಗಳ ಭವ್ಯ ವಾಸ್ತುಶಿಲ್ಪ ಮತ್ತು ಗೋಲಗುಂಬಜ್‌ನ ವಿಸ್ಮಯವನ್ನು ತಿಳಿಯಲು ಆವರಣದಲ್ಲಿರುವ ದೊಡ್ಡ ಹಾಟ್‌ಸ್ಪಾಟ್‌ಗಳ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ...
+    ಸ್ವಾಗತ! ಆದಿಲ್ ಶಾಹಿಗಳ ಭವ್ಯ ವಾಸ್ತುಶಿಲ್ಪ ಮತ್ತು ಗೋಲಗುಂಬಜ್‌ನ ವಿಸ್ಮಯವನ್ನು ತಿಳಿಯಲು ಆವರಣದಲ್ಲಿರುವ ಹಾಟ್‌ಸ್ಪಾಟ್‌ಗಳ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ...
 </div>
 
+<div id="hotspots-layer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;"></div>
+<div id="canvas-container"></div>
+
 <script>
-// ಕನ್ನಡ ಧ್ವನಿ ಕಾರ್ಯವಿಧಾನ
+// --- 1. ಆಡಿಯೋ ಮತ್ತು ಮಾಹಿತಿ ಪ್ರದರ್ಶನ ಕಾರ್ಯವಿಧಾನ ---
 function speakKannada(title, infoText) {
-    document.getElementById('info-panel').innerHTML = `<strong>${title}</strong><br>${infoText}`;
-    
+    document.getElementById('info-panel').innerHTML = `<strong style="color:var(--primary); font-size:20px;">${title}</strong><br>${infoText}`;
     if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel(); // ಹಳೆಯ ಧ್ವನಿ ನಿಲ್ಲಿಸಲು
-        
-        const speech = new SpeechSynthesisUtterance();
-        speech.text = title + ". " + infoText;
-        speech.lang = 'kn-IN'; // ಕನ್ನಡ ಭಾಷೆ
+        window.speechSynthesis.cancel(); // ಹಳೆಯ ಆಡಿಯೋ ನಿಲ್ಲಿಸಲು
+        const speech = new SpeechSynthesisUtterance(title + ". " + infoText);
+        speech.lang = 'kn-IN'; // ಕನ್ನಡ ಧ್ವನಿ
         speech.rate = 0.85; // ಸ್ಪಷ್ಟ ಧ್ವನಿ ವೇಗ
-        
         window.speechSynthesis.speak(speech);
     }
 }
 
-// Pannellum ವೀಕ್ಷಕ ಸೆಟ್ಟಿಂಗ್ಸ್
-pannellum.viewer('panorama', {
-    "type": "equirectangular",
-    "panorama": "https://raw.githubusercontent.com/chandugokarna-bit/gpt-teachers-resources/main/resources/virtual/golgumbaz1360.jpg",
-    "autoLoad": true,
-    "title": "ಗೋಲಗುಂಬಜ್, ವಿಜಯಪುರ",
-    "author": "ಭವ್ಯ ಐತಿಹಾಸಿಕ ತಾಣ",
-    "hotSpots": [
-        {
-            "pitch": 12,
-            "yaw": -30,
-            "cssClass": "custom-hotspot", // ನಮ್ಮ ಕಸ್ಟಮ್ ದೊಡ್ಡ ಹಾಟ್‌ಸ್ಪಾಟ್
-            "createTooltipFunc": function(hotSpotDiv) { hotSpotDiv.setAttribute("title", "ಭವ್ಯ ಗುಮ್ಮಟ"); },
-            "clickHandlerFunc": function() {
-                speakKannada(
-                    "ಭವ್ಯವಾದ ಕೇಂದ್ರ ಗುಮ್ಮಟ", 
-                    "ಗೋಲಗುಂಬಜ್ ಮಹಮ್ಮದ್ ಆದಿಲ್ ಶಾ ಅವರ ಸಮಾಧಿಯಾಗಿದ್ದು, ಇದರ ಕೇಂದ್ರ ಗುಮ್ಮಟವು ವಿಶ್ವದ ಅತ್ಯಂತ ದೊಡ್ಡ ಗುಮ್ಮಟಗಳಲ್ಲಿ ಒಂದಾಗಿದೆ. ವಿಶೇಷವೆಂದರೆ, ಈ ಬೃಹತ್ ಗುಮ್ಮಟವನ್ನು ಯಾವುದೇ ಕಂಬಗಳ ಆಧಾರವಿಲ್ಲದೆ ಕೇವಲ ವಾಸ್ತುಶಿಲ್ಪದ ವಿಶಿಷ್ಟ ತಂತ್ರಜ್ಞಾನದಿಂದ ನಿರ್ಮಿಸಲಾಗಿದೆ."
-                );
-            }
-        },
-        {
-            "pitch": 5,
-            "yaw": 20,
-            "cssClass": "custom-hotspot",
-            "createTooltipFunc": function(hotSpotDiv) { hotSpotDiv.setAttribute("title", "ಬಿಸುಗುಟ್ಟುವ ಗ್ಯಾಲರಿ"); },
-            "clickHandlerFunc": function() {
-                speakKannada(
-                    "ಬಿಸುಗುಟ್ಟುವ ಗ್ಯಾಲರಿ (Whispering Gallery)", 
-                    "ಗುಮ್ಮಟದ ಒಳಗಿರುವ ವೃತ್ತಾಕಾರದ ಗ್ಯಾಲರಿಯಲ್ಲಿ ನಿಂತು ಒಂದು ಕಡೆ ಅತ್ಯಂತ ಸಣ್ಣ ಧ್ವನಿಯಲ್ಲಿ ಪಿಸುಗುಟ್ಟಿದರೂ, ಅದು ಇಡೀ ಗ್ಯಾಲರಿಯ ಇನ್ನೊಂದು ಬದಿಗೆ ಅತ್ಯಂತ ಸ್ಪಷ್ಟವಾಗಿ ಕೇಳಿಸುತ್ತದೆ. ಇಲ್ಲಿ ಉಂಟಾಗುವ ಧ್ವನಿಯು ಪ್ರತಿಧ್ವನಿಯಾಗಿ ಸುಮಾರು 7 ರಿಂದ 10 ಬಾರಿ ಮರುಕಳಿಸುತ್ತದೆ!"
-                );
-            }
-        },
-        {
-            "pitch": -5,
-            "yaw": 50,
-            "cssClass": "custom-hotspot",
-            "createTooltipFunc": function(hotSpotDiv) { hotSpotDiv.setAttribute("title", "ಮಿನಾರ್ ಗೋಪುರಗಳು"); },
-            "clickHandlerFunc": function() {
-                speakKannada(
-                    "ಏಳು ಅಂತಸ್ತಿನ ಮಿನಾರ್ ಗೋಪುರಗಳು", 
-                    "ಗೋಲಗುಂಬಜ್ ಕಟ್ಟಡದ ನಾಲ್ಕೂ ಮೂಲೆಗಳಲ್ಲಿ ಏಳು ಅಂತಸ್ತುಗಳ ವಿಶಿಷ್ಟವಾದ ಅಷ್ಟಕೋನಾಕೃತಿಯ ಮಿನಾರ್ ಗೋಪುರಗಳಿವೆ. ಈ ಗೋಪುರಗಳ ಒಳಗಿರುವ ಮೆಟ್ಟಿಲುಗಳ ಮೂಲಕ ನಾವು ಮೇಲಿರುವ ಗ್ಯಾಲರಿಯನ್ನು ತಲುಪಬಹುದು."
-                );
-            }
+// --- 2. ರಿಯಲ್ ಹಾಟ್‌ಸ್ಪಾಟ್‌ಗಳ ಡೇಟಾಬೇಸ್ (ಇಲ್ಲಿ ನಿಮ್ಮ XYZ ನಂಬರ್‌ಗಳನ್ನು ಎಡಿಟ್ ಮಾಡಿ) ---
+const hotSpots = [
+    {
+        name: "ಭವ್ಯ ಗುಮ್ಮಟ",
+        x: -8.60, y: 4.44, z: -2.53, // ಈ ನಂಬರ್‌ಗಳನ್ನು ನಿಮ್ಮ ಇಷ್ಟದಂತೆ ಬದಲಾಯಿಸಿ
+        action: function() {
+            speakKannada(
+                "ಭವ್ಯವಾದ ಕೇಂದ್ರ ಗುಮ್ಮಟ", 
+                "ಗೋಲಗುಂಬಜ್ ಮಹಮ್ಮದ್ ಆದಿಲ್ ಶಾ ಅವರ ಸಮಾಧಿಯಾಗಿದ್ದು, ಇದರ ಕೇಂದ್ರ ಗುಮ್ಮಟವು ವಿಶ್ವದ ಅತ್ಯಂತ ದೊಡ್ಡ ಗುಮ್ಮಟಗಳಲ್ಲಿ ಒಂದಾಗಿದೆ. ವಿಶೇಷವೆಂದರೆ, ಈ ಬೃಹತ್ ಗುಮ್ಮಟವನ್ನು ಯಾವುದೇ ಕಂಬಗಳ ಆಧಾರವಿಲ್ಲದೆ ಕೇವಲ ವಾಸ್ತುಶಿಲ್ಪದ ವಿಶಿಷ್ಟ ತಂತ್ರಜ್ಞಾನದಿಂದ ನಿರ್ಮಿಸಲಾಗಿದೆ."
+            );
         }
-    ]
-});
+    },
+    {
+        name: "ಬಿಸುಗುಟ್ಟುವ ಗ್ಯಾಲರಿ",
+        x: -9.38, y: 1.29, z: -3.23, // ಈ ನಂಬರ್‌ಗಳನ್ನು ನಿಮ್ಮ ಇಷ್ಟದಂತೆ ಬದಲಾಯಿಸಿ
+        action: function() {
+            speakKannada(
+                "ಬಿಸುಗುಟ್ಟುವ ಗ್ಯಾಲರಿ (Whispering Gallery)", 
+                "ಗುಮ್ಮಟದ ಒಳಗಿರುವ ವೃತ್ತಾಕಾರದ ಗ್ಯಾಲರಿಯಲ್ಲಿ ನಿಂತು ಒಂದು ಕಡೆ ಅತ್ಯಂತ ಸಣ್ಣ ಧ್ವನಿಯಲ್ಲಿ ಪಿಸುಗುಟ್ಟಿದರೂ, ಅದು ಇಡೀ ಗ್ಯಾಲರಿಯ ಇನ್ನೊಂದು ಬದಿಗೆ ಅತ್ಯಂತ ಸ್ಪಷ್ಟವಾಗಿ ಕೇಳಿಸುತ್ತದೆ. ಇಲ್ಲಿ ಉಂಟಾಗುವ ಧ್ವನಿಯು ಪ್ರತಿಧ್ವನಿಯಾಗಿ ಸುಮಾರು 7 ರಿಂದ 10 ಬಾರಿ ಮರುಕಳಿಸುತ್ತದೆ!"
+            );
+        }
+    },
+    {
+        name: "ಮಿನಾರ್ ಗೋಪುರಗಳು",
+        x: -9.72, y: 2.35, z: 0.09, // ಈ ನಂಬರ್‌ಗಳನ್ನು ನಿಮ್ಮ ಇಷ್ಟದಂತೆ ಬದಲಾಯಿಸಿ
+        action: function() {
+            speakKannada(
+                "ಏಳು ಅಂತಸ್ತಿನ ಮಿನಾರ್ ಗೋಪುರಗಳು", 
+                "ಗೋಲಗುಂಬಜ್ ಕಟ್ಟಡದ ನಾಲ್ಕೂ ಮೂಲೆಗಳಲ್ಲಿ ಏಳು ಅಂತಸ್ತುಗಳ ವಿಶಿಷ್ಟವಾದ ಅಷ್ಟಕೋನಾಕೃತಿಯ ಮಿನಾರ್ ಗೋಪುರಗಳಿವೆ. ಈ ಗೋಪುರಗಳ ಒಳಗಿರುವ ಮೆಟ್ಟಿಲುಗಳ ಮೂಲಕ ನಾವು ಮೇಲಿರುವ ಗ್ಯಾಲರಿಯನ್ನು ತಲುಪಬಹುದು."
+            );
+        }
+    }
+];
+
+// --- 3. 360° ಇಂಜಿನ್ ಸೆಟಪ್ (Three.js) ---
+let scene, camera, renderer, sphere;
+let isUserInteracting = false, onPointerDownPointerX = 0, onPointerDownPointerY = 0,
+    lon = 0, onPointerDownLon = 0, lat = 0, onPointerDownLat = 0, phi = 0, theta = 0, zoomFactor = 75;
+
+const container = document.getElementById('canvas-container');
+const hotspotsLayer = document.getElementById('hotspots-layer');
+
+init();
+animate();
+
+function init() {
+    scene = new THREE.Scene();
+    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1100);
+    
+    const geometry = new THREE.SphereGeometry(500, 60, 40);
+    geometry.scale(-1, 1, 1); 
+
+    const texture = new THREE.TextureLoader().load('https://raw.githubusercontent.com/chandugokarna-bit/gpt-teachers-resources/main/resources/virtual/golgumbaz1360.jpg');
+    const material = new THREE.MeshBasicMaterial({ map: texture });
+    sphere = new THREE.Mesh(geometry, material);
+    scene.add(sphere);
+
+    renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    container.appendChild(renderer.domElement);
+
+    container.addEventListener('pointerdown', onPointerDown);
+    container.addEventListener('wheel', onWebGLWheel);
+    window.addEventListener('resize', onWindowResize);
+
+    createVisualHotspots();
+}
+
+// --- 4. ಹಾಟ್‌ಸ್ಪಾಟ್‌ಗಳನ್ನು ಸ್ಕ್ರೀನ್ ಮೇಲೆ ಇರಿಸುವ ಲಾಜಿಕ್ ---
+function createVisualHotspots() {
+    hotspotsLayer.innerHTML = '';
+    hotSpots.forEach((hs, index) => {
+        const el = document.createElement('div');
+        el.className = 'hotspot-label';
+        el.id = 'hs-' + index;
+        el.innerHTML = `
+            <div class="hotspot-circle"></div>
+            <div class="hotspot-text">${hs.name}</div>
+        `;
+        
+        el.addEventListener('click', function(e) {
+            e.stopPropagation();
+            if(hs.action) hs.action();
+        });
+        
+        hotspotsLayer.appendChild(el);
+        hs.domElement = el;
+    });
+}
+
+function updateHotspotsPosition() {
+    hotSpots.forEach(hs => {
+        if (!hs.domElement) return;
+        const wp = new THREE.Vector3(hs.x, hs.y, hs.z).normalize().multiplyScalar(500);
+        const proj = wp.project(camera);
+        
+        if (proj.z > 1) {
+            hs.domElement.style.display = 'none';
+            return;
+        }
+        
+        const x = (proj.x * .5 + .5) * window.innerWidth;
+        const y = (proj.y * -.5 + .5) * window.innerHeight;
+        
+        hs.domElement.style.display = 'block';
+        hs.domElement.style.left = x + 'px';
+        hs.domElement.style.top = y + 'px';
+    });
+}
+
+// --- 5. ನಿಯಂತ್ರಣಗಳು (Controls) ---
+function onPointerDown(event) {
+    isUserInteracting = true;
+    onPointerDownPointerX = event.clientX;
+    onPointerDownPointerY = event.clientY;
+    onPointerDownLon = lon;
+    onPointerDownLat = lat;
+    document.addEventListener('pointermove', onPointerMove);
+    document.addEventListener('pointerup', onPointerUp);
+}
+
+function onPointerMove(event) {
+    if (isUserInteracting === true) {
+        lon = (onPointerDownPointerX - event.clientX) * 0.1 + onPointerDownLon;
+        lat = (event.clientY - onPointerDownPointerY) * 0.1 + onPointerDownLat;
+    }
+}
+
+function onPointerUp() {
+    isUserInteracting = false;
+    document.removeEventListener('pointermove', onPointerMove);
+    document.removeEventListener('pointerup', onPointerUp);
+}
+
+function onWebGLWheel(event) {
+    zoomFactor += event.deltaY * 0.05;
+    zoomFactor = Math.max(30, Math.min(100, zoomFactor)); 
+    camera.fov = zoomFactor;
+    camera.updateProjectionMatrix();
+}
+
+function onWindowResize() {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+}
+
+// --- 6. ಅನಿಮೇಷನ್ ಲೂಪ್ ---
+function animate() {
+    requestAnimationFrame(animate);
+    update();
+}
+
+function update() {
+    lat = Math.max(-85, Math.min(85, lat));
+    phi = THREE.MathUtils.degToRad(90 - lat);
+    theta = THREE.MathUtils.degToRad(lon);
+
+    const target = new THREE.Vector3();
+    target.x = 500 * Math.sin(phi) * Math.sin(theta);
+    target.y = 500 * Math.cos(phi);
+    target.z = 500 * Math.sin(phi) * Math.cos(theta);
+
+    camera.lookAt(target);
+    renderer.render(scene, camera);
+    updateHotspotsPosition();
+}
 </script>
 
 </body>
