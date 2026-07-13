@@ -4,135 +4,264 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ಐಹೊಳೆ ಚಾಲುಕ್ಯ ವಾಸ್ತುಶಿಲ್ಪ - 360° ಆಡಿಯೋ ಪ್ರವಾಸ</title>
-    <!-- Pannellum 360 ಲೈಬ್ರರಿ -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.7/build/pannellum.css"/>
-    <script src="https://cdn.jsdelivr.net/npm/pannellum@2.5.7/build/pannellum.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <style>
-        body { margin: 0; padding: 0; font-family: sans-serif; }
-        #panorama { width: 100vw; height: 100vh; }
-        
-        /* ಶೀರ್ಷಿಕೆ ಫಲಕ */
+        :root {
+            --primary: #eab308;
+            --bg-dark: rgba(15, 23, 42, 0.9);
+        }
+        body { margin: 0; padding: 0; overflow: hidden; font-family: system-ui, -apple-system, sans-serif; background: #000; }
+        #canvas-container { width: 100vw; height: 100vh; cursor: grab; }
+        #canvas-container:active { cursor: grabbing; }
+
+        /* ಭವ್ಯ ಶೀರ್ಷಿಕೆ ಫಲಕ */
         #title-panel {
             position: absolute; top: 20px; left: 20px; color: white;
-            background: rgba(15, 23, 42, 0.85); padding: 15px; border-radius: 10px;
-            border-left: 5px solid #eab308; z-index: 999; pointer-events: none;
+            background: var(--bg-dark); padding: 18px; border-radius: 12px;
+            border-left: 6px solid var(--primary); z-index: 10;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); pointer-events: none;
         }
-        #title-panel h1 { margin: 0; font-size: 20px; color: #eab308; }
-        #title-panel p { margin: 5px 0 0 0; font-size: 14px; color: #e2e8f0; }
+        #title-panel h1 { margin: 0; font-size: 22px; color: var(--primary); font-weight: 700; }
+        #title-panel p { margin: 6px 0 0 0; font-size: 14px; color: #cbd5e1; }
 
-        /* ಕೆಳಗಿನ ಸುಂದರ ಮಾಹಿತಿ ಫಲಕ (ಆಡಿಯೋ ಮತ್ತು ಪಠ್ಯಕ್ಕಾಗಿ) */
+        /* ಸುಂದರ ಆಡಿಯೋ ಮಾಹಿತಿ ಫಲಕ */
         #info-panel {
             position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
-            width: 85%; max-width: 650px; background: rgba(15, 23, 42, 0.95); color: #f8fafc;
-            padding: 20px; border-radius: 15px; text-align: center;
-            font-size: 17px; line-height: 1.6; border: 2px solid #eab308; /* ಚಾಲುಕ್ಯರ ಭವ್ಯತೆಗೆ ಚಿನ್ನದ ಬಣ್ಣ */
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
-            z-index: 999; pointer-events: none;
+            width: 85%; max-width: 650px; background: var(--bg-dark); color: #f8fafc;
+            padding: 22px; border-radius: 16px; text-align: center;
+            font-size: 18px; line-height: 1.6; border: 2px solid var(--primary);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6); z-index: 10;
+            backdrop-filter: blur(10px);
         }
 
-        /* 🎯 ದೊಡ್ಡದಾಗಿರುವ ಕಸ್ಟಮ್ ಹಾಟ್‌ಸ್ಪಾಟ್‌ ಬಬಲ್ಸ್ */
-        .custom-hotspot {
-            height: 32px;
-            width: 32px;
-            background: #eab308; /* ಹೊಳೆಯುವ ಚಿನ್ನದ ಬಣ್ಣ */
-            border: 3px solid #ffffff;
-            border-radius: 50%;
-            cursor: pointer;
-            box-shadow: 0 0 12px rgba(234, 179, 8, 0.8);
+        /* ಹೊಳೆಯುವ ಮಾಡರ್ನ್ ಹಾಟ್‌ಸ್ಪಾಟ್‌ಗಳು */
+        .hotspot-label {
+            position: absolute; z-index: 5; transform: translate(-50%, -50%);
+            color: white; font-size: 12px; cursor: pointer; pointer-events: auto;
+        }
+        .hotspot-circle {
+            width: 34px; height: 34px; background: var(--primary);
+            border: 3px solid #ffffff; border-radius: 50%;
+            box-shadow: 0 0 18px var(--primary);
             transition: all 0.3s ease;
-            
-            /* 🛠️ ಹಾಟ್‌ಸ್ಪಾಟ್ ಇರಬೇಕಾದ ಜಾಗದಲ್ಲೇ ಕೂರಲು ನಿಖರವಾದ ಆಂಕರ್ ಪಾಯಿಂಟ್ ಫಿಕ್ಸ್ ಮಾಡಲಾಗಿದೆ */
-            margin-left: -16px;
-            margin-top: -16px;
         }
-        /* ಅದರ ಮೇಲೆ ಬೆರಳು ಇಟ್ಟಾಗ ಕೆಂಪು ಬಣ್ಣಕ್ಕೆ ತಿರುಗಲು */
-        .custom-hotspot:hover {
-            background: #ef4444; 
-            box-shadow: 0 0 15px rgba(239, 68, 68, 0.9);
-            transform: scale(1.2);
+        .hotspot-circle:hover {
+            background: #ef4444; transform: scale(1.2);
+            box-shadow: 0 0 22px #ef4444;
         }
+
+        /* ಕನ್ನಡ ಟೂಲ್‌ಟಿಪ್ (ಮಾಹಿತಿ ಬಬಲ್) */
+        .hotspot-text {
+            position: absolute; bottom: 42px; left: 50%; transform: translateX(-50%);
+            background: #0f172a; color: var(--primary); border: 1px solid var(--primary);
+            padding: 6px 12px; border-radius: 6px; white-space: nowrap;
+            font-size: 14px; font-weight: bold; opacity: 0; transition: opacity 0.3s; pointer-events: none;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+        }
+        .hotspot-label:hover .hotspot-text { opacity: 1; }
     </style>
 </head>
 <body>
 
 <div id="title-panel">
     <h1>ಐಹೊಳೆ: ಭಾರತೀಯ ದೇವಸ್ಥಾನ ವಾಸ್ತುಶಿಲ್ಪದ ತೊಟ್ಟಿಲು</h1>
-    <p>ದೊಡ್ಡದಾಗಿರುವ ಚಿನ್ನದ ಬಣ್ಣದ ವರ್ತುಲಗಳ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ ಆಡಿಯೋ ವಿವರ ಪಡೆಯಿರಿ</p>
+    <p>ಚಿತ್ರವನ್ನು ಎಡ-ಬಲಕ್ಕೆ ಚಲಿಸಿ. ಚಿನ್ನದ ಬಣ್ಣದ ಹಾಟ್‌ಸ್ಪಾಟ್‌ಗಳ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ ಆಡಿಯೋ ವಿವರ ಪಡೆಯಿರಿ</p>
 </div>
-
-<div id="panorama"></div>
 
 <div id="info-panel">
-    ಸ್ವಾಗತ! ಚಾಲುಕ್ಯರ ಅದ್ಭುತ ಕಲಾ ನಗರಿ ಐಹೊಳೆಯ ಇತಿಹಾಸವನ್ನು ತಿಳಿಯಲು ಆವರಣದಲ್ಲಿರುವ ದೊಡ್ಡ ಹಾಟ್‌ಸ್ಪಾಟ್‌ಗಳ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ...
+    ಸ್ವಾಗತ! ಚಾಲುಕ್ಯರ ಅದ್ಭುತ ಕಲಾ ನಗರಿ ಐಹೊಳೆಯ ಇತಿಹಾಸವನ್ನು ತಿಳಿಯಲು ಆವರಣದಲ್ಲಿರುವ ಹಾಟ್‌ಸ್ಪಾಟ್‌ಗಳ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ...
 </div>
 
+<div id="hotspots-layer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;"></div>
+<div id="canvas-container"></div>
+
 <script>
-// ಕನ್ನಡ ಧ್ವನಿ ಕಾರ್ಯವಿಧಾನ
+// --- 1. ಆಡಿಯೋ ಮತ್ತು ಮಾಹಿತಿ ಪ್ರದರ್ಶನ ಕಾರ್ಯವಿಧಾನ ---
 function speakKannada(title, infoText) {
-    document.getElementById('info-panel').innerHTML = `<strong>${title}</strong><br>${infoText}`;
-    
+    document.getElementById('info-panel').innerHTML = `<strong style="color:var(--primary); font-size:20px;">${title}</strong><br>${infoText}`;
     if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel(); // ಹಳೆಯ ಧ್ವನಿ ನಿಲ್ಲಿಸಲು
-        
-        const speech = new SpeechSynthesisUtterance();
-        speech.text = title + ". " + infoText;
-        speech.lang = 'kn-IN'; // ಕನ್ನಡ ಭಾಷೆ
+        window.speechSynthesis.cancel(); // ಹಳೆಯ ಆಡಿಯೋ ನಿಲ್ಲಿಸಲು
+        const speech = new SpeechSynthesisUtterance(title + ". " + infoText);
+        speech.lang = 'kn-IN'; // ಕನ್ನಡ ಧ್ವನಿ
         speech.rate = 0.85; // ಸ್ಪಷ್ಟ ಧ್ವನಿ ವೇಗ
-        
         window.speechSynthesis.speak(speech);
     }
 }
 
-// Pannellum ವೀಕ್ಷಕ ಸೆಟ್ಟಿಂಗ್ಸ್
-pannellum.viewer('panorama', {
-    "type": "equirectangular",
-    "panorama": "https://raw.githubusercontent.com/chandugokarna-bit/gpt-teachers-resources/main/resources/virtual/aihole360.jpg",
-    "autoLoad": true,
-    "title": "ಐಹೊಳೆ, ಬಾಗಲಕೋಟೆ",
-    "author": "ಚಾಲುಕ್ಯ ವಾಸ್ತುಶಿಲ್ಪ ಕ್ಷೇತ್ರ",
-    
-    /* 🛠️ ಲೈವ್ ಆಗಿ ಡಿಗ್ರಿ ನಂಬರ್‌ಗಳನ್ನು ಕಂಡುಹಿಡಿಯಲು ಡಿಬಗ್ ಮೋಡ್ ಆನ್ ಮಾಡಲಾಗಿದೆ */
-    "hotSpotDebug": true, 
-    
-    "hotSpots": [
-        {
-            "pitch": 0,
-            "yaw": -40,
-            "cssClass": "custom-hotspot", // ನಮ್ಮ ಕಸ್ಟಮ್ ದೊಡ್ಡ ಹಾಟ್‌ಸ್ಪಾಟ್
-            "createTooltipFunc": function(hotSpotDiv) { hotSpotDiv.setAttribute("title", "ಐಹೊಳೆ ಇತಿಹಾಸ"); },
-            "clickHandlerFunc": function() {
-                speakKannada(
-                    "ಭಾರತೀಯ ದೇವಸ್ಥಾನ ವಾಸ್ತುಶಿಲ್ಪದ ತೊಟ್ಟಿಲು", 
-                    "ಐಹೊಳೆ ಬಾದಾಮಿ ಚಾಲುಕ್ಯರ ಮೊದಲ ರಾಜಧಾನಿಯಾಗಿತ್ತು. ಇಲ್ಲಿ 125 ಕ್ಕೂ ಹೆಚ್ಚು ಕಲ್ಲಿನ ದೇವಸ್ಥಾನಗಳಿರುವುದರಿಂದ ಇದನ್ನು 'ಭಾರತೀಯ ದೇವಸ್ಥಾನ ವಾಸ್ತುಶಿಲ್ಪದ ತೊಟ್ಟಿಲು' ಎಂದು ಕರೆಯಲಾಗುತ್ತದೆ. ಇಲ್ಲಿ ಚಾಲುಕ್ಯ ಶಿಲ್ಪಿಗಳು ವಿವಿಧ ಶೈಲಿಯ ಕಟ್ಟಡಗಳನ್ನು ಕಟ್ಟಿ ಪ್ರಯೋಗ ನಡೆಸುತ್ತಿದ್ದರು."
-                );
-            }
-        },
-        {
-            "pitch": 8,
-            "yaw": 0,
-            "cssClass": "custom-hotspot",
-            "createTooltipFunc": function(hotSpotDiv) { hotSpotDiv.setAttribute("title", "ದುರ್ಗಾ ದೇವಸ್ಥಾನ"); },
-            "clickHandlerFunc": function() {
-                speakKannada(
-                    "ಭವ್ಯ ದುರ್ಗಾ ದೇವಸ್ಥಾನ", 
-                    "ಐಹೊಳೆಯ ಅತ್ಯಂತ ಪ್ರಸಿದ್ಧ ಮತ್ತು ಸುಂದರ ಕಟ್ಟಡವೇ ದುರ್ಗಾ ದೇವಸ್ಥಾನ. ಇದು ಬೌದ್ಧ ಚೈತ್ಯಾಲಯವನ್ನು ಹೋಲುವ ವಿಶಿಷ್ಟವಾದ ಅರೆ-ವೃತ್ತಾಕಾರದ ಅಥವಾ 'ಗಜಪೃಷ್ಠಾಕಾರದ' ತಳಪಾಯವನ್ನು ಹೊಂದಿದೆ. ಇದರ ಕಾರಿಡಾರ್ ಮತ್ತು ಕಂಬಗಳ ಮೇಲಿರುವ ಕೆತ್ತನೆಗಳು ಅತ್ಯಂತ ಮೋಹಕವಾಗಿವೆ."
-                );
-            }
-        },
-        {
-            "pitch": -5,
-            "yaw": 40,
-            "cssClass": "custom-hotspot",
-            "createTooltipFunc": function(hotSpotDiv) { hotSpotDiv.setAttribute("title", "ಲಡ್ ಖಾನ್ ದೇವಸ್ಥಾನ"); },
-            "clickHandlerFunc": function() {
-                speakKannada(
-                    "ಲಡ್ ಖಾನ್ ದೇವಸ್ಥಾನ ಮತ್ತು ಐಹೊಳೆ ಶಾಸನ", 
-                    "ಇಲ್ಲಿನ ಅತ್ಯಂತ ಹಳೆಯ ದೇವಸ್ಥಾನಗಳಲ್ಲಿ ಲಡ್ ಖಾನ್ ದೇವಸ್ಥಾನವೂ ಒಂದು, ಇದನ್ನು ಆರಂಭದಲ್ಲಿ ಸಭಾಭವನವಾಗಿ ಬಳಸಲಾಗುತ್ತಿತ್ತು. ಇದರ ಜೊತೆಗೆ, ಐಹೊಳೆಯ ಮೇಗುತಿ ಜೈನ ದೇವಾಲಯದಲ್ಲಿ ಪ್ರಸಿದ್ಧ ಕವಿ ರವಿಕೀರ್ತಿ ಬರೆದ 'ಐಹೊಳೆ ಶಾಸನ'ವಿದೆ. ಇದು ಇಮ್ಮಡಿ ಪುಲಕೇಶಿಯು ಹರ್ಷವರ್ಧನನ್ನು ಸೋಲಿಸಿದ ಭವ್ಯ ವಿಜಯದ ಇತಿಹಾಸವನ್ನು ಸಾರುತ್ತದೆ."
-                );
-            }
+// --- 2. ರಿಯಲ್ ಹಾಟ್‌ಸ್ಪಾಟ್‌ಗಳ ಡೇಟಾಬೇಸ್ (XYZ ಕೋಡ್‌ಗಳು) ---
+const hotSpots = [
+    {
+        name: "ಐಹೊಳೆ ಇತಿಹಾಸ",
+        x: -7.21, y: -0.65, z: -6.90,
+        action: function() {
+            speakKannada(
+                "ಭಾರತೀಯ ದೇವಸ್ಥಾನ ವಾಸ್ತುಶಿಲ್ಪದ ತೊಟ್ಟಿಲು", 
+                "ಐಹೊಳೆ ಬಾದಾಮಿ ಚಾಲುಕ್ಯರ ಮೊದಲ ರಾಜಧಾನಿಯಾಗಿತ್ತು. ಇಲ್ಲಿ 125 ಕ್ಕೂ ಹೆಚ್ಚು ಕಲ್ಲಿನ ದೇವಸ್ಥಾನಗಳಿರುವುದರಿಂದ ಇದನ್ನು 'ಭಾರತೀಯ ದೇವಸ್ಥಾನ ವಾಸ್ತುಶಿಲ್ಪದ ತೊಟ್ಟಿಲು' ಎಂದು ಕರೆಯಲಾಗುತ್ತದೆ. ಇಲ್ಲಿ ಚಾಲುಕ್ಯ ಶಿಲ್ಪಿಗಳು ವಿವಿಧ ಶೈಲಿಯ ಕಟ್ಟಡಗಳನ್ನು ಕಟ್ಟಿ ಪ್ರಯೋಗ ನಡೆಸುತ್ತಿದ್ದರು."
+            );
         }
-    ]
-});
+    },
+    {
+        name: "ದುರ್ಗಾ ದೇವಸ್ಥಾನ",
+        x: 7.89, y: 2.50, z: -5.61,
+        action: function() {
+            speakKannada(
+                "ಭವ್ಯ ದುರ್ಗಾ ದೇವಸ್ಥಾನ", 
+                "ಐಹೊಳೆಯ ಅತ್ಯಂತ ಪ್ರಸಿದ್ಧ ಮತ್ತು ಸುಂದರ ಕಟ್ಟಡವೇ ದುರ್ಗಾ ದೇವಸ್ಥಾನ. ಇದು ಬೌದ್ಧ ಚೈತ್ಯಾಲಯವನ್ನು ಹೋಲುವ ವಿಶಿಷ್ಟವಾದ ಅರೆ-ವೃತ್ತಾಕಾರದ ಅಥವಾ 'ಗಜಪೃಷ್ಠಾಕಾರದ' ತಳಪಾಯವನ್ನು ಹೊಂದಿದೆ. ಇದರ ಕಾರಿಡಾರ್ ಮತ್ತು ಕಂಬಗಳ ಮೇಲಿರುವ ಕೆತ್ತನೆಗಳು ಅತ್ಯಂತ ಮೋಹಕವಾಗಿವೆ."
+            );
+        }
+    },
+    {
+        name: "ಲಡ್ ಖಾನ್ ದೇವಸ್ಥಾನ",
+        x: 0.95, y: 1.26, z: 9.88,
+        action: function() {
+            speakKannada(
+                "ಲಡ್ ಖಾನ್ ದೇವಸ್ಥಾನ ಮತ್ತು ಐಹೊಳೆ ಶಾಸನ", 
+                "ಇಲ್ಲಿನ ಅತ್ಯಂತ ಹಳೆಯ ದೇವಸ್ಥಾನಗಳಲ್ಲಿ ಲಡ್ ಖಾನ್ ದೇವಸ್ಥಾನವೂ ಒಂದು, ಇದನ್ನು ಆರಂಭದಲ್ಲಿ ಸಭಾಭವನವಾಗಿ ಬಳಸಲಾಗುತ್ತಿತ್ತು. ಇದರ ಜೊತೆಗೆ, ಐಹೊಳೆಯ ಮೇಗುತಿ ಜೈನ ದೇವಾಲಯದಲ್ಲಿ ಪ್ರಸಿದ್ಧ ಕವಿ ರವಿಕೀರ್ತಿ ಬರೆದ 'ಐಹೊಳೆ ಶಾಸನ'ವಿದೆ. ಇದು ಇಮ್ಮಡಿ ಪುಲಕೇಶಿಯು ಹರ್ಷವರ್ಧನನ್ನು ಸೋಲಿಸಿದ ಭವ್ಯ ವಿಜಯದ ಇತಿಹಾಸವನ್ನು ಸಾರುತ್ತದೆ."
+            );
+        }
+    }
+];
+
+// --- 3. 360° ಇಂಜಿನ್ ಸೆಟಪ್ (Three.js) ---
+let scene, camera, renderer, sphere;
+let isUserInteracting = false, onPointerDownPointerX = 0, onPointerDownPointerY = 0,
+    lon = 0, onPointerDownLon = 0, lat = 0, onPointerDownLat = 0, phi = 0, theta = 0, zoomFactor = 75;
+
+const container = document.getElementById('canvas-container');
+const hotspotsLayer = document.getElementById('hotspots-layer');
+
+init();
+animate();
+
+function init() {
+    scene = new THREE.Scene();
+    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1100);
+    
+    // 360 ಡಿಗ್ರಿ ಸ್ಪಿಯರ್ ಜಿಯೋಮೆಟ್ರಿ
+    const geometry = new THREE.SphereGeometry(500, 60, 40);
+    geometry.scale(-1, 1, 1); // ಚಿತ್ರ ಒಳಗಡೆ ಕಾಣಿಸಲು ಇನ್ವರ್ಟ್
+
+    const texture = new THREE.TextureLoader().load('https://raw.githubusercontent.com/chandugokarna-bit/gpt-teachers-resources/main/resources/virtual/aihole360.jpg');
+    const material = new THREE.MeshBasicMaterial({ map: texture });
+    sphere = new THREE.Mesh(geometry, material);
+    scene.add(sphere);
+
+    renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    container.appendChild(renderer.domElement);
+
+    // ಈವೆಂಟ್ ಲಿಸನರ್ಸ್
+    container.addEventListener('pointerdown', onPointerDown);
+    container.addEventListener('wheel', onWebGLWheel);
+    window.addEventListener('resize', onWindowResize);
+
+    // ಹಾಟ್‌ಸ್ಪಾಟ್‌ಗಳನ್ನು ದೃಶ್ಯದಲ್ಲಿ ಮೂಡಿಸುವುದು
+    createVisualHotspots();
+}
+
+// --- 4. ಹಾಟ್‌ಸ್ಪಾಟ್‌ಗಳನ್ನು ಸ್ಕ್ರೀನ್ ಮೇಲೆ ಇರಿಸುವ ಲಾಜಿಕ್ ---
+function createVisualHotspots() {
+    hotspotsLayer.innerHTML = '';
+    hotSpots.forEach((hs, index) => {
+        const el = document.createElement('div');
+        el.className = 'hotspot-label';
+        el.id = 'hs-' + index;
+        el.innerHTML = `
+            <div class="hotspot-circle"></div>
+            <div class="hotspot-text">${hs.name}</div>
+        `;
+        
+        // ಕ್ಲಿಕ್ ಮಾಡಿದಾಗ ಆಡಿಯೋ ಕಾರ್ಯಗತಗೊಳಿಸಲು
+        el.addEventListener('click', function(e) {
+            e.stopPropagation();
+            if(hs.action) hs.action();
+        });
+        
+        hotspotsLayer.appendChild(el);
+        hs.domElement = el;
+    });
+}
+
+// 3D ಯಿಂದ 2D ಸ್ಕ್ರೀನ್ ಪೊಸಿಷನ್‌ಗೆ ಪರಿವರ್ತನೆ
+function updateHotspotsPosition() {
+    hotSpots.forEach(hs => {
+        if (!hs.domElement) return;
+        const wp = new THREE.Vector3(hs.x, hs.y, hs.z).normalize().multiplyScalar(500);
+        const proj = wp.project(camera);
+        
+        // ಕ್ಯಾಮೆರಾ ಹಿಂಭಾಗದಲ್ಲಿದ್ದರೆ ಹೈಡ್ ಮಾಡು
+        if (proj.z > 1) {
+            hs.domElement.style.display = 'none';
+            return;
+        }
+        
+        const x = (proj.x * .5 + .5) * window.innerWidth;
+        const y = (proj.y * -.5 + .5) * window.innerHeight;
+        
+        hs.domElement.style.display = 'block';
+        hs.domElement.style.left = x + 'px';
+        hs.domElement.style.top = y + 'px';
+    });
+}
+
+// --- 5. ನಿಯಂತ್ರಣಗಳು (Interaction Controls) ---
+function onPointerDown(event) {
+    isUserInteracting = true;
+    onPointerDownPointerX = event.clientX;
+    onPointerDownPointerY = event.clientY;
+    onPointerDownLon = lon;
+    onPointerDownLat = lat;
+    document.addEventListener('pointermove', onPointerMove);
+    document.addEventListener('pointerup', onPointerUp);
+}
+
+function onPointerMove(event) {
+    if (isUserInteracting === true) {
+        lon = (onPointerDownPointerX - event.clientX) * 0.1 + onPointerDownLon;
+        lat = (event.clientY - onPointerDownPointerY) * 0.1 + onPointerDownLat;
+    }
+}
+
+function onPointerUp() {
+    isUserInteracting = false;
+    document.removeEventListener('pointermove', onPointerMove);
+    document.removeEventListener('pointerup', onPointerUp);
+}
+
+function onWebGLWheel(event) {
+    zoomFactor += event.deltaY * 0.05;
+    zoomFactor = Math.max(30, Math.min(100, zoomFactor)); // ಸ್ಮೂತ್ ಜೂಮ್ ಮಿತಿ
+    camera.fov = zoomFactor;
+    camera.updateProjectionMatrix();
+}
+
+function onWindowResize() {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+}
+
+// --- 6. ಅನಿಮೇಷನ್ ಲೂಪ್ ---
+function animate() {
+    requestAnimationFrame(animate);
+    update();
+}
+
+function update() {
+    lat = Math.max(-85, Math.min(85, lat));
+    phi = THREE.MathUtils.degToRad(90 - lat);
+    theta = THREE.MathUtils.degToRad(lon);
+
+    const target = new THREE.Vector3();
+    target.x = 500 * Math.sin(phi) * Math.sin(theta);
+    target.y = 500 * Math.cos(phi);
+    target.z = 500 * Math.sin(phi) * Math.cos(theta);
+
+    camera.lookAt(target);
+    renderer.render(scene, camera);
+    updateHotspotsPosition(); // ಪ್ರತಿ ಫ್ರೇಮ್‌ನಲ್ಲೂ ಪೊಸಿಷನ್ ಅಪ್ಡೇಟ್
+}
 </script>
 
 </body>
