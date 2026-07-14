@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 4: Electric & Magnetic Effects - Interactive Lab & Game Room</title>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --secondary: #06b6d4;
+            --accent: #f59e0b;
+            --success: #10b981;
+            --danger: #ef4444;
+            --dark: #1e1b4b;
+            --light: #f8fafc;
+            --card-bg: #ffffff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #e0e7ff 0%, #cffafe 100%);
+            color: var(--dark);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            background: rgba(255, 255, 255, 0.85);
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(79, 70, 229, 0.15);
+            backdrop-filter: blur(10px);
+            border: 2px solid #ffffff;
+        }
+
+        header h1 {
+            color: var(--primary);
+            font-size: 2.2rem;
+            margin-bottom: 5px;
+        }
+
+        header p {
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        /* Nav Tabs */
+        .nav-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 25px;
+            justify-content: center;
+        }
+
+        .tab-btn {
+            background: var(--card-bg);
+            color: var(--dark);
+            border: none;
+            padding: 12px 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: 2px solid transparent;
+        }
+
+        .tab-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(79, 70, 229, 0.15);
+            background: #f1f5f9;
+        }
+
+        .tab-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary-hover);
+        }
+
+        /* Panel Settings */
+        .panel {
+            display: none;
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 30px;
+            box-shadow: 0 15px 35px rgba(30, 27, 75, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            animation: fadeIn 0.4s ease-in-out forwards;
+        }
+
+        .panel.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 {
+            color: var(--primary);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* VIRTUAL LAB STYLING */
+        .lab-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .lab-layout { grid-template-columns: 1fr; }
+        }
+
+        .lab-canvas-container {
+            background: #0f172a;
+            border-radius: 16px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 320px;
+            position: relative;
+            color: white;
+            box-shadow: inset 0 4px 10px rgba(0,0,0,0.5);
+        }
+
+        .circuit-element {
+            transition: all 0.3s ease;
+        }
+
+        .wire {
+            stroke: #475569;
+            stroke-width: 4;
+            fill: none;
+        }
+        .wire.active {
+            stroke: #fbbf24;
+            stroke-dasharray: 8;
+            animation: flow 1s linear infinite;
+        }
+
+        @keyframes flow {
+            to { stroke-dashoffset: -16; }
+        }
+
+        .compass-needle {
+            transform-origin: 150px 220px;
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .lab-controls {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 16px;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .control-group label {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+        .btn:hover { background: var(--primary-hover); }
+
+        /* GAME COMMON DESIGNS */
+        .quiz-container, .game-box {
+            background: #f8fafc;
+            border-radius: 16px;
+            padding: 20px;
+            margin-top: 15px;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .option-card {
+            background: white;
+            border: 2px solid #e2e8f0;
+            padding: 15px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .option-card:hover {
+            border-color: var(--primary);
+            background: #eef2ff;
+        }
+
+        .option-card.correct {
+            background: #d1fae5;
+            border-color: var(--success);
+            color: #065f46;
+        }
+
+        .option-card.wrong {
+            background: #fee2e2;
+            border-color: var(--danger);
+            color: #991b1b;
+        }
+
+        .score-counter {
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        /* Drag & Drop Styles */
+        .drag-container {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .drag-box, .drop-box {
+            flex: 1;
+            background: white;
+            padding: 15px;
+            border-radius: 12px;
+            border: 2px dashed #cbd5e1;
+            min-height: 150px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .drop-box {
+            background: #f1f5f9;
+            border-style: solid;
+        }
+        .drop-title {
+            font-weight: bold;
+            text-align: center;
+            color: #475569;
+            margin-bottom: 5px;
+        }
+        .draggable-item {
+            background: var(--secondary);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: grab;
+            font-weight: 500;
+            text-align: center;
+        }
+
+        /* Feedback text */
+        .feedback {
+            margin-top: 15px;
+            font-weight: 600;
+            min-height: 24px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>⚡ Chapter 4: Electric & Magnetic Effects</h1>
+        <p>Interactive Discovery Deck & Gamified Testing Center</p>
+    </header>
+
+    <div class="container">
+        <div class="nav-tabs">
+            <button class="tab-btn active" onclick="switchTab(event, 'lab')">🔬 Virtual Lab Simulation</button>
+            <button class="tab-btn" onclick="switchTab(event, 'act1')">🎮 Game 1: Cell Explorer</button>
+            <button class="tab-btn" onclick="switchTab(event, 'act2')">🚀 Game 2: Thermal Blast</button>
+            <button class="tab-btn" onclick="switchTab(event, 'act3')">🧲 Game 3: Magnetic Deflector</button>
+            <button class="tab-btn" onclick="switchTab(event, 'act4')">🧪 Game 4: Electrolysis Sorting</button>
+            <button class="tab-btn" onclick="switchTab(event, 'act5')">🏆 Game 5: True-False Blitz</button>
+        </div>
+
+        <div id="lab" class="panel active">
+            <h2>🔬 Oersted's Electromagnetic Compass Lab</h2>
+            <p style="margin-bottom: 15px; color:#475569;">Observe how electric currents produce magnetic fields. Adjust the parameters to watch the magnetic needle deflect instantly!</p>
+            <div class="lab-layout">
+                <div class="lab-canvas-container">
+                    <svg width="300" height="300" viewBox="0 0 300 300">
+                        <rect x="30" y="30" width="60" height="40" rx="5" fill="#f59e0b"/>
+                        <rect x="90" y="45" width="10" height="10" fill="#334155"/>
+                        <text x="45" y="55" fill="white" font-weight="bold" font-size="12">BATTERY</text>
+                        
+                        <path id="lab-wire" class="wire" d="M 90 50 L 250 50 L 250 220 L 150 220 M 150 220 L 50 220 L 50 70" />
+                        
+                        <circle cx="150" cy="220" r="40" fill="#334155" stroke="#94a3b8" stroke-width="4"/>
+                        <circle cx="150" cy="220" r="35" fill="#1e293b"/>
+                        
+                        <g id="compass-needle" class="compass-needle">
+                            <polygon points="150,185 160,220 140,220" fill="#ef4444" />
+                            <polygon points="150,255 160,220 140,220" fill="#cbd5e1" />
+                            <circle cx="150" cy="220" r="4" fill="#fbbf24"/>
+                        </g>
+
+                        <circle id="glow-light" cx="250" cy="130" r="10" fill="#475569"/>
+                    </svg>
+                    <div id="lab-status" style="position:absolute; bottom:15px; background:rgba(0,0,0,0.6); padding:5px 15px; border-radius:20px; font-size:0.9rem;">Status: Circuit Open (No Current)</div>
+                </div>
+                <div class="lab-controls">
+                    <div class="control-group">
+                        <label>Switch Mechanism:</label>
+                        <button class="btn" id="toggle-circuit-btn" onclick="toggleCircuit()">Close Switch (Turn On)</button>
+                    </div>
+                    <div class="control-group">
+                        <label>Current Intensity (Voltage):</label>
+                        <input type="range" id="voltage-slider" min="1" max="5" value="2" step="1" oninput="updateLab()">
+                    </div>
+                    <div style="background: white; padding: 12px; border-radius: 8px; font-size: 0.9rem; border: 1px solid #cbd5e1;">
+                        <strong>Educational Insight:</strong> Closing the circuit forces electric current through the wire. This automatically manifests a magnetic field surrounding it, making the compass needle deflect away from its standard true north line!
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="act1" class="panel">
+            <h2>🎮 Game 1: Voltaic Cell Discovery Quest</h2>
+            <div class="score-counter">Score: <span id="act1-score">0</span> / 4</div>
+            <div class="quiz-container" id="act1-container">
+                </div>
+        </div>
+
+        <div id="act2" class="panel">
+            <h2>🚀 Game 2: Thermal Blast (Heating Effects)</h2>
+            <div class="score-counter">Score: <span id="act2-score">0</span> / 4</div>
+            <div class="quiz-container" id="act2-container">
+                </div>
+        </div>
+
+        <div id="act3" class="panel">
+            <h2>🧲 Game 3: Magnetic Deflector Matrix</h2>
+            <div class="score-counter">Score: <span id="act3-score">0</span> / 4</div>
+            <div class="quiz-container" id="act3-container">
+                </div>
+        </div>
+
+        <div id="act4" class="panel">
+            <h2>🧪 Game 4: Electrolysis & Liquid Sorting Challenge</h2>
+            <p>Drag the items on the left into their correct structural category classifications based on Chapter 4[cite: 16]!</p>
+            
+            <div class="drag-container">
+                <div class="drag-box" id="source-box" ondragover="allowDrop(event)" ondrop="drop(event)">
+                    <div class="draggable-item" draggable="true" ondragstart="drag(event)" id="item1">Lemon Juice</div>
+                    <div class="draggable-item" draggable="true" ondragstart="drag(event)" id="item2">Distilled Pure Water</div>
+                    <div class="draggable-item" draggable="true" ondragstart="drag(event)" id="item3">Dilute Sulfuric Acid</div>
+                    <div class="draggable-item" draggable="true" ondragstart="drag(event)" id="item4">Sugar Solution</div>
+                </div>
+                
+                <div class="drop-box" id="conductor-box" ondragover="allowDrop(event)" ondrop="drop(event)">
+                    <div class="drop-title">Good Conductors / Electrolytes</div>
+                </div>
+
+                <div class="drop-box" id="insulator-box" ondragover="allowDrop(event)" ondrop="drop(event)">
+                    <div class="drop-title">Poor Conductors / Non-Electrolytes</div>
+                </div>
+            </div>
+            <button class="btn" style="margin-top:20px;" onclick="checkDragDrop()">Submit & Validate Categories</button>
+            <div class="feedback" id="drag-feedback"></div>
+        </div>
+
+        <div id="act5" class="panel">
+            <h2>🏆 Game 5: True-False Blitz Arena</h2>
+            <div class="score-counter">Score: <span id="act5-score">0</span> / 4</div>
+            <div class="quiz-container" id="act5-container">
+                </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab switching logic
+        function switchTab(evt, tabId) {
+            const panels = document.querySelectorAll('.panel');
+            panels.forEach(p => p.classList.remove('active'));
+            
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            tabBtns.forEach(b => b.classList.remove('active'));
+            
+            document.getElementById(tabId).classList.add('active');
+            if(evt) evt.currentTarget.classList.add('active');
+        }
+
+        // Virtual Lab State Management
+        let circuitOpen = true;
+        function toggleCircuit() {
+            circuitOpen = !circuitOpen;
+            const btn = document.getElementById('toggle-circuit-btn');
+            if(!circuitOpen) {
+                btn.textContent = "Open Switch (Turn Off)";
+                btn.style.background = "var(--danger)";
+            } else {
+                btn.textContent = "Close Switch (Turn On)";
+                btn.style.background = "var(--primary)";
+            }
+            updateLab();
+        }
+
+        function updateLab() {
+            const wire = document.getElementById('lab-wire');
+            const needle = document.getElementById('compass-needle');
+            const glow = document.getElementById('glow-light');
+            const status = document.getElementById('lab-status');
+            const voltage = document.getElementById('voltage-slider').value;
+
+            if (circuitOpen) {
+                wire.classList.remove('active');
+                needle.style.transform = "rotate(0deg)";
+                glow.setAttribute('fill', '#475569');
+                status.textContent = "Status: Circuit Open (No Current Flow)";
+            } else {
+                wire.classList.add('active');
+                const angle = voltage * 15; // Deflection increases with voltage
+                needle.style.transform = `rotate(${angle}deg)`;
+                glow.setAttribute('fill', '#f59e0b');
+                status.textContent = `Status: Circuit Closed. Current Deflection Angle: ${angle}°`;
+            }
+        }
+
+        // Question Datasets
+        const dataset = {
+            act1: [
+                { q: "What is the fluid or chemical liquid utilized inside a Voltaic Cell called[cite: 16]?", a: ["Electrolyte", "Insulator", "Catalyst", "Fuel"], c: 0 },
+                { q: "Which metal is typically configured as the positive terminal (anode) in a foundational Voltaic cell setup?", a: ["Zinc", "Copper", "Iron", "Aluminum"], c: 1 },
+                { q: "Which of the following is commonly used as the negative plate in a simple cell?", a: ["Gold", "Silver", "Zinc", "Carbon"], c: 2 },
+                { q: "A simple chemical cell changes chemical energy directly into which form of energy?", a: ["Light Energy", "Sound Energy", "Electrical Energy", "Mechanical Energy"], c: 2 }
+            ],
+            act2: [
+                { q: "Which primary factor naturally generates excess undesirable heat energy inside real home switchboards[cite: 15]?", a: ["High current flow & wire resistance", "Clean insulation plates", "Low voltages", "Magnetic field drops"], c: 0 },
+                { q: "Which device uses the heating effect of electric current to protect home appliances from overloading?", a: ["Electric Fuse", "Electric Bell", "Compass Needle", "Electromagnet"], c: 0 },
+                { q: "What item uses a high-resistance heating filament wire to purposefully generate heat?", a: ["Electric Iron", "Voltaic Cell", "Bar Magnet", "Plastic Straw"], c: 0 },
+                { q: "When electric current flows through a high-resistance wire, the wire becomes...", a: ["Cold", "Hot", "Liquidized", "Magnetized instantly"], c: 1 }
+            ],
+            act3: [
+                { q: "Who discovered that a wire carrying current causes a magnetic compass needle to deflect[cite: 14]?", a: ["Hans Christian Oersted", "Newton", "Galileo", "Pasteur"], c: 0 },
+                { q: "If you wrap an insulated copper wire around an ordinary iron nail and run current through it, it becomes an[cite: 14]:", a: ["Electromagnet", "Voltaic Cell", "Insulator strip", "Permanent steel bar magnet"], c: 0 },
+                { q: "What happens to the magnetic field strength of a wire coil if you increase the current flowing through it?", a: ["It drops to zero", "It stays completely static", "It increases significantly", "It changes color"], c: 2 },
+                { q: "Which appliance relies heavily on built-in electromagnets to create mechanical striking sounds?", a: ["Electric Bell", "Simple Filament Lamp", "Chemical Test Tube", "Electric Fuse strip"], c: 0 }
+            ],
+            act5: [
+                { q: "An electric current passing through any coil creates an active magnetic effect[cite: 16].", a: ["True", "False"], c: 0 },
+                { q: "Pure distilled water is an excellent conductor of electricity and works well as an electrolyte[cite: 12].", a: ["True", "False"], c: 1 },
+                { q: "An electric fuse wire should have an extremely high melting point so it never melts.", a: ["True", "False"], c: 1 },
+                { q: "Deflection of a magnetic compass needle increases when current passing nearby increases.", a: ["True", "False"], c: 0 }
+            ]
+        };
+
+        // Render functions for multiple choice sections
+        const userScores = { act1: 0, act2: 0, act3: 0, act5: 0 };
+
+        function loadQuiz(sectionId) {
+            const container = document.getElementById(`${sectionId}-container`);
+            const questions = dataset[sectionId];
+            container.innerHTML = "";
+
+            questions.forEach((qData, qIdx) => {
+                const qBlock = document.createElement('div');
+                qBlock.style.marginBottom = "20px";
+                qBlock.innerHTML = `<p style="font-weight:600; color:var(--dark);">${qIdx + 1}. ${qData.q}</p>`;
+                
+                const grid = document.createElement('div');
+                grid.className = "options-grid";
+
+                qData.a.forEach((optText, optIdx) => {
+                    const card = document.createElement('div');
+                    card.className = "option-card";
+                    card.textContent = optText;
+                    card.onclick = () => selectOption(sectionId, qIdx, optIdx, card, qData.c);
+                    grid.appendChild(card);
+                });
+
+                qBlock.appendChild(grid);
+                container.appendChild(qBlock);
+            });
+        }
+
+        function selectOption(sectionId, qIdx, optIdx, cardEl, correctIdx) {
+            // Prevent multiple clicks on the same question line
+            const parent = cardEl.parentElement;
+            if(parent.classList.contains('answered')) return;
+            parent.classList.add('answered');
+
+            if (optIdx === correctIdx) {
+                cardEl.classList.add('correct');
+                userScores[sectionId]++;
+                document.getElementById(`${sectionId}-score`).textContent = userScores[sectionId];
+            } else {
+                cardEl.classList.add('wrong');
+                // Highlight the correct option dynamically
+                parent.children[correctIdx].classList.add('correct');
+            }
+        }
+
+        // Drag & Drop Functionality for Game 4
+        function allowDrop(ev) { ev.preventDefault(); }
+        function drag(ev) { ev.dataTransfer.setData("text", ev.target.id); }
+        function drop(ev) {
+            ev.preventDefault();
+            const data = ev.dataTransfer.getData("text");
+            const draggedNode = document.getElementById(data);
+            if(ev.target.className === 'drop-box' || ev.target.id === 'source-box') {
+                ev.target.appendChild(draggedNode);
+            }
+        }
+
+        function checkDragDrop() {
+            const condBox = document.getElementById('conductor-box');
+            const insBox = document.getElementById('insulator-box');
+            const feedback = document.getElementById('drag-feedback');
+
+            let errors = 0;
+            // Lemon Juice (item1) and Acid (item3) belong in conductors
+            // Distilled Water (item2) and Sugar (item4) belong in insulators [cite: 12, 16]
+            
+            const cItems = Array.from(condBox.children).map(n => n.id);
+            const iItems = Array.from(insBox.children).map(n => n.id);
+
+            if(!cItems.includes('item1')) errors++;
+            if(!cItems.includes('item3')) errors++;
+            if(!iItems.includes('item2')) errors++;
+            if(!iItems.includes('item4')) errors++;
+
+            if(errors === 0) {
+                feedback.textContent = "🏆 Excellent! All items correctly mapped based on electrolyte properties.";
+                feedback.style.color = "var(--success)";
+            } else {
+                feedback.textContent = "❌ Some items are incorrectly placed. Check your chemical electrolyte rules and try again.";
+                feedback.style.color = "var(--danger)";
+            }
+        }
+
+        // Initialization
+        window.onload = () => {
+            loadQuiz('act1');
+            loadQuiz('act2');
+            loadQuiz('act3');
+            loadQuiz('act5');
+        };
+    </script>
+</body>
+</html>

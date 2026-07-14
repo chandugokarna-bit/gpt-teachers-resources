@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Integer Addition: Coins Game</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f3e5f5;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+            text-align: center;
+        }
+        .container {
+            max-width: 850px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            border-top: 8px solid #9c27b0;
+        }
+        h1 {
+            color: #7b1fa2;
+            font-size: 32px;
+            margin-bottom: 5px;
+        }
+        .rules {
+            background-color: #f5f5f5;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 16px;
+            border: 2px dashed #ccc;
+        }
+        .level-indicator {
+            font-size: 20px;
+            font-weight: bold;
+            color: #d84315;
+            margin-bottom: 10px;
+        }
+        .problem-box {
+            font-size: 36px;
+            font-weight: bold;
+            color: #fff;
+            background-color: #ab47bc;
+            padding: 20px;
+            border-radius: 10px;
+            display: inline-block;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        }
+        
+        /* Controls */
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .btn-coin {
+            font-size: 18px;
+            font-weight: bold;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: 0.2s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        }
+        .btn-green { background-color: #4CAF50; }
+        .btn-green:hover { background-color: #388E3C; }
+        .btn-red { background-color: #F44336; }
+        .btn-red:hover { background-color: #D32F2F; }
+        
+        /* Workspace */
+        .workspace {
+            background-color: #fafafa;
+            border: 3px solid #e0e0e0;
+            border-radius: 15px;
+            min-height: 200px;
+            padding: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            align-content: flex-start;
+            gap: 15px;
+            justify-content: center;
+        }
+        .coin {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            font-weight: bold;
+            color: white;
+            box-shadow: inset -3px -3px 6px rgba(0,0,0,0.3), 2px 2px 5px rgba(0,0,0,0.2);
+            cursor: pointer;
+            animation: popIn 0.3s ease-out;
+            transition: 0.3s;
+        }
+        .coin.pos { background: radial-gradient(circle at 30% 30%, #66bb6a, #2e7d32); }
+        .coin.neg { background: radial-gradient(circle at 30% 30%, #ef5350, #c62828); }
+        .coin.fading { transform: scale(0); opacity: 0; }
+        
+        /* Actions */
+        .action-area {
+            background-color: #e3f2fd;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        .btn-action {
+            background-color: #1976D2;
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        }
+        .btn-action:hover { background-color: #1565C0; }
+        
+        .answer-area {
+            display: none;
+            margin-top: 20px;
+        }
+        input[type="number"] {
+            font-size: 24px;
+            padding: 10px;
+            width: 100px;
+            text-align: center;
+            border: 2px solid #1976D2;
+            border-radius: 8px;
+        }
+        #feedback {
+            font-size: 22px;
+            font-weight: bold;
+            margin-top: 15px;
+            min-height: 30px;
+        }
+        .btn-next {
+            background-color: #ff9800;
+            display: none;
+            margin: 20px auto 0 auto;
+        }
+        .btn-next:hover { background-color: #f57c00; }
+        
+        #victoryScreen {
+            display: none;
+            margin-top: 30px;
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0); }
+            80% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>🎮 Integer Addition Game</h1>
+        <div class="rules">
+            🟢 <b>Green Coin = +1</b> &nbsp; | &nbsp; 🔴 <b>Red Coin = -1</b> &nbsp; | &nbsp; 💡 <i>(Click on a coin to remove it)</i>
+        </div>
+
+        <div id="gameplayArea">
+            <div class="level-indicator" id="levelDisplay">Level: 1 / 20</div>
+            
+            <div class="problem-box" id="problemDisplay">
+                </div>
+
+            <div class="controls" id="coinControls">
+                <button class="btn-coin btn-green" onclick="addCoin('pos')">➕ Add Green Coin</button>
+                <button class="btn-coin btn-red" onclick="addCoin('neg')">➕ Add Red Coin</button>
+            </div>
+
+            <div class="workspace" id="workspace">
+                </div>
+
+            <div class="action-area" id="actionArea">
+                <button class="btn-action" id="checkSetupBtn" onclick="checkSetup()">1. Check My Coins</button>
+                <button class="btn-action" id="cancelPairsBtn" style="display:none; background-color:#9c27b0;" onclick="cancelPairs()">2. Cancel Zero Pairs</button>
+                
+                <div class="answer-area" id="answerArea">
+                    <label style="font-size:22px; font-weight:bold;">Final Answer: </label>
+                    <input type="number" id="finalAnswer" placeholder="Answer">
+                    <button class="btn-action" style="background-color:#4CAF50;" onclick="checkAnswer()">Submit Answer</button>
+                </div>
+            </div>
+
+            <div id="feedback"></div>
+            <button class="btn-action btn-next" id="nextBtn" onclick="nextLevel()">Next Level ➡️</button>
+        </div>
+
+        <div id="victoryScreen">
+            <h2 style="color: #4CAF50; font-size: 36px;">🎉 Wonderful Achievement! 🎉</h2>
+            <p style="font-size: 22px;">You have successfully completed all 20 challenges!</p>
+            <div style="font-size: 80px; margin: 20px 0;">🏆👑🪙</div>
+            <button class="btn-action" style="background-color: #ff9800;" onclick="location.reload()">Play Again from the Start</button>
+        </div>
+
+    </div>
+
+    <script>
+        // 20 Predefined Questions (From easy to hard)
+        const questions = [
+            { n1: 2, n2: 3 },      // 1. Pos + Pos
+            { n1: -2, n2: -3 },    // 2. Neg + Neg
+            { n1: 4, n2: -2 },     // 3. Pos > Neg
+            { n1: -5, n2: 3 },     // 4. Neg > Pos
+            { n1: 3, n2: -3 },     // 5. Zero Pair (Exact)
+            { n1: 5, n2: 2 },      // 6. Pos + Pos
+            { n1: -4, n2: -1 },    // 7. Neg + Neg
+            { n1: 2, n2: -6 },     // 8. Neg > Pos
+            { n1: -3, n2: 7 },     // 9. Pos > Neg
+            { n1: -6, n2: 6 },     // 10. Zero Pair
+            { n1: 0, n2: -4 },     // 11. Zero + Neg
+            { n1: 5, n2: 0 },      // 12. Pos + Zero
+            { n1: -7, n2: -2 },    // 13. Neg + Neg (Bigger)
+            { n1: 8, n2: -3 },     // 14. Pos > Neg
+            { n1: -5, n2: 9 },     // 15. Pos > Neg
+            { n1: 4, n2: -8 },     // 16. Neg > Pos
+            { n1: -9, n2: 2 },     // 17. Neg > Pos
+            { n1: 6, n2: 3 },      // 18. Pos + Pos
+            { n1: -8, n2: -1 },    // 19. Neg + Neg
+            { n1: 9, n2: -9 }      // 20. Zero Pair (Bigger)
+        ];
+
+        let currentLevelIndex = 0;
+        let expectedPos = 0;
+        let expectedNeg = 0;
+        let currentPos = 0;
+        let currentNeg = 0;
+
+        window.onload = function() {
+            loadLevel();
+        };
+
+        function loadLevel() {
+            if (currentLevelIndex >= questions.length) {
+                document.getElementById("gameplayArea").style.display = "none";
+                document.getElementById("victoryScreen").style.display = "block";
+                return;
+            }
+
+            let q = questions[currentLevelIndex];
+            document.getElementById("levelDisplay").innerText = `Level: ${currentLevelIndex + 1} / 20`;
+            
+            // Format problem text nicely
+            let displayNum2 = q.n2 < 0 ? `(${q.n2})` : q.n2;
+            document.getElementById("problemDisplay").innerText = `${q.n1} + ${displayNum2} = ?`;
+
+            // Calculate Expected Coins
+            expectedPos = (q.n1 > 0 ? q.n1 : 0) + (q.n2 > 0 ? q.n2 : 0);
+            expectedNeg = (q.n1 < 0 ? Math.abs(q.n1) : 0) + (q.n2 < 0 ? Math.abs(q.n2) : 0);
+
+            // Reset State
+            currentPos = 0;
+            currentNeg = 0;
+            document.getElementById("workspace").innerHTML = "";
+            document.getElementById("finalAnswer").value = "";
+            document.getElementById("feedback").innerText = "";
+            
+            // Reset UI Visibility
+            document.getElementById("coinControls").style.pointerEvents = "auto";
+            document.getElementById("checkSetupBtn").style.display = "inline-block";
+            document.getElementById("cancelPairsBtn").style.display = "none";
+            document.getElementById("answerArea").style.display = "none";
+            document.getElementById("nextBtn").style.display = "none";
+        }
+
+        function addCoin(type) {
+            let workspace = document.getElementById("workspace");
+            let coin = document.createElement("div");
+            coin.className = `coin ${type}`;
+            coin.innerText = type === 'pos' ? "+" : "-";
+            
+            // Allow removing coin by clicking it
+            coin.onclick = function() {
+                if (type === 'pos') currentPos--;
+                else currentNeg--;
+                workspace.removeChild(coin);
+            };
+
+            workspace.appendChild(coin);
+
+            if (type === 'pos') currentPos++;
+            else currentNeg++;
+        }
+
+        function checkSetup() {
+            let feedback = document.getElementById("feedback");
+
+            if (currentPos === expectedPos && currentNeg === expectedNeg) {
+                feedback.innerHTML = "✅ <b>Correct!</b> You have placed the coins according to the problem.";
+                feedback.style.color = "#2E7D32";
+                
+                // Disable adding/removing coins
+                document.getElementById("coinControls").style.pointerEvents = "none";
+                let allCoins = document.querySelectorAll('.coin');
+                allCoins.forEach(c => c.onclick = null);
+
+                document.getElementById("checkSetupBtn").style.display = "none";
+                
+                let pairs = Math.min(currentPos, currentNeg);
+                if (pairs > 0) {
+                    document.getElementById("cancelPairsBtn").style.display = "inline-block";
+                } else {
+                    document.getElementById("answerArea").style.display = "block";
+                }
+            } else {
+                feedback.innerHTML = `❌ <b>Incorrect!</b> Pay attention to the problem. You need ${expectedPos} Green and ${expectedNeg} Red coins.`;
+                feedback.style.color = "#C62828";
+            }
+        }
+
+        function cancelPairs() {
+            let pairs = Math.min(currentPos, currentNeg);
+            let workspace = document.getElementById("workspace");
+            let posCoins = workspace.querySelectorAll('.coin.pos');
+            let negCoins = workspace.querySelectorAll('.coin.neg');
+
+            // Animate cancellation
+            for (let i = 0; i < pairs; i++) {
+                posCoins[i].classList.add('fading');
+                negCoins[i].classList.add('fading');
+                
+                setTimeout(() => {
+                    if (posCoins[i].parentNode) posCoins[i].parentNode.removeChild(posCoins[i]);
+                    if (negCoins[i].parentNode) negCoins[i].parentNode.removeChild(negCoins[i]);
+                }, 300);
+            }
+
+            document.getElementById("cancelPairsBtn").style.display = "none";
+            
+            let feedback = document.getElementById("feedback");
+            feedback.innerHTML = "✨ <b>Zero pairs cancelled!</b> Count the remaining coins and write the answer.";
+            feedback.style.color = "#7b1fa2";
+
+            setTimeout(() => {
+                document.getElementById("answerArea").style.display = "block";
+            }, 500);
+        }
+
+        function checkAnswer() {
+            let userAnswer = parseInt(document.getElementById("finalAnswer").value);
+            let q = questions[currentLevelIndex];
+            let correctAnswer = q.n1 + q.n2;
+            let feedback = document.getElementById("feedback");
+
+            if (isNaN(userAnswer)) {
+                feedback.innerHTML = "⚠️ Please enter the answer!";
+                feedback.style.color = "#F57C00";
+                return;
+            }
+
+            if (userAnswer === correctAnswer) {
+                feedback.innerHTML = "🎉 <b>Wonderful! Your final answer is correct!</b> 🏆";
+                feedback.style.color = "#2E7D32";
+                document.getElementById("answerArea").style.display = "none";
+                document.getElementById("nextBtn").style.display = "inline-block";
+            } else {
+                feedback.innerHTML = "❌ <b>Answer is incorrect.</b> Count the coins on the screen once again!";
+                feedback.style.color = "#C62828";
+            }
+        }
+
+        function nextLevel() {
+            currentLevelIndex++;
+            loadLevel();
+        }
+    </script>
+</body>
+</html>

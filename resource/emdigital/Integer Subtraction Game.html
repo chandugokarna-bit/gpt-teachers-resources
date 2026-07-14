@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Integer Subtraction Game</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #e0f2f1;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+            text-align: center;
+        }
+        .container {
+            max-width: 850px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            border-top: 8px solid #00897b;
+        }
+        h1 {
+            color: #00695c;
+            font-size: 32px;
+            margin-bottom: 5px;
+        }
+        .rules {
+            background-color: #f5f5f5;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 16px;
+            border: 2px dashed #00897b;
+            text-align: left;
+            display: inline-block;
+        }
+        .level-indicator {
+            font-size: 20px;
+            font-weight: bold;
+            color: #d84315;
+            margin-bottom: 10px;
+        }
+        .problem-box {
+            font-size: 36px;
+            font-weight: bold;
+            color: #fff;
+            background-color: #00acc1;
+            padding: 20px;
+            border-radius: 10px;
+            display: inline-block;
+            margin-bottom: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        }
+        .instruction-box {
+            font-size: 18px;
+            color: #e65100;
+            background-color: #ffe0b2;
+            padding: 10px 20px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        
+        /* Workspace */
+        .workspace-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #424242;
+            margin-bottom: 10px;
+        }
+        .workspace {
+            background-color: #fafafa;
+            border: 3px solid #b0bec5;
+            border-radius: 15px;
+            min-height: 200px;
+            padding: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            align-content: flex-start;
+            gap: 15px;
+            justify-content: center;
+        }
+        .coin {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            font-weight: bold;
+            color: white;
+            box-shadow: inset -3px -3px 6px rgba(0,0,0,0.3), 2px 2px 5px rgba(0,0,0,0.2);
+            cursor: pointer;
+            animation: popIn 0.3s ease-out;
+            transition: transform 0.2s;
+        }
+        .coin:hover { transform: scale(1.1); }
+        .coin.pos { background: radial-gradient(circle at 30% 30%, #66bb6a, #2e7d32); }
+        .coin.neg { background: radial-gradient(circle at 30% 30%, #ef5350, #c62828); }
+        .coin.fading { transform: scale(0); opacity: 0; transition: 0.3s; }
+        
+        /* Controls & Actions */
+        .btn-zero {
+            background-color: #9c27b0;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            margin-bottom: 20px;
+        }
+        .btn-zero:hover { background-color: #7b1fa2; transform: translateY(-2px); }
+
+        .action-area {
+            background-color: #e0f7fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 10px;
+            border: 2px solid #80deea;
+        }
+        disabled: #b2dfdb;
+        input[type="number"] {
+            font-size: 24px;
+            padding: 10px;
+            width: 100px;
+            text-align: center;
+            border: 2px solid #0097a7;
+            border-radius: 8px;
+            margin-right: 10px;
+        }
+        .btn-submit {
+            background-color: #4CAF50;
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        }
+        .btn-submit:hover { background-color: #388E3C; }
+
+        .btn-hint {
+            background-color: #2196F3;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-left: 10px;
+            transition: 0.3s;
+        }
+        .btn-hint:hover { background-color: #1976D2; }
+        
+        .hint-box {
+            display: none;
+            background-color: #fff9c4;
+            color: #f57f17;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            border-left: 5px solid #fbc02d;
+            text-align: left;
+        }
+        
+        #feedback {
+            font-size: 22px;
+            font-weight: bold;
+            margin-top: 15px;
+            min-height: 30px;
+        }
+        .btn-next {
+            background-color: #ff9800;
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            display: none;
+            margin: 20px auto 0 auto;
+        }
+        .btn-next:hover { background-color: #f57c00; }
+        
+        #victoryScreen { display: none; margin-top: 30px; }
+
+        @keyframes popIn { 0% { transform: scale(0); } 80% { transform: scale(1.2); } 100% { transform: scale(1); } }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>🎮 Integer Subtraction Game</h1>
+        <div class="rules">
+            <b>Rules:</b><br>
+            1. Subtraction means <b>"taking away"</b>.<br>
+            2. If there aren't enough coins to remove, add a <b>"Zero Pair (1 Green + 1 Red)"</b>.<br>
+            3. Click on a coin to <b>remove it</b>.
+        </div>
+
+        <div id="gameplayArea">
+            <div class="level-indicator" id="levelDisplay">Level: 1 / 15</div>
+            
+            <div class="problem-box" id="problemDisplay"></div>
+            <br>
+            <div class="instruction-box" id="taskInstruction"></div>
+
+            <div class="workspace-title">Your Board (Remove coins from here):</div>
+            <button class="btn-zero" onclick="addZeroPair()">➕ Add Zero Pair</button>
+
+            <div class="workspace" id="workspace"></div>
+
+            <div class="action-area" id="actionArea">
+                <label style="font-size:20px; font-weight:bold;">Final Answer: </label>
+                <input type="number" id="finalAnswer" placeholder="Answer">
+                <button class="btn-submit" onclick="checkAnswer()">Verify</button>
+                <button class="btn-hint" onclick="showHint()">💡 Hint</button>
+                
+                <div class="hint-box" id="hintBox"></div>
+            </div>
+
+            <div id="feedback"></div>
+            <button class="btn-next" id="nextBtn" onclick="nextLevel()">Next Level ➡️</button>
+        </div>
+
+        <div id="victoryScreen">
+            <h2 style="color: #4CAF50; font-size: 36px;">🎉 Awesome! You won the Subtraction game! 🎉</h2>
+            <p style="font-size: 22px;">You have mastered the strategy of subtracting using zero pairs.</p>
+            <div style="font-size: 80px; margin: 20px 0;">🏅🧠🚀</div>
+            <button class="btn-submit" style="background-color: #ff9800;" onclick="location.reload()">Play Again</button>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            { n1: 5, n2: 2 }, { n1: -4, n2: -1 }, { n1: 3, n2: 5 }, { n1: 4, n2: -2 },
+            { n1: -3, n2: 2 }, { n1: -2, n2: -6 }, { n1: 0, n2: 4 }, { n1: 0, n2: -3 },
+            { n1: 5, n2: -5 }, { n1: -4, n2: 4 }, { n1: 6, n2: 6 }, { n1: -7, n2: -7 },
+            { n1: 2, n2: 8 }, { n1: -1, n2: -8 }, { n1: -5, n2: 5 }
+        ];
+
+        let currentLevelIndex = 0;
+        let coinsArray = []; 
+
+        window.onload = function() { loadLevel(); };
+
+        function loadLevel() {
+            if (currentLevelIndex >= questions.length) {
+                document.getElementById("gameplayArea").style.display = "none";
+                document.getElementById("victoryScreen").style.display = "block";
+                return;
+            }
+
+            let q = questions[currentLevelIndex];
+            document.getElementById("levelDisplay").innerText = `Level: ${currentLevelIndex + 1} / 15`;
+            let displayNum2 = q.n2 < 0 ? `(${q.n2})` : q.n2;
+            document.getElementById("problemDisplay").innerText = `${q.n1} - ${displayNum2} = ?`;
+
+            let colorToTake = q.n2 > 0 ? "Green" : "Red";
+            let amountToTake = Math.abs(q.n2);
+            document.getElementById("taskInstruction").innerHTML = `Goal: Click and remove <b>${amountToTake} ${colorToTake}</b> coins from the board!`;
+
+            coinsArray = [];
+            let type = q.n1 > 0 ? 'pos' : 'neg';
+            let count = Math.abs(q.n1);
+            for(let i=0; i<count; i++) coinsArray.push(type);
+
+            renderCoins();
+
+            // Reset UI
+            document.getElementById("finalAnswer").value = "";
+            document.getElementById("feedback").innerText = "";
+            document.getElementById("hintBox").style.display = "none";
+            document.getElementById("nextBtn").style.display = "none";
+            document.querySelector('.btn-zero').disabled = false;
+        }
+
+        function renderCoins() {
+            let workspace = document.getElementById("workspace");
+            workspace.innerHTML = "";
+            
+            coinsArray.forEach((type, index) => {
+                let coin = document.createElement("div");
+                coin.className = `coin ${type}`;
+                coin.innerText = type === 'pos' ? "+" : "-";
+                
+                coin.onclick = function() {
+                    coin.classList.add('fading');
+                    setTimeout(() => {
+                        coinsArray.splice(index, 1);
+                        document.getElementById("hintBox").style.display = "none"; // Hide hint if they take action
+                        renderCoins();
+                    }, 200);
+                };
+                workspace.appendChild(coin);
+            });
+        }
+
+        function addZeroPair() {
+            coinsArray.push('pos');
+            coinsArray.push('neg');
+            document.getElementById("hintBox").style.display = "none";
+            renderCoins();
+        }
+
+        function showHint() {
+            let q = questions[currentLevelIndex];
+            let amountToTake = Math.abs(q.n2);
+            let colorToTake = q.n2 > 0 ? 'pos' : 'neg';
+            let colorNameK = q.n2 > 0 ? 'Green' : 'Red';
+
+            let currentPosCount = coinsArray.filter(c => c === 'pos').length;
+            let currentNegCount = coinsArray.filter(c => c === 'neg').length;
+            let currentCount = colorToTake === 'pos' ? currentPosCount : currentNegCount;
+
+            let hintBox = document.getElementById("hintBox");
+            
+            if (currentCount < amountToTake) {
+                let needed = amountToTake - currentCount;
+                hintBox.innerHTML = `💡 <b>Hint:</b> You need a total of ${amountToTake} ${colorNameK} coins to remove. But there aren't enough coins on the board. So, press the <b>"➕ Add Zero Pair"</b> button ${needed} more times!`;
+            } else if (currentCount >= amountToTake) {
+                // They have enough coins, check if they already took them away
+                let initialCoins = colorToTake === 'pos' ? (q.n1 > 0 ? q.n1 : 0) : (q.n1 < 0 ? Math.abs(q.n1) : 0);
+                
+                // Have they taken the correct amount?
+                let targetCountAfterSub = initialCoins - amountToTake; // This is a simplification, but helps.
+                
+                hintBox.innerHTML = `💡 <b>Hint:</b> You have enough ${colorNameK} coins! Now click and remove <b>exactly ${amountToTake} ${colorNameK} coins from the board</b>. Then, count the remaining coins and write the answer.`;
+            }
+            
+            hintBox.style.display = "block";
+        }
+
+        function checkAnswer() {
+            let userAnswer = parseInt(document.getElementById("finalAnswer").value);
+            let q = questions[currentLevelIndex];
+            let correctAnswer = q.n1 - q.n2;
+            let feedback = document.getElementById("feedback");
+
+            if (isNaN(userAnswer)) {
+                feedback.innerHTML = "⚠️ Please enter the answer!";
+                feedback.style.color = "#F57C00";
+                return;
+            }
+
+            let currentPosCount = coinsArray.filter(c => c === 'pos').length;
+            let currentNegCount = coinsArray.filter(c => c === 'neg').length;
+            let boardValue = currentPosCount - currentNegCount;
+            let hasZeroPairs = Math.min(currentPosCount, currentNegCount) > 0;
+
+            if (userAnswer === correctAnswer) {
+                if (boardValue === correctAnswer && !hasZeroPairs) {
+                    feedback.innerHTML = "🎉 <b>Wonderful! You have correctly subtracted and found the answer!</b> 🏆";
+                    feedback.style.color = "#2E7D32";
+                    document.getElementById("nextBtn").style.display = "inline-block";
+                    document.querySelector('.btn-zero').disabled = true; 
+                    
+                    let allCoins = document.querySelectorAll('.coin');
+                    allCoins.forEach(c => c.onclick = null);
+                } else if (hasZeroPairs) {
+                    feedback.innerHTML = "⚠️ Answer is correct. But extra 'zero pairs' remain on the board. Remove them!";
+                    feedback.style.color = "#d84315";
+                } else {
+                    feedback.innerHTML = "⚠️ Answer is correct, but the coins on the board do not match your answer. Subtract correctly!";
+                    feedback.style.color = "#d84315";
+                }
+            } else {
+                feedback.innerHTML = "❌ <b>Answer is incorrect.</b> Use the 'Hint' button and try again.";
+                feedback.style.color = "#C62828";
+            }
+        }
+
+        function nextLevel() {
+            currentLevelIndex++;
+            loadLevel();
+        }
+    </script>
+</body>
+</html>

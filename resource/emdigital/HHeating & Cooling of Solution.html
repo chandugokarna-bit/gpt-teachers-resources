@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laboratory Thermometer (Automatic)</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #f8fafc;
+            color: #1e293b;
+            padding: 2rem;
+            margin: 0;
+        }
+        .sandbox {
+            background: white;
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            max-width: 800px;
+            width: 100%;
+        }
+        h2 { text-align: center; color: #0f172a; }
+        p { text-align: center; color: #475569; }
+        .experiment-area {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin: 2rem 0;
+            padding: 2rem;
+            background: #f1f5f9;
+            border-radius: 12px;
+            position: relative;
+        }
+
+        /* Lab Setup Styling */
+        .lab-setup {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 350px;
+            justify-content: flex-end;
+        }
+        
+        .stand-base { width: 100px; height: 10px; background: #475569; position: absolute; bottom: -10px; left: -60px; }
+        .stand-rod { width: 8px; height: 380px; background: #94a3b8; position: absolute; bottom: 0; left: -15px; }
+        .stand-clamp { width: 60px; height: 6px; background: #64748b; position: absolute; top: 50px; left: -10px; }
+
+        .lab-thermometer {
+            width: 16px;
+            height: 280px;
+            background: rgba(255, 255, 255, 0.8);
+            border: 2px solid #cbd5e1;
+            border-radius: 8px 8px 0 0;
+            position: absolute;
+            top: 30px;
+            left: 42px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            z-index: 10;
+        }
+        .lab-fill {
+            width: 8px;
+            background: #ef4444; 
+            transition: height 0.1s linear; 
+            border-radius: 4px;
+        }
+        .lab-bulb {
+            width: 24px;
+            height: 24px;
+            background: #ef4444;
+            border-radius: 50%;
+            position: absolute;
+            bottom: -12px;
+            left: -6px;
+            border: 2px solid #cbd5e1;
+            z-index: 11;
+        }
+
+        .beaker {
+            width: 100px;
+            height: 120px;
+            border: 4px solid #94a3b8;
+            border-top: none;
+            border-radius: 0 0 15px 15px;
+            background: rgba(255, 255, 255, 0.4);
+            position: relative;
+            display: flex;
+            align-items: flex-end;
+            z-index: 5;
+            margin-bottom: 20px;
+        }
+        .water {
+            width: 100%;
+            height: 70%;
+            background: #3b82f6;
+            opacity: 0.7;
+            border-radius: 0 0 10px 10px;
+            transition: all 0.5s ease;
+            position: relative;
+        }
+        .water.ice { background: #a5f3fc; border-top: 4px solid white; }
+        .water.boil { background: #ef4444; animation: bubbling 0.5s infinite alternate; }
+
+        .burner {
+            width: 60px;
+            height: 20px;
+            background: #64748b;
+            border-radius: 5px 5px 0 0;
+            position: absolute;
+            bottom: 0;
+            display: flex;
+            justify-content: center;
+        }
+        .flame {
+            width: 20px;
+            height: 0px;
+            background: #f97316;
+            border-radius: 50% 50% 20% 20%;
+            position: absolute;
+            bottom: 20px;
+            transition: height 0.3s;
+            box-shadow: 0 0 10px #facc15;
+        }
+        .flame.active { height: 35px; animation: flicker 0.2s infinite alternate; }
+
+        @keyframes flicker { 0% { transform: scale(1); opacity: 0.9; } 100% { transform: scale(1.1); opacity: 1; } }
+        @keyframes bubbling { 0% { height: 70%; } 100% { height: 75%; } }
+
+        /* Controls */
+        .info-panel { width: 45%; display: flex; flex-direction: column; gap: 15px; }
+        .reading-box {
+            background: white; padding: 1.5rem; border-radius: 12px; text-align: center;
+            border: 2px solid #e2e8f0; font-size: 1.5rem; font-weight: bold; color: #ef4444;
+        }
+        .controls { margin-top: 1rem; background: #f8fafc; padding: 1.5rem; border-radius: 12px; border: 1px solid #e2e8f0; }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 15px;
+        }
+        button {
+            padding: 10px 15px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 1rem;
+            transition: background 0.2s; color: white;
+        }
+        .btn-heat { background: #ef4444; } .btn-heat:hover { background: #dc2626; }
+        .btn-cool { background: #3b82f6; } .btn-cool:hover { background: #2563eb; }
+        .btn-stop { background: #64748b; } .btn-stop:hover { background: #475569; }
+        
+        input[type="range"] { width: 100%; cursor: pointer; }
+        .observation { margin-top: 1rem; padding: 1rem; background: #fef3c7; border-radius: 8px; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div class="sandbox">
+        <h2>Heating & Cooling of Solution</h2>
+        <p>Observe how the temperature changes when you heat or cool the solution using the buttons.</p>
+
+        <div class="experiment-area">
+            <div class="lab-setup">
+                <div class="stand-base"></div><div class="stand-rod"></div><div class="stand-clamp"></div>
+                <div class="lab-thermometer"><div class="lab-fill" id="mercury-level"></div><div class="lab-bulb"></div></div>
+                <div class="beaker"><div class="water" id="beaker-water"></div></div>
+                <div class="burner"><div class="flame" id="burner-flame"></div></div>
+            </div>
+
+            <div class="info-panel">
+                <div class="reading-box" id="digital-reading">25 °C</div>
+                
+                <div class="controls">
+                    <div class="button-group">
+                        <button class="btn-heat" id="heatBtn">🔥 Heat</button>
+                        <button class="btn-cool" id="coolBtn">❄️ Cool</button>
+                        <button class="btn-stop" id="stopBtn">🛑 Stop</button>
+                    </div>
+                    <input type="range" id="heatControl" min="-10" max="110" value="25" step="1" style="display:none;">
+                    
+                    <div class="observation" id="obs-text">
+                        <b>Observation:</b> The solution is at room temperature.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const slider = document.getElementById('heatControl');
+        const mercuryLevel = document.getElementById('mercury-level');
+        const digitalReading = document.getElementById('digital-reading');
+        const beakerWater = document.getElementById('beaker-water');
+        const burnerFlame = document.getElementById('burner-flame');
+        const obsText = document.getElementById('obs-text');
+        
+        let simulationTimer = null;
+
+        function updateExperiment() {
+            let temp = parseInt(slider.value);
+            digitalReading.innerText = temp + " °C";
+
+            let percent = ((temp + 10) / 120) * 100;
+            mercuryLevel.style.height = percent + '%';
+
+            beakerWater.className = 'water'; 
+            
+            if (temp <= 0) {
+                beakerWater.classList.add('ice');
+                burnerFlame.classList.remove('active');
+                digitalReading.style.color = '#0284c7';
+                obsText.innerHTML = "<b>Observation:</b> Temperature is below 0°C. The solution is freezing.";
+            } 
+            else if (temp > 0 && temp < 40) {
+                burnerFlame.classList.remove('active');
+                digitalReading.style.color = '#10b981';
+                obsText.innerHTML = "<b>Observation:</b> The solution is at room temperature.";
+            }
+            else if (temp >= 40 && temp < 100) {
+                burnerFlame.classList.add('active');
+                burnerFlame.style.background = '#f97316'; 
+                digitalReading.style.color = '#eab308';
+                obsText.innerHTML = "<b>Observation:</b> The solution is being heated. Mercury is expanding due to heat and the level is rising.";
+            }
+            else if (temp >= 100) {
+                beakerWater.classList.add('boil');
+                burnerFlame.classList.add('active');
+                burnerFlame.style.background = '#ef4444';
+                digitalReading.style.color = '#ef4444';
+                obsText.innerHTML = "<b>Observation:</b> Temperature has reached 100°C. The solution has started boiling.";
+            }
+        }
+
+        document.getElementById('heatBtn').addEventListener('click', () => {
+            clearInterval(simulationTimer);
+            burnerFlame.classList.add('active'); 
+            
+            simulationTimer = setInterval(() => {
+                let currentTemp = parseInt(slider.value);
+                if (currentTemp < 110) {
+                    slider.value = currentTemp + 1; 
+                    updateExperiment();
+                } else {
+                    clearInterval(simulationTimer); 
+                }
+            }, 100); 
+        });
+
+        document.getElementById('coolBtn').addEventListener('click', () => {
+            clearInterval(simulationTimer);
+            burnerFlame.classList.remove('active'); 
+            
+            simulationTimer = setInterval(() => {
+                let currentTemp = parseInt(slider.value);
+                if (currentTemp > -10) {
+                    slider.value = currentTemp - 1; 
+                    updateExperiment();
+                } else {
+                    clearInterval(simulationTimer); 
+                }
+            }, 100);
+        });
+
+        document.getElementById('stopBtn').addEventListener('click', () => {
+            clearInterval(simulationTimer);
+            burnerFlame.classList.remove('active');
+            let temp = parseInt(slider.value);
+            obsText.innerHTML = `<b>Observation:</b> Process stopped. Current temperature: ${temp}°C`;
+        });
+
+        updateExperiment(); 
+    </script>
+</body>
+</html>

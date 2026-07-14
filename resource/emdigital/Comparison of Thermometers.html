@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comparison of Thermometers (Clinical vs Lab Thermometer)</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #f0fdfa;
+            color: #0f172a;
+            padding: 2rem;
+            margin: 0;
+        }
+        .sandbox {
+            background: white;
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            max-width: 800px;
+            width: 100%;
+            text-align: center;
+        }
+        .visual-area {
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-end;
+            margin: 2rem 0;
+            padding-bottom: 30px;
+            border-bottom: 2px solid #cbd5e1;
+            height: 350px;
+        }
+        
+        /* General Thermometer Styling */
+        .thermo-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 40%;
+            position: relative;
+        }
+        .glass {
+            background: #f8fafc;
+            border: 2px solid #94a3b8;
+            border-radius: 15px 15px 0 0;
+            position: relative;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            z-index: 2;
+        }
+        .fill {
+            width: 10px;
+            background: #ef4444;
+            transition: height 0.3s ease-out;
+            border-radius: 5px;
+            margin-bottom: 5px;
+        }
+        .bulb {
+            background: #ef4444;
+            border-radius: 50%;
+            border: 2px solid #94a3b8;
+            z-index: 3;
+            margin-top: -5px;
+        }
+        .scale {
+            position: absolute;
+            left: 100%;
+            margin-left: 10px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: #475569;
+            font-weight: bold;
+            padding: 10px 0;
+        }
+
+        /* Lab Thermometer Specs (-10 to 110) */
+        .lab-glass { width: 20px; height: 300px; }
+        .lab-bulb { width: 30px; height: 30px; }
+        
+        /* Clinical Thermometer Specs (35 to 42) */
+        .clinical-glass { width: 24px; height: 200px; margin-bottom: 15px;}
+        .clinical-bulb { width: 36px; height: 36px; }
+        .kink {
+            position: absolute;
+            bottom: 12px;
+            width: 28px;
+            height: 6px;
+            background: #94a3b8;
+            border-radius: 3px;
+            z-index: 4;
+        }
+        .kink-label {
+            position: absolute;
+            bottom: 5px;
+            right: 40px;
+            background: #fef08a;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            border: 1px solid #eab308;
+            color: #854d0e;
+        }
+
+        .label { margin-top: 20px; font-weight: bold; font-size: 1.1rem; }
+        
+        /* Controls */
+        .controls {
+            background: #f1f5f9;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-top: 1rem;
+        }
+        input[type="range"] { width: 100%; margin: 1rem 0; cursor: pointer; }
+        
+        button {
+            background: #3b82f6; color: white; border: none; padding: 10px 20px;
+            border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 1rem;
+            transition: background 0.2s;
+        }
+        button:hover { background: #2563eb; }
+
+        .info-cards { display: flex; gap: 15px; margin-top: 1.5rem; text-align: left; }
+        .card { flex: 1; padding: 1.5rem; border-radius: 8px; font-size: 0.95rem; line-height: 1.6; }
+        .card-clinical { background: #fee2e2; border-top: 4px solid #ef4444; }
+        .card-lab { background: #e0f2fe; border-top: 4px solid #0ea5e9; }
+    </style>
+</head>
+<body>
+
+    <div class="sandbox">
+        <h2>Comparison of Thermometers</h2>
+        <p>Observe how clinical and laboratory thermometers respond to temperature changes.</p>
+
+        <div class="visual-area">
+            <div class="thermo-wrapper">
+                <div class="glass clinical-glass">
+                    <div class="scale"><span>42°C</span><span>38°C</span><span>35°C</span></div>
+                    <div class="fill" id="clinical-fill"></div>
+                    <div class="kink"></div>
+                    <div class="kink-label">Kink →</div>
+                </div>
+                <div class="bulb clinical-bulb"></div>
+                <div class="label" id="clin-read">Clinical: 37.0 °C</div>
+            </div>
+
+            <div class="thermo-wrapper">
+                <div class="glass lab-glass">
+                    <div class="scale"><span>110°C</span><span>50°C</span><span>0°C</span><span>-10°C</span></div>
+                    <div class="fill" id="lab-fill"></div>
+                </div>
+                <div class="bulb lab-bulb"></div>
+                <div class="label" id="lab-read">Laboratory: 37 °C</div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <label for="envTemp"><strong>Environmental / Object Temperature: <span id="env-display">37</span> °C</strong></label>
+            <input type="range" id="envTemp" min="-10" max="110" value="37" step="1">
+            <br><br>
+            <button id="shakeBtn">Shake Clinical Thermometer (Shake to Reset)</button>
+        </div>
+
+        <div class="info-cards">
+            <div class="card card-clinical">
+                <strong>Clinical Thermometer</strong>
+                <ul>
+                    <li><strong>Range:</strong> 35°C to 42°C only.</li>
+                    <li><strong>Kink:</strong> It contains a small kink to prevent the mercury level from falling down on its own.</li>
+                    <li><strong>Use:</strong> Only for measuring human body temperature. It must be <b>shaken</b> before reuse.</li>
+                </ul>
+            </div>
+            <div class="card card-lab">
+                <strong>Laboratory Thermometer</strong>
+                <ul>
+                    <li><strong>Range:</strong> -10°C to 110°C.</li>
+                    <li><strong>No Kink:</strong> There is no kink in it, so the mercury drops down automatically as soon as the temperature decreases.</li>
+                    <li><strong>Use:</strong> For measuring the temperature of liquids/objects in the laboratory (e.g., when water boils).</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const envSlider = document.getElementById('envTemp');
+        const envDisplay = document.getElementById('env-display');
+        const labFill = document.getElementById('lab-fill');
+        const clinFill = document.getElementById('clinical-fill');
+        const labRead = document.getElementById('lab-read');
+        const clinRead = document.getElementById('clin-read');
+        const shakeBtn = document.getElementById('shakeBtn');
+
+        let currentEnvTemp = 37;
+        let clinicalRecordedTemp = 37; 
+
+        function updateThermometers() {
+            currentEnvTemp = parseInt(envSlider.value);
+            envDisplay.innerText = currentEnvTemp;
+
+            // --- 1. Lab Thermometer Logic ---
+            let labPercent = ((currentEnvTemp + 10) / 120) * 100;
+            labFill.style.height = Math.max(0, Math.min(100, labPercent)) + '%';
+            labRead.innerText = `Laboratory: ${currentEnvTemp} °C`;
+
+            // --- 2. Clinical Thermometer Logic ---
+            if (currentEnvTemp > clinicalRecordedTemp) {
+                clinicalRecordedTemp = currentEnvTemp;
+            }
+            
+            let displayClinTemp = Math.max(35, Math.min(42, clinicalRecordedTemp));
+            let clinPercent = ((displayClinTemp - 35) / 7) * 100;
+            clinFill.style.height = clinPercent + '%';
+            
+            if (clinicalRecordedTemp > 42) {
+                clinRead.innerText = `Clinical: >42 °C (Exceeded!)`;
+                clinFill.style.height = '105%'; 
+            } else if (clinicalRecordedTemp < 35) {
+                clinRead.innerText = `Clinical: <35 °C`;
+                clinFill.style.height = '0%';
+            } else {
+                clinRead.innerText = `Clinical: ${displayClinTemp} °C`;
+            }
+        }
+
+        shakeBtn.addEventListener('click', () => {
+            clinicalRecordedTemp = currentEnvTemp < 35 ? 34 : currentEnvTemp; 
+            updateThermometers();
+            
+            const wrapper = clinFill.parentElement.parentElement;
+            wrapper.style.transform = "rotate(-5deg)";
+            setTimeout(() => wrapper.style.transform = "rotate(5deg)", 50);
+            setTimeout(() => wrapper.style.transform = "rotate(-5deg)", 100);
+            setTimeout(() => wrapper.style.transform = "rotate(0deg)", 150);
+        });
+
+        envSlider.addEventListener('input', updateThermometers);
+        updateThermometers(); 
+    </script>
+</body>
+</html>

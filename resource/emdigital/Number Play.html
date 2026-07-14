@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grade 8 Ganita Prakash - Chapter 5: Number Play</title>
+    <style>
+        :root {
+            --bg-dark: #0b1329;
+            --panel-dark: #1c2541;
+            --accent-glow: #00b4d8;
+            --text-main: #edf2f4;
+            --text-muted: #8d99ae;
+            --success: #38b000;
+            --error: #d90429;
+            --border-color: #3a506b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            padding: 2rem 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+            max-width: 800px;
+        }
+
+        header h1 {
+            font-size: 2.2rem;
+            color: var(--accent-glow);
+            margin-bottom: 0.5rem;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 850px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            overflow-x: auto;
+            padding-bottom: 0.5rem;
+        }
+
+        .tab-btn {
+            background: var(--panel-dark);
+            color: var(--text-muted);
+            border: 1px solid var(--border-color);
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            white-space: nowrap;
+            transition: all 0.2s ease;
+        }
+
+        .tab-btn:hover {
+            border-color: var(--accent-glow);
+            color: var(--text-main);
+        }
+
+        .tab-btn.active {
+            background: var(--accent-glow);
+            color: var(--bg-dark);
+            border-color: var(--accent-glow);
+            box-shadow: 0 0 12px rgba(0, 180, 216, 0.4);
+        }
+
+        .activity-card {
+            background: var(--panel-dark);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+            display: none;
+        }
+
+        .activity-card.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .activity-title {
+            font-size: 1.3rem;
+            margin-bottom: 0.4rem;
+            color: var(--accent-glow);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.4rem;
+        }
+
+        .activity-desc {
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+        }
+
+        .question-block {
+            background: rgba(11, 19, 41, 0.5);
+            border: 1px solid var(--border-color);
+            padding: 1.2rem;
+            border-radius: 8px;
+            margin-bottom: 1.2rem;
+        }
+
+        .question-text {
+            font-size: 1rem;
+            font-weight: 500;
+            margin-bottom: 0.8rem;
+        }
+
+        /* MCQ Options */
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.6rem;
+        }
+
+        @media (min-width: 600px) {
+            .options-grid { grid-template-columns: 1fr 1fr; }
+        }
+
+        .option-label {
+            background: var(--panel-dark);
+            border: 1px solid var(--border-color);
+            padding: 0.6rem 0.8rem;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+        }
+
+        .option-label:hover {
+            border-color: var(--accent-glow);
+            background: rgba(0, 180, 216, 0.05);
+        }
+
+        .option-label input {
+            accent-color: var(--accent-glow);
+        }
+
+        /* Drag and Drop Container */
+        .drag-items-pool {
+            display: flex;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+            background: rgba(11, 19, 41, 0.7);
+            padding: 0.8rem;
+            border-radius: 6px;
+            border: 1px dashed var(--border-color);
+            margin-bottom: 1rem;
+            min-height: 45px;
+        }
+
+        .drag-item {
+            background: var(--accent-glow);
+            color: var(--bg-dark);
+            font-weight: bold;
+            padding: 0.3rem 0.8rem;
+            border-radius: 4px;
+            cursor: grab;
+            user-select: none;
+            font-size: 0.9rem;
+        }
+
+        .drop-zone {
+            background: var(--bg-dark);
+            border: 2px dashed var(--border-color);
+            min-height: 35px;
+            border-radius: 6px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.1rem 0.8rem;
+            vertical-align: middle;
+            margin: 0 0.3rem;
+            min-width: 100px;
+            color: var(--accent-glow);
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .drop-zone.drag-over {
+            border-color: var(--accent-glow);
+            background: rgba(0, 180, 216, 0.1);
+        }
+
+        /* Controls Footer */
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1.5rem;
+        }
+
+        .action-btn {
+            background: var(--success);
+            color: #fff;
+            border: none;
+            padding: 0.6rem 1.5rem;
+            font-size: 0.95rem;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .action-btn:hover { opacity: 0.9; }
+
+        .score-display {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: var(--accent-glow);
+        }
+
+        /* Verification colors */
+        .correct-ans {
+            border-color: var(--success) !important;
+            background: rgba(56, 176, 0, 0.1) !important;
+        }
+
+        .wrong-ans {
+            border-color: var(--error) !important;
+            background: rgba(217, 4, 41, 0.1) !important;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Ganita Prakash: Number Play Exercises</h1>
+        <p>Interactive playground tailored to Class 8 Chapter 5 standard arithmetic operations.</p>
+    </header>
+
+    <div class="container">
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchActivity(1)">1. Odd & Even Logic (MCQ)</button>
+            <button class="tab-btn" onclick="switchActivity(2)">2. Basic Divisibility (Drag & Drop)</button>
+            <button class="tab-btn" onclick="switchActivity(3)">3. Digits & Reversals (MCQ)</button>
+            <button class="tab-btn" onclick="switchActivity(4)">4. Cryptarithms (Drag & Drop)</button>
+        </div>
+
+        <div id="activity1" class="activity-card active">
+            <h2 class="activity-title">Activity 1: Odd and Even Number Properties</h2>
+            <p class="activity-desc">Let's solve basic questions regarding odd/even groupings and consecutive sums!</p>
+            
+            <form id="form-act1">
+                <div class="question-block">
+                    <p class="question-text">1. When items are grouped into pairs and exactly ONE item is left alone with no partner, the total count is an:</p>
+                    <div class="options-grid">
+                        <label class="option-label"><input type="radio" name="a1q1" value="A"> Even Number</label>
+                        <label class="option-label"><input type="radio" name="a1q1" value="B"> Odd Number</label>
+                        <label class="option-label"><input type="radio" name="a1q1" value="C"> Prime Number</label>
+                        <label class="option-label"><input type="radio" name="a1q1" value="D"> Zero</label>
+                    </div>
+                </div>
+
+                <div class="question-block">
+                    <p class="question-text">2. What happens when you calculate the sum of two Odd numbers?</p>
+                    <div class="options-grid">
+                        <label class="option-label"><input type="radio" name="a1q2" value="A"> Always Odd</label>
+                        <label class="option-label"><input type="radio" name="a1q2" value="B"> Always Even</label>
+                        <label class="option-label"><input type="radio" name="a1q2" value="C"> Always Zero</label>
+                        <label class="option-label"><input type="radio" name="a1q2" value="D"> It alternates randomly</label>
+                    </div>
+                </div>
+
+                <div class="question-block">
+                    <p class="question-text">3. Complete the statement: The product of any Even number and an Odd number is always:</p>
+                    <div class="options-grid">
+                        <label class="option-label"><input type="radio" name="a1q3" value="A"> Odd</label>
+                        <label class="option-label"><input type="radio" name="a1q3" value="B"> Even</label>
+                        <label class="option-label"><input type="radio" name="a1q3" value="C"> Negative</label>
+                        <label class="option-label"><input type="radio" name="a1q3" value="D"> Prime</label>
+                    </div>
+                </div>
+
+                <div class="question-block">
+                    <p class="question-text">4. If 'n' is an odd number, what kind of number is 'n + 1'?</p>
+                    <div class="options-grid">
+                        <label class="option-label"><input type="radio" name="a1q4" value="A"> Odd number</label>
+                        <label class="option-label"><input type="radio" name="a1q4" value="B"> Even number</label>
+                        <label class="option-label"><input type="radio" name="a1q4" value="C"> It remains odd</label>
+                        <label class="option-label"><input type="radio" name="a1q4" value="D"> Fraction</label>
+                    </div>
+                </div>
+
+                <div class="question-block">
+                    <p class="question-text">5. What is the sum of the first two consecutive odd numbers (1 + 3)?</p>
+                    <div class="options-grid">
+                        <label class="option-label"><input type="radio" name="a1q5" value="A"> 3</label>
+                        <label class="option-label"><input type="radio" name="a1q5" value="B"> 4</label>
+                        <label class="option-label"><input type="radio" name="a1q5" value="C"> 5</label>
+                        <label class="option-label"><input type="radio" name="a1q5" value="D"> 6</label>
+                    </div>
+                </div>
+            </form>
+
+            <div class="controls">
+                <span class="score-display" id="score-act1"></span>
+                <button class="action-btn" onclick="checkMCQ(1, {a1q1:'B', a1q2:'B', a1q3:'B', a1q4:'B', a1q5:'B'})">Check Answers</button>
+            </div>
+        </div>
+
+        <div id="activity2" class="activity-card">
+            <h2 class="activity-title">Activity 2: Testing Divisibility Rules</h2>
+            <p class="activity-desc">Drag the proper number label into the matching divisibility context box below.</p>
+            
+            <div class="drag-items-pool" id="pool2">
+                <div class="drag-item" draggable="true" id="act2-t1">By 2</div>
+                <div class="drag-item" draggable="true" id="act2-t2">By 3</div>
+                <div class="drag-item" draggable="true" id="act2-t3">By 5</div>
+                <div class="drag-item" draggable="true" id="act2-t4">By 9</div>
+                <div class="drag-item" draggable="true" id="act2-t5">By 10</div>
+            </div>
+
+            <div class="dd-container">
+                <div class="question-block">
+                    <p class="question-text">1. A number is divisible <span class="drop-zone" id="a2q1" data-ans="By 5">Drop Here</span> if its final digit is either 0 or 5.</p>
+                </div>
+                <div class="question-block">
+                    <p class="question-text">2. A number is completely divisible <span class="drop-zone" id="a2q2" data-ans="By 2">Drop Here</span> if its last digit is an even number (0, 2, 4, 6, 8).</p>
+                </div>
+                <div class="question-block">
+                    <p class="question-text">3. If the sum of all digits of a number is equal to 12, then the number is divisible <span class="drop-zone" id="a2q3" data-ans="By 3">Drop Here</span>.</p>
+                </div>
+                <div class="question-block">
+                    <p class="question-text">4. A whole number is divisible <span class="drop-zone" id="a2q4" data-ans="By 10">Drop Here</span> only if its units place digit is exactly 0.</p>
+                </div>
+                <div class="question-block">
+                    <p class="question-text">5. If the sum of the digits adds up to 18, it is divisible <span class="drop-zone" id="a2q5" data-ans="By 9">Drop Here</span>.</p>
+                </div>
+            </div>
+
+            <div class="controls">
+                <span class="score-display" id="score-act2"></span>
+                <button class="action-btn" onclick="checkDragDrop(2)">Check Answers</button>
+            </div>
+        </div>
+
+        <div id="activity3" class="activity-card">
+            <h2 class="activity-title">Activity 3: Reversing Digits & Place Value</h2>
+            <p class="activity-desc">Let's check place value representations and standard number-reversal tricks!</p>
+            
+            <form id="form-act3">
+                <div class="question-block">
+                    <p class="question-text">1. For a two-digit number with tens digit 'a' and units digit 'b', how is it represented in place value form?</p>
+                    <div class="options-grid">
+                        <label class="option-label"><input type="radio" name="a3q1" value="A"> a + b</label>
+                        <label class="option-label"><input type="radio" name="a3q1" value="B"> 10a + b</label>
+                        <label class="option-label"><input type="radio" name="a3q1" value="C"> 10b + a</label>
+                        <label class="option-label"><input type="radio" name="a3q1" value="D"> 100a + b</label>
+                    </div>
+                </div>
+
+                <div class="question-block">
+                    <p class="question-text">2. If you reverse the digits of the number 54, you get 45. What is the difference between 54 and 45?</p>
+                    <div class="options-grid">
+                        <label class="option-label"><input type="radio" name="a3q2" value="A"> 5</label>
+                        <label class="option-label"><input type="radio" name="a3q2" value="B"> 9</label>
+                        <label class="option-label"><input type="radio" name="a3q2" value="C"> 11</label>
+                        <label class="option-label"><input type="radio" name="a3q2" value="D"> 12</label>
+                    </div>
+                </div>
+
+                <div class="question-block">
+                    <p class="question-text">3. The difference between any 2-digit number and its reversed form is always a perfect multiple of:</p>
+                    <div class="options-grid">
+                        <label class="option-label"><input type="radio" name="a3q3" value="A"> 5</label>
+                        <label class="option-label"><input type="radio" name="a3q3" value="B"> 7</label>
+                        <label class="option-label"><input type="radio" name="a3q3" value="C"> 9</label>
+                        <label class="option-label"><input type="radio" name="a3q3" value="D"> 11</label>
+                    </div>
+                </div>
+
+                <div class="question-block">
+                    <p class="question-text">4. Expand the three-digit general number representation 'xyz' using proper place value:</p>
+                    <div class="options-grid">
+                        <label class="option-label"><input type="radio" name="a3q4" value="A"> x + y + z</label>
+                        <label class="option-label"><input type="radio" name="a3q4" value="B"> 100x + 10y + z</label>
+                        <label class="option-label"><input type="radio" name="a3q4" value="C"> 10x + 10y + 10z</label>
+                        <label class="option-label"><input type="radio" name="a3q4" value="D"> 100z + 10y + x</label>
+                    </div>
+                </div>
+
+                <div class="question-block">
+                    <p class="question-text">5. What value do you obtain if you reverse the digits of the number 72 and add it back to 72?</p>
+                    <div class="options-grid">
+                        <label class="option-label"><input type="radio" name="a3q5" value="A"> 99</label>
+                        <label class="option-label"><input type="radio" name="a3q5" value="B"> 90</label>
+                        <label class="option-label"><input type="radio" name="a3q5" value="C"> 81</label>
+                        <label class="option-label"><input type="radio" name="a3q5" value="D"> 77</label>
+                    </div>
+                </div>
+            </form>
+
+            <div class="controls">
+                <span class="score-display" id="score-act3"></span>
+                <button class="action-btn" onclick="checkMCQ(3, {a3q1:'B', a3q2:'B', a3q3:'C', a3q4:'B', a3q5:'A'})">Check Answers</button>
+            </div>
+        </div>
+
+        <div id="activity4" class="activity-card">
+            <h2 class="activity-title">Activity 4: Cryptarithms & Digits in Disguise</h2>
+            <p class="activity-desc">Drag the single-digit value into the matching letter placeholder box to solve the puzzles.</p>
+            
+            <div class="drag-items-pool" id="pool4">
+                <div class="drag-item" draggable="true" id="act4-t1">2</div>
+                <div class="drag-item" draggable="true" id="act4-t2">5</div>
+                <div class="drag-item" draggable="true" id="act4-t3">6</div>
+                <div class="drag-item" draggable="true" id="act4-t4">7</div>
+                <div class="drag-item" draggable="true" id="act4-t5">9</div>
+            </div>
+
+            <div class="dd-container">
+                <div class="question-block">
+                    <p class="question-text">1. If a puzzle states that 4 + A = 11, then the digit hidden by A must be: <span class="drop-zone" id="a4q1" data-ans="7">Drop Here</span></p>
+                </div>
+                <div class="question-block">
+                    <p class="question-text">2. Look at the addition puzzle: 2A + 13 = 38. The value of letter digit A is: <span class="drop-zone" id="a4q2" data-ans="5">Drop Here</span></p>
+                </div>
+                <div class="question-block">
+                    <p class="question-text">3. In the multiplication problem: Q × 3 = 18. The number hidden behind letter Q is: <span class="drop-zone" id="a4q3" data-ans="6">Drop Here</span></p>
+                </div>
+                <div class="question-block">
+                    <p class="question-text">4. Find the value of B if B + B = 4 (given B is greater than 1): <span class="drop-zone" id="a4q4" data-ans="2">Drop Here</span></p>
+                </div>
+                <div class="question-block">
+                    <p class="question-text">5. If the number 8R is fully divisible by 10, then the digit R must be: <span class="drop-zone" id="a4q5" data-ans="2">Drop Here</span></p>
+                </div>
+            </div>
+
+            <div class="controls">
+                <span class="score-display" id="score-act4"></span>
+                <button class="action-btn" onclick="checkDragDrop(4)">Check Answers</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab system navigation control
+        function switchActivity(index) {
+            document.querySelectorAll('.tab-btn').forEach((btn, idx) => {
+                btn.classList.toggle('active', idx === index - 1);
+            });
+            document.querySelectorAll('.activity-card').forEach((card, idx) => {
+                card.classList.toggle('active', idx === index - 1);
+            });
+        }
+
+        // Multiple choice validation logic
+        function checkMCQ(actNum, answerKey) {
+            let score = 0;
+            let total = Object.keys(answerKey).length;
+            let form = document.getElementById(`form-act${actNum}`);
+
+            for (let q in answerKey) {
+                const selected = form.querySelector(`input[name="${q}"]:checked`);
+                const parentBlock = form.querySelector(`input[name="${q}"]`).closest('.question-block');
+                
+                if (selected && selected.value === answerKey[q]) {
+                    score++;
+                    parentBlock.className = "question-block correct-ans";
+                } else {
+                    parentBlock.className = "question-block wrong-ans";
+                }
+            }
+            document.getElementById(`score-act${actNum}`).innerText = `Score: ${score} / ${total}`;
+        }
+
+        // Setup HTML5 Drag and Drop events
+        let activeDraggedNode = null;
+
+        document.querySelectorAll('.drag-item').forEach(item => {
+            item.addEventListener('dragstart', function() {
+                activeDraggedNode = this;
+                this.style.opacity = '0.6';
+            });
+
+            item.addEventListener('dragend', function() {
+                this.style.opacity = '1';
+                activeDraggedNode = null;
+            });
+        });
+
+        document.querySelectorAll('.drop-zone').forEach(zone => {
+            zone.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                this.classList.add('drag-over');
+            });
+
+            zone.addEventListener('dragleave', function() {
+                this.classList.remove('drag-over');
+            });
+
+            zone.addEventListener('drop', function(e) {
+                e.preventDefault();
+                this.classList.remove('drag-over');
+                if (activeDraggedNode) {
+                    this.innerText = activeDraggedNode.innerText;
+                    this.style.borderStyle = 'solid';
+                    this.style.borderColor = 'var(--accent-glow)';
+                }
+            });
+        });
+
+        // Validation logic for Drag and Drop fields
+        function checkDragDrop(actNum) {
+            let score = 0;
+            let container = document.getElementById(`activity${actNum}`);
+            let zones = container.querySelectorAll('.drop-zone');
+
+            zones.forEach(zone => {
+                let correctAnswer = zone.getAttribute('data-ans');
+                let parentBlock = zone.closest('.question-block');
+                if (zone.innerText.trim() === correctAnswer) {
+                    score++;
+                    parentBlock.className = "question-block correct-ans";
+                } else {
+                    parentBlock.className = "question-block wrong-ans";
+                }
+            });
+
+            document.getElementById(`score-act${actNum}`).innerText = `Score: ${score} / ${zones.length}`;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Balanced Diet Plate Challenge</title>
+    <style>
+        :root {
+            --bg-color: #fffbeb;
+            --primary-orange: #d97706;
+            --accent-green: #16a34a;
+            --danger-red: #dc2626;
+            --card-bg: #ffffff;
+            --text-dark: #292524;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-dark);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        header h1 {
+            font-size: 2.2rem;
+            color: var(--primary-orange);
+            margin-bottom: 8px;
+        }
+
+        header p {
+            color: #57534e;
+            font-size: 1.1rem;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 950px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Setup / Team Selector Row */
+        .setup-panel {
+            background: white;
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .team-select {
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 1rem;
+            border: 2px solid var(--primary-orange);
+            background: white;
+            font-weight: bold;
+        }
+
+        .score-board {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #78350f;
+            background: #fef3c7;
+            padding: 8px 15px;
+            border-radius: 6px;
+        }
+
+        /* Main Game Layout */
+        .game-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .game-grid { grid-template-columns: 1fr; }
+        }
+
+        /* Market Section */
+        .panel {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            border: 1px solid #e7e5e4;
+        }
+
+        .panel-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            padding-bottom: 5px;
+            border-bottom: 2px solid #f5f5f4;
+            color: #44403c;
+        }
+
+        .market-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+            gap: 12px;
+        }
+
+        .food-card {
+            background: #fafaf9;
+            border: 1px solid #e7e5e4;
+            border-radius: 8px;
+            padding: 12px 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .food-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+            border-color: var(--primary-orange);
+        }
+
+        .food-emoji {
+            font-size: 2.5rem;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .food-name {
+            font-size: 0.95rem;
+            font-weight: bold;
+        }
+
+        .nutrient-tag {
+            font-size: 0.75rem;
+            color: #78716c;
+            display: block;
+            margin-top: 3px;
+        }
+
+        /* Plate / Summary Section */
+        .plate-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #f5f5f4;
+            border-radius: 50%;
+            width: 240px;
+            height: 240px;
+            margin: 0 auto 20px auto;
+            border: 8px double #d6d3d1;
+            position: relative;
+            box-shadow: inset 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        .plate-center-text {
+            font-size: 1rem;
+            font-weight: bold;
+            color: #a8a29e;
+            text-align: center;
+            padding: 10px;
+        }
+
+        .food-on-plate {
+            position: absolute;
+            font-size: 1.8rem;
+        }
+
+        /* Nutrient Meters */
+        .meter-container {
+            margin-bottom: 10px;
+        }
+
+        .meter-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            font-weight: bold;
+            margin-bottom: 3px;
+        }
+
+        .meter-bg {
+            background: #e7e5e4;
+            height: 12px;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .meter-fill {
+            height: 100%;
+            width: 0%;
+            background: var(--accent-green);
+            transition: width 0.3s ease;
+        }
+
+        /* Buttons & Feedback */
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .btn-primary { background: var(--accent-green); color: white; }
+        .btn-danger { background: #e7e5e4; color: #44403c; }
+        .btn:hover { opacity: 0.9; }
+
+        .feedback {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: bold;
+            text-align: center;
+            min-height: 45px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>🍽️ Balanced Diet Plate Challenge 🌾</h1>
+        <p>Choose your team, select the food with correct nutrients from the market, and fill the plate!</p>
+    </header>
+
+    <div class="container">
+        
+        <div class="setup-panel">
+            <div>
+                <label class="food-name" style="font-size:1.1rem">Currently Playing Team: </label>
+                <select id="teamSelect" class="team-select" onchange="changeTeam()">
+                    <option value="Team 1">Team 1</option>
+                    <option value="Team 2">Team 2</option>
+                    <option value="Team 3">Team 3</option>
+                    <option value="Team 4">Team 4</option>
+                </select>
+            </div>
+            <div class="score-board" id="scoreDisplay">Score: 0 Points</div>
+        </div>
+
+        <div class="game-grid">
+            
+            <div class="panel">
+                <div class="panel-title">🛒 Virtual Food Market (Click on items here to select)</div>
+                <div class="market-grid" id="marketGrid">
+                </div>
+            </div>
+
+            <div class="panel" style="border-left: 4px solid var(--primary-orange);">
+                <div class="panel-title">🥗 Your Plate</div>
+                
+                <div class="plate-area" id="plateArea">
+                    <div class="plate-center-text" id="plateEmptyText">Your plate is empty!<br>Add food items.</div>
+                </div>
+
+                <div id="metersArea">
+                    <div class="meter-container">
+                        <div class="meter-label"><span>🍞 Carbohydrate (Energy)</span><span id="carbVal">0%</span></div>
+                        <div class="meter-bg"><div class="meter-fill" id="carbMeter"></div></div>
+                    </div>
+                    <div class="meter-container">
+                        <div class="meter-label"><span>🥚 Protein (Growth)</span><span id="proteinVal">0%</span></div>
+                        <div class="meter-bg"><div class="meter-fill" id="proteinMeter"></div></div>
+                    </div>
+                    <div class="meter-container">
+                        <div class="meter-label"><span>🍎 Vitamin / Mineral (Protection)</span><span id="vitVal">0%</span></div>
+                        <div class="meter-bg"><div class="meter-fill" id="vitMeter"></div></div>
+                    </div>
+                    <div class="meter-container">
+                        <div class="meter-label"><span>🧈 Fat (Energy Storage)</span><span id="fatVal">0%</span></div>
+                        <div class="meter-bg"><div class="meter-fill" id="fatMeter"></div></div>
+                    </div>
+                </div>
+
+                <div class="feedback" id="feedbackBox"></div>
+
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="validatePlate()">✔️ Check Plate</button>
+                    <button class="btn btn-danger" onclick="resetPlate()">🔄 Empty Plate</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // Food Items Database
+        const foodItems = [
+            { name: "Rice / Roti", emoji: "🍚", type: "carb", amount: 50, junk: false, label: "Carbohydrate" },
+            { name: "Chapati", emoji: "🫓", type: "carb", amount: 50, junk: false, label: "Carbohydrate" },
+            { name: "Pigeon Peas (Dal)", emoji: "🍲", type: "protein", amount: 50, junk: false, label: "Protein" },
+            { name: "Egg / Milk", emoji: "🥛", type: "protein", amount: 50, junk: false, label: "Protein" },
+            { name: "Vegetables", emoji: "🥦", type: "vitamin", amount: 50, junk: false, label: "Vitamin" },
+            { name: "Fruits", emoji: "🍎", type: "vitamin", amount: 50, junk: false, label: "Vitamin" },
+            { name: "Ghee / Butter", emoji: "🧈", type: "fat", amount: 50, junk: false, label: "Fat" },
+            { name: "Almonds / Cashews", emoji: "🥜", type: "fat", amount: 50, junk: false, label: "Fat" },
+            // Junk Foods (For point deduction)
+            { name: "Potato Chips", emoji: "🍟", type: "junk", amount: 0, junk: true, label: "Junk Food" },
+            { name: "Cold Drink", emoji: "🥤", type: "junk", amount: 0, junk: true, label: "Junk Food" },
+            { name: "Burger", emoji: "🍔", type: "junk", amount: 0, junk: true, label: "Junk Food" },
+            { name: "Candy", emoji: "🍬", type: "junk", amount: 0, junk: true, label: "Junk Food" }
+        ];
+
+        // Team Score Tracking
+        let teamScores = { "Team 1": 0, "Team 2": 0, "Team 3": 0, "Team 4": 0 };
+        let currentTeam = "Team 1";
+
+        // Current Nutrient State on Plate
+        let currentPlate = { carb: 0, protein: 0, vitamin: 0, fat: 0, hasJunk: false };
+        let selectedEmojis = [];
+
+        // Game Initialization
+        function initGame() {
+            renderMarket();
+            updateScoreDisplay();
+            resetPlate();
+        }
+
+        // Market Render Display
+        function renderMarket() {
+            const grid = document.getElementById('marketGrid');
+            grid.innerHTML = '';
+            foodItems.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'food-card';
+                card.innerHTML = `
+                    <span class="food-emoji">${item.emoji}</span>
+                    <span class="food-name">${item.name}</span>
+                    <span class="nutrient-tag">${item.label}</span>
+                `;
+                card.onclick = () => addFoodToPlate(item);
+                grid.appendChild(card);
+            });
+        }
+
+        // Add Food Item to Plate Area
+        function addFoodToPlate(item) {
+            const feedback = document.getElementById('feedbackBox');
+            
+            if (item.junk) {
+                // Junk Food Penalty: Deduct 5 points instantly!
+                teamScores[currentTeam] = Math.max(0, teamScores[currentTeam] - 5);
+                updateScoreDisplay();
+                feedback.innerText = `⚠️ Oh no! You chose "${item.name}" (Junk Food). Your team lost 5 points!`;
+                feedback.style.backgroundColor = "#fee2e2";
+                feedback.style.color = "var(--danger-red)";
+                currentPlate.hasJunk = true;
+                return;
+            }
+
+            // If healthy food, add nutrient values (capped at 100%)
+            if (currentPlate[item.type] >= 100) {
+                feedback.innerText = `💡 Your plate already has enough ${item.label}!`;
+                feedback.style.backgroundColor = "#fef3c7";
+                feedback.style.color = "#b45309";
+                return;
+            }
+
+            currentPlate[item.type] += item.amount;
+            selectedEmojis.push(item.emoji);
+            
+            feedback.innerText = `✅ "${item.name}" has been added to the plate.`;
+            feedback.style.backgroundColor = "#dcfce7";
+            feedback.style.color = "var(--accent-green)";
+
+            updateMeters();
+            updatePlateVisual();
+        }
+
+        // Meter Progress Updates
+        function updateMeters() {
+            document.getElementById('carbMeter').style.width = currentPlate.carb + '%';
+            document.getElementById('carbVal').innerText = currentPlate.carb + '%';
+
+            document.getElementById('proteinMeter').style.width = currentPlate.protein + '%';
+            document.getElementById('proteinVal').innerText = currentPlate.protein + '%';
+
+            document.getElementById('vitMeter').style.width = currentPlate.vitamin + '%';
+            document.getElementById('vitVal').innerText = currentPlate.vitamin + '%';
+
+            document.getElementById('fatMeter').style.width = currentPlate.fat + '%';
+            document.getElementById('fatVal').innerText = currentPlate.fat + '%';
+        }
+
+        // Position Emojis Inside Plate Element
+        function updatePlateVisual() {
+            const plate = document.getElementById('plateArea');
+            const emptyText = document.getElementById('plateEmptyText');
+
+            if (selectedEmojis.length > 0) {
+                emptyText.style.display = 'none';
+            }
+
+            // Remove old emojis and re-render
+            const oldElements = plate.querySelectorAll('.food-on-plate');
+            oldElements.forEach(el => el.remove());
+
+            selectedEmojis.forEach((emoji, index) => {
+                const el = document.createElement('div');
+                el.className = 'food-on-plate';
+                el.innerText = emoji;
+                
+                // Distribute emojis circularly inside the plate container
+                const angle = (index / selectedEmojis.length) * 2 * Math.PI;
+                const radius = 60; 
+                const x = 100 + radius * Math.cos(angle);
+                const y = 100 + radius * Math.sin(angle);
+                
+                el.style.left = x + 'px';
+                el.style.top = y + 'px';
+                plate.appendChild(el);
+            });
+        }
+
+        // Balanced Food Validation Matrix
+        function validatePlate() {
+            const feedback = document.getElementById('feedbackBox');
+            
+            // Check if all essential metrics meet 100% saturation thresholds
+            const isBalanced = currentPlate.carb >= 100 && 
+                               currentPlate.protein >= 100 && 
+                               currentPlate.vitamin >= 100 && 
+                               currentPlate.fat >= 100;
+
+            if (currentPlate.hasJunk) {
+                feedback.innerText = "❌ Validation Failed! Your plate contains junk food elements. Clear the plate and try again.";
+                feedback.style.backgroundColor = "#fee2e2";
+                feedback.style.color = "var(--danger-red)";
+            } else if (isBalanced) {
+                // Success criteria met: credit team 20 points
+                teamScores[currentTeam] += 20;
+                updateScoreDisplay();
+                feedback.innerText = `🎉 Brilliant! ${currentTeam} built an excellent 'Balanced Diet Plate'. +20 Points!`;
+                feedback.style.backgroundColor = "#dcfce7";
+                feedback.style.color = "var(--accent-green)";
+            } else {
+                feedback.innerText = "⚠️ Your plate is not balanced yet! Select food items until all nutrient levels reach 100%.";
+                feedback.style.backgroundColor = "#fef3c7";
+                feedback.style.color = "#b45309";
+            }
+        }
+
+        // Change Active Team Parameters
+        function changeTeam() {
+            currentTeam = document.getElementById('teamSelect').value;
+            updateScoreDisplay();
+            resetPlate();
+            document.getElementById('feedbackBox').innerText = `${currentTeam}'s turn has started!`;
+            document.getElementById('feedbackBox').style.backgroundColor = "#eff6ff";
+            document.getElementById('feedbackBox').style.color = "#1e40af";
+        }
+
+        // Score Tracker UI Update
+        function updateScoreDisplay() {
+            document.getElementById('scoreDisplay').innerText = `🏆 Points (${currentTeam}): ${teamScores[currentTeam]} `;
+        }
+
+        // Clear Current Plate Array States
+        function resetPlate() {
+            currentPlate = { carb: 0, protein: 0, vitamin: 0, fat: 0, hasJunk: false };
+            selectedEmojis = [];
+            updateMeters();
+            
+            const plate = document.getElementById('plateArea');
+            document.getElementById('plateEmptyText').style.display = 'block';
+            const oldElements = plate.querySelectorAll('.food-on-plate');
+            oldElements.forEach(el => el.remove());
+            
+            const feedback = document.getElementById('feedbackBox');
+            feedback.innerText = "The plate has been emptied. Get ready to select fresh food items!";
+            feedback.style.backgroundColor = "#f5f5f4";
+            feedback.style.color = "#57534e";
+        }
+
+        window.onload = initGame;
+    </script>
+</body>
+</html>

@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Motion Charades Challenge!</title>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --secondary: #06b6d4;
+            --dark-bg: #0f172a;
+            --card-bg: #1e293b;
+            --text-light: #f8fafc;
+            --accent-pink: #ec4899;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: var(--text-light);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 25px;
+            max-width: 700px;
+        }
+
+        header h1 {
+            font-size: 2.3rem;
+            color: var(--secondary);
+            margin-bottom: 10px;
+            text-shadow: 0 0 15px rgba(6, 182, 212, 0.3);
+        }
+
+        header p {
+            color: #94a3b8;
+            font-size: 1.1rem;
+            line-height: 1.5;
+        }
+
+        .main-container {
+            width: 100%;
+            max-width: 800px;
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+            border: 1px solid #334155;
+        }
+
+        /* Scoreboard & Timer Grid */
+        .game-status {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .status-box {
+            background: #0f172a;
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid #334155;
+        }
+
+        .status-val {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--secondary);
+            margin-top: 5px;
+        }
+
+        #timerVal {
+            color: var(--accent-pink);
+        }
+
+        /* Chit Area */
+        .chit-zone {
+            background: linear-gradient(135deg, #1e1b4b, #2e1042);
+            border: 2px dashed var(--secondary);
+            border-radius: 16px;
+            padding: 35px;
+            text-align: center;
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .chit-title {
+            font-size: 1.1rem;
+            color: #94a3b8;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .secret-content {
+            background: #0f172a;
+            padding: 20px;
+            border-radius: 8px;
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin: 20px 0;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #475569;
+            filter: blur(8px);
+            transition: filter 0.3s ease;
+        }
+
+        .secret-content.revealed {
+            filter: blur(0);
+            color: #fef08a;
+            border-color: #eab308;
+        }
+
+        .hint-text {
+            font-size: 1.05rem;
+            color: #a7f3d0;
+            background: rgba(16, 185, 129, 0.15);
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 15px;
+            display: none;
+        }
+
+        /* Buttons Control */
+        .btn-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: white;
+        }
+
+        .btn-primary { background: var(--primary); }
+        .btn-secondary { background: #475569; }
+        .btn-success { background: #10b981; }
+        .btn-pink { background: var(--accent-pink); }
+        .btn:hover { opacity: 0.9; transform: translateY(-1px); }
+        .btn:disabled { opacity: 0.3; cursor: not-allowed; transform: none; }
+
+        /* Score Controllers */
+        .score-controls {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 25px;
+            background: #0f172a;
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        .team-btn-group {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>🎭 Motion Charades Challenge 🏃‍♂️</h1>
+        <p>Convey the type of motion to your classmates through physical acting only, without speaking! The rest of the class must guess it accurately.</p>
+    </header>
+
+    <div class="main-container">
+        
+        <div class="game-status">
+            <div class="status-box">
+                <div>👥 Team 'A' Score</div>
+                <div class="status-val" id="scoreA">0</div>
+            </div>
+            <div class="status-box" style="border-color: var(--accent-pink);">
+                <div>⏱️ Time Remaining</div>
+                <div class="status-val" id="timerVal">60s</div>
+            </div>
+            <div class="status-box">
+                <div>👥 Team 'B' Score</div>
+                <div class="status-val" id="scoreB">0</div>
+            </div>
+        </div>
+
+        <div class="chit-zone">
+            <div class="chit-title">📦 Digital Chit Box</div>
+            <p style="color: #cbd5e1;">Only the acting student should click the button below to view the chit!</p>
+            
+            <div class="secret-content" id="chitDisplay">Your chit will appear here</div>
+            
+            <div class="hint-text" id="hintDisplay">💡 Acting Hint: Loading...</div>
+
+            <div class="btn-grid">
+                <button class="btn btn-primary" onclick="drawNewChit()">🎲 Draw New Chit</button>
+                <button class="btn btn-secondary" id="toggleBtn" onclick="toggleReveal()" disabled>👁️ Show/Hide Chit</button>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-bottom: 25px;">
+            <button class="btn btn-pink" id="startTimerBtn" onclick="startTimer()" style="width: 50%;" disabled>⏱️ Start Timer</button>
+        </div>
+
+        <div class="score-controls">
+            <div class="team-btn-group">
+                <span style="font-weight: bold;">Team A:</span>
+                <button class="btn btn-success" style="padding: 5px 12px; font-size:0.9rem;" onclick="updateScore('A', 10)">+10 Pts</button>
+            </div>
+            <div class="team-btn-group">
+                <span style="font-weight: bold;">Team B:</span>
+                <button class="btn btn-success" style="padding: 5px 12px; font-size:0.9rem;" onclick="updateScore('B', 10)">+10 Pts</button>
+            </div>
+            <button class="btn btn-secondary" style="padding: 5px 12px; font-size:0.9rem; background:#cbd5e1; color:#0f172a;" onclick="resetScores()">🔄 Reset Score</button>
+        </div>
+
+    </div>
+
+    <script>
+        const motionChits = [
+            {
+                name: "Rectilinear Motion",
+                hint: "March forward in a perfect straight line like soldiers, or just walk exactly straight."
+            },
+            {
+                name: "Circular Motion",
+                hint: "Rotate your hand circularly like a clock needle or ceiling fan, or walk in a complete circle around a spot."
+            },
+            {
+                name: "Periodic Motion",
+                hint: "Sway your body back and forth regularly like a playground swing or a clock pendulum."
+            },
+            {
+                name: "Rotational Motion",
+                hint: "Spin completely around in one place on your own axis like a top or the Earth."
+            },
+            {
+                name: "Oscillatory Motion",
+                hint: "Vibrate your hands or body rapidly like a guitar string when plucked and released."
+            },
+            {
+                name: "Curvilinear Motion",
+                hint: "Move in a wavy, zigzag manner like a slithering snake or a vehicle driving along sharp road bends."
+            }
+        ];
+
+        let scoreA = 0;
+        let scoreB = 0;
+        let timeLeft = 60;
+        let timerInterval = null;
+        let isRevealed = false;
+
+        function drawNewChit() {
+            const randomIndex = Math.floor(Math.random() * motionChits.length);
+            const selectedChit = motionChits[randomIndex];
+
+            const display = document.getElementById('chitDisplay');
+            const hint = document.getElementById('hintDisplay');
+            
+            display.innerText = selectedChit.name;
+            hint.innerText = `💡 Acting Hint: ${selectedChit.hint}`;
+            
+            display.classList.remove('revealed');
+            hint.style.display = 'none';
+            isRevealed = false;
+
+            document.getElementById('toggleBtn').disabled = false;
+            document.getElementById('startTimerBtn').disabled = false;
+            
+            clearInterval(timerInterval);
+            timeLeft = 60;
+            document.getElementById('timerVal').innerText = `${timeLeft}s`;
+        }
+
+        function toggleReveal() {
+            const display = document.getElementById('chitDisplay');
+            const hint = document.getElementById('hintDisplay');
+            
+            if (!isRevealed) {
+                display.classList.add('revealed');
+                hint.style.display = 'block';
+                isRevealed = true;
+            } else {
+                display.classList.remove('revealed');
+                hint.style.display = 'none';
+                isRevealed = false;
+            }
+        }
+
+        function startTimer() {
+            clearInterval(timerInterval);
+            timeLeft = 60;
+            document.getElementById('startTimerBtn').disabled = true;
+
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                document.getElementById('timerVal').innerText = `${timeLeft}s`;
+
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    document.getElementById('timerVal').innerText = "Time's Up! 🔔";
+                    document.getElementById('chitDisplay').classList.add('revealed');
+                }
+            }, 1000);
+        }
+
+        function updateScore(team, points) {
+            if (team === 'A') {
+                scoreA += points;
+                document.getElementById('scoreA').innerText = scoreA;
+            } else if (team === 'B') {
+                scoreB += points;
+                document.getElementById('scoreB').innerText = scoreB;
+            }
+            clearInterval(timerInterval);
+        }
+
+        function resetScores() {
+            scoreA = 0;
+            scoreB = 0;
+            document.getElementById('scoreA').innerText = 0;
+            document.getElementById('scoreB').innerText = 0;
+        }
+    </script>
+</body>
+</html>

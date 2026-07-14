@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚡ MathQuest: Interactive Digital Book</title>
+    <style>
+        :root {
+            --bg-canvas: #f0f4f8;
+            --book-base: #ffffff;
+            --primary-glow: #ff4757;
+            --secondary-glow: #2eea96;
+            --accent-blue: #54a0ff;
+            --accent-purple: #9b5de5;
+            --text-dark: #2c3e50;
+            --text-light: #7f8c8d;
+            --card-soft: #f8fafd;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Comic Sans MS', 'Segoe UI', system-ui, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-canvas);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1.5rem;
+            background-image: radial-gradient(#dff9fb 2px, transparent 2px);
+            background-size: 24px 24px;
+        }
+
+        /* Interactive Book Framework */
+        .book-container {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            width: 100%;
+            max-width: 1200px;
+            height: 85vh;
+            min-height: 650px;
+            background: var(--book-base);
+            border-radius: 30px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.08);
+            border: 8px solid #fff;
+            overflow: hidden;
+            position: relative;
+        }
+
+        @media (max-width: 900px) {
+            .book-container {
+                grid-template-columns: 1fr;
+                height: auto;
+            }
+            .sidebar { display: none; }
+        }
+
+        /* Left Navigation Spine/Sidebar */
+        .sidebar {
+            background: linear-gradient(135deg, #2f3542, #1e222b);
+            color: #fff;
+            padding: 2rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            border-top-left-radius: 22px;
+            border-bottom-left-radius: 22px;
+        }
+
+        .book-title h2 {
+            font-size: 1.6rem;
+            color: #ff6b81;
+            margin-bottom: 0.2rem;
+        }
+        .book-title p {
+            font-size: 0.85rem;
+            color: #a4b0be;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .nav-list {
+            list-style: none;
+            margin-top: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+
+        .nav-item {
+            padding: 0.85rem 1.2rem;
+            border-radius: 14px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.05);
+            color: #ced6e0;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: var(--primary-glow);
+            color: #fff;
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(255, 71, 87, 0.3);
+        }
+
+        /* Right Page Content Windows */
+        .page-content {
+            padding: 2.5rem;
+            overflow-y: auto;
+            position: relative;
+            background: #fff;
+        }
+
+        .page-window {
+            display: none;
+            animation: pageFlip 0.5s ease-out forwards;
+        }
+
+        .page-window.active {
+            display: block;
+        }
+
+        @keyframes pageFlip {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .welcome-badge {
+            background: #eccc68;
+            color: #2c3e50;
+            padding: 0.4rem 1rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 1rem;
+        }
+
+        h1.section-heading {
+            font-size: 2.2rem;
+            color: var(--text-dark);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        p.intro-text {
+            color: var(--text-light);
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+        }
+
+        /* Activity Element Card Layouts */
+        .question-card {
+            background: var(--card-soft);
+            border: 2px solid #eef2f7;
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .question-header {
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            color: #2f3542;
+        }
+
+        /* MCQ Options Styling */
+        .options-cluster {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 0.75rem;
+        }
+
+        .option-node {
+            background: #fff;
+            border: 2px solid #e4eaf0;
+            padding: 0.85rem 1.2rem;
+            border-radius: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .option-node:hover {
+            border-color: var(--accent-blue);
+            background: #f1f7ff;
+            transform: scale(1.02);
+        }
+
+        .option-node input {
+            accent-color: var(--accent-blue);
+            width: 18px;
+            height: 18px;
+        }
+
+        /* Drag and Drop Interface Architecture */
+        .dd-universe {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .word-vault {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            background: #f1f2f6;
+            padding: 1.2rem;
+            border-radius: 16px;
+            border: 2px dashed #ced6e0;
+        }
+
+        .draggable-tile {
+            background: linear-gradient(135deg, var(--accent-purple), #70a1ff);
+            color: white;
+            padding: 0.6rem 1.2rem;
+            border-radius: 12px;
+            cursor: grab;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            user-select: none;
+        }
+
+        .draggable-tile:active { cursor: grabbing; }
+
+        .matching-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .matching-row {
+            display: grid;
+            grid-template-columns: 1fr 180px;
+            gap: 1.5rem;
+            align-items: center;
+            background: var(--card-soft);
+            padding: 1rem;
+            border-radius: 16px;
+            border: 1px solid #e4eaf0;
+        }
+
+        .drop-bucket {
+            border: 2px dashed #b2bec3;
+            min-height: 45px;
+            border-radius: 12px;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-light);
+            font-size: 0.9rem;
+            transition: all 0.2s;
+            padding: 4px;
+        }
+
+        .drop-bucket.hover {
+            border-color: var(--accent-blue);
+            background: #ebf3ff;
+        }
+
+        /* Global Footer Action Bars */
+        .action-hub {
+            margin-top: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 2px solid #f1f2f6;
+            padding-top: 1.5rem;
+        }
+
+        .btn-action {
+            background: linear-gradient(135deg, #2ed573, #1abc9c);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.8rem;
+            border-radius: 14px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(46, 213, 115, 0.25);
+            transition: all 0.2s;
+        }
+
+        .btn-action:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(46, 213, 115, 0.4);
+        }
+
+        .score-board {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: var(--text-dark);
+            background: #f1f2f6;
+            padding: 0.6rem 1.2rem;
+            border-radius: 50px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="book-container">
+        <div class="sidebar">
+            <div class="book-title">
+                <h2>MathQuest 📐</h2>
+                <p>Grade 8 • Chapter 2</p>
+            </div>
+            <ul class="nav-list">
+                <li class="nav-item active" onclick="flipToPage(0)">🏡 Introduction</li>
+                <li class="nav-item" onclick="flipToPage(1)">🎯 Activity 1 (MCQ)</li>
+                <li class="nav-item" onclick="flipToPage(2)">⚡ Activity 2 (D&D)</li>
+                <li class="nav-item" onclick="flipToPage(3)">🧩 Activity 3 (MCQ)</li>
+                <li class="nav-item" onclick="flipToPage(4)">🔗 Activity 4 (D&D)</li>
+                <li class="nav-item" onclick="flipToPage(5)">🏆 Activity 5 (MCQ)</li>
+            </ul>
+            <div style="font-size: 0.8rem; color: #747d8c; text-align: center;">Interactive Smart Book v2.0</div>
+        </div>
+
+        <div class="page-content">
+            
+            <div class="page-window active">
+                <span class="welcome-badge">Welcome Student! 👋</span>
+                <h1 class="section-heading">Linear Equations in One Variable</h1>
+                <p class="intro-text">
+                    Welcome to your interactive math experience room! In Chapter 2, we dive into the wonderland of equations where a mysterious letter (like <b>x</b> or <b>y</b>) holds a hidden number value. Your mission is to use operations to set it free and discover its value!<br><br>
+                    Use the side menu bar to navigate through 5 custom-designed puzzle games. Solve them, click verify, and track your performance directly!
+                </p>
+                <div style="text-align: center; margin-top: 4rem;">
+                    <button class="btn-action" style="background: var(--primary-glow); box-shadow: 0 6px 20px rgba(255, 71, 87, 0.3);" onclick="flipToPage(1)">Let's Begin! 🚀</button>
+                </div>
+            </div>
+
+            <div class="page-window" id="act1">
+                <h1 class="section-heading">Activity 1: Spot the Linear Expression (MCQ)</h1>
+                <p class="intro-text">Let's find out if you can spot a true <b>Linear Equation in One Variable</b>. The variable must have a maximum power of 1!</p>
+                
+                <div class="question-card" data-ans="A">
+                    <div class="question-header">1. Which of the following is a linear equation in one variable?</div>
+                    <div class="options-cluster">
+                        <label class="option-node"><input type="radio" name="q1_1" value="A"> x + 5 = 10</label>
+                        <label class="option-node"><input type="radio" name="q1_1" value="B"> x² + 2 = 9</label>
+                        <label class="option-node"><input type="radio" name="q1_1" value="C"> x + y = 3</label>
+                    </div>
+                </div>
+
+                <div class="question-card" data-ans="C">
+                    <div class="question-header">2. What is the maximum power of the variable in a linear expression?</div>
+                    <div class="options-cluster">
+                        <label class="option-node"><input type="radio" name="q1_2" value="A"> 2</label>
+                        <label class="option-node"><input type="radio" name="q1_2" value="B"> 0</label>
+                        <label class="option-node"><input type="radio" name="q1_2" value="C"> 1</label>
+                    </div>
+                </div>
+
+                <div class="question-card" data-ans="B">
+                    <div class="question-header">3. Why is "2x + 3y = 15" NOT an equation in one variable?</div>
+                    <div class="options-cluster">
+                        <label class="option-node"><input type="radio" name="q1_3" value="A"> It has no numbers</label>
+                        <label class="option-node"><input type="radio" name="q1_3" value="B"> It contains two different variables (x and y)</label>
+                        <label class="option-node"><input type="radio" name="q1_3" value="C"> It has an equals sign</label>
+                    </div>
+                </div>
+
+                <div class="question-card" data-ans="A">
+                    <div class="question-header">4. In the expression "5x - 3", what do we call the letter 'x'?</div>
+                    <div class="options-cluster">
+                        <label class="option-node"><input type="radio" name="q1_4" value="A"> Variable</label>
+                        <label class="option-node"><input type="radio" name="q1_4" value="B"> Constant</label>
+                        <label class="option-node"><input type="radio" name="q1_4" value="C"> Operator</label>
+                    </div>
+                </div>
+
+                <div class="question-card" data-ans="B">
+                    <div class="question-header">5. Which of these is a linear expression?</div>
+                    <div class="options-cluster">
+                        <label class="option-node"><input type="radio" name="q1_5" value="A"> z³ - 1</label>
+                        <label class="option-node"><input type="radio" name="q1_5" value="B"> 3y + 7</label>
+                        <label class="option-node"><input type="radio" name="q1_5" value="C"> 5/x</label>
+                    </div>
+                </div>
+
+                <div class="action-hub">
+                    <button class="btn-action" onclick="gradeMCQ('act1')">Verify Page 📑</button>
+                    <span class="score-board" id="score-act1">Score: --</span>
+                </div>
+            </div>
+
+            <div class="page-window" id="act2">
+                <h1 class="section-heading">Activity 2: The Balance Scale Challenge (Drag & Drop)</h1>
+                <p class="intro-text">Drag the correct value tiles to find the solutions to these one-step equations!</p>
+                
+                <div class="word-vault" id="pool2">
+                    <div class="draggable-tile" draggable="true" id="d2_1">5</div>
+                    <div class="draggable-tile" draggable="true" id="d2_2">10</div>
+                    <div class="draggable-tile" draggable="true" id="d2_3">3</div>
+                    <div class="draggable-tile" draggable="true" id="d2_4">21</div>
+                    <div class="draggable-tile" draggable="true" id="d2_5">14</div>
+                </div>
+
+                <div class="dd-universe">
+                    <div class="matching-row">
+                        <div>1. Calculate <b>x</b> if: <code>x - 3 = 7</b></div>
+                        <div class="drop-bucket" data-match="d2_2">Drop solution</div>
+                    </div>
+                    <div class="matching-row">
+                        <div>2. Calculate <b>y</b> if: <code>2y = 6</b></div>
+                        <div class="drop-bucket" data-match="d2_3">Drop solution</div>
+                    </div>
+                    <div class="matching-row">
+                        <div>3. Calculate <b>z</b> if: <code>z / 3 = 7</b></div>
+                        <div class="drop-bucket" data-match="d2_4">Drop solution</div>
+                    </div>
+                    <div class="matching-row">
+                        <div>4. Calculate <b>m</b> if: <code>m + 5 = 10</b></div>
+                        <div class="drop-bucket" data-match="d2_1">Drop solution</div>
+                    </div>
+                    <div class="matching-row">
+                        <div>5. Calculate <b>p</b> if: <code>p - 4 = 10</b></div>
+                        <div class="drop-bucket" data-match="d2_5">Drop solution</div>
+                    </div>
+                </div>
+
+                <div class="action-hub">
+                    <button class="btn-action" onclick="gradeDragDrop('act2')">Verify Page 📑</button>
+                    <span class="score-board" id="score-act2">Score: --</span>
+                </div>
+            </div>
+
+            <div class="page-window" id="act3">
+                <h1 class="section-heading">Activity 3: Two-Step Equations Decoder (MCQ)</h1>
+                <p class="intro-text">Time to upgrade! Solve these problems by performing operations on both sides step-by-step.</p>
+                
+                <div class="question-card" data-ans="B">
+                    <div class="question-header">1. Solve the equation: 2x + 1 = 7</div>
+                    <div class="options-cluster">
+                        <label class="option-node"><input type="radio" name="q3_1" value="A"> x = 4</label>
+                        <label class="option-node"><input type="radio" name="q3_1" value="B"> x = 3</label>
+                        <label class="option-node"><input type="radio" name="q3_1" value="C"> x = 2</label>
+                    </div>
+                </div>
+
+                <div class="question-card" data-ans="A">
+                    <div class="question-header">2. Find the value of y: 3y - 2 = 13</div>
+                    <div class="options-cluster">
+                        <label class="option-node"><input type="radio" name="q3_2" value="A"> y = 5</label>
+                        <label class="option-node"><input type="radio" name="q3_2" value="B"> y = 4</label>
+                        <label class="option-node"><input type="radio" name="q3_2" value="C"> y = 6</label>
+                    </div>
+                </div>
+
+                <div class="question-card" data-ans="C">
+                    <div class="question-header">3. Solve for z: 5z + 4 = 24</div>
+                    <div class="options-cluster">
+                        <label class="option-node"><input type="radio" name="q3_3" value="A"> z = 5</label>
+                        <label class="option-node"><input type="radio" name="q3_3" value="B"> z = 3</label>
+                        <label class="option-node"><input type="radio" name="q3_3" value="C"> z = 4</label>
+                    </div>
+                </div>
+
+                <div class="question-card" data-ans="B">
+                    <div class="question-header">4. If 4x = 12, what is the value of 2x + 1?</div>
+                    <div class="options-cluster">
+                        <label class="option-node"><input type="radio" name="q3_4" value="A"> 6</label>
+                        <label class="option-node"><input type="radio" name="q3_4" value="B"> 7</label>
+                        <label class="option-node"><input type="radio" name="q3_4" value="C"> 8</label>
+                    </div>
+                </div>
+
+                <div class="question-card" data-ans="A">
+                    <div class="question-header">5. Solve for the unknown letter: x/2 + 1 = 6</div>
+                    <div class="options-cluster">
+                        <label class="option-node"><input type="radio" name="q3_5" value="A"> x = 10</label>
+                        <label class="option-node"><input type="radio" name="q3_5" value="B"> x = 12</label>
+                        <label class="option-node"><input type="radio" name="q3_5" value="C"> x = 5</label>
+                    </div>
+                </div>
+
+                <div class="action-hub">
+                    <button class="btn-action" onclick="gradeMCQ('act3')">Verify Page 📑</button>
+                    <span class="score-board" id="score-act3">Score: --</span>
+                </div>
+            </div>
+
+            <div class="page-window" id="act4">
+                <h1 class="section-heading">Activity 4: Converting Words to Math Formulas (Drag & Drop)</h1>
+                <p class="intro-text">Drag the correct algebraic structures into the slots that represent the text statements!</p>
+                
+                <div class="word-vault" id="pool4">
+                    <div class="draggable-tile" draggable="true" id="d4_1">x + 7 = 15</div>
+                    <div class="draggable-tile" draggable="true" id="d4_2">2x - 3 = 9</div>
+                    <div class="draggable-tile" draggable="true" id="d4_3">x / 5 = 4</div>
+                    <div class="draggable-tile" draggable="true" id="d4_4">3x + 1 = 10</div>
+                    <div class="draggable-tile" draggable="true" id="d4_5">x - 4 = 11</div>
+                </div>
+
+                <div class="dd-universe">
+                    <div class="matching-row">
+                        <div>1. "The sum of a number x and 7 is 15"</div>
+                        <div class="drop-bucket" data-match="d4_1">Drop layout</div>
+                    </div>
+                    <div class="matching-row">
+                        <div>2. "Three times a number x increased by 1 is 10"</div>
+                        <div class="drop-bucket" data-match="d4_4">Drop layout</div>
+                    </div>
+                    <div class="matching-row">
+                        <div>3. "Four subtracted from a number x gives 11"</div>
+                        <div class="drop-bucket" data-match="d4_5">Drop layout</div>
+                    </div>
+                    <div class="matching-row">
+                        <div>4. "Twice a number x decreased by 3 equals 9"</div>
+                        <div class="drop-bucket" data-match="d4_2">Drop layout</div>
+                    </div>
+                    <div class="matching-row">
+                        <div>5. "A number x divided by 5 gives 4"</div>
+                        <div class="drop-bucket" data-match="d4_3">Drop layout</div>
+                    </div>
+                </div>
+
+                <div class="action-hub">
+                    <button class="btn-action" onclick="gradeDragDrop('act4')">Verify Page 📑</button>
+                    <span class="score-board" id="score-act4">Score: --</span>
+                </div>
+            </div>
+
+            <div class="page-window" id="act5">
+                <h1 class="section-heading">Activity 5: Variables on Both Sides (MCQ)</h1>
+                <p class="intro-text">Ultimate Boss Round! Bring all the variable letters to one side and constants to the other to reach your goal.</p>
+                
+                <div class="question-card" data-ans="A">
+                    <div class="question-header">1. Solve for x: 2x = x + 5</div>
+                    <div class="options-cluster">
+                        <label class="option-node"><input type="radio" name="q5_1" value="A"> x = 5</label>
+                        <label class="option-node"><input type="radio" name="q5_1" value="B"> x = 2</label>
+                        <label class="option-node"><input type="radio" name="q5_1" value="C"> x = 10</label>
+                    </div>
+                </div>
+
+                <div class="question-card" data-ans="C">
+                    <div class="question-header">2. Solve the equation: 3x + 2 = 2x + 7</div>
+                    <div class="options-cluster">
+                        <label class="option-node"><input type="radio" name="q5_2" value="A"> x = 9</label>
+                        <label class="option-node"><input type="radio" name="q5_2" value="B"> x = 4</label>
+                        <label class="option-node"><input type="radio" name="q5_2" value="C"> x = 5</label>
+                    </div>
+                </div>
+
+                <div class="question-card" data-ans="B">
+                    <div class="question-header">3. Solve for y: 5y - 3 = 3y + 7</div>
+                    <div class="options-cluster">
+                        <label class="option-node"><input type="radio" name="q5_3" value="A"> y = 3</label>
+                        <label class="option-node"><input type="radio" name="q5_3" value="B"> y = 5</label>
+                        <label class="option-node"><input type="radio" name="q5_3" value="C"> y = 2</label>
+                    </div>
+                </div>
+
+                <div class="question-card" data-ans="A">
+                    <div class="question-header">4. Find the value of z: 4z + 1 = z + 10</div>
+                    <div class="options-cluster">
+                        <label class="option-node"><input type="radio" name="q5_4" value="A"> z = 3</label>
+                        <label class="option-node"><input type="radio" name="q5_4" value="B"> z = 4</label>
+                        <label class="option-node"><input type="radio" name="q5_4" value="C"> z = 9</label>
+                    </div>
+                </div>
+
+                <div class="question-card" data-ans="C">
+                    <div class="question-header">5. Solve for x: 6x - 2 = 4x + 6</div>
+                    <div class="options-cluster">
+                        <label class="option-node"><input type="radio" name="q5_5" value="A"> x = 2</label>
+                        <label class="option-node"><input type="radio" name="q5_5" value="B"> x = 3</label>
+                        <label class="option-node"><input type="radio" name="q5_5" value="C"> x = 4</label>
+                    </div>
+                </div>
+
+                <div class="action-hub">
+                    <button class="btn-action" onclick="gradeMCQ('act5')">Verify Page 📑</button>
+                    <span class="score-board" id="score-act5">Score: --</span>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // Digital Book Engine Tab Navigation Controller
+        function flipToPage(pageIdx) {
+            const tabs = document.querySelectorAll('.nav-item');
+            const windows = document.querySelectorAll('.page-window');
+
+            tabs.forEach(t => t.classList.remove('active'));
+            windows.forEach(w => w.classList.remove('active'));
+
+            if(pageIdx > 0) {
+                tabs[pageIdx - 1].classList.add('active');
+            } else {
+                tabs[0].classList.add('active');
+            }
+            windows[pageIdx].classList.add('active');
+        }
+
+        // Multiple Choice Evaluation Function
+        function gradeMCQ(panelId) {
+            const page = document.getElementById(panelId);
+            const blocks = page.querySelectorAll('.question-card');
+            let totalCorrect = 0;
+
+            blocks.forEach(block => {
+                const solution = block.getAttribute('data-ans');
+                const clientPick = block.querySelector('input[type="radio"]:checked');
+
+                if (clientPick && clientPick.value === solution) {
+                    totalCorrect++;
+                }
+            });
+
+            document.getElementById(`score-${panelId}`).innerText = `Score: ${totalCorrect} / ${blocks.length}`;
+        }
+
+        // Drag and Drop Logic Architecture Engine
+        let holdingBlock = null;
+
+        document.querySelectorAll('.draggable-tile').forEach(tile => {
+            tile.addEventListener('dragstart', function(e) {
+                holdingBlock = this;
+                e.dataTransfer.setData('text/plain', this.id);
+            });
+        });
+
+        document.querySelectorAll('.drop-bucket').forEach(bucket => {
+            bucket.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                this.classList.add('hover');
+            });
+
+            bucket.addEventListener('dragleave', function() {
+                this.classList.remove('hover');
+            });
+
+            bucket.addEventListener('drop', function(e) {
+                e.preventDefault();
+                this.classList.remove('hover');
+                const targetId = e.dataTransfer.getData('text/plain');
+                const payload = document.getElementById(targetId);
+
+                if (this.children.length > 0) {
+                    const fallbackChild = this.children[0];
+                    const activePool = this.closest('.page-window').querySelector('.word-vault');
+                    activePool.appendChild(fallbackChild);
+                }
+
+                this.innerHTML = '';
+                this.appendChild(payload);
+            });
+        });
+
+        // Drop handling to return to item vault
+        document.querySelectorAll('.word-vault').forEach(vault => {
+            vault.addEventListener('dragover', function(e) { e.preventDefault(); });
+            vault.addEventListener('drop', function(e) {
+                e.preventDefault();
+                const targetId = e.dataTransfer.getData('text/plain');
+                const payload = document.getElementById(targetId);
+                this.appendChild(payload);
+            });
+        });
+
+        // Drag and Drop Verification Module
+        function gradeDragDrop(panelId) {
+            const page = document.getElementById(panelId);
+            const buckets = page.querySelectorAll('.drop-bucket');
+            let matches = 0;
+
+            buckets.forEach(bucket => {
+                const targetMatch = bucket.getAttribute('data-match');
+                if (bucket.children.length > 0 && bucket.children[0].id === targetMatch) {
+                    matches++;
+                }
+            });
+
+            document.getElementById(`score-${panelId}`).innerText = `Score: ${matches} / ${buckets.length}`;
+        }
+    </script>
+</body>
+</html>

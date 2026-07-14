@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Motion Science Park</title>
+    <style>
+        :root {
+            --slate-900: #0f172a;
+            --slate-800: #1e293b;
+            --emerald: #10b981;
+            --cyan: #06b6d4;
+            --amber: #f59e0b;
+            --rose: #f43f5e;
+            --text: #f8fafc;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+
+        body {
+            background-color: var(--slate-900);
+            color: var(--text);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 25px;
+            max-width: 800px;
+        }
+
+        header h1 {
+            font-size: 2.4rem;
+            color: var(--cyan);
+            margin-bottom: 10px;
+            text-shadow: 0 0 15px rgba(6, 182, 212, 0.4);
+        }
+
+        header p {
+            color: #94a3b8;
+            font-size: 1.1rem;
+        }
+
+        .main-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            width: 100%;
+            max-width: 950px;
+        }
+
+        @media (max-width: 768px) {
+            .main-layout { grid-template-columns: 1fr; }
+        }
+
+        .card {
+            background: var(--slate-800);
+            border-radius: 16px;
+            padding: 25px;
+            border: 1px solid #334155;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.4);
+        }
+
+        /* Simulation Window */
+        .sim-window {
+            background: #090d16;
+            border: 2px inset #334155;
+            border-radius: 12px;
+            height: 320px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .sim-title {
+            position: absolute;
+            top: 10px;
+            left: 15px;
+            font-size: 0.9rem;
+            color: var(--cyan);
+            font-weight: bold;
+            background: rgba(6, 182, 212, 0.1);
+            padding: 4px 10px;
+            border-radius: 20px;
+        }
+
+        /* Animated Objects */
+        .motion-object {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #a855f7, #6366f1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 0 0 20px rgba(168, 85, 247, 0.6);
+            position: absolute;
+        }
+
+        /* CSS Live Animations */
+        /* 1. Rectilinear */
+        .anim-rectilinear {
+            animation: moveLine 2s linear infinite alternate;
+            top: 50%;
+            left: 10%;
+        }
+        @keyframes moveLine {
+            0% { left: 10%; }
+            100% { left: 80%; }
+        }
+
+        /* 2. Circular */
+        .orbit-track {
+            width: 160px;
+            height: 160px;
+            border: 2px dashed #334155;
+            border-radius: 50%;
+            position: absolute;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        .anim-circular {
+            position: relative;
+            animation: moveCircle 4s linear infinite;
+        }
+        @keyframes moveCircle {
+            0% { transform: rotate(0deg) translate(80px) rotate(0deg); }
+            100% { transform: rotate(360deg) translate(80px) rotate(-360deg); }
+        }
+
+        /* 3. Rotational */
+        .anim-rotational {
+            position: absolute;
+            top: 45%;
+            left: 45%;
+            border-radius: 8px; 
+            animation: spinInPlace 1.5s linear infinite;
+        }
+        @keyframes spinInPlace {
+            100% { transform: rotate(360deg); }
+        }
+
+        /* 4. Periodic */
+        .pivot-point {
+            position: absolute;
+            top: 20px;
+            width: 10px;
+            height: 10px;
+            background: white;
+            border-radius: 50%;
+            display: none;
+        }
+        .anim-periodic {
+            position: absolute;
+            top: 150px;
+            transform-origin: center -130px;
+            animation: swingSwing 2s ease-in-out infinite alternate;
+        }
+        @keyframes swingSwing {
+            0% { transform: rotate(-45deg); }
+            100% { transform: rotate(45deg); }
+        }
+
+        /* Quest / Controls Side */
+        .quest-box {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100%;
+        }
+
+        .riddle-tag {
+            color: var(--amber);
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .riddle-text {
+            font-size: 1.25rem;
+            line-height: 1.6;
+            color: #e2e8f0;
+            background: #0f172a;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid var(--amber);
+            margin-bottom: 20px;
+        }
+
+        .options-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .opt-btn {
+            background: #1e293b;
+            color: white;
+            border: 2px solid #475569;
+            padding: 14px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-align: left;
+            transition: all 0.2s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .opt-btn:hover {
+            border-color: var(--cyan);
+            background: #273549;
+        }
+
+        .feedback {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: bold;
+            text-align: center;
+            font-size: 1.1rem;
+            display: none;
+        }
+        .success { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid var(--emerald); }
+        .error { background: rgba(244, 63, 94, 0.2); color: #fb7185; border: 1px solid var(--rose); }
+
+        .next-btn {
+            background: var(--cyan);
+            color: var(--slate-900);
+            font-weight: bold;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 15px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 1.1rem;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>🚀 Interactive Motion Science Park 🎡</h1>
+        <p>The science park rides are turned off! Read the riddle, correctly identify the type of motion, and bring the rides to life.</p>
+    </header>
+
+    <div class="main-layout">
+        
+        <div class="card">
+            <div class="sim-window" id="simWindow">
+                <div class="sim-title" id="simTitle">Stopped</div>
+                
+                <div class="orbit-track" id="orbitTrack"></div>
+                
+                <div class="pivot-point" id="pivotPoint"></div>
+
+                <div class="motion-object" id="motionObj">⚫</div>
+            </div>
+            
+            <div style="margin-top:15px; font-size:0.9rem; color:#94a3b8; text-align:center;">
+                💡 <b>Tip for Teachers:</b> When the answer is correct, the object in the box above will start moving live according to that concept!
+            </div>
+        </div>
+
+        <div class="card quest-box">
+            <div>
+                <div class="riddle-tag">⚡ Power Reconnect Challenge (<span id="levelText">1 / 4</span>)</div>
+                <div class="riddle-text" id="riddleDisplay">Loading...</div>
+                
+                <div class="options-stack" id="optionsStack"></div>
+            </div>
+
+            <div>
+                <div class="feedback" id="feedbackBox"></div>
+                <button class="next-btn" id="nextBtn" onclick="nextQuestion()">Turn on Next Ride ➔</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const motionQuests = [
+            {
+                riddle: "Ride 1: After passing the signal, a metro train speeds forward on a perfectly straight track. What type of motion is this?",
+                options: ["Rectilinear Motion", "Circular Motion", "Periodic Motion", "Rotational Motion"],
+                correct: "Rectilinear Motion",
+                animClass: "anim-rectilinear",
+                emoji: "🚇",
+                titleText: "Rectilinear Motion Active"
+            },
+            {
+                riddle: "Ride 2: A playground swing moves back and forth regularly at fixed intervals of time. What motion is this?",
+                options: ["Rectilinear Motion", "Periodic Motion", "Rotational Motion", "Circular Motion"],
+                correct: "Periodic Motion",
+                animClass: "anim-periodic",
+                emoji: "➿",
+                titleText: "Periodic Motion Active"
+            },
+            {
+                riddle: "Ride 3: A spinning top or a ground spinner chakra rotates rapidly around its own central axis when set in motion. What motion does it exhibit?",
+                options: ["Circular Motion", "Rectilinear Motion", "Rotational Motion", "Periodic Motion"],
+                correct: "Rotational Motion",
+                animClass: "anim-rotational",
+                emoji: "🌀",
+                titleText: "Rotational Motion Active"
+            },
+            {
+                riddle: "Ride 4: What do we call the motion of our Earth as it revolves around the Sun along a fixed, designated orbital path?",
+                options: ["Circular Motion", "Rotational Motion", "Rectilinear Motion", "Periodic Motion"],
+                correct: "Circular Motion",
+                animClass: "anim-circular",
+                emoji: "🌍",
+                titleText: "Circular Motion Active"
+            }
+        ];
+
+        let currentLevel = 0;
+
+        function loadLevel() {
+            const quest = motionQuests[currentLevel];
+            
+            document.getElementById('levelText').innerText = `${currentLevel + 1} / ${motionQuests.length}`;
+            document.getElementById('riddleDisplay').innerText = quest.riddle;
+            document.getElementById('feedbackBox').style.display = 'none';
+            document.getElementById('nextBtn').style.display = 'none';
+            
+            const obj = document.getElementById('motionObj');
+            obj.className = "motion-object";
+            obj.style.top = "45%";
+            obj.style.left = "45%";
+            obj.innerText = "❌";
+            document.getElementById('simTitle').innerText = "Power Off";
+            document.getElementById('orbitTrack').style.display = 'none';
+            document.getElementById('pivotPoint').style.display = 'none';
+
+            const stack = document.getElementById('optionsStack');
+            stack.innerHTML = '';
+            
+            quest.options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'opt-btn';
+                btn.innerHTML = `<span>${opt}</span> 🔘`;
+                btn.onclick = () => checkAnswer(opt, btn);
+                stack.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(selectedOpt, btnElement) {
+            const quest = motionQuests[currentLevel];
+            const feedback = document.getElementById('feedbackBox');
+            feedback.style.display = 'block';
+
+            if (selectedOpt === quest.correct) {
+                feedback.className = "feedback success";
+                feedback.innerHTML = "🎯 Correct answer! Power turned on. Observe the live simulation.";
+                document.getElementById('nextBtn').style.display = 'block';
+                
+                document.querySelectorAll('.opt-btn').forEach(b => b.disabled = true);
+                btnElement.style.borderColor = "var(--emerald)";
+                btnElement.innerHTML = `<span>${selectedOpt}</span> ✅`;
+
+                triggerAnimation(quest);
+            } else {
+                feedback.className = "feedback error";
+                feedback.innerHTML = "❌ Wrong choice! Re-read the description and visualize the path of motion.";
+                btnElement.style.borderColor = "var(--rose)";
+                btnElement.innerHTML = `<span>${selectedOpt}</span> ❌`;
+            }
+        }
+
+        function triggerAnimation(quest) {
+            const obj = document.getElementById('motionObj');
+            obj.innerText = quest.emoji;
+            
+            obj.className = `motion-object ${quest.animClass}`;
+            document.getElementById('simTitle').innerText = quest.titleText;
+
+            if (quest.animClass === 'anim-circular') {
+                document.getElementById('orbitTrack').style.display = 'flex';
+            }
+            if (quest.animClass === 'anim-periodic') {
+                const pivot = document.getElementById('pivotPoint');
+                pivot.style.display = 'block';
+                pivot.style.left = '50%';
+            }
+        }
+
+        function nextQuestion() {
+            currentLevel++;
+            if (currentLevel < motionQuests.length) {
+                loadLevel();
+            } else {
+                document.getElementById('riddleDisplay').innerHTML = "🎉 <b>Congratulations!</b> You have successfully powered up all rides in the Science Park and mastered the concepts of motion!";
+                document.getElementById('optionsStack').innerHTML = '';
+                document.getElementById('feedbackBox').style.display = 'none';
+                
+                const nextBtn = document.getElementById('nextBtn');
+                nextBtn.innerText = "Restart 🔄";
+                nextBtn.onclick = () => {
+                    currentLevel = 0;
+                    loadLevel();
+                    nextBtn.onclick = nextQuestion;
+                };
+            }
+        }
+
+        window.onload = loadLevel;
+    </script>
+</body>
+</html>

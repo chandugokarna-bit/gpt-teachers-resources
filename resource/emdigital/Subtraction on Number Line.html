@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subtraction on Number Line</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #e0f7fa;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+            text-align: center;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            border-top: 8px solid #0097A7;
+        }
+        h1 {
+            color: #006064;
+            font-size: 32px;
+            margin-bottom: 5px;
+        }
+        .level-text {
+            font-size: 20px;
+            font-weight: bold;
+            color: #d84315;
+            margin-bottom: 15px;
+        }
+        .problem-box {
+            font-size: 40px;
+            font-weight: bold;
+            color: #fff;
+            background-color: #00BCD4;
+            padding: 20px 40px;
+            border-radius: 10px;
+            display: inline-block;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            letter-spacing: 2px;
+        }
+        .instruction-box {
+            font-size: 20px;
+            font-weight: bold;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: inline-block;
+            transition: 0.3s;
+        }
+        .instr-step1 { background-color: #fce4ec; color: #c2185b; border: 2px dashed #f06292; }
+        .instr-step2 { background-color: #e3f2fd; color: #1565c0; border: 2px dashed #64b5f6; }
+        .instr-success { background-color: #e8f5e9; color: #2e7d32; border: 2px dashed #66bb6a; }
+        
+        /* Canvas */
+        .canvas-wrapper {
+            overflow-x: auto;
+            padding: 10px 0;
+            margin-bottom: 20px;
+        }
+        canvas {
+            background-color: #fafafa;
+            border: 2px solid #ccc;
+            border-radius: 10px;
+            cursor: pointer;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
+        }
+
+        #feedback {
+            font-size: 22px;
+            font-weight: bold;
+            margin-top: 10px;
+            min-height: 30px;
+        }
+        .btn-next {
+            background-color: #ff9800;
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            display: none;
+            margin: 15px auto 0 auto;
+            transition: 0.3s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        }
+        .btn-next:hover { background-color: #f57c00; transform: translateY(-2px); }
+
+        #victoryScreen { display: none; margin-top: 30px; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>🐸 Subtraction on Number Line ➖</h1>
+        <p style="font-size: 16px; color: #666; margin-bottom: 20px;">
+            Complete the jump yourself by clicking the numbers on the number line!
+        </p>
+
+        <div id="gameplayArea">
+            <div class="level-text" id="levelDisplay">Level: 1 / 20</div>
+            
+            <div class="problem-box" id="problemDisplay">
+                </div>
+            <br>
+            <div class="instruction-box instr-step1" id="instructionDisplay">
+                </div>
+
+            <div class="canvas-wrapper">
+                <canvas id="numberLineCanvas" width="900" height="250"></canvas>
+            </div>
+
+            <div id="feedback"></div>
+            <button class="btn-next" id="nextBtn" onclick="nextLevel()">Next Level ➡️</button>
+        </div>
+
+        <div id="victoryScreen">
+            <h2 style="color: #00838f; font-size: 36px;">🎉 Amazing Achievement! 🎉</h2>
+            <p style="font-size: 22px;">You have successfully solved all 20 subtraction problems using the number line!</p>
+            <div style="font-size: 80px; margin: 20px 0;">🏆🐸🎯</div>
+            <button class="btn-next" style="display: inline-block; background-color: #ff9800;" onclick="location.reload()">Play Again from the Start</button>
+        </div>
+    </div>
+
+    <script>
+        // 20 Interactive Subtraction Levels
+        const questions = [
+            { n1: 5, n2: 2 },       // 5 - 2 = 3
+            { n1: 4, n2: 6 },       // 4 - 6 = -2
+            { n1: -2, n2: 3 },      // -2 - 3 = -5
+            { n1: -4, n2: -3 },     // -4 - (-3) = -1 (Trick)
+            { n1: 3, n2: -4 },      // 3 - (-4) = 7 (Trick)
+            { n1: 0, n2: 5 },       // 0 - 5 = -5
+            { n1: 0, n2: -6 },      // 0 - (-6) = 6
+            { n1: -5, n2: -5 },     // -5 - (-5) = 0
+            { n1: 7, n2: 7 },       // 7 - 7 = 0
+            { n1: -8, n2: 2 },      // -8 - 2 = -10
+            { n1: 2, n2: -8 },      // 2 - (-8) = 10
+            { n1: -1, n2: 4 },      // -1 - 4 = -5
+            { n1: -3, n2: -9 },     // -3 - (-9) = 6
+            { n1: 8, n2: 11 },      // 8 - 11 = -3
+            { n1: -10, n2: -2 },    // -10 - (-2) = -8
+            { n1: 6, n2: -5 },      // 6 - (-5) = 11
+            { n1: -7, n2: 5 },      // -7 - 5 = -12
+            { n1: 10, n2: 12 },     // 10 - 12 = -2
+            { n1: -2, n2: -10 },    // -2 - (-10) = 8
+            { n1: 5, n2: -7 }       // 5 - (-7) = 12
+        ];
+
+        let currentLevel = 0;
+        let gameState = 0; // 0 = wait for start jump, 1 = wait for sub jump, 2 = level complete
+
+        const canvas = document.getElementById("numberLineCanvas");
+        const ctx = canvas.getContext("2d");
+
+        // Canvas Config
+        const padding = 40;
+        const lineY = 180;
+        const minVal = -12;
+        const maxVal = 12;
+        const range = maxVal - minVal;
+        const intervalWidth = (canvas.width - 2 * padding) / range;
+
+        window.onload = function() { loadLevel(); };
+
+        function getXCoord(val) {
+            return padding + (val - minVal) * intervalWidth;
+        }
+
+        function drawBaseLine() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw Horizontal Line
+            ctx.beginPath();
+            ctx.moveTo(padding - 20, lineY);
+            ctx.lineTo(canvas.width - padding + 20, lineY);
+            ctx.lineWidth = 4;
+            ctx.strokeStyle = "#333";
+            ctx.stroke();
+
+            drawArrowHead(padding - 20, lineY, Math.PI, "#333");
+            drawArrowHead(canvas.width - padding + 20, lineY, 0, "#333");
+
+            // Draw Ticks and Numbers
+            for (let i = minVal; i <= maxVal; i++) {
+                let x = getXCoord(i);
+                
+                ctx.beginPath();
+                ctx.moveTo(x, lineY - 8);
+                ctx.lineTo(x, lineY + 8);
+                ctx.lineWidth = i === 0 ? 4 : 2;
+                ctx.strokeStyle = i === 0 ? "#00ACC1" : "#757575"; 
+                ctx.stroke();
+
+                ctx.fillStyle = i === 0 ? "#00ACC1" : "#333";
+                ctx.font = i === 0 ? "bold 18px Arial" : "16px Arial";
+                ctx.textAlign = "center";
+                ctx.fillText(i, x, lineY + 30);
+            }
+        }
+
+        function drawArrowHead(x, y, angle, color) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.rotate(angle);
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.lineTo(-12, -7);
+            ctx.lineTo(-12, 7);
+            ctx.closePath();
+            ctx.fillStyle = color;
+            ctx.fill();
+            ctx.restore();
+        }
+
+        function drawJumpArc(startVal, endVal, color, text, arcHeightOffset) {
+            let startX = getXCoord(startVal);
+            let endX = getXCoord(endVal);
+            if (startVal === endVal) return;
+
+            let distance = endX - startX;
+            let midX = startX + distance / 2;
+            let arcHeight = lineY - 30 - arcHeightOffset; 
+            
+            ctx.beginPath();
+            ctx.moveTo(startX, lineY - 12);
+            ctx.quadraticCurveTo(midX, arcHeight - 30, endX, lineY - 15);
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 4;
+            ctx.setLineDash([5, 5]); 
+            ctx.stroke();
+            ctx.setLineDash([]); 
+
+            let angle = endVal > startVal ? Math.PI/5 : (Math.PI * 4)/5; 
+            drawArrowHead(endX, lineY - 12, angle, color);
+
+            ctx.fillStyle = color;
+            ctx.font = "bold 18px Arial";
+            ctx.textAlign = "center";
+            ctx.fillText(text, midX, arcHeight - 20);
+        }
+
+        function highlightPoint(val, color) {
+            let x = getXCoord(val);
+            ctx.beginPath();
+            ctx.arc(x, lineY, 12, 0, Math.PI * 2);
+            ctx.fillStyle = "rgba(255,255,255,0.8)";
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(x, lineY, 8, 0, Math.PI * 2);
+            ctx.fillStyle = color;
+            ctx.fill();
+        }
+
+        function loadLevel() {
+            if (currentLevel >= questions.length) {
+                document.getElementById("gameplayArea").style.display = "none";
+                document.getElementById("victoryScreen").style.display = "block";
+                return;
+            }
+
+            let q = questions[currentLevel];
+            gameState = 0;
+
+            document.getElementById("levelDisplay").innerText = `Level: ${currentLevel + 1} / 20`;
+            
+            // Format problem text
+            let displayNum2 = q.n2 < 0 ? `(${q.n2})` : q.n2;
+            document.getElementById("problemDisplay").innerText = `${q.n1} - ${displayNum2} = ?`;
+
+            let instr = document.getElementById("instructionDisplay");
+            instr.className = "instruction-box instr-step1";
+            instr.innerHTML = `📍 <b>Step 1:</b> Starting from zero (0), click <b>${q.n1}</b> on the line to jump to the first number <b>(${q.n1})</b>.`;
+
+            document.getElementById("feedback").innerText = "";
+            document.getElementById("nextBtn").style.display = "none";
+
+            drawBaseLine();
+            highlightPoint(0, "#333"); // Show starting point
+        }
+
+        canvas.addEventListener("click", function(event) {
+            if (gameState === 2) return; // Level already completed
+
+            let rect = canvas.getBoundingClientRect();
+            let scaleX = canvas.width / rect.width; 
+            let clickX = (event.clientX - rect.left) * scaleX;
+
+            let clickedFloat = ((clickX - padding) / intervalWidth) + minVal;
+            let clickedInt = Math.round(clickedFloat);
+            let distance = Math.abs(clickedFloat - clickedInt);
+            
+            let feedback = document.getElementById("feedback");
+            let q = questions[currentLevel];
+
+            // If click is near an integer
+            if (distance < 0.4 && clickedInt >= minVal && clickedInt <= maxVal) {
+                
+                if (gameState === 0) {
+                    // Expecting click on q.n1
+                    if (clickedInt === q.n1) {
+                        feedback.innerText = "";
+                        drawBaseLine();
+                        drawJumpArc(0, q.n1, "#E91E63", `First Number (${q.n1})`, 20);
+                        highlightPoint(q.n1, "#E91E63");
+                        
+                        gameState = 1;
+                        let instr = document.getElementById("instructionDisplay");
+                        instr.className = "instruction-box instr-step2";
+                        
+                        let steps = Math.abs(q.n2);
+                        if(q.n2 > 0) {
+                            instr.innerHTML = `📍 <b>Step 2:</b> You need to subtract a positive number (${q.n2}). When subtracting, you must move <b>left ⬅️</b>! Therefore, jump <b>${steps} steps left</b> from ${q.n1} and click.`;
+                        } else if(q.n2 < 0) {
+                            instr.innerHTML = `📍 <b>Step 2:</b> You need to subtract a negative number (${q.n2}). Subtracting a negative number is the same as adding! Therefore, jump <b>${steps} steps right ➡️</b> from ${q.n1} and click.`;
+                        } else {
+                            instr.innerHTML = `📍 <b>Step 2:</b> You are subtracting zero. Click on the same spot.`;
+                        }
+                    } else {
+                        feedback.innerText = `❌ Incorrect. You must click on ${q.n1} first.`;
+                        feedback.style.color = "#C62828";
+                    }
+                } 
+                else if (gameState === 1) {
+                    // Expecting click on final answer (q.n1 - q.n2)
+                    let result = q.n1 - q.n2;
+                    if (clickedInt === result) {
+                        feedback.innerHTML = `✅ <b>Wonderful! Final Answer: ${result}</b>`;
+                        feedback.style.color = "#00838F";
+                        
+                        drawBaseLine();
+                        drawJumpArc(0, q.n1, "#E91E63", `(${q.n1})`, 20);
+                        
+                        // Second jump for subtraction (Blue)
+                        let signStr = q.n2 < 0 ? `-(${q.n2})` : `- ${q.n2}`;
+                        drawJumpArc(q.n1, result, "#1976D2", `Subtraction ${signStr}`, 60);
+                        
+                        highlightPoint(result, "#4CAF50");
+
+                        gameState = 2;
+                        let instr = document.getElementById("instructionDisplay");
+                        instr.className = "instruction-box instr-success";
+                        instr.innerHTML = `🌟 You jumped correctly! Answer: ${result}`;
+
+                        document.getElementById("nextBtn").style.display = "inline-block";
+                    } else {
+                        feedback.innerHTML = `❌ Incorrect. Count the steps carefully from ${q.n1} and click.`;
+                        feedback.style.color = "#C62828";
+                    }
+                }
+            }
+        });
+
+        function nextLevel() {
+            currentLevel++;
+            loadLevel();
+        }
+    </script>
+</body>
+</html>

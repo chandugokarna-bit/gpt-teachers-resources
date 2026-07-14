@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grand Material Properties Sorting Challenge!</title>
+    <style>
+        :root {
+            --slate-900: #0f172a;
+            --slate-800: #1e293b;
+            --indigo: #6366f1;
+            --emerald: #10b981;
+            --rose: #f43f5e;
+            --amber: #f59e0b;
+            --cyan: #06b6d4;
+            --text-light: #f8fafc;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+
+        body {
+            background-color: var(--slate-900);
+            color: var(--text-light);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 25px;
+            max-width: 800px;
+        }
+
+        header h1 {
+            font-size: 2.3rem;
+            color: var(--indigo);
+            margin-bottom: 8px;
+            text-shadow: 0 0 15px rgba(99, 102, 241, 0.3);
+        }
+
+        header p {
+            color: #94a3b8;
+            font-size: 1.1rem;
+        }
+
+        .game-container {
+            width: 100%;
+            max-width: 1000px;
+            background: var(--slate-800);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid #334155;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+        }
+
+        /* Teacher's Voice Announcement Display */
+        .announcement-box {
+            background: linear-gradient(135deg, #1e1b4b, #311042);
+            border: 2px solid var(--amber);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+            box-shadow: 0 0 20px rgba(245, 158, 11, 0.2);
+        }
+
+        .announcement-box h3 {
+            font-size: 1rem;
+            color: var(--amber);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+
+        .current-property {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #ffffff;
+            animation: pulse 1.5s infinite alternate;
+        }
+
+        /* Items Table Playground */
+        .table-title {
+            font-size: 1.1rem;
+            color: #94a3b8;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .items-table {
+            background: #0f172a;
+            border: 3px dashed #334155;
+            border-radius: 12px;
+            padding: 25px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 15px;
+            min-height: 250px;
+            margin-bottom: 30px;
+        }
+
+        .item-card {
+            background: var(--slate-800);
+            border: 2px solid #475569;
+            border-radius: 10px;
+            padding: 15px 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+
+        .item-card:hover {
+            border-color: var(--indigo);
+            transform: translateY(-2px);
+        }
+
+        .item-emoji {
+            font-size: 2.5rem;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .item-name {
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+
+        /* Sorting Destination Box */
+        .sorting-box-container {
+            background: rgba(16, 185, 129, 0.1);
+            border: 2px solid var(--emerald);
+            border-radius: 12px;
+            padding: 20px;
+            min-height: 140px;
+        }
+
+        .box-title {
+            color: var(--emerald);
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .box-contents {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        /* Dynamic Classes for Actions */
+        .wrong-shake {
+            animation: shake 0.4s ease;
+            border-color: var(--rose) !important;
+            background: rgba(244, 63, 94, 0.1);
+        }
+
+        .correct-fade {
+            opacity: 0.3;
+            cursor: not-allowed;
+            pointer-events: none;
+            border-color: var(--emerald) !important;
+        }
+
+        /* Next Button Control */
+        .control-panel {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 25px;
+        }
+
+        .score-board {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .next-btn {
+            background: var(--cyan);
+            color: var(--slate-900);
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            display: none;
+            transition: all 0.2s;
+        }
+
+        .next-btn:hover {
+            background: #0891b2;
+        }
+
+        /* Animations */
+        @keyframes pulse {
+            from { transform: scale(0.98); text-shadow: 0 0 10px rgba(255,255,255,0.2); }
+            to { transform: scale(1.02); text-shadow: 0 0 20px rgba(255,255,255,0.5); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-8px); }
+            40%, 80% { transform: translateX(8px); }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>🧪 Grand Material Properties Sorting Challenge! 📦</h1>
+        <p>Class 6 Science: Listen to the teacher's voice callout and sort all matching objects from the 18 options on the table into the box!</p>
+    </header>
+
+    <div class="game-container">
+        
+        <div class="announcement-box">
+            <h3>📢 Teacher's Callout:</h3>
+            <div class="current-property" id="propertyCallout">Loading...</div>
+        </div>
+
+        <div>
+            <div class="table-title">🫳 18 Objects on the Table:</div>
+            <div class="items-table" id="objectsTable"></div>
+        </div>
+
+        <div class="sorting-box-container">
+            <div class="box-title">📥 Sorting Group Box (<span id="boxTargetName">Group</span>)</div>
+            <div class="box-contents" id="dropBox"></div>
+        </div>
+
+        <div class="control-panel">
+            <div class="score-board">✨ Total Score: <span id="scoreVal" style="color:var(--cyan)">0</span></div>
+            <button class="next-btn" id="nextChallengeBtn" onclick="setupNextChallenge()">Next Property ➔</button>
+        </div>
+
+    </div>
+
+    <script>
+        const scienceObjects = [
+            { id: "stone", name: "Stone", emoji: "🪨", props: ["Sinking Objects", "Opaque Objects", "Insoluble Objects"] },
+            { id: "spoon", name: "Steel Spoon", emoji: "🥄", props: ["Sinking Objects", "Opaque Objects", "Insoluble Objects"] },
+            { id: "glass_cup", name: "Glass", emoji: "🥛", props: ["Sinking Objects", "Transparent Objects", "Insoluble Objects"] },
+            { id: "sponge", name: "Sponge", emoji: "🧽", props: ["Floating Objects", "Opaque Objects", "Insoluble Objects"] },
+            { id: "coconut_oil", name: "Oil", emoji: "🫗", props: ["Floating Objects", "Translucent Objects", "Insoluble Objects"] },
+            { id: "sugar", name: "Sugar", emoji: "🧂", props: ["Sinking Objects", "Opaque Objects", "Soluble Objects"] },
+            { id: "salt", name: "Salt", emoji: "🍚", props: ["Sinking Objects", "Opaque Objects", "Soluble Objects"] },
+            { id: "wood_block", name: "Wood", emoji: "🪵", props: ["Floating Objects", "Opaque Objects", "Insoluble Objects"] },
+            { id: "iron_nail", name: "Iron Nail", emoji: "📌", props: ["Sinking Objects", "Opaque Objects", "Insoluble Objects"] },
+            { id: "dry_leaf", name: "Dry Leaf", emoji: "🍂", props: ["Floating Objects", "Opaque Objects", "Insoluble Objects"] },
+            { id: "coin", name: "Coin", emoji: "🪙", props: ["Sinking Objects", "Opaque Objects", "Insoluble Objects"] },
+            { id: "sand", name: "Sand", emoji: "⏳", props: ["Sinking Objects", "Opaque Objects", "Insoluble Objects"] },
+            { id: "oily_paper", name: "Oily Paper", emoji: "📄", props: ["Floating Objects", "Translucent Objects", "Insoluble Objects"] },
+            { id: "plastic_bottle", name: "Plastic Bottle", emoji: "🍾", props: ["Floating Objects", "Transparent Objects", "Insoluble Objects"] },
+            { id: "honey", name: "Honey", emoji: "🍯", props: ["Sinking Objects", "Translucent Objects", "Soluble Objects"] },
+            { id: "feather", name: "Feather", emoji: "🪶", props: ["Floating Objects", "Opaque Objects", "Insoluble Objects"] },
+            { id: "chalk", name: "Chalk", emoji: "🖍️", props: ["Sinking Objects", "Opaque Objects", "Insoluble Objects"] },
+            { id: "butter_paper", name: "Butter Paper", emoji: "📜", props: ["Floating Objects", "Translucent Objects", "Insoluble Objects"] }
+        ];
+
+        const challenges = [
+            { text: "Objects that Float in Water! 💧🛶", matchKey: "Floating Objects" },
+            { text: "Objects that Sink in Water! ⚓", matchKey: "Sinking Objects" },
+            { text: "Transparent Objects! 🔎", matchKey: "Transparent Objects" },
+            { text: "Opaque Objects! 🧱", matchKey: "Opaque Objects" },
+            { text: "Translucent Objects! 🌤️", matchKey: "Translucent Objects" },
+            { text: "Soluble Objects in Water! 🌪️", matchKey: "Soluble Objects" },
+            { text: "Insoluble Objects in Water! ❌", matchKey: "Insoluble Objects" }
+        ];
+
+        let currentChallengeIndex = 0;
+        let score = 0;
+        let remainingMatchesCount = 0;
+
+        function initGame() {
+            shuffleArray(challenges); 
+            loadChallenge();
+        }
+
+        function loadChallenge() {
+            const currentChallenge = challenges[currentChallengeIndex];
+            
+            document.getElementById('propertyCallout').innerText = currentChallenge.text;
+            document.getElementById('boxTargetName').innerText = currentChallenge.matchKey;
+            document.getElementById('dropBox').innerHTML = '';
+            document.getElementById('nextChallengeBtn').style.display = 'none';
+
+            remainingMatchesCount = scienceObjects.filter(obj => obj.props.includes(currentChallenge.matchKey)).length;
+
+            const table = document.getElementById('objectsTable');
+            table.innerHTML = '';
+            
+            scienceObjects.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'item-card';
+                card.id = `item-${item.id}`;
+                card.innerHTML = `<span class="item-emoji">${item.emoji}</span><span class="item-name">${item.name}</span>`;
+                
+                card.onclick = () => verifyItemSelection(item, card, currentChallenge.matchKey);
+                table.appendChild(card);
+            });
+        }
+
+        function verifyItemSelection(item, cardElement, matchKey) {
+            if (item.props.includes(matchKey)) {
+                score += 10;
+                document.getElementById('scoreVal').innerText = score;
+                remainingMatchesCount--;
+
+                cardElement.classList.add('correct-fade');
+                
+                const box = document.getElementById('dropBox');
+                const boxItem = document.createElement('div');
+                boxItem.className = 'item-card';
+                boxItem.style.background = '#065f46';
+                boxItem.style.borderColor = 'var(--emerald)';
+                boxItem.innerHTML = `<span class="item-emoji">${item.emoji}</span><span class="item-name">${item.name}</span>`;
+                box.appendChild(boxItem);
+
+                if (remainingMatchesCount === 0) {
+                    document.getElementById('propertyCallout').innerText = "🎉 Fantastic! You successfully sorted all materials for this property.";
+                    document.getElementById('nextChallengeBtn').style.display = 'block';
+                }
+            } else {
+                cardElement.classList.add('wrong-shake');
+                setTimeout(() => {
+                    cardElement.classList.remove('wrong-shake');
+                }, 400);
+            }
+        }
+
+        function setupNextChallenge() {
+            currentChallengeIndex++;
+            if (currentChallengeIndex < challenges.length) {
+                loadChallenge();
+            } else {
+                document.getElementById('propertyCallout').innerText = "🏆 Congratulations! You have fully conquered the grand sorting challenge!";
+                document.getElementById('objectsTable').innerHTML = '<div style="grid-column: 1/-1; text-align:center; font-size:1.3rem; color:var(--emerald); font-weight:bold;">You possess excellent practical knowledge of material properties! 🌟</div>';
+                document.getElementById('nextChallengeBtn').style.display = 'none';
+            }
+        }
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        window.onload = initGame;
+    </script>
+</body>
+</html>

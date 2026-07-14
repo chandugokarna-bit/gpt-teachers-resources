@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Angle Type Game</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 30px;
+            border-top: 6px solid #ff5722;
+        }
+        h1 { color: #333; }
+        .score-board {
+            display: flex;
+            justify-content: space-around;
+            background-color: #e3f2fd;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        .team1 { color: #d32f2f; }
+        .team2 { color: #1976d2; }
+        canvas {
+            background-color: #fafafa;
+            border: 2px dashed #ccc;
+            border-radius: 10px;
+            margin: 20px 0;
+            display: none;
+        }
+        .input-section { margin: 20px 0; padding: 20px; background-color: #fff9c4; border-radius: 10px; }
+        input[type="number"] {
+            font-size: 18px;
+            padding: 10px;
+            width: 150px;
+            text-align: center;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+            margin: 10px;
+        }
+        select {
+            font-size: 18px;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px;
+            cursor: pointer;
+        }
+        .btn {
+            font-size: 18px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            color: white;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+        .btn-set { background-color: #e91e63; }
+        .btn-set:hover { background-color: #c2185b; }
+        .btn-guess { background-color: #4caf50; }
+        .btn-guess:hover { background-color: #388e3c; }
+        .btn-next { background-color: #ff9800; display: none; margin: 0 auto;}
+        .instruction { font-size: 18px; color: #555; font-weight: bold; }
+        #feedback { font-size: 20px; font-weight: bold; margin-top: 15px; min-height: 30px; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>📐 Identify the Angle Type 📏</h1>
+        <p>Rule: Identify the correct angle type to score 10 points! The team with the highest score wins.</p>
+
+        <div class="score-board">
+            <div class="team1">Team 1 Score: <span id="score1">0</span></div>
+            <div class="team2">Team 2 Score: <span id="score2">0</span></div>
+        </div>
+
+        <div id="instruction" class="instruction">
+            Team 1: Please secretly enter your angle (1 to 360).
+        </div>
+
+        <div class="input-section" id="setSection">
+            <input type="number" id="secretAngle" placeholder="Type the angle (°)" min="1" max="360">
+            <br>
+            <button class="btn btn-set" onclick="setAngle()">Set Angle</button>
+        </div>
+
+        <canvas id="angleCanvas" width="400" height="300"></canvas>
+
+        <div class="input-section" id="guessSection" style="display: none;">
+            <select id="angleType">
+                <option value="">What type of angle is this?</option>
+                <option value="Acute">Acute Angle</option>
+                <option value="Right">Right Angle</option>
+                <option value="Obtuse">Obtuse Angle</option>
+                <option value="Straight">Straight Angle</option>
+                <option value="Reflex">Reflex Angle</option>
+                <option value="Complete">Complete Angle</option>
+            </select>
+            <br>
+            <button class="btn btn-guess" onclick="guessAngleType()">Submit</button>
+        </div>
+
+        <div id="feedback"></div>
+        <button class="btn btn-next" id="nextBtn" onclick="nextTurn()">Next Turn</button>
+    </div>
+
+    <script>
+        let currentSettingTeam = 1; 
+        let currentGuessingTeam = 2;
+        let actualAngle = 0;
+        let scores = { 1: 0, 2: 0 };
+
+        function setAngle() {
+            let input = document.getElementById("secretAngle").value;
+            if(input === "" || input <= 0 || input > 360) {
+                alert("Please enter an angle between 1 and 360.");
+                return;
+            }
+            actualAngle = parseInt(input);
+
+            // Hide set section, show canvas and guess section
+            document.getElementById("setSection").style.display = "none";
+            document.getElementById("angleCanvas").style.display = "block";
+            document.getElementById("guessSection").style.display = "block";
+            
+            document.getElementById("instruction").innerText = `Team ${currentGuessingTeam}: Identify what type of angle is on the screen!`;
+            
+            drawAngle(actualAngle);
+        }
+
+        function drawAngle(angle) {
+            let canvas = document.getElementById("angleCanvas");
+            let ctx = canvas.getContext("2d");
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            let centerX = 200;
+            let centerY = 200;
+            let radius = 120;
+
+            // Draw base line
+            ctx.beginPath();
+            ctx.moveTo(centerX, centerY);
+            ctx.lineTo(centerX + radius, centerY);
+            ctx.lineWidth = 4;
+            ctx.strokeStyle = "#333";
+            ctx.stroke();
+
+            // Draw angle line
+            ctx.beginPath();
+            ctx.moveTo(centerX, centerY);
+            let rad = (angle * Math.PI) / 180;
+            let x = centerX + radius * Math.cos(-rad); // negative for drawing upward
+            let y = centerY + radius * Math.sin(-rad);
+            ctx.lineTo(x, y);
+            ctx.stroke();
+
+            // Draw arc to show angle size
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, 40, 0, -rad, true);
+            ctx.strokeStyle = "#ff5722";
+            ctx.stroke();
+        }
+
+        function getCorrectAngleType(angle) {
+            if (angle < 90) return "Acute";
+            if (angle === 90) return "Right";
+            if (angle > 90 && angle < 180) return "Obtuse";
+            if (angle === 180) return "Straight";
+            if (angle > 180 && angle < 360) return "Reflex";
+            if (angle === 360) return "Complete";
+            return "";
+        }
+
+        function guessAngleType() {
+            let typeInput = document.getElementById("angleType").value;
+
+            if(typeInput === "") {
+                alert("Please select the type of angle.");
+                return;
+            }
+
+            let correctType = getCorrectAngleType(actualAngle);
+            let feedbackElement = document.getElementById("feedback");
+
+            if (typeInput === correctType) {
+                scores[currentGuessingTeam] += 10;
+                document.getElementById(`score${currentGuessingTeam}`).innerText = scores[currentGuessingTeam];
+                feedbackElement.innerText = `✅ Correct answer! This is a/an ${correctType} angle (${actualAngle}°). 10 points for Team ${currentGuessingTeam}!`;
+                feedbackElement.style.color = "green";
+            } else {
+                feedbackElement.innerText = `❌ Incorrect answer! The correct answer is a/an ${correctType} angle (${actualAngle}°).`;
+                feedbackElement.style.color = "red";
+            }
+
+            // Hide guess button, show next turn button
+            document.querySelector(".btn-guess").style.display = "none";
+            document.getElementById("nextBtn").style.display = "block";
+        }
+
+        function nextTurn() {
+            // Swap teams
+            let temp = currentSettingTeam;
+            currentSettingTeam = currentGuessingTeam;
+            currentGuessingTeam = temp;
+
+            // Reset UI
+            document.getElementById("secretAngle").value = "";
+            document.getElementById("angleType").value = "";
+            document.getElementById("feedback").innerText = "";
+            
+            document.getElementById("setSection").style.display = "block";
+            document.getElementById("angleCanvas").style.display = "none";
+            document.getElementById("guessSection").style.display = "none";
+            document.querySelector(".btn-guess").style.display = "inline-block";
+            document.getElementById("nextBtn").style.display = "none";
+
+            document.getElementById("instruction").innerText = `Team ${currentSettingTeam}: Please secretly enter your angle (1 to 360).`;
+        }
+    </script>
+</body>
+</html>

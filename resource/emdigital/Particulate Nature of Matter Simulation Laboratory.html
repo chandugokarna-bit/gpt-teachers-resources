@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Particulate Nature of Matter: Interactive Quantum Sandbox</title>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --secondary: #22d3ee;
+            --accent: #f43f5e;
+            --solid-color: #38bdf8;
+            --liquid-color: #fbbf24;
+            --gas-color: #34d399;
+            --bg-dark: #090d16;
+            --card-dark: #151f32;
+            --text-light: #f8fafc;
+            --text-muted: #94a3b8;
+            --success: #10b981;
+            --danger: #ef4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            padding: 25px 15px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1150px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            background: linear-gradient(135deg, #0f172a, #1e1b4b);
+            padding: 25px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+        }
+
+        header h1 {
+            font-size: 2.1rem;
+            background: linear-gradient(to right, #a78bfa, #22d3ee);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+
+        /* 6-Category Navigation System */
+        .game-nav {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .nav-btn {
+            background: var(--card-dark);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            color: var(--text-muted);
+            padding: 14px 8px;
+            border-radius: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            font-size: 0.85rem;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .nav-btn span {
+            font-size: 1.4rem;
+        }
+
+        .nav-btn:hover {
+            background: #1e2d4a;
+            color: var(--text-light);
+            transform: translateY(-2px);
+        }
+
+        .nav-btn.active {
+            background: linear-gradient(135deg, var(--primary), #4338ca);
+            color: white;
+            border-color: #818cf8;
+            box-shadow: 0 0 15px rgba(99, 102, 241, 0.4);
+        }
+
+        /* Layout Main Workspace */
+        .main-workspace {
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 25px;
+        }
+
+        @media (max-width: 850px) {
+            .main-workspace {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .panel {
+            background: var(--card-dark);
+            border-radius: 20px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 4px 25px rgba(0,0,0,0.3);
+        }
+
+        .panel-title {
+            font-size: 1.2rem;
+            color: var(--secondary);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 10px;
+            font-weight: 600;
+        }
+
+        /* Sandbox Canvas Viewport Display */
+        .sandbox-display {
+            background: #040711;
+            height: 280px;
+            border-radius: 16px;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .canvas-container {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Info Explanation Card */
+        .info-card {
+            margin-top: 15px;
+            background: rgba(34, 211, 238, 0.05);
+            border-left: 4px solid var(--secondary);
+            padding: 12px;
+            border-radius: 0 10px 10px 0;
+            font-size: 0.9rem;
+            line-height: 1.45;
+        }
+
+        /* Dynamic Quiz Testing Interface System */
+        .quiz-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .question-card {
+            display: none;
+        }
+
+        .question-card.active {
+            display: block;
+            animation: slideIn 0.35s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .question-text {
+            font-size: 1.05rem;
+            font-weight: 500;
+            margin-bottom: 16px;
+            line-height: 1.4;
+        }
+
+        .option-btn {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: var(--text-light);
+            padding: 14px 16px;
+            border-radius: 12px;
+            text-align: left;
+            cursor: pointer;
+            margin-bottom: 10px;
+            transition: all 0.2s ease;
+            font-size: 0.95rem;
+        }
+
+        .option-btn:hover {
+            background: rgba(255, 255, 255, 0.07);
+            border-color: var(--text-muted);
+            transform: translateX(4px);
+        }
+
+        .option-btn.correct {
+            background: rgba(16, 185, 129, 0.18) !important;
+            border-color: var(--success) !important;
+            color: #34d399;
+            font-weight: 600;
+        }
+
+        .option-btn.wrong {
+            background: rgba(239, 68, 68, 0.18) !important;
+            border-color: var(--danger) !important;
+            color: #f87171;
+        }
+
+        .score-hud {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #0f172a;
+            padding: 12px 16px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            border: 1px solid rgba(99, 102, 241, 0.25);
+        }
+
+        .score-hud span.score-val {
+            color: #a78bfa;
+        }
+
+        /* Controls Deck Layout */
+        .interactive-widget {
+            margin-top: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .slider-control {
+            width: 100%;
+            accent-color: var(--secondary);
+            cursor: pointer;
+            margin-top: 4px;
+        }
+
+        /* Group buttons style for state selectors */
+        .state-selector-group {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 5px;
+        }
+
+        .state-btn {
+            flex: 1;
+            background: #1e2d4a;
+            border: 1px solid rgba(255,255,255,0.1);
+            color: var(--text-muted);
+            padding: 8px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .state-btn:hover {
+            background: #27395e;
+            color: var(--text-light);
+        }
+
+        .state-btn.active-state {
+            background: var(--secondary);
+            color: #090d16;
+            border-color: #22d3ee;
+        }
+
+        .action-btn {
+            background: linear-gradient(135deg, #06b6d4, #0891b2);
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s;
+            margin-top: 4px;
+        }
+        .action-btn:hover { opacity: 0.9; }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 6px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 3px;
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            width: 25%;
+            background: var(--secondary);
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>🔬 Particulate Nature of Matter Simulation Laboratory</h1>
+            <p>Explore molecular structures, kinetic energy, diffusion states, and complete diagnostic core quizzes</p>
+        </header>
+
+        <div class="game-nav">
+            <button class="nav-btn active" onclick="switchActivity(1)">
+                <span>💎</span>Act 1: Solid Lattice
+            </button>
+            <button class="nav-btn" onclick="switchActivity(2)">
+                <span>💧</span>Act 2: Liquid Flow
+            </button>
+            <button class="nav-btn" onclick="switchActivity(3)">
+                <span>☁️</span>Act 3: Gas Chaos
+            </button>
+            <button class="nav-btn" onclick="switchActivity(4)">
+                <span>🔥</span>Act 4: Thermal Energy
+            </button>
+            <button class="nav-btn" onclick="switchActivity(5)">
+                <span>🧪</span>Act 5: Diffusion Rates
+            </button>
+            <button class="nav-btn" onclick="switchActivity(6)">
+                <span>💉</span>Act 6: Compression
+            </button>
+        </div>
+
+        <div class="main-workspace">
+            
+            <div class="panel">
+                <div class="panel-title" id="sandbox-title">💎 Solid State Rigid Lattice Matrix</div>
+                
+                <div class="sandbox-display">
+                    <canvas id="particleCanvas" class="canvas-container"></canvas>
+                </div>
+
+                <div class="interactive-widget" id="sandbox-control-block">
+                    <div id="additional-controls"></div>
+                    
+                    <label id="slider-label" style="font-size:0.85rem; font-weight:600; color:var(--text-muted);">Vibration Amplitude (Energy Tweak):</label>
+                    <input type="range" id="param-slider" class="slider-control" min="1" max="100" value="10" oninput="executeSimulationAdjustment()">
+
+                    <div class="info-card" id="sandbox-explanation">
+                        In solids, particles are tightly packed in fixed geometric locations with negligible empty space between them. They cannot shift positions but continuously vibrate in place.
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel quiz-container">
+                <div class="panel-title">🏆 Active Quest Core Node Matrix</div>
+                
+                <div class="score-hud">
+                    <div>Progress Node: <span id="progress-hud-text">1 / 4</span></div>
+                    <div>Score Credits: <span id="score-counter" class="score-val">0</span> XP</div>
+                </div>
+
+                <div class="progress-bar-container">
+                    <div id="progress-indicator" class="progress-fill"></div>
+                </div>
+
+                <div id="quiz-deck-wrapper">
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        const comprehensiveActivities = {
+            1: {
+                title: "💎 Solid State Rigid Lattice Matrix",
+                explanation: "In solids, particles are tightly packed in fixed geometric locations with negligible empty space between them. They cannot move freely but continuously vibrate in place, maintaining a rigid shape and constant fixed volume.",
+                sliderText: "Vibration Amplitude (Energy Tweak):",
+                initSliderVal: 10,
+                questions: [
+                    { q: "Which statement best describes the structural arrangement of particles in solid matter?", o: ["Particles are tightly packed in fixed spots and vibrate in place", "Particles are far apart and fly around completely randomly", "Particles constantly change identity and individual size specifications"], c: 0 },
+                    { q: "Why do solids possess a definite fixed shape and constant volume parameter?", o: ["Strong attractive forces hold tightly packed particles in place", "Solids contain zero actual matter particles", "Particles move too fast to change form parameters"], c: 0 },
+                    { q: "What happens to the structure of particles if a solid crystalline block is smashed forcefully with a heavy hammer?", o: ["The rigid crystalline pattern cracks or shatters apart", "The particles instantly turn into tiny gas bubbles", "Spaces between adjacent particle loops stretch out into perfect vacuum zones"], c: 0 },
+                    { q: "Can particles inside a solid bar swap positions spontaneously at normal room temperature?", o: ["No, they only vibrate about their fixed mean geometric positions", "Yes, they flow like running rivers across the lattice surface", "Only if the solid structure is painted a darker color spectrum"], c: 0 }
+                ]
+            },
+            2: {
+                title: "💧 Liquid State Translational Flow Field",
+                explanation: "Particles in liquids are close together but lack a rigid structure. Intermolecular spaces are slightly larger than solids, allowing particles to slide past one another to dynamically take the shape of any container.",
+                sliderText: "Fluidity Shift Vector (Velocity Modifier):",
+                initSliderVal: 30,
+                questions: [
+                    { q: "Why can liquids easily flow and adapt to fill the geometric shapes of completely different containers?", o: ["Particles are not locked in fixed spots and can slide past each other", "Liquid particles shrink in individual volume dramatically when poured", "They possess infinite empty spaces between adjacent matter nodes"], c: 0 },
+                    { q: "How do the spaces between particles in a liquid compare generally to those in solid states?", o: ["Slightly larger than solids, allowing moderate movement freedom", "Infinitely smaller than solid structures", "Exactly identical in internal rigidity properties"], c: 0 },
+                    { q: "Which core property remains perfectly constant for an isolated sample of liquid placed in an open flask?", o: ["Its total Volume", "Its geometric Shape configuration", "Its absolute chemical surface tension vector"], c: 0 },
+                    { q: "What lets you smoothly slice your hand through water inside a swimming pool container?", o: ["Forces holding liquid particles together are weaker than in solids", "Water is made of abstract energy loops without actual physical mass", "Liquid particles evaporate immediately on structural skin contact instances"], c: 0 }
+                ]
+            },
+            3: {
+                title: "☁️ Gas State Chaotic Dispersion Cloud",
+                explanation: "Gas particles are separated by vast intermolecular gaps and experience negligible attractive forces. They move rapidly in random directions, filling any closed container space entirely.",
+                sliderText: "Kinetic Scatter Velocity (Turbulence Multiplier):",
+                initSliderVal: 40,
+                questions: [
+                    { q: "What key mechanical layout characterizes the movement velocity of particles inside gaseous matter?", o: ["Fierce, continuous random motion at high speeds in all directions", "Perfect standstill stagnation without kinetic energy fields", "Rhythmic synchronized orbital patterns around fixed nodes"], c: 0 },
+                    { q: "Why does a gas sample instantly expand to occupy the entire volume space of any closed container?", o: ["Forces between particles are negligible, allowing absolute dispersion", "Gas particles continuously double in structural mass size", "Atmospheric vacuum fields force them to clone repeatedly"], c: 0 },
+                    { q: "How do particle spacing dimensions in gases compare to solid and liquid structures?", o: ["Gases have significantly larger intermolecular spaces than solids and liquids", "Gases have completely nonexistent gaps between nodes", "Gases match liquid spacing values accurately down to the nanometer"], c: 0 },
+                    { q: "If you trap a gas specimen inside an elastic cylinder container, what creates the pressure acting on the container walls?", o: ["Continuous random collisions of fast-moving particles against internal surfaces", "Chemical corrosion eating away the metallic framework links", "The static weight loading of the outer gas boundaries"], c: 0 }
+                ]
+            },
+            4: {
+                title: "🔥 Thermal Kinetic Energy Activation Engine",
+                explanation: "Supplying thermal energy (heat) increases the kinetic speed of particles. This overcomes attractive forces, causing phase transformations from solid to liquid, and liquid to gas.",
+                sliderText: "Thermal Heat Input (Thermal Energy Tap):",
+                initSliderVal: 20,
+                questions: [
+                    { q: "What fundamental property shifts inside matter particles as you apply heat energy?", o: ["Their kinetic energy increases, causing faster particle movement", "Particles increase in individual physical weight specifications", "The underlying atomic nuclei melt into electromagnetic radiation pools"], c: 0 },
+                    { q: "How does a solid block eventually transition into a liquid fluid state upon heating?", o: ["Fierce thermal vibrations break down rigid particle lattice locks", "Particles disappear from existence until cooled down", "The material absorbs nitrogen molecules directly out of thin air"], c: 0 },
+                    { q: "What happens to the rate of molecular movement if you cool a gas cloud down to extreme freezing temperatures?", o: ["Particle speed slows down dramatically as kinetic energy decreases", "Particles accelerate instantly to the speed of light parameters", "The particle spacing expands infinitely without correlation metrics"], c: 0 },
+                    { q: "What physical process describes a liquid converting directly into a gas phase at room temperature?", o: ["Evaporation", "Sublimation", "Condensation Matrix"], c: 0 }
+                ]
+            },
+            5: {
+                title: "🧪 Molecular Diffusion Rate & State Comparison",
+                explanation: "Diffusion is the spontaneous intermixing of particles of different substances due to their random motion. It occurs fastest in gases, slower in liquids, and is nearly absent in solids.",
+                sliderText: "Temperature Vector Control (Diffusion Velocity Booster):",
+                initSliderVal: 25,
+                questions: [
+                    { q: "What core scientific process causes the scent of an open perfume bottle to travel across a large room?", o: ["Diffusion driven by the random kinetic motion of air and gas particles", "Gravitational magnetic waves carrying aromatic molecules", "Static electrical charges pushing molecular strands through doors"], c: 0 },
+                    { q: "In which physical state of matter does the rate of particle diffusion occur at the absolute fastest velocity?", o: ["Gaseous State", "Liquid State", "Solid State Structural Blocks"], c: 0 },
+                    { q: "Why does the rate of diffusion speed up significantly when the temperature of the fluid is elevated?", o: ["Higher heat increases particle speed, accelerating the intermixing rate", "Thermal heat cancels out the mass properties of the solution completely", "Particles grow smaller, sliding through atomic lattice holes easier"], c: 0 },
+                    { q: "If you place a drop of blue ink into a glass of stable water, it slowly colors the whole fluid due to:", o: ["Particles of ink spontaneously intermixing between water particles", "Chemical burning processes eating away the transparency values", "Optical light refraction phenomena creating an illusion structure"], c: 0 }
+                ]
+            },
+            6: {
+                title: "💉 Mechanical Compression & Volumetric Gaps",
+                explanation: "Gases are highly compressible because of the vast empty spaces separating their particles. Solids and liquids are virtually incompressible because their particles are already closely packed.",
+                sliderText: "Piston Displacement Strain (Syringe Compress):",
+                initSliderVal: 5,
+                questions: [
+                    { q: "Why can a gas trapped inside a syringe be heavily compressed while a liquid sample cannot?", o: ["Gases have vast intermolecular spaces that can be pushed closer together", "Liquid particles are hollow and break immediately under stress", "Solid pistons can only interact with low-density atomic models"], c: 0 },
+                    { q: "What happens to the internal volume space and particle density of a gas as it undergoes heavy compression?", o: ["Intermolecular spaces shrink, forcing particles significantly closer together", "The gas particles combine to form one giant solid macromolecule", "Total particle counts drop down to zero under extreme pressure"], c: 0 },
+                    { q: "If you fill a sealed testing syringe with dry sand or wood shavings, how far can you push the plunger?", o: ["Hardly at all, because solid particles are already tightly packed", "Easily to the bottom wall due to high elasticity thresholds", "It moves backwards automatically due to atomic repulsion fields"], c: 0 },
+                    { q: "Which state of matter displays the highest level of resistance against volumetric compression forces?", o: ["Solid State", "Gaseous State", "Vapor Cloud Forms"], c: 0 }
+                ]
+            }
+        };
+
+        let currentActivityIndex = 1;
+        let compressionState = 'gas'; 
+        let diffusionState = 'liquid'; 
+        let globalXPScore = 0;
+        
+        const canvas = document.getElementById('particleCanvas');
+        const ctx = canvas.getContext('2d');
+        let animationFrameId;
+        let particles = [];
+
+        window.onload = function() {
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+            switchActivity(1);
+        };
+
+        function resizeCanvas() {
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+            initParticles();
+        }
+
+        class Particle {
+            constructor(x, y, type) {
+                this.baseX = x;
+                this.baseY = y;
+                this.x = x;
+                this.y = y;
+                this.vx = (Math.random() - 0.5) * 2;
+                this.vy = (Math.random() - 0.5) * 2;
+                this.radius = 6;
+                this.color = '#38bdf8';
+                this.type = type; 
+            }
+
+            update(sliderVal) {
+                if (currentActivityIndex === 1) { 
+                    let amp = sliderVal * 0.15;
+                    this.x = this.baseX + (Math.random() - 0.5) * amp;
+                    this.y = this.baseY + (Math.random() - 0.5) * amp;
+                    this.color = varToHex('--solid-color');
+                } 
+                else if (currentActivityIndex === 2) { 
+                    let speed = sliderVal * 0.08;
+                    this.x += this.vx * speed;
+                    this.y += this.vy * speed;
+                    this.color = varToHex('--liquid-color');
+
+                    if (this.x < 30 || this.x > canvas.width - 30) this.vx *= -1;
+                    if (this.y < canvas.height - 120 || this.y > canvas.height - 20) this.vy *= -1;
+                } 
+                else if (currentActivityIndex === 3) { 
+                    let speed = sliderVal * 0.15;
+                    this.x += this.vx * speed;
+                    this.y += this.vy * speed;
+                    this.color = varToHex('--gas-color');
+
+                    if (this.x < 15 || this.x > canvas.width - 15) this.vx *= -1;
+                    if (this.y < 15 || this.y > canvas.height - 15) this.vy *= -1;
+                }
+                else if (currentActivityIndex === 4) { 
+                    let speed = sliderVal * 0.12;
+                    this.x += this.vx * speed;
+                    this.y += this.vy * speed;
+                    
+                    if(sliderVal < 30) {
+                        this.color = varToHex('--solid-color');
+                        if (this.x < 100 || this.x > canvas.width - 100) this.vx *= -1;
+                        if (this.y < canvas.height - 100 || this.y > canvas.height - 20) this.vy *= -1;
+                    } else if(sliderVal < 70) {
+                        this.color = varToHex('--liquid-color');
+                        if (this.x < 40 || this.x > canvas.width - 40) this.vx *= -1;
+                        if (this.y < canvas.height - 140 || this.y > canvas.height - 15) this.vy *= -1;
+                    } else {
+                        this.color = varToHex('--accent');
+                        if (this.x < 15 || this.x > canvas.width - 15) this.vx *= -1;
+                        if (this.y < 15 || this.y > canvas.height - 15) this.vy *= -1;
+                    }
+                }
+                else if (currentActivityIndex === 5) { 
+                    // Diffusion Physics Update
+                    if (diffusionState === 'solid') {
+                        // Solids: No macro-mixing, particles merely vibrate slightly
+                        this.x = this.baseX + (Math.random() - 0.5) * 0.5;
+                        this.y = this.baseY + (Math.random() - 0.5) * 0.5;
+                    } 
+                    else if (diffusionState === 'liquid') {
+                        // Liquids: Moderate mixing modulated by temperature slider
+                        let speed = 0.3 + (sliderVal * 0.04);
+                        this.x += this.vx * speed;
+                        this.y += this.vy * speed;
+                    } 
+                    else if (diffusionState === 'gas') {
+                        // Gases: Rapid and extensive dispersion mapping
+                        let speed = 1.5 + (sliderVal * 0.08);
+                        this.x += this.vx * speed;
+                        this.y += this.vy * speed;
+                    }
+
+                    if (this.x < 15 || this.x > canvas.width - 15) this.vx *= -1;
+                    if (this.y < 15 || this.y > canvas.height - 15) this.vy *= -1;
+
+                    if (this.type === 'ink') {
+                        this.color = varToHex('--accent');
+                    } else {
+                        this.color = diffusionState === 'solid' ? varToHex('--solid-color') : 
+                                     diffusionState === 'liquid' ? 'rgba(251, 191, 36, 0.3)' : 'rgba(52, 211, 153, 0.15)';
+                    }
+                }
+                else if (currentActivityIndex === 6) { 
+                    let maxAllowedWidth = canvas.width - (sliderVal * 2.5);
+                    if (maxAllowedWidth < 100) maxAllowedWidth = 100;
+
+                    if (compressionState === 'solid') {
+                        this.x = this.baseX + (Math.random() - 0.5) * 1.5;
+                        this.y = this.baseY + (Math.random() - 0.5) * 1.5;
+                        this.color = varToHex('--solid-color');
+                    } 
+                    else if (compressionState === 'liquid') {
+                        let speed = 1.2;
+                        this.x += this.vx * speed;
+                        this.y += this.vy * speed;
+                        this.color = varToHex('--liquid-color');
+
+                        if (this.x < 30 || this.x > maxAllowedWidth - 15) this.vx *= -1;
+                        if (this.y < 60 || this.y > canvas.height - 60) this.vy *= -1;
+                    } 
+                    else if (compressionState === 'gas') {
+                        let speedMultiplier = 1.5 + (sliderVal * 0.04);
+                        this.x += this.vx * speedMultiplier;
+                        this.y += this.vy * speedMultiplier;
+                        this.color = varToHex('--gas-color');
+
+                        if (this.x < 30) { this.x = 30; this.vx *= -1; }
+                        if (this.x > maxAllowedWidth - 15) { this.x = maxAllowedWidth - 15; this.vx *= -1; }
+                        if (this.y < 60) { this.y = 60; this.vy *= -1; }
+                        if (this.y > canvas.height - 60) { this.y = canvas.height - 60; this.vy *= -1; }
+                    }
+                }
+            }
+
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+                ctx.closePath();
+            }
+        }
+
+        function varToHex(varName) {
+            return getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
+        }
+
+        function initParticles() {
+            particles = [];
+            let w = canvas.width;
+            let h = canvas.height;
+
+            if (currentActivityIndex === 1) { 
+                let rows = 6;
+                let cols = 10;
+                let xSpacing = 22;
+                let ySpacing = 22;
+                let startX = (w - (cols * xSpacing)) / 2;
+                let startY = (h - (rows * ySpacing)) / 2;
+
+                for (let r = 0; r < rows; r++) {
+                    for (let c = 0; c < cols; c++) {
+                        particles.push(new Particle(startX + c * xSpacing, startY + r * ySpacing, 'solid'));
+                    }
+                }
+            } 
+            else if (currentActivityIndex === 2 || currentActivityIndex === 4) { 
+                for (let i = 0; i < 75; i++) {
+                    let rx = 50 + Math.random() * (w - 100);
+                    let ry = (h - 110) + Math.random() * 80;
+                    particles.push(new Particle(rx, ry, 'fluid'));
+                }
+            } 
+            else if (currentActivityIndex === 3) { 
+                for (let i = 0; i < 40; i++) {
+                    let rx = 30 + Math.random() * (w - 60);
+                    let ry = 30 + Math.random() * (h - 60);
+                    particles.push(new Particle(rx, ry, 'gas'));
+                }
+            }
+            else if (currentActivityIndex === 5) { 
+                // Diffusion Initialization Setup
+                if (diffusionState === 'solid') {
+                    let startX1 = w * 0.15;
+                    let startX2 = w * 0.6;
+                    for(let r=0; r<8; r++) {
+                        for(let c=0; c<6; c++) {
+                            particles.push(new Particle(startX1 + c*18, 60 + r*18, 'matrix'));
+                        }
+                    }
+                    for(let r=0; r<8; r++) {
+                        for(let c=0; c<4; c++) {
+                            particles.push(new Particle(startX2 + c*18, 60 + r*18, 'ink'));
+                        }
+                    }
+                } 
+                else if (diffusionState === 'liquid') {
+                    for (let i = 0; i < 65; i++) {
+                        particles.push(new Particle(30 + Math.random() * (w/2 - 40), 30 + Math.random() * (h - 60), 'water'));
+                    }
+                    for (let i = 0; i < 20; i++) {
+                        particles.push(new Particle((w/2 + 20) + Math.random() * (w/2 - 50), 40 + Math.random() * (h - 80), 'ink'));
+                    }
+                } 
+                else if (diffusionState === 'gas') {
+                    for (let i = 0; i < 35; i++) {
+                        particles.push(new Particle(20 + Math.random() * (w/2 - 30), 30 + Math.random() * (h - 60), 'air'));
+                    }
+                    for (let i = 0; i < 15; i++) {
+                        particles.push(new Particle((w * 0.7) + Math.random() * (w*0.25), 40 + Math.random() * (h - 80), 'ink'));
+                    }
+                }
+            }
+            else if (currentActivityIndex === 6) { 
+                let sliderVal = parseInt(document.getElementById('param-slider').value);
+                let maxAllowedWidth = w - (sliderVal * 2.5);
+                if (maxAllowedWidth < 100) maxAllowedWidth = 100;
+
+                if (compressionState === 'solid') {
+                    let rows = 8;
+                    let cols = 12;
+                    for (let r = 0; r < rows; r++) {
+                        for (let c = 0; c < cols; c++) {
+                            particles.push(new Particle(40 + c * 14, 80 + r * 14, 'compressedSolid'));
+                        }
+                    }
+                } 
+                else if (compressionState === 'liquid') {
+                    for (let i = 0; i < 80; i++) {
+                        let rx = 40 + Math.random() * (w * 0.65);
+                        let ry = 70 + Math.random() * (h - 140);
+                        particles.push(new Particle(rx, ry, 'compressedLiquid'));
+                    }
+                } 
+                else if (compressionState === 'gas') {
+                    for (let i = 0; i < 35; i++) {
+                        let rx = 40 + Math.random() * (maxAllowedWidth - 60);
+                        let ry = 70 + Math.random() * (h - 140);
+                        particles.push(new Particle(rx, ry, 'compressedGases'));
+                    }
+                }
+            }
+        }
+
+        function changeDiffusionState(state) {
+            diffusionState = state;
+            
+            document.querySelectorAll('.state-btn').forEach(btn => {
+                btn.classList.remove('active-state');
+            });
+            document.getElementById(state + 'DiffBtn').classList.add('active-state');
+
+            const explanation = document.getElementById('sandbox-explanation');
+            const slider = document.getElementById('param-slider');
+
+            if (state === 'solid') {
+                slider.disabled = true;
+                explanation.innerText = "Diffusion in Solids: Particles are rigidly bound to their fixed matrix slots, resulting in zero macro intermixing. The diffusion rate here is completely zero!";
+            } 
+            else if (state === 'liquid') {
+                slider.disabled = false;
+                explanation.innerText = "Diffusion in Liquids (e.g., Ink in Water): Particles have moderate fluid clearance and spontaneously intermix throughout the medium. Elevating thermal values directly accelerates this blending rate.";
+            } 
+            else {
+                slider.disabled = false;
+                explanation.innerText = "Diffusion in Gases (e.g., Perfume in Air): Gas entities enjoy vast intermolecular pathways, dispersing rapidly in all directions to fill up the room ecosystem within minutes.";
+            }
+
+            initParticles();
+        }
+
+        function changeCompressionState(state) {
+            compressionState = state;
+            
+            document.querySelectorAll('.state-btn').forEach(btn => {
+                btn.classList.remove('active-state');
+            });
+            document.getElementById(state + 'StateBtn').classList.add('active-state');
+
+            const slider = document.getElementById('param-slider');
+            const explanation = document.getElementById('sandbox-explanation');
+
+            if (state === 'solid') {
+                slider.value = 1; 
+                slider.disabled = true;
+                explanation.innerText = "Solids (e.g., Sand/Metal Blocks): Possess non-existent interstitial spacing dimensions. They are absolutely incompressible, so the syringe plunger handle refuses to budge!";
+            } 
+            else if (state === 'liquid') {
+                slider.value = 8; 
+                slider.disabled = false;
+                explanation.innerText = "Liquids (e.g., Water Samples): Matter nodes are packed too tightly for macro-displacement. They are virtually incompressible, allowing only minor piston clearance.";
+            } 
+            else {
+                slider.value = 5;
+                slider.disabled = false;
+                explanation.innerText = "Gases (e.g., Atmospheric Air): Composed of wide volumetric voids between particles, making them highly compressible. The piston plunges smoothly deep into the tube framework!";
+            }
+
+            initParticles();
+        }
+
+        function executeSimulationAdjustment() {
+            let slider = document.getElementById('param-slider');
+            let val = parseInt(slider.value);
+
+            if (currentActivityIndex === 6) {
+                if (compressionState === 'solid' && val > 1) slider.value = 1;
+                if (compressionState === 'liquid' && val > 12) slider.value = 12; 
+            }
+        }
+
+        function runParticleLabEngine() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            let sliderVal = parseInt(document.getElementById('param-slider').value);
+
+            if(currentActivityIndex === 6) { 
+                let maxAllowedWidth = canvas.width - (sliderVal * 2.5);
+                if (maxAllowedWidth < 100) maxAllowedWidth = 100;
+
+                particles.forEach(p => {
+                    if (p.x > maxAllowedWidth - 15) {
+                        p.x = maxAllowedWidth - 15;
+                        p.vx = -Math.abs(p.vx); 
+                    }
+                });
+
+                ctx.strokeStyle = '#475569';
+                ctx.lineWidth = 6;
+                ctx.beginPath();
+                ctx.moveTo(canvas.width, 50);
+                ctx.lineTo(20, 50);
+                ctx.lineTo(20, canvas.height - 50);
+                ctx.lineTo(canvas.width, canvas.height - 50);
+                ctx.stroke();
+
+                ctx.strokeStyle = varToHex('--accent');
+                ctx.beginPath();
+                ctx.moveTo(maxAllowedWidth, 53);
+                ctx.lineTo(maxAllowedWidth, canvas.height - 53);
+                ctx.moveTo(maxAllowedWidth, canvas.height / 2);
+                ctx.lineTo(canvas.width, canvas.height / 2);
+                ctx.lineWidth = 8;
+                ctx.stroke();
+            }
+
+            particles.forEach(p => {
+                p.update(sliderVal);
+                p.draw();
+            });
+
+            animationFrameId = requestAnimationFrame(runParticleLabEngine);
+        }
+
+        function switchActivity(activityId) {
+            currentActivityIndex = activityId;
+            cancelAnimationFrame(animationFrameId);
+
+            document.querySelectorAll('.nav-btn').forEach((btn, index) => {
+                btn.classList.toggle('active', (index + 1) === activityId);
+            });
+
+            const configData = comprehensiveActivities[activityId];
+            document.getElementById('sandbox-title').innerText = configData.title;
+            document.getElementById('slider-label').innerText = configData.sliderText;
+            document.getElementById('sandbox-explanation').innerText = configData.explanation;
+            
+            const slider = document.getElementById('param-slider');
+            slider.value = configData.initSliderVal;
+            slider.disabled = false;
+
+            const addCtrlBox = document.getElementById('additional-controls');
+            addCtrlBox.innerHTML = "";
+            
+            if(activityId === 5) {
+                addCtrlBox.innerHTML = `
+                    <div class="state-selector-group">
+                        <button id="solidDiffBtn" class="state-btn" onclick="changeDiffusionState('solid')">💎 Solid Medium</button>
+                        <button id="liquidDiffBtn" class="state-btn active-state" onclick="changeDiffusionState('liquid')">💧 Liquid Medium</button>
+                        <button id="gasDiffBtn" class="state-btn" onclick="changeDiffusionState('gas')">☁️ Gas Medium</button>
+                    </div>
+                    <button class="action-btn" onclick="initParticles()">Reset Diffusion Field</button>
+                `;
+                diffusionState = 'liquid';
+            } 
+            else if(activityId === 6) {
+                addCtrlBox.innerHTML = `
+                    <div class="state-selector-group">
+                        <button id="solidStateBtn" class="state-btn" onclick="changeCompressionState('solid')">💎 Solid State</button>
+                        <button id="liquidStateBtn" class="state-btn" onclick="changeCompressionState('liquid')">💧 Liquid State</button>
+                        <button id="gasStateBtn" class="state-btn active-state" onclick="changeCompressionState('gas')">☁️ Gas State</button>
+                    </div>
+                `;
+                compressionState = 'gas';
+            }
+
+            initParticles();
+            runParticleLabEngine();
+            renderActiveQuizDeck();
+        }
+
+        function renderActiveQuizDeck() {
+            const wrapper = document.getElementById('quiz-deck-wrapper');
+            wrapper.innerHTML = ""; 
+
+            const currentData = comprehensiveActivities[currentActivityIndex];
+            const questionsArray = currentData.questions;
+
+            document.getElementById('progress-hud-text').innerText = `1 / ${questionsArray.length}`;
+            document.getElementById('progress-indicator').style.width = `${(1 / questionsArray.length) * 100}%`;
+
+            questionsArray.forEach((questionData, questionIdx) => {
+                const qCard = document.createElement('div');
+                qCard.className = `question-card ${questionIdx === 0 ? 'active' : ''}`;
+                qCard.id = `act-${currentActivityIndex}-q-${questionIdx}`;
+
+                const qText = document.createElement('p');
+                qText.className = "question-text";
+                qText.innerText = `${questionIdx + 1}. ${questionData.q}`;
+                qCard.appendChild(qText);
+
+                questionData.o.forEach((optionString, optionIdx) => {
+                    const optBtn = document.createElement('button');
+                    optBtn.className = "option-btn";
+                    optBtn.innerText = optionString;
+
+                    optBtn.onclick = function() {
+                        if(qCard.classList.contains('evaluated-node')) return;
+                        qCard.classList.add('evaluated-node');
+
+                        if(optionIdx === questionData.c) {
+                            optBtn.classList.add('correct');
+                            globalXPScore += 100;
+                            document.getElementById('score-counter').innerText = globalXPScore;
+                        } else {
+                            optBtn.classList.add('wrong');
+                            qCard.querySelectorAll('.option-btn')[questionData.c].classList.add('correct');
+                        }
+
+                        setTimeout(() => {
+                            proceedToNextQuestionNode(questionIdx, questionsArray.length);
+                        }, 1400);
+                    };
+
+                    qCard.appendChild(optBtn);
+                });
+
+                wrapper.appendChild(qCard);
+            });
+        }
+
+        function proceedToNextQuestionNode(currentIdx, totalQuestions) {
+            const nextIdx = currentIdx + 1;
+            const activeCard = document.getElementById(`act-${currentActivityIndex}-q-${currentIdx}`);
+            
+            if(nextIdx < totalQuestions) {
+                const nextCard = document.getElementById(`act-${currentActivityIndex}-q-${nextIdx}`);
+                activeCard.classList.remove('active');
+                nextCard.classList.add('active');
+
+                document.getElementById('progress-hud-text').innerText = `${nextIdx + 1} / ${totalQuestions}`;
+                document.getElementById('progress-indicator').style.width = `${((nextIdx + 1) / totalQuestions) * 100}%`;
+            } else {
+                alert(`🎉 Congratulations! You have successfully mastered this laboratory module. Final Score: ${globalXPScore} XP. Select another active activity tab form the header matrix!`);
+            }
+        }
+    </script>
+</body>
+</html>

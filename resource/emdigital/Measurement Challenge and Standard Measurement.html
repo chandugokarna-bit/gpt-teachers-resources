@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Measurement Challenge and Standardization - Measurement Lab</title>
+    <style>
+        :root {
+            --wood-brown: #8b5a2b;
+            --bench-light: #cd853f;
+            --primary-blue: #0284c7;
+            --success-green: #16a34a;
+            --bg-color: #f8fafc;
+            --panel-bg: #ffffff;
+            --text-dark: #0f172a;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-dark);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 25px;
+            max-width: 800px;
+        }
+
+        header h1 {
+            font-size: 2.2rem;
+            color: var(--primary-blue);
+            margin-bottom: 8px;
+        }
+
+        header p {
+            color: #475569;
+            font-size: 1.1rem;
+            line-height: 1.5;
+        }
+
+        .lab-container {
+            width: 100%;
+            max-width: 900px;
+            background: var(--panel-bg);
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            border: 1px solid #e2e8f0;
+        }
+
+        /* Setup Section */
+        .setup-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            background: #f1f5f9;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+        }
+
+        .character-select {
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: bold;
+            border: 2px solid var(--primary-blue);
+            outline: none;
+        }
+
+        /* Visual Experiment Table */
+        .experiment-area {
+            background: #fafafa;
+            border: 2px dashed #cbd5e1;
+            border-radius: 12px;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            margin-bottom: 25px;
+            min-height: 200px;
+        }
+
+        /* Bench Visual */
+        .wood-bench {
+            width: 80%;
+            height: 45px;
+            background: linear-gradient(to bottom, var(--bench-light), var(--wood-brown));
+            border-radius: 6px;
+            position: relative;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .bench-leg {
+            position: absolute;
+            width: 15px;
+            height: 50px;
+            background: var(--wood-brown);
+            bottom: -50px;
+        }
+        .leg-left { left: 20px; }
+        .leg-right { right: 20px; }
+
+        /* Overlay tools */
+        .measure-tool-overlay {
+            position: absolute;
+            top: 25px;
+            width: 80%;
+            display: flex;
+            justify-content: space-between;
+            pointer-events: none;
+        }
+
+        .handspan-container {
+            width: 80%;
+            position: absolute;
+            top: 15px;
+            display: flex;
+            justify-content: flex-start;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+
+        .hand-emoji {
+            font-size: 2rem;
+            display: inline-block;
+            animation: bounce 0.4s ease infinite alternate;
+        }
+
+        /* Standard Scale Visual */
+        .ruler-visual {
+            width: 80%;
+            height: 25px;
+            background: #fef08a;
+            border: 1px solid #eab308;
+            margin-top: 15px;
+            position: relative;
+            display: none;
+            background-image: linear-gradient(to right, #000 1px, transparent 1px);
+            background-size: 10% 100%;
+        }
+
+        .ruler-text {
+            position: absolute;
+            right: 5px;
+            bottom: 2px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            color: #854d0e;
+        }
+
+        /* Controls */
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-orange { background: #f97316; color: white; }
+        .btn-blue { background: var(--primary-blue); color: white; }
+        .btn-gray { background: #e2e8f0; color: #475569; }
+        .btn:hover { opacity: 0.9; transform: translateY(-1px); }
+
+        /* Results Panel */
+        .results-panel {
+            background: #f8fafc;
+            border-left: 5px solid var(--primary-blue);
+            padding: 15px;
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 25px;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .result-box {
+            background: white;
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+            text-align: center;
+        }
+
+        .result-value {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #0f172a;
+            margin-top: 5px;
+        }
+
+        /* Discussion Section */
+        .discussion-box {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .discussion-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: var(--success-green);
+            margin-bottom: 10px;
+        }
+
+        @keyframes bounce {
+            from { transform: translateY(0); }
+            to { transform: translateY(-5px); }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>📏 Measurement Challenge and Standard Measurement 🔎</h1>
+        <p>Learn the difference between non-standard personal units and standardized units by watching the simulation. Follow the steps below!</p>
+    </header>
+
+    <div class="lab-container">
+        
+        <div class="setup-row">
+            <div>
+                <label style="font-weight: bold; font-size: 1.1rem;">👤 Choose the person measuring: </label>
+                <select id="charSelect" class="character-select" onchange="resetExperiment()">
+                    <option value="child">Small Child (Small Hands) 👶</option>
+                    <option value="student" selected>Raju - School Student (Medium Hands) 👦</option>
+                    <option value="teacher">Science Teacher (Large Hands) 👨‍🏫</option>
+                </select>
+            </div>
+            <div style="font-size: 0.95rem; color: #64748b; font-weight: 500;">Object to Measure: <b>Science Lab Bench</b></div>
+        </div>
+
+        <div class="experiment-area">
+            
+            <div class="handspan-container" id="handspanZone"></div>
+
+            <div class="wood-bench">
+                Science Laboratory Bench
+                <div class="bench-leg leg-left"></div>
+                <div class="bench-leg leg-right"></div>
+            </div>
+
+            <div class="ruler-visual" id="rulerVisual">
+                <div class="ruler-text">Standard Metric Ruler (cm Scale)</div>
+            </div>
+        </div>
+
+        <div class="btn-group">
+            <button class="btn btn-orange" onclick="measureWithHandspan()">🖐️ Measure with Handspan (Non-Standard)</button>
+            <button class="btn btn-blue" onclick="measureWithRuler()">📏 Measure with Scale (Standard)</button>
+            <button class="btn btn-gray" onclick="resetExperiment()">🔄 Reset</button>
+        </div>
+
+        <div class="results-panel">
+            <h3 style="font-size: 1.1rem;">📊 Measurement Results of Selected Character:</h3>
+            <div class="results-grid">
+                <div class="result-box">
+                    <div style="color: #f97316; font-weight: bold;">🖐️ Total Handspans</div>
+                    <div class="result-value" id="handspanResult">--</div>
+                </div>
+                <div class="result-box">
+                    <div style="color: var(--primary-blue); font-weight: bold;">📏 Standard Measurement (Centimeters)</div>
+                    <div class="result-value" id="rulerResult">--</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="discussion-box">
+            <div class="discussion-title">🧠 Brainstorming & Discussion:</div>
+            <p style="line-height: 1.6; color: #334155;">
+                <b>Notice:</b> When you change the person measuring, the <b>number of handspans changes</b> because different people have different hand sizes. However, the <b>standard ruler measurement stays exactly the same!</b><br>
+                <span style="color: #16a34a; font-weight: bold;">Question:</span> Why must we rely on a standard metric ruler rather than individual handspans for globally accurate trade and science? Discuss with your classmates!
+            </p>
+        </div>
+
+    </div>
+
+    <script>
+        const benchLengthCm = 120;
+
+        const handspanSizes = {
+            child: 15,     
+            student: 20,   
+            teacher: 24    
+        };
+
+        function resetExperiment() {
+            document.getElementById('handspanResult').innerText = "--";
+            document.getElementById('rulerResult').innerText = "--";
+            
+            document.getElementById('rulerVisual').style.display = 'none';
+            document.getElementById('handspanZone').innerHTML = '';
+        }
+
+        function measureWithHandspan() {
+            const selectedChar = document.getElementById('charSelect').value;
+            const handSize = handspanSizes[selectedChar];
+            
+            const totalSpans = benchLengthCm / handSize;
+            
+            document.getElementById('handspanResult').innerText = `${totalSpans} Handspans`;
+
+            const zone = document.getElementById('handspanZone');
+            zone.innerHTML = ''; 
+
+            for (let i = 0; i < totalSpans; i++) {
+                setTimeout(() => {
+                    const hand = document.createElement('span');
+                    hand.className = 'hand-emoji';
+                    hand.innerText = '🖐️';
+                    hand.style.marginLeft = '5px';
+                    zone.appendChild(hand);
+                }, i * 150); 
+            }
+        }
+
+        function measureWithRuler() {
+            document.getElementById('rulerResult').innerText = `${benchLengthCm} cm`;
+            document.getElementById('rulerVisual').style.display = 'block';
+        }
+    </script>
+</body>
+</html>

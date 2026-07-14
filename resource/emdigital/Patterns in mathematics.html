@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ganita Prakash: Extended Interactive </title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            color: #f8fafc;
+        }
+        .glass-card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .dot {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .drop-zone {
+            border: 2px dashed rgba(99, 102, 241, 0.4);
+            background: rgba(15, 23, 42, 0.4);
+            transition: all 0.2s ease;
+        }
+        .drop-zone.drag-over {
+            border-color: #10b981;
+            background: rgba(16, 185, 129, 0.1);
+        }
+        .draggable-item {
+            cursor: grab;
+            user-select: none;
+        }
+        .draggable-item:active {
+            cursor: grabbing;
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-8">
+
+    <!-- Header -->
+    <header class="max-w-7xl mx-auto mb-12 text-center md:text-left">
+        <div class="flex flex-col md:flex-row justify-between items-center border-b border-slate-700 pb-6 gap-4">
+            <div>
+                <span class="text-xs font-bold tracking-widest text-indigo-400 uppercase bg-indigo-500/10 px-3 py-1 rounded-full">Ganita Prakash • Grade 6</span>
+                <h1 class="text-4xl font-extrabold mt-2 tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-200 to-indigo-300">
+                    Patterns in Mathematics
+                </h1>
+                <p class="text-slate-400 mt-1">Chapter 1 of the Grade 6 Mathematics Framework</p>
+            </div>
+            <div class="text-right hidden md:block">
+                <p class="text-sm font-semibold text-slate-300"></p>
+                <p class="text-xs text-indigo-400 font-mono"></p>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
+        
+        <!-- Interactive 1: Odd Numbers Summation -->
+        <section class="glass-card lg:col-span-7 p-6 rounded-2xl flex flex-col justify-between">
+            <div>
+                <div class="flex justify-between items-start mb-4">
+                    <h2 class="text-xl font-bold text-white">1. Visualizing Odd Sums to Squares</h2>
+                    <span class="text-xs font-mono px-2 py-1 bg-emerald-500/10 text-emerald-400 rounded"></span>
+                </div>
+                <p class="text-sm text-slate-400 mb-6">
+                    See why adding successive odd numbers always yields a perfect square (1 + 3 + 5 + 7 = 16) using expanding spatial L-shapes.
+                </p>
+                
+                <div class="flex flex-col sm:flex-row gap-6 items-center justify-center my-6">
+                    <div id="oddGrid" class="grid gap-1.5 p-4 bg-slate-900/50 rounded-xl border border-slate-800"></div>
+                    <div class="text-left w-full sm:w-48 bg-slate-900/30 p-4 rounded-xl border border-slate-800">
+                        <div class="text-xs text-slate-500 font-bold uppercase tracking-wider">Mathematical Proof</div>
+                        <div id="oddEquation" class="text-sm font-semibold text-indigo-300 mt-2 space-y-1 font-mono"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-4 pt-4 border-t border-slate-800">
+                <label for="oddSlider" class="text-xs text-slate-400 font-medium block mb-2">Adjust Sequence Length ($n$):</label>
+                <input type="range" id="oddSlider" min="1" max="7" value="4" class="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-500">
+            </div>
+        </section>
+
+        <!-- Interactive 2: Adding Up and Down -->
+        <section class="glass-card lg:col-span-5 p-6 rounded-2xl flex flex-col justify-between">
+            <div>
+                <div class="flex justify-between items-start mb-4">
+                    <h2 class="text-xl font-bold text-white">2. Adding Up & Down Peak Pattern</h2>
+                    <span class="text-xs font-mono px-2 py-1 bg-emerald-500/10 text-emerald-400 rounded"></span>
+                </div>
+                <p class="text-sm text-slate-400 mb-6">
+                    Adding numbers incrementally up to a maximum peak value and completely back down recursively generates square integers.
+                </p>
+                
+                <div class="my-4 p-4 bg-slate-950/60 rounded-xl font-mono text-center border border-slate-800">
+                    <div id="peakDisplay" class="text-indigo-300 font-bold text-sm tracking-wide break-all mb-2"></div>
+                    <div id="peakResult" class="text-2xl font-extrabold text-emerald-400"></div>
+                </div>
+            </div>
+
+            <div class="mt-4 pt-4 border-t border-slate-800">
+                <label for="peakSlider" class="text-xs text-slate-400 font-medium block mb-2">Set Peak Value:</label>
+                <input type="range" id="peakSlider" min="1" max="12" value="4" class="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-500">
+            </div>
+        </section>
+
+        <!-- Interactive 3: Triangular vs Square Morpher -->
+        <section class="glass-card lg:col-span-6 p-6 rounded-2xl flex flex-col justify-between">
+            <div>
+                <div class="flex justify-between items-start mb-4">
+                    <h2 class="text-xl font-bold text-white">3. Triangular & Square Multi-Role Identity</h2>
+                    <span class="text-xs font-mono px-2 py-1 bg-emerald-500/10 text-emerald-400 rounded"></span>
+                </div>
+                <p class="text-sm text-slate-400 mb-4">
+                    Certain numbers can play different roles depending on structural layout. Morph **36** to observe it serving perfectly as both a triangular and square array.
+                </p>
+
+                <div class="flex justify-center items-center my-6 h-48 bg-slate-900/40 rounded-xl relative overflow-hidden border border-slate-800">
+                    <div id="morphContainer" class="relative w-40 h-40"></div>
+                </div>
+            </div>
+
+            <div class="flex gap-4 mt-2">
+                <button onclick="renderMorph('triangle')" class="flex-1 py-2 px-4 bg-indigo-600 hover:bg-indigo-500 text-sm font-semibold rounded-xl transition duration-200">Arrange as Triangle</button>
+                <button onclick="renderMorph('square')" class="flex-1 py-2 px-4 bg-slate-700 hover:bg-slate-600 text-sm font-semibold rounded-xl transition duration-200">Arrange as Square</button>
+            </div>
+        </section>
+
+        <!-- Interactive 4: Shape Sequence Explorer -->
+        <section class="glass-card lg:col-span-6 p-6 rounded-2xl flex flex-col justify-between">
+            <div>
+                <div class="flex justify-between items-start mb-4">
+                    <h2 class="text-xl font-bold text-white">4. Geometric Sequences & Graph Counting</h2>
+                    <span class="text-xs font-mono px-2 py-1 bg-emerald-500/10 text-emerald-400 rounded"></span>
+                </div>
+                <p class="text-sm text-slate-400 mb-4">
+                    Select a shape pattern from the textbook to examine how multi-dimensional geometries map natively onto systemic number lines.
+                </p>
+
+                <div class="grid grid-cols-3 gap-2 mb-6">
+                    <button onclick="loadShape('polygon')" id="btn-polygon" class="py-2 px-3 text-xs font-medium rounded-lg bg-indigo-600 text-white">Polygons</button>
+                    <button onclick="loadShape('graph')" id="btn-graph" class="py-2 px-3 text-xs font-medium rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700">Complete Graphs</button>
+                    <button onclick="loadShape('stacked')" id="btn-stacked" class="py-2 px-3 text-xs font-medium rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700">Stacked Squares</button>
+                </div>
+
+                <div class="p-4 bg-slate-950/40 rounded-xl border border-slate-800 min-h-[100px] flex flex-col justify-center">
+                    <h3 id="shapeTitle" class="text-sm font-bold text-indigo-300 mb-1"></h3>
+                    <p id="shapeDesc" class="text-xs text-slate-400 mb-3"></p>
+                    <div id="shapeSequence" class="text-lg font-mono font-bold text-emerald-400 tracking-wider"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Interactive 5: Collatz Conjecture -->
+        <section class="glass-card lg:col-span-12 p-6 rounded-2xl mb-8">
+            <div class="flex justify-between items-start mb-4">
+                <div>
+                    <h2 class="text-xl font-bold text-white">5. Computational Thinking: The Collatz Sequence Mystery</h2>
+                    <p class="text-sm text-slate-400 mt-1">If even, half it). If odd, triple it and add one (3x + 1). Will every integer drop to 1?</p>
+                </div>
+                <span class="text-xs font-mono px-2 py-1 bg-emerald-500/10 text-emerald-400 rounded"></span>
+            </div>
+
+            <div class="flex flex-col md:flex-row gap-6 items-stretch mt-6">
+                <div class="w-full md:w-1/3 space-y-4">
+                    <div>
+                        <label for="collatzInput" class="text-xs text-slate-400 font-medium block mb-2">Enter Any Starting Seed Integer:</label>
+                        <div class="flex gap-2">
+                            <input type="number" id="collatzInput" value="12" min="2" max="1000" class="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-white text-sm font-mono focus:outline-none focus:border-indigo-500">
+                            <button onclick="runCollatz()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm px-4 py-2 rounded-xl transition">Compute</button>
+                        </div>
+                    </div>
+                    <div class="text-xs text-slate-500 bg-slate-900/30 p-3 rounded-lg border border-slate-800">
+                        <strong>Textbook Insight:</strong> This remains one of the most famous unsolved puzzles in mathematics.
+                    </div>
+                </div>
+
+                <div class="p-4 bg-slate-950/40 rounded-xl border border-slate-800 flex flex-col justify-between min-h-[140px] flex-1">
+                    <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Generated Sequence Path</div>
+                    <div id="collatzOutput" class="font-mono text-sm text-indigo-200 tracking-wide leading-relaxed max-h-32 overflow-y-auto pr-2"></div>
+                    <div id="collatzStats" class="text-xs text-slate-400 mt-3 pt-2 border-t border-slate-800/60 font-medium"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= NEW CONTENT SECTION ================= -->
+
+        <!-- Interactive 6: Multiple Choice Questions (MCQs) -->
+        <section class="glass-card lg:col-span-6 p-6 rounded-2xl flex flex-col justify-between">
+            <div>
+                <div class="flex justify-between items-start mb-2">
+                    <h2 class="text-xl font-bold text-white">6. Multiple Choice Challenge</h2>
+                    <span class="text-xs font-mono px-2 py-1 bg-indigo-500/10 text-indigo-400 rounded">5 Tasks</span>
+                </div>
+                <p class="text-sm text-slate-400 mb-4">Choose the option that correctly answers the structural query.</p>
+                
+                <div class="bg-slate-900/40 p-4 rounded-xl border border-slate-800/80 min-h-[180px]">
+                    <span id="mcqProgress" class="text-xs font-semibold text-indigo-400">Question 1/5</span>
+                    <p id="mcqText" class="text-sm font-medium text-white mt-2 mb-4"></p>
+                    <div id="mcqOptions" class="space-y-2"></div>
+                </div>
+            </div>
+            <div class="mt-4 flex justify-between items-center">
+                <span id="mcqFeedback" class="text-sm font-medium"></span>
+                <button id="mcqNextBtn" onclick="nextMcq()" class="hidden py-2 px-4 bg-slate-800 hover:bg-slate-700 text-xs font-semibold rounded-xl border border-slate-700 transition">Next</button>
+            </div>
+        </section>
+
+        <!-- Interactive 7: Drag and Drop Activity -->
+        <section class="glass-card lg:col-span-6 p-6 rounded-2xl flex flex-col justify-between">
+            <div>
+                <div class="flex justify-between items-start mb-2">
+                    <h2 class="text-xl font-bold text-white">7. Structural Sequence Drop</h2>
+                    <span class="text-xs font-mono px-2 py-1 bg-indigo-500/10 text-indigo-400 rounded">5 Targets</span>
+                </div>
+                <p class="text-sm text-slate-400 mb-4">Drag the matching dynamic property card directly onto its sequence destination block.</p>
+                
+                <div class="space-y-4">
+                    <div id="dragItems" class="flex flex-wrap gap-2 py-2 min-h-[45px]"></div>
+                    <div id="dropZones" class="space-y-2.5"></div>
+                </div>
+            </div>
+            <div class="mt-4 flex justify-between items-center pt-2 border-t border-slate-800/60">
+                <span id="dragFeedback" class="text-sm font-medium"></span>
+                <button onclick="resetDragAndDrop()" class="py-1.5 px-3 bg-slate-800 hover:bg-slate-700 text-xs font-semibold rounded-lg border border-slate-700 transition">Reset Set</button>
+            </div>
+        </section>
+
+        <!-- Interactive 8: Fill in the Blanks -->
+        <section class="glass-card lg:col-span-6 p-6 rounded-2xl flex flex-col justify-between">
+            <div>
+                <div class="flex justify-between items-start mb-2">
+                    <h2 class="text-xl font-bold text-white">8. Complete the Series Missing Values</h2>
+                    <span class="text-xs font-mono px-2 py-1 bg-indigo-500/10 text-indigo-400 rounded">5 Inputs</span>
+                </div>
+                <p class="text-sm text-slate-400 mb-4">Analyze the logic of each string layer and calculate the exact integer output needed.</p>
+                
+                <div class="space-y-3 font-mono text-xs">
+                    <div class="bg-slate-900/30 p-3 rounded-xl border border-slate-800 flex items-center justify-between">
+                        <div>1, 3, 6, 10, 15, <span class="text-indigo-400 font-bold">[?]</span></div>
+                        <input type="number" data-ans="21" class="fib-input bg-slate-950 border border-slate-700 rounded p-1 w-16 text-center text-white focus:outline-none focus:border-indigo-500">
+                    </div>
+                    <div class="bg-slate-900/30 p-3 rounded-xl border border-slate-800 flex items-center justify-between">
+                        <div>1, 8, 27, 64, <span class="text-indigo-400 font-bold">[?]</span></div>
+                        <input type="number" data-ans="125" class="fib-input bg-slate-950 border border-slate-700 rounded p-1 w-16 text-center text-white focus:outline-none focus:border-indigo-500">
+                    </div>
+                    <div class="bg-slate-900/30 p-3 rounded-xl border border-slate-800 flex items-center justify-between">
+                        <div>1, 2, 4, 8, 16, <span class="text-indigo-400 font-bold">[?]</span></div>
+                        <input type="number" data-ans="32" class="fib-input bg-slate-950 border border-slate-700 rounded p-1 w-16 text-center text-white focus:outline-none focus:border-indigo-500">
+                    </div>
+                    <div class="bg-slate-900/30 p-3 rounded-xl border border-slate-800 flex items-center justify-between">
+                        <div>1, 3, 9, 27, <span class="text-indigo-400 font-bold">[?]</span></div>
+                        <input type="number" data-ans="81" class="fib-input bg-slate-950 border border-slate-700 rounded p-1 w-16 text-center text-white focus:outline-none focus:border-indigo-500">
+                    </div>
+                    <div class="bg-slate-900/30 p-3 rounded-xl border border-slate-800 flex items-center justify-between">
+                        <div>1, 2, 3, 5, 8, 13, <span class="text-indigo-400 font-bold">[?]</span></div>
+                        <input type="number" data-ans="21" class="fib-input bg-slate-950 border border-slate-700 rounded p-1 w-16 text-center text-white focus:outline-none focus:border-indigo-500">
+                    </div>
+                </div>
+            </div>
+            <div class="mt-4 flex justify-between items-center">
+                <span id="fibFeedback" class="text-sm font-medium"></span>
+                <button onclick="checkFib()" class="py-2 px-4 bg-indigo-600 hover:bg-indigo-500 text-xs font-semibold rounded-xl transition">Submit Blanks</button>
+            </div>
+        </section>
+
+        <!-- Interactive 9: True or False Flashcards -->
+        <section class="glass-card lg:col-span-6 p-6 rounded-2xl flex flex-col justify-between">
+            <div>
+                <div class="flex justify-between items-start mb-2">
+                    <h2 class="text-xl font-bold text-white">9. Logical Property Flashcards</h2>
+                    <span class="text-xs font-mono px-2 py-1 bg-indigo-500/10 text-indigo-400 rounded">5 Cards</span>
+                </div>
+                <p class="text-sm text-slate-400 mb-4">Validate statements by assessing whether they are structurally true or false.</p>
+                
+                <div class="bg-slate-900/40 p-4 rounded-xl border border-slate-800/80 min-h-[180px] flex flex-col justify-between">
+                    <div>
+                        <span id="tfProgress" class="text-xs font-semibold text-indigo-400">Card 1/5</span>
+                        <p id="tfText" class="text-sm font-medium text-white mt-3 leading-relaxed"></p>
+                    </div>
+                    <div class="flex gap-3 mt-4">
+                        <button onclick="handleTf(true)" class="flex-1 py-2 px-3 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 text-xs border border-emerald-500/30 font-semibold rounded-xl transition">True</button>
+                        <button onclick="handleTf(false)" class="flex-1 py-2 px-3 bg-rose-600/20 hover:bg-rose-600/30 text-rose-400 text-xs border border-rose-500/30 font-semibold rounded-xl transition">False</button>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-4 flex justify-between items-center">
+                <span id="tfFeedback" class="text-sm font-medium"></span>
+                <button id="tfNextBtn" onclick="nextTf()" class="hidden py-2 px-4 bg-slate-800 hover:bg-slate-700 text-xs font-semibold rounded-xl border border-slate-700 transition">Next Card</button>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="max-w-7xl mx-auto mt-12 text-center text-xs text-slate-500 border-t border-slate-800 pt-6 pb-12">
+        Designed for foundational literacy, numeracy frameworks, and experiential learning modules.
+    </footer>
+
+    <!-- JS Implementations -->
+    <script>
+        // Audio Synthesizer (Oscillator System)
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playSound(isCorrect) {
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                
+                if (isCorrect) {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(587.33, audioCtx.currentTime); // D5
+                    osc.frequency.setValueAtTime(880, audioCtx.currentTime + 0.1);  // A5
+                    gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.4);
+                } else {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+                    gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.3);
+                }
+            } catch (e) { console.log("Audio not allowed yet"); }
+        }
+
+        // 1. Odd Sums
+        const oddSlider = document.getElementById('oddSlider');
+        const oddGrid = document.getElementById('oddGrid');
+        const oddEquation = document.getElementById('oddEquation');
+
+        function drawOddGrid() {
+            const n = parseInt(oddSlider.value);
+            oddGrid.innerHTML = '';
+            oddGrid.style.gridTemplateColumns = `repeat(${n}, minmax(0, 1fr))`;
+            
+            let sum = 0;
+            let eqParts = [];
+
+            for (let r = 0; r < n; r++) {
+                for (let c = 0; c < n; c++) {
+                    const layer = Math.max(r, c);
+                    const cell = document.createElement('div');
+                    cell.className = 'w-6 h-6 rounded-md dot opacity-40';
+                    cell.style.backgroundColor = rowColors[layer];
+                    if (layer < n) cell.classList.remove('opacity-40');
+                    oddGrid.appendChild(cell);
+                }
+            }
+
+            for (let i = 0; i < n; i++) {
+                eqParts.push(2 * i + 1);
+                sum += (2 * i + 1);
+            }
+
+            oddEquation.innerHTML = `
+                <div>${eqParts.join(' + ')}</div>
+                <div class="text-xs text-slate-500">= ${sum} total dots</div>
+                <div class="text-emerald-400 text-base mt-1 font-bold">= ${n}² squares</div>
+            `;
+        }
+        oddSlider.addEventListener('input', drawOddGrid);
+
+        // 2. Up and Down Addition
+        const peakSlider = document.getElementById('peakSlider');
+        const peakDisplay = document.getElementById('peakDisplay');
+        const peakResult = document.getElementById('peakResult');
+
+        function drawPeakPattern() {
+            const peak = parseInt(peakSlider.value);
+            let seq = [];
+            let total = 0;
+
+            for (let i = 1; i <= peak; i++) { seq.push(i); total += i; }
+            for (let i = peak - 1; i >= 1; i--) { seq.push(i); total += i; }
+
+            peakDisplay.innerText = seq.join(' + ');
+            peakResult.innerHTML = `${total} <span class="text-sm font-normal text-slate-500">(${peak}²)</span>`;
+        }
+        peakSlider.addEventListener('input', drawPeakPattern);
+
+        // 3. Triangular vs Square Morpher (36 Dots)
+        const morphContainer = document.getElementById('morphContainer');
+        function initMorphDots() {
+            morphContainer.innerHTML = '';
+            for (let i = 0; i < 36; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'absolute w-3 h-3 rounded-full bg-indigo-400 shadow-lg shadow-indigo-500/20';
+                dot.id = `m-dot-${i}`;
+                morphContainer.appendChild(dot);
+            }
+        }
+
+        function renderMorph(type) {
+            let index = 0;
+            if (type === 'square') {
+                for (let r = 0; r < 6; r++) {
+                    for (let c = 0; c < 6; c++) {
+                        const dot = document.getElementById(`m-dot-${index++}`);
+                        if (dot) {
+                            dot.style.left = `${c * 28 + 10}px`;
+                            dot.style.top = `${r * 20 + 20}px`;
+                            dot.style.backgroundColor = '#38bdf8';
+                        }
+                    }
+                }
+            } else if (type === 'triangle') {
+                let count = 0;
+                for (let row = 1; row <= 8; row++) {
+                    for (let col = 0; col < row; col++) {
+                        if (count < 36) {
+                            const targetDot = document.getElementById(`m-dot-${count}`);
+                            if (targetDot) {
+                                const offset = (8 - row) * 12;
+                                targetDot.style.left = `${col * 24 + offset + 4}px`;
+                                targetDot.style.top = `${row * 18}px`;
+                                targetDot.style.backgroundColor = '#ec4899';
+                            }
+                            count++;
+                        }
+                    }
+                }
+            }
+        }
+
+        // 4. Shape Sequence Explorer
+        const shapesData = {
+            polygon: {
+                title: "Regular Polygons (Sides Counter)",
+                desc: "Counts structural bounding segments sequentially across standard geometrical faces.",
+                seq: "3, 4, 5, 6, 7, 8, 9, 10, ..."
+            },
+            graph: {
+                title: "Complete Graphs (K-Model Connector Lines)",
+                desc: "Counts total inside paths linking vertices directly together: $\\frac{n(n-1)}{2}$.",
+                seq: "1, 3, 6, 10, 15, 21, 28, ..."
+            },
+            stacked: {
+                title: "Stacked Matrix Squares",
+                desc: "The geometric base area calculation logic scaling exponential growth patterns safely.",
+                seq: "1, 4, 9, 16, 25, 36, 49, ..."
+            }
+        };
+
+        function loadShape(type) {
+            ['polygon', 'graph', 'stacked'].forEach(t => {
+                const btn = document.getElementById(`btn-${t}`);
+                btn.className = t === type ? "py-2 px-3 text-xs font-medium rounded-lg bg-indigo-600 text-white" : "py-2 px-3 text-xs font-medium rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700";
+            });
+            document.getElementById('shapeTitle').innerText = shapesData[type].title;
+            document.getElementById('shapeDesc').innerHTML = shapesData[type].desc;
+            document.getElementById('shapeSequence').innerText = shapesData[type].seq;
+        }
+
+        // 5. Collatz Conjecture Generator
+        function runCollatz() {
+            let num = parseInt(document.getElementById('collatzInput').value);
+            if (!num || num < 1) return;
+            
+            let path = [num];
+            let steps = 0;
+            let peak = num;
+
+            while (num !== 1 && steps < 200) {
+                if (num % 2 === 0) {
+                    num = num / 2;
+                } else {
+                    num = 3 * num + 1;
+                }
+                path.push(num);
+                if (num > peak) peak = num;
+                steps++;
+            }
+
+            document.getElementById('collatzOutput').innerText = path.join(' ➔ ');
+            document.getElementById('collatzStats').innerHTML = `Total Steps taken to reach 1: <strong class="text-emerald-400">${steps}</strong> | Highest value reached: <strong class="text-indigo-400">${peak}</strong>`;
+        }
+
+        // 6. Multiple Choice Challenge Engine
+        const mcqData = [
+            { q: "What sequence follows the rule where the terms are obtained by multiplying a number by itself?", options: ["Triangular Numbers", "Square Numbers", "Virahānka Numbers", "Powers of 2"], ans: 1 },
+            { q: "If you add up the first 3 consecutive odd numbers (1 + 3 + 5), what number do you get?", options: ["6", "8", "9", "12"], ans: 2 },
+            { q: "Which sequence matches the progression: 1, 3, 6, 10, 15...?", options: ["All 1's", "Counting Numbers", "Odd Numbers", "Triangular Numbers"], ans: 3 },
+            { q: "In the adding up and down sequence, what does '1 + 2 + 3 + 4 + 3 + 2 + 1' sum to?", options: ["12", "16", "20", "25"], ans: 1 },
+            { q: "What sequence follows the incremental power progression: 1, 2, 4, 8, 16...?", options: ["Powers of 2", "Powers of 3", "Cubes", "Counting Numbers"], ans: 0 }
+        ];
+        let curMcq = 0;
+
+        function loadMcq() {
+            const data = mcqData[curMcq];
+            document.getElementById('mcqProgress').innerText = `Question ${curMcq + 1}/5`;
+            document.getElementById('mcqText').innerText = data.q;
+            document.getElementById('mcqFeedback').innerText = "";
+            document.getElementById('mcqNextBtn').classList.add('hidden');
+            
+            const optContainer = document.getElementById('mcqOptions');
+            optContainer.innerHTML = "";
+            data.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = "w-full text-left p-2.5 rounded-xl bg-slate-950/40 hover:bg-slate-800 text-xs text-slate-300 border border-slate-800 transition duration-150";
+                btn.innerText = opt;
+                btn.onclick = () => checkMcq(idx, btn);
+                optContainer.appendChild(btn);
+            });
+        }
+
+        function checkMcq(selected, btn) {
+            const correct = mcqData[curMcq].ans;
+            const options = document.getElementById('mcqOptions').children;
+            for(let opt of options) opt.disabled = true;
+
+            if (selected === correct) {
+                btn.className = "w-full text-left p-2.5 rounded-xl bg-emerald-600/20 text-emerald-400 text-xs border border-emerald-500/40 font-semibold";
+                document.getElementById('mcqFeedback').className = "text-sm font-medium text-emerald-400";
+                document.getElementById('mcqFeedback').innerText = "Correct answer!";
+                playSound(true);
+            } else {
+                btn.className = "w-full text-left p-2.5 rounded-xl bg-rose-600/20 text-rose-400 text-xs border border-rose-500/40 font-semibold";
+                options[correct].className = "w-full text-left p-2.5 rounded-xl bg-emerald-600/20 text-emerald-400 text-xs border border-emerald-500/40 font-semibold";
+                document.getElementById('mcqFeedback').className = "text-sm font-medium text-rose-400";
+                document.getElementById('mcqFeedback').innerText = "Incorrect answer.";
+                playSound(false);
+            }
+            document.getElementById('mcqNextBtn').classList.remove('hidden');
+        }
+
+        function nextMcq() {
+            curMcq = (curMcq + 1) % mcqData.length;
+            loadMcq();
+        }
+
+        // 7. Drag & Drop Activity Engine
+        const dragData = [
+            { id: "prop1", label: "Even Numbers", target: "seq1", text: "2, 4, 6, 8, 10..." },
+            { id: "prop2", label: "Cubes Series", target: "seq2", text: "1, 8, 27, 64..." },
+            { id: "prop3", label: "Powers of 3", target: "seq3", text: "1, 3, 9, 27, 81..." },
+            { id: "prop4", label: "Odd Numbers", target: "seq4", text: "1, 3, 5, 7, 9..." },
+            { id: "prop5", label: "Counting Numbers", target: "seq5", text: "1, 2, 3, 4, 5..." }
+        ];
+
+        function initDragAndDrop() {
+            const dragItemsContainer = document.getElementById('dragItems');
+            const dropZonesContainer = document.getElementById('dropZones');
+            dragItemsContainer.innerHTML = "";
+            dropZonesContainer.innerHTML = "";
+
+            // Shuffle matching labels array
+            const shuffled = [...dragData].sort(() => Math.random() - 0.5);
+            shuffled.forEach(item => {
+                const el = document.createElement('div');
+                el.className = "draggable-item bg-indigo-600/20 text-indigo-300 text-xs font-semibold px-3 py-1.5 rounded-xl border border-indigo-500/30 shadow-sm";
+                el.innerText = item.label;
+                el.draggable = true;
+                el.id = item.id;
+                el.addEventListener('dragstart', (e) => e.dataTransfer.setData('text/plain', e.target.id));
+                dragItemsContainer.appendChild(el);
+            });
+
+            // Populate stable targets rows
+            dragData.forEach(zone => {
+                const row = document.createElement('div');
+                row.className = "p-3 bg-slate-950/40 rounded-xl border border-slate-800 flex items-center justify-between gap-4 font-mono text-xs";
+                
+                const seqText = document.createElement('div');
+                seqText.className = "text-slate-300 font-semibold tracking-wider";
+                seqText.innerText = zone.text;
+
+                const targetBox = document.createElement('div');
+                targetBox.className = "drop-zone w-36 h-8 rounded-lg flex items-center justify-center text-center text-[11px] font-sans font-medium text-slate-500";
+                targetBox.innerText = "Drop Property Here";
+                targetBox.dataset.zoneId = zone.target;
+
+                targetBox.addEventListener('dragover', (e) => { e.preventDefault(); targetBox.classList.add('drag-over'); });
+                targetBox.addEventListener('dragleave', () => targetBox.classList.remove('drag-over'));
+                targetBox.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    targetBox.classList.remove('drag-over');
+                    const draggedId = e.dataTransfer.getData('text/plain');
+                    const draggedNode = document.getElementById(draggedId);
+                    const matchingData = dragData.find(d => d.id === draggedId);
+                    
+                    if (matchingData && matchingData.target === zone.target) {
+                        targetBox.innerHTML = `<span class="text-emerald-400 font-semibold">✓ ${matchingData.label}</span>`;
+                        targetBox.className = "w-36 h-8 bg-emerald-500/10 border border-emerald-500/30 rounded-lg flex items-center justify-center text-[11px]";
+                        draggedNode.remove();
+                        checkDragSetCompletion();
+                        playSound(true);
+                    } else {
+                        document.getElementById('dragFeedback').className = "text-xs font-medium text-rose-400";
+                        document.getElementById('dragFeedback').innerText = "Incorrect connection. Try matching another pair.";
+                        setTimeout(() => { document.getElementById('dragFeedback').innerText = ""; }, 2500);
+                        playSound(false);
+                    }
+                });
+
+                row.appendChild(seqText);
+                row.appendChild(targetBox);
+                dropZonesContainer.appendChild(row);
+            });
+        }
+
+        function checkDragSetCompletion() {
+            const remaining = document.getElementById('dragItems').children.length;
+            if (remaining === 0) {
+                document.getElementById('dragFeedback').className = "text-sm font-medium text-emerald-400";
+                document.getElementById('dragFeedback').innerText = "Excellent! All series properties aligned correctly.";
+            }
+        }
+
+        function resetDragAndDrop() {
+            document.getElementById('dragFeedback').innerText = "";
+            initDragAndDrop();
+        }
+
+        // 8. Fill in the Blanks Verification Logic
+        function checkFib() {
+            const inputs = document.querySelectorAll('.fib-input');
+            let allCorrect = true;
+            
+            inputs.forEach(input => {
+                const usrVal = parseInt(input.value);
+                const correctVal = parseInt(input.dataset.ans);
+                if (usrVal === correctVal) {
+                    input.className = "fib-input bg-emerald-950/40 border border-emerald-500 text-emerald-400 rounded p-1 w-16 text-center font-bold";
+                } else {
+                    input.className = "fib-input bg-rose-950/40 border border-rose-500 text-rose-400 rounded p-1 w-16 text-center font-bold";
+                    allCorrect = false;
+                }
+            });
+
+            const fb = document.getElementById('fibFeedback');
+            if (allCorrect) {
+                fb.className = "text-sm font-medium text-emerald-400";
+                fb.innerText = "All items accurate!";
+                playSound(true);
+            } else {
+                fb.className = "text-sm font-medium text-rose-400";
+                fb.innerText = "Some patterns are incomplete.";
+                playSound(false);
+            }
+        }
+
+        // 9. True or False Logic Flashcards Engine
+        const tfData = [
+            { s: "Adding an unbroken sequence of consecutive odd numbers starting from 1 always calculates to a square outcome.", ans: true },
+            { s: "Number theory is the specific branch of mathematics focusing strictly on structural patterns found across whole numbers.", ans: true },
+            { s: "The Collatz Conjecture was verified by classical algebraic proofs to hold valid across every existing seed integer.", ans: false },
+            { s: "The total number of sides inside the regular polygon shape sequence grows sequentially following odd numbering layers.", ans: false },
+            { s: "A visual picture grid remains a valid logical path for mathematicians to verify structural relations between patterns.", ans: true }
+        ];
+        let curTf = 0;
+
+        function loadTfCard() {
+            document.getElementById('tfProgress').innerText = `Card ${curTf + 1}/5`;
+            document.getElementById('tfText').innerText = tfData[curTf].s;
+            document.getElementById('tfFeedback').innerText = "";
+            document.getElementById('tfNextBtn').className = "hidden";
+        }
+
+        function handleTf(userAns) {
+            const correct = tfData[curTf].ans;
+            const fb = document.getElementById('tfFeedback');
+            
+            if (userAns === correct) {
+                fb.className = "text-sm font-medium text-emerald-400";
+                fb.innerText = "Correct reasoning!";
+                playSound(true);
+            } else {
+                fb.className = "text-sm font-medium text-rose-400";
+                fb.innerText = `Incorrect. This statement is ${correct ? 'True' : 'False'}.`;
+                playSound(false);
+            }
+            document.getElementById('tfNextBtn').className = "py-2 px-4 bg-slate-800 hover:bg-slate-700 text-xs font-semibold rounded-xl border border-slate-700 transition block";
+        }
+
+        function nextTf() {
+            curTf = (curTf + 1) % tfData.length;
+            loadTfCard();
+        }
+
+        // Shared baseline color config
+        const rowColors = ['#6366f1', '#10b981', '#f59e0b', '#ec4899', '#3b82f6', '#8b5cf6', '#a855f7'];
+
+        // Global Orchestration Initialization Bootloader
+        window.onload = () => {
+            drawOddGrid();
+            drawPeakPattern();
+            initMorphDots();
+            renderMorph('triangle');
+            loadShape('polygon');
+            runCollatz();
+            
+            // Append New Dashboards components configuration dynamically
+            loadMcq();
+            initDragAndDrop();
+            loadTfCard();
+        };
+    </script>
+</body>
+</html>

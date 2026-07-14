@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 3: Health, the Ultimate Treasure - Interactive Game Box</title>
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #2e1065 100%);
+            --card-bg: rgba(255, 255, 255, 0.04);
+            --card-border: rgba(255, 255, 255, 0.1);
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --accent-cyan: #22d3ee;
+            --accent-green: #4ade80;
+            --accent-amber: #fbbf24;
+            --correct: #10b981;
+            --wrong: #f43f5e;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+
+        body {
+            background: var(--bg-gradient);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 2rem 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            width: 100%;
+            max-width: 850px;
+        }
+
+        header h1 {
+            font-size: 2.2rem;
+            background: linear-gradient(to right, var(--accent-cyan), var(--accent-green), var(--accent-amber));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        .score-badge {
+            background: rgba(34, 211, 238, 0.15);
+            border: 1px solid var(--accent-cyan);
+            padding: 0.5rem 1.5rem;
+            border-radius: 50px;
+            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--accent-cyan);
+            box-shadow: 0 0 15px rgba(34, 211, 238, 0.2);
+            margin-bottom: 1.5rem;
+        }
+
+        .notebook-container {
+            width: 100%;
+            max-width: 850px;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 2rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .book-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 0.75rem;
+            overflow-x: auto;
+        }
+
+        .tab-btn {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--card-border);
+            color: var(--text-secondary);
+            padding: 0.6rem 1rem;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 500;
+            white-space: nowrap;
+            transition: all 0.2s ease;
+        }
+
+        .tab-btn.active {
+            background: var(--accent-cyan);
+            color: #0f172a;
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 15px rgba(34, 211, 238, 0.4);
+            font-weight: bold;
+        }
+
+        .activity-page {
+            display: none;
+        }
+
+        .activity-page.active {
+            display: block;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 {
+            font-size: 1.4rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .instruction {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+            background: rgba(255, 255, 255, 0.02);
+            padding: 0.6rem 1rem;
+            border-left: 3px solid var(--accent-cyan);
+            border-radius: 4px;
+        }
+
+        .game-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--card-border);
+            padding: 1.25rem;
+            border-radius: 16px;
+            margin-bottom: 1.25rem;
+        }
+
+        .game-question {
+            font-size: 1rem;
+            font-weight: 500;
+            margin-bottom: 1rem;
+        }
+
+        /* Grid choices for Game 1 and Game 3 */
+        .grid-choices {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+        }
+
+        @media (max-width: 600px) {
+            .grid-choices { grid-template-columns: 1fr; }
+        }
+
+        .choice-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--card-border);
+            color: var(--text-primary);
+            padding: 0.8rem 1rem;
+            border-radius: 10px;
+            cursor: pointer;
+            text-align: left;
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+        }
+
+        .choice-btn:hover:not(:disabled) {
+            background: rgba(34, 211, 238, 0.1);
+            border-color: var(--accent-cyan);
+        }
+
+        .choice-btn.correct { background: rgba(16, 185, 129, 0.2) !important; border-color: var(--correct) !important; color: #a7f3d0; }
+        .choice-btn.wrong { background: rgba(244, 63, 94, 0.2) !important; border-color: var(--wrong) !important; color: #fecdd3; }
+
+        /* Drag & Drop Styles for Game 2 */
+        .drag-game-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        @media (max-width: 600px) {
+            .drag-game-container { grid-template-columns: 1fr; }
+        }
+        .bucket-zone {
+            background: rgba(255, 255, 255, 0.01);
+            border: 2px dashed var(--card-border);
+            border-radius: 14px;
+            padding: 1rem;
+            min-height: 160px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            align-content: flex-start;
+        }
+        .bucket-zone.over { border-color: var(--accent-green); background: rgba(74, 222, 128, 0.05); }
+        .bucket-zone h4 { width: 100%; font-size: 0.85rem; margin-bottom: 0.5rem; text-transform: uppercase; color: var(--accent-cyan); }
+        .token-bank { grid-column: 1 / -1; background: rgba(255, 255, 255, 0.03); border-style: solid; min-height: auto; }
+        .drag-token {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            cursor: grab;
+            font-size: 0.85rem;
+            user-select: none;
+        }
+
+        /* Binary Yes/No Styles for Game 4 */
+        .binary-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--card-border);
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 0.75rem;
+            gap: 1rem;
+        }
+        .binary-actions { display: flex; gap: 0.5rem; }
+        .bin-btn {
+            padding: 0.4rem 1.2rem;
+            border-radius: 8px;
+            border: 1px solid var(--card-border);
+            background: rgba(255,255,255,0.05);
+            color: white;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+        .bin-btn.active-yes { background: var(--correct); border-color: var(--correct); color: white; }
+        .bin-btn.active-no { background: var(--wrong); border-color: var(--wrong); color: white; }
+
+        /* Input field formatting for Game 5 */
+        .input-box-game {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--card-border);
+            color: #fff;
+            padding: 0.5rem 0.8rem;
+            border-radius: 8px;
+            width: 150px;
+            text-align: center;
+            outline: none;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+        }
+
+        .flex-row-space {
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            gap: 1rem;
+        }
+        @media (max-width: 500px) {
+            .flex-row-space { flex-direction: column; align-items: flex-start; }
+            .input-box-game { width: 100%; }
+        }
+
+        .footer-nav {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 1.25rem;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Chapter 3: Health, the Ultimate Treasure</h1>
+        <p>Master the secrets of physical wellness, hygiene, and nutrition through interactive challenges!</p>
+    </header>
+
+    <div class="score-badge">
+        <span>🏆 Current Score:</span>
+        <span id="live-score-span">0</span>
+    </div>
+
+    <div class="notebook-container">
+        <div class="book-tabs">
+            <button class="tab-btn active" onclick="goToPage(1)">Game 1: MCQ Attack</button>
+            <button class="tab-btn" onclick="goToPage(2)">Game 2: Habit Sorting</button>
+            <button class="tab-btn" onclick="goToPage(3)">Game 3: Nutrient Hunt</button>
+            <button class="tab-btn" onclick="goToPage(4)">Game 4: Fact Checker</button>
+            <button class="tab-btn" onclick="goToPage(5)">Game 5: Term Master</button>
+        </div>
+
+        <div class="activity-page active" id="page-1">
+            <h2>🍎 Game 1: Multiple Choice Wellness Attack</h2>
+            <p class="instruction">Choose the single best option for each question to instantly verify and earn 10 points per answer.</p>
+            
+            <div class="game-card">
+                <p class="game-question">1. Which of the following state conditions correctly defines complete health according to the WHO?</p>
+                <div class="grid-choices">
+                    <button class="choice-btn" onclick="runMcq(this, false)">Only the absence of physical disease</button>
+                    <button class="choice-btn" onclick="runMcq(this, true)">Complete physical, mental, and social well-being</button>
+                    <button class="choice-btn" onclick="runMcq(this, false)">Having high physical muscle strength only</button>
+                    <button class="choice-btn" onclick="runMcq(this, false)">Eating expensive food everyday</button>
+                </div>
+            </div>
+
+            <div class="game-card">
+                <p class="game-question">2. Which essential component is necessary for maintaining a healthy digestive system and preventing constipation?</p>
+                <div class="grid-choices">
+                    <button class="choice-btn" onclick="runMcq(this, false)">Refined Sugar</button>
+                    <button class="choice-btn" onclick="runMcq(this, false)">Saturated Fats</button>
+                    <button class="choice-btn" onclick="runMcq(this, true)">Dietary Fibre (Roughage)</button>
+                    <button class="choice-btn" onclick="runMcq(this, false)">Carbonated Water</button>
+                </div>
+            </div>
+
+            <div class="game-card">
+                <p class="game-question">3. Deficiencies of Vitamin A in a human being's daily diet directly leads to which condition?</p>
+                <div class="grid-choices">
+                    <button class="choice-btn" onclick="runMcq(this, false)">Scurvy</button>
+                    <button class="choice-btn" onclick="runMcq(this, true)">Night Blindness</button>
+                    <button class="choice-btn" onclick="runMcq(this, false)">Rickets</button>
+                    <button class="choice-btn" onclick="runMcq(this, false)">Beriberi</button>
+                </div>
+            </div>
+
+            <div class="game-card">
+                <p class="game-question">4. Which of these mineral elements is fundamentally needed to form hemoglobin in red blood cells?</p>
+                <div class="grid-choices">
+                    <button class="choice-btn" onclick="runMcq(this, false)">Calcium</button>
+                    <button class="choice-btn" onclick="runMcq(this, false)">Iodine</button>
+                    <button class="choice-btn" onclick="runMcq(this, false)">Sodium</button>
+                    <button class="choice-btn" onclick="runMcq(this, true)">Iron</button>
+                </div>
+            </div>
+
+            <div class="game-card">
+                <p class="game-question">5. Diseases that can directly spread from an infected individual to a healthy person via air, water, or contact are called:</p>
+                <div class="grid-choices">
+                    <button class="choice-btn" onclick="runMcq(this, false)">Deficiency Diseases</button>
+                    <button class="choice-btn" onclick="runMcq(this, true)">Communicable Diseases</button>
+                    <button class="choice-btn" onclick="runMcq(this, false)">Hereditary Conditions</button>
+                    <button class="choice-btn" onclick="runMcq(this, false)">Chronic Organ Failures</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="activity-page" id="page-2">
+            <h2>🧼 Game 2: Habit Sorting Arena (Drag & Drop)</h2>
+            <p class="instruction">Drag each lifestyle token from the pool bank and drop it into its correct health classification bucket below.</p>
+            
+            <div class="drag-game-container">
+                <div class="bucket-zone token-bank" id="box-pool" ondragover="allowDrop(event)" ondrop="handleDrop(event)">
+                    <h4>Habit Token Pool</h4>
+                    <div class="drag-token" draggable="true" ondragstart="startDrag(event)" id="h1" data-correct="good-box">Sleeping 7-8 hours daily</div>
+                    <div class="drag-token" draggable="true" ondragstart="startDrag(event)" id="h2" data-correct="bad-box">Consuming open street food with flies</div>
+                    <div class="drag-token" draggable="true" ondragstart="startDrag(event)" id="h3" data-correct="good-box">Washing hands with soap before meals</div>
+                    <div class="drag-token" draggable="true" ondragstart="startDrag(event)" id="h4" data-correct="bad-box">Using smart screens late into midnight</div>
+                    <div class="drag-token" draggable="true" ondragstart="startDrag(event)" id="h5" data-correct="good-box">Drinking clean boiled and filtered water</div>
+                </div>
+
+                <div class="bucket-zone" id="good-box" ondragover="allowDrop(event)" ondrop="dropEvaluate(event)">
+                    <h4 style="color: var(--accent-green)">💚 Treasure Builders (Healthy)</h4>
+                </div>
+
+                <div class="bucket-zone" id="bad-box" ondragover="allowDrop(event)" ondrop="dropEvaluate(event)">
+                    <h4 style="color: var(--wrong)">⚠️ Treasure Destroyers (Unhealthy)</h4>
+                </div>
+            </div>
+        </div>
+
+        <div class="activity-page" id="page-3">
+            <h2>🥗 Game 3: Nutrient Matrix Fields (Identify 5 Essentials)</h2>
+            <p class="instruction">Out of the 10 choices below, hunt down and select the 5 options that represent essential core nutrients required in a balanced diet.</p>
+            
+            <div class="game-card">
+                <div class="grid-choices">
+                    <button class="choice-btn" onclick="clickHunt(this, true)">Carbohydrates</button>
+                    <button class="choice-btn" onclick="clickHunt(this, false)">Plastic Microbeads</button>
+                    <button class="choice-btn" onclick="clickHunt(this, true)">Proteins</button>
+                    <button class="choice-btn" onclick="clickHunt(this, false)">Artificial Flavorings</button>
+                    <button class="choice-btn" onclick="clickHunt(this, true)">Vitamins</button>
+                    <button class="choice-btn" onclick="clickHunt(this, false)">Refined Preservatives</button>
+                    <button class="choice-btn" onclick="clickHunt(this, true)">Minerals</button>
+                    <button class="choice-btn" onclick="clickHunt(this, false)">Carbon Monoxide</button>
+                    <button class="choice-btn" onclick="clickHunt(this, true)">Fats</button>
+                    <button class="choice-btn" onclick="clickHunt(this, false)">Synthetic Oils</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="activity-page" id="page-4">
+            <h2>⚡ Game 4: Truth or Fallacy (Rapid Evaluator)</h2>
+            <p class="instruction">Analyze the assertions below regarding human health, and select Yes (True) or No (False).</p>
+            
+            <div class="binary-row">
+                <span>1. A balanced diet must contain all nutrients in equal quantities regardless of age or physical labor.</span>
+                <div class="binary-actions">
+                    <button class="bin-btn" onclick="checkBinary(this, 'yes', false)">Yes</button>
+                    <button class="bin-btn" onclick="checkBinary(this, 'no', true)">No</button>
+                </div>
+            </div>
+            <div class="binary-row">
+                <span>2. Vaccination helps our immune system develop defense mechanisms against specific disease pathogens.</span>
+                <div class="binary-actions">
+                    <button class="bin-btn" onclick="checkBinary(this, 'yes', true)">Yes</button>
+                    <button class="bin-btn" onclick="checkBinary(this, 'no', false)">No</button>
+                </div>
+            </div>
+            <div class="binary-row">
+                <span>3. Obesity is exclusively caused by an intake of protein-rich diet frames.</span>
+                <div class="binary-actions">
+                    <button class="bin-btn" onclick="checkBinary(this, 'yes', false)">Yes</button>
+                    <button class="bin-btn" onclick="checkBinary(this, 'no', true)">No</button>
+                </div>
+            </div>
+            <div class="binary-row">
+                <span>4. Stagnant open water around housing plots acts as a breeding center for malaria-carrying mosquitoes.</span>
+                <div class="binary-actions">
+                    <button class="bin-btn" onclick="checkBinary(this, 'yes', true)">Yes</button>
+                    <button class="bin-btn" onclick="checkBinary(this, 'no', false)">No</button>
+                </div>
+            </div>
+            <div class="binary-row">
+                <span>5. Mental health is secondary and does not impact physical body balance or wellness matrices.</span>
+                <div class="binary-actions">
+                    <button class="bin-btn" onclick="checkBinary(this, 'yes', false)">Yes</button>
+                    <button class="bin-btn" onclick="checkBinary(this, 'no', true)">No</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="activity-page" id="page-5">
+            <h2>✍️ Game 5: Terminology Master (Type to Check)</h2>
+            <p class="instruction">Type out the accurate lowercase scientific or general phrase answers. Input validates automatically when correct.</p>
+            
+            <div class="game-card flex-row-space">
+                <span>1. Condition of physical body structural weight damage caused by long-term overeating of fats: <b>o_ _ _ _ _y</b></span>
+                <input type="text" class="input-box-game" placeholder="Type answer..." data-ans="obesity" oninput="liveInputCheck(this)">
+            </div>
+            <div class="game-card flex-row-space">
+                <span>2. Lack of critical necessary nutrients inside the body frame over extended periods: <b>d_ _ _ _ _ _ _ _y</b></span>
+                <input type="text" class="input-box-game" placeholder="Type answer..." data-ans="deficiency" oninput="liveInputCheck(this)">
+            </div>
+            <div class="game-card flex-row-space">
+                <span>3. Deficiency disease caused by the acute lack of Vitamin C in daily food plans: <b>s_ _ _ _y</b></span>
+                <input type="text" class="input-box-game" placeholder="Type answer..." data-ans="scurvy" oninput="liveInputCheck(this)">
+            </div>
+            <div class="game-card flex-row-space">
+                <span>4. General state of physical body or mental deviation where the normal functions are disrupted: <b>d_ _ _ _ _e</b></span>
+                <input type="text" class="input-box-game" placeholder="Type answer..." data-ans="disease" oninput="liveInputCheck(this)">
+            </div>
+            <div class="game-card flex-row-space">
+                <span>5. Disease-causing microorganisms such as virus strains, toxic bacteria, or protozoans: <b>p_ _ _ _ _ _ _s</b></span>
+                <input type="text" class="input-box-game" placeholder="Type answer..." data-ans="pathogens" oninput="liveInputCheck(this)">
+            </div>
+        </div>
+
+        <div class="footer-nav">
+            <button class="tab-btn" id="prev-btn" onclick="shiftPage(-1)" disabled>Previous Activity</button>
+            <button class="tab-btn" id="next-btn" onclick="shiftPage(1)">Next Activity</button>
+        </div>
+    </div>
+
+    <script>
+        let currPage = 1;
+        const totalPages = 5;
+        let runningScore = 0;
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+        // Audio Oscillator Engine (No external sound dependencies)
+        function triggerSfx(isRight) {
+            if (audioContext.state === 'suspended') audioContext.resume();
+            const osc = audioContext.createOscillator();
+            const amp = audioContext.createGain();
+            osc.connect(amp);
+            amp.connect(audioContext.destination);
+
+            if (isRight) {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(523.25, audioContext.currentTime); // C5
+                osc.frequency.setValueAtTime(659.25, audioContext.currentTime + 0.08); // E5
+                amp.gain.setValueAtTime(0.1, audioContext.currentTime);
+                amp.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+                osc.start(); osc.stop(audioContext.currentTime + 0.3);
+            } else {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(140, audioContext.currentTime);
+                amp.gain.setValueAtTime(0.12, audioContext.currentTime);
+                amp.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
+                osc.start(); osc.stop(audioContext.currentTime + 0.2);
+            }
+        }
+
+        function modifyScore(amt) {
+            runningScore += amt;
+            document.getElementById('live-score-span').innerText = runningScore;
+        }
+
+        // Display Page Routing System
+        function goToPage(targetPage) {
+            currPage = targetPage;
+            document.querySelectorAll('.activity-page').forEach((p, index) => {
+                p.classList.toggle('active', (index + 1) === targetPage);
+            });
+            document.querySelectorAll('.tab-btn').forEach((b, index) => {
+                if(index < 5) b.classList.toggle('active', (index + 1) === targetPage);
+            });
+            document.getElementById('prev-btn').disabled = currPage === 1;
+            document.getElementById('next-btn').disabled = currPage === totalPages;
+        }
+
+        function shiftPage(dir) {
+            let page = currPage + dir;
+            if(page >= 1 && page <= totalPages) goToPage(page);
+        }
+
+        // Game 1 Engine: Multiple Choice Selection
+        function runMcq(btn, isCorrect) {
+            const row = btn.parentElement;
+            row.querySelectorAll('.choice-btn').forEach(b => b.disabled = true);
+            if (isCorrect) {
+                btn.classList.add('correct');
+                triggerSfx(true);
+                modifyScore(10);
+            } else {
+                btn.classList.add('wrong');
+                triggerSfx(false);
+                row.querySelectorAll('.choice-btn').forEach(b => {
+                    if (b.getAttribute('onclick').includes('true')) b.classList.add('correct');
+                });
+            }
+        }
+
+        // Game 2 Engine: Drag and Drop Interactions
+        function startDrag(e) { e.dataTransfer.setData("text/plain", e.target.id); }
+        function allowDrop(e) { e.preventDefault(); e.currentTarget.classList.add('over'); }
+        document.querySelectorAll('.bucket-zone').forEach(box => {
+            box.addEventListener('dragleave', (e) => e.currentTarget.classList.remove('over'));
+        });
+
+        function dropEvaluate(e) {
+            e.preventDefault();
+            const bucket = e.currentTarget;
+            bucket.classList.remove('over');
+            const dataId = e.dataTransfer.getData("text/plain");
+            const element = document.getElementById(dataId);
+            
+            if (bucket.id === element.getAttribute('data-correct')) {
+                bucket.appendChild(element);
+                element.style.borderColor = "var(--correct)";
+                element.style.background = "rgba(16, 185, 129, 0.1)";
+                element.draggable = false;
+                triggerSfx(true);
+                modifyScore(10);
+            } else {
+                element.style.borderColor = "var(--wrong)";
+                triggerSfx(false);
+            }
+        }
+        function handleDrop(e) { e.preventDefault(); e.currentTarget.classList.remove('over'); }
+
+        // Game 3 Engine: Multiple Answer Hunting
+        function clickHunt(btn, isCorrectNutrient) {
+            btn.disabled = true;
+            if (isCorrectNutrient) {
+                btn.classList.add('correct');
+                triggerSfx(true);
+                modifyScore(10);
+            } else {
+                btn.classList.add('wrong');
+                triggerSfx(false);
+            }
+        }
+
+        // Game 4 Engine: Binary Evaluator
+        function checkBinary(btn, optionType, isCorrect) {
+            const section = btn.parentElement;
+            section.querySelectorAll('.bin-btn').forEach(b => b.disabled = true);
+            if (isCorrect) {
+                btn.classList.add(optionType === 'yes' ? 'active-yes' : 'active-no');
+                triggerSfx(true);
+                modifyScore(10);
+            } else {
+                btn.classList.add('wrong');
+                triggerSfx(false);
+            }
+        }
+
+        // Game 5 Engine: String Realtime Text Validator
+        function liveInputCheck(field) {
+            const inputVal = field.value.trim().toLowerCase();
+            const targetVal = field.getAttribute('data-ans').toLowerCase();
+            if (inputVal === targetVal) {
+                field.style.borderColor = "var(--correct)";
+                field.style.boxShadow = "0 0 10px rgba(16, 185, 129, 0.4)";
+                field.disabled = true;
+                triggerSfx(true);
+                modifyScore(10);
+            }
+        }
+    </script>
+</body>
+</html>
