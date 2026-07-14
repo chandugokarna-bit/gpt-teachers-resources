@@ -9,13 +9,11 @@
         body, html { width: 100%; height: 100%; overflow: hidden; background-color: #010403; font-family: 'Segoe UI', sans-serif; color: #fff; }
         #canvas-container { width: 100%; height: 100%; position: absolute; top: 0; left: 0; z-index: 1; }
         
-        /* UI ಲೇಯರ್ - ರೀಸೆಟ್ ಬಟನ್‌ಗಾಗಿ */
         .ui-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; pointer-events: none; display: flex; flex-direction: column; justify-content: flex-end; padding: 25px; }
         .interactive { pointer-events: auto; }
         .nav-btn { background: rgba(0, 255, 150, 0.15); border: 1px solid #00ffaa; color: #00ffaa; padding: 10px 22px; border-radius: 25px; cursor: pointer; font-weight: bold; transition: 0.3s; backdrop-filter: blur(5px); }
         .nav-btn:hover { background: #00ffaa; color: #000; transform: scale(1.05); box-shadow: 0 0 15px rgba(0, 255, 150, 0.4); }
         
-        /* 🎯 ಸಿನಿಮಾಟಿಕ್ 6 ಸೆಕೆಂಡ್ ಇಂಟ್ರೋ ಹೆಡ್‌ಲೈನ್ ಮತ್ತು ಲೋಡರ್ */
         #loader { 
             position: fixed; 
             top: 0; 
@@ -71,7 +69,6 @@
 </head>
 <body>
 
-    <!-- 6 ಸೆಕೆಂಡ್ ಪ್ರದರ್ಶನವಾಗುವ ಹೆಡ್‌ಲೈನ್ ಸ್ಕ್ರೀನ್ -->
     <div id="loader">
         <h1 class="intro-headline">ಜಗತ್ತಿನ ವಿವಿಧ ಅರಣ್ಯಗಳ ವೀಡಿಯೋ ಗ್ಯಾಲರಿ</h1>
         <p class="intro-sub">ECO-SPHERE • 3D IMMERSIVE VIDEO EXPERIENCE</p>
@@ -97,11 +94,9 @@
 
         const colors = [0x00ffaa, 0x00aa77, 0x55ff55, 0xaaff00, 0x00ffff, 0x0088ff, 0x78ffd6, 0xa8ff78, 0x20bf6b, 0x26de81];
 
-        // 🎯 ನಿಮ್ಮ ವೆಬ್‌ಸೈಟ್‌ನ ಮುಖ್ಯ ಲಿಂಕ್ ಅನ್ನು ಇಲ್ಲಿ ಹಾಕಿ (ಕೊನೆಯಲ್ಲಿ '/' ಇರಲಿ)
-        // ಉದಾಹರಣೆಗೆ: "https://mywebsite.com/videos/"
+        // ನಿಮ್ಮ ವೆಬ್‌ಸೈಟ್‌ನ ಮುಖ್ಯ ಲಿಂಕ್
         const websiteBaseUrl = "https://raw.githubusercontent.com/chandugokarna-bit/gpt-teachers-resources/main/images/Amazon/"; 
 
-        // 10 ವೀಡಿಯೋಗಳ ಆಟೋಮ್ಯಾಟಿಕ್ ಲಿಂಕ್ ರಚನೆ (forest1.mp4, forest2.mp4...)
         const videosList = [];
         for(let i = 1; i <= 10; i++) {
             videosList.push(websiteBaseUrl + "forest" + i + ".mp4");
@@ -122,53 +117,48 @@
             controls = new THREE.OrbitControls(camera, renderer.domElement);
             controls.enableDamping = true;
             controls.dampingFactor = 0.07;
-            controls.maxDistance = 18;
+            controls.maxDistance = 24;
             controls.minDistance = 0.5;
 
             scene.add(new THREE.AmbientLight(0xffffff, 0.95));
             
-            // 3D ಗ್ಯಾಲರಿ ಹಾಲ್
-            const roomGeo = new THREE.BoxGeometry(32, 12, 32);
-            const wallMat = new THREE.MeshStandardMaterial({ color: 0x040c08, side: THREE.BackSide });
+            const roomWidth = 40, roomHeight = 12, roomDepth = 40;
+            const roomGeo = new THREE.BoxGeometry(roomWidth, roomHeight, roomDepth);
+            const wallMat = new THREE.MeshStandardMaterial({ color: 0x030a06, side: THREE.BackSide });
             const room = new THREE.Mesh(roomGeo, wallMat);
             scene.add(room);
 
             raycaster = new THREE.Raycaster();
             mouse = new THREE.Vector2();
 
-            const wallX = 16 - 0.05; 
-            const wallZ = 16 - 0.05; 
+            const wallX = (roomWidth / 2) - 0.05; 
+            const wallZ = (roomDepth / 2) - 0.05; 
 
-            // 10 ವೀಡಿಯೋ ಪ್ಯಾನಲ್‌ಗಳ 3D ಲೇಔಟ್ ಜೋಡಣೆ
             const galleryLayout = [
-                { id: 0, url: videosList[0], w: 7.5, h: 4.8, pos: [-4, 0.5, -wallZ], rot: [0, 0, 0], normal: [0, 0, 1] },
-                { id: 1, url: videosList[1], w: 7.5, h: 4.8, pos: [4, 0.5, -wallZ], rot: [0, 0, 0], normal: [0, 0, 1] },
-                
-                { id: 2, url: videosList[2], w: 7.5, h: 4.8, pos: [-wallX, 0.5, -9.5], rot: [0, Math.PI/2, 0], normal: [1, 0, 0] },
+                { id: 0, url: videosList[0], w: 7.5, h: 4.8, pos: [-6, 0.5, -wallZ], rot: [0, 0, 0], normal: [0, 0, 1] },
+                { id: 1, url: videosList[1], w: 7.5, h: 4.8, pos: [6, 0.5, -wallZ], rot: [0, 0, 0], normal: [0, 0, 1] },
+                { id: 2, url: videosList[2], w: 7.5, h: 4.8, pos: [-wallX, 0.5, -12], rot: [0, Math.PI/2, 0], normal: [1, 0, 0] },
                 { id: 3, url: videosList[3], w: 7.5, h: 4.8, pos: [-wallX, 0.5, 0], rot: [0, Math.PI/2, 0], normal: [1, 0, 0] },
-                { id: 4, url: videosList[4], w: 7.5, h: 4.8, pos: [-wallX, 0.5, 9.5], rot: [0, Math.PI/2, 0], normal: [1, 0, 0] },
-                
-                { id: 5, url: videosList[5], w: 7.5, h: 4.8, pos: [-4, 0.5, wallZ], rot: [0, Math.PI, 0], normal: [0, 0, -1] },
-                { id: 6, url: videosList[6], w: 7.5, h: 4.8, pos: [4, 0.5, wallZ], rot: [0, Math.PI, 0], normal: [0, 0, -1] },
-                
-                { id: 7, url: videosList[7], w: 7.5, h: 4.8, pos: [wallX, 0.5, 9.5], rot: [0, -Math.PI/2, 0], normal: [-1, 0, 0] },
+                { id: 4, url: videosList[4], w: 7.5, h: 4.8, pos: [-wallX, 0.5, 12], rot: [0, Math.PI/2, 0], normal: [1, 0, 0] },
+                { id: 5, url: videosList[5], w: 7.5, h: 4.8, pos: [-6, 0.5, wallZ], rot: [0, Math.PI, 0], normal: [0, 0, -1] },
+                { id: 6, url: videosList[6], w: 7.5, h: 4.8, pos: [6, 0.5, wallZ], rot: [0, Math.PI, 0], normal: [0, 0, -1] },
+                { id: 7, url: videosList[7], w: 7.5, h: 4.8, pos: [wallX, 0.5, 12], rot: [0, -Math.PI/2, 0], normal: [-1, 0, 0] },
                 { id: 8, url: videosList[8], w: 7.5, h: 4.8, pos: [wallX, 0.5, 0], rot: [0, -Math.PI/2, 0], normal: [-1, 0, 0] },
-                { id: 9, url: videosList[9], w: 7.5, h: 4.8, pos: [wallX, 0.5, -9.5], rot: [0, -Math.PI/2, 0], normal: [-1, 0, 0] }
+                { id: 9, url: videosList[9], w: 7.5, h: 4.8, pos: [wallX, 0.5, -12], rot: [0, -Math.PI/2, 0], normal: [-1, 0, 0] }
             ];
 
-            // ಪ್ರತಿಯೊಂದು ವೀಡಿಯೋ ಲಿಂಕ್ ಅನ್ನು ಲೋಡ್ ಮಾಡಿ 3D ಪ್ಯಾನಲ್ ಕ್ರಿಯೇಟ್ ಮಾಡುವುದು
             galleryLayout.forEach((art, index) => {
                 createVideoArtwork(art.id, art.url, colors[index], art.w, art.h, new THREE.Vector3(...art.pos), new THREE.Vector3(...art.rot), new THREE.Vector3(...art.normal));
             });
 
-            // 🎯 ನಿಮ್ಮ ಬೇಡಿಕೆಯಂತೆ ಪಕ್ಕಾ 6 ಸೆಕೆಂಡ್ (6000ms) ಹೆಡ್‌ಲೈನ್ ತೋರಿಸಿ ನಂತರ ಗ್ಯಾಲರಿ ಓಪನ್ ಮಾಡುವುದು
             setTimeout(() => { 
                 const loader = document.getElementById('loader');
                 loader.style.opacity = 0;
                 setTimeout(() => { 
                     loader.style.display = 'none'; 
-                    // ಇಂಟ್ರೋ ಮುಗಿದ ತಕ್ಷಣ ಎಲ್ಲ ವೀಡಿಯೋಗಳ ಪ್ಲೇಬ್ಯಾಕ್ ಶುರುವಾಗುತ್ತದೆ
-                    videoElements.forEach(v => v.play().catch(e => console.log("Auto-play blocked, interaction required")));
+                    videoElements.forEach(v => {
+                        v.play().catch(e => console.log("ಪ್ಲೇಬ್ಯಾಕ್ ಸಿಗ್ನಲ್ ವೇಟಿಂಗ್..."));
+                    });
                 }, 800);
             }, 6000);
 
@@ -183,38 +173,41 @@
             window.addEventListener('resize', onWindowResize, false);
         }
 
-        // 🎥 ವೀಡಿಯೋ ಟೆಕ್ಸ್ಚರ್ ಕ್ರಿಯೇಟ್ ಮಾಡುವ ವಿಶೇಷ ಫಂಕ್ಷನ್
         function createVideoArtwork(id, videoUrl, fallbackColor, width, height, position, rotation, normal) {
             const group = new THREE.Group();
             const artGeo = new THREE.PlaneGeometry(width, height);
             
-            // HTML5 ವೀಡಿಯೋ ಎಲಿಮೆಂಟ್ ಸೃಷ್ಟಿ
             const video = document.createElement('video');
             video.src = videoUrl;
             video.crossOrigin = 'anonymous';
             video.loop = true;
-            video.muted = true; // ಬ್ರೌಸರ್ ಆಟೋಪ್ಲೇ ಪಾಲಿಸಿಗೆ ಮ್ಯೂಟ್ ಮಾಡುವುದು ಕಡ್ಡಾಯ
+            video.muted = true; 
             video.playsInline = true;
+            
+            video.addEventListener('error', function() {
+                artMesh.material = new THREE.MeshStandardMaterial({ color: fallbackColor, roughness: 0.4, side: THREE.DoubleSide });
+            });
+
             video.load();
             videoElements.push(video);
 
-            // Three.js ವೀಡಿಯೋ ಟೆಕ್ಸ್ಚರ್ ಸೆಟಪ್
             const texture = new THREE.VideoTexture(video);
             texture.minFilter = THREE.LinearFilter;
             texture.magFilter = THREE.LinearFilter;
-            texture.format = THREE.RGBFormat;
+            texture.format = THREE.RGBAFormat;
 
             const artMat = new THREE.MeshStandardMaterial({ map: texture, roughness: 0.2, side: THREE.DoubleSide });
             const artMesh = new THREE.Mesh(artGeo, artMat);
             
-            // ಪಕ್ಕದ ವೀಡಿಯೋಗಳು ಕಾಣಿಸದಂತೆ ತಡೆಯುವ ಪರ್ಫೆಕ್ಟ್ ಫುಲ್ ಸ್ಕ್ರೀನ್ 0.90 ಸೂತ್ರ
+            // 🎯 ಕಟ್ ಆಗುವುದನ್ನು ತಡೆಯುವ ಪರ್ಫೆಕ್ಟ್ ಫಿಟ್ಟಿಂಗ್ ಲೆಕ್ಕಾಚಾರ:
             const vFOV = (camera.fov * Math.PI) / 180;
-            let distance = (height / 2) / Math.tan(vFOV / 2);
+            let distanceForHeight = (height / 2) / Math.tan(vFOV / 2);
             
             const aspect = window.innerWidth / window.innerHeight;
-            const distanceForWidth = (width / 2) / Math.tan((camera.fov * aspect * Math.PI) / 360);
+            let distanceForWidth = (width / 2) / Math.tan((camera.fov * aspect * Math.PI) / 360);
             
-            distance = Math.max(distance, distanceForWidth) * 0.90; 
+            // ಜೂಮ್ ಫ್ಯಾಕ್ಟರ್ ಅನ್ನು 1.02 ಕ್ಕೆ ಸ್ವಲ್ಪ ಹೆಚ್ಚಿಸಲಾಗಿದೆ, ಇದು ಇಡೀ ವೀಡಿಯೋವನ್ನು ಕ್ರಾಪ್ ಆಗದಂತೆ ಸ್ಕ್ರೀನ್‌ನ ಫ್ರೇಮ್ ಒಳಗೆ ತರುತ್ತದೆ.
+            let distance = Math.max(distanceForHeight, distanceForWidth) * 1.02; 
 
             const camPos = position.clone().add(normal.clone().multiplyScalar(distance));
 
@@ -222,7 +215,6 @@
             clickableObjects.push(artMesh); 
             group.add(artMesh);
 
-            // ಫಾರೆಸ್ಟ್ ಗ್ರೀನ್ ನಿಯಾನ್ ಬಾರ್ಡರ್ ವೈರ್‌ಫ್ರೇಮ್
             const frameGeo = new THREE.PlaneGeometry(width + 0.04, height + 0.04);
             const frameMat = new THREE.MeshBasicMaterial({ color: 0x00ffaa, wireframe: true, side: THREE.DoubleSide });
             const frameMesh = new THREE.Mesh(frameGeo, frameMat);
