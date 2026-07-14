@@ -88,11 +88,11 @@ function speakKannada(title, infoText) {
     }
 }
 
-// --- 2. ರಿಯಲ್ ಹಾಟ್‌ಸ್ಪಾಟ್‌ಗಳ ಡೇಟಾಬೇಸ್ (XYZ ಕೋಡ್‌ಗಳು) ---
+// --- 2. ರಿಯಲ್ ಹಾಟ್‌ಸ್ಪಾಟ್‌ಗಳ ಡೇಟಾಬೇಸ್ (ಇಲ್ಲಿ ನಿಮ್ಮ XYZ ನಂಬರ್‌ಗಳನ್ನು ಎಡಿಟ್ ಮಾಡಿ) ---
 const hotSpots = [
     {
         name: "ಐಹೊಳೆ ಇತಿಹಾಸ",
-        x: -7.21, y: -0.65, z: -6.90,
+        x: -7.21, y: -0.65, z: -6.90, // ಈ ನಂಬರ್‌ಗಳನ್ನು ನಿಮ್ಮ ಇಷ್ಟದಂತೆ ಬದಲಾಯಿಸಿ
         action: function() {
             speakKannada(
                 "ಭಾರತೀಯ ದೇವಸ್ಥಾನ ವಾಸ್ತುಶಿಲ್ಪದ ತೊಟ್ಟಿಲು", 
@@ -102,7 +102,7 @@ const hotSpots = [
     },
     {
         name: "ದುರ್ಗಾ ದೇವಸ್ಥಾನ",
-        x: 7.89, y: 2.50, z: -5.61,
+        x: 7.89, y: 2.50, z: -5.61, // ಈ ನಂಬರ್‌ಗಳನ್ನು ನಿಮ್ಮ ಇಷ್ಟದಂತೆ ಬದಲಾಯಿಸಿ
         action: function() {
             speakKannada(
                 "ಭವ್ಯ ದುರ್ಗಾ ದೇವಸ್ಥಾನ", 
@@ -112,7 +112,7 @@ const hotSpots = [
     },
     {
         name: "ಲಡ್ ಖಾನ್ ದೇವಸ್ಥಾನ",
-        x: 0.95, y: 1.26, z: 9.88,
+        x: 0.95, y: 1.26, z: 9.88, // ಈ ನಂಬರ್‌ಗಳನ್ನು ನಿಮ್ಮ ಇಷ್ಟದಂತೆ ಬದಲಾಯಿಸಿ
         action: function() {
             speakKannada(
                 "ಲಡ್ ಖಾನ್ ದೇವಸ್ಥಾನ ಮತ್ತು ಐಹೊಳೆ ಶಾಸನ", 
@@ -137,9 +137,8 @@ function init() {
     scene = new THREE.Scene();
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1100);
     
-    // 360 ಡಿಗ್ರಿ ಸ್ಪಿಯರ್ ಜಿಯೋಮೆಟ್ರಿ
     const geometry = new THREE.SphereGeometry(500, 60, 40);
-    geometry.scale(-1, 1, 1); // ಚಿತ್ರ ಒಳಗಡೆ ಕಾಣಿಸಲು ಇನ್ವರ್ಟ್
+    geometry.scale(-1, 1, 1); 
 
     const texture = new THREE.TextureLoader().load('https://raw.githubusercontent.com/chandugokarna-bit/gpt-teachers-resources/main/resources/virtual/aihole360.jpg');
     const material = new THREE.MeshBasicMaterial({ map: texture });
@@ -151,12 +150,10 @@ function init() {
     renderer.setSize(window.innerWidth, window.innerHeight);
     container.appendChild(renderer.domElement);
 
-    // ಈವೆಂಟ್ ಲಿಸನರ್ಸ್
     container.addEventListener('pointerdown', onPointerDown);
     container.addEventListener('wheel', onWebGLWheel);
     window.addEventListener('resize', onWindowResize);
 
-    // ಹಾಟ್‌ಸ್ಪಾಟ್‌ಗಳನ್ನು ದೃಶ್ಯದಲ್ಲಿ ಮೂಡಿಸುವುದು
     createVisualHotspots();
 }
 
@@ -172,7 +169,6 @@ function createVisualHotspots() {
             <div class="hotspot-text">${hs.name}</div>
         `;
         
-        // ಕ್ಲಿಕ್ ಮಾಡಿದಾಗ ಆಡಿಯೋ ಕಾರ್ಯಗತಗೊಳಿಸಲು
         el.addEventListener('click', function(e) {
             e.stopPropagation();
             if(hs.action) hs.action();
@@ -183,14 +179,12 @@ function createVisualHotspots() {
     });
 }
 
-// 3D ಯಿಂದ 2D ಸ್ಕ್ರೀನ್ ಪೊಸಿಷನ್‌ಗೆ ಪರಿವರ್ತನೆ
 function updateHotspotsPosition() {
     hotSpots.forEach(hs => {
         if (!hs.domElement) return;
         const wp = new THREE.Vector3(hs.x, hs.y, hs.z).normalize().multiplyScalar(500);
         const proj = wp.project(camera);
         
-        // ಕ್ಯಾಮೆರಾ ಹಿಂಭಾಗದಲ್ಲಿದ್ದರೆ ಹೈಡ್ ಮಾಡು
         if (proj.z > 1) {
             hs.domElement.style.display = 'none';
             return;
@@ -205,7 +199,7 @@ function updateHotspotsPosition() {
     });
 }
 
-// --- 5. ನಿಯಂತ್ರಣಗಳು (Interaction Controls) ---
+// --- 5. ನಿಯಂತ್ರಣಗಳು (Controls) ---
 function onPointerDown(event) {
     isUserInteracting = true;
     onPointerDownPointerX = event.clientX;
@@ -231,7 +225,7 @@ function onPointerUp() {
 
 function onWebGLWheel(event) {
     zoomFactor += event.deltaY * 0.05;
-    zoomFactor = Math.max(30, Math.min(100, zoomFactor)); // ಸ್ಮೂತ್ ಜೂಮ್ ಮಿತಿ
+    zoomFactor = Math.max(30, Math.min(100, zoomFactor)); 
     camera.fov = zoomFactor;
     camera.updateProjectionMatrix();
 }
@@ -260,7 +254,7 @@ function update() {
 
     camera.lookAt(target);
     renderer.render(scene, camera);
-    updateHotspotsPosition(); // ಪ್ರತಿ ಫ್ರೇಮ್‌ನಲ್ಲೂ ಪೊಸಿಷನ್ ಅಪ್ಡೇಟ್
+    updateHotspotsPosition();
 }
 </script>
 
