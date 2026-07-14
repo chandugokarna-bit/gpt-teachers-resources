@@ -1,106 +1,264 @@
 <!DOCTYPE html>
 <html lang="kn">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ಎಲ್ಲೋರಾ ಕೈಲಾಸನಾಥ ದೇವಾಲಯ 360° ಆಡಿಯೋ ಪ್ರವಾಸ</title>
-    <!-- A-Frame VR ಲೈಬ್ರರಿ -->
-    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+    <title>ಎಲ್ಲೋರಾ ಕೈಲಾಸನಾಥ ದೇವಾಲಯ - 360° ಆಡಿಯೋ ಪ್ರವಾಸ</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <style>
-        /* ಮಾಹಿತಿ ಫಲಕ */
-        #info-panel {
-            position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
-            width: 85%; max-width: 650px; background: rgba(24, 24, 27, 0.95); color: #f4f4f5;
-            padding: 20px; border-radius: 15px; font-family: sans-serif; text-align: center;
-            font-size: 18px; line-height: 1.6; border: 2px solid #eab308; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
-            z-index: 999; pointer-events: none;
+        :root {
+            --primary: #eab308; /* ಎಲ್ಲೋರಾ ಭವ್ಯತೆಗೆ ಚಿನ್ನದ ಬಣ್ಣ */
+            --accent: #eab308;  /* ಹಾಟ್‌ಸ್ಪಾಟ್‌ಗೆ ಚಿನ್ನದ ಬಣ್ಣ */
+            --bg-dark: rgba(24, 24, 27, 0.95);
         }
-        /* ಶೀರ್ಷಿಕೆ ಫಲಕ */
+        body { margin: 0; padding: 0; overflow: hidden; font-family: system-ui, -apple-system, sans-serif; background: #000; }
+        #canvas-container { width: 100vw; height: 100vh; cursor: grab; }
+        #canvas-container:active { cursor: grabbing; }
+
+        /* ಭವ್ಯ ಶೀರ್ಷಿಕೆ ಫಲಕ */
         #title-panel {
             position: absolute; top: 20px; left: 20px; color: white;
-            background: rgba(24, 24, 27, 0.85); padding: 15px; border-radius: 10px;
-            border-left: 5px solid #eab308; z-index: 999;
+            background: var(--bg-dark); padding: 18px; border-radius: 12px;
+            border-left: 6px solid var(--primary); z-index: 10;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); pointer-events: none;
         }
-        #title-panel h1 { margin: 0; font-size: 22px; color: #eab308; }
+        #title-panel h1 { margin: 0; font-size: 22px; color: var(--primary); font-weight: 700; }
+        #title-panel p { margin: 6px 0 0 0; font-size: 14px; color: #cbd5e1; }
+
+        /* ಸುಂದರ ಆಡಿಯೋ ಮಾಹಿತಿ ಫಲಕ */
+        #info-panel {
+            position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
+            width: 85%; max-width: 650px; background: var(--bg-dark); color: #f4f4f5;
+            padding: 22px; border-radius: 16px; text-align: center;
+            font-size: 18px; line-height: 1.6; border: 2px solid var(--primary);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6); z-index: 10;
+            backdrop-filter: blur(10px);
+        }
+
+        /* ಹೊಳೆಯುವ ಮಾಡರ್ನ್ ಹಾಟ್‌ಸ್ಪಾಟ್‌ಗಳು */
+        .hotspot-label {
+            position: absolute; z-index: 5; transform: translate(-50%, -50%);
+            color: white; font-size: 12px; cursor: pointer; pointer-events: auto;
+        }
+        .hotspot-circle {
+            width: 34px; height: 34px; background: var(--accent);
+            border: 3px solid #ffffff; border-radius: 50%;
+            box-shadow: 0 0 18px var(--accent);
+            transition: all 0.3s ease;
+        }
+        .hotspot-circle:hover {
+            background: #ef4444; transform: scale(1.2);
+            box-shadow: 0 0 22px #ef4444;
+        }
+
+        /* ಕನ್ನಡ ಟೂಲ್‌ಟಿಪ್ (ಮಾಹಿತಿ ಬಬಲ್) */
+        .hotspot-text {
+            position: absolute; bottom: 42px; left: 50%; transform: translateX(-50%);
+            background: #0f172a; color: var(--accent); border: 1px solid var(--accent);
+            padding: 6px 12px; border-radius: 6px; white-space: nowrap;
+            font-size: 14px; font-weight: bold; opacity: 0; transition: opacity 0.3s; pointer-events: none;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+        }
+        .hotspot-label:hover .hotspot-text { opacity: 1; }
     </style>
 </head>
 <body>
 
-    <div id="title-panel">
-        <h1>ಎಲ್ಲೋರಾ: ಜಗತ್ಪ್ರಸಿದ್ಧ ಕೈಲಾಸನಾಥ ಏಕಶಿಲಾ ದೇವಾಲಯ</h1>
-        <p>ಚಿನ್ನದ ಬಣ್ಣದ ವರ್ತುಲಗಳ ಮೇಲೆ ನೇರವಾಗಿ ಕ್ಲಿಕ್ ಮಾಡಿ ಆಡಿಯೋ ಮಾಹಿತಿ ಪಡೆಯಿರಿ</p>
-    </div>
+<div id="title-panel">
+    <h1>ಎಲ್ಲೋರಾ: ಜಗತ್ಪ್ರಸಿದ್ಧ ಕೈಲಾಸನಾಥ ಏಕಶಿಲಾ ದೇವಾಲಯ</h1>
+    <p>ಚಿತ್ರವನ್ನು ಎಡ-ಬಲಕ್ಕೆ ಚಲಿಸಿ. ಚಿನ್ನದ ಬಣ್ಣದ ಹಾಟ್‌ಸ್ಪಾಟ್‌ಗಳ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ ಆಡಿಯೋ ವಿವರ ಪಡೆಯಿರಿ</p>
+</div>
 
-    <div id="info-panel">
-        ಸ್ವಾಗತ! ಯುನೆಸ್ಕೋ (UNESCO) ಜಗತ್ತಿನ ವಿಶಿಷ್ಟ ಪಾರಂಪರಿಕ ತಾಣವಾಗಿರುವ ಎಲ್ಲೋರಾದ ತಾಂತ್ರಿಕ ವಿಸ್ಮಯವನ್ನು ತಿಳಿಯಲು ಆವರಣದಲ್ಲಿರುವ ಚಿನ್ನದ ಬಣ್ಣದ ಹಾಟ್‌ಸ್ಪಾಟ್‌ಗಳ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ...
-    </div>
+<div id="info-panel">
+    ಸ್ವಾಗತ! ಯುನೆಸ್ಕೋ (UNESCO) ಜಗತ್ತಿನ ವಿಶಿಷ್ಟ ಪಾರಂಪರಿಕ ತಾಣವಾಗಿರುವ ಎಲ್ಲೋರಾದ ತಾಂತ್ರಿಕ ವಿಸ್ಮಯವನ್ನು ತಿಳಿಯಲು ಆವರಣದಲ್ಲಿರುವ ಹಾಟ್‌ಸ್ಪಾಟ್‌ಗಳ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ...
+</div>
 
-    <!-- ನೇರ ಮೌಸ್ ಕ್ಲಿಕ್ ಸಿಸ್ಟಮ್ -->
-    <a-scene cursor="rayOrigin: mouse">
-        <a-assets>
-            <img id="ellora-scene" src="https://raw.githubusercontent.com/chandugokarna-bit/gpt-teachers-resources/main/resources/virtual/ellora360.jpg" crossorigin="anonymous">
-        </a-assets>
+<div id="hotspots-layer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;"></div>
+<div id="canvas-container"></div>
 
-        <!-- ಹಿನ್ನೆಲೆ 360 ಚಿತ್ರ -->
-        <a-sky src="#ellora-scene"></a-sky>
+<script>
+// --- 1. ಆಡಿಯೋ ಮತ್ತು ಮಾಹಿತಿ ಪ್ರದರ್ಶನ ಕಾರ್ಯವಿಧಾನ ---
+function speakKannada(title, infoText) {
+    document.getElementById('info-panel').innerHTML = `<strong style="color:var(--primary); font-size:20px;">${title}</strong><br>${infoText}`;
+    if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel(); // ಹಳೆಯ ಆಡಿಯೋ ನಿಲ್ಲಿಸಲು
+        const speech = new SpeechSynthesisUtterance(title + ". " + infoText);
+        speech.lang = 'kn-IN'; // ಕನ್ನಡ ಧ್ವನಿ
+        speech.rate = 0.85; // ಸ್ಪಷ್ಟ ಧ್ವನಿ ವೇಗ
+        window.speechSynthesis.speak(speech);
+    }
+}
 
-        <a-entity camera look-controls position="0 1.6 0"></a-entity>
+// --- 2. ರಿಯಲ್ ಹಾಟ್‌ಸ್ಪಾಟ್‌ಗಳ ಡೇಟಾಬೇಸ್ (ಇಲ್ಲಿ ನಿಮ್ಮ XYZ ನಂಬರ್‌ಗಳನ್ನು ಎಡಿಟ್ ಮಾಡಿ) ---
+const hotSpots = [
+    {
+        name: "ರಾಷ್ಟ್ರಕೂಟರ ಇತಿಹಾಸ",
+        x: -5.00, y: 1.50, z: -7.50, // ಈ ನಂಬರ್‌ಗಳನ್ನು ನಿಮ್ಮ ಇಷ್ಟದಂತೆ ಬದಲಾಯಿಸಿ
+        action: function() {
+            speakKannada(
+                "ರಾಷ್ಟ್ರಕೂಟರ ದಿವ್ಯ ಕಾಣಿಕೆ - ಗುಹೆ ಸಂಖ್ಯೆ 16", 
+                "ಎಲ್ಲೋರಾದಲ್ಲಿ ಒಟ್ಟು 34 ಪ್ರಮುಖ ಗುಹೆಗಳಿದ್ದು, ಅದರಲ್ಲಿ 16 ನೇ ಗುಹೆಯೇ ಈ ಭವ್ಯ ಕೈಲಾಸನಾಥ ದೇವಾಲಯ. ಇದನ್ನು ಕ್ರಿ.ಶ 8 ನೇ ಶತಮಾನದಲ್ಲಿ ರಾಷ್ಟ್ರಕೂಟರ ಪ್ರಸಿದ್ಧ ದೊರೆ ಒಂದನೇ ಕೃಷ್ಣನು ನಿರ್ಮಿಸಿದನು. ಇದು ಜಗತ್ತಿನಲ್ಲೇ ಅತಿ ದೊಡ್ಡದಾದ, ಮೇಲಿನಿಂದ ಕೆಳಕ್ಕೆ ಕೆತ್ತಲಾದ ಏಕಶಿಲಾ (Monolithic) ಮುಕ್ತ ಕಲ್ಲಿನ ಕಟ್ಟಡವಾಗಿದೆ."
+            );
+        }
+    },
+    {
+        name: "ಶಿಲ್ಪಕಲಾ ಇಂಜಿನಿಯರಿಂಗ್",
+        x: -8.53, y: 5.18, z: -0.64, // ಈ ನಂಬರ್‌ಗಳನ್ನು ನಿಮ್ಮ ಇಷ್ಟದಂತೆ ಬದಲಾಯಿಸಿ
+        action: function() {
+            speakKannada(
+                "ವಿಶ್ವದ ಶ್ರೇಷ್ಠ ಶಿಲ್ಪಕಲಾ ಇಂಜಿನಿಯರಿಂಗ್", 
+                "ಸಾಮಾನ್ಯವಾಗಿ ದೇವಸ್ಥಾನಗಳನ್ನು ಕೆಳಗಿನಿಂದ ತಳಪಾಯ ಹಾಕಿ ಮೇಲಕ್ಕೆ ಕಟ್ಟಲಾಗುತ್ತದೆ. ಆದರೆ ಈ ಕೈಲಾಸ ದೇವಾಲಯವನ್ನು ಒಂದು ದೈತ್ಯ ಕಲ್ಲಿನ ಬೆಟ್ಟದ ಮೇಲ್ಭಾಗದಿಂದ ಆರಂಭಿಸಿ, ಕೆಳಮುಖವಾಗಿ ಬಂಡೆಯನ್ನು ಸವೆಯುತ್ತಾ ಕೆತ್ತಲಾಗಿದೆ! ಸುಮಾರು 2 ರಿಂದ 4 ಲಕ್ಷ ಟನ್ ತೂಕದ ಕಲ್ಲನ್ನು ಕೇವಲ ಉಳಿ ಮತ್ತು ಸುತ್ತಿಗೆಯಿಂದ ಹೊರತೆಗೆದು ಇಂತಹ ಭವ್ಯ ಮಹಲನ್ನು ಸೃಷ್ಟಿಸಲಾಗಿದೆ."
+            );
+        }
+    },
+    {
+        name: "ರಾವಣನ ಶಿಲ್ಪ",
+        x: -9.83, y: 1.29, z: 1.32, // ಈ ನಂಬರ್‌ಗಳನ್ನು ನಿಮ್ಮ ಇಷ್ಟದಂತೆ ಬದಲಾಯಿಸಿ
+        action: function() {
+            speakKannada(
+                "ಕೈಲಾಸ ಪರ್ವತವನ್ನು ಎತ್ತುವ ರಾವಣನ ದೃಶ್ಯ", 
+                "ದೇವಾಲಯದ ತಳಭಾಗದಲ್ಲಿ ಇಡೀ ಕಟ್ಟಡವನ್ನು ಹೊತ್ತು ನಿಂತಿರುವಂತೆ ಭಾಸವಾಗುವ ಬೃಹತ್ ಕಲ್ಲಿನ ಆನೆಗಳ ಸಾಲನ್ನು ಕೆತ್ತಲಾಗಿದೆ. ಇದರೊಂದಿಗೆ, ದೇವಾಲಯದ ಕೆಳಭಾಗದಲ್ಲಿ ಲಂಕಾಧಿಪತಿ ರಾವಣನು ತನ್ನ ಇಡೀ ಶಕ್ತಿಯನ್ನು ಬಳಸಿ ಶಿವನ ಆವಾಸಸ್ಥಾನವಾದ ಕೈಲಾಸ ಪರ್ವತವನ್ನು ಬುಡದಿಂದ ಅಲುಗಾಡಿಸಲು ಪ್ರಯತ್ನಿಸುತ್ತಿರುವ ಅತ್ಯಂತ ಜೀವಂತವಾದ ಶಿಲ್ಪಕಲಾ ಚಿತ್ರಣವಿದೆ."
+            );
+        }
+    }
+];
 
-        <!-- ================= ಇಂಟರಾಕ್ಟಿವ್ ಹಾಟ್‌ಸ್ಪಾಟ್‌ಗಳು (ಆರಂಭಿಕ ಸುರಕ್ಷಿತ ಸ್ಥಾನ) ================= -->
+// --- 3. 360° ಇಂಜಿನ್ ಸೆಟಪ್ (Three.js) ---
+let scene, camera, renderer, sphere;
+let isUserInteracting = false, onPointerDownPointerX = 0, onPointerDownPointerY = 0,
+    lon = 0, onPointerDownLon = 0, lat = 0, onPointerDownLat = 0, phi = 0, theta = 0, zoomFactor = 75;
 
-        <!-- 1. ಎಲ್ಲೋರಾ ಗುಹೆಗಳು ಮತ್ತು ರಾಷ್ಟ್ರಕೂಟರ ಇತಿಹಾಸ (ಎಡಭಾಗ) -->
-        <a-sphere id="hotspot-ellora-history" position="-2 1.5 -4" radius="0.35" color="#eab308" class="hotspot"
-                  data-title="ರಾಷ್ಟ್ರಕೂಟರ ದಿವ್ಯ ಕಾಣಿಕೆ - ಗುಹೆ ಸಂಖ್ಯೆ 16"
-                  data-info="ಎಲ್ಲೋರಾದಲ್ಲಿ ಒಟ್ಟು 34 ಪ್ರಮುಖ ಗುಹೆಗಳಿದ್ದು, ಅದರಲ್ಲಿ 16 ನೇ ಗುಹೆಯೇ ಈ ಭವ್ಯ ಕೈಲಾಸನಾಥ ದೇವಾಲಯ. ಇದನ್ನು ಕ್ರಿ.ಶ 8 ನೇ ಶತಮಾನದಲ್ಲಿ ರಾಷ್ಟ್ರಕೂಟರ ಪ್ರಸಿದ್ಧ ದೊರೆ ಒಂದನೇ ಕೃಷ್ಣನು ನಿರ್ಮಿಸಿದನು. ಇದು ಜಗತ್ತಿನಲ್ಲೇ ಅತಿ ದೊಡ್ಡದಾದ, ಮೇಲಿನಿಂದ ಕೆಳಕ್ಕೆ ಕೆತ್ತಲಾದ ಏಕಶಿಲಾ (Monolithic) ಮುಕ್ತ ಕಲ್ಲಿನ ಕಟ್ಟಡವಾಗಿದೆ.">
-        </a-sphere>
+const container = document.getElementById('canvas-container');
+const hotspotsLayer = document.getElementById('hotspots-layer');
 
-        <!-- 2. ಮೇಲಿನಿಂದ ಕೆಳಕ್ಕೆ ಕೆತ್ತಿದ ಅದ್ಭುತ ತಂತ್ರಜ್ಞಾನ (ಮಧ್ಯದಲ್ಲಿದೆ) -->
-        <a-sphere id="hotspot-ellora-architecture" position="0 1.5 -4" radius="0.35" color="#eab308" class="hotspot"
-                  data-title="ವಿಶ್ವದ ಶ್ರೇಷ್ಠ ಶಿಲ್ಪಕಲಾ ಇಂಜಿನಿಯರಿಂಗ್"
-                  data-info="ಸಾಮಾನ್ಯವಾಗಿ ದೇವಸ್ಥಾನಗಳನ್ನು ಕೆಳಗಿನಿಂದ ತಳಪಾಯ ಹಾಕಿ ಮೇಲಕ್ಕೆ ಕಟ್ಟಲಾಗುತ್ತದೆ. ಆದರೆ ಈ ಕೈಲಾಸ ದೇವಾಲಯವನ್ನು ಒಂದು ದೈತ್ಯ ಕಲ್ಲಿನ ಬೆಟ್ಟದ ಮೇಲ್ಭಾಗದಿಂದ ಆರಂಭಿಸಿ, ಕೆಳಮುಖವಾಗಿ ಬಂಡೆಯನ್ನು ಸವೆಯುತ್ತಾ ಕೆತ್ತಲಾಗಿದೆ! ಸುಮಾರು 2 ರಿಂದ 4 ಲಕ್ಷ ಟನ್ ತೂಕದ ಕಲ್ಲನ್ನು ಕೇವಲ ಉಳಿ ಮತ್ತು ಸುತ್ತಿಗೆಯಿಂದ ಹೊರತೆಗೆದು ಇಂತಹ ಭವ್ಯ ಮಹಲನ್ನು ಸೃಷ್ಟಿಸಿರುವುದು ಇಂದಿನ ಆಧುನಿಕ ಇಂಜಿನಿಯರ್‌ಗಳಿಗೂ ಒಂದು ಸವಾಲಾಗಿದೆ.">
-        </a-sphere>
+init();
+animate();
 
-        <!-- 3. ಬೃಹತ್ ಆನೆಗಳ ಕೆತ್ತನೆ ಮತ್ತು ರಾವಣನ ಶಿಲ್ಪ (ಬಲಭಾಗದಲ್ಲಿದೆ) -->
-        <a-sphere id="hotspot-ellora-sculpture" position="2 1.5 -4" radius="0.35" color="#eab308" class="hotspot"
-                  data-title="ಕೈಲಾಸ ಪರ್ವತವನ್ನು ಎತ್ತುವ ರಾವಣನ ದೃಶ್ಯ"
-                  data-info="ದೇವಾಲಯದ ತಳಭಾಗದಲ್ಲಿ ಇಡೀ ಕಟ್ಟಡವನ್ನು ಹೊತ್ತು ನಿಂತಿರುವಂತೆ ಭಾಸವಾಗುವ ಬೃಹತ್ ಕಲ್ಲಿನ ಆನೆಗಳ ಸಾಲನ್ನು ಕೆತ್ತಲಾಗಿದೆ. ಇದರೊಂದಿಗೆ, ದೇವಾಲಯದ ಕೆಳಭಾಗದಲ್ಲಿ ಲಂಕಾಧಿಪತಿ ರಾವಣನು ತನ್ನ ಇಡೀ ಶಕ್ತಿಯನ್ನು ಬಳಸಿ ಶಿವನ ಆವಾಸಸ್ಥಾನವಾದ ಕೈಲಾಸ ಪರ್ವತವನ್ನು ಬುಡದಿಂದ ಅಲುಗಾಡಿಸಲು ಪ್ರಯತ್ನಿಸುತ್ತಿರುವ ಅತ್ಯಂತ ಜೀವಂತವಾದ ಶಿಲ್ಪಕಲಾ ಚಿತ್ರಣವಿದೆ.">
-        </a-sphere>
+function init() {
+    scene = new THREE.Scene();
+    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1100);
+    
+    const geometry = new THREE.SphereGeometry(500, 60, 40);
+    geometry.scale(-1, 1, 1); 
 
-    </a-scene>
+    const texture = new THREE.TextureLoader().load('https://raw.githubusercontent.com/chandugokarna-bit/gpt-teachers-resources/main/resources/virtual/ellora360.jpg');
+    const material = new THREE.MeshBasicMaterial({ map: texture });
+    sphere = new THREE.Mesh(geometry, material);
+    scene.add(sphere);
 
-    <script>
-        const hotspots = document.querySelectorAll('.hotspot');
-        const infoPanel = document.getElementById('info-panel');
+    renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    container.appendChild(renderer.domElement);
 
-        hotspots.forEach(hotspot => {
-            // ಮೌಸ್ Hover ಇಫೆಕ್ಟ್
-            hotspot.addEventListener('mouseenter', function () {
-                this.setAttribute('color', '#ef4444'); // ಕೆಂಪು ಬಣ್ಣ
-            });
+    container.addEventListener('pointerdown', onPointerDown);
+    container.addEventListener('wheel', onWebGLWheel);
+    window.addEventListener('resize', onWindowResize);
 
-            hotspot.addEventListener('mouseleave', function () {
-                this.setAttribute('color', '#eab308'); // ಮರಳಿ ಚಿನ್ನದ ಬಣ್ಣ
-            });
+    createVisualHotspots();
+}
 
-            // ಕ್ಲಿಕ್ ಇವೆಂಟ್ ಮತ್ತು ಆಡಿಯೋ ಪ್ಲೇಬ್ಯಾಕ್
-            hotspot.addEventListener('click', function () {
-                const title = this.getAttribute('data-title');
-                const info = this.getAttribute('data-info');
-                
-                infoPanel.innerHTML = `<strong>${title}</strong><br>${info}`;
-
-                if ('speechSynthesis' in window) {
-                    window.speechSynthesis.cancel(); // ಹಳೆಯ ಧ್ವನಿ ನಿಲ್ಲಿಸಲು
-                    
-                    const speech = new SpeechSynthesisUtterance();
-                    speech.text = title + ". " + info;
-                    speech.lang = 'kn-IN'; // ಕನ್ನಡ ಭಾಷೆ
-                    speech.rate = 0.85; // ಸ್ಪಷ್ಟ ಧ್ವನಿ ವೇಗ
-                    
-                    window.speechSynthesis.speak(speech);
-                }
-            });
+// --- 4. map-spots position on screen ---
+function createVisualHotspots() {
+    hotspotsLayer.innerHTML = '';
+    hotSpots.forEach((hs, index) => {
+        const el = document.createElement('div');
+        el.className = 'hotspot-label';
+        el.id = 'hs-' + index;
+        el.innerHTML = `
+            <div class="hotspot-circle"></div>
+            <div class="hotspot-text">${hs.name}</div>
+        `;
+        
+        el.addEventListener('click', function(e) {
+            e.stopPropagation();
+            if(hs.action) hs.action();
         });
-    </script>
+        
+        hotspotsLayer.appendChild(el);
+        hs.domElement = el;
+    });
+}
+
+function updateHotspotsPosition() {
+    hotSpots.forEach(hs => {
+        if (!hs.domElement) return;
+        const wp = new THREE.Vector3(hs.x, hs.y, hs.z).normalize().multiplyScalar(500);
+        const proj = wp.project(camera);
+        
+        if (proj.z > 1) {
+            hs.domElement.style.display = 'none';
+            return;
+        }
+        
+        const x = (proj.x * .5 + .5) * window.innerWidth;
+        const y = (proj.y * -.5 + .5) * window.innerHeight;
+        
+        hs.domElement.style.display = 'block';
+        hs.domElement.style.left = x + 'px';
+        hs.domElement.style.top = y + 'px';
+    });
+}
+
+// --- 5. ನಿಯಂತ್ರಣಗಳು (Controls) ---
+function onPointerDown(event) {
+    isUserInteracting = true;
+    onPointerDownPointerX = event.clientX;
+    onPointerDownPointerY = event.clientY;
+    onPointerDownLon = lon;
+    onPointerDownLat = lat;
+    document.addEventListener('pointermove', onPointerMove);
+    document.addEventListener('pointerup', onPointerUp);
+}
+
+function onPointerMove(event) {
+    if (isUserInteracting === true) {
+        lon = (onPointerDownPointerX - event.clientX) * 0.1 + onPointerDownLon;
+        lat = (event.clientY - onPointerDownPointerY) * 0.1 + onPointerDownLat;
+    }
+}
+
+function onPointerUp() {
+    isUserInteracting = false;
+    document.removeEventListener('pointermove', onPointerMove);
+    document.removeEventListener('pointerup', onPointerUp);
+}
+
+// zoom function
+function onWebGLWheel(event) {
+    zoomFactor += event.deltaY * 0.05;
+    zoomFactor = Math.max(30, Math.min(100, zoomFactor)); 
+    camera.fov = zoomFactor;
+    camera.updateProjectionMatrix();
+}
+
+function onWindowResize() {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+}
+
+// --- 6. ಅನಿಮೇಷನ್ ಲೂಪ್ ---
+function animate() {
+    requestAnimationFrame(animate);
+    update();
+}
+
+function update() {
+    lat = Math.max(-85, Math.min(85, lat));
+    phi = THREE.MathUtils.degToRad(90 - lat);
+    theta = THREE.MathUtils.degToRad(lon);
+
+    const target = new THREE.Vector3();
+    target.x = 500 * Math.sin(phi) * Math.sin(theta);
+    target.y = 500 * Math.cos(phi);
+    target.z = 500 * Math.sin(phi) * Math.theta;
+
+    camera.lookAt(target);
+    renderer.render(scene, camera);
+    updateHotspotsPosition();
+}
+</script>
+
 </body>
 </html>
