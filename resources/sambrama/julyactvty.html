@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಸಂಭ್ರಮ ಶನಿವಾರ - ಸಿಂಗಲ್ ಪೇಜ್ 3D ಆಲ್ಬಮ್</title>
+    
+    <!-- jQuery ಮತ್ತು Turn.js ಲೈಬ್ರರಿಗಳು (3D ಫ್ಲಿಪ್ ಎಫೆಕ್ಟ್ ಕೆಲಸ ಮಾಡಲು ಅತ್ಯಗತ್ಯ) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/turn.js/3/turn.min.js"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+        body {
+            background-color: #0d1117;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            color: #fff;
+        }
+
+        /* ಮೇಲ್ಭಾಗದ ಹೆಡರ್ */
+        .album-header {
+            width: 100%;
+            text-align: center;
+            padding: 15px;
+            background: linear-gradient(to right, #161b22, #0d1117, #161b22);
+            border-bottom: 2px solid #30363d;
+            position: absolute;
+            top: 0;
+            z-index: 100;
+        }
+        .album-header h1 {
+            font-size: 1.5rem;
+            color: #fbbf24;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+        }
+        .album-header p {
+            font-size: 0.9rem;
+            color: #8b949e;
+            margin-top: 4px;
+        }
+
+        /* 3D ಫ್ಲಿಪ್ ಬುಕ್ ಪ್ರದರ್ಶನ ಕಂಟೈನರ್ (16:9 ಲ್ಯಾಂಡ್‌ಸ್ಕೇಪ್ ರೇಶಿಯೋ) */
+        .book-wrapper {
+            position: relative;
+            width: 90vw;
+            height: 70vh;
+            max-width: 1100px;
+            max-height: 618px; /* 16:9 ಅನುಪಾತವನ್ನು ಕಾಯ್ದುಕೊಳ್ಳಲು */
+            margin-top: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #flipbook {
+            width: 100%;
+            height: 100%;
+            box-shadow: 0px 20px 50px rgba(0, 0, 0, 0.8);
+            background-color: #161b22;
+            border-radius: 8px;
+        }
+
+        /* ಪ್ರತಿ ಸಿಂಗಲ್ ಪೇಜ್ ಡಿಸೈನ್ */
+        #flipbook .page {
+            width: 100%;
+            height: 100%;
+            background-color: #161b22;
+            overflow: hidden;
+            border-radius: 8px;
+        }
+
+        /* ನಿಮ್ಮ ಪಿಪಿಟಿ ಇಮೇಜ್ ಇಡೀ ಲ್ಯಾಂಡ್‌ಸ್ಕೇಪ್ ಸ್ಕ್ರೀನ್ ತುಂಬಿಕೊಳ್ಳಲು */
+        #flipbook img {
+            width: 100%;
+            height: 100%;
+            object-fit: fill; /* ಚಿತ್ರವು ಎಲ್ಲೂ ಕಟ್ ಆಗದೆ ಸಂಪೂರ್ಣವಾಗಿ ಕಾಣಲು */
+            display: block;
+        }
+
+        /* ಕೆಳಗಿನ ಸುಂದರ ಕಂಟ್ರೋಲ್ ಬಟನ್‌ಗಳು */
+        .controls {
+            margin-top: 25px;
+            display: flex;
+            gap: 20px;
+            z-index: 100;
+        }
+        .btn {
+            background-color: #fbbf24;
+            color: #0d1117;
+            border: none;
+            padding: 12px 35px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 15px rgba(251, 191, 36, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn:hover {
+            background-color: #f59e0b;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(245, 158, 11, 0.5);
+        }
+        .btn:active {
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ಆಲ್ಬಮ್ ಟೈಟಲ್ -->
+    <div class="album-header">
+        <h1>🎉 ಸಂಭ್ರಮ ಶನಿವಾರ - ಪ್ರೀಮಿಯಂ 3D ಸಿಂಗಲ್ ಪೇಜ್ ಆಲ್ಬಮ್</h1>
+        <p>ವಿಷಯ: ಮಾದಕ ವಸ್ತುಗಳ ದುರುಪಯೋಗ ತಡೆಗಟ್ಟುವಿಕೆ ಮತ್ತು ನಿರ್ವಹಣೆ (ಲೈವ್ ಮಾಡೆಲ್)</p>
+    </div>
+
+    <!-- 3D ಆಲ್ಬಮ್ ಕಂಟೈನರ್ -->
+    <div class="book-wrapper">
+        <div id="flipbook">
+            <!-- ಸ್ಲೈಡ್ 1: ಜುಲೈ ತಿಂಗಳ ಸಂಭ್ರಮ ಶನಿವಾರ ಪೋಸ್ಟರ್ (ಮಾಡೆಲ್ ಚಿತ್ರ 1) -->
+            <div>
+                <img src="http://googleusercontent.com/image_collection/image_retrieval/848552963456731666_0" alt="Cover Slide">
+            </div>
+            
+            <!-- ಸ್ಲೈಡ್ 2: ಆರೋಗ್ಯವಂತ ಮತ್ತು ಹಾನಿಗೊಳಗಾದ ಶ್ವಾಸಕೋಶಗಳು (ಮಾಡೆಲ್ ಚಿತ್ರ 2) -->
+            <div>
+                <img src="http://googleusercontent.com/image_collection/image_retrieval/6408862548343513144_0" alt="Lungs comparison">
+            </div>
+
+            <!-- ಸ್ಲೈಡ್ 3: ಮಕ್ಕಳ ಡ್ರಾಯಿಂಗ್ ಮತ್ತು ಪೋಸ್ಟರ್ ರಚನೆ (ಮಾಡೆಲ್ ಚಿತ್ರ 3) -->
+            <div>
+                <img src="http://googleusercontent.com/image_collection/image_retrieval/5819223296288568960_0" alt="Kids poster making">
+            </div>
+
+            <!-- ಸ್ಲೈಡ್ 4: ಮಾನವ ದೇಹ ಮತ್ತು ಅಂಗಾಂಗಗಳ ಮಾಹಿತಿ (ಮಾಡೆಲ್ ಚಿತ್ರ 4) -->
+            <div>
+                <img src="http://googleusercontent.com/image_collection/image_retrieval/540863722857259309_0" alt="Human Organs Guide">
+            </div>
+
+            <!-- ಸ್ಲೈಡ್ 5: ತರಗತಿಯಲ್ಲಿ ಜಾಗೃತಿ ಪ್ರತಿಜ್ಞೆ ಸ್ವೀಕಾರ (ಮಾಡೆಲ್ ಚಿತ್ರ 5) -->
+            <div>
+                <img src="http://googleusercontent.com/image_collection/image_retrieval/426296991271318254_0" alt="Pledge Ceremony">
+            </div>
+        </div>
+    </div>
+
+    <!-- ಪುಟ ನಿಯಂತ್ರಣ ಬಟನ್‌ಗಳು -->
+    <div class="controls">
+        <button class="btn" onclick="$('#flipbook').turn('previous');">❮ ಹಿಂದಿನ ಸ್ಲೈಡ್</button>
+        <button class="btn" onclick="$('#flipbook').turn('next');">ಮುಂದಿನ ಸ್ಲೈಡ್ ❯</button>
+    </div>
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            // Turn.js ಇನಿಶಿಯಲೈಸೇಶನ್ - ಕೇವಲ ಒಂದೇ ಒಂದು ಪೂರ್ಣ ಲ್ಯಾಂಡ್‌ಸ್ಕೇಪ್ ಪುಟ ಕಾಣಿಸಲು display: 'single' ಬಳಸಲಾಗಿದೆ!
+            $("#flipbook").turn({
+                display: 'single', // ಅಪ್ಪಟ ಒಂದೇ ಇಮೇಜ್ ಲ್ಯಾಂಡ್‌ಸ್ಕೇಪ್ ಆಗಿ ಪ್ಲೇ ಮಾಡಲು ಇದುವೇ ಮ್ಯಾಜಿಕ್ ಕೋಡ್!
+                width: 1000,
+                height: 562, // ಅಚ್ಚುಕಟ್ಟಾದ 16:9 ಲ್ಯಾಂಡ್‌ಸ್ಕೇಪ್ ಅನುಪಾತ
+                autoCenter: true,
+                duration: 900, // ಪೇಜ್ ಮಡಚಿ ತಿರುಗುವ ವೇಗ (milliseconds ನಲ್ಲಿ)
+                acceleration: true
+            });
+        });
+
+        // ಕೀಬೋರ್ಡ್ ಶಾರ್ಟ್‌ಕಟ್ (ಬಾಣದ ಕೀಲಿಗಳು) ಮೂಲಕ ನಿಯಂತ್ರಣ
+        $(window).bind('keydown', function(e){
+            if (e.keyCode == 37) {
+                $('#flipbook').turn('previous');
+            } else if (e.keyCode == 39) {
+                $('#flipbook').turn('next');
+            }
+        });
+    </script>
+
+</body>
+</html>
