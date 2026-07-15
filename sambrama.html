@@ -3,249 +3,286 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ಸಂಭ್ರಮ ಶನಿವಾರ ಚಟುವಟಿಕೆಗಳು</title>
-    <style>
-        :root {
-            --primary: #ffd700;
-            --bg-dark: #0b132b;
-            --card-bg: #1c2541;
-            --accent: #56cfe1;
-        }
+    <title>ಸಂಭ್ರಮ ಶನಿವಾರ - ಪ್ರೀಮಿಯಂ 3D ಸಿಂಗಲ್ ಪೇಜ್ ಆಲ್ಬಮ್</title>
+    
+    <!-- jQuery ಮತ್ತು Turn.js ಲೈಬ್ರರಿಗಳು (3D ಫ್ಲಿಪ್ ಎಫೆಕ್ಟ್ ಕೆಲಸ ಮಾಡಲು ಅತ್ಯಗತ್ಯ) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/turn.js/3/turn.min.js"></script>
 
-        body {
-            background-color: var(--bg-dark);
-            color: white;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    <style>
+        * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
-            overflow-x: hidden;
+            user-select: none;
         }
-
-        /* ಮುಖ್ಯ ಹೆಡರ್ */
-        .header-section {
-            text-align: center;
-            padding: 12px 20px;
-            background: linear-gradient(180deg, #111a36 0%, var(--bg-dark) 100%);
-        }
-        .header-section h1 {
-            color: var(--primary);
-            margin: 0 0 5px 0;
-            font-size: 24px;
-            text-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
-        }
-        .header-section p {
-            color: var(--accent);
-            margin: 0;
-            font-size: 13px;
-            font-weight: bold;
-        }
-
-        /* ಥಿಯೇಟರ್ ಸ್ಕ್ರೀನ್ ಕಂಟೇನರ್ - ಈಗ ಕಂಪ್ಯೂಟರ್ ಪರದೆಯ ಒಳಗೆ ಫಿಟ್ ಆಗುತ್ತದೆ */
-        .theater-container {
-            width: 96%; 
-            max-width: 1300px; 
-            margin: 0 auto 15px auto;
-            position: relative;
-            background-color: #000814;
-            border-radius: 12px;
+        body {
+            background-color: #0d1117;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
             overflow: hidden;
-            border: 2px solid var(--accent);
-            box-shadow: 0 0 30px rgba(86, 207, 225, 0.25);
-            box-sizing: border-box;
+            color: #fff;
         }
 
-        /* ಪರಿಹಾರ: ಸ್ಕ್ರೀನ್ ಎತ್ತರವನ್ನು ಸ್ವಲ್ಪ ಕಡಿಮೆ (80vh) ಮಾಡಿ ಇಡೀ ಫ್ರೇಮ್ ಕಣ್ಣಿಗೆ ಬೀಳುವಂತೆ ಮಾಡಲಾಗಿದೆ */
-        .screen-ratio {
-            position: relative;
+        /* ಮೇಲ್ಭಾಗದ ಹೆಡರ್ */
+        .album-header {
             width: 100%;
-            height: 80vh; /* ಈಗ ಯಾವುದೇ ಕಾರಣಕ್ಕೂ ಕೆಳಭಾಗ ಕಟ್ ಆಗುವುದಿಲ್ಲ */
-        }
-
-        .theater-container iframe {
+            text-align: center;
+            padding: 15px;
+            background: linear-gradient(to right, #161b22, #0d1117, #161b22);
+            border-bottom: 2px solid #30363d;
             position: absolute;
             top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            border: none;
-            display: block;
-            opacity: 0;
-            transition: opacity 0.4s ease-in-out;
-            z-index: 2;
+            z-index: 100;
+        }
+        .album-header h1 {
+            font-size: 1.5rem;
+            color: #fbbf24;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+        }
+        .album-header p {
+            font-size: 0.9rem;
+            color: #8b949e;
+            margin-top: 4px;
         }
 
-        /* ಆಕ್ಟಿವಿಟಿ ರೆಡಿಯಾದಾಗ ಸ್ಮೂತ್ ಆಗಿ ಪ್ರದರ್ಶಿಸಲು */
-        .theater-container.ready iframe {
-            opacity: 1;
+        /* ಅಲ್ಟ್ರಾ ಮಾಡರ್ನ್ ಡಿಜಿಟಲ್ ಆಲ್ಬಮ್ ಸ್ಕ್ರೀನ್ ಕಂಟೈನರ್ */
+        .modern-theater-screen {
+            width: 95vw;
+            max-width: 1160px;
+            background: #090d16;
+            border: 1px solid #1e293b;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+            position: relative;
+            margin-top: 60px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
         }
 
-        /* ಮಿನಿಮಲ್ ಲೋಡರ್ */
-        .minimal-spinner {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 40px;
-            height: 40px;
-            margin: -20px 0 0 -20px;
-            border: 3px solid rgba(255, 255, 255, 0.1);
-            border-top-color: var(--primary);
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-            z-index: 1;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        /* ಪ್ಲೇ ಆಗುತ್ತಿರುವ ಆಕ್ಟಿವಿಟಿ ಟೈಟಲ್ ಬಾರ್ */
-        .current-title-bar {
-            background-color: #111a36;
-            padding: 12px 20px;
-            border-top: 1px solid #23315d;
+        /* ಟಾಪ್ ಬಾರ್ ವಿನ್ಯಾಸ */
+        .screen-top-bar {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            background: #111827;
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: 1px solid #1f2937;
         }
-        .current-title-bar h2 {
-            margin: 0;
-            font-size: 16px;
-            color: var(--primary);
-        }
-        .live-tag {
-            background-color: #ff124f;
-            color: white;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 11px;
+        .live-indicator {
+            font-size: 12px;
             font-weight: bold;
+            color: #ef4444;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            letter-spacing: 1px;
+        }
+        .blink-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #ef4444;
+            border-radius: 50%;
+            display: inline-block;
+            animation: blink 1.5s infinite;
+        }
+        .screen-branding {
+            font-size: 13px;
+            color: #fbbf24;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+        .fullscreen-hint {
+            font-size: 12px;
+            color: #9ca3af;
         }
 
-        /* 2. ಕೆಳಗಡೆ ಇರುವ ಹಳೆಯ ಆಕ್ಟಿವಿಟಿಗಳ ಸ್ಕ್ರಾಲ್ ಸೆಕ್ಷನ್ */
-        .archive-section {
-            width: 95%;
-            max-width: 1300px;
-            margin: 30px auto 50px auto;
-        }
-        .archive-heading {
-            border-bottom: 2px solid #23315d;
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-            font-size: 18px;
-            color: #e2e8f0;
-        }
-
-        /* ಹಳೆಯ ಆಕ್ಟಿವಿಟಿ ಕಾರ್ಡ್‌ಗಳ ಗ್ರಿಡ್ ಲೇಔಟ್ */
-        .cards-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
-        }
-
-        .activity-card {
-            background-color: var(--card-bg);
-            border: 1px solid #23315d;
+        /* ಥಿಯೇಟರ್ ವ್ಯೂಪೋರ್ಟ್ */
+        .theater-viewport {
+            position: relative;
+            background: #020617;
             border-radius: 12px;
             padding: 15px;
-            cursor: pointer;
-            transition: transform 0.2s ease, border-color 0.2s ease;
+            border: 1px solid rgba(251, 191, 36, 0.15);
             display: flex;
-            flex-direction: column;
-            gap: 8px;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
         }
-        .activity-card:hover {
-            transform: translateY(-4px);
-            border-color: var(--primary);
-        }
-        .card-date { font-size: 11px; color: var(--accent); font-weight: bold; }
-        .card-title { font-size: 14px; font-weight: bold; color: white; margin: 0; line-height: 1.4; }
-        .card-badge { align-self: flex-start; background: rgba(255, 255, 255, 0.05); padding: 2px 8px; border-radius: 4px; font-size: 11px; color: #94a3b8; }
 
-        @media (max-width: 768px) {
-            .screen-ratio { height: 480px; }
-            .cards-grid { grid-template-columns: 1fr; }
+        /* ಆಲ್ಬಮ್ ಕಂಟೆಂಟ್ ಹೊಂದಿಕೊಳ್ಳುವ ಬಾಕ್ಸ್ (16:9 ಲ್ಯಾಂಡ್‌ಸ್ಕೇಪ್) */
+        .actual-screen-content {
+            width: 1000px; 
+            height: 562px; 
+            max-width: 100%;
+            position: relative;
+            z-index: 10;
+        }
+
+        #flipbook {
+            width: 100%;
+            height: 100%;
+            box-shadow: 0px 20px 50px rgba(0, 0, 0, 0.8);
+            background-color: #161b22;
+            border-radius: 8px;
+        }
+
+        /* ಪ್ರತಿ ಸಿಂಗಲ್ ಪೇಜ್ ಡಿಸೈನ್ */
+        #flipbook .page {
+            width: 100%;
+            height: 100%;
+            background-color: #161b22;
+            overflow: hidden;
+            border-radius: 8px;
+        }
+
+        /* ಪಿಪಿಟಿ ಇಮೇಜ್ ಇಡೀ ಲ್ಯಾಂಡ್‌ಸ್ಕೇಪ್ ಸ್ಕ್ರೀನ್ ತುಂಬಿಕೊಳ್ಳಲು */
+        #flipbook img {
+            width: 100%;
+            height: 100%;
+            object-fit: fill; 
+            display: block;
+            cursor: pointer;
+        }
+
+        /* ನಿಯಾನ್ ಗ್ಲೋ ಎಫೆಕ್ಟ್‌ಗಳು */
+        .glow-effect-top {
+            position: absolute;
+            top: -50px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            height: 60px;
+            background: radial-gradient(circle, rgba(251, 191, 36, 0.15) 0%, rgba(0,0,0,0) 70%);
+            pointer-events: none;
+        }
+        .glow-effect-bottom {
+            position: absolute;
+            bottom: -50px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            height: 60px;
+            background: radial-gradient(circle, rgba(251, 191, 36, 0.1) 0%, rgba(0,0,0,0) 70%);
+            pointer-events: none;
+        }
+
+        /* ಫುಟರ್ ಬಾರ್ ವಿನ್ಯಾಸ */
+        .screen-footer-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px 10px;
+        }
+        .theme-tag {
+            font-size: 14px;
+            font-weight: bold;
+            color: #38bdf8;
+        }
+        .interactive-status {
+            font-size: 13px;
+            color: #6b7280;
+        }
+
+        /* ಬ್ಲಿಂಕ್ ಅನಿಮೇಷನ್ */
+        @keyframes blink {
+            0% { opacity: 0.2; }
+            50% { opacity: 1; }
+            100% { opacity: 0.2; }
         }
     </style>
 </head>
 <body>
 
-    <!-- ಹೆಡರ್ ಭಾಗ -->
-    <div class="header-section">
-        <h1>🎉 ಸಂಭ್ರಮ ಶನಿವಾರ ಚಟುವಟಿಕೆಗಳ ಡಿಜಿಟಲ್ ಥಿಯೇಟರ್</h1>
-        <p>ಆನಂದದಾಯಕ ಕಲಿಕೆಯ ಅದ್ಭುತ ಲೋಕ</p>
+    <!-- ಆಲ್ಬಮ್ ಟೈಟಲ್ ಹೆಡರ್ -->
+    <div class="album-header">
+        <h1>🎉 ಸಂಭ್ರಮ ಶನಿವಾರ - ಪ್ರೀಮಿಯಂ 3D ಸಿಂಗಲ್ ಪೇಜ್ ಆಲ್ಬಮ್</h1>
+        <p>ವಿಷಯ: ಮಾದಕ ವಸ್ತುಗಳ ದುರುಪಯೋಗ ತಡೆಗಟ್ಟುವಿಕೆ ಮತ್ತು ನಿರ್ವಹಣೆ</p>
     </div>
 
-    <!-- 1. ಬೃಹತ್ ಫುಲ್ ಫ್ರೇಮ್ ಸ್ಕ್ರೀನ್ -->
-    <div class="theater-container" id="docWrapper">
-        <div class="minimal-spinner" id="docSpinner"></div>
-        
-        <div class="screen-ratio">
-            <!-- scrolling="no" ಕೊಟ್ಟಿರುವುದರಿಂದ ಕೆಳಭಾಗದ ಇನ್ಫೋ ಬಾಕ್ಸ್ ಪರ್ಫೆಕ್ಟ್ ಆಗಿ ಕಂಟ್ರೋಲ್ ಒಳಗೆ ಇರುತ್ತದೆ -->
-            <iframe 
-                src="resources/sambrama/sambramajuly1.html" 
-                id="docFrame"
-                title="Sambhrama Saturday Live Screen"
-                scrolling="no"
-                allowfullscreen="true">
-            </iframe>
+    <!-- ಮಾಡರ್ನ್ ಥಿಯೇಟರ್ ಸ್ಕ್ರೀನ್ ಕಂಟೈನರ್ -->
+    <div class="modern-theater-screen">
+        <div class="screen-top-bar">
+            <div class="live-indicator">
+                <span class="blink-dot"></span> 3D LIVE MODE
+            </div>
+            <div class="screen-branding">ಜಿಪಿಟಿ ಶಿಕ್ಷಕರ ಶೈಕ್ಷಣಿಕ ಸಂಪನ್ಮೂಲಗಳು, ಉತ್ತರ ಕನ್ನಡ</div>
+            <div class="fullscreen-hint">💡 Use Keyboard ❮ ❯ to Flip</div>
         </div>
-        
-        <div class="current-title-bar">
-            <h2 id="currentPlayingTitle">ಪ್ರಸ್ತುತ ಪ್ಲೇ ಆಗುತ್ತಿದೆ: ಜುಲೈ ತಿಂಗಳ ಸಂಭ್ರಮ ಶನಿವಾರ ಆಕ್ಟಿವಿಟಿ</h2>
-            <div class="live-tag" id="screenBadge">ಇವತ್ತಿನ ಚಟುವಟಿಕೆ</div>
-        </div>
-    </div>
 
-    <!-- 2. ಕೆಳಗಡೆ ಇರುವ ಹಳೆಯ ಚಟುವಟಿಕೆಗಳ ಪಟ್ಟಿ -->
-    <div class="archive-section">
-        <div class="archive-heading">📚 ಹಳೆಯ ಶನಿವಾರದ ಚಟುವಟಿಕೆಗಳ ಸಂಗ್ರಹ (Archive)</div>
-        
-        <div class="cards-grid">
-            <!-- ಕಾರ್ಡ್ 1 -->
-            <div class="activity-card" onclick="playInTheater('resources/sambrama/sambramajuly1.html', 'ಜುಲೈ ತಿಂಗಳ ಸಂಭ್ರಮ ಶನಿವಾರ ಆಕ್ಟಿವಿಟಿ', 'ಇವತ್ತಿನ ಚಟುವಟಿಕೆ')">
-                <div class="card-date">ಜುಲೈ 2026</div>
-                <h3 class="card-title">🌍 ುಲೈ ತಿಂಗಳ ಸಂಭ್ರಮ ಶನಿವಾರ ಆಕ್ಟಿವಿಟಿ</h3>
-                <div class="card-badge">ುಲೈ ತಿಂಗಳ ಸಂಭ್ರಮ ಶನಿವಾರ ಆಕ್ಟಿವಿಟಿ</div>
+        <div class="theater-viewport">
+            <div class="glow-effect-top"></div>
+            
+            <div class="actual-screen-content">
+                <!-- 3D ಫ್ಲಿಪ್ ಬುಕ್ ಬ್ಲಾಕ್ -->
+                <div id="flipbook">
+                    <div><img src="https://raw.githubusercontent.com/chandugokarna-bit/gpt-teachers-resources/main/resources/sambrama/july/Slide1.JPG" alt="Slide 1"></div>
+                    <div><img src="https://raw.githubusercontent.com/chandugokarna-bit/gpt-teachers-resources/main/resources/sambrama/july/Slide2.JPG" alt="Slide 2"></div>
+                    <div><img src="https://raw.githubusercontent.com/chandugokarna-bit/gpt-teachers-resources/main/resources/sambrama/july/Slide3.JPG" alt="Slide 3"></div>
+                    <div><img src="https://raw.githubusercontent.com/chandugokarna-bit/gpt-teachers-resources/main/resources/sambrama/july/Slide4.JPG" alt="Slide 4"></div>
+                    <div><img src="https://raw.githubusercontent.com/chandugokarna-bit/gpt-teachers-resources/main/resources/sambrama/july/Slide5.JPG" alt="Slide 5"></div>
+                    <div><img src="https://raw.githubusercontent.com/chandugokarna-bit/gpt-teachers-resources/main/resources/sambrama/july/Slide6.JPG" alt="Slide 6"></div>
+                    <div><img src="https://raw.githubusercontent.com/chandugokarna-bit/gpt-teachers-resources/main/resources/sambrama/july/Slide7.JPG" alt="Slide 7"></div>
+                    <div><img src="https://raw.githubusercontent.com/chandugokarna-bit/gpt-teachers-resources/main/resources/sambrama/july/Slide8.JPG" alt="Slide 8"></div>
+                    <div><img src="https://raw.githubusercontent.com/chandugokarna-bit/gpt-teachers-resources/main/resources/sambrama/july/Slide9.JPG" alt="Slide 9"></div>
+                    <div><img src="https://raw.githubusercontent.com/chandugokarna-bit/gpt-teachers-resources/main/resources/sambrama/july/Slide10.JPG" alt="Slide 10"></div>
+                    <div><img src="https://raw.githubusercontent.com/chandugokarna-bit/gpt-teachers-resources/main/resources/sambrama/july/Slide11.JPG" alt="Slide 11"></div>
+                    <div><img src="https://raw.githubusercontent.com/chandugokarna-bit/gpt-teachers-resources/main/resources/sambrama/july/Slide12.JPG" alt="Slide 12"></div>
+                </div>
             </div>
 
-            <!-- ಕಾರ್ಡ್ 2 -->
-            <div class="activity-card" onclick="playInTheater('resources/sambrama/sambramajuly1.html', 'ಜುಲೈ ತಿಂಗಳ ಸಂಭ್ರಮ ಶನಿವಾರ ಆಕ್ಟಿವಿಟಿ', 'ಹಳೆಯ ಆಕ್ಟಿವಿಟಿ')">
-                <div class="card-date">ಜೂನ್ 2026</div>
-                <h3 class="card-title">📖ಜುಲೈ ತಿಂಗಳ ಸಂಭ್ರಮ ಶನಿವಾರ ಆಕ್ಟಿವಿಟಿ</h3>
-                <div class="card-badge">ಜುಲೈ ತಿಂಗಳ ಸಂಭ್ರಮ ಶನಿವಾರ ಆಕ್ಟಿವಿಟಿ</div>
-            </div>
+            <div class="glow-effect-bottom"></div>
+        </div>
+
+        <div class="screen-footer-bar">
+            <div class="theme-tag">🎉 ಸಂಭ್ರಮ ಶನಿವಾರ ಆಕ್ಟಿವಿಟಿ</div>
+            <div class="interactive-status">🖱️ Click on image corners to turn pages</div>
         </div>
     </div>
 
-    <script>
-        const docFrame = document.getElementById('docFrame');
-        const docSpinner = document.getElementById('docSpinner');
-        const docWrapper = document.getElementById('docWrapper');
-        const currentPlayingTitle = document.getElementById('currentPlayingTitle');
-        const screenBadge = document.getElementById('screenBadge');
+    <!-- ಜಾವಾಸ್ಕ್ರಿಪ್ಟ್ ಆಕ್ಷನ್ ಕೋಡ್ -->
+    <script type="text/javascript">
+        $(document).ready(function() {
+            // Turn.js ಇನಿಶಿಯಲೈಸೇಶನ್
+            $("#flipbook").turn({
+                display: 'single', 
+                width: 1000,
+                height: 562, 
+                autoCenter: true,
+                duration: 900, 
+                acceleration: true
+            });
 
-        // ಸ್ಮೂತ್ ರಿವೀಲ್
-        docFrame.addEventListener('load', function() {
-            docSpinner.style.opacity = '0';
-            setTimeout(function() {
-                docSpinner.style.display = 'none';
-                docWrapper.classList.add('ready');
-            }, 200);
+            // ಚಿತ್ರದ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿದಾಗ ಪುಟ ಬದಲಾಗುವ ಸ್ಮಾರ್ಟ್ ಫಂಕ್ಷನ್ (ಬಟನ್ ಗಳಿಲ್ಲದೆ)
+            $("#flipbook").bind("click", function(e) {
+                var bookOffset = $(this).offset();
+                var clickX = e.pageX - bookOffset.left;
+                
+                // ಬಲಗಡೆ ಕ್ಲಿಕ್ ಮಾಡಿದರೆ ಮುಂದಕ್ಕೆ, ಎಡಗಡೆ ಕ್ಲಿಕ್ ಮಾಡಿದರೆ ಹಿಂದಕ್ಕೆ
+                if (clickX > $(this).width() / 2) {
+                    $("#flipbook").turn("next");
+                } else {
+                    $("#flipbook").turn("previous");
+                }
+            });
         });
 
-        // ಕಾರ್ಡ್ ಕ್ಲಿಕ್ ಫಂಕ್ಷನ್
-        function playInTheater(fileUrl, activityName, badgeText) {
-            docWrapper.classList.remove('ready');
-            docSpinner.style.display = 'block';
-            docSpinner.style.opacity = '1';
-            
-            docFrame.src = fileUrl;
-            currentPlayingTitle.innerText = "ಪ್ರಸ್ತುತ ಪ್ಲೇ ಆಗುತ್ತಿದೆ: " + activityName;
-            screenBadge.innerText = badgeText;
-            
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
+        // ಕೀಬೋರ್ಡ್ ಶಾರ್ಟ್ ಕಟ್ ನಿಯಂತ್ರಣ
+        $(window).bind('keydown', function(e){
+            if (e.keyCode == 37) {
+                $('#flipbook').turn('previous');
+            } else if (e.keyCode == 39) {
+                $('#flipbook').turn('next');
+            }
+        });
     </script>
 
 </body>
