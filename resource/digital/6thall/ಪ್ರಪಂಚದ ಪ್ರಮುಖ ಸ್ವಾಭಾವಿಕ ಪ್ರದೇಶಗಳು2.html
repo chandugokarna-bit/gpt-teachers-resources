@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಪ್ರಪಂಚದ ಪ್ರಮುಖ ಸ್ವಾಭಾವಿಕ ಪ್ರದೇಶಗಳು - ಇಂಟರಾಕ್ಟಿವ್ ನಕ್ಷೆ</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #0f172a;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #f8fafc;
+        }
+
+        h1 {
+            color: #38bdf8;
+            margin-bottom: 5px;
+            text-align: center;
+        }
+
+        .subtitle {
+            color: #94a3b8;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .main-container {
+            display: flex;
+            flex-direction: column;
+            background: #1e293b;
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            max-width: 1200px;
+            width: 100%;
+            gap: 25px;
+            border: 1px solid #334155;
+        }
+
+        @media (min-width: 992px) {
+            .main-container {
+                flex-direction: row;
+                align-items: flex-start;
+            }
+        }
+
+        .map-section {
+            flex: 1.5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: #090d16;
+            padding: 15px;
+            border-radius: 12px;
+            border: 2px solid #38bdf8;
+            position: relative;
+        }
+
+        .map-image-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 650px;
+            background: #000; /* ಕತ್ತಲೆ ಮಾಡಲು ಹಿನ್ನೆಲೆ ಬಣ್ಣ */
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        /* ಒರಿಜಿನಲ್ ಇಮೇಜ್ ಸ್ಟೈಲ್ - ಲೈವ್ ಆಗಿ ಡಿಮ್ ಮಾಡಲು ಟ್ರಾನ್ಸಿಸನ್ */
+        .map-image-wrapper img {
+            width: 100%;
+            height: auto;
+            display: block;
+            transition: filter 0.3s ease;
+        }
+
+        /* ಬಟನ್ ಕ್ಲಿಕ್ ಮಾಡಿದಾಗ ಇಮೇಜ್ ಅನ್ನು 40% ಕತ್ತಲೆ (Dim) ಮಾಡುತ್ತದೆ */
+        .map-image-wrapper.dim-map img {
+            filter: brightness(0.4) contrast(1.1);
+        }
+
+        /* ಸುಧಾರಿತ ಬೆಳಕು ಮೂಡುವ ಲೈವ್ ಓವರ್‌ಲೇ ಲೇಯರ್ */
+        .map-overlay-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            mix-blend-mode: screen; 
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .map-overlay-layer.active {
+            opacity: 1.0; /* ಪೂರ್ಣ ಬೆಳಕಿನ ತೀವ್ರತೆ */
+        }
+
+        .controls-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 520px;
+            overflow-y: auto;
+            padding-right: 10px;
+            width: 100%;
+        }
+
+        .controls-section::-webkit-scrollbar {
+            width: 6px;
+        }
+        .controls-section::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 3px;
+        }
+
+        .region-btn {
+            padding: 11px 12px;
+            border: 1px solid #475569;
+            background: #334155;
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            text-align: left;
+            transition: all 0.2s;
+            font-size: 0.88em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+        }
+
+        .region-btn:hover {
+            background: #475569;
+        }
+
+        .region-btn.active {
+            border-color: #38bdf8;
+            box-shadow: 0 0 8px rgba(56, 189, 248, 0.4);
+            font-weight: 600;
+            background: #0369a1;
+        }
+
+        .color-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .info-box {
+            margin-top: 15px;
+            background: #0f172a;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #38bdf8;
+            font-size: 0.95em;
+            line-height: 1.5;
+            color: #cbd5e1;
+            width: 95%;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>🌍 ಪ್ರಪಂಚದ ಪ್ರಮುಖ ಸ್ವಾಭಾವಿಕ ಪ್ರದೇಶಗಳು</h1>
+    <div class="subtitle">ಪ್ರದೇಶಗಳ ಹೆಸರಿನ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ, ನಕ್ಷೆಯ ಮೇಲೆ ಬೆಳಕು ಮೂಡುವುದನ್ನು ಗಮನಿಸಿ</div>
+
+    <div class="main-container">
+        <div class="map-section">
+            <div class="map-image-wrapper" id="imageWrapper">
+                <img id="baseMap" src="https://raw.githubusercontent.com/chandugokarna-bit/gpt-teachers-resources/main/images/map.jpg" alt="World Natural Regions Map">
+                <canvas id="overlayCanvas" class="map-overlay-layer"></canvas>
+            </div>
+
+            <div class="info-box" id="infoBox">
+                ಬಲಬದಿಯ ಪಟ್ಟಿಯಲ್ಲಿರುವ ಯಾವುದೇ ಸ್ವಾಭಾವಿಕ ಪ್ರದೇಶವನ್ನು ಆರಿಸಿ, ನಕ್ಷೆಯಲ್ಲಿ ಅದರ ನಿಖರವಾದ ಸ್ಥಾನವನ್ನು ಬೆಳಕಿನ ಮೂಲಕ ಗುರುತಿಸಬಹುದು.
+            </div>
+        </div>
+
+        <div class="controls-section" id="btnContainer"></div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('overlayCanvas');
+        const ctx = canvas.getContext('2d');
+        const img = document.getElementById('baseMap');
+        const imageWrapper = document.getElementById('imageWrapper');
+        const infoBox = document.getElementById('infoBox');
+        const btnContainer = document.getElementById('btnContainer');
+
+        const regions = [
+            { id: 1, name: "1. ಸಮಭಾಜಕ ವೃತ್ತಪ್ರದೇಶಗಳು (ಅಮೇಜಾನ್ ಮಾದರಿ)", color: "#22c55e", desc: "ಭೂಮಿಯ ಮಧ್ಯಭಾಗದಲ್ಲಿದ್ದು (0° ಅಕ್ಷಾಂಶ), ವರ್ಷಪೂರ್ತಿ ಅತ್ಯಧಿಕ ಮಳೆ ಮತ್ತು ದಟ್ಟವಾದ ನಿತ್ಯಹರಿದ್ವರ್ಣ ಕಾಡುಗಳನ್ನು ಹೊಂದಿರುವ ಪ್ರದೇಶ.", zones: [[0.22, 0.52, 0.12, 0.05], [0.45, 0.52, 0.14, 0.06], [0.75, 0.55, 0.08, 0.05]] },
+            { id: 2, name: "2. ಉಷ್ಣವಲಯದ ಹುಲ್ಲುಗಾವಲು ಪ್ರದೇಶ (ಸುಡಾನ್ ಮಾದರಿ)", color: "#84cc16", desc: "ಸಮಭಾಜಕ ವೃತ್ತದ ಎರಡೂ ಬದಿಗಳಲ್ಲಿದ್ದು, ಕಡಿಮೆ ಮಳೆ ಪಡೆಯುತ್ತದೆ. ಇಲ್ಲಿ ಪ್ರಸಿದ್ಧ 'ಸವನ್ನಾ' ಮಾದರಿಯ ಎತ್ತರದ ಹುಲ್ಲುಗಾವಲುಗಳು ಕಂಡುಬರುತ್ತವೆ.", zones: [[0.23, 0.57, 0.10, 0.04], [0.44, 0.46, 0.15, 0.06], [0.45, 0.58, 0.12, 0.05]] },
+            { id: 3, name: "3. ಉಷ್ಣವಲಯದ ಮಾನ್ಸೂನ್ ಪ್ರದೇಶಗಳು", color: "#06b6d4", desc: "ನಮ್ಮ ಭಾರತ ಸೇರಿದಂತೆ ದಕ್ಷಿಣ ಮತ್ತು ಆಗ್ನೇಯ ಏಷ್ಯಾದ ಭಾಗಗಳು ಇದರಲ್ಲಿ ಬರುತ್ತವೆ. ಇಲ್ಲಿ ನಿಶ್ಚಿತ ಋತುಮಾನಕ್ಕೆ ತಕ್ಕಂತೆ ಮಾನ್ಸೂನ್ ಮಳೆಯಾಗುತ್ತದೆ.", zones: [[0.62, 0.44, 0.15, 0.09], [0.76, 0.60, 0.05, 0.06]] },
+            { id: 4, name: "4. ಉಷ್ಣವಲಯದ ಸಾಗರಿಕ ಪ್ರದೇಶಗಳು", color: "#3b82f6", desc: "ಉಷ್ಣವಲಯದ ವ್ಯಾಪ್ತಿಯಲ್ಲಿ ಬರುವ ದ್ವೀಪಗಳು ಮತ್ತು ಕರಾವಳಿ ತೀರಗಳು. ಇಲ್ಲಿ ಸಮುದ್ರದ ಗಾಳಿಯ ಪ್ರಭಾವದಿಂದ ಹವಾಮಾನವು ಹಿತಕರವಾಗಿರುತ್ತದೆ.", zones: [[0.28, 0.42, 0.04, 0.05], [0.82, 0.61, 0.06, 0.05]] },
+            { id: 5, name: "5. ಉಷ್ಣವಲಯದ ಮರುಭೂಮಿ ಪ್ರದೇಶಗಳು (ಸಹರಾ ಮಾದರಿ)", color: "#eab308", desc: "ಜಗತ್ತಿನ ಅತ್ಯಂತ ಬಿಸಿಯಾದ ಆಫ್ರಿಕಾದ ಸಹರಾ, ಅರೇಬಿಯಾ ಮತ್ತು ಆಸ್ಟ್ರೇಲಿಯಾದ ಮರುಭೂಮಿಗಳು ಇದರ ವ್ಯಾಪ್ತಿಯಲ್ಲಿ ಬರುತ್ತವೆ.", zones: [[0.40, 0.40, 0.16, 0.06], [0.76, 0.66, 0.10, 0.07]] },
+            { id: 6, name: "6. ಸಮಶೀತೋಷ್ಣವಲಯದ ಮರುಭೂಮಿಗಳು", color: "#ca8a04", desc: "ಖಂಡಗಳ ಒಳಭಾಗದಲ್ಲಿರುವ ಗೋಬಿ ಮರುಭೂಮಿಯಂತಹ ತಂಪಾದ ಮರುಭೂಮಿ ಪ್ರದೇಶಗಳು. ಚಳಿಗಾಲ ತೀವ್ರ ಶೀತದಿಂದ ಕೂಡಿರುತ್ತದೆ.", zones: [[0.56, 0.32, 0.14, 0.06], [0.20, 0.32, 0.06, 0.04]] },
+            { id: 7, name: "7. ಮೆಡಿಟರೇನಿಯನ್ ಪ್ರದೇಶಗಳು", color: "#f97316", desc: "ಬೇಸಿಗೆಯಲ್ಲಿ ಒಣ ಹವೆ ಇರುತ್ತದೆ, ಆದರೆ ಚಳಿಗಾಲದಲ್ಲಿ ಮಳೆಯಾಗುತ್ತದೆ. ಇದು ಸಿಟ್ರಸ್ ಹಣ್ಣುಗಳ ಕೃಷಿಗೆ ಜಗತ್ತಿನಲ್ಲೇ ಪ್ರಸಿದ್ಧವಾಗಿದೆ.", zones: [[0.40, 0.34, 0.10, 0.05], [0.22, 0.66, 0.04, 0.04], [0.76, 0.71, 0.03, 0.04]] },
+            { id: 8, name: "8. ಬೆಚ್ಚಗಿನ ಸಮಶೀತೋಷ್ಣವಲಯದ ಪೂರ್ವ ಅಂಚು", color: "#f43f5e", desc: "ಇದನ್ನು 'ಚೀನಾ ಮಾದರಿ' ಪ್ರದೇಶ ಎಂದೂ ಕರೆಯುತ್ತಾರೆ. ಇಲ್ಲಿ ವರ್ಷಪೂರ್ತಿ ಹಿತಕರವಾದ ಮಳೆಯಾಗುವುದರಿಂದ ಕೃಷಿಗೆ ಅತ್ಯಂತ ಸೂಕ್ತವಾಗಿದೆ.", zones: [[0.68, 0.35, 0.10, 0.07], [0.25, 0.50, 0.04, 0.04]] },
+            { id: 9, name: "9. ತಂಪು ಸಮಶೀತೋಷ್ಣವಲಯದ ಸಾಗರಿಕ ಪ್ರದೇಶಗಳು", color: "#a855f7", desc: "ಪಶ್ಚಿಮ ಯುರೋಪ್ ಮಾದರಿಯ ಹವಾಮಾನ ಪ್ರದೇಶ. ಸಮುದ್ರದ ಸನಿಹವಿರುವುದರಿಂದ ವರ್ಷಪೂರ್ತಿ ಸಮಾನವಾದ ತಂಪಾದ ಹವಾಮಾನ ಇರುತ್ತದೆ.", zones: [[0.38, 0.22, 0.06, 0.06], [0.12, 0.24, 0.05, 0.06]] },
+            { id: 10, name: "10. ಸಮಶೀತೋಷ್ಣವಲಯದ ಹುಲ್ಲುಗಾವಲು ಪ್ರದೇಶಗಳು", color: "#fb923c", desc: "ಉತ್ತರ ಅಮೆರಿಕದ ಪ್ರೈರಿ ಮತ್ತು ದಕ್ಷಿಣ ಅಮೆರಿಕದ ಪಂಪಾಸ್ ವಲಯಗಳು. ಇವು ಜಗತ್ತಿನ ಪ್ರಮುಖ ಗೋಧಿ ಬೆಳೆಯುವ ಪ್ರದೇಶಗಳಾಗಿವೆ.", zones: [[0.14, 0.28, 0.10, 0.05], [0.24, 0.62, 0.05, 0.05], [0.58, 0.37, 0.10, 0.04]] },
+            { id: 11, name: "11. ತಂಪು ಸಮಶೀತೋಷ್ಣವಲಯದ ಪೂರ್ವ ಕರಾವಳಿ", color: "#14b8a6", desc: "ಇದನ್ನು 'ಸೇಂಟ್ ಲಾರೆನ್ಸ್ ಮಾದರಿ' ಎನ್ನಲಾಗುತ್ತದೆ. ಇಲ್ಲಿ ಚಳಿಗಾಲವು ದೀರ್ಘವಾಗಿದ್ದು ತಂಪಾದ ಕರಾವಳಿ ಮಾರುತಗಳು ಬೀಸುತ್ತವೆ.", zones: [[0.24, 0.22, 0.05, 0.04], [0.75, 0.24, 0.07, 0.06]] },
+            { id: 12, name: "12. ಶೀತ ಖಂಡಾಂತರ ಪ್ರದೇಶಗಳು ಅಥವಾ ಟೈಗಾ ಪ್ರದೇಶಗಳು", color: "#ec4899", desc: "ವಿಶಾಲವಾದ ತೈಗಾ ಅರಣ್ಯ ವಲಯ. ಇಲ್ಲಿ ಸೂಜಿಪರ್ಣ (Coniferous) ಸಸ್ಯಗಳು ಬೆಳೆಯುತ್ತವೆ. ಕಾಗದ ಕೈಗಾರಿಕೆಗೆ ಇದು ಹೆಸರುವಾಸಿ.", zones: [[0.12, 0.16, 0.16, 0.06], [0.38, 0.13, 0.50, 0.09]] },
+            { id: 13, name: "13. ತುಂಡ್ರಾ ಪ್ರದೇಶಗಳು ಅಥವಾ ಶೀತ ಮರುಭೂಮಿ", color: "#c084fc", desc: "ಉತ್ತರ ಧ್ರುವದ ತೀರಾ ಹತ್ತಿರದ ಪ್ರದೇಶ. ವರ್ಷದ 8-9 ತಿಂಗಳು ಹಿಮದಿಂದ ಮುಚ್ಚಿರುತ್ತದೆ. ಇಲ್ಲಿ ಕೇವಲ ಪಾಚಿಗಳು ಮಾತ್ರ ಬೆಳೆಯುತ್ತವೆ.", zones: [[0.08, 0.08, 0.24, 0.07], [0.35, 0.05, 0.55, 0.08]] }
+        ];
+
+        let activeId = null;
+
+        function resizeCanvas() {
+            canvas.width = img.clientWidth;
+            canvas.height = img.clientHeight;
+            if(activeId !== null) drawHighlight(activeId);
+        }
+
+        img.onload = resizeCanvas;
+        window.addEventListener('resize', resizeCanvas);
+
+        function init() {
+            regions.forEach(region => {
+                const btn = document.createElement('button');
+                btn.className = 'region-btn';
+                btn.id = `btn-${region.id}`;
+                
+                const dot = document.createElement('div');
+                dot.className = 'color-dot';
+                dot.style.backgroundColor = region.color;
+                
+                const text = document.createElement('span');
+                text.textContent = region.name;
+                
+                btn.appendChild(dot);
+                btn.appendChild(text);
+                btn.onclick = () => highlightRegion(region.id);
+                btnContainer.appendChild(btn);
+            });
+            if(img.complete) resizeCanvas();
+        }
+
+        function highlightRegion(id) {
+            document.querySelectorAll('.region-btn').forEach(b => b.classList.remove('active'));
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            if (activeId === id) {
+                activeId = null;
+                canvas.classList.remove('active');
+                imageWrapper.classList.remove('dim-map'); // ಮ್ಯಾಪ್ ಕತ್ತಲೆ ರದ್ದುಗೊಳಿಸು
+                infoBox.innerHTML = "ಬಲಬದಿಯ ಪಟ್ಟಿಯಲ್ಲಿರುವ ಯಾವುದೇ ಸ್ವಾಭಾವಿಕ ಪ್ರದೇಶವನ್ನು ಆರಿಸಿ, ನಕ್ಷೆಯಲ್ಲಿ ಅದರ ನಿಖರವಾದ ಸ್ಥಾನವನ್ನು ಬೆಳಕಿನ ಮೂಲಕ ಗುರುತಿಸಬಹುದು.";
+            } else {
+                activeId = id;
+                document.getElementById(`btn-${id}`).classList.add('active');
+                canvas.classList.add('active');
+                imageWrapper.classList.add('dim-map'); // ಮ್ಯಾಪ್ ಕತ್ತಲೆ ಮಾಡು
+                
+                drawHighlight(id);
+                
+                const current = regions.find(r => r.id === id);
+                infoBox.innerHTML = `<b>${current.name}:</b><br>${current.desc}`;
+            }
+        }
+
+        function drawHighlight(id) {
+            const current = regions.find(r => r.id === id);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.fillStyle = current.color;
+            ctx.shadowBlur = 40; // ಹೊಳಪಿನ ತೀವ್ರತೆ ಡಬಲ್ ಮಾಡಲಾಗಿದೆ
+            ctx.shadowColor = current.color;
+
+            current.zones.forEach(box => {
+                let x = box[0] * canvas.width;
+                let y = box[1] * canvas.height;
+                let w = box[2] * canvas.width;
+                let h = box[3] * canvas.height;
+                
+                // ಒಂದರ ಮೇಲೆ ಒಂದರಂತೆ ಎರಡು ಬಾರಿ ಬರೆದು ಬೆಳಕನ್ನು ಇನ್ನಷ್ಟು ದಟ್ಟವಾಗಿಸುವುದು
+                ctx.fillRect(x, y, w, h);
+                ctx.fillRect(x, y, w, h);
+            });
+        }
+
+        init();
+    </script>
+</body>
+</html>

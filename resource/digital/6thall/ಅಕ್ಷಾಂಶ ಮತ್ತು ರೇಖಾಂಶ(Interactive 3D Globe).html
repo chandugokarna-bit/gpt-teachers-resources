@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D ಅಕ್ಷಾಂಶ ಮತ್ತು ರೇಖಾಂಶಗಳ ಇಂಟರಾಕ್ಟಿವ್ ಮಾದರಿ</title>
+    <!-- 3D ಗ್ರಾಫಿಕ್ಸ್ ಗಾಗಿ Three.js ಲೈಬ್ರರಿ -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- ಮೌಸ್ ಮೂಲಕ ತಿರುಗಿಸಲು OrbitControls ಲೈಬ್ರರಿ -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #0f172a;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #f8fafc;
+        }
+
+        h1 {
+            color: #38bdf8;
+            margin-bottom: 5px;
+            text-align: center;
+        }
+
+        .subtitle {
+            color: #94a3b8;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .main-container {
+            display: flex;
+            flex-direction: column;
+            background: #1e293b;
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            max-width: 950px;
+            width: 100%;
+            gap: 25px;
+            border: 1px solid #334155;
+        }
+
+        @media (min-width: 768px) {
+            .main-container {
+                flex-direction: row;
+                align-items: center;
+            }
+        }
+
+        .visual-area {
+            flex: 1.2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #020617;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 2px solid #38bdf8;
+            height: 400px;
+            position: relative;
+        }
+
+        #canvas3d {
+            width: 100%;
+            height: 100%;
+        }
+
+        .controls-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        label {
+            font-weight: 600;
+            color: #38bdf8;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .val-display {
+            background: #0369a1;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            color: white;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            accent-color: #38bdf8;
+            cursor: pointer;
+        }
+
+        .info-panel {
+            background: #0f172a;
+            border-left: 4px solid #38bdf8;
+            padding: 15px;
+            border-radius: 0 8px 8px 0;
+            font-size: 0.95em;
+            line-height: 1.5;
+            color: #cbd5e1;
+        }
+
+        .guide-text {
+            font-size: 0.85em;
+            color: #64748b;
+            text-align: center;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>🌍 ಅದ್ಭುತ 3D ಭೂಗೋಳ ಮಾದರಿ (Interactive 3D Globe)</h1>
+    <div class="subtitle">ಸ್ಲೈಡರ್ ಬಳಸಿ ಲೈವ್ ಆಗಿ ಚಲಿಸುವ ಅಕ್ಷಾಂಶ ಮತ್ತು ರೇಖಾಂಶದ ವೃತ್ತಗಳನ್ನು ಗಮನಿಸಿ</div>
+
+    <div class="main-container">
+        <!-- 3D ಗ್ಲೋಬ್ ಪ್ರದರ್ಶನ ವಲಯ -->
+        <div class="visual-area">
+            <div id="canvas3d"></div>
+        </div>
+
+        <!-- ನಿಯಂತ್ರಣ ಉಪಕರಣಗಳು -->
+        <div class="controls-area">
+            <div class="control-group">
+                <label>ಅಕ್ಷಾಂಶ (Latitude ರೇಖೆ): <span id="latVal" class="val-display">0° ಉತ್ತರ</span></label>
+                <input type="range" id="latInput" min="-90" max="90" value="0">
+            </div>
+
+            <div class="control-group">
+                <label>ರೇಖಾಂಶ (Longitude ರೇಖೆ): <span id="lonVal" class="val-display">0° ಪೂರ್ವ</span></label>
+                <input type="range" id="lonInput" min="-180" max="180" value="0">
+            </div>
+
+            <div class="info-panel" id="infoPanel">
+                ಸ್ಲೈಡರ್‌ಗಳನ್ನು ಚಲಿಸಿದಾಗ 3D ಗೋಳದ ಮೇಲೆ ಅಕ್ಷಾಂಶ ಮತ್ತು ರೇಖಾಂಶದ ಗೆರೆಗಳು ವೃತ್ತಾಕಾರವಾಗಿ ಚಲಿಸುತ್ತವೆ.
+            </div>
+            
+            <div class="guide-text">
+                💡 ಮೌಸ್ ಎಡ ಬಟನ್ ಒತ್ತಿ ಹಿಡಿದು ತಿರುಗಿಸಿ. ಸ್ಕ್ರಾಲ್ ಮಾಡುವ ಮೂಲಕ ಜೂಮ್ ಇನ್/ಔಟ್ ಮಾಡಿ.
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 1. Three.js 3D ಸೀನ್ ಸೆಟಪ್
+        const container = document.getElementById('canvas3d');
+        const scene = new THREE.Scene();
+        
+        const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+        camera.position.z = 12;
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(container.clientWidth, container.clientHeight);
+        container.appendChild(renderer.domElement);
+
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+
+        // 2. 3D ಗ್ಲೋಬ್ (ಭೂಮಿ) ಮತ್ತು ಹಿನ್ನೆಲೆ ಗ್ರಿಡ್ ರಚನೆ
+        const globeRadius = 4;
+        const globeGeometry = new THREE.SphereGeometry(globeRadius, 32, 32);
+        const globeMaterial = new THREE.MeshBasicMaterial({
+            color: '#1e3a8a',
+            transparent: true,
+            opacity: 0.85
+        });
+        const globe = new THREE.Mesh(globeGeometry, globeMaterial);
+        scene.add(globe);
+
+        const gridHelper = new THREE.SphereGeometry(globeRadius + 0.01, 24, 24);
+        const gridMaterial = new THREE.MeshBasicMaterial({
+            color: '#475569',
+            wireframe: true,
+            transparent: true,
+            opacity: 0.25
+        });
+        const grid = new THREE.Mesh(gridHelper, gridMaterial);
+        scene.add(grid);
+
+        // 3. ಸ್ಥಿರ ಸಮಭಾಜಕ ವೃತ್ತ (0° Equator - ಸ್ಥಿರ ಕೆಂಪು ರೇಖೆ)
+        const equatorRadius = globeRadius + 0.02;
+        const equatorGeom = new THREE.BufferGeometry();
+        const equatorPoints = [];
+        for(let i = 0; i <= 64; i++) {
+            let theta = (i / 64) * Math.PI * 2;
+            equatorPoints.push(new THREE.Vector3(Math.cos(theta) * equatorRadius, 0, Math.sin(theta) * equatorRadius));
+        }
+        equatorGeom.setFromPoints(equatorPoints);
+        const equatorMat = new THREE.LineBasicMaterial({ color: '#ef4444', linewidth: 2 });
+        const equatorLine = new THREE.Line(equatorGeom, equatorMat);
+        scene.add(equatorLine);
+
+        // 4. ಡೈನಾಮಿಕ್ ಅಕ್ಷಾಂಶ ವೃತ್ತ (Dynamic Latitude Line - ತಿಳಿ ನೀಲಿ)
+        const latGeom = new THREE.BufferGeometry();
+        const latMat = new THREE.LineBasicMaterial({ color: '#38bdf8', linewidth: 3 });
+        const dynamicLatLine = new THREE.Line(latGeom, latMat);
+        scene.add(dynamicLatLine);
+
+        // 5. ಡೈನಾಮಿಕ್ ರೇಖಾಂಶ ವೃತ್ತ (Dynamic Longitude Line - ನೇರಳೆ)
+        const lonGeom = new THREE.BufferGeometry();
+        const lonMat = new THREE.LineBasicMaterial({ color: '#a78bfa', linewidth: 3 });
+        const dynamicLonLine = new THREE.Line(lonGeom, lonMat);
+        scene.add(dynamicLonLine);
+
+        // 6. ಇಂಟರಾಕ್ಟಿವ್ ಪಾಯಿಂಟ್ (ಹಸಿರು ಚುಕ್ಕಿ ಸಂಧಿಸುವ ಜಾಗದಲ್ಲಿ)
+        const markerGeom = new THREE.SphereGeometry(0.12, 16, 16);
+        const markerMat = new THREE.MeshBasicMaterial({ color: '#10b981' });
+        const marker = new THREE.Mesh(markerGeom, markerMat);
+        scene.add(marker);
+
+        // ಇನ್‌ಪುಟ್ ನಿಯಂತ್ರಣಗಳು
+        const latInput = document.getElementById('latInput');
+        const lonInput = document.getElementById('lonInput');
+        const latVal = document.getElementById('latVal');
+        const lonVal = document.getElementById('lonVal');
+        const infoPanel = document.getElementById('infoPanel');
+
+        // ಸ್ಲೈಡರ್ ಬದಲಾದಾಗ ಗೆರೆ ಮತ್ತು ಚುಕ್ಕಿಗಳನ್ನು ನವೀಕರಿಸುವ ಫಂಕ್ಷನ್
+        function updateGlobeLines() {
+            let lat = parseFloat(latInput.value);
+            let lon = parseFloat(lonInput.value);
+
+            let latDir = lat >= 0 ? 'ಉತ್ತರ' : 'ದಕ್ಷಿಣ';
+            let lonDir = lon >= 0 ? 'ಪೂರ್ವ' : 'ಪಶ್ಚಿಮ';
+
+            latVal.textContent = `${Math.abs(lat)}° ${latDir}`;
+            lonVal.textContent = `${Math.abs(lon)}° ${lonDir}`;
+
+            const rOffset = globeRadius + 0.04;
+
+            // --- ಅಕ್ಷಾಂಶ ವೃತ್ತವನ್ನು ಬಿಡಿಸುವುದು (Horizontal Circle) ---
+            const latPoints = [];
+            let latRad = lat * (Math.PI / 180);
+            let currentLatRadius = rOffset * Math.cos(latRad);
+            let yPos = rOffset * Math.sin(latRad);
+
+            for(let i = 0; i <= 64; i++) {
+                let theta = (i / 64) * Math.PI * 2;
+                latPoints.push(new THREE.Vector3(Math.cos(theta) * currentLatRadius, yPos, Math.sin(theta) * currentLatRadius));
+            }
+            latGeom.setFromPoints(latPoints);
+
+            // --- ರೇಖಾಂಶ ಅರ್ಧವೃತ್ತವನ್ನು ಬಿಡಿಸುವುದು (Vertical Arch) ---
+            const lonPoints = [];
+            let lonRad = lon * (Math.PI / 180);
+
+            for(let i = -90; i <= 90; i += 2) {
+                let pRad = i * (Math.PI / 180);
+                let x = rOffset * Math.cos(pRad) * Math.sin(lonRad);
+                let y = rOffset * Math.sin(pRad);
+                let z = rOffset * Math.cos(pRad) * Math.cos(lonRad);
+                lonPoints.push(new THREE.Vector3(x, y, z));
+            }
+            lonGeom.setFromPoints(lonPoints);
+
+            // --- ಹಸಿರು ಚುಕ್ಕಿಯ ಸ್ಥಾನ (Intersection Point) ---
+            let phi = (90 - lat) * (Math.PI / 180);
+            let theta = (lon + 180) * (Math.PI / 180);
+            let ptRadius = globeRadius + 0.06;
+
+            marker.position.x = -(ptRadius * Math.sin(phi) * Math.sin(theta));
+            marker.position.y = ptRadius * Math.cos(phi);
+            marker.position.z = ptRadius * Math.sin(phi) * Math.cos(theta);
+
+            infoPanel.innerHTML = `ಪ್ರಸ್ತುತ <b>ತಿಳಿ ನೀಲಿ ಅಕ್ಷಾಂಶ ವೃತ್ತವು</b> ${Math.abs(lat)}° ${latDir}ಕ್ಕೂ, ಮತ್ತು <b>ನೇರಳೆ ರೇಖಾಂಶ ವೃತ್ತವು</b> ${Math.abs(lon)}° ${lonDir}ಕ್ಕೂ ಚಲಿಸಿದೆ. ಇವೆರಡೂ ಸಂಧಿಸುವ ಜಾಗವೇ ಹಸಿರು ಚುಕ್ಕಿ!`;
+        }
+
+        latInput.addEventListener('input', updateGlobeLines);
+        lonInput.addEventListener('input', updateGlobeLines);
+
+        window.addEventListener('resize', () => {
+            if (container.clientWidth > 0 && container.clientHeight > 0) {
+                camera.aspect = container.clientWidth / container.clientHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(container.clientWidth, container.clientHeight);
+            }
+        });
+
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        // ಪ್ರಾರಂಭಿಕ ಚಾಲನೆ
+        updateGlobeLines();
+        animate();
+    </script>
+</body>
+</html>

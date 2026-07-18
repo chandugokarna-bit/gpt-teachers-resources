@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಅಕ್ಷಾಂಶ ಮತ್ತು ರೇಖಾಂಶಗಳ ಇಂಟರಾಕ್ಟಿವ್ ಮಾದರಿ</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f4f8;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #333;
+        }
+
+        h1 {
+            color: #1e3a8a;
+            margin-bottom: 5px;
+            text-align: center;
+        }
+
+        .subtitle {
+            color: #4b5563;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            background: white;
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+            max-width: 800px;
+            width: 100%;
+            gap: 30px;
+        }
+
+        @media (min-width: 768px) {
+            .container {
+                flex-direction: row;
+                align-items: center;
+            }
+        }
+
+        .visual-area {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            position: relative;
+        }
+
+        canvas {
+            background: #0d1b2a;
+            border-radius: 50%;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.6), 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .controls-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        label {
+            font-weight: 600;
+            color: #1e3a8a;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .val-display {
+            background: #e0e7ff;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            accent-color: #2563eb;
+            cursor: pointer;
+        }
+
+        .btn-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        button {
+            padding: 10px;
+            border: 1px solid #cbd5e1;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        button:hover {
+            background: #f1f5f9;
+            border-color: #94a3b8;
+        }
+
+        button.active {
+            background: #2563eb;
+            color: white;
+            border-color: #2563eb;
+        }
+
+        .info-panel {
+            background: #f8fafc;
+            border-left: 4px solid #2563eb;
+            padding: 12px;
+            border-radius: 0 8px 8px 0;
+            font-size: 0.95em;
+            min-height: 60px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>🌍 ಅಕ್ಷಾಂಶ ಮತ್ತು ರೇಖಾಂಶಗಳ ಕಲಿಕಾ ಮಾದರಿ</h1>
+    <div class="subtitle">ಸ್ಲೈಡರ್ ಬಳಸಿ ಅಥವಾ ಬಟನ್ ಒತ್ತಿ ಬದಲಾವಣೆಗಳನ್ನು ಗಮನಿಸಿ</div>
+
+    <div class="container">
+        <!-- ಗ್ಲೋಬ್ ಪ್ರದರ್ಶನ ಪ್ರದೇಶ -->
+        <div class="visual-area">
+            <canvas id="globeCanvas" width="300" height="300"></canvas>
+        </div>
+
+        <!-- ನಿಯಂತ್ರಣ ಉಪಕರಣಗಳು -->
+        <div class="controls-area">
+            <!-- ಅಕ್ಷಾಂಶ ಸ್ಲೈಡರ್ -->
+            <div class="control-group">
+                <label>ಅಕ್ಷಾಂಶ (Latitude): <span id="latVal" class="val-display">0°</span></label>
+                <input type="range" id="latInput" min="-90" max="90" value="0">
+            </div>
+
+            <!-- ರೇಖಾಂಶ ಸ್ಲೈಡರ್ -->
+            <div class="control-group">
+                <label>ರೇಖಾಂಶ (Longitude): <span id="lonVal" class="val-display">0°</span></label>
+                <input type="range" id="lonInput" min="-180" max="180" value="0">
+            </div>
+
+            <!-- ತ್ವರಿತ ಹೈಲೈಟ್ ಬಟನ್‌ಗಳು -->
+            <div class="control-group">
+                <label>ಪ್ರಮುಖ ರೇಖೆಗಳನ್ನು ಗುರುತಿಸಿ:</label>
+                <div class="btn-grid">
+                    <button onclick="highlightLine('equator')">ಸಮಭಾಜಕ ವೃತ್ತ (0°)</button>
+                    <button onclick="highlightLine('cancer')">ಕರ್ಕಾಟಕ ವೃತ್ತ (23.5° N)</button>
+                    <button onclick="highlightLine('capricorn')">ಮಕರ ವೃತ್ತ (23.5° S)</button>
+                    <button onclick="highlightLine('meridian')">ಮುಖ್ಯ ರೇಖಾಂಶ (0°)</button>
+                </div>
+            </div>
+
+            <!-- ಮಾಹಿತಿ ಪ್ರದರ್ಶನ -->
+            <div class="info-panel" id="infoPanel">
+                ಸ್ಲೈಡರ್‌ಗಳನ್ನು ಚಲಿಸುವ ಮೂಲಕ ಭೂಮಿಯ ಮೇಲಿನ ಬಿಂದುವಿನ ಸ್ಥಾನವನ್ನು ಬದಲಾಯಿಸಿ.
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('globeCanvas');
+        const ctx = canvas.getContext('2d');
+        const latInput = document.getElementById('latInput');
+        const lonInput = document.getElementById('lonInput');
+        const latVal = document.getElementById('latVal');
+        const lonVal = document.getElementById('lonVal');
+        const infoPanel = document.getElementById('infoPanel');
+
+        const R = 130; // ಗ್ಲೋಬ್‌ನ ತ್ರಿಜ್ಯ
+        const cx = canvas.width / 2;
+        const cy = canvas.height / 2;
+
+        const infoTexts = {
+            equator: "<b>ಸಮಭಾಜಕ ವೃತ್ತ (0° ಅಕ್ಷಾಂಶ):</b> ಇದು ಭೂಮಿಯನ್ನು ಉತ್ತರ ಮತ್ತು ದಕ್ಷಿಣ ಗೋಳಾರ್ಧಗಳಾಗಿ ಸಮನಾಗಿ ಹಂಚುತ್ತದೆ.",
+            cancer: "<b>ಕರ್ಕಾಟಕ ಸಂಕ್ರಾಂತಿ ವೃತ್ತ (23.5° ಉತ್ತರಾಕ್ಷಾಂಶ):</b> ಇದು ಭಾರತದ ಮಧ್ಯಭಾಗದಲ್ಲಿ ಹಾದುಹೋಗುವ ಪ್ರಮುಖ ರೇಖೆಯಾಗಿದೆ.",
+            capricorn: "<b>ಮಕರ ಸಂಕ್ರಾಂತಿ ವೃತ್ತ (23.5° ದಕ್ಷಿಣಾಕ್ಷಾಂಶ):</b> ದಕ್ಷಿಣ ಗೋಳಾರ್ಧದಲ್ಲಿರುವ ಪ್ರಮುಖ ಅಕ್ಷಾಂಶ ರೇಖೆ.",
+            meridian: "<b>ಗ್ರೀನ್‌ವಿಚ್ ಮುಖ್ಯ ರೇಖಾಂಶ (0° ರೇಖಾಂಶ):</b> ಜಗತ್ತಿನ ಸಮಯವನ್ನು ನಿರ್ಧರಿಸಲು ಈ ರೇಖೆಯನ್ನು ಆಧಾರವಾಗಿ ಬಳಸಲಾಗುತ್ತದೆ."
+        };
+
+        function drawGlobe() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            let lat = parseFloat(latInput.value);
+            let lon = parseFloat(lonInput.value);
+
+            // 1. ಭೂಮಿಯ ಹಿನ್ನೆಲೆ ಬಣ್ಣ (ಸಮುದ್ರ)
+            ctx.beginPath();
+            ctx.arc(cx, cy, R, 0, 2 * Math.PI);
+            ctx.fillStyle = '#1e3a8a';
+            ctx.fill();
+
+            // 2. ಗ್ರಿಡ್ ಲೈನ್‌ಗಳು (ಅಕ್ಷಾಂಶಗಳು)
+            ctx.lineWidth = 1;
+            for (let l = -60; l <= 60; l += 30) {
+                if (l === 0) continue; // ಸಮಭಾಜಕವನ್ನು ಪ್ರತ್ಯೇಕವಾಗಿ ಎಳೆಯೋಣ
+                ctx.beginPath();
+                let y = cy - R * Math.sin(l * Math.PI / 180);
+                let r = R * Math.cos(l * Math.PI / 180);
+                ctx.ellipse(cx, y, r, r * 0.2, 0, 0, 2 * Math.PI);
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
+                ctx.stroke();
+            }
+
+            // 3. ಸಮಭಾಜಕ ವೃತ್ತ (Equator) ಸ್ಥಿರ ರೇಖೆ
+            ctx.beginPath();
+            ctx.ellipse(cx, cy, R, R * 0.2, 0, 0, 2 * Math.PI);
+            ctx.strokeStyle = lat === 0 ? '#f59e0b' : 'rgba(255, 255, 255, 0.6)';
+            ctx.lineWidth = lat === 0 ? 2.5 : 1.5;
+            ctx.stroke();
+
+            // 4. ಪ್ರಸ್ತುತ ಆಯ್ಕೆಯಾಗಿರುವ ಅಕ್ಷಾಂಶದ ರೇಖೆ (ಡೈನಾಮಿಕ್)
+            if (lat !== 0) {
+                ctx.beginPath();
+                let currentY = cy - R * Math.sin(lat * Math.PI / 180);
+                let currentR = R * Math.cos(lat * Math.PI / 180);
+                ctx.ellipse(cx, currentY, currentR, currentR * 0.2, 0, 0, 2 * Math.PI);
+                ctx.strokeStyle = '#38bdf8';
+                ctx.lineWidth = 2;
+                ctx.setLineDash([4, 4]);
+                ctx.stroke();
+                ctx.setLineDash([]); // ಡ್ಯಾಶ್ ರದ್ದುಗೊಳಿಸಿ
+            }
+
+            // 5. ಪ್ರಸ್ತುತ ರೇಖಾಂಶದ ರೇಖೆ (ಡೈನಾಮಿಕ್ ಅರ್ಧವೃತ್ತ ನೋಟ)
+            ctx.beginPath();
+            let lonRad = lon * Math.PI / 180;
+            ctx.ellipse(cx, cy, R * Math.sin(lonRad), R, 0, -Math.PI/2, Math.PI/2, lon < 0);
+            ctx.strokeStyle = lon === 0 ? '#ef4444' : '#a78bfa';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // 6. ಪ್ರಸ್ತುತ ಸ್ಥಾನದ ಬಿಂದು (Target Marker)
+            let pointY = cy - R * Math.sin(lat * Math.PI / 180);
+            let pointR = R * Math.cos(lat * Math.PI / 180);
+            let pointX = cx + pointR * Math.sin(lon * Math.PI / 180);
+
+            // ಬಿಂದುವು ಮುಂಭಾಗದಲ್ಲಿದ್ದರೆ ಮಾತ್ರ ಸ್ಪಷ್ಟವಾಗಿ ತೋರಿಸು
+            ctx.beginPath();
+            ctx.arc(pointX, pointY, 7, 0, 2 * Math.PI);
+            ctx.fillStyle = '#10b981';
+            ctx.strokeStyle = '#white';
+            ctx.lineWidth = 2;
+            ctx.fill();
+            ctx.stroke();
+
+            // ಹೊಳಪಿನ ಎಫೆಕ್ಟ್
+            ctx.beginPath();
+            ctx.arc(pointX, pointY, 12, 0, 2 * Math.PI);
+            ctx.strokeStyle = 'rgba(16, 185, 129, 0.4)';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        }
+
+        function updateValues() {
+            let lat = latInput.value;
+            let lon = lonInput.value;
+            
+            let latDir = lat >= 0 ? 'ಉತ್ತರ' : 'ದಕ್ಷಿಣ';
+            let lonDir = lon >= 0 ? 'ಪೂರ್ವ' : 'ಪಶ್ಚಿಮ';
+
+            latVal.textContent = `${Math.abs(lat)}° ${latDir}`;
+            lonVal.textContent = `${Math.abs(lon)}° ${lonDir}`;
+
+            // ಬಟನ್‌ಗಳ ಆಕ್ಟಿವ್ ಕ್ಲಾಸ್ ತೆಗೆದುಹಾಕಿ
+            document.querySelectorAll('.btn-grid button').forEach(b => b.classList.remove('active'));
+            infoPanel.innerHTML = `ಪ್ರಸ್ತುತ ಸ್ಥಾನ: <b>${Math.abs(lat)}° ${latDir} ಅಕ್ಷಾಂಶ</b> ಮತ್ತು <b>${Math.abs(lon)}° ${lonDir} ರೇಖಾಂಶ</b>.`;
+
+            drawGlobe();
+        }
+
+        function highlightLine(type) {
+            // ಎಲ್ಲಾ ಬಟನ್ ಆಕ್ಟಿವ್ ಸ್ಟೇಟ್ ರಿಸೆಟ್
+            document.querySelectorAll('.btn-grid button').forEach(b => b.classList.remove('active'));
+            
+            if (type === 'equator') {
+                latInput.value = 0;
+                event.target.classList.add('active');
+            } else if (type === 'cancer') {
+                latInput.value = 23.5;
+                event.target.classList.add('active');
+            } else if (type === 'capricorn') {
+                latInput.value = -23.5;
+                event.target.classList.add('active');
+            } else if (type === 'meridian') {
+                lonInput.value = 0;
+                event.target.classList.add('active');
+            }
+            
+            updateValues();
+            infoPanel.innerHTML = infoTexts[type];
+        }
+
+        latInput.addEventListener('input', updateValues);
+        lonInput.addEventListener('input', updateValues);
+
+        // ಮೊದಲ ಬಾರಿ ಲೋಡ್ ಮಾಡುವಾಗ
+        drawGlobe();
+    </script>
+</body>
+</html>

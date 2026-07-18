@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಭೂಮಿಯ ಪಂಚ ವಲಯಗಳ 3D ಇಂಟರಾಕ್ಟಿವ್ ಮಾದರಿ</title>
+    <!-- 3D ಗ್ರಾಫಿಕ್ಸ್ ಗಾಗಿ Three.js ಲೈಬ್ರರಿ -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- ಮೌಸ್ ಮೂಲಕ ತಿರುಗಿಸಲು OrbitControls ಲೈಬ್ರರಿ -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #0f172a;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #f8fafc;
+        }
+
+        h1 {
+            color: #38bdf8;
+            margin-bottom: 5px;
+            text-align: center;
+        }
+
+        .subtitle {
+            color: #94a3b8;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .main-container {
+            display: flex;
+            flex-direction: column;
+            background: #1e293b;
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            max-width: 1000px;
+            width: 100%;
+            gap: 25px;
+            border: 1px solid #334155;
+        }
+
+        @media (min-width: 768px) {
+            .main-container {
+                flex-direction: row;
+                align-items: stretch;
+            }
+        }
+
+        .visual-area {
+            flex: 1.2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #020617;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 2px solid #38bdf8;
+            height: 450px;
+            position: relative;
+        }
+
+        #canvas3d {
+            width: 100%;
+            height: 100%;
+        }
+
+        .controls-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .zone-btn {
+            padding: 12px;
+            border: 1px solid #475569;
+            background: #334155;
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            text-align: left;
+            transition: all 0.2s;
+            font-size: 0.95em;
+        }
+
+        .zone-btn:hover {
+            background: #475569;
+        }
+
+        .zone-btn.active {
+            border-color: #38bdf8;
+            box-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+        }
+
+        /* ವಲಯಗಳ ವೈಯಕ್ತಿಕ ಬಟನ್ ಬಣ್ಣಗಳು */
+        #btn-frigid-n.active { background: #38bdf8; color: #0f172a; }
+        #btn-temp-n.active { background: #10b981; color: white; }
+        #btn-torrid.active { background: #f59e0b; color: #0f172a; }
+        #btn-temp-s.active { background: #10b981; color: white; }
+        #btn-frigid-s.active { background: #38bdf8; color: #0f172a; }
+
+        .info-panel {
+            background: #0f172a;
+            border-left: 4px solid #38bdf8;
+            padding: 15px;
+            border-radius: 0 8px 8px 0;
+            font-size: 0.95em;
+            line-height: 1.6;
+            color: #cbd5e1;
+            flex-grow: 1;
+            min-height: 120px;
+        }
+
+        .guide-text {
+            font-size: 0.85em;
+            color: #64748b;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>🌍 ಭೂಮಿಯ ಪಂಚ ವಲಯಗಳು (5 Major Thermal Zones)</h1>
+    <div class="subtitle">ಯಾವುದೇ ವಲಯದ ಬಟನ್ ಒತ್ತಿ ಅದರ ವ್ಯಾಪ್ತಿ ಮತ್ತು ಹವಾಮಾನದ ವಿವರಣೆಯನ್ನು 3D ಯಲ್ಲಿ ವೀಕ್ಷಿಸಿ</div>
+
+    <div class="main-container">
+        <!-- 3D ಪ್ರದರ್ಶನ ವಲಯ -->
+        <div class="visual-area">
+            <div id="canvas3d"></div>
+        </div>
+
+        <!-- ಬಲಭಾಗದ ನಿಯಂತ್ರಣ ಬಟನ್‌ಗಳು ಮತ್ತು ಮಾಹಿತಿ -->
+        <div class="controls-area">
+            <button id="btn-frigid-n" class="zone-btn" onclick="selectZone('frigidN')">🥶 1. ಉತ್ತರ ಶೀತ ವಲಯ (North Frigid Zone)</button>
+            <button id="btn-temp-n" class="zone-btn" onclick="selectZone('tempN')">🍃 2. ಉತ್ತರ ಸಮಶೀತೋಷ್ಣ ವಲಯ (North Temperate Zone)</button>
+            <button id="btn-torrid" class="zone-btn" onclick="selectZone('torrid')">☀️ 3. ಉಷ್ಣವಲಯ (Torrid Zone)</button>
+            <button id="btn-temp-s" class="zone-btn" onclick="selectZone('tempS')">🍃 4. ದಕ್ಷಿಣ ಸಮಶೀತೋಷ್ಣ ವಲಯ (South Temperate Zone)</button>
+            <button id="btn-frigid-s" class="zone-btn" onclick="selectZone('frigidS')">🥶 5. ದಕ್ಷಿಣ ಶೀತ ವಲಯ (South Frigid Zone)</button>
+
+            <div class="info-panel" id="infoPanel">
+                ಬಟನ್‌ಗಳ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡುವ ಮೂಲಕ ಭೂಮಿಯ ಪಂಚ ವಲಯಗಳ ಸಂಪೂರ್ಣ ಭೌಗೋಳಿಕ ಮಾಹಿತಿ ಮತ್ತು ಹವಾಮಾನದ ವೈಶಿಷ್ಟ್ಯಗಳನ್ನು ತಿಳಿಯಿರಿ.
+            </div>
+            
+            <div class="guide-text">
+                💡 ಮೌಸ್ ಬಳಸಿ ಗ್ಲೋಬ್ ಅನ್ನು ತಿರುಗಿಸಬಹುದು ಮತ್ತು ಜೂಮ್ ಮಾಡಬಹುದು.
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 1. Three.js ಸೀನ್ ಸೆಟಪ್
+        const container = document.getElementById('canvas3d');
+        const scene = new THREE.Scene();
+        
+        const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+        camera.position.set(0, 4, 10); // ವಲಯಗಳು ಚೆನ್ನಾಗಿ ಕಾಣಲು ಸ್ವಲ್ಪ ಮೇಲಿನ ಕೋನ
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(container.clientWidth, container.clientHeight);
+        container.appendChild(renderer.domElement);
+
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+
+        // ಬೆಳಕಿನ ವ್ಯವಸ್ಥೆ (ವಲಯಗಳ ಬಣ್ಣ ಚೆನ್ನಾಗಿ ಕಾಣಲು)
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+        scene.add(ambientLight);
+        const dirLight = new THREE.DirectionalLight(0xffffff, 0.5);
+        dirLight.position.set(5, 5, 5);
+        scene.add(dirLight);
+
+        // 2. ಬೇಸ್ ಗ್ಲೋಬ್ ರಚನೆ (ಒಳಗಿನ ನೀಲಿ ಗೋಳ)
+        const globeRadius = 3.5;
+        const globeGeom = new THREE.SphereGeometry(globeRadius, 32, 32);
+        const globeMat = new THREE.MeshStandardMaterial({ color: '#1e293b', roughness: 0.8 });
+        const globe = new THREE.Mesh(globeGeom, globeMat);
+        scene.add(globe);
+
+        // 3. ಪಂಚ ವಲಯಗಳ ಲೇಯರ್‌ಗಳನ್ನು ಸೃಜಿಸುವುದು (ವಿಭಿನ್ನ ಲ್ಯಾಟಿಟ್ಯೂಡ್ ಬ್ಯಾಂಡ್‌ಗಳು)
+        const zones = {};
+
+        function createZoneMesh(latMin, latMax, color) {
+            // ಡಿಗ್ರಿಯಿಂದ ರೇಡಿಯನ್ಸ್‌ಗೆ ಪರಿವರ್ತನೆ (Three.js ಫೈ ಕೋನವು ಧ್ರುವದಿಂದ ಆರಂಭವಾಗುತ್ತದೆ)
+            const phiStart = (90 - latMax) * (Math.PI / 180);
+            const phiLength = (latMax - latMin) * (Math.PI / 180);
+            
+            const geom = new THREE.SphereGeometry(globeRadius + 0.03, 32, 16, 0, Math.PI * 2, phiStart, phiLength);
+            const mat = new THREE.MeshStandardMaterial({
+                color: color,
+                transparent: true,
+                opacity: 0.4,
+                side: THREE.DoubleSide
+            });
+            return new THREE.Mesh(geom, mat);
+        }
+
+        // ಪಂಚ ವಲಯಗಳ ಬಣ್ಣ ಮತ್ತು ವ್ಯಾಪ್ತಿ ನಿರ್ಧಾರ
+        zones.frigidN = createZoneMesh(66.5, 90, '#38bdf8');  // ಉತ್ತರ ಶೀತ ವಲಯ - ತಿಳಿ ನೀಲಿ
+        zones.tempN   = createZoneMesh(23.5, 66.5, '#10b981'); // ಉತ್ತರ ಸಮಶೀತೋಷ್ಣ - ಹಸಿರು
+        zones.torrid  = createZoneMesh(-23.5, 23.5, '#f59e0b'); // ಉಷ್ಣವಲಯ - ಕಿತ್ತಳೆ/ಹಳದಿ
+        zones.tempS   = createZoneMesh(-66.5, -23.5, '#10b981');// ದಕ್ಷಿಣ ಸಮಶೀತೋಷ್ಣ - ಹಸಿರು
+        zones.frigidS = createZoneMesh(-90, -66.5, '#38bdf8'); // ದಕ್ಷಿಣ ಶೀತ ವಲಯ - ತಿಳಿ ನೀಲಿ
+
+        // ಸೀನ್‌ಗೆ ಎಲ್ಲಾ ವಲಯಗಳನ್ನು ಸೇರಿಸುವುದು
+        Object.values(zones).forEach(mesh => scene.add(mesh));
+
+        // ಪ್ರಮುಖ ಅಕ್ಷಾಂಶ ರೇಖೆಗಳನ್ನು ಎಳೆಯುವುದು (Equator, Tropics, Polar Circles)
+        function drawLatitudeLine(lat, colorHex) {
+            const rad = lat * (Math.PI / 180);
+            const r = (globeRadius + 0.05) * Math.cos(rad);
+            const y = (globeRadius + 0.05) * Math.sin(rad);
+            
+            const points = [];
+            for (let i = 0; i <= 64; i++) {
+                let theta = (i / 64) * Math.PI * 2;
+                points.push(new THREE.Vector3(Math.cos(theta) * r, y, Math.sin(theta) * r));
+            }
+            const geom = new THREE.BufferGeometry().setFromPoints(points);
+            const mat = new THREE.LineBasicMaterial({ color: colorHex, linewidth: 1.5 });
+            scene.add(new THREE.Line(geom, mat));
+        }
+
+        drawLatitudeLine(0, '#ef4444');     // ಸಮಭಾಜಕ ವೃತ್ತ (0°) - ಕೆಂಪು
+        drawLatitudeLine(23.5, '#ffffff');  // ಕರ್ಕಾಟಕ ವೃತ್ತ (23.5° N)
+        drawLatitudeLine(-23.5, '#ffffff'); // ಮಕರ ವೃತ್ತ (23.5° S)
+        drawLatitudeLine(66.5, '#e2e8f0');  // ಆರ್ಕ್ಟಿಕ್ ವೃತ್ತ (66.5° N)
+        drawLatitudeLine(-66.5, '#e2e8f0'); // ಅಂಟಾರ್ಕ್ಟಿಕ್ ವೃತ್ತ (66.5° S)
+
+        // 4. ಮಾಹಿತಿ ಡೇಟಾಬೇಸ್ (ಕನ್ನಡ ವಿವರಣೆಗಳು)
+        const infoTexts = {
+            frigidN: "<b>🥶 ಉತ್ತರ ಶೀತ ವಲಯ (North Frigid Zone):</b><br>• <b>ವ್ಯಾಪ್ತಿ:</b> 66½° ಉತ್ತರ ಅಕ್ಷಾಂಶದಿಂದ (ಆರ್ಕ್ಟಿಕ್ ವೃತ್ತ) 90° ಉತ್ತರ ಧ್ರುವದವರೆಗೆ ಹರಡಿದೆ.<br>• <b>ಹವಾಮಾನ:</b> ಇಲ್ಲಿ ಸೂರ್ಯನ ಕಿರಣಗಳು ತೀವ್ರ ಓರೆಯಾಗಿ ಬೀಳುವುದರಿಂದ ವರ್ಷಪೂರ್ತಿ ಅತ್ಯಂತ ಕಠಿಣವಾದ ಚಳಿ ಮತ್ತು ಹಿಮದಿಂದ ಆವೃತವಾಗಿರುತ್ತದೆ.",
+            tempN: "<b>🍃 ಉತ್ತರ ಸಮಶೀತೋಷ್ಣ ವಲಯ (North Temperate Zone):</b><br>• <b>ವ್ಯಾಪ್ತಿ:</b> 23½° ಉತ್ತರ ಅಕ್ಷಾಂಶದಿಂದ (ಕರ್ಕಾಟಕ ವೃತ್ತ) 66½° ಉತ್ತರ ಅಕ್ಷಾಂಶದವರೆಗೆ (ಆರ್ಕ್ಟಿಕ್ ವೃತ್ತ) ಇದೆ.<br>• <b>ಹವಾಮಾನ:</b> ಇಲ್ಲಿ ಅತಿಯಾದ ಉಷ್ಣತೆಯೂ ಇರದೆ, ಅತಿಯಾದ ಚಳಿಯೂ ಇರದೆ ಹಿತಕರವಾದ ಸಮಾನ ಹವಾಮಾನವಿರುತ್ತದೆ.",
+            torrid: "<b>☀️ ಉಷ್ಣವಲಯ (Torrid Zone / Tropical Zone):</b><br>• <b>ವ್ಯಾಪ್ತಿ:</b> 23½° ಉತ್ತರ ಅಕ್ಷಾಂಶದಿಂದ (ಕರ್ಕಾಟಕ ವೃತ್ತ) 23½° ದಕ್ಷಿಣ ಅಕ್ಷಾಂಶದ (مಕರ ವೃತ್ತ) ನಡುವಿನ ಪ್ರದೇಶ.<br>• <b>ಹವಾಮಾನ:</b> ಭೂಮಿಯ ಮಧ್ಯಭಾಗದಲ್ಲಿದ್ದು, ವರ್ಷಪೂರ್ತಿ ಸೂರ್ಯನ ಕಿರಣಗಳು ನೇರವಾಗಿ ಬೀಳುವುದರಿಂದ ಇದು ಜಗತ್ತಿನ ಅತ್ಯಂತ ಬಿಸಿಯಾದ ವಲಯವಾಗಿದೆ. ನಮ್ಮ ಭಾರತದ ಅರ್ಧಭಾಗ ಇದರಲ್ಲಿದೆ.",
+            tempS: "<b>🍃 ದಕ್ಷಿಣ ಸಮಶೀತೋಷ್ಣ ವಲಯ (South Temperate Zone):</b><br>• <b>ವ್ಯಾಪ್ತಿ:</b> 23½° ದಕ್ಷಿಣ ಅಕ್ಷಾಂಶದಿಂದ (ಮಕರ ವೃತ್ತ) 66½° ದಕ್ಷಿಣ ಅಕ್ಷಾಂಶದವರೆಗೆ (ಅಂಟಾರ್ಕ್ಟಿಕ್ ವೃತ್ತ) ಹರಡಿದೆ.<br>• <b>ಹವಾಮಾನ:</b> ಉತ್ತರ ಸಮಶೀತೋಷ್ಣ ವಲಯದಂತೆಯೇ ಇಲ್ಲೂ ಸಹ ತೀವ್ರ ಚಳಿ ಅಥವಾ ಬಿಸಿ ಇರದೆ ಹಿತಕರವಾದ ವಾತಾವರಣವಿರುತ್ತದೆ.",
+            frigidS: "<b>🥶 ದಕ್ಷಿಣ ಶೀತ ವಲಯ (South Frigid Zone):</b><br>• <b>ವ್ಯಾಪ್ತಿ:</b> 66½° ದಕ್ಷಿಣ ಅಕ್ಷಾಂಶದಿಂದ (ಅಂಟಾರ್ಕ್ಟಿಕ್ ವೃತ್ತ) 90° ದಕ್ಷಿಣ ಧ್ರುವದವರೆಗಿನ ಪ್ರದೇಶ (ಅಂಟಾರ್ಕ್ಟಿಕಾ ಖಂಡ).<br>• <b>ಹವಾಮಾನ:</b> ಅತ್ಯಂತ ಶೀತಲ ಪ್ರದೇಶವಾಗಿದ್ದು, ಸದಾ ಕಾಲ ದಪ್ಪನೆಯ ಮಂಜಿನ ಪದರದಿಂದ ಮುಚ್ಚಲ್ಪಟ್ಟಿರುತ್ತದೆ."
+        };
+
+        // 5. ವಲಯವನ್ನು ಆಯ್ಕೆ ಮಾಡುವ ಮತ್ತು ಹೈಲೈಟ್ ಮಾಡುವ ಫಂಕ್ಷನ್
+        function selectZone(selectedKey) {
+            // ಎಲ್ಲಾ ಬಟನ್‌ಗಳ ಆಕ್ಟಿವ್ ಕ್ಲಾಸ್ ಮತ್ತು ವಲಯಗಳ ಒಪಾಸಿಟಿ ರಿಸೆಟ್ ಮಾಡಿ
+            document.querySelectorAll('.zone-btn').forEach(btn => btn.classList.remove('active'));
+            
+            Object.keys(zones).forEach(key => {
+                if (key === selectedKey) {
+                    zones[key].material.opacity = 0.85; // ಆಯ್ಕೆಯಾದ ವಲಯ ಹೆಚ್ಚು ಪ್ರಕಾಶಮಾನವಾಗುತ್ತದೆ
+                    zones[key].material.needsUpdate = true;
+                } else {
+                    zones[key].material.opacity = 0.2;  // ಉಳಿದ ವಲಯಗಳು ಮಂದವಾಗುತ್ತವೆ
+                    zones[key].material.needsUpdate = true;
+                }
+            });
+
+            // ಪ್ರಸ್ತುತ ಬಟನ್ ಹೈಲೈಟ್ ಮಾಡಿ ಮತ್ತು ಮಾಹಿತಿ ನವೀಕರಿಸಿ
+            let btnId = "btn-" + (selectedKey === 'frigidN' ? 'frigid-n' : selectedKey === 'tempN' ? 'temp-n' : selectedKey === 'torrid' ? 'torrid' : selectedKey === 'tempS' ? 'temp-s' : 'frigid-s');
+            document.getElementById(btnId).classList.add('active');
+            document.getElementById('infoPanel').innerHTML = infoTexts[selectedKey];
+        }
+
+        // ವಿಂಡೋ ರಿಸೈಸ್ ನಿರ್ವಹಣೆ
+        window.addEventListener('resize', () => {
+            if (container.clientWidth > 0 && container.clientHeight > 0) {
+                camera.aspect = container.clientWidth / container.clientHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(container.clientWidth, container.clientHeight);
+            }
+        });
+
+        // 6. ರೆಂಡರಿಂಗ್ ಲೂಪ್
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        // ಮೊದಲ ಬಾರಿಗೆ ಉಷ್ಣವಲಯವನ್ನು ಡಿಫಾಲ್ಟ್ ಆಗಿ ಹೈಲೈಟ್ ಮಾಡೋಣ
+        selectZone('torrid');
+        animate();
+    </script>
+</body>
+</html>
