@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಭೂಮಿಯ ಸ್ವರೂಪ - ಇಂಟರ್ ಆಕ್ಟಿವ್ ಕ್ವಿಜ್</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background: linear-gradient(135deg, #74ebd5 0%, #9ece6a 100%);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .quiz-container {
+            background-color: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            width: 100%;
+            max-width: 800px;
+            padding: 30px;
+            position: relative;
+        }
+        .header {
+            text-align: center;
+            border-bottom: 3px solid #f0f0f0;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            color: #2c3e50;
+            margin: 0 0 10px 0;
+            font-size: 26px;
+        }
+        .header h2 {
+            color: #27ae60;
+            margin: 0;
+            font-size: 20px;
+        }
+        .progress-bar-container {
+            width: 100%;
+            background-color: #e0e0e0;
+            border-radius: 10px;
+            height: 12px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #ff7e5f, #feb47b);
+            transition: width 0.3s ease;
+        }
+        .question-box {
+            display: none;
+        }
+        .question-box.active {
+            display: block;
+        }
+        .question-text {
+            font-size: 18px;
+            font-weight: bold;
+            color: #34495e;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .option-btn {
+            background-color: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 12px 20px;
+            font-size: 16px;
+            color: #212529;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            outline: none;
+        }
+        .option-btn:hover {
+            background-color: #e2e6ea;
+            border-color: #dae0e5;
+        }
+        .option-btn.correct {
+            background-color: #d4edda !important;
+            border-color: #28a745 !important;
+            color: #155724 !important;
+            font-weight: bold;
+        }
+        .option-btn.wrong {
+            background-color: #f8d7da !important;
+            border-color: #dc3545 !important;
+            color: #721c24 !important;
+        }
+        .feedback {
+            margin-top: 15px;
+            font-weight: bold;
+            font-size: 16px;
+            min-height: 24px;
+        }
+        .feedback.correct {
+            color: #28a745;
+        }
+        .feedback.wrong {
+            color: #dc3545;
+        }
+        .navigation-btns {
+            margin-top: 25px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .nav-btn {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .nav-btn:hover {
+            background-color: #0056b3;
+        }
+        .nav-btn:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        .result-container {
+            display: none;
+            text-align: center;
+        }
+        .result-container h2 {
+            font-size: 28px;
+            color: #2c3e50;
+        }
+        .score-card {
+            font-size: 22px;
+            margin: 20px 0;
+            color: #8e44ad;
+            font-weight: bold;
+        }
+        .restart-btn {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 18px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .restart-btn:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+
+<div class="quiz-container">
+    <div class="header">
+        <h1>ಸಮಾಜ ವಿಜ್ಞಾನ - ಇಂಟರ್ ಆಕ್ಟಿವ್ ಅಭ್ಯಾಸ</h1>
+        <h2>ಅಧ್ಯಾಯ 11: ಭೂಮಿಯ ಸ್ವರೂಪ</h2>
+    </div>
+
+    <div class="progress-bar-container">
+        <div class="progress-bar" id="progress-bar"></div>
+    </div>
+
+    <div id="quiz-body">
+        <!-- 20 ಪ್ರಶ್ನೆಗಳ ಕಂಟೇನರ್ -->
+        <div id="questions-container"></div>
+
+        <div class="navigation-btns">
+            <button class="nav-btn" id="prev-btn" onclick="changeQuestion(-1)">ಹಿಂದಿನ ಪ್ರಶ್ನೆ</button>
+            <button class="nav-btn" id="next-btn" onclick="changeQuestion(1)">ಮುಂದಿನ ಪ್ರಶ್ನೆ</button>
+        </div>
+    </div>
+
+    <div class="result-container" id="result-container">
+        <h2>ಅಭಿನಂದನೆಗಳು!</h2>
+        <p>ನೀವು ಕ್ವಿಜ್ ಪೂರ್ಣಗೊಳಿಸಿದ್ದೀರಿ.</p>
+        <div class="score-card" id="score-card"></div>
+        <button class="restart-btn" onclick="restartQuiz()">ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ</button>
+    </div>
+</div>
+
+<script>
+    const questionsData = [
+        {
+            q: "1. ಸುತ್ತಲಿನ ಪ್ರದೇಶಕ್ಕಿಂತ ಎತ್ತರವಾಗಿದ್ದು, ಕಡಿದಾದ ಇಳಿಜಾರು ಮತ್ತು ಶಿಖರಗಳನ್ನು ಹೊಂದಿರುವ ಭೂಭಾಗವನ್ನು ಏನೆಂದು ಕರೆಯುತ್ತಾರೆ?",
+            options: ["ಮೈದಾನ", "ಪರ್ವತ", "ದ್ವೀಪ", "ಮರುಭೂಮಿ"],
+            correct: 1
+        },
+        {
+            q: "2. ಪರ್ವತದ ಅತ್ಯಂತ ಎತ್ತರವುಳ್ಳ ತುದಿಗೆ ಏನೆಂದು ಕರೆಯುತ್ತಾರೆ?",
+            options: ["ಕಣಿವೆ", "ಪೀಠಭೂಮಿ", "ಶಿಖರ", "ಮೈದಾನ"],
+            correct: 2
+        },
+        {
+            q: "3. ಬೆಟ್ಟಗಳು ಸಾಮಾನ್ಯವಾಗಿ ಎಷ್ಟು ಮೀಟರ್‌ಗಳಷ್ಟು ಎತ್ತರವನ್ನು ಹೊಂದಿರುತ್ತವೆ?",
+            options: ["600 ಮೀಟರ್", "2000 ಮೀಟರ್", "5000 ಮೀಟರ್", "10000 ಮೀಟರ್"],
+            correct: 0
+        },
+        {
+            q: "4. ಶಿಲಾಸ್ತರಗಳು ಮುದುಡಿಕೊಳ್ಳುವುದರಿಂದ ನಿರ್ಮಾಣವಾಗುವ ಪರ್ವತಗಳಿಗೆ ಉದಾಹರಣೆ ಯಾವುದು?",
+            options: ["ಸಿಯೆರ್ರ ನಿವೇದ", "ಫ್ಯೂಜಿಯಾಮಾ", "ಹಿಮಾಲಯ", "ಕಿಲಿಮಂಜಾರೋ"],
+            correct: 2
+        },
+        {
+            q: "5. ಜ್ವಾಲಾಮುಖಿ ಹೊರಹಾಕುವ ವಸ್ತುಗಳು ರಾಶಿಯಾಗಿ ಶಂಕುವಾಕಾರದಲ್ಲಿ ನಿರ್ಮಾಣವಾಗುವ ಪರ್ವತ ಯಾವುದು?",
+            options: ["ಆಲ್ಪ್ಸ್", "ಕಿಲಿಮಂಜಾರೋ", "ಆಂಡೀಸ್", "ರಾಕಿ"],
+            correct: 1
+        },
+        {
+            q: "6. ಸಮತಟ್ಟಾದ ಮೇಲ್ಭಾಗ ಮತ್ತು ಕಡಿದಾದ ಬದಿಗಳನ್ನು ಹೊಂದಿರುವ ಭೂಭಾಗವನ್ನು ಏನೆಂದು ಕರೆಯುತ್ತಾರೆ?",
+            options: ["ಪರ್ವತ", "ಪ್ರಸ್ಥಭೂಮಿ", "ಮೈದಾನ", "ಕಣಿವೆ"],
+            correct: 1
+        },
+        {
+            q: "7. ಜಗತ್ತಿನಲ್ಲಿಯೇ ಅತಿ ಎತ್ತರದಲ್ಲಿರುವ ಪ್ರಸ್ಥಭೂಮಿ ಯಾವುದು?",
+            options: ["ಬೊಲಿವಿಯಾ ಪ್ರಸ್ಥಭೂಮಿ", "ದಖನ್ ಪ್ರಸ್ಥಭೂಮಿ", "ಟಿಬೆಟ್ ಪ್ರಸ್ಥಭೂಮಿ", "ಪಟಗೋನಿಯಾ ಪ್ರಸ್ಥಭೂಮಿ"],
+            correct: 2
+        },
+        {
+            q: "8. ಜಗತ್ತಿನ ಪ್ರಪಂಚದ ಮೇಲ್ಛಾವಣಿ ಎಂದು ಯಾವುದನ್ನು ಕರೆಯಲಾಗುತ್ತದೆ?",
+            options: ["ಹಿಮಾಲಯ", "ಟಿಬೆಟ್ ಪ್ರಸ್ಥಭೂಮಿ", "ಸಹಾರಾ", "ಆಲ್ಪ್ಸ್"],
+            correct: 1
+        },
+        {
+            q: "9. ಸುತ್ತಲೂ ಪರ್ವತ ಶ್ರೇಣಿಗಳಿಂದ ಸುತ್ತುವರಿದಿರುವ ಪ್ರಸ್ಥಭೂಮಿಯನ್ನು ಏನೆಂದು ಕರೆಯುತ್ತಾರೆ?",
+            options: ["ಅಂತರಪರ್ವತ ಪ್ರಸ್ಥಭೂಮಿ", "ಪರ್ವತಪಾದ ಪ್ರಸ್ಥಭೂಮಿ", "ಖಂಡಾಂತರ ಪ್ರಸ್ಥಭೂಮಿ", "ಮೈದಾನ"],
+            correct: 0
+        },
+        {
+            q: "10. ವಿಶಾಲವಾದ ಸಮತಟ್ಟಾದ ಅಥವಾ ಸ್ವಲ್ಪವೇ ಏರಿಳಿತಗಳಿರುವ ತಗ್ಗಾದ ಭೂಭಾಗವನ್ನು ಏನೆಂದು ಕರೆಯುತ್ತಾರೆ?",
+            options: ["ಪರ್ವತ", "ಬೆಟ್ಟ", "ಮೈದಾನ", "ಪ್ರಸ್ಥಭೂಮಿ"],
+            correct: 2
+        },
+        {
+            q: "11. ನದಿ, ಹಿಮನದಿ ಹಾಗೂ ಮಾರುತಗಳು ಹೊತ್ತು ತಂದ ಮೆಕ್ಕಲು-ಮಣ್ಣಿನ ಸಂಚಯದಿಂದ ನಿರ್ಮಾಣವಾಗುವ ಮೈದಾನಕ್ಕೆ ಉದಾಹರಣೆ ಯಾವುದು?",
+            options: ["ಸೈಬೀರಿಯಾ ಮೈದಾನ", "ಸಿಂಧೂ-ಗಂಗಾ ನದಿ ಬಯಲು", "ಯು.ಎಸ್.ಎ. ಆಗ್ನೇಯ ಮೈದಾನ", "ಸಹಾರಾ"],
+            correct: 1
+        },
+        {
+            q: "12. ಭೂಮೇಲ್ಮೈನಲ್ಲಿ ಮರುಭೂಮಿಗಳು ಎಷ್ಟನೇ ಒಂದು ಭಾಗವನ್ನು ಆವರಿಸಿಕೊಂಡಿವೆ?",
+            options: ["ಎರಡನೇ ಒಂದು ಭಾಗ", "ಮೂರನೇ ಒಂದು ಭಾಗ", "ಐದನೇ ಒಂದು ಭಾಗ", "ಹತ್ತನೇ ಒಂದು ಭಾಗ"],
+            correct: 2
+        },
+        {
+            q: "13. ಪ್ರಪಂಚದಲ್ಲಿಯೇ ಅತ್ಯಂತ ವಿಶಾಲವಾದ ಮರುಭೂಮಿ ಯಾವುದು?",
+            options: ["ಥಾರ್ ಮರುಭೂಮಿ", "ಸಹಾರಾ ಮರುಭೂಮಿ", "ಗೋಬಿ ಮರುಭೂಮಿ", "ಅಟಕಾಮ ಮರುಭೂಮಿ"],
+            correct: 1
+        },
+        {
+            q: "14. ಮರುಭೂಮಿಯಲ್ಲಿ ಅಂತರ್ಜಲವು ಚಿಲುಮೆಯಾಗಿ ಹೊರಬರುವ ಪ್ರದೇಶವನ್ನು ಏನೆಂದು ಕರೆಯುತ್ತಾರೆ?",
+            options: ["ದ್ವೀಪ", "ಕಿರುದ್ವೀಪ", "ಓಯಸಿಸ್", "ನಡುಗಡ್ಡೆ"],
+            correct: 2
+        },
+        {
+            q: "15. ಸಾಗರ, ಸಮುದ್ರ ಅಥವಾ ನದಿಗಳಲ್ಲಿ ಸುತ್ತಲೂ ನೀರಿನಿಂದಾವೃತವಾದ ಚಿಕ್ಕ ಭೂಭಾಗವನ್ನು ಏನೆಂದು ಕರೆಯುತ್ತಾರೆ?",
+            options: ["ಪ್ರಸ್ಥಭೂಮಿ", "ದ್ವೀಪ", "ಮೈದಾನ", "ಕಣಿವೆ"],
+            correct: 1
+        },
+        {
+            q: "16. ಭಾರತದ ಲಕ್ಷ ದ್ವೀಪಗಳು ಯಾವ ಮಾದರಿಯ ದ್ವೀಪಗಳಾಗಿವೆ?",
+            options: ["ಖಂಡಾಂತರ ದ್ವೀಪಗಳು", "ಜ್ವಾಲಾಮುಖಿ ದ್ವೀಪಗಳು", "ಹವಳದ ದ್ವೀಪಗಳು", "ನದಿ ದ್ವೀಪಗಳು"],
+            correct: 2
+        },
+        {
+            q: "17. ಪ್ರಪಂಚದ ಅತಿ ಎತ್ತರವಾದ ಶಿಖರ ಯಾವುದು?",
+            options: ["ಕೆ2 (Godwin Austen)", "ಮೌಂಟ್ ಎವರೆಸ್ಟ್", "ಕಿಲಿಮಂಜಾರೋ", "ಆನೈಮುಡಿ"],
+            correct: 1
+        },
+        {
+            q: "18. ಆಫ್ರಿಕಾದ ಪ್ರಸ್ಥಭೂಮಿಯು ಯಾವ ಗಣಿಗಾರಿಕೆಗೆ ಜಗತ್ತಿನಲ್ಲಿ ಪ್ರಸಿದ್ಧಿಯಾಗಿದೆ?",
+            options: ["ಕಬ್ಬಿಣ ಮತ್ತು ಕಲ್ಲಿದ್ದಲು", "ಚಿನ್ನ ಮತ್ತು ವಜ್ರ", "ತಾಮ್ರ ಮತ್ತು ಸಸ್ಯಾಧಾರಿತ ತೈಲ", "ಬಾಕ್ಸೈಟ್"],
+            correct: 1
+        },
+        {
+            q: "19. ಪ್ರಪಂಚದಲ್ಲಿಯೇ ಅತಿ ದೊಡ್ಡದಾದ ಗಂಗಾ ನದಿ ಮುಖಜಭೂಮಿಯನ್ನು ಏನೆಂದು ಕರೆಯಲಾಗುತ್ತದೆ?",
+            options: ["ಸುಂದರಬನ್", "ಓಯಸಿಸ್", "ಪ್ರೈರಿ", "ವೆಲ್ಡ್"],
+            correct: 0
+        },
+        {
+            q: "20. ಸಮಶೀತೋಷ್ಣವಲಯದ ಹುಲ್ಲುಗಾವಲುಗಳನ್ನು ಉತ್ತರ ಅಮೆರಿಕಾದಲ್ಲಿ ಏನೆಂದು ಕರೆಯುತ್ತಾರೆ?",
+            options: ["ವೆಲ್ಡ್", "ಪ್ರೈರಿ", "ಸುಂದರಬನ್", "ಟೈಗಾ"],
+            correct: 1
+        }
+    ];
+
+    let currentQuestionIndex = 0;
+    let userAnswers = new Array(questionsData.length).fill(null);
+
+    const questionsContainer = document.getElementById('questions-container');
+    const progressBar = document.getElementById('progress-bar');
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+
+    function initQuiz() {
+        questionsContainer.innerHTML = '';
+        questionsData.forEach((data, index) => {
+            const questionBox = document.createElement('div');
+            questionBox.className = `question-box ${index === 0 ? 'active' : ''}`;
+            questionBox.id = `q-box-${index}`;
+
+            let optionsHTML = '';
+            data.options.forEach((opt, optIdx) => {
+                optionsHTML += `<button class="option-btn" id="opt-${index}-${optIdx}" onclick="selectOption(${index}, ${optIdx})">${opt}</button>`;
+            });
+
+            questionBox.innerHTML = `
+                <div class="question-text">${data.q}</div>
+                <div class="options-container">${optionsHTML}</div>
+                <div class="feedback" id="feedback-${index}"></div>
+            `;
+            questionsContainer.appendChild(questionBox);
+        });
+        updateUI();
+    }
+
+    function selectOption(qIdx, optIdx) {
+        if (userAnswers[qIdx] !== null) return; // ಈಗಾಗಲೇ ಉತ್ತರಿಸಿದ್ದರೆ ಬದಲಾಯಿಸಲು ಬಿಡಬೇಡಿ
+
+        userAnswers[qIdx] = optIdx;
+        const correctOpt = questionsData[qIdx].correct;
+        const feedbackEl = document.getElementById(`feedback-${qIdx}`);
+
+        for (let i = 0; i < 4; i++) {
+            const btn = document.getElementById(`opt-${qIdx}-${i}`);
+            btn.disabled = true;
+            if (i === correctOpt) {
+                btn.classList.add('correct');
+            }
+        }
+
+        if (optIdx === correctOpt) {
+            feedbackEl.innerText = "ಸರಿ ಉತ್ತರ! 🎉";
+            feedbackEl.className = "feedback correct";
+        } else {
+            const selectedBtn = document.getElementById(`opt-${qIdx}-${optIdx}`);
+            selectedBtn.classList.add('wrong');
+            feedbackEl.innerText = `ತಪ್ಪು ಉತ್ತರ! ಸರಿಯಾದ ಉತ್ತರ: ${questionsData[qIdx].options[correctOpt]}`;
+            feedbackEl.className = "feedback wrong";
+        }
+    }
+
+    function changeQuestion(direction) {
+        document.getElementById(`q-box-${currentQuestionIndex}`).classList.remove('active');
+        currentQuestionIndex += direction;
+
+        if (currentQuestionIndex >= questionsData.length) {
+            showResults();
+            return;
+        }
+
+        document.getElementById(`q-box-${currentQuestionIndex}`).classList.add('active');
+        updateUI();
+    }
+
+    function updateUI() {
+        prevBtn.disabled = currentQuestionIndex === 0;
+        if (currentQuestionIndex === questionsData.length - 1) {
+            nextBtn.innerText = "ಫಲಿತಾಂಶ ನೋಡಿ";
+        } else {
+            nextBtn.innerText = "ಮುಂದಿನ ಪ್ರಶ್ನೆ";
+        }
+
+        const progressPercent = ((currentQuestionIndex + 1) / questionsData.length) * 100;
+        progressBar.style.width = `${progressPercent}%`;
+    }
+
+    function showResults() {
+        document.getElementById('quiz-body').style.display = 'none';
+        document.getElementById('result-container').style.display = 'block';
+
+        let score = 0;
+        userAnswers.forEach((ans, idx) => {
+            if (ans === questionsData[idx].correct) {
+                score++;
+            }
+        });
+
+        document.getElementById('score-card').innerText = `ನಿಮ್ಮ ಅಂಕಗಳು: 20 ರಲ್ಲಿ ${score}`;
+    }
+
+    function restartQuiz() {
+        currentQuestionIndex = 0;
+        userAnswers = new Array(questionsData.length).fill(null);
+        document.getElementById('quiz-body').style.display = 'block';
+        document.getElementById('result-container').style.display = 'none';
+        initQuiz();
+    }
+
+    // ಕ್ವಿಜ್ ಪ್ರಾರಂಭಿಸಿ
+    initQuiz();
+</script>
+
+</body>
+</html>

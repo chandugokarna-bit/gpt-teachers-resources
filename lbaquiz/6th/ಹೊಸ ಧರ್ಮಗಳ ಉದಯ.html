@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>೬ನೇ ತರಗತಿ ಸಮಾಜ ವಿಜ್ಞಾನ - ಅಧ್ಯಾಯ ೫</title>
+    <style>
+        :root {
+            --primary-color: #2e7d32; /* ಪ್ರಶಾಂತ ಹಸಿರು ಬಣ್ಣ */
+            --secondary-color: #fbc02d; /* ಗೋಲ್ಡನ್ ಹಳದಿ */
+            --accent-color: #1b5e20; /* ಡಾರ್ಕ್ ಗ್ರೀನ್ */
+            --background-gradient: linear-gradient(135deg, #e8f5e9 0%, #a5d6a7 100%);
+            --card-bg: rgba(255, 255, 255, 0.96);
+            --text-color: #1b2e1b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+
+        body {
+            background: var(--background-gradient);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .quiz-container {
+            background: var(--card-bg);
+            border-radius: 20px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.25);
+            width: 100%;
+            max-width: 700px;
+            padding: 30px;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            border: 3px solid var(--primary-color);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #c8e6c9;
+            padding-bottom: 15px;
+        }
+
+        .header h1 {
+            color: var(--accent-color);
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+
+        .header h2 {
+            color: var(--primary-color);
+            font-size: 1.1rem;
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 10px;
+            background-color: #c8e6c9;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #fbc02d, #2e7d32);
+            transition: width 0.3s ease;
+        }
+
+        .question-box {
+            margin-bottom: 20px;
+        }
+
+        .question-number {
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+
+        .question-text {
+            font-size: 1.2rem;
+            color: var(--text-color);
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .option-btn {
+            background: #ffffff;
+            border: 2px solid #c8e6c9;
+            padding: 15px 20px;
+            border-radius: 12px;
+            font-size: 1rem;
+            color: var(--text-color);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .option-btn:hover {
+            background: #f1f8e9;
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+
+        .option-btn.correct {
+            background-color: #d1fae5 !important;
+            border-color: #10b981 !important;
+            color: #065f46 !important;
+            font-weight: bold;
+        }
+
+        .option-btn.incorrect {
+            background-color: #fee2e2 !important;
+            border-color: #ef4444 !important;
+            color: #991b1b !important;
+        }
+
+        .option-btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.9;
+        }
+
+        .controls {
+            margin-top: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .score-board {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: var(--accent-color);
+        }
+
+        .next-btn {
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            transition: transform 0.2s ease;
+            display: none;
+        }
+
+        .next-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .result-box {
+            text-align: center;
+            padding: 30px 10px;
+        }
+
+        .result-box h2 {
+            font-size: 2rem;
+            color: var(--accent-color);
+            margin-bottom: 15px;
+        }
+
+        .result-score {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: var(--text-color);
+        }
+
+        .restart-btn {
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 30px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .restart-btn:hover {
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+
+<div class="quiz-container">
+    <div class="header">
+        <h1>ಅಧ್ಯಾಯ - ೫: ಹೊಸ ಧರ್ಮಗಳ ಉದಯ</h1>
+        <h2>ಅಲ್ಟ್ರಾ ಮಾಡರ್ನ್ ಇಂಟರಾಕ್ಟಿವ್ ರಸಪ್ರಶ್ನೆ</h2>
+    </div>
+
+    <div class="progress-bar-container">
+        <div class="progress-bar" id="progress-bar"></div>
+    </div>
+
+    <div id="quiz-screen">
+        <div class="question-box">
+            <div class="question-number" id="question-number">ಪ್ರಶ್ನೆ ೧/೨೦</div>
+            <div class="question-text" id="question-text">ಪ್ರಶ್ನೆ ಇಲ್ಲಿ ಮೂಡುತ್ತದೆ...</div>
+        </div>
+
+        <div class="options-grid" id="options-container">
+            <!-- ಆಯ್ಕೆಗಳು ಬಟನ್‌ಗಳಾಗಿ ಬರುತ್ತವೆ -->
+        </div>
+
+        <div class="controls">
+            <div class="score-board" id="score-display">ಅಂಕಗಳು: ೦</div>
+            <button class="next-btn" id="next-btn" onclick="nextQuestion()">ಮುಂದಿನ ಪ್ರಶ್ನೆ ➔</button>
+        </div>
+    </div>
+
+    <div id="result-screen" style="display: none;">
+        <div class="result-box">
+            <h2>ಅಭಿನಂದನೆಗಳು! 🌸🎉</h2>
+            <div class="result-score" id="final-score">ನಿಮ್ಮ ಅಂಕಗಳು: ೦/೨೦</div>
+            <button class="restart-btn" onclick="restartQuiz()">ಮತ್ತೊಮ್ಮೆ ಪ್ರಯತ್ನಿಸಿ 🔄</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const quizData = [
+        {
+            question: "ಜೈನ ಧರ್ಮದ ಸ್ಥಾಪಕ : ವರ್ಧಮಾನ ಮಹಾವೀರ :: ಬೌದ್ಧ ಧರ್ಮದ ಸ್ಥಾಪಕ : _____",
+            options: ["A) ವೃಷಭನಾಥ", "B) ಪಾರ್ಶ್ವನಾಥ", "C) ಏಸುಕ್ರಿಸ್ತ", "D) ಗೌತಮ ಬುದ್ಧ"],
+            correct: 3
+        },
+        {
+            question: "ಸಿದ್ಧಾರ್ಥ ಎಂಬುದು ಯಾರ ಮೂಲ ಹೆಸರು?",
+            options: ["A) ವರ್ಧಮಾನ ಮಹಾವೀರ", "B) ಗೌತಮ ಬುದ್ಧ", "C) ಪಾರ್ಶ್ವನಾಥ", "D) ಶುದ್ಧೋದನ"],
+            correct: 1
+        },
+        {
+            question: "‘ಈ ಮಗು ಲೋಕವನ್ನು ಆಳುವ ರಾಜನಾಗುತ್ತಾನೆ ಇಲ್ಲವೆ ಲೋಕದ ಅಳಲನ್ನು ನಿವಾರಿಸುವ ಸನ್ಯಾಸಿಯಾಗುತ್ತಾನೆ.’ - ಸಿದ್ಧಾರ್ಥನ ಕುರಿತು ಹೀಗೆ ಭವಿಷ್ಯ ನುಡಿದ ಮಹರ್ಷಿ:",
+            options: ["A) ಚಾಣಕ್ಯ", "B) ವಸಿಷ್ಠ", "C) ಅಸಿತ", "D) ಮೇಲಿನ ಯಾವುದೂ ಅಲ್ಲ"],
+            correct: 2
+        },
+        {
+            question: "ಗೌತಮ ಬುದ್ಧನಿಗೆ ಜ್ಞಾನೋದಯವಾದ ‘ಗಯಾ’ ಎಂಬ ಸ್ಥಳ ಈ ರಾಜ್ಯದಲ್ಲಿದೆ:",
+            options: ["A) ಕರ್ನಾಟಕ", "B) ಬಿಹಾರ", "C) ಗುಜರಾತ್", "D) ಉತ್ತರ ಪ್ರದೇಶ"],
+            correct: 1
+        },
+        {
+            question: "ಬುದ್ಧನು ತನ್ನ ಮೊದಲ ಉಪದೇಶವನ್ನು ನೀಡಿದ ಸ್ಥಳ ________.",
+            options: ["A) ಸಾರನಾಥ", "B) ಶ್ರವಣಬೆಳಗೊಳ", "C) ಕಾಶಿ", "D) ಲುಂಬಿನಿ"],
+            correct: 0
+        },
+        {
+            question: "ಗೌತಮ ಬುದ್ಧನು ಮಹಾಪರಿನಿರ್ವಾಣಗೊಂಡ ಸ್ಥಳ:",
+            options: ["A) ಕುಶಿನಗರ", "B) ಶ್ರೀನಗರ", "C) ಸಾರನಾಥ", "D) ಲುಂಬಿನಿ"],
+            correct: 0
+        },
+        {
+            question: "ಬುದ್ಧನು ತನ್ನ ಉಪದೇಶವನ್ನು ಬೋಧಿಸಿದ ಭಾಷೆ ಇದು:",
+            options: ["A) ಸಂಸ್ಕೃತ", "B) ಹಿಂದಿ", "C) ಪಾಳಿ", "D) ಎಲ್ಲವೂ ಸರಿ"],
+            correct: 2
+        },
+        {
+            question: "ಬುದ್ಧನ ಉಪದೇಶಗಳ ಸಂಗ್ರಹವೇ ________.",
+            options: ["A) ಉಪದೇಶಗಳು", "B) ತ್ರಿಪಿಟಕಗಳು", "C) ವೇದಗಳು", "D) ಮಹಾಕಾವ್ಯಗಳು"],
+            correct: 1
+        },
+        {
+            question: "ಜೈನ ಧರ್ಮದ ೨೪ನೇ ತೀರ್ಥಂಕರರಾದ ವರ್ಧಮಾನ ಮಹಾವೀರರ ಜನ್ಮ ಸ್ಥಳವಿದು:",
+            options: ["A) ಕುಂದಗ್ರಾಮ", "B) ಗುರುಗ್ರಾಮ", "C) ಲುಂಬಿನಿ", "D) ಸಾರನಾಥ"],
+            correct: 0
+        },
+        {
+            question: "‘ಜಿನ’ ಎಂದರೆ _________ ಎಂದರ್ಥ.",
+            options: ["A) ಮೋಹವನ್ನು ಪಡೆದವನು", "B) ಮೋಹದಲ್ಲಿ ಸೋತವನು", "C) ಮೋಹವನ್ನು ಗೆದ್ದವನು", "D) ಮೇಲಿನ ಎಲ್ಲವೂ"],
+            correct: 2
+        },
+        {
+            question: "೧ನೇ ತೀರ್ಥಂಕರ : ವೃಷಭನಾಥ :: ೨೩ನೇ ತೀರ್ಥಂಕರ : ______",
+            options: ["A) ವರ್ಧಮಾನ ಮಹಾವೀರ", "B) ಅಜಿತನಾಥ", "C) ಆದಿನಾಥ", "D) ಪಾರ್ಶ್ವನಾಥ"],
+            correct: 3
+        },
+        {
+            question: "ಕರ್ನಾಟಕದ ಶ್ರವಣಬೆಳಗೊಳವು ________ ಧರ್ಮದ ಪ್ರಸಿದ್ಧ ಸ್ಥಳವಾಗಿದೆ.",
+            options: ["A) ಜೈನ", "B) ಮುಸ್ಲಿಂ", "C) ಹಿಂದೂ", "D) ಬೌದ್ಧ"],
+            correct: 0
+        },
+        {
+            question: "ಮಹಾಜನಪದಗಳು ಈ ಕೆಳಗಿನ ಯಾವ ನದಿ ಬಯಲಿನಲ್ಲಿ ಕಂಡುಬಂದಿವೆ?",
+            options: ["A) ಗಂಗಾ-ಬ್ರಹ್ಮಪುತ್ರ", "B) ಗಂಗಾ-ಯಮುನಾ", "C) ಸಿಂಧೂ-ಗಂಗಾ", "D) ಬ್ರಹ್ಮಪುತ್ರ-ಸಿಂಧೂ"],
+            correct: 2
+        },
+        {
+            question: "ವಜ್ಜಿ (ವೃಜಿ) ಗಣರಾಜ್ಯದ ರಾಜಧಾನಿ ಯಾವುದಾಗಿತ್ತು?",
+            options: ["A) ವೈಶಾಲಿ", "B) ಕುಶಿನಗರ", "C) ಸಾರನಾಥ", "D) ಗಯಾ"],
+            correct: 0
+        },
+        {
+            question: "ಬಿಳಿಯ ವಸ್ತ್ರಧಾರಿಗಳಾದ ಜೈನ ಧರ್ಮದ ಪಂಥದವರನ್ನು ಏನೆಂದು ಕರೆಯುತ್ತಾರೆ?",
+            options: ["A) ದಿಗಂಬರರು", "B) ಶ್ವೇತಾಂಬರರು", "C) ಆಡಂಬರರು", "D) ಮೇಲಿನ ಎಲ್ಲರೂ"],
+            correct: 1
+        },
+        {
+            question: "ಗೌತಮ ಬುದ್ಧನ ತಂದೆ ಮತ್ತು ತಾಯಿಯ ಹೆಸರೇನು?",
+            options: ["A) ಶುದ್ಧೋದನ ಮತ್ತು ಮಾಯಾದೇವಿ", "B) ಸಿದ್ಧಾರ್ಥ ಮತ್ತು ತ್ರಿಶಲಾದೇವಿ", "C) ವರ್ಧಮಾನ ಮತ್ತು ಯಶೋಧರೆ", "D) ವೃಷಭನಾಥ ಮತ್ತು ಮಾಯಾದೇವಿ"],
+            correct: 0
+        },
+        {
+            question: "ಬುದ್ಧನು ತನ್ನ ಮೊದಲ ಉಪದೇಶವನ್ನು ಐವರು ಶಿಷ್ಯರಿಗೆ ನೀಡಿದ ಘಟನೆಯನ್ನು ಏನೆಂದು ಕರೆಯುತ್ತಾರೆ?",
+            options: ["A) ಮಹಾಪರಿತ್ಯಾಗ", "B) ಧರ್ಮಚಕ್ರ ಪ್ರವರ್ತನ", "C) ಮಹಾಪರಿನಿರ್ವಾಣ", "D) ಜ್ಞಾನೋದಯ"],
+            correct: 1
+        },
+        {
+            question: "ವರ್ಧಮಾನ ಮಹಾವೀರರ ತಂದೆ ಮತ್ತು ತಾಯಿಯ ಹೆಸರೇನು?",
+            options: ["A) ಸಿದ್ಧಾರ್ಥ ಮತ್ತು ತ್ರಿಶಲಾದೇವಿ", "B) ಶುದ್ಧೋದನ ಮತ್ತು ಮಾಯಾದೇವಿ", "C) ಯಶೋಧರ ಮತ್ತು ರೋಹಿಣಿ", "D) ಅಸಿತ ಮತ್ತು ಮಾಯಾದೇವಿ"],
+            correct: 0
+        },
+        {
+            question: "ಈ ಕೆಳಗಿನವುಗಳಲ್ಲಿ ಜೈನ ಧರ್ಮದ ೫ ನೈತಿಕ ತತ್ವಗಳಲ್ಲಿ ಸೇರದ ತತ್ವ ಯಾವುದು?",
+            options: ["A) ಸತ್ಯ ಮತ್ತು ಅಹಿಂಸೆ", "B) ಅಸ್ತೇಯ ಮತ್ತು ಅಪರಿಗ್ರಹ", "C) ಬ್ರಹ್ಮಚರ್ಯ", "D) ಹಿಂಸೆ"],
+            correct: 3
+        },
+        {
+            question: "ಬೌದ್ಧ ಸಾಹಿತ್ಯದಲ್ಲಿ ಉಲ್ಲೇಖಿಸಲಾದ ಪ್ರಮುಖ ಮಹಾಜನಪದಗಳಲ್ಲಿ ಒಂದನ್ನು ಗುರುತಿಸಿ:",
+            options: ["A) ಮಗಧ", "B) ಬಂಗಾಳ", "C) ಕಳಿಂಗ", "D) ಕಾಶ್ಮೀರ"],
+            correct: 0
+        }
+    ];
+
+    let currentQuestionIndex = 0;
+    let score = 0;
+
+    const questionNumberEl = document.getElementById('question-number');
+    const questionTextEl = document.getElementById('question-text');
+    const optionsContainerEl = document.getElementById('options-container');
+    const scoreDisplayEl = document.getElementById('score-display');
+    const nextBtnEl = document.getElementById('next-btn');
+    const progressBarEl = document.getElementById('progress-bar');
+    const quizScreenEl = document.getElementById('quiz-screen');
+    const resultScreenEl = document.getElementById('result-screen');
+    const finalScoreEl = document.getElementById('final-score');
+
+    function loadQuestion() {
+        const currentData = quizData[currentQuestionIndex];
+        
+        // Progress Bar
+        const progressPercent = ((currentQuestionIndex) / quizData.length) * 100;
+        progressBarEl.style.width = `${progressPercent}%`;
+
+        // Question Text
+        questionNumberEl.textContent = `ಪ್ರಶ್ನೆ ${currentQuestionIndex + 1}/${quizData.length}`;
+        questionTextEl.innerText = currentData.question;
+
+        // Clear Options
+        optionsContainerEl.innerHTML = '';
+        nextBtnEl.style.display = 'none';
+
+        // Render Options
+        currentData.options.forEach((optionText, index) => {
+            const btn = document.createElement('button');
+            btn.classList.add('option-btn');
+            btn.textContent = optionText;
+            btn.onclick = () => selectOption(index);
+            optionsContainerEl.appendChild(btn);
+        });
+    }
+
+    function selectOption(selectedIndex) {
+        const currentData = quizData[currentQuestionIndex];
+        const optionButtons = optionsContainerEl.children;
+
+        for (let i = 0; i < optionButtons.length; i++) {
+            optionButtons[i].disabled = true;
+        }
+
+        if (selectedIndex === currentData.correct) {
+            optionButtons[selectedIndex].classList.add('correct');
+            score++;
+            scoreDisplayEl.textContent = `ಅಂಕಗಳು: ${score}`;
+        } else {
+            optionButtons[selectedIndex].classList.add('incorrect');
+            optionButtons[currentData.correct].classList.add('correct');
+        }
+
+        nextBtnEl.style.display = 'block';
+    }
+
+    function nextQuestion() {
+        currentQuestionIndex++;
+        if (currentQuestionIndex < quizData.length) {
+            loadQuestion();
+        } else {
+            showResults();
+        }
+    }
+
+    function showResults() {
+        progressBarEl.style.width = `100%`;
+        quizScreenEl.style.display = 'none';
+        resultScreenEl.style.display = 'block';
+        finalScoreEl.textContent = `ನಿಮ್ಮ ಅಂಕಗಳು: ${score} / ${quizData.length}`;
+    }
+
+    function restartQuiz() {
+        currentQuestionIndex = 0;
+        score = 0;
+        scoreDisplayEl.textContent = `ಅಂಕಗಳು: ೦`;
+        quizScreenEl.style.display = 'block';
+        resultScreenEl.style.display = 'none';
+        loadQuestion();
+    }
+
+    // Start Quiz
+    loadQuestion();
+</script>
+
+</body>
+</html>

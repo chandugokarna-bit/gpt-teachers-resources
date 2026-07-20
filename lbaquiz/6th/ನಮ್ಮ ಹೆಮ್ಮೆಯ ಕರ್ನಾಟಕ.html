@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>೬ನೇ ತರಗತಿ ಸಮಾಜ ವಿಜ್ಞಾನ - ಅಧ್ಯಾಯ ೩</title>
+    <style>
+        :root {
+            --primary-color: #ffcc00; /* ಹಳದಿ ಬಣ್ಣ */
+            --secondary-color: #cc0000; /* ಕೆಂಪು ಬಣ್ಣ */
+            --accent-color: #8b0000; /* ಡಾರ್ಕ್ ರೆಡ್ */
+            --background-gradient: linear-gradient(135deg, #fff3b0 0%, #ca2626 100%);
+            --card-bg: rgba(255, 255, 255, 0.96);
+            --text-color: #2c3e50;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+
+        body {
+            background: var(--background-gradient);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .quiz-container {
+            background: var(--card-bg);
+            border-radius: 20px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 700px;
+            padding: 30px;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            border: 3px solid var(--primary-color);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 15px;
+        }
+
+        .header h1 {
+            color: var(--secondary-color);
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+
+        .header h2 {
+            color: #d97706;
+            font-size: 1.1rem;
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 10px;
+            background-color: #e0e0e0;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            transition: width 0.3s ease;
+        }
+
+        .question-box {
+            margin-bottom: 20px;
+        }
+
+        .question-number {
+            font-weight: bold;
+            color: var(--secondary-color);
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+
+        .question-text {
+            font-size: 1.2rem;
+            color: var(--text-color);
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .option-btn {
+            background: #ffffff;
+            border: 2px solid #e9ecef;
+            padding: 15px 20px;
+            border-radius: 12px;
+            font-size: 1rem;
+            color: var(--text-color);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .option-btn:hover {
+            background: #fffbe6;
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+
+        .option-btn.correct {
+            background-color: #d4edda !important;
+            border-color: #28a745 !important;
+            color: #155724 !important;
+            font-weight: bold;
+        }
+
+        .option-btn.incorrect {
+            background-color: #f8d7da !important;
+            border-color: #dc3545 !important;
+            color: #721c24 !important;
+        }
+
+        .option-btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.9;
+        }
+
+        .controls {
+            margin-top: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .score-board {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: var(--secondary-color);
+        }
+
+        .next-btn {
+            background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            transition: transform 0.2s ease;
+            display: none;
+        }
+
+        .next-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .result-box {
+            text-align: center;
+            padding: 30px 10px;
+        }
+
+        .result-box h2 {
+            font-size: 2rem;
+            color: var(--secondary-color);
+            margin-bottom: 15px;
+        }
+
+        .result-score {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: var(--text-color);
+        }
+
+        .restart-btn {
+            background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 30px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .restart-btn:hover {
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+
+<div class="quiz-container">
+    <div class="header">
+        <h1>ಅಧ್ಯಾಯ - ೩: ನಮ್ಮ ಹೆಮ್ಮೆಯ ಕರ್ನಾಟಕ</h1>
+        <h2>ಅಲ್ಟ್ರಾ ಮಾಡರ್ನ್ ಇಂಟರಾಕ್ಟಿವ್ ರಸಪ್ರಶ್ನೆ</h2>
+    </div>
+
+    <div class="progress-bar-container">
+        <div class="progress-bar" id="progress-bar"></div>
+    </div>
+
+    <div id="quiz-screen">
+        <div class="question-box">
+            <div class="question-number" id="question-number">ಪ್ರಶ್ನೆ ೧/೨೦</div>
+            <div class="question-text" id="question-text">ಪ್ರಶ್ನೆ ಇಲ್ಲಿ ಮೂಡುತ್ತದೆ...</div>
+        </div>
+
+        <div class="options-grid" id="options-container">
+            <!-- ಆಯ್ಕೆಗಳು ಬಟನ್‌ಗಳಾಗಿ ಬರುತ್ತವೆ -->
+        </div>
+
+        <div class="controls">
+            <div class="score-board" id="score-display">ಅಂಕಗಳು: ೦</div>
+            <button class="next-btn" id="next-btn" onclick="nextQuestion()">ಮುಂದಿನ ಪ್ರಶ್ನೆ ➔</button>
+        </div>
+    </div>
+
+    <div id="result-screen" style="display: none;">
+        <div class="result-box">
+            <h2>ಸಿರಿಗನ್ನಡಂ ಗೆಲ್ಗೆ! 💛❤️🎉</h2>
+            <div class="result-score" id="final-score">ನಿಮ್ಮ ಅಂಕಗಳು: ೦/೨೦</div>
+            <button class="restart-btn" onclick="restartQuiz()">ಮತ್ತೊಮ್ಮೆ ಪ್ರಯತ್ನಿಸಿ 🔄</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const quizData = [
+        {
+            question: "ನಮ್ಮ ರಾಜ್ಯವನ್ನು ಆಡಳಿತ ಅನುಕೂಲಕ್ಕಾಗಿ _________ ವಿಭಾಗಗಳಾಗಿ ವಿಭಾಗಿಸಲಾಗಿದೆ.",
+            options: ["A) ಎರಡು", "B) ಐದು", "C) ಆರು", "D) ನಾಲ್ಕು"],
+            correct: 3
+        },
+        {
+            question: "ಧಾರವಾಡ ಮತ್ತು ಬಾಗಲಕೋಟೆ ಜಿಲ್ಲೆಗಳಿರುವ ವಿಭಾಗ ___________.",
+            options: ["A) ಮೈಸೂರು", "B) ಬೆಂಗಳೂರು", "C) ಕಲಬುರಗಿ", "D) ಬೆಳಗಾವಿ"],
+            correct: 3
+        },
+        {
+            question: "ವಿಶ್ವವಿಖ್ಯಾತ 'ಜೋಗ ಜಲಪಾತ'ವು ಅತ್ಯಂತ ಮನಮೋಹಕವಾಗಿದೆ. ಈ ಜಲಪಾತವಿರುವ ಜಿಲ್ಲೆ.",
+            options: ["A) ಬೆಂಗಳೂರು ನಗರ", "B) ಶಿವಮೊಗ್ಗ", "C) ಉತ್ತರ ಕನ್ನಡ", "D) ಬೆಳಗಾವಿ"],
+            correct: 1
+        },
+        {
+            question: "ಮೈಸೂರು ಆಳಿದ ಒಡೆಯರ್ ಮನೆತನದ ಮೊದಲ ಅರಸ.",
+            options: ["A) ನಾಲ್ವಡಿ ಕೃಷ್ಣರಾಜ", "B) ಯದುರಾಯ", "C) ಮುಮ್ಮಡಿ ಕೃಷ್ಣರಾಜ", "D) ಚಿಕ್ಕದೇವರಾಜ"],
+            correct: 1
+        },
+        {
+            question: "ಬಂಡೀಪುರ ರಾಷ್ಟ್ರೀಯ ಉದ್ಯಾನವನವಿರುವ ಜಿಲ್ಲೆ _____.",
+            options: ["A) ಮೈಸೂರು", "B) ಚಾಮರಾಜನಗರ", "C) ಮಂಡ್ಯ", "D) ಬೆಳಗಾವಿ"],
+            correct: 1
+        },
+        {
+            question: "‘ದಸರಾ ಹಬ್ಬ’ ಈ ರಾಜಮನೆತನದ ಪ್ರಮುಖ ಆಚರಣೆಯಾಗಿದ್ದು, ಇದು ಕರ್ನಾಟಕದ ನಾಡಹಬ್ಬವಾಗಿದೆ.",
+            options: ["A) ಮೈಸೂರು", "B) ಧಾರವಾಡ", "C) ಕಲಬುರಗಿ", "D) ಮೇಲಿನ ಯಾವುದೂ ಅಲ್ಲ"],
+            correct: 0
+        },
+        {
+            question: "ಬೀದರ್ ಜಿಲ್ಲೆಯು ಈ ಕೆಳಗಿನ ಯಾವ ಕಲೆಗೆ ಹೆಸರುವಾಸಿಯಾಗಿದೆ?",
+            options: ["A) ಬಿದರಿ", "B) ಶಿಲ್ಪಕಲೆ", "C) ಚಿತ್ರಕಲೆ", "D) ವಾಸ್ತುಕಲೆ"],
+            correct: 0
+        },
+        {
+            question: "ಕರಡಿಯೆಂದರೆ ಮಕ್ಕಳಿಗೆ ಬಹಳ ಪ್ರೀತಿ. 'ದರೋಜಿ ಕರಡಿ ಧಾಮ'ವಿರುವ ಜಿಲ್ಲೆ:",
+            options: ["A) ಬಳ್ಳಾರಿ", "B) ರಾಯಚೂರು", "C) ಯಾದಗಿರಿ", "D) ಧಾರವಾಡ"],
+            correct: 0
+        },
+        {
+            question: "ದಾಸ ಸಾಹಿತ್ಯದ ತವರೂರು ಎಂದು ಕರೆಯಲ್ಪಡುವ ಜಿಲ್ಲೆ ________.",
+            options: ["A) ರಾಯಚೂರು", "B) ಮೈಸೂರು", "C) ಧಾರವಾಡ", "D) ಶಿವಮೊಗ್ಗ"],
+            correct: 0
+        },
+        {
+            question: "1924 ರ ಬೆಳಗಾವಿ ರಾಷ್ಟ್ರೀಯ ಕಾಂಗ್ರೆಸ್ ಅಧಿವೇಶನದ ಅಧ್ಯಕ್ಷತೆಯನ್ನು ವಹಿಸಿದವರು:",
+            options: ["A) ಜವಾಹರಲಾಲ್ ನೆಹರು", "B) ಸರ್ದಾರ್ ವಲ್ಲಭಭಾಯಿ ಪಟೇಲ್", "C) ಮಹಾತ್ಮಾ ಗಾಂಧೀಜಿ", "D) ಸುಭಾಷ್ ಚಂದ್ರ ಬೋಸ್"],
+            correct: 2
+        },
+        {
+            question: "‘ವಿದ್ಯಾಕಾಶಿ’ ಎಂದು ಹೆಸರು ಪಡೆದ ಬೆಳಗಾವಿ ವಿಭಾಗದ ಜಿಲ್ಲೆ _______.",
+            options: ["A) ಬೆಳಗಾವಿ", "B) ಧಾರವಾಡ", "C) ಬೆಂಗಳೂರು", "D) ಮೈಸೂರು"],
+            correct: 1
+        },
+        {
+            question: "ಅಂಧ ಮಕ್ಕಳಿಗೆ ಆಶ್ರಯ ನೀಡಿ ಸಂಗೀತ ಕಲೆಗೆ ಪ್ರೋತ್ಸಾಹಿಸಿದವರು ________.",
+            options: ["A) ಪಂಡಿತ್ ಭೀಮಸೇನ ಜೋಶಿ", "B) ಗಂಗೂಬಾಯಿ ಹಾನಗಲ್", "C) ಪಂಚಾಕ್ಷರಿ ಗವಾಯಿಗಳು", "D) ಮಲ್ಲಿಕಾರ್ಜುನ ಮನ್ಸೂರ್"],
+            correct: 2
+        },
+        {
+            question: "‘ಸಿರಿಗನ್ನಡಂ ಗೆಲ್ಗೆ’ ಎಂಬ ಸಪ್ತಾಕ್ಷರಿ ಮಂತ್ರವನ್ನು ಕಟ್ಟಿದವರು.",
+            options: ["A) ರಾ. ಹ. ದೇಶಪಾಂಡೆ", "B) ದ.ರಾ.ಬೇಂದ್ರೆ", "C) ಆಲೂರು ವೆಂಕಟರಾವ್", "D) ಕುವೆಂಪು"],
+            correct: 0
+        },
+        {
+            question: "ಬೆಳಗಾವಿ ಜಿಲ್ಲೆಯ ಕಿತ್ತೂರಿನ ರಾಣಿ ಚೆನ್ನಮ್ಮ ಬ್ರಿಟಿಷರ ವಿರುದ್ಧ ಹೋರಾಟ ನಡೆಸಿದ ವರ್ಷ:",
+            options: ["A) 1824", "B) 1857", "C) 1924", "D) 1947"],
+            correct: 0
+        },
+        {
+            question: "ಕರ್ನಾಟಕದಲ್ಲಿ ಗ್ರಾನೈಟ್ ನ ಅಪಾರ ನಿಕ್ಷೇಪವಿರುವ ಪ್ರಸಿದ್ಧ ಪ್ರದೇಶ:",
+            options: ["A) ಇಳಕಲ್", "B) ಧಾರವಾಡ", "C) ಬೆಳಗಾವಿ", "D) ಮೈಸೂರು"],
+            correct: 0
+        },
+        {
+            question: "ವಚನ ಸಾಹಿತ್ಯಕ್ಕೆ ದೊಡ್ಡ ಕೊಡುಗೆ ನೀಡಿದ ಫ. ಗು. ಹಳಕಟ್ಟಿ ಅವರನ್ನು ಏನೆಂದು ಕರೆಯುತ್ತಾರೆ?",
+            options: ["A) ಕಾವ್ಯ ಪಿತಾಮಹ", "B) ವಚನ ಪಿತಾಮಹ", "C) ನಾಟಕ ಪಿತಾಮಹ", "D) ದಾಸ ಪಿತಾಮಹ"],
+            correct: 1
+        },
+        {
+            question: "ಬೆಳಗಾವಿ ವಿಭಾಗದಲ್ಲಿದ್ದು, 'ಕಾಳಿ' ನದಿಯ ದಡದಲ್ಲಿರುವ ರಾಷ್ಟ್ರೀಯ ಉದ್ಯಾನವನ:",
+            options: ["A) ಬಂಡೀಪುರ", "B) ನಾಗರಹೊಳೆ", "C) ಅಂಶಿ ರಾಷ್ಟ್ರೀಯ ಉದ್ಯಾನವನ", "D) ಬನ್ನೇರುಘಟ್ಟ"],
+            correct: 2
+        },
+        {
+            question: "ಭಾರತರತ್ನ ಪ್ರಶಸ್ತಿ ಪಡೆದ ಬೆಂಗಳೂರು ವಿಭಾಗದ ಇಬ್ಬರು ವ್ಯಕ್ತಿಗಳು:",
+            options: ["A) ಡಾ. ರಾಜ್‌ಕುಮಾರ್, ಡಾ. ವಿಷ್ಣುವರ್ಧನ್", "B) ಸರ್ ಎಂ. ವಿಶ್ವೇಶ್ವರಯ್ಯ, ಸಿ.ಎನ್.ಆರ್ ರಾವ್", "C) ಪಿ. ಲಂಕೇಶ್, ಡಿ. ವಿ ಗುಂಡಪ್ಪ", "D) ದೇವರಾಜ್ ಅರಸ್, ಆರ್. ಕೆ. ನಾರಾಯಣ್"],
+            correct: 1
+        },
+        {
+            question: "ಕನ್ನಡ ನಾಡಿನ ಇತಿಹಾಸದಲ್ಲೇ ಪ್ರಸಿದ್ಧವಾದ ಭದ್ರಾವತಿಯ 'ವಿಶ್ವೇಶ್ವರಯ್ಯ ಕಬ್ಬಿಣ ಮತ್ತು ಉಕ್ಕಿನ ಕಾರ್ಖಾನೆ' ಸ್ಥಾಪನೆಯಾದ ವರ್ಷ:",
+            options: ["A) 1923", "B) 1947", "C) 1956", "D) 1911"],
+            correct: 0
+        },
+        {
+            question: "ಹೈದರಾಬಾದ್ ನಿಜಾಮನ ವಿರುದ್ಧ ಸ್ವಾತಂತ್ರ್ಯ ಹೋರಾಟದ ನೇತೃತ್ವವನ್ನು ವಹಿಸಿದ್ದವರು:",
+            options: ["A) ಸ್ವಾಮಿ ರಮಾನಂದ ತೀರ್ಥರು", "B) ಆಲೂರು ವೆಂಕಟರಾವ್", "C) ಕೊಂಡಜ್ಜ ಬಸಪ್ಪ", "D) ಹರ್ಡೇಕರ್ ಮಂಜಪ್ಪ"],
+            correct: 0
+        }
+    ];
+
+    let currentQuestionIndex = 0;
+    let score = 0;
+
+    const questionNumberEl = document.getElementById('question-number');
+    const questionTextEl = document.getElementById('question-text');
+    const optionsContainerEl = document.getElementById('options-container');
+    const scoreDisplayEl = document.getElementById('score-display');
+    const nextBtnEl = document.getElementById('next-btn');
+    const progressBarEl = document.getElementById('progress-bar');
+    const quizScreenEl = document.getElementById('quiz-screen');
+    const resultScreenEl = document.getElementById('result-screen');
+    const finalScoreEl = document.getElementById('final-score');
+
+    function loadQuestion() {
+        const currentData = quizData[currentQuestionIndex];
+        
+        // Progress Bar
+        const progressPercent = ((currentQuestionIndex) / quizData.length) * 100;
+        progressBarEl.style.width = `${progressPercent}%`;
+
+        // Question Text
+        questionNumberEl.textContent = `ಪ್ರಶ್ನೆ ${currentQuestionIndex + 1}/${quizData.length}`;
+        questionTextEl.innerText = currentData.question;
+
+        // Clear Options
+        optionsContainerEl.innerHTML = '';
+        nextBtnEl.style.display = 'none';
+
+        // Render Options
+        currentData.options.forEach((optionText, index) => {
+            const btn = document.createElement('button');
+            btn.classList.add('option-btn');
+            btn.textContent = optionText;
+            btn.onclick = () => selectOption(index);
+            optionsContainerEl.appendChild(btn);
+        });
+    }
+
+    function selectOption(selectedIndex) {
+        const currentData = quizData[currentQuestionIndex];
+        const optionButtons = optionsContainerEl.children;
+
+        for (let i = 0; i < optionButtons.length; i++) {
+            optionButtons[i].disabled = true;
+        }
+
+        if (selectedIndex === currentData.correct) {
+            optionButtons[selectedIndex].classList.add('correct');
+            score++;
+            scoreDisplayEl.textContent = `ಅಂಕಗಳು: ${score}`;
+        } else {
+            optionButtons[selectedIndex].classList.add('incorrect');
+            optionButtons[currentData.correct].classList.add('correct');
+        }
+
+        nextBtnEl.style.display = 'block';
+    }
+
+    function nextQuestion() {
+        currentQuestionIndex++;
+        if (currentQuestionIndex < quizData.length) {
+            loadQuestion();
+        } else {
+            showResults();
+        }
+    }
+
+    function showResults() {
+        progressBarEl.style.width = `100%`;
+        quizScreenEl.style.display = 'none';
+        resultScreenEl.style.display = 'block';
+        finalScoreEl.textContent = `ನಿಮ್ಮ ಅಂಕಗಳು: ${score} / ${quizData.length}`;
+    }
+
+    function restartQuiz() {
+        currentQuestionIndex = 0;
+        score = 0;
+        scoreDisplayEl.textContent = `ಅಂಕಗಳು: ೦`;
+        quizScreenEl.style.display = 'block';
+        resultScreenEl.style.display = 'none';
+        loadQuestion();
+    }
+
+    // Start Quiz
+    loadQuestion();
+</script>
+
+</body>
+</html>

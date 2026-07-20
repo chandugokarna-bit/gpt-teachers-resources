@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>೬ನೇ ತರಗತಿ ಸಮಾಜ ವಿಜ್ಞಾನ - ಅಧ್ಯಾಯ ೧೦</title>
+    <style>
+        :root {
+            --primary-color: #0284c7; /* ಓಷನ್ ಬ್ಲೂ */
+            --secondary-color: #0d9488; /* ಸೀ ಗ್ರೀನ್ */
+            --accent-color: #0f172a; /* ಡಾರ್ಕ್ ನೇವಿ */
+            --background-gradient: linear-gradient(135deg, #e0f2fe 0%, #99f6e4 100%);
+            --card-bg: rgba(255, 255, 255, 0.96);
+            --text-color: #0f172a;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+
+        body {
+            background: var(--background-gradient);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .quiz-container {
+            background: var(--card-bg);
+            border-radius: 20px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.25);
+            width: 100%;
+            max-width: 700px;
+            padding: 30px;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            border: 3px solid var(--primary-color);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #bae6fd;
+            padding-bottom: 15px;
+        }
+
+        .header h1 {
+            color: var(--accent-color);
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+
+        .header h2 {
+            color: var(--primary-color);
+            font-size: 1.1rem;
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 10px;
+            background-color: #bae6fd;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #0d9488, #0284c7);
+            transition: width 0.3s ease;
+        }
+
+        .question-box {
+            margin-bottom: 20px;
+        }
+
+        .question-number {
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+
+        .question-text {
+            font-size: 1.2rem;
+            color: var(--text-color);
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .option-btn {
+            background: #ffffff;
+            border: 2px solid #bae6fd;
+            padding: 15px 20px;
+            border-radius: 12px;
+            font-size: 1rem;
+            color: var(--text-color);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .option-btn:hover {
+            background: #f0f9ff;
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+
+        .option-btn.correct {
+            background-color: #d1fae5 !important;
+            border-color: #10b981 !important;
+            color: #065f46 !important;
+            font-weight: bold;
+        }
+
+        .option-btn.incorrect {
+            background-color: #fee2e2 !important;
+            border-color: #ef4444 !important;
+            color: #991b1b !important;
+        }
+
+        .option-btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.9;
+        }
+
+        .controls {
+            margin-top: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .score-board {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: var(--accent-color);
+        }
+
+        .next-btn {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            transition: transform 0.2s ease;
+            display: none;
+        }
+
+        .next-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .result-box {
+            text-align: center;
+            padding: 30px 10px;
+        }
+
+        .result-box h2 {
+            font-size: 2rem;
+            color: var(--accent-color);
+            margin-bottom: 15px;
+        }
+
+        .result-score {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: var(--text-color);
+        }
+
+        .restart-btn {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 30px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .restart-btn:hover {
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+
+<div class="quiz-container">
+    <div class="header">
+        <h1>ಅಧ್ಯಾಯ - ೧೦: ಗ್ಲೋಬ್ ಮತ್ತು ನಕಾಶೆಗಳು</h1>
+        <h2>ಅಲ್ಟ್ರಾ ಮಾಡರ್ನ್ ಇಂಟರಾಕ್ಟಿವ್ ರಸಪ್ರಶ್ನೆ</h2>
+    </div>
+
+    <div class="progress-bar-container">
+        <div class="progress-bar" id="progress-bar"></div>
+    </div>
+
+    <div id="quiz-screen">
+        <div class="question-box">
+            <div class="question-number" id="question-number">ಪ್ರಶ್ನೆ ೧/೨೦</div>
+            <div class="question-text" id="question-text">ಪ್ರಶ್ನೆ ಇಲ್ಲಿ ಮೂಡುತ್ತದೆ...</div>
+        </div>
+
+        <div class="options-grid" id="options-container">
+            <!-- ಆಯ್ಕೆಗಳು ಬಟನ್‌ಗಳಾಗಿ ಬರುತ್ತವೆ -->
+        </div>
+
+        <div class="controls">
+            <div class="score-board" id="score-display">ಅಂಕಗಳು: ೦</div>
+            <button class="next-btn" id="next-btn" onclick="nextQuestion()">ಮುಂದಿನ ಪ್ರಶ್ನೆ ➔</button>
+        </div>
+    </div>
+
+    <div id="result-screen" style="display: none;">
+        <div class="result-box">
+            <h2>ಅಭಿನಂದನೆಗಳು! 🌍🎉</h2>
+            <div class="result-score" id="final-score">ನಿಮ್ಮ ಅಂಕಗಳು: ೦/೨೦</div>
+            <button class="restart-btn" onclick="restartQuiz()">ಮತ್ತೊಮ್ಮೆ ಪ್ರಯತ್ನಿಸಿ 🔄</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const quizData = [
+        {
+            question: "ಈ ಹಿಂದೆ ಭೂಮಿಯು ಅಂಡಾಕಾರವಾಗಿದೆಯೆಂದು ಭಾವಿಸಲಾಗಿತ್ತು. ನಂತರ ಭೂಮಿಯು ಈ ಆಕಾರದಲ್ಲಿದೆಯೆಂದು ಪರಿಗಣಿಸಲಾಗಿದೆ:",
+            options: ["A) ದುಂಡಾಕಾರದಲ್ಲಿದೆ", "B) ಜಿಯಾಯ್ಡ್", "C) ಚಪ್ಪಟೆ ಆಕಾರದಲ್ಲಿದೆ", "D) ಚೌಕಾಕಾರದಲ್ಲಿದೆ"],
+            correct: 1
+        },
+        {
+            question: "ವಿದ್ಯಾರ್ಥಿಗಳಿಗೆ ಭೂಮಿಯ ಪ್ರತಿರೂಪವನ್ನು ತಿಳಿಸಲು ಶಿಕ್ಷಕರು ಈ ಕೆಳಗಿನ ಯಾವ ಸಾಧನವನ್ನು ಬಳಸುವರು?",
+            options: ["A) ಗ್ಲೋಬ್", "B) ದಿಕ್ಸೂಚಿ", "C) ನಕಾಶೆ", "D) ಚಿತ್ರಪಟ"],
+            correct: 0
+        },
+        {
+            question: "ಈ ಕೆಳಗಿನ ಹೇಳಿಕೆಗಳಲ್ಲಿ ಸರಿಯಾದುದನ್ನು ಗುರುತಿಸಿ:\ni) ಗ್ಲೋಬ್ ಭೂಮಿಯ ಒಂದು ಚಿಕ್ಕ ಮಾದರಿ.\nii) ಗ್ಲೋಬ್ ಮೇಲೆ ಅಕ್ಷಾಂಶ ಮತ್ತು ರೇಖಾಂಶಗಳಿವೆ.",
+            options: ["A) i ಮಾತ್ರ ಸರಿ", "B) ii ಮಾತ್ರ ಸರಿ", "C) i ಮತ್ತು ii ಸರಿ", "D) ಎರಡೂ ತಪ್ಪು"],
+            correct: 2
+        },
+        {
+            question: "ಗ್ಲೋಬ್‌ನಲ್ಲಿರುವ ಸಾಗರ, ಸಮುದ್ರ, ನದಿಗಳನ್ನು ಈ ಬಣ್ಣದಿಂದ ಗುರುತಿಸಲಾಗಿದೆ:",
+            options: ["A) ಕೆಂಪು", "B) ಹಸಿರು", "C) ನೀಲಿ", "D) ಕಪ್ಪು"],
+            correct: 2
+        },
+        {
+            question: "ಗ್ಲೋಬ್ ಇದು ೪ ಸಾಗರಗಳು ಮತ್ತು ಎಷ್ಟು ಖಂಡಗಳನ್ನು ಒಳಗೊಂಡಿದೆ?",
+            options: ["A) ೫", "B) ೬", "C) ೩", "D) ೭"],
+            correct: 3
+        },
+        {
+            question: "ಗ್ಲೋಬ್ ಮೇಲಿರುವ ಖಂಡಗಳನ್ನು ನೋಡಿದ ಮೇಲೆ ಅತಿದೊಡ್ಡ ಖಂಡ ಯಾವುದೆಂದು ಗುರುತಿಸಿ:",
+            options: ["A) ಆಫ್ರಿಕಾ", "B) ಏಷ್ಯಾ", "C) ಆಸ್ಟ್ರೇಲಿಯಾ", "D) ಯೂರೋಪ್"],
+            correct: 1
+        },
+        {
+            question: "ಭೂಮಿಯ ಪೂರ್ಣ ಅಥವಾ ಭಾಗಶಃ ಭಾಗವನ್ನು ಸಮತಲದ ಮೇಲೆ ಮಾನಕ್ಕೆ ಅನುಗುಣವಾಗಿ ರೂಪಿಸುವ ಆಕೃತಿಯೇ:",
+            options: ["A) ದಿಕ್ಸೂಚಿ", "B) ನಕಾಶೆ", "C) ಗ್ಲೋಬ್", "D) ಅಟ್ಲಾಸ್"],
+            correct: 1
+        },
+        {
+            question: "ನಕ್ಷೆಯನ್ನು ತಯಾರಿಸುವ ವಿಜ್ಞಾನ ಮತ್ತು ಕಲೆಯನ್ನು ಏನೆಂದು ಕರೆಯುತ್ತಾರೆ?",
+            options: ["A) ನಕ್ಷಾಶಾಸ್ತ್ರ (Cartography)", "B) ಭೂಗೋಳಶಾಸ್ತ್ರ", "C) ಖಗೋಳಶಾಸ್ತ್ರ", "D) ಇತಿಹಾಸ"],
+            correct: 0
+        },
+        {
+            question: "ವಿವಿಧ ಪ್ರಕಾರದ ನಕ್ಷೆಗಳನ್ನು ಸೇರಿಸಿ ತಯಾರಿಸಿದ ಪುಸ್ತಕ ಯಾವುದು?",
+            options: ["A) ಅಟ್ಲಾಸ್ (Atlas)", "B) ನೋಟ್‌ಬುಕ್", "C) ದಿನಚರಿ", "D) ನಿಘಂಟು"],
+            correct: 0
+        },
+        {
+            question: "ಭೂಮಿಯ ಮೇಲಿನ ವಾಸ್ತವ ದೂರಕ್ಕೂ ಮತ್ತು ನಕಾಶೆಯ ಮೇಲಿನ ದೂರಕ್ಕೂ ಇರುವ ಪರಿಮಾಣವನ್ನು ಏನೆನ್ನಲಾಗುತ್ತದೆ?",
+            options: ["A) ಸೂಚಿ", "B) ಮಾನಕ (Scale)", "C) ಅಕ್ಷಾಂಶ", "D) ರೇಖಾಂಶ"],
+            correct: 1
+        },
+        {
+            question: "ನಕೆಯಲ್ಲಿರುವ ಬಾಣದತುದಿ 'ಉ' (N) ಎಂದು ತೋರಿಸಿದರೆ, ಸೂರ್ಯ ಹುಟ್ಟುವ ಬಾಣದ ತುದಿ ತೋರಿಸುವ ದಿಕ್ಕು ಯಾವುದು?",
+            options: ["A) ದಕ್ಷಿಣ (South)", "B) ಪೂರ್ವ (East)", "C) ಪಶ್ಚಿಮ (West)", "D) ಯಾವುದೂ ಅಲ್ಲ"],
+            correct: 1
+        },
+        {
+            question: "ನಕಾಶೆಯಲ್ಲಿ ಗಡಿರೇಖೆ, ರಾಜಧಾನಿ, ನಗರ, ನದಿಗಳನ್ನು ಸೂಚಿಸಲು ಮತ್ತು ಗುರುತಿಸಲು ಬಳಕೆ ಮಾಡುವ ಯಾವುದೇ ಸೂಚಿಗೆ ಏನೆನ್ನುವರು?",
+            options: ["A) ಶೀರ್ಷಿಕೆ", "B) ಮಾನಕ", "C) ದಿಕ್ಕು", "D) ನಕ್ಷಾ ಸೂಚಿ (Legend/Key)"],
+            correct: 3
+        },
+        {
+            question: "ಸಾ.ಶ.ಪೂರ್ವ ೨೩೦೦ ರಲ್ಲೇ ಅತ್ಯಂತ ಪುರಾತನ ನಕಾಶೆಯು ಎಲ್ಲಿ ಕಂಡುಬಂದಿದೆ?",
+            options: ["A) ಗ್ರೀಕ್", "B) ಬ್ಯಾಬಿಲೋನಿಯಾ", "C) ಈಜಿಪ್ಟ್", "D) ರೋಮ್"],
+            correct: 1
+        },
+        {
+            question: "ಪ್ರಪಂಚದಲ್ಲಿಯೇ ಪ್ರಥಮ ಅಟ್ಲಾಸ್ ಹೊರತಂದವರು ಯಾರು?",
+            options: ["A) ಕ್ಲಾಡಿಯಸ್ ಟಾಲೆಮಿ", "B) ಅರಿಸ್ಟಾಟಲ್", "C) ಪ್ಲೇಟೋ", "D) ಸಾಕ್ರಟೀಸ್"],
+            correct: 0
+        },
+        {
+            question: "ದಿಕ್ಸೂಚಿಯಲ್ಲಿರುವ ಮುಳ್ಳು ಯಾವಾಗಲೂ ಯಾವ ದಿಕ್ಕನ್ನೇ ತೋರಿಸುತ್ತದೆ?",
+            options: ["A) ಪೂರ್ವ", "B) ದಕ್ಷಿಣ", "C) ಉತ್ತರ", "D) ಪಶ್ಚಿಮ"],
+            correct: 2
+        },
+        {
+            question: "ಭೂಮಿಯ ಮೇಲೆ ಎಳೆದಿರುವ ಕಾಲ್ಪನಿಕ ರೇಖೆಗಳು ಇವಾಗಿವೆ:",
+            options: ["A) ಅಕ್ಷಾಂಶ ಮತ್ತು ರೇಖಾಂಶ", "B) ದಿಕ್ಕುಗಳು", "C) ಮಾನಕ", "D) ದೇಶಗಳ ಹೆಸರು"],
+            correct: 0
+        },
+        {
+            question: "ನಕಾಶೆಯಲ್ಲಿ 'ಹಸಿರು ಬಣ್ಣ'ವು ಈ ಕೆಳಗಿನ ಯಾವ ಭೂಸ್ವರೂಪವನ್ನು ಸೂಚಿಸುತ್ತದೆ?",
+            options: ["A) ಮೈದಾನ ಮತ್ತು ತಗ್ಗು ಪ್ರದೇಶಗಳು", "B) ಹಿಮದಿಂದಾವೃತ ಪ್ರದೇಶ", "C) ಜಲ ಭಾಗಗಳು", "D) ಅತಿ ಎತ್ತರವಾದ ಪರ್ವತಗಳು"],
+            correct: 0
+        },
+        {
+            question: "ನಕಾಶೆಯಲ್ಲಿ 'ಬಿಳುಪು / ನೇರಳೆ ಬಣ್ಣ'ವು ಯಾವುದನ್ನು ಸೂಚಿಸುತ್ತದೆ?",
+            options: ["A) ಮೈದಾನ ಪ್ರದೇಶ", "B) ಹಿಮದಿಂದಾವೃತ ಪ್ರದೇಶ", "C) ಜಲ ಭಾಗಗಳು", "D) ಕಾಡುಗಳು"],
+            correct: 1
+        },
+        {
+            question: "ಪರ್ವತ, ಪ್ರಸ್ಥಭೂಮಿ, ಬಯಲು ಪ್ರದೇಶ, ನದಿ ಮುಂತಾದ ನೈಸರ್ಗಿಕ ಅಂಶಗಳನ್ನು ತೋರಿಸುವ ನಕ್ಷೆಗಳು:",
+            options: ["A) ರಾಜಕೀಯ ನಕ್ಷೆಗಳು", "B) ಹಂಚಿಕೆ ನಕ್ಷೆಗಳು", "C) ಸ್ವಾಭಾವಿಕ/ಪ್ರಾಕೃತಿಕ ನಕ್ಷೆಗಳು", "D) ಹವಾಮಾನ ನಕ್ಷೆಗಳು"],
+            correct: 2
+        },
+        {
+            question: "ರಾಜ್ಯ, ದೇಶ, ಖಂಡ ಹಾಗೂ ಅವುಗಳ ಗಡಿಗಳು ಮತ್ತು ರಾಜಧಾನಿಗಳನ್ನು ತೋರಿಸುವ ನಕ್ಷೆಗಳು ಯಾವುವು?",
+            options: ["A) ಪ್ರಾಕೃತಿಕ ನಕ್ಷೆಗಳು", "B) ರಾಜಕೀಯ ನಕ್ಷೆಗಳು", "C) ಹಂಚಿಕೆ ನಕ್ಷೆಗಳು", "D) ರಸ್ತೆ ನಕ್ಷೆಗಳು"],
+            correct: 1
+        }
+    ];
+
+    let currentQuestionIndex = 0;
+    let score = 0;
+
+    const questionNumberEl = document.getElementById('question-number');
+    const questionTextEl = document.getElementById('question-text');
+    const optionsContainerEl = document.getElementById('options-container');
+    const scoreDisplayEl = document.getElementById('score-display');
+    const nextBtnEl = document.getElementById('next-btn');
+    const progressBarEl = document.getElementById('progress-bar');
+    const quizScreenEl = document.getElementById('quiz-screen');
+    const resultScreenEl = document.getElementById('result-screen');
+    const finalScoreEl = document.getElementById('final-score');
+
+    function loadQuestion() {
+        const currentData = quizData[currentQuestionIndex];
+        
+        // Progress Bar
+        const progressPercent = ((currentQuestionIndex) / quizData.length) * 100;
+        progressBarEl.style.width = `${progressPercent}%`;
+
+        // Question Text
+        questionNumberEl.textContent = `ಪ್ರಶ್ನೆ ${currentQuestionIndex + 1}/${quizData.length}`;
+        questionTextEl.innerText = currentData.question;
+
+        // Clear Options
+        optionsContainerEl.innerHTML = '';
+        nextBtnEl.style.display = 'none';
+
+        // Render Options
+        currentData.options.forEach((optionText, index) => {
+            const btn = document.createElement('button');
+            btn.classList.add('option-btn');
+            btn.textContent = optionText;
+            btn.onclick = () => selectOption(index);
+            optionsContainerEl.appendChild(btn);
+        });
+    }
+
+    function selectOption(selectedIndex) {
+        const currentData = quizData[currentQuestionIndex];
+        const optionButtons = optionsContainerEl.children;
+
+        for (let i = 0; i < optionButtons.length; i++) {
+            optionButtons[i].disabled = true;
+        }
+
+        if (selectedIndex === currentData.correct) {
+            optionButtons[selectedIndex].classList.add('correct');
+            score++;
+            scoreDisplayEl.textContent = `ಅಂಕಗಳು: ${score}`;
+        } else {
+            optionButtons[selectedIndex].classList.add('incorrect');
+            optionButtons[currentData.correct].classList.add('correct');
+        }
+
+        nextBtnEl.style.display = 'block';
+    }
+
+    function nextQuestion() {
+        currentQuestionIndex++;
+        if (currentQuestionIndex < quizData.length) {
+            loadQuestion();
+        } else {
+            showResults();
+        }
+    }
+
+    function showResults() {
+        progressBarEl.style.width = `100%`;
+        quizScreenEl.style.display = 'none';
+        resultScreenEl.style.display = 'block';
+        finalScoreEl.textContent = `ನಿಮ್ಮ ಅಂಕಗಳು: ${score} / ${quizData.length}`;
+    }
+
+    function restartQuiz() {
+        currentQuestionIndex = 0;
+        score = 0;
+        scoreDisplayEl.textContent = `ಅಂಕಗಳು: ೦`;
+        quizScreenEl.style.display = 'block';
+        resultScreenEl.style.display = 'none';
+        loadQuestion();
+    }
+
+    // Start Quiz
+    loadQuestion();
+</script>
+
+</body>
+</html>
