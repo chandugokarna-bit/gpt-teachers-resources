@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>೭ನೇ ತರಗತಿ ಸಮಾಜ ವಿಜ್ಞಾನ - ಅಧ್ಯಾಯ ೨೧: ವಿವಿಧ ಕ್ಷೇತ್ರಗಳಲ್ಲಿ ಮುನ್ನಡೆ</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Arial, 'Tunga', sans-serif;
+        }
+        body {
+            background-color: #e2e8f0;
+            margin: 0;
+            padding: 20px;
+            transition: background 0.4s ease, color 0.4s ease;
+        }
+        /* Ultra Mode Theme */
+        body.ultra-mode {
+            background-color: #090d16;
+            color: #f1f5f9;
+        }
+        .quiz-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+            border: 2px solid #cbd5e1;
+        }
+        body.ultra-mode .quiz-container {
+            background: #131c2e;
+            box-shadow: 0 0 25px rgba(59, 130, 246, 0.4);
+            border-color: #3b82f6;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+        body.ultra-mode .header {
+            border-bottom-color: #1e293b;
+        }
+        .ultra-btn {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.95rem;
+            box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3);
+            transition: 0.3s;
+        }
+        body.ultra-mode .ultra-btn {
+            background: #ef4444;
+            box-shadow: 0 0 15px #ef4444;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        .timer-container {
+            width: 100%;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            display: none;
+            overflow: hidden;
+        }
+        body.ultra-mode .timer-container {
+            display: block;
+            background: #334155;
+        }
+        .timer-bar {
+            height: 100%;
+            background: #ef4444;
+            width: 100%;
+            transition: width 1s linear;
+        }
+        .question {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            line-height: 1.5;
+            white-space: pre-line;
+        }
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+        .opt-btn {
+            background: #f8fafc;
+            border: 2px solid #cbd5e1;
+            padding: 14px 18px;
+            border-radius: 10px;
+            text-align: left;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.2s;
+            color: inherit;
+        }
+        body.ultra-mode .opt-btn {
+            background: #1e293b;
+            border-color: #334155;
+        }
+        .opt-btn:hover:not([disabled]) {
+            border-color: #3b82f6;
+            background: #eff6ff;
+        }
+        body.ultra-mode .opt-btn:hover:not([disabled]) {
+            background: #0f172a;
+            border-color: #60a5fa;
+        }
+        .correct {
+            background-color: #d1fae5 !important;
+            border-color: #10b981 !important;
+            color: #065f46 !important;
+            font-weight: bold;
+        }
+        .wrong {
+            background-color: #fee2e2 !important;
+            border-color: #ef4444 !important;
+            color: #991b1b !important;
+        }
+        body.ultra-mode .correct {
+            background-color: #064e3b !important;
+            color: #a7f3d0 !important;
+        }
+        body.ultra-mode .wrong {
+            background-color: #7f1d1d !important;
+            color: #fecaca !important;
+        }
+        .footer {
+            margin-top: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .next-btn {
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+        .next-btn:hover {
+            background: #059669;
+        }
+        .score-card {
+            text-align: center;
+            padding: 20px;
+        }
+        .score-card h2 {
+            font-size: 2rem;
+            color: #3b82f6;
+        }
+    </style>
+</head>
+<body>
+
+<div class="quiz-container">
+    <div class="header">
+        <div>
+            <h3 style="margin:0;">೭ನೇ ತರಗತಿ - ಸಮಾಜ ವಿಜ್ಞಾನ</h3>
+            <small>ಅಧ್ಯಾಯ ೨೧: ವಿವಿಧ ಕ್ಷೇತ್ರಗಳಲ್ಲಿ ಮುನ್ನಡೆ</small>
+        </div>
+        <button class="ultra-btn" onclick="toggleUltraMode()" id="ultraBtn">⚡ ULTRA MODE: OFF</button>
+    </div>
+
+    <div class="timer-container">
+        <div class="timer-bar" id="timerBar"></div>
+    </div>
+
+    <div id="quiz-body">
+        <div class="question" id="qText">ಪ್ರಶ್ನೆ ಲೋಡ್ ಆಗುತ್ತಿದೆ...</div>
+        <div class="options-grid" id="optsBox"></div>
+
+        <div class="footer">
+            <span id="progressText" style="font-weight: bold;">ಪ್ರಶ್ನೆ 1 / 27</span>
+            <button class="next-btn" onclick="nextQuestion()" id="nextBtn">ಮುಂದಿನ ಪ್ರಶ್ನೆ ➔</button>
+        </div>
+    </div>
+
+    <div id="result-box" class="score-card" style="display: none;">
+        <h2>ಅಭಿನಂದನೆಗಳು! 🎉</h2>
+        <p style="font-size: 1.2rem;">ನಿಮ್ಮ ಒಟ್ಟು ಅಂಕಗಳು: <strong id="scoreVal">0</strong> / 27</p>
+        <button class="next-btn" onclick="restartQuiz()">ಮತ್ತೆ ಪರೀಕ್ಷೆ ಬರೆಯಿರಿ</button>
+    </div>
+</div>
+
+<script>
+    // ಅಧ್ಯಾಯ-೨೧ ರ ಎಲ್ಲಾ ೨೭ ಬಹುಆಯ್ಕೆ ಪ್ರಶ್ನೆಗಳು ಮತ್ತು ಉತ್ತರಗಳು
+    const questionsData = [
+        // ಕಲಿಕಾ ಫಲ - ೨೧.೧ (೯ ಪ್ರಶ್ನೆಗಳು)
+        {
+            q: "1. ಪ್ರಾಚೀನ ಕಾಲದಲ್ಲಿ ನಮ್ಮ ಹಿರಿಯರು ಒಂದು ಸ್ಥಳದಿಂದ ಮತ್ತೊಂದು ಸ್ಥಳಕ್ಕೆ ವಿಷಯ ಅಥವಾ ಸುದ್ದಿಯನ್ನು ತಲುಪಿಸಲು ಬಳಸಲಾಗುತ್ತಿದ್ದ ಹಕ್ಕಿ.",
+            opts: ["A. ಗರುಡ", "B. ಪಾರಿವಾಳ", "C. ಕೋಗಿಲೆ", "D. ಕಾಗೆ"],
+            correct: 1
+        },
+        {
+            q: "2. ಒಬ್ಬರಿಂದ ಮತ್ತೊಬ್ಬರಿಗೆ ಅಥವಾ ಒಂದು ಸ್ಥಳದಿಂದ ಮತ್ತೊಂದು ಸ್ಥಳಕ್ಕೆ ಸುದ್ದಿ ಅಥವಾ ವಿಷಯವನ್ನು ತಲುಪಿಸುವ ವಿಧಾನವನ್ನು ಹೀಗೆ ಕರೆಯಲಾಗಿದೆ.",
+            opts: ["A. ಸಂಪರ್ಕ ವ್ಯವಸ್ಥೆ", "B. ಸಾರಿಗೆ ವ್ಯವಸ್ಥೆ", "C. ಸುದ್ದಿ ವ್ಯವಸ್ಥೆ", "D. ಮೇಲಿನ ಎಲ್ಲವೂ ಸರಿ"],
+            correct: 0
+        },
+        {
+            q: "3. ಸಮೂಹ ಮಾಧ್ಯಮಗಳನ್ನು ವಿಂಗಡಿಸಲಾದ ಗುಂಪುಗಳೆಂದರೆ.",
+            opts: ["A. ಮುದ್ರಣ ಮಾಧ್ಯಮ", "B. ವಿದ್ಯುನ್ಮಾನ ಮಾಧ್ಯಮ", "C. ಮನರಂಜನಾ ಮಾಧ್ಯಮ", "D. ಮೇಲಿನ ಎಲ್ಲವೂ ಸರಿ"],
+            correct: 3
+        },
+        {
+            q: "4. ನಗರ, ಹಳ್ಳಿ ಭೇದವಿಲ್ಲದೆ ಎಲ್ಲರನ್ನೂ ತಲುಪುತ್ತಿರುವ ಶಕ್ತಿಶಾಲಿ ಮಾಧ್ಯಮವಾದ ದಿನಪತ್ರಿಕೆಗಳು ಸಂಬಂಧಪಟ್ಟ ಮಾಧ್ಯಮದ ವಿಧ.",
+            opts: ["A. ಮುದ್ರಣ ಮಾಧ್ಯಮ", "B. ವಿದ್ಯುನ್ಮಾನ ಮಾಧ್ಯಮ", "C. ಮನರಂಜನಾ ಮಾಧ್ಯಮ", "D. ಯಾವುದೂ ಅಲ್ಲ"],
+            correct: 0
+        },
+        {
+            q: "5. ಕರ್ನಾಟಕ ಇತಿಹಾಸದ ಜಾಗತಿಕ ದಾಖಲೆಯಾದ ಕನ್ನಡದಲ್ಲಿ ಪ್ರಕಟವಾದ ಮೊಟ್ಟ ಮೊದಲ ಪತ್ರಿಕೆ ಇದಾಗಿದೆ.",
+            opts: ["A. ಬೆಂಗಳೂರು ಸಮಾಚಾರ", "B. ಮೈಸೂರು ರಾಜ್ಯ ಸಮಾಚಾರ", "C. ಮಂಗಳೂರು ಸಮಾಚಾರ", "D. ಕೋಲಾರ ಸಮಾಚಾರ"],
+            correct: 2
+        },
+        {
+            q: "6. ನಿಮ್ಮ ಮನೆಗೆ 15 ದಿನಗಳಿಗೊಮ್ಮೆ ಬರುವ 'ತುಂತುರು' ಪತ್ರಿಕೆಯನ್ನು ಹೀಗೆ ಕರೆಯಬಹುದು.",
+            opts: ["A. ದಿನಪತ್ರಿಕೆ", "B. ವಾರಪತ್ರಿಕೆ", "C. ಅರ್ಧ ವಾರ್ಷಿಕ ಪತ್ರಿಕೆ", "D. ಪಾಕ್ಷಿಕ ಪತ್ರಿಕೆ"],
+            correct: 3
+        },
+        {
+            q: "7. ಮಾಹಿತಿಯ ಜೊತೆಗೆ ಬೃಹತ್ ಮನರಂಜನೆಯನ್ನು ಒದಗಿಸುವ ಮಾಧ್ಯಮ ಇದಾಗಿದೆ.",
+            opts: ["A. ವಿದ್ಯುನ್ಮಾನ ಮಾಧ್ಯಮ (ದೂರದರ್ಶನ)", "B. ಮುದ್ರಣ ಮಾಧ್ಯಮ (ದಿನಪತ್ರಿಕೆ)", "C. ಅಂಚೆ ಮತ್ತು ತಂತಿ ವ್ಯವಸ್ಥೆ", "D. ಯಾವುದೂ ಅಲ್ಲ"],
+            correct: 0
+        },
+        {
+            q: "8. ಅಕ್ಷರಸ್ಥರು ಹಾಗೂ ಅನಕ್ಷರಸ್ಥರನ್ನು ತಲುಪಿರುವ ಪ್ರಭಾವಿ ಮಾಧ್ಯಮ ಇದಾಗಿದೆ.",
+            opts: ["A. ದಿನ ಪತ್ರಿಕೆ", "B. ಗಣಕ ಯಂತ್ರ", "C. ಮೊಬೈಲ್", "D. ಯಾವುದೂ ಅಲ್ಲ"],
+            correct: 2
+        },
+        {
+            q: "9. ಮನರಂಜನೆಯ ಕ್ಷೇತ್ರದಲ್ಲಿ ಬಹುದೊಡ್ಡ ಮಾಧ್ಯಮ ಇದಾಗಿದೆ.",
+            opts: ["A. ಸಿನೆಮಾ", "B. ಕಬಡ್ಡಿ", "C. ನಾಟಕ", "D. ಯಕ್ಷಗಾನ"],
+            correct: 0
+        },
+
+        // ಕಲಿಕಾ ಫಲ - ೨೧.೨ (೮ ಪ್ರಶ್ನೆಗಳು)
+        {
+            q: "10. ಇನ್ಫೋಸಿಸ್ ಮತ್ತು ವಿಪ್ರೋನಂತಹ ದೈತ್ಯ ಕಂಪನಿಗಳಿಂದಾಗಿ 'ಸಿಲಿಕಾನ್ ನಗರ' ಎಂದು ಪ್ರಖ್ಯಾತಿ ಹೊಂದಿದ ನಗರ.",
+            opts: ["A. ಲಖನೌ", "B. ದೆಹಲಿ", "C. ಬೆಂಗಳೂರು", "D. ಚೆನ್ನೈ"],
+            correct: 2
+        },
+        {
+            q: "11. ಭಾರತ ಮತ್ತು ಕರ್ನಾಟಕ ಸರ್ಕಾರಗಳು ಜಂಟಿಯಾಗಿ 'ಸೈಬರ್ ಪಾರ್ಕಿಂಗ್' ಯೋಜನೆಯನ್ನು ಪ್ರಾರಂಭಿಸಲಾದ ವರ್ಷ.",
+            opts: ["A. ಸಾ.ಶ. 2000", "B. ಸಾ.ಶ. 1999", "C. ಸಾ.ಶ. 2001", "D. ಸಾ.ಶ. 2004"],
+            correct: 0
+        },
+        {
+            q: "12. ಜೈವಿಕ ತಂತ್ರಜ್ಞಾನದ ಕ್ರಾಂತಿಯಾದ ಪ್ರಪಂಚದ ಮೊಟ್ಟಮೊದಲ ತಳರೂಪಿ ಪ್ರಾಣಿಯೊಂದನ್ನು ಸೃಷ್ಟಿಸಿದ ವಿಜ್ಞಾನಿ.",
+            opts: ["A. ವಿಲ್ಮುಟ್", "B. ನ್ಯೂಟನ್", "C. ಎಡಿಸನ್", "D. ಜೆ ಸಿ ಬೋಸ್"],
+            correct: 0
+        },
+        {
+            q: "13. ಮಾಹಿತಿ ತಂತ್ರಜ್ಞಾನ : ತಂತ್ರಜ್ಞಾನದ ನೆರವಿನಿಂದ ಮಾಹಿತಿಯ ಸೃಷ್ಟಿ ಮತ್ತು ಪ್ರಸರಣ :: ಜೈವಿಕ ತಂತ್ರಜ್ಞಾನ : ____________",
+            opts: [
+                "A. ಜೀವ ವಿಜ್ಞಾನದಲ್ಲಿ ತಂತ್ರಜ್ಞಾನದ ಬಳಕೆ",
+                "B. ಜೀವ ವಿಜ್ಞಾನ ಮತ್ತು ಇತರ ಮೂಲ ವಿಜ್ಞಾನಗಳ ಅನ್ವಯಿಕ ರೂಪ",
+                "C. ಕೃತಕವಾಗಿ ಜೀವಿಗಳ ಸೃಷ್ಟಿ",
+                "D. ಮೇಲಿನ ಯಾವುದೂ ಅಲ್ಲ"
+            ],
+            correct: 1
+        },
+        {
+            q: "14. ಜೀವಿಗಳ ಗುಣಲಕ್ಷಣಗಳನ್ನು ಬಳಸಿಕೊಂಡು ಉಪಯುಕ್ತ ಉತ್ಪನ್ನಗಳನ್ನು ತಾಂತ್ರಿಕವಾಗಿ ಪಡೆಯುವ ಕ್ರಮವನ್ನು ಹೀಗೆನ್ನುವರು.",
+            opts: ["A. ಮಾಹಿತಿ ತಂತ್ರಜ್ಞಾನ", "B. ಜೈವಿಕ ತಂತ್ರಜ್ಞಾನ", "C. ತಳಿ ತಂತ್ರಜ್ಞಾನ", "D. ರಾಸಾಯನಿಕ ತಂತ್ರಜ್ಞಾನ"],
+            correct: 1
+        },
+        {
+            q: "15. ಸಾ.ಶ. 1997ರಲ್ಲಿ ಸೃಷ್ಟಿಸಲಾದ ಪ್ರಪಂಚದ ಮೊಟ್ಟ ಮೊದಲ ತಳರೂಪಿ ಪ್ರಾಣಿ ಕುರಿಯ ಹೆಸರು.",
+            opts: ["A. ಟಾಮಿ", "B. ಡಾಲಿ", "C. ಬ್ರೂಸ್", "D. ಯಾವುದೂ ಅಲ್ಲ"],
+            correct: 1
+        },
+        {
+            q: "16. ಕೃಷಿ ವಲಯದಲ್ಲಿ ಜೈವಿಕ ತಂತ್ರಜ್ಞಾನದ ಅಳವಡಿಕೆಯ ಭಾಗವಾಗಿ ಕರ್ನಾಟಕದ ಈ ಎರಡು ಕೃಷಿ ವಿಶ್ವ ವಿದ್ಯಾನಿಲಯಗಳಲ್ಲಿ ಜೈವಿಕ ತಂತ್ರಜ್ಞಾನದ ಪಾರ್ಕುಗಳನ್ನು ಸ್ಥಾಪಿಸಲಾಗಿದೆ.",
+            opts: ["A. ಹುಬ್ಬಳ್ಳಿ ಮತ್ತು ಧಾರವಾಡ", "B. ಬೆಂಗಳೂರು ಮತ್ತು ಮಂಗಳೂರು", "C. ಧಾರವಾಡ ಮತ್ತು ವಿಜಯಪುರ", "D. ಬೆಂಗಳೂರು ಮತ್ತು ಧಾರವಾಡ"],
+            correct: 3
+        },
+        {
+            q: "17. ಜೈವಿಕ ತಂತ್ರಜ್ಞಾನದ ಪ್ರಸಿದ್ಧ ಸಂಸ್ಥೆ 'ಬಯೋಕಾನ್'ಅನ್ನು ಈ ನಗರದಲ್ಲಿ ಸ್ಥಾಪಿಸಲಾಗಿದೆ.",
+            opts: ["A. ಧಾರವಾಡ", "B. ಬಾಗಲಕೋಟೆ", "C. ಬಳ್ಳಾರಿ", "D. ಬೆಂಗಳೂರು"],
+            correct: 3
+        },
+
+        // ಕಲಿಕಾ ಫಲ - ೨೧.೩ (೧೦ ಪ್ರಶ್ನೆಗಳು)
+        {
+            q: "18. ಭಾರತದ 7ನೇ ದೊಡ್ಡ ರಾಜ್ಯವಾಗಿರುವ ಕರ್ನಾಟಕ ರಾಜ್ಯದ ವಿಸ್ತೀರ್ಣ.",
+            opts: ["A. ಸುಮಾರು 1,90,000 ಚ.ಕಿ.ಮೀ.", "B. ಸುಮಾರು 1,80,000 ಚ.ಕಿ.ಮೀ.", "C. ಸುಮಾರು 1,70,000 ಚ.ಕಿ.ಮೀ.", "D. ಸುಮಾರು 1,60,000 ಚ.ಕಿ.ಮೀ."],
+            correct: 0
+        },
+        {
+            q: "19. ಭಾರತದಲ್ಲಿ ಅತೀ ಹೆಚ್ಚು ಜನ ಅವಲಂಬಿಸಿರುವ ಈ ವಲಯವು, ರಾಷ್ಟ್ರದ ಅರ್ಥಿಕತೆಯ ಮೂಲ ಜೀವಾಳವಾಗಿದೆ.",
+            opts: ["A. ಕೈಗಾರಿಕಾ ವಲಯ", "B. ತಂತ್ರಜ್ಞಾನ ವಲಯ", "C. ಕೃಷಿ ವಲಯ", "D. ಮಾಧ್ಯಮ ವಲಯ"],
+            correct: 2
+        },
+        {
+            q: "20. ಕರ್ನಾಟಕ ರಾಜ್ಯವು ಹೊಂದಿರುವ ಅರಣ್ಯ ಪ್ರದೇಶದ ಶೇಕಡಾವಾರು ಪ್ರಮಾಣ.",
+            opts: ["A. 18 ಶೇಕಡಾ", "B. 19 ಶೇಕಡಾ", "C. 20 ಶೇಕಡಾ", "D. 25 ಶೇಕಡಾ"],
+            correct: 2
+        },
+        {
+            q: "21. ಕೃಷಿ ಅಭಿವೃದ್ಧಿಗಾಗಿ ಸರ್ಕಾರಗಳು ಕೈಗೊಂಡಿರುವ ಕ್ರಮಗಳು.",
+            opts: ["A. ನೀರಾವರಿ ವ್ಯವಸ್ಥೆ", "B. ಮಣ್ಣಿನ ಸಂರಕ್ಷಣೆಗೆ ಒತ್ತು", "C. ಸಾವಯವ ಕೃಷಿ ಪದ್ಧತಿಗೆ ಒತ್ತು", "D. ಈ ಮೇಲಿನ ಎಲ್ಲವೂ ಸರಿ"],
+            correct: 3
+        },
+        {
+            q: "22. ಭಾರತದ ಅರ್ಥಿಕ ಅಭಿವೃದ್ಧಿಯಲ್ಲಿ ಮಹತ್ವದ ಪಾತ್ರವಹಿಸಿದ ಕೈಗಾರಿಕೆಗಳ ಮೂರು ವರ್ಗಗಳು.",
+            opts: ["A. ಸಣ್ಣ ಕೈಗಾರಿಕೆಗಳು", "B. ಮಧ್ಯಮ ಕೈಗಾರಿಕೆಗಳು", "C. ಬೃಹತ್ ಕೈಗಾರಿಕೆಗಳು", "D. ಈ ಮೇಲಿನ ಎಲ್ಲವೂ ಸರಿ"],
+            correct: 3
+        },
+        {
+            q: "23. 'ಗೃಹ ಕೈಗಾರಿಕೆಗಳು ದೇಶವನ್ನು ಪ್ರಗತಿಪಥದತ್ತ ಕೊಂಡೊಯ್ಯುವ ದಿವಟಿಗೆಗಳು' ಎಂದು ಹೇಳಿದವರು.",
+            opts: ["A. ಸರ್ ಎಂ ವಿಶ್ವೇಶ್ವರಯ್ಯ", "B. ಗಾಂಧೀಜಿ", "C. ರತನ್ ಟಾಟಾ", "D. ನಾರಾಯಣ ಮೂರ್ತಿ"],
+            correct: 1
+        },
+        {
+            q: "24. ಕರ್ನಾಟಕ ರಾಜ್ಯವು ತನ್ನದೇ ಆದ ಕೈಗಾರಿಕ ನೀತಿಯನ್ನು ರೂಪಿಸಿದ ವರ್ಷ.",
+            opts: ["A. ಸಾ.ಶ. 1990", "B. ಸಾ.ಶ. 1995", "C. ಸಾ.ಶ. 1996", "D. ಸಾ.ಶ. 1997"],
+            correct: 2
+        },
+        {
+            q: "25. ರೈತರಿಗೆ ತಿಳುವಳಿಕೆ ನೀಡುವ ಉದ್ದೇಶದಿಂದ ದೂರದರ್ಶನದಲ್ಲಿ ಬಿತ್ತರವಾಗುವ ಕಾರ್ಯಕ್ರಮ.",
+            opts: ["A. ಕೃಷಿರಂಗ", "B. ರೈತ ಮಿತ್ರ", "C. ಕೃಷಿ ಸಿಂಚನ", "D. ಅನ್ನದಾತ"],
+            correct: 0
+        },
+        {
+            q: "26. ಸಾ.ಶ. 2011ರ ಅರ್ಥಿಕ ಸಮೀಕ್ಷೆಯ ಪ್ರಕಾರ ಕರ್ನಾಟಕವು ಕೃಷಿ ಉತ್ಪಾದನೆಯಲ್ಲಿ ಪಡೆದ ಸ್ಥಾನ.",
+            opts: ["A. 4ನೇ ಸ್ಥಾನ", "B. 5ನೇ ಸ್ಥಾನ", "C. 6ನೇ ಸ್ಥಾನ", "D. 7ನೇ ಸ್ಥಾನ"],
+            correct: 2
+        },
+        {
+            q: "27. ಗಾಳಿ ಮಳೆ ಮತ್ತು ಪ್ರವಾಹ ಮೊದಲಾದ ನೈಸರ್ಗಿಕ ಕ್ರಿಯೆಗಳಿಂದ ಮಣ್ಣಿನ ಫಲವತ್ತಾದ ಮೇಲಿನ ಪದರು ಕಳಚಿ ಹೋಗುವುದಕ್ಕೆ ಹೀಗೆನ್ನುವರು.",
+            opts: ["A. ಮಣ್ಣಿನ ಫಲವತ್ತತೆ", "B. ಮಣ್ಣಿನ ಸಂಚಯನ", "C. ಕಡಲು ಕೊರೆತ", "D. ಮಣ್ಣಿನ ಸವಕಳಿ"],
+            correct: 3
+        }
+    ];
+
+    let currentQIndex = 0;
+    let score = 0;
+    let isUltraMode = false;
+    let timerInterval;
+    let timeRemaining = 15;
+
+    function toggleUltraMode() {
+        isUltraMode = !isUltraMode;
+        document.body.classList.toggle('ultra-mode');
+        const btn = document.getElementById('ultraBtn');
+        btn.innerText = isUltraMode ? "⚡ ULTRA MODE: ON" : "⚡ ULTRA MODE: OFF";
+        restartQuiz();
+    }
+
+    function loadQuestion() {
+        clearInterval(timerInterval);
+        
+        if (currentQIndex >= questionsData.length) {
+            showResults();
+            return;
+        }
+
+        const currentQ = questionsData[currentQIndex];
+        document.getElementById("qText").innerText = currentQ.q;
+        document.getElementById("progressText").innerText = `ಪ್ರಶ್ನೆ ${currentQIndex + 1} / ${questionsData.length}`;
+        
+        const optsContainer = document.getElementById("optsBox");
+        optsContainer.innerHTML = "";
+
+        currentQ.opts.forEach((optText, index) => {
+            const button = document.createElement("button");
+            button.className = "opt-btn";
+            button.innerText = optText;
+            button.onclick = () => checkAnswer(index, currentQ.correct);
+            optsContainer.appendChild(button);
+        });
+
+        if (isUltraMode) {
+            startTimer();
+        }
+    }
+
+    function startTimer() {
+        timeRemaining = 15;
+        const timerBar = document.getElementById("timerBar");
+        timerBar.style.width = "100%";
+
+        timerInterval = setInterval(() => {
+            timeRemaining--;
+            timerBar.style.width = (timeRemaining / 15) * 100 + "%";
+            if (timeRemaining <= 0) {
+                clearInterval(timerInterval);
+                nextQuestion();
+            }
+        }, 1000);
+    }
+
+    function checkAnswer(selectedIdx, correctIdx) {
+        clearInterval(timerInterval);
+        const buttons = document.querySelectorAll(".opt-btn");
+
+        buttons.forEach((btn, idx) => {
+            btn.disabled = true;
+            if (idx === correctIdx) {
+                btn.classList.add("correct");
+            }
+            if (idx === selectedIdx && selectedIdx !== correctIdx) {
+                btn.classList.add("wrong");
+            }
+        });
+
+        if (selectedIdx === correctIdx) {
+            score++;
+        }
+    }
+
+    function nextQuestion() {
+        currentQIndex++;
+        loadQuestion();
+    }
+
+    function showResults() {
+        document.getElementById("quiz-body").style.display = "none";
+        document.getElementById("result-box").style.display = "block";
+        document.getElementById("scoreVal").innerText = score;
+    }
+
+    function restartQuiz() {
+        currentQIndex = 0;
+        score = 0;
+        document.getElementById("quiz-body").style.display = "block";
+        document.getElementById("result-box").style.display = "none";
+        loadQuestion();
+    }
+
+    loadQuestion();
+</script>
+
+</body>
+</html>

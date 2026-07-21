@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>೭ನೇ ತರಗತಿ ಸಮಾಜ ವಿಜ್ಞಾನ - ಅಧ್ಯಾಯ ೧೪: ದಕ್ಷಿಣ ಅಮೇರಿಕಾ ಖಂಡ</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Arial, 'Tunga', sans-serif;
+        }
+        body {
+            background-color: #e2e8f0;
+            margin: 0;
+            padding: 20px;
+            transition: background 0.4s ease, color 0.4s ease;
+        }
+        /* Ultra Mode Theme */
+        body.ultra-mode {
+            background-color: #090d16;
+            color: #f1f5f9;
+        }
+        .quiz-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+            border: 2px solid #cbd5e1;
+        }
+        body.ultra-mode .quiz-container {
+            background: #131c2e;
+            box-shadow: 0 0 25px rgba(59, 130, 246, 0.4);
+            border-color: #3b82f6;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+        body.ultra-mode .header {
+            border-bottom-color: #1e293b;
+        }
+        .ultra-btn {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.95rem;
+            box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3);
+            transition: 0.3s;
+        }
+        body.ultra-mode .ultra-btn {
+            background: #ef4444;
+            box-shadow: 0 0 15px #ef4444;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        .timer-container {
+            width: 100%;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            display: none;
+            overflow: hidden;
+        }
+        body.ultra-mode .timer-container {
+            display: block;
+            background: #334155;
+        }
+        .timer-bar {
+            height: 100%;
+            background: #ef4444;
+            width: 100%;
+            transition: width 1s linear;
+        }
+        .question {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            line-height: 1.5;
+            white-space: pre-line;
+        }
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+        .opt-btn {
+            background: #f8fafc;
+            border: 2px solid #cbd5e1;
+            padding: 14px 18px;
+            border-radius: 10px;
+            text-align: left;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.2s;
+            color: inherit;
+        }
+        body.ultra-mode .opt-btn {
+            background: #1e293b;
+            border-color: #334155;
+        }
+        .opt-btn:hover:not([disabled]) {
+            border-color: #3b82f6;
+            background: #eff6ff;
+        }
+        body.ultra-mode .opt-btn:hover:not([disabled]) {
+            background: #0f172a;
+            border-color: #60a5fa;
+        }
+        .correct {
+            background-color: #d1fae5 !important;
+            border-color: #10b981 !important;
+            color: #065f46 !important;
+            font-weight: bold;
+        }
+        .wrong {
+            background-color: #fee2e2 !important;
+            border-color: #ef4444 !important;
+            color: #991b1b !important;
+        }
+        body.ultra-mode .correct {
+            background-color: #064e3b !important;
+            color: #a7f3d0 !important;
+        }
+        body.ultra-mode .wrong {
+            background-color: #7f1d1d !important;
+            color: #fecaca !important;
+        }
+        .footer {
+            margin-top: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .next-btn {
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+        .next-btn:hover {
+            background: #059669;
+        }
+        .score-card {
+            text-align: center;
+            padding: 20px;
+        }
+        .score-card h2 {
+            font-size: 2rem;
+            color: #3b82f6;
+        }
+    </style>
+</head>
+<body>
+
+<div class="quiz-container">
+    <div class="header">
+        <div>
+            <h3 style="margin:0;">೭ನೇ ತರಗತಿ - ಸಮಾಜ ವಿಜ್ಞಾನ</h3>
+            <small>ಅಧ್ಯಾಯ ೧೪: ದಕ್ಷಿಣ ಅಮೇರಿಕಾ ಖಂಡ</small>
+        </div>
+        <button class="ultra-btn" onclick="toggleUltraMode()" id="ultraBtn">⚡ ULTRA MODE: OFF</button>
+    </div>
+
+    <div class="timer-container">
+        <div class="timer-bar" id="timerBar"></div>
+    </div>
+
+    <div id="quiz-body">
+        <div class="question" id="qText">ಪ್ರಶ್ನೆ ಲೋಡ್ ಆಗುತ್ತಿದೆ...</div>
+        <div class="options-grid" id="optsBox"></div>
+
+        <div class="footer">
+            <span id="progressText" style="font-weight: bold;">ಪ್ರಶ್ನೆ 1 / 26</span>
+            <button class="next-btn" onclick="nextQuestion()" id="nextBtn">ಮುಂದಿನ ಪ್ರಶ್ನೆ ➔</button>
+        </div>
+    </div>
+
+    <div id="result-box" class="score-card" style="display: none;">
+        <h2>ಅಭಿನಂದನೆಗಳು! 🎉</h2>
+        <p style="font-size: 1.2rem;">ನಿಮ್ಮ ಒಟ್ಟು ಅಂಕಗಳು: <strong id="scoreVal">0</strong> / 26</p>
+        <button class="next-btn" onclick="restartQuiz()">ಮತ್ತೆ ಪರೀಕ್ಷೆ ಬರೆಯಿರಿ</button>
+    </div>
+</div>
+
+<script>
+    // ಪ್ರಶ್ನಾಕೋಠಿಯ ಅಧ್ಯಾಯ-೧೪ ರಲ್ಲಿರುವ ಎಲ್ಲಾ ೨೬ ಬಹುಆಯ್ಕೆ ಪ್ರಶ್ನೆಗಳು ಮತ್ತು ಉತ್ತರಗಳು
+    const questionsData = [
+        {
+            q: "1. ಕ್ರಿ.ಶ. 1498ರಲ್ಲಿ ಕ್ರಿಸ್ಟೋಫರ್ ಕೊಲಂಬಸನು ವಿಸ್ತೀರ್ಣದಲ್ಲಿ ಪ್ರಪಂಚದಲ್ಲೇ 4 ನೇ ದೊಡ್ಡ ಭೂಖಂಡವಾದ ಈ ಖಂಡವನ್ನು ತಲುಪಿದನು.",
+            opts: ["A) ಏಷ್ಯಾ", "B) ಯುರೋಪ್", "C) ಉ. ಅಮೇರಿಕಾ", "D) ದ. ಅಮೇರಿಕಾ"],
+            correct: 3
+        },
+        {
+            q: "2. ನಾವು ಪ್ರತಿನಿತ್ಯ ಕುಡಿಯುವ ಕಾಫಿಯನ್ನು ಪ್ರಪಂಚದಲ್ಲೇ ಅತ್ಯಧಿಕ ಉತ್ಪಾದಿಸುವ ಖಂಡ ಇದಾಗಿದೆ.",
+            opts: ["A) ಏಷ್ಯಾ", "B) ಯುರೋಪ್", "C) ದ. ಅಮೇರಿಕಾ", "D) ಉ. ಅಮೇರಿಕಾ"],
+            correct: 2
+        },
+        {
+            q: "3. ಈ ಖಂಡವು ಆಂಡೀಸ್ ಪರ್ವತ ಮತ್ತು ಅಮೇಜಾನ್ ನದಿಯಿಂದ ಕೂಡಿರುವ ವಿಶೇಷವಾದ ಭೂಭಾಗವಾಗಿದ್ದು, ಇದನ್ನು “ಹುಲ್ಲುಗಾವಲುಗಳ ನಾಡು” ಎಂದು ಕರೆಯುವರು.",
+            opts: ["A) ಏಷ್ಯಾ", "B) ದ. ಅಮೇರಿಕಾ", "C) ಉ. ಅಮೇರಿಕಾ", "D) ಯುರೋಪ್"],
+            correct: 1
+        },
+        {
+            q: "4. ಶಿಕ್ಷಕರು ವಿದ್ಯಾರ್ಥಿಗಳಿಗೆ ಭೂ ಗೋಳವನ್ನು ತೋರಿಸಿ, ದಕ್ಷಿಣ ಅಮೇರಿಕಾ ಖಂಡದ ಬಹುಭಾಗ ಭೂಗ್ರಹದ ಈ ಗೋಳಾರ್ಧದಲ್ಲಿದೆ ಎಂದು ವಿವರಿಸಿದರು.",
+            opts: ["A) ಪೂರ್ವ", "B) ಪಶ್ಚಿಮ", "C) ಉತ್ತರ", "D) ದಕ್ಷಿಣ"],
+            correct: 3
+        },
+        {
+            q: "5. ದ.ಅಮೇರಿಕಾ ಖಂಡವು ಭಾರತಕ್ಕಿಂತಲೂ 3 ಪಟ್ಟು ದೊಡ್ಡದಾಗಿದೆ. ಈ ಖಂಡ ಒಟ್ಟು ____ ರಾಷ್ಟ್ರಗಳನ್ನು ಹೊಂದಿದೆ.",
+            opts: ["A) 10", "B) 13", "C) 16", "D) 20"],
+            correct: 1
+        },
+        {
+            q: "6. ಬೊಲಿವಿಯಾ ಹಾಗೂ ಪರಾಗ್ವೆ ಹೊರತುಪಡಿಸಿ ದಕ್ಷಿಣ ಅಮೇರಿಕಾದ ಎಲ್ಲಾ ದೇಶಗಳು ಕರಾವಳಿ ತೀರ ಹೊಂದಿವೆ. ಆದರೆ ನೀಳವಾದ ರಾಷ್ಟ್ರ ಇದಾಗಿದೆ.",
+            opts: ["A) ಚಿಲಿ", "B) ಬ್ರೆಜಿಲ್", "C) ಬೊಲಿವಿಯಾ", "D) ಪರಾಗ್ವೆ"],
+            correct: 0
+        },
+        {
+            q: "7. ನಾವು ಚಲನಚಿತ್ರ ವೀಕ್ಷಿಸುವಾಗ ನಟ-ನಟಿಯರ ಅಲಂಕಾರಗಳನ್ನು ನೋಡಿ ಮೆಚ್ಚುಗೆ ವ್ಯಕ್ತಪಡಿಸುತ್ತೇವೆ. ಹಾಗಾದರೆ ಮಾಡಲಿಂಗ್ ಮತ್ತು ವಿನ್ಯಾಸಕ್ಕೆ ಹೆಸರುವಾಸಿ ರಾಷ್ಟ್ರ",
+            opts: ["A) ವೆನೆಜುವೇಲಾ", "B) ಪೆರು", "C) ಬೊಲಿವಿಯಾ", "D) ಪರಾಗ್ವೆ"],
+            correct: 0
+        },
+        {
+            q: "8. ಆಕಾಶ್‌ನು ತನ್ನ ಸ್ನೇಹಿತನಿಗೆ ತನಗೆ ಫುಟ್‌ಬಾಲ್ ಆಟವೆಂದರೆ ಬಹಳ ಇಷ್ಟ ಎಂದು ಹೇಳಿ, ________ ರಾಷ್ಟ್ರಗಳು ಈ ಆಟಕ್ಕೆ ಪ್ರಸಿದ್ಧ ರಾಷ್ಟ್ರಗಳು ಎಂದನು.",
+            opts: ["A) ಟೋಕಿಯೋ ಮತ್ತು ಜಪಾನ್", "B) ಚಿಲಿ ಮತ್ತು ಬೊಲಿವಿಯಾ", "C) ಪರಾಗ್ವೆ ಮತ್ತು ಬೊಲಿವಿಯಾ", "D) ಅರ್ಜೆಂಟೈನಾ ಮತ್ತು ಬ್ರೆಜಿಲ್"],
+            correct: 3
+        },
+        {
+            q: "9. ಆಂಡೀಸ್ ಪರ್ವತದಲ್ಲಿ ಹುಟ್ಟುವ ದಕ್ಷಿಣ ಅಮೇರಿಕಾದ ಅತಿ ಉದ್ದವಾದ ಹಾಗೂ ಪ್ರಪಂಚದ ಅತಿದೊಡ್ಡ ನದಿ ಇದಾಗಿದೆ.",
+            opts: ["A) ಪಾರಾನ", "B) ಉರುಗ್ವೆ", "C) ಪರಾಗ್ವೆ", "D) ಅಮೆಜಾನ್"],
+            correct: 3
+        },
+        {
+            q: "10. ಸಮಭಾಜಕ ವೃತ್ತ ಪ್ರದೇಶದಲ್ಲಿ ಬೀಳುವ ಈ ಮಳೆಯನ್ನು ಅಪರಾಹ್ನದ ಮಳೆ, ಚಹಾ ವಿರಾಮದ ಮಳೆ ಮತ್ತು 4 ಗಂಟೆಯ ಮಳೆ ಎಂದು ಕರೆಯುವರು.",
+            opts: ["A) ಮಾನ್ಸೂನ್ ಮಳೆ", "B) ಪರಿಸರಣ ಮಳೆ", "C) ಪರ್ವತ ಮಳೆ", "D) ಆಮ್ಲ ಮಳೆ"],
+            correct: 1
+        },
+        {
+            q: "11. ನಾವು ಇಂದು 200 ವರ್ಷಗಳಿಂದ ಮಳೆ ಬೀಳದ ಭೂಮಿಯ ಮೇಲಿನ ಅತಿ ಶುಷ್ಕ ಪ್ರದೇಶವಾದ ಅಟಕಮಾ ಮರುಭೂಮಿಯಲ್ಲಿದ್ದೇವೆ ಎಂದು ಭಾವಿಸೋಣ. ಹಾಗಾದರೆ ನಾವು ಈಗ ಈ ದೇಶದಲ್ಲಿದ್ದೇವೆ.",
+            opts: ["A) ಚೀನಾ", "B) ಬ್ರೆಜಿಲ್", "C) ಚಿಲಿ", "D) ಪರಾಗ್ವೆ"],
+            correct: 2
+        },
+        {
+            q: "12. ಸಿದ್ಧಪ್ಪನು ರಬ್ಬರ್ ಮರದಿಂದ “ಲ್ಯಾಟೆಕ್ಸ್” ತೆಗೆದುಕೊಂಡು ಹೋದರು ಎಂದು ತನ್ನ ತಂದೆಗೆ ಹೇಳಿದನು. ಹಾಗಾದರೆ ಗೆರೆಯಳೆದ ಪದದ ಅರ್ಥ…",
+            opts: ["A) ರಬ್ಬರ್ ಹಾಲು", "B) ಬೇರು", "C) ಕಟ್ಟಿಗೆ", "D) ಮರದ ತಿರುಳು"],
+            correct: 0
+        },
+        {
+            q: "13. ವೆನೆಜುವೇಲದ ಹುಲ್ಲುಗಾವಲನ್ನು ಹೇಗೆಂದು ಕರೆಯುವರು?",
+            opts: ["A) ಲ್ಯಾನೋಸ್", "B) ಪಂಪಾಸ್", "C) ಕೆಂಪಾಸ್", "D) ಯಾವುದೂ ಅಲ್ಲ"],
+            correct: 0
+        },
+        {
+            q: "14. ದ. ಅಮೇರಿಕಾ ಖಂಡವು ವೈವಿಧ್ಯಮಯವಾದ ವನ್ಯಪ್ರಾಣಿಗಳು, ಪಕ್ಷಿಗಳು ಮತ್ತು ಸರೀಸೃಪಗಳನ್ನು ಹೊಂದಿದ್ದು, ಈ ಖಂಡವನ್ನು ಹೀಗೆಂದು ಕರೆಯುವರು.",
+            opts: ["A) ಸರೋವರಗಳ ಖಂಡ", "B) ಪಕ್ಷಿಗಳ ಖಂಡ", "C) ಪ್ರಾಣಿಗಳ ಖಂಡ", "D) ನದಿಗಳ ಖಂಡ"],
+            correct: 1
+        },
+        {
+            q: "15. ನನಗೆ ಇಷ್ಟವಾದ ಪಕ್ಷಿ ನವಿಲು. ಹಾಗಾದರೆ ಪ್ರಪಂಚದ ದೊಡ್ಡ ಪಕ್ಷಿ ಇದಾಗಿದೆ.",
+            opts: ["A) ಉಷ್ಟ್ರಪಕ್ಷಿ", "B) ನವಿಲು", "C) ಕೊಂಡರ್", "D) ಹಮ್ಮಿಂಗ್‌ಬರ್ಡ್"],
+            correct: 2
+        },
+        {
+            q: "16. ರಹೇಮನು ತನ್ನ ಸ್ನೇಹಿತನಿಗೆ ನನಗೆ ಮೀನಿನ ಊಟ ಬಹಳ ಇಷ್ಟ ಎಂದು ಹೇಳಿ, ಆದರೆ ವಿಶ್ವದಲ್ಲೇ ಅತಿ ಅಪಾಯಕಾರಿ ಮೀನು _______ಎಂದನು.",
+            opts: ["A) ಸ್ಟಿಂಗ್ ರೇ", "B) ಎಲೆಕ್ಟ್ರಿಕ್ ಫಿಷ್", "C) ಪಿರಾನ್ಹ", "D) ಮೇಲಿನ ಯಾವುದೂ ಅಲ್ಲ"],
+            correct: 2
+        },
+        {
+            q: "17. ದ. ಅಮೇರಿಕಾದ ಪ್ರಮುಖ ಬೆಳೆ ಇದು ಅಲ್ಲ.",
+            opts: ["A) ಮೆಕ್ಕೆಜೋಳ", "B) ಗೋಧಿ", "C) ಭತ್ತ", "D) ಚಹಾ"],
+            correct: 3
+        },
+        {
+            q: "18. ವಿಶ್ವದ ಕಾಫಿ ಬಂದರು : ಸ್ಯಾಂಟೋಸ್ :: ಪ್ರಪಂಚದ ಕಾಫಿಯ ಪಾತ್ರೆ :",
+            opts: ["A) ಶ್ರೀಲಂಕಾ", "B) ಬ್ರೆಜಿಲ್", "C) ಚೀನಾ", "D) ಭಾರತ"],
+            correct: 1
+        },
+        {
+            q: "19. ದ.ಅಮೇರಿಕಾದ ಸ್ವಾಭಾವಿಕ ಜನಸಂಖ್ಯೆ ಹೆಚ್ಚಳದ ದರವು ಪ್ರಪಂಚದ ಸರಾಸರಿ ದರಕ್ಕಿಂತ ____ವಾಗಿದೆ.",
+            opts: ["A) ಶೂನ್ಯ", "B) ಅಧಿಕ", "C) ಕಡಿಮೆ", "D) ಸಮ"],
+            correct: 1
+        },
+        {
+            q: "20. ಶಿಕ್ಷಕರು ಪಾಠ ಮಾಡುವಾಗ ದ. ಅಮೇರಿಕಾ ಖಂಡವು _____ ಭಾಗವನ್ನು ಹೊರತುಪಡಿಸಿ ಉಳಿದೆಲ್ಲಾ ದಿಕ್ಕುಗಳು ಜಲಭಾಗಗಳಿಂದ ಸುತ್ತುವರೆದಿದೆ ಎಂದರು.",
+            opts: ["A) ಪೂರ್ವ", "B) ಪಶ್ಚಿಮ", "C) ಉತ್ತರ", "D) ದಕ್ಷಿಣ"],
+            correct: 2
+        },
+        {
+            q: "21. ಗೀತಾಳು ತನ್ನ ಸ್ನೇಹಿತೆಗೆ ತಾನು ಒಲಂಪಿಕ್ ಆಟಗಳನ್ನು ನೋಡಲು ಇಷ್ಟಪಡುತ್ತೇನೆ, ______ ರಲ್ಲಿ ನಡೆದ ಟೋಕಿಯೋ, ಜಪಾನ್‌ನಲ್ಲಿ ನಡೆದ ಒಲಂಪಿಕ್ ಕ್ರೀಡಾಕೂಟವನ್ನು ನೋಡಿದ್ದೇನೆ ಎಂದಳು.",
+            opts: ["A) 2020", "B) 1912", "C) 1947", "D) 1982"],
+            correct: 0
+        },
+        {
+            q: "22. ವಿಶ್ವದ ಅತ್ಯಂತ ಎತ್ತರವಾದ ಏಂಜಲ್ ಜಲಪಾತವನ್ನು ಗಯಾನ ಭೂಫಲಕದಲ್ಲಿ ನಿರ್ಮಾಣ ಮಾಡಿದ ನದಿ.",
+            opts: ["A) ಲಾಪ್ಲಾಟ", "B) ಚೂರುನ್", "C) ಅಕಾನ್‌ಕಾಗುವ", "D) ಅಮೆಜಾನ್"],
+            correct: 1
+        },
+        {
+            q: "23. ದಕ್ಷಿಣ ಅಮೇರಿಕಾ ಖಂಡದ ಬೊಲಿವಿಯದಲ್ಲಿರುವ ____________ ಸರೋವರ ಪ್ರಪಂಚದಲ್ಲಿಯೇ ಎತ್ತರದಲ್ಲಿರುವ ಸರೋವರವಾಗಿದೆ.",
+            opts: ["A) ಅರಾಲ್", "B) ದಾಲ್", "C) ಟಿಟಿಕಾಕ", "D) ವಿಕ್ಟೋರಿಯಾ"],
+            correct: 2
+        },
+        {
+            q: "24. ಅಮೆಜಾನ್ ನದಿ ಕುರಿತು ಹೇಳಿಕೆಗಳನ್ನು ಪರಿಶೀಲಿಸಿ:\n೧. ಇದು ಅತಿದೊಡ್ಡ ನದಿ, 1,000 ಕ್ಕಿಂತ ಅಧಿಕವಾದ ಉಪನದಿಗಳನ್ನು ಹೊಂದಿದೆ.\n೨. ವಿಶ್ವ ಭೂಭಾಗ ಸುಮಾರು 11.5% ರಷ್ಟು ಭೂಭಾಗವನ್ನು ಆವರಿಸಿದೆ.",
+            opts: ["A) 1 ಮತ್ತು 2 ಸರಿಯಾಗಿವೆ", "B) 1 ಮತ್ತು 2 ತಪ್ಪಾಗಿವೆ", "C) 1 ಮಾತ್ರ ಸರಿ", "D) 2 ಮಾತ್ರ ಸರಿ"],
+            correct: 0
+        },
+        {
+            q: "25. ದಕ್ಷಿಣ ಅಮೇರಿಕವು ವೈವಿಧ್ಯಮಯ ವಾಯುಗುಣವನ್ನು ಹೊಂದಿದೆ. ಈ ಖಂಡದ ವಾಯುಗುಣದಲ್ಲೂ ವ್ಯತ್ಯಾಸಕ್ಕೆ ಅಲ್ಲಿನ_______ ಸಾಮೀಪ್ಯವೇ ಕಾರಣವಾಗಿದೆ.",
+            opts: ["A) ಪೆಸಿಫಿಕ್ ಹಾಗೂ ಅಟ್ಲಾಂಟಿಕ್ ಮಹಾಸಾಗರ", "B) ಬಂಗಾಳಕೊಲ್ಲಿ ಹಾಗೂ ಅರೇಬಿಯನ್ ಸಮುದ್ರ", "C) ಬಂಗಾಳಕೊಲ್ಲಿ ಹಾಗೂ ಅಟ್ಲಾಂಟಿಕ್ ಮಹಾಸಾಗರ", "D) ಪೆಸಿಫಿಕ್ ಹಾಗೂ ಅರೇಬಿಯನ್ ಸಮುದ್ರ"],
+            correct: 0
+        },
+        {
+            q: "26. ಬೆಚ್ಚನೆಯ ಉಷ್ಣವಲಯ ಪ್ರದೇಶದಲ್ಲಿ ಅತಿ ಪ್ರಮುಖ ಆಹಾರ ಬೆಳೆಯಾದ _______ವು ದಕ್ಷಿಣ ಅಮೇರಿಕದ ದೇಶೀಯ ಬೆಳೆಯಾಗಿದೆ.",
+            opts: ["A) ಮೆಕ್ಕೆಜೋಳ", "B) ಗೋಧಿ", "C) ಕಾಫಿ", "D) ಹತ್ತಿ"],
+            correct: 0
+        }
+    ];
+
+    let currentQIndex = 0;
+    let score = 0;
+    let isUltraMode = false;
+    let timerInterval;
+    let timeRemaining = 15;
+
+    function toggleUltraMode() {
+        isUltraMode = !isUltraMode;
+        document.body.classList.toggle('ultra-mode');
+        const btn = document.getElementById('ultraBtn');
+        btn.innerText = isUltraMode ? "⚡ ULTRA MODE: ON" : "⚡ ULTRA MODE: OFF";
+        restartQuiz();
+    }
+
+    function loadQuestion() {
+        clearInterval(timerInterval);
+        
+        if (currentQIndex >= questionsData.length) {
+            showResults();
+            return;
+        }
+
+        const currentQ = questionsData[currentQIndex];
+        document.getElementById("qText").innerText = currentQ.q;
+        document.getElementById("progressText").innerText = `ಪ್ರಶ್ನೆ ${currentQIndex + 1} / ${questionsData.length}`;
+        
+        const optsContainer = document.getElementById("optsBox");
+        optsContainer.innerHTML = "";
+
+        currentQ.opts.forEach((optText, index) => {
+            const button = document.createElement("button");
+            button.className = "opt-btn";
+            button.innerText = optText;
+            button.onclick = () => checkAnswer(index, currentQ.correct);
+            optsContainer.appendChild(button);
+        });
+
+        if (isUltraMode) {
+            startTimer();
+        }
+    }
+
+    function startTimer() {
+        timeRemaining = 15;
+        const timerBar = document.getElementById("timerBar");
+        timerBar.style.width = "100%";
+
+        timerInterval = setInterval(() => {
+            timeRemaining--;
+            timerBar.style.width = (timeRemaining / 15) * 100 + "%";
+            if (timeRemaining <= 0) {
+                clearInterval(timerInterval);
+                nextQuestion();
+            }
+        }, 1000);
+    }
+
+    function checkAnswer(selectedIdx, correctIdx) {
+        clearInterval(timerInterval);
+        const buttons = document.querySelectorAll(".opt-btn");
+
+        buttons.forEach((btn, idx) => {
+            btn.disabled = true;
+            if (idx === correctIdx) {
+                btn.classList.add("correct");
+            }
+            if (idx === selectedIdx && selectedIdx !== correctIdx) {
+                btn.classList.add("wrong");
+            }
+        });
+
+        if (selectedIdx === correctIdx) {
+            score++;
+        }
+    }
+
+    function nextQuestion() {
+        currentQIndex++;
+        loadQuestion();
+    }
+
+    function showResults() {
+        document.getElementById("quiz-body").style.display = "none";
+        document.getElementById("result-box").style.display = "block";
+        document.getElementById("scoreVal").innerText = score;
+    }
+
+    function restartQuiz() {
+        currentQIndex = 0;
+        score = 0;
+        document.getElementById("quiz-body").style.display = "block";
+        document.getElementById("result-box").style.display = "none";
+        loadQuestion();
+    }
+
+    loadQuestion();
+</script>
+
+</body>
+</html>

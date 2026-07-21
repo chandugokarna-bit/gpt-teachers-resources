@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>೭ನೇ ತರಗತಿ ಸಮಾಜ ವಿಜ್ಞಾನ - ಅಧ್ಯಾಯ ೨೩: ರಕ್ಷಣಾ ಪಡೆಗಳು</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Arial, 'Tunga', sans-serif;
+        }
+        body {
+            background-color: #e2e8f0;
+            margin: 0;
+            padding: 20px;
+            transition: background 0.4s ease, color 0.4s ease;
+        }
+        /* Ultra Mode Theme */
+        body.ultra-mode {
+            background-color: #090d16;
+            color: #f1f5f9;
+        }
+        .quiz-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+            border: 2px solid #cbd5e1;
+        }
+        body.ultra-mode .quiz-container {
+            background: #131c2e;
+            box-shadow: 0 0 25px rgba(59, 130, 246, 0.4);
+            border-color: #3b82f6;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+        body.ultra-mode .header {
+            border-bottom-color: #1e293b;
+        }
+        .ultra-btn {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.95rem;
+            box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3);
+            transition: 0.3s;
+        }
+        body.ultra-mode .ultra-btn {
+            background: #ef4444;
+            box-shadow: 0 0 15px #ef4444;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        .timer-container {
+            width: 100%;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            display: none;
+            overflow: hidden;
+        }
+        body.ultra-mode .timer-container {
+            display: block;
+            background: #334155;
+        }
+        .timer-bar {
+            height: 100%;
+            background: #ef4444;
+            width: 100%;
+            transition: width 1s linear;
+        }
+        .question {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            line-height: 1.5;
+            white-space: pre-line;
+        }
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+        .opt-btn {
+            background: #f8fafc;
+            border: 2px solid #cbd5e1;
+            padding: 14px 18px;
+            border-radius: 10px;
+            text-align: left;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.2s;
+            color: inherit;
+        }
+        body.ultra-mode .opt-btn {
+            background: #1e293b;
+            border-color: #334155;
+        }
+        .opt-btn:hover:not([disabled]) {
+            border-color: #3b82f6;
+            background: #eff6ff;
+        }
+        body.ultra-mode .opt-btn:hover:not([disabled]) {
+            background: #0f172a;
+            border-color: #60a5fa;
+        }
+        .correct {
+            background-color: #d1fae5 !important;
+            border-color: #10b981 !important;
+            color: #065f46 !important;
+            font-weight: bold;
+        }
+        .wrong {
+            background-color: #fee2e2 !important;
+            border-color: #ef4444 !important;
+            color: #991b1b !important;
+        }
+        body.ultra-mode .correct {
+            background-color: #064e3b !important;
+            color: #a7f3d0 !important;
+        }
+        body.ultra-mode .wrong {
+            background-color: #7f1d1d !important;
+            color: #fecaca !important;
+        }
+        .footer {
+            margin-top: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .next-btn {
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+        .next-btn:hover {
+            background: #059669;
+        }
+        .score-card {
+            text-align: center;
+            padding: 20px;
+        }
+        .score-card h2 {
+            font-size: 2rem;
+            color: #3b82f6;
+        }
+    </style>
+</head>
+<body>
+
+<div class="quiz-container">
+    <div class="header">
+        <div>
+            <h3 style="margin:0;">೭ನೇ ತರಗತಿ - ಸಮಾಜ ವಿಜ್ಞಾನ</h3>
+            <small>ಅಧ್ಯಾಯ ೨೩: ರಕ್ಷಣಾ ಪಡೆಗಳು</small>
+        </div>
+        <button class="ultra-btn" onclick="toggleUltraMode()" id="ultraBtn">⚡ ULTRA MODE: OFF</button>
+    </div>
+
+    <div class="timer-container">
+        <div class="timer-bar" id="timerBar"></div>
+    </div>
+
+    <div id="quiz-body">
+        <div class="question" id="qText">ಪ್ರಶ್ನೆ ಲೋಡ್ ಆಗುತ್ತಿದೆ...</div>
+        <div class="options-grid" id="optsBox"></div>
+
+        <div class="footer">
+            <span id="progressText" style="font-weight: bold;">ಪ್ರಶ್ನೆ 1 / 18</span>
+            <button class="next-btn" onclick="nextQuestion()" id="nextBtn">ಮುಂದಿನ ಪ್ರಶ್ನೆ ➔</button>
+        </div>
+    </div>
+
+    <div id="result-box" class="score-card" style="display: none;">
+        <h2>ಅಭಿನಂದನೆಗಳು! 🎉</h2>
+        <p style="font-size: 1.2rem;">ನಿಮ್ಮ ಒಟ್ಟು ಅಂಕಗಳು: <strong id="scoreVal">0</strong> / 18</p>
+        <button class="next-btn" onclick="restartQuiz()">ಮತ್ತೆ ಪರೀಕ್ಷೆ ಬರೆಯಿರಿ</button>
+    </div>
+</div>
+
+<script>
+    // ಅಧ್ಯಾಯ-೨೩ ರ ಎಲ್ಲಾ ೧೮ ಬಹುಆಯ್ಕೆ ಪ್ರಶ್ನೆಗಳು ಮತ್ತು ಉತ್ತರಗಳು
+    const questionsData = [
+        {
+            q: "1. ನಮ್ಮ ರಕ್ಷಣಾ ಪಡೆಗಳ ಮೇಲಿನ ಸರ್ವೋಚ್ಚ ಅಧಿಕಾರವನ್ನು ಇವರಿಗೆ ನೀಡಲಾಗಿದೆ...",
+            opts: ["A. ಪ್ರಧಾನಮಂತ್ರಿ", "B. ರಾಷ್ಟ್ರಪತಿ", "C. ಮುಖ್ಯಮಂತ್ರಿ", "D. ಉಪರಾಷ್ಟ್ರಪತಿ"],
+            correct: 1
+        },
+        {
+            q: "2. ಭಾರತದ ಭೂ ಸೇನೆಯ ಮುಖ್ಯಸ್ಥರನ್ನು ಹೀಗೆಂದು ಕರೆಯುವರು.",
+            opts: ["A. ದಂಡನಾಯಕ (ಜನರಲ್)", "B. ಅಡ್ಮಿರೆಲ್", "C. ಏರ್ ಚೀಫ್ ಮಾರ್ಷಲ್", "D. ಕಮಾಂಡರ್"],
+            correct: 0
+        },
+        {
+            q: "3. ಭಾರತದ ಕರಾವಳಿ ತೀರವನ್ನು ಹಾಗೂ ದ್ವೀಪಗಳನ್ನು ರಕ್ಷಿಸಲು ಅಗತ್ಯವಾದ ದಳ..........",
+            opts: ["A. ಭೂ ದಳ", "B. ನೌಕಾ ದಳ", "C. ವಾಯು ದಳ", "D. ಗಡಿ ಭದ್ರತಾ ದಳ"],
+            correct: 1
+        },
+        {
+            q: "4. ನಮ್ಮ ದೇಶದ ಗಡಿಗಳನ್ನು ರಕ್ಷಿಸುತ್ತಿರುವ ಗಡಿ ಭದ್ರತಾ ದಳದ ಮುಖ್ಯ ಧೈಯ...",
+            opts: ["A. ಶಿಸ್ತು ಮತ್ತು ಒಗ್ಗಟ್ಟು", "B. ಮಾನವೀಯತೆ ಮತ್ತು ಸ್ವಯಂಸೇವೆ", "C. ಪ್ರಾಣ ಇರುವವರೆಗೆ ಕರ್ತವ್ಯ", "D. ಸಾಮೂಹಿಕ ಜೀವನ ಪ್ರಾಧಾನ್ಯ"],
+            correct: 2
+        },
+        {
+            q: "5. ನಮ್ಮ ದೇಶದ ರಕ್ಷಣಾ ಪಡೆಗಳಿಗೆ ಸಂಬಂಧಿಸಿದ ತಪ್ಪಾದ ಹೇಳಿಕೆ.",
+            opts: [
+                "A. ದೇಶದ ಗಡಿ ಪ್ರದೇಶಗಳ ರಕ್ಷಣೆ",
+                "B. ದೇಶದ ಸಮಗ್ರತೆಯನ್ನು ಕಾಪಾಡದಿರುವುದು.",
+                "C. ಕಳ್ಳ ಸಾಗಾಣಿಕೆ ತಡೆಗಟ್ಟುವುದು.",
+                "D. ಕಾನೂನು ಬಾಹಿರ ಚಟುವಟಿಕೆಗಳನ್ನು ತಡೆಗಟ್ಟುವುದು."
+            ],
+            correct: 1
+        },
+        {
+            q: "6. ಪೂರಕ ರಕ್ಷಣಾ ಪಡೆಗಳ ಸರಿಯಾದ ಜೋಡಿಯನ್ನು ಆಯ್ಕೆ ಮಾಡಿ.",
+            opts: [
+                "A. ಗಡಿ ಭದ್ರತಾ ದಳ ಮತ್ತು ಗಡಿ ರಸ್ತೆಗಳ ಸಂಘಟನೆ",
+                "B. ಗಡಿ ಭದ್ರತಾ ದಳ ಮತ್ತು ಭಾರತೀಯ ಭೂಸೇನೆ.",
+                "C. ಭಾರತೀಯ ರೆಡ್ ಕ್ರಾಸ್ ಸಂಸ್ಥೆ ಮತ್ತು ಗಡಿ ಭದ್ರತಾ ದಳ",
+                "D. ಗಡಿ ಭದ್ರತಾ ದಳ ಮತ್ತು ನಾಗರಿಕ ಪೊಲೀಸ್ ಪಡೆಗಳು"
+            ],
+            correct: 0
+        },
+        {
+            q: "7. ಆದಿತ್ಯ ಎಂಬ ಏಳನೇ ತರಗತಿಯ ವಿದ್ಯಾರ್ಥಿಯು ಸಾಮೂಹಿಕ ಜೀವನದ ಪ್ರಾಧಾನ್ಯತೆ, ನಾಯಕತ್ವ ಮುಂತಾದ ಗುಣಗಳನ್ನು ಕಲಿಯಲು ಇಚ್ಛಿಸಿದ್ದಾನೆ. ಇದನ್ನು ಕಲಿಯಲು ಆದಿತ್ಯನಿಗೆ ನೀವು ಯಾವ ಸಹಾಯಕ ರಕ್ಷಣಾ ಸೇವೆಯ ತರಬೇತಿಯನ್ನು ಪಡೆಯಲು ಸೂಚಿಸುವಿರಿ?",
+            opts: ["A. ಎನ್. ಸಿ. ಸಿ.", "B. ನಾಗರಿಕ ಪೊಲೀಸ್ ಪಡೆಗಳು", "C. ಭಾರತೀಯ ರೆಡ್ ಕ್ರಾಸ್ ಸಂಸ್ಥೆ", "D. ಗೃಹ ರಕ್ಷಕ ದಳ."],
+            correct: 0
+        },
+        {
+            q: "8. ಭಾರತದ ರಕ್ಷಣಾ ವ್ಯವಸ್ಥೆಯ ಮೂರು ವಿಭಾಗಗಳು.",
+            opts: [
+                "A. ಗಡಿ ಭದ್ರತಾ ದಳ, ಕರಾವಳಿ ಪಹರೆ, ಗಡಿ ರಸ್ತೆಗಳ ಸಂಘಟನೆ",
+                "B. ಎನ್ ಸಿಸಿ, ಭಾರತೀಯ ರೆಡ್ ಕ್ರಾಸ್ ಸಂಸ್ಥೆ, ನಾಗರಿಕ ಪೊಲೀಸ್ ಪಡೆಗಳು",
+                "C. ಭೂ ಸೇನೆ, ನೌಕಾದಳ, ವಾಯುಪಡೆ.",
+                "D. ಭೂಸೇನೆ, ಕರಾವಳಿ ಪಹರೆಯವರು, ಗಡಿ ಭದ್ರತಾ ದಳ"
+            ],
+            correct: 2
+        },
+        {
+            q: "9. ಭಾರತ ಹೊಂದಿರುವ ಭೂಗಡಿ ಮತ್ತು ಜಲ ಗಡಿ ಪ್ರದೇಶ ಕಿ. ಮೀ. ಗಳಲ್ಲಿ......",
+            opts: [
+                "A. 15200 k.m ಭೂ ಗಡಿ ಮತ್ತು 7565.1 k. m ಜಲಗಡಿ",
+                "B. 12500 k.m ಭೂಗಡಿ ಮತ್ತು 7556.1 k. m ಜಲಗಡಿ",
+                "C. 15200 k.m ಭೂ ಗಡಿ ಮತ್ತು 7516.5 k. m. ಜಲಗಡಿ",
+                "D. 15200 k.m ಭೂ ಗಡಿ ಮತ್ತು 7561.5 k. m ಜಲಗಡಿ."
+            ],
+            correct: 2
+        },
+        {
+            q: "10. ಭಾರತೀಯ ಭೂ ಸೇನೆಯ ಪ್ರಧಾನ ಕಛೇರಿ ಇರುವುದು.",
+            opts: ["A. ಹೊಸ ದೆಹಲಿ", "B. ಬೆಂಗಳೂರು", "C. ಹೈದರಾಬಾದ್", "D. ಪಂಜಾಬ್"],
+            correct: 0
+        },
+        {
+            q: "11. ಕರ್ನಾಟಕದ ಕಾರವಾರದಲ್ಲಿರುವ ನೌಕಾನೆಲೆ...",
+            opts: ["A. ಐ. ಎನ್. ಎಸ್. ವಿಭೂತಿ", "B. ಐ. ಎನ್. ಎಸ್. ವಿಕ್ರಮಾದಿತ್ಯ", "C. ಐ. ಎನ್. ಎಸ್ ಗೋಡಾವರಿ", "D. ಸೀಬರ್ಡ್"],
+            correct: 3
+        },
+        {
+            q: "12. ವಾಯುಪಡೆಗೆ ತರಬೇತಿ ನೀಡುವ ಕೇಂದ್ರವಿರದ ಸ್ಥಳ.",
+            opts: ["A. ಬೆಂಗಳೂರು", "B. ಲಕ್ನೋ", "C. ದಿಂಡಿಗಲ್", "D. ಹೈದರಾಬಾದ್"],
+            correct: 1
+        },
+        {
+            q: "13. ನೌಕಾದಳ : ಅಡ್ಮಿರೆಲ್ :: ವಾಯುದಳ : _______________",
+            opts: ["A. ದಂಡ ನಾಯಕ", "B. ಏರ್ ಚೀಫ್ ಮಾರ್ಷಲ್", "C. ಅಡ್ಮಿರೆಲ್", "D. ಕಮಾಂಡರ್"],
+            correct: 1
+        },
+        {
+            q: "14. ಎನ್ .ಸಿ .ಸಿಯು ಈ ಮುಖ್ಯ ಧೈಯವನ್ನು ಇಟ್ಟುಕೊಂಡು ಕಾರ್ಯನಿರ್ವಹಿಸುತ್ತದೆ.",
+            opts: ["A. ಶಿಸ್ತು ಮತ್ತು ಒಗ್ಗಟ್ಟು", "B. ಮಾನವೀಯತೆ ಮತ್ತು ಸ್ವಯಂಸೇವೆ", "C. ಸಾಯುವವರೆಗೆ ಕರ್ತವ್ಯ", "D. ಸೇವೆ ಮತ್ತು ದೇಶ ಪ್ರೇಮ"],
+            correct: 0
+        },
+        {
+            q: "15. ಇದು ಮಾನವೀಯತೆ ಮತ್ತು ಸ್ವಯಂ ಸೇವೆಯನ್ನು ಮುಖ್ಯ ಧೈಯವನ್ನಾಗಿಸಿಕೊಂಡ ಸಹಾಯಕ ರಕ್ಷಣಾ ಸೇವೆಯಾಗಿದೆ.",
+            opts: ["A. ಗೃಹ ರಕ್ಷಕ ದಳ", "B. ಭಾರತೀಯ ರೆಡ್ ಕ್ರಾಸ್ ಸಂಸ್ಥೆ", "C. ನಾಗರಿಕ ಪೊಲೀಸ್ ಪಡೆಗಳು", "D. ನ್ಯಾಷನಲ್ ಕೆಡೆಟ್ ಕಾರ್ಪ್ಸ್ (ಎನ್.ಸಿ.ಸಿ. )"],
+            correct: 1
+        },
+        {
+            q: "16. ನಮ್ಮ ದೇಶದ ಜನರಿಗೆ ರಕ್ಷಣೆಯನ್ನು ನೀಡುವ ದಳವಿದು ....",
+            opts: ["A. ಗೃಹ ರಕ್ಷಕ ದಳ", "B. ಭಾರತೀಯ ರೆಡ್ ಕ್ರಾಸ್ ಸಂಸ್ಥೆ", "C. ರಾಷ್ಟ್ರೀಯ ರಕ್ಷಣಾ ದಳ", "D. ಗಡಿ ಭದ್ರತಾ ದಳ"],
+            correct: 0
+        },
+        {
+            q: "17. ಈ ದಳವು ಪೊಲೀಸ್ ಪಡೆಗೆ ಪೂರಕವಾಗಿ ಕೆಲಸ ಮಾಡುತ್ತದೆ.",
+            opts: ["A. ಗೃಹ ರಕ್ಷಕ ದಳ", "B. ರಾಷ್ಟ್ರೀಯ ರಕ್ಷಣಾ ದಳ", "C. ಕೇಂದ್ರ ಕೈಗಾರಿಕಾ ಭದ್ರತಾ ಪಡೆ", "D. ಗಡಿ ಭದ್ರತಾ ದಳ"],
+            correct: 0
+        },
+        {
+            q: "18. ಈ ಕೆಳಗಿನವುಗಳಲ್ಲಿ ಸರಿಯಾದ ಸಹಾಯಕ ರಕ್ಷಣಾ ಸೇವೆಗಳ ಗುಂಪು.",
+            opts: [
+                "A. ಗಡಿ ಭದ್ರತಾದಳ, ಕರಾವಳಿ ಪಹರೆಯವರು, ಗಡಿ ರಸ್ತೆಗಳ ಸಂಘಟನೆ, ಕೇಂದ್ರ ಕೈಗಾರಿಕಾ ಭದ್ರತಾಪಡೆ.",
+                "B. ಎನ್. ಸಿ. ಸಿ, ಭಾರತೀಯ ರೆಡ್ ಕ್ರಾಸ್ ಸಂಸ್ಥೆ, ನಾಗರಿಕ ಪೊಲೀಸ್ ಪಡೆಗಳು, ಗೃಹ ರಕ್ಷಕ ದಳ",
+                "C. ಗಡಿಭದ್ರತಾ ದಳ, ಎನ್. ಸಿ. ಸಿ. ಗಡಿ ರಸ್ತೆಗಳ ಸಂಘಟನೆ, ಗೃಹ ರಕ್ಷಕ ದಳ.",
+                "D. ಎನ್ .ಸಿ. ಸಿ, ಭಾರತೀಯ ರೆಡ್ ಕ್ರಾಸ್ ಸಂಸ್ಥೆ, ಕರಾವಳಿ ಪಹರೆಯವರು, ಗೃಹ ರಕ್ಷಕ ದಳ"
+            ],
+            correct: 1
+        }
+    ];
+
+    let currentQIndex = 0;
+    let score = 0;
+    let isUltraMode = false;
+    let timerInterval;
+    let timeRemaining = 15;
+
+    function toggleUltraMode() {
+        isUltraMode = !isUltraMode;
+        document.body.classList.toggle('ultra-mode');
+        const btn = document.getElementById('ultraBtn');
+        btn.innerText = isUltraMode ? "⚡ ULTRA MODE: ON" : "⚡ ULTRA MODE: OFF";
+        restartQuiz();
+    }
+
+    function loadQuestion() {
+        clearInterval(timerInterval);
+        
+        if (currentQIndex >= questionsData.length) {
+            showResults();
+            return;
+        }
+
+        const currentQ = questionsData[currentQIndex];
+        document.getElementById("qText").innerText = currentQ.q;
+        document.getElementById("progressText").innerText = `ಪ್ರಶ್ನೆ ${currentQIndex + 1} / ${questionsData.length}`;
+        
+        const optsContainer = document.getElementById("optsBox");
+        optsContainer.innerHTML = "";
+
+        currentQ.opts.forEach((optText, index) => {
+            const button = document.createElement("button");
+            button.className = "opt-btn";
+            button.innerText = optText;
+            button.onclick = () => checkAnswer(index, currentQ.correct);
+            optsContainer.appendChild(button);
+        });
+
+        if (isUltraMode) {
+            startTimer();
+        }
+    }
+
+    function startTimer() {
+        timeRemaining = 15;
+        const timerBar = document.getElementById("timerBar");
+        timerBar.style.width = "100%";
+
+        timerInterval = setInterval(() => {
+            timeRemaining--;
+            timerBar.style.width = (timeRemaining / 15) * 100 + "%";
+            if (timeRemaining <= 0) {
+                clearInterval(timerInterval);
+                nextQuestion();
+            }
+        }, 1000);
+    }
+
+    function checkAnswer(selectedIdx, correctIdx) {
+        clearInterval(timerInterval);
+        const buttons = document.querySelectorAll(".opt-btn");
+
+        buttons.forEach((btn, idx) => {
+            btn.disabled = true;
+            if (idx === correctIdx) {
+                btn.classList.add("correct");
+            }
+            if (idx === selectedIdx && selectedIdx !== correctIdx) {
+                btn.classList.add("wrong");
+            }
+        });
+
+        if (selectedIdx === correctIdx) {
+            score++;
+        }
+    }
+
+    function nextQuestion() {
+        currentQIndex++;
+        loadQuestion();
+    }
+
+    function showResults() {
+        document.getElementById("quiz-body").style.display = "none";
+        document.getElementById("result-box").style.display = "block";
+        document.getElementById("scoreVal").innerText = score;
+    }
+
+    function restartQuiz() {
+        currentQIndex = 0;
+        score = 0;
+        document.getElementById("quiz-body").style.display = "block";
+        document.getElementById("result-box").style.display = "none";
+        loadQuestion();
+    }
+
+    loadQuestion();
+</script>
+
+</body>
+</html>

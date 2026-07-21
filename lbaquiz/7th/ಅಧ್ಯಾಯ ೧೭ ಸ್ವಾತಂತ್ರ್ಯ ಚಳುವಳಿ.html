@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>೭ನೇ ತರಗತಿ ಸಮಾಜ ವಿಜ್ಞಾನ - ಅಧ್ಯಾಯ ೧೭: ಸ್ವಾತಂತ್ರ್ಯ ಚಳುವಳಿ</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Arial, 'Tunga', sans-serif;
+        }
+        body {
+            background-color: #e2e8f0;
+            margin: 0;
+            padding: 20px;
+            transition: background 0.4s ease, color 0.4s ease;
+        }
+        /* Ultra Mode Theme */
+        body.ultra-mode {
+            background-color: #090d16;
+            color: #f1f5f9;
+        }
+        .quiz-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+            border: 2px solid #cbd5e1;
+        }
+        body.ultra-mode .quiz-container {
+            background: #131c2e;
+            box-shadow: 0 0 25px rgba(59, 130, 246, 0.4);
+            border-color: #3b82f6;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+        body.ultra-mode .header {
+            border-bottom-color: #1e293b;
+        }
+        .ultra-btn {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.95rem;
+            box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3);
+            transition: 0.3s;
+        }
+        body.ultra-mode .ultra-btn {
+            background: #ef4444;
+            box-shadow: 0 0 15px #ef4444;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        .timer-container {
+            width: 100%;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            display: none;
+            overflow: hidden;
+        }
+        body.ultra-mode .timer-container {
+            display: block;
+            background: #334155;
+        }
+        .timer-bar {
+            height: 100%;
+            background: #ef4444;
+            width: 100%;
+            transition: width 1s linear;
+        }
+        .question {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            line-height: 1.5;
+            white-space: pre-line;
+        }
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+        .opt-btn {
+            background: #f8fafc;
+            border: 2px solid #cbd5e1;
+            padding: 14px 18px;
+            border-radius: 10px;
+            text-align: left;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.2s;
+            color: inherit;
+        }
+        body.ultra-mode .opt-btn {
+            background: #1e293b;
+            border-color: #334155;
+        }
+        .opt-btn:hover:not([disabled]) {
+            border-color: #3b82f6;
+            background: #eff6ff;
+        }
+        body.ultra-mode .opt-btn:hover:not([disabled]) {
+            background: #0f172a;
+            border-color: #60a5fa;
+        }
+        .correct {
+            background-color: #d1fae5 !important;
+            border-color: #10b981 !important;
+            color: #065f46 !important;
+            font-weight: bold;
+        }
+        .wrong {
+            background-color: #fee2e2 !important;
+            border-color: #ef4444 !important;
+            color: #991b1b !important;
+        }
+        body.ultra-mode .correct {
+            background-color: #064e3b !important;
+            color: #a7f3d0 !important;
+        }
+        body.ultra-mode .wrong {
+            background-color: #7f1d1d !important;
+            color: #fecaca !important;
+        }
+        .footer {
+            margin-top: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .next-btn {
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+        .next-btn:hover {
+            background: #059669;
+        }
+        .score-card {
+            text-align: center;
+            padding: 20px;
+        }
+        .score-card h2 {
+            font-size: 2rem;
+            color: #3b82f6;
+        }
+    </style>
+</head>
+<body>
+
+<div class="quiz-container">
+    <div class="header">
+        <div>
+            <h3 style="margin:0;">೭ನೇ ತರಗತಿ - ಸಮಾಜ ವಿಜ್ಞಾನ</h3>
+            <small>ಅಧ್ಯಾಯ ೧೭: ಸ್ವಾತಂತ್ರ್ಯ ಚಳುವಳಿ</small>
+        </div>
+        <button class="ultra-btn" onclick="toggleUltraMode()" id="ultraBtn">⚡ ULTRA MODE: OFF</button>
+    </div>
+
+    <div class="timer-container">
+        <div class="timer-bar" id="timerBar"></div>
+    </div>
+
+    <div id="quiz-body">
+        <div class="question" id="qText">ಪ್ರಶ್ನೆ ಲೋಡ್ ಆಗುತ್ತಿದೆ...</div>
+        <div class="options-grid" id="optsBox"></div>
+
+        <div class="footer">
+            <span id="progressText" style="font-weight: bold;">ಪ್ರಶ್ನೆ 1 / 51</span>
+            <button class="next-btn" onclick="nextQuestion()" id="nextBtn">ಮುಂದಿನ ಪ್ರಶ್ನೆ ➔</button>
+        </div>
+    </div>
+
+    <div id="result-box" class="score-card" style="display: none;">
+        <h2>ಅಭಿನಂದನೆಗಳು! 🎉</h2>
+        <p style="font-size: 1.2rem;">ನಿಮ್ಮ ಒಟ್ಟು ಅಂಕಗಳು: <strong id="scoreVal">0</strong> / 51</p>
+        <button class="next-btn" onclick="restartQuiz()">ಮತ್ತೆ ಪರೀಕ್ಷೆ ಬರೆಯಿರಿ</button>
+    </div>
+</div>
+
+<script>
+    // ಅಧ್ಯಾಯ-೧೭ ರ ಎಲ್ಲಾ ೫೧ ಬಹುಆಯ್ಕೆ ಪ್ರಶ್ನೆಗಳು ಮತ್ತು ಉತ್ತರಗಳು
+    const questionsData = [
+        // ಕಲಿಕಾ ಫಲ - ೧೭.೨ (೨೫ ಪ್ರಶ್ನೆಗಳು)
+        {
+            q: "1. ಜನರು ಪ್ರೀತಿಯಿಂದ 'ಬಾಪೂಜಿ' ಎಂದು ಕರೆಯಲ್ಪಡುವ ಭಾರತೀಯ ಸ್ವಾತಂತ್ರ್ಯ ಹೋರಾಟದ ಜನಪ್ರಿಯ ನಾಯಕ.",
+            opts: ["A. ಗಾಂಧೀಜಿ", "B. ನೇತಾಜಿ", "C. ನೆಹರು", "D. ಪಟೇಲರು"],
+            correct: 0
+        },
+        {
+            q: "2. ಗಾಂಧೀಜಿಯವರ ಹೋರಾಟದ ಪ್ರಮುಖ ಎರಡು ಅಸ್ತ್ರಗಳು ಹೀಗಿವೆ.",
+            opts: ["A. ಸತ್ಯ ಮತ್ತು ಶಾಂತಿ", "B. ಸತ್ಯಾಗ್ರಹ ಮತ್ತು ಅಹಿಂಸೆ", "C. ಉಪವಾಸ ಮತ್ತು ಹಿಂಸೆ", "D. ಈ ಮೇಲಿನ ಯಾವುದೂ ಅಲ್ಲ"],
+            correct: 1
+        },
+        {
+            q: "3. ಗಾಂಧೀಜಿಯವರ ಹೋರಾಟದ ವಿಧಾನವು ಇಂದಿಗೂ ಹೇಗೆ ಜನಪ್ರಿಯವಾಗಿದೆ.",
+            opts: ["A. ದಾದಾಗಿರಿ", "B. ಗಾಂಧಿಗಿರಿ", "C. ಗೂಂಡಾಗಿರಿ", "D. ಯಾವುದೂ ಅಲ್ಲ"],
+            correct: 1
+        },
+        {
+            q: "4. ಸ್ವಾತಂತ್ರ್ಯ ಹೋರಾಟ ಪೂರ್ವದಲ್ಲಿ ಗಾಂಧೀಜಿಯವರು ಕೈಗೊಂಡಿದ್ದ ವೃತ್ತಿ.",
+            opts: ["A. ಶಿಕ್ಷಕ", "B. ವೈದ್ಯ", "C. ಬಡಿಗ", "D. ವಕೀಲ"],
+            correct: 3
+        },
+        {
+            q: "5. ಗಾಂಧೀಜಿಯವರ ರಾಜಕೀಯ ಗುರುವಾಗಿದ್ದ ಮಂದಗಾಮಿ ನಾಯಿಕರಿವರು (ಚಿತ್ರದಲ್ಲಿರುವಂತೆ).",
+            opts: ["A. ರಾಮಕೃಷ್ಣ ಪರಮಹಂಸರು", "B. ಸ್ವಾಮಿ ವಿವೇಕಾನಂದರು", "C. ಗೋಪಾಲಕೃಷ್ಣ ಗೋಖಲೆ", "D. ದಾದಾಬಾಯಿ ನವರೋಜಿ"],
+            correct: 2
+        },
+        {
+            q: "6. ಸ್ವಾತಂತ್ರ್ಯ ಹೋರಾಟದಲ್ಲಿ ಮೂಲಶಿಕ್ಷಣದ ತರಬೇತಿ ಕೇಂದ್ರವಾಗಿದ್ದ ಸಾಬರಮತಿ ಆಶ್ರಮ ಸ್ಥಾಪಿಸಿದರು.",
+            opts: ["A. ಮಹಾತ್ಮಾ ಗಾಂಧೀಜಿ", "B. ಜವಾಹರ್ ಲಾಲ್ ನೆಹರೂ", "C. ನೇತಾಜಿ ಸುಭಾಸ್ ಚಂದ್ರ ಬೋಸ್", "D. ಸರ್ದಾರ್ ವಲ್ಲಭ ಬಾಯ್ ಪಟೇಲರು"],
+            correct: 0
+        },
+        {
+            q: "7. ಗಾಂಧೀಜಿಯವರು ದಕ್ಷಿಣ ಆಫ್ರಿಕಾದಲ್ಲಿದ್ದಾಗ ಸತ್ಯಾಗ್ರಹ ಮತ್ತು ಅಹಿಂಸೆ ಎಂಬ ಅಸ್ತ್ರಗಳ ಮೂಲಕ ಇವರ ವಿರುದ್ಧ ಹೋರಾಡಿದರು.",
+            opts: ["A. ಬಿಳಿಯರ", "B. ಕರಿಯರ", "C. ಅಧಿಕಾರಿಗಳ", "D. ಕಾರ್ಮಿಕರ"],
+            correct: 0
+        },
+        {
+            q: "8. ಗಾಂಧೀಜಿಯವರು ನೀಲಿ ಬೆಳೆಗಾರರ ಪರವಾಗಿ ಆರಂಭಿಸಿದ ಸತ್ಯಾಗ್ರಹ.",
+            opts: ["A. ಖೇಡಾ ಸತ್ಯಾಗ್ರಹ", "B. ಚಂಪಾರಣ್ಯ ಸತ್ಯಾಗ್ರಹ", "C. ಅಸಹಕಾರ ಚಳುವಳಿ", "D. ಈ ಮೇಲಿನ ಎಲ್ಲವೂ"],
+            correct: 1
+        },
+        {
+            q: "9. ಅಸಹಕಾರ ಚಳುವಳಿಯ ಸಂದರ್ಭದಲ್ಲಿ ಗಾಂಧೀಜಿ ಅವರು ಬ್ರಿಟಿಷರಿಗೆ ಹಿಂದಿರುಗಿಸಿದ ಪದವಿ.",
+            opts: ["A. ನೈಟ್ ಹುಡ್", "B. ಬ್ಯಾರಿಸ್ಟರ್", "C. ಕೈಸರ್-ಎ-ಹಿಂದ್", "D. ಯಾವುದೂ ಅಲ್ಲ"],
+            correct: 2
+        },
+        {
+            q: "10. ಅಹಿಂಸಾ ಸಿದ್ಧಾಂತಕ್ಕೆ ವಿರುದ್ಧವಾಗಿ ನಡೆದ 'ಚೌರಿ ಚೌರ' ಘಟನೆಯಿಂದ ಮನನೊಂದ ಗಾಂಧೀಜಿಯವರು ಹಿಂಪಡೆದುಕೊಂಡ ಚಳುವಳಿ.",
+            opts: ["A. ಅಸಹಕಾರ ಚಳುವಳಿ", "B. ಖಿಲಾಫತ್ ಚಳುವಳಿ", "C. ಕ್ವಿಟ್ ಇಂಡಿಯಾ ಚಳುವಳಿ", "D. ಯಾವುದೂ ಅಲ್ಲ"],
+            correct: 0
+        },
+        {
+            q: "11. ಸಾ.ಶ. 1930 ಮಾರ್ಚ್ 12 ರಂದು ಪ್ರಸಿದ್ಧ ದಂಡಿಯಾತ್ರೆಯೊಂದಿಗೆ ನಾಗರಿಕ ಕಾನೂನು ಭಂಗ ಚಳುವಳಿಯನ್ನು ಆರಂಭಿಸಿದವರು.",
+            opts: ["A. ಅಬ್ದುಲ್ ಗಫಾರ್ ಖಾನ್", "B. ಅಬ್ದುಲ್ ಕಲಾಂ", "C. ಮಹಾತ್ಮಾ ಗಾಂಧೀಜಿ", "D. ನೇತಾಜಿ ಸುಭಾಸ್ ಚಂದ್ರ ಬೋಸ್"],
+            correct: 2
+        },
+        {
+            q: "12. ಮಿಷ್ರಾ ಮೇಘ: ವಿ.ಡಿ. ಸಾವರ್ಕರ್ :: ಬುದಾಯ್ ಖಿದ್ಮತ್ ಗಾರ್ : ___________",
+            opts: ["A. ಭಗತ್ ಸಿಂಗ್", "B. ಸುಭಾಷ್ ಚಂದ್ರ ಬೋಸ್", "C. ಖಾನ್ ಅಬ್ದುಲ್ ಗಫಾರ್ ಖಾನ್", "D. ಸೈಯದ್ ಅಹಮ್ಮದ್ ಖಾನ್"],
+            correct: 2
+        },
+        {
+            q: "13. \"ನನ್ನ ಮೈ ಮೇಲಿನ ಲಾಠಿ ಹೊಡೆತಗಳು ಮುಂದೊಂದು ದಿನ ಬ್ರಿಟಿಷ್ ಶವ ಪೆಟ್ಟಿಗೆಯ ಮೇಲಿನ ಮೊಳೆಗಳಾಗಲಿವೆ\" ಎಂಬ ಭವಿಷ್ಯವಾಣಿ ನುಡಿದರು.",
+            opts: ["A. ಲಾಲಾ ಲಜಪತ್ ರಾಯ್", "B. ಬಾಲ ಗಂಗಾಧರ ತಿಲಕ್", "C. ನೇತಾಜಿ ಸುಭಾಸ್ ಚಂದ್ರ ಬೋಸ್", "D. ಅರವಿಂದ ಘೋಷ್"],
+            correct: 0
+        },
+        {
+            q: "14. ಸಾ.ಶ. 1928 ರಲ್ಲಿ ಬ್ರಿಟಿಷ್ ಸರ್ಕಾರ ಸೈಮನ್ ಆಯೋಗವನ್ನು ಭಾರತಕ್ಕೆ ಕಳುಹಿಸಿದ ಉದ್ದೇಶ.",
+            opts: ["A. ಅಸಹಕಾರ ಚಳುವಳಿಯನ್ನು ಹತ್ತಿಕ್ಕಲು", "B. ಭಾರತಕ್ಕೆ ರಾಜಕೀಯ ಸ್ವಾತಂತ್ರ್ಯ ನೀಡಲು", "C. ಸಾ.ಶ. 1919 ಸುಧಾರಣೆಗಳ ಪರಿಣಾಮಗಳ ಅಧ್ಯಯನ", "D. ಭಾರತಕ್ಕೆ ಸ್ವಯಂ ಆಡಳಿತ ಸ್ಥಾನಮಾನ ನೀಡಲು"],
+            correct: 2
+        },
+        {
+            q: "15. ಭಾರತೀಯರು ಸೈಮನ್ ನಿಯೋಗವನ್ನು \"ಸೈಮನ್ನರೇ ಹಿಂತಿರುಗಿ\" ಎಂಬ ಘೋಷಣೆಯೊಂದಿಗೆ ಬಹಿಷ್ಕರಿಸಲು ಕಾರಣ.",
+            opts: ["A. ಈ ನಿಯೋಗವು ಇಂಗ್ಲಿಷ್ ಸದಸ್ಯರನ್ನು ಮಾತ್ರ ಒಳಗೊಂಡಿತ್ತು", "B. ಸೈಮನ್‌ನೊಂದಿಗೆ ಅಸಹಕಾರ ಚಳವಳಿ ನಿಂತಿತು", "C. ಸೈಮನ್ ನಿಯೋಗದಲ್ಲಿ ಭಾರತೀಯರಿಗೆ ಪ್ರಾತಿನಿಧ್ಯವಿರಲಿಲ್ಲ", "D. A ಮತ್ತು C ಸರಿಯಾಗಿವೆ"],
+            correct: 3
+        },
+        {
+            q: "16. ಸೈಮನ್ ಕಮಿಷನ್ ವಿರುದ್ಧದ ಹೋರಾಟದಲ್ಲಿ ಭಾಗವಹಿಸಿ ಲಾಠಿ ಏಟಿಗೆ ತುತ್ತಾಗಿ ಪ್ರಾಣತ್ಯಾಗ ಮಾಡಿದ ತೀವ್ರಗಾಮಿ ನಾಯಕ.",
+            opts: ["A. ಲಾಲಾ ಲಜಪತ್ ರಾಯ್", "B. ಬಿಪಿನ್ ಚಂದ್ರ ಪಾಲ್", "C. ಬಾಲಗಂಗಾಧರ ತಿಲಕ್", "D. ಸುಭಾಷ್ ಚಂದ್ರ ಬೋಸ್"],
+            correct: 0
+        },
+        {
+            q: "17. ಪೂರ್ಣ ಸ್ವರಾಜ್ಯ ದಿನದ ಸಂಭ್ರಮಾಚರಣೆಯ ನೆನಪನ್ನು ಹಸಿರಾಗಿಸಲು ಕೈಗೊಂಡ ನಿರ್ಣಯ.",
+            opts: ["A. ಸಂವಿಧಾನವನ್ನು ನವೆಂಬರ್ 26, 1949 ರಂದು ಅಂಗೀಕರಿಸಲಾಯಿತು", "B. ಸಂವಿಧಾನವನ್ನು ಜನವರಿ 26, 1950 ರಂದು ಅಂಗೀಕರಿಸಲಾಯಿತು", "C. ಭಾರತಕ್ಕೆ ಆಗಸ್ಟ್ 15 1947 ರಂದು ಸ್ವಾತಂತ್ರ್ಯ ನೀಡಲಾಯಿತು", "D. ಸಂವಿಧಾನವನ್ನು ಜನವರಿ 26, 1950 ರಂದು ಜಾರಿಗೆ ತರಲಾಯಿತು"],
+            correct: 3
+        },
+        {
+            q: "18. ಈ ನಾಟಕವು ಗಾಂಧೀಜಿಯವರ ಜೀವನದ ಮೇಲೆ ಅತ್ಯಂತ ಹೆಚ್ಚು ಪ್ರಭಾವವನ್ನು ಬೀರಿತು.",
+            opts: ["A. ತುಘಲಕ್ ನಾಟಕ", "B. ಮಿತ್ರವಿಂದ ಗೋವಿಂದ ನಾಟಕ", "C. ಸತ್ಯ ಹರಿಶ್ಚಂದ್ರ ನಾಟಕ", "D. ರತ್ನಾವಳಿ ನಾಟಕ"],
+            correct: 2
+        },
+        {
+            q: "19. ಮಹಾತ್ಮ ಗಾಂಧೀಜಿ ಅವರು ಈ ಕಂಪನಿಯ ಆಹ್ವಾನದ ಮೇರೆಗೆ ಕಾನೂನು ಸಲಹೆಗಾರರಾಗಿ ದಕ್ಷಿಣ ಆಫ್ರಿಕಾಕ್ಕೆ ತೆರಳಿದರು.",
+            opts: ["A. ದಾದಾ ಅಬ್ದುಲ್ಲಾ ಕಂಪನಿ", "B. ಟಾಟಾ ಕಂಪನಿ", "C. ಇನ್ಫೋಸಿಸ್ ಕಂಪನಿ", "D. ನೋಕಿಯಾ ಕಂಪನಿ"],
+            correct: 0
+        },
+        {
+            q: "20. ಚಂಪಾರಣ್ಯ ಸತ್ಯಾಗ್ರಹ : ರಾಜೇಂದ್ರ ಪ್ರಸಾದ್ :: ಖೇಡಾ ಸತ್ಯಾಗ್ರಹ : ___________",
+            opts: ["A. ಜವಾಹರ್ ಲಾಲ್ ನೆಹರು", "B. ರಾಜೇಂದ್ರ ಪ್ರಸಾದ್", "C. ಜಯಪ್ರಕಾಶ್ ನಾರಾಯಣ್", "D. ಸರ್ದಾರ್ ವಲ್ಲಭಬಾಯಿ ಪಟೇಲ್"],
+            correct: 3
+        },
+        {
+            q: "21. ಭಾರತದಲ್ಲಿ ಆರಂಭವಾಗಿದ್ದ ಖಿಲಾಫತ್ ಚಳುವಳಿಯ ನಾಯಕತ್ವವನ್ನು ವಹಿಸಿಕೊಳ್ಳುವ ಮೂಲಕ ಹಿಂದೂ ಮುಸ್ಲಿಮರ ನಡುವೆ ಸಾಮರಸ್ಯ ಏರ್ಪಡಿಸಲು ಪ್ರಯತ್ನಿಸಿದವರು.",
+            opts: ["A. ಜಯಪ್ರಕಾಶ್ ನಾರಾಯಣ್", "B. ಡಾ. ಬಿ.ಆರ್ ಅಂಬೇಡ್ಕರ್", "C. ಬಾಬು ರಾಜೇಂದ್ರ ಪ್ರಸಾದ್", "D. ಮಹಾತ್ಮ ಗಾಂಧೀಜಿ"],
+            correct: 3
+        },
+        {
+            q: "22. ಗಾಂಧೀಜಿಯವರು ಬ್ರಿಟಿಷರಿಗೆ ಅಸಹಕಾರ ತೋರಿಸಬೇಕೆಂದು ಹಾಗೂ ಸ್ವರಾಜ್ಯಕ್ಕಾಗಿ ಒತ್ತಾಯಿಸಬೇಕೆಂದು ಕರೆಕೊಟ್ಟ ಚಳುವಳಿ.",
+            opts: ["A. ಕ್ವಿಟ್ ಇಂಡಿಯಾ ಚಳುವಳಿ", "B. ಅಸಹಕಾರ ಚಳುವಳಿ", "C. ಕಾನೂನು ಭಂಗ ಚಳುವಳಿ", "D. ದಂಡಿ ಚಳವಳಿ"],
+            correct: 1
+        },
+        {
+            q: "23. ಬ್ರಿಟಿಷರು ಮತೀಯ ತೀರ್ಪನ್ನು ಘೋಷಿಸಿ ಅದರಲ್ಲಿ ದಲಿತ ವರ್ಗಕ್ಕೆ ಪ್ರತ್ಯೇಕ ಚುನಾವಣಾ ಕ್ಷೇತ್ರವನ್ನು ತಲುಪಿಸಿದ್ದು ಸ್ವಾತಂತ್ರ್ಯ ಹೋರಾಟದ ಈ ಘಟ್ಟದ ನಂತರವಾಗಿದೆ.",
+            opts: ["A. ದುಂಡುಮೇಜಿನ ಸಮ್ಮೇಳನಗಳ ನಂತರ", "B. ಕ್ವಿಟ್ ಇಂಡಿಯಾ ಚಳುವಳಿಯ ನಂತರ", "C. ಅಸಹಕಾರ ಚಳುವಳಿಯ ನಂತರ", "D. ಉಪ್ಪಿನ ಸತ್ಯಾಗ್ರಹದ ನಂತರ"],
+            correct: 0
+        },
+        {
+            q: "24. ಮತೀಯ ತೀರ್ಪಿಗೆ ಸಂಬಂಧಿಸಿದಂತೆ ಗಾಂಧೀಜಿ ಹಾಗೂ ಅಂಬೇಡ್ಕರ್ ನಡುವೆ ಯರವಾಡ ಜೈಲಿನಲ್ಲಿ ನಡೆದ ಒಪ್ಪಂದ.",
+            opts: ["A. ಮಂಗಳೂರು ಒಪ್ಪಂದ", "B. ಮದ್ರಾಸ್ ಒಪ್ಪಂದ", "C. ಪೂನಾ ಒಪ್ಪಂದ", "D. ಪ್ಯಾರಿಸ್ ಒಪ್ಪಂದ"],
+            correct: 2
+        },
+        {
+            q: "25. ಈ ಕೆಳಗಿನ ಚಳುವಳಿಯಲ್ಲಿ ಮಹಾತ್ಮ ಗಾಂಧೀಜಿಯವರು ಭಾರತ ಬಿಟ್ಟು ತೊಲಗಿ ಎಂಬ ನಿರ್ಣಯವನ್ನು ಅಂಗೀಕರಿಸಿ ಭಾರತೀಯರಿಗೆ \"ಮಾಡು ಇಲ್ಲವೇ ಮಡಿ\" ಎಂಬ ಕರೆಯನ್ನು ನೀಡಿದರು.",
+            opts: ["A. ಅಸಹಕಾರ ಚಳುವಳಿ", "B. ಕ್ವಿಟ್ ಇಂಡಿಯಾ ಚಳುವಳಿ", "C. ಖಿಲಾಫತ್ ಚಳವಳಿ", "D. ಕಾನೂನು ಭಂಗ ಚಳವಳಿ"],
+            correct: 1
+        },
+
+        // ಕಲಿಕಾ ಫಲ - ೧೭.೩ (೧೧ ಪ್ರಶ್ನೆಗಳು)
+        {
+            q: "26. ರಾಣಿ ಅಬ್ಬಕ್ಕನ ಸ್ಮರಣಾರ್ಥವಾಗಿ ಮಂಗಳೂರಿನಲ್ಲಿ ಈ ಉತ್ಸವ ಆಚರಿಸುತ್ತಾರೆ.",
+            opts: ["A. ಕದಂಬೋತ್ಸವ", "B. ವೀರರಾಣಿ ಅಬ್ಬಕ್ಕನ ಉತ್ಸವ", "C. ಹಂಪಿ ಉತ್ಸವ", "D. ಈ ಮೇಲಿನ ಯಾವುದೂ ಅಲ್ಲ"],
+            correct: 1
+        },
+        {
+            q: "27. ಮೈಸೂರು ಸಂಸ್ಥಾನದಲ್ಲಿ ಧ್ವಜಾರೋಹಣ ಕಾರ್ಯಕ್ರಮ ನೆರವೇರಿಸಿದ ಪ್ರಥಮ ಮಹಿಳೆ ಎಂಬ ಹೆಗಳಿಕೆಗೆ ಪಾತ್ರರಾದವರು.",
+            opts: ["A. ಬಳ್ಳಾರಿ ಸಿದ್ಧಮ್ಮ", "B. ಅರುಣಾ ಅಸಫ್ ಅಲಿ", "C. ಯಶೋಧರಮ್ಮ ದಾಸಪ್ಪ", "D. ಉಮಾಬಾಯಿ ಕುಂದಾಪುರ"],
+            correct: 0
+        },
+        {
+            q: "28. \"ಗಾಂಧಿ ಉಪ್ಪನ್ನು ಕೊಳ್ಳಿ, ಇದರ ಬೆಲೆ ಆರು ತಿಂಗಳ ಶಿಕ್ಷೆ\" ಎಂದು ಹೇಳುತ್ತಾ ಉಪ್ಪನ್ನು ಮಾರಾಟ ಮಾಡಿ ದಸ್ತಗಿರಿಯಾದ ಕರ್ನಾಟಕದ ಮಹಿಳೆ ಇವರು.",
+            opts: ["A. ಉಮಾಬಾಯಿ ಕುಂದಾಪುರ", "B. ಯಶೋಧರಮ್ಮ ದಾಸಪ್ಪ", "C. ಕಮಲಾದೇವಿ ಚಟ್ಟೋಪಾಧ್ಯಾಯ", "D. ಬಳ್ಳಾರಿ ಸಿದ್ಧಮ್ಮ"],
+            correct: 2
+        },
+        {
+            q: "29. ಸಾ.ಶ. 1942 ರ ಕ್ವಿಟ್ ಇಂಡಿಯಾ ಚಳುವಳಿಯಲ್ಲಿ ಇವರ ಮನೆ ಸ್ವಾತಂತ್ರ್ಯ ಹೋರಾಟಕ್ಕೆ ಪೂರಕವಾದ ಭೂಗತ ಚಟುವಟಿಕೆಗಳ ಕೇಂದ್ರವಾಗಿತ್ತು.",
+            opts: ["A. ಬಳ್ಳಾರಿ ಸಿದ್ಧಮ್ಮ", "B. ಯಶೋಧರಮ್ಮ ದಾಸಪ್ಪ", "C. ಉಮಾಬಾಯಿ ಕುಂದಾಪುರ", "D. ಕಮಲಾದೇವಿ ಚಟ್ಟೋಪಾಧ್ಯಾಯ"],
+            correct: 1
+        },
+        {
+            q: "30. ಮರಾಠಿ ಭಾಷೆಯಲ್ಲಿ 'ಸ್ವದೇಶಿ ವ್ರತ' ಎಂಬ ನಾಟಕವನ್ನು ರಚಿಸಿ 'ಸ್ವದೇಶಿ ತತ್ವ'ದ ಮಹತ್ವವನ್ನು ಸಾರಿದ ಮಹಿಳೆ.",
+            opts: ["A. ಕಮಲಾದೇವಿ ಚಟ್ಟೋಪಾಧ್ಯಾಯ", "B. ಉಮಾಬಾಯಿ ಕುಂದಾಪುರ", "C. ಯಶೋಧರಮ್ಮ ದಾಸಪ್ಪ", "D. ಬಳ್ಳಾರಿ ಸಿದ್ಧಮ್ಮ"],
+            correct: 1
+        },
+        {
+            q: "31. ಬ್ರಿಟಿಷರು ಮತ್ತು ಜಮೀನ್ದಾರರಿಂದ ಶೋಷಣೆಗೊಳಗಾದ ಆದಿವಾಸಿ ದಂಗೆಗಳ ಪ್ರಮುಖ ಲಕ್ಷಣ ಇದಾಗಿತ್ತು.",
+            opts: ["A. ಅತ್ಯಂತ ಶಾಂತಿಯುತವಾಗಿತ್ತು", "B. ಭೀಕರ ರಕ್ತಪಾತವೇ ಆಗಿತ್ತು", "C. ಸತ್ಯಾಗ್ರಹವಾಗಿದ್ದು", "D. ಈ ಮೇಲಿನ ಯಾವುದೂ ಅಲ್ಲ"],
+            correct: 1
+        },
+        {
+            q: "32. ಭಾರತಕ್ಕೆ ಅಧಿಕಾರವನ್ನು ಹಸ್ತಾಂತರಿಸಲು ಅನುಸರಿಸಬೇಕಾದ ಮಾರ್ಗಗಳನ್ನು ಕಂಡುಕೊಳ್ಳಲು ಬ್ರಿಟಿಷ್ ಸರ್ಕಾರ ಈ ಆಯೋಗವನ್ನು ಭಾರತಕ್ಕೆ ಕಳುಹಿಸಿ ಕೊಟ್ಟಿತ್ತು.",
+            opts: ["A. ಮಹಿಳಾ ಆಯೋಗ", "B. ಕೊಠಾರಿ ಆಯೋಗ", "C. ಕ್ಯಾಬಿನೆಟ್ ಆಯೋಗ", "D. ಈ ಮೇಲಿನ ಯಾವುದೂ ಅಲ್ಲ"],
+            correct: 2
+        },
+        {
+            q: "33. ಮುಸ್ಲಿಂ ಲೀಗ್ ನ ನಾಯಕರಾದ ಇವರು ಪ್ರತ್ಯೇಕ ಮುಸ್ಲಿಂ ದೇಶಕ್ಕಾಗಿ ಪಟ್ಟು ಹಿಡಿದು ಪ್ರತ್ಯೇಕ ಪಾಕಿಸ್ತಾನವೆಂಬ ದೇಶದ ಉದಯಕ್ಕೆ ಕಾರಣರಾದವರು.",
+            opts: ["A. ಅಬುಲ್ ಕಲಾಂ ಆಜಾದ್", "B. ಮಹಮದ್ ಅಲಿ ಜಿನ್ನಾ", "C. ಸರ್ ಸೈಯದ್ ಅಹಮದ್ ಖಾನ್", "D. ಅಬ್ದುಲ್ ಕಲಾಮ್"],
+            correct: 1
+        },
+        {
+            q: "34. ಸಾ.ಶ. 1947 ರಲ್ಲಿ ಭಾರತಕ್ಕೆ ಸ್ವಾತಂತ್ರ್ಯದ ಅಧಿಕಾರ ಹಸ್ತಾಂತರಿಸಿದ ಕೊನೆಯ ಗವರ್ನರ್ ಜನರಲ್.",
+            opts: ["A. ಲಾರ್ಡ್ ಮೌಂಟ್ ಬ್ಯಾಟನ್", "B. ಲಾರ್ಡ್ ಕರ್ಜನ್", "C. ಲಾರ್ಡ್ ಕ್ರಿಪ್ಸ್", "D. ಸೈಮನ್"],
+            correct: 0
+        },
+        {
+            q: "35. ಭಾರತದ ಸ್ವಾತಂತ್ರ್ಯ ಹೋರಾಟದ ಇತಿಹಾಸದಲ್ಲಿ ಭಾರತೀಯರೆಲ್ಲರಿಗೂ ಇದೊಂದು ಅವಿಸ್ಮರಣೀಯ ದಿನವಾಗಿದೆ.",
+            opts: ["A. ಆಗಸ್ಟ್ 14, 1947", "B. ಆಗಸ್ಟ್ 15, 1947", "C. ಜೂನ್ 3, 1947", "D. ಜನವರಿ 26, 1947"],
+            correct: 1
+        },
+        {
+            q: "36. ಸಾ. ಶ 1947 ರಲ್ಲಿ ಮೈಸೂರು ಸಂಸ್ಥಾನವು ಸ್ವತಂತ್ರಗೊಂಡ ನಂತರ ಎಸ್. ನಿಜಲಿಂಗಪ್ಪನವರ ಮಂತ್ರಿಮಂಡಲದಲ್ಲಿ ಯಶೋಧರಮ್ಮ ದಾಸಪ್ಪನವರು ಈ ಜವಾಬ್ದಾರಿಯನ್ನು ನಿರ್ವಹಿಸಿದರು.",
+            opts: ["A. ಕಂದಾಯ ಸಚಿವರಾಗಿ", "B. ಶಿಕ್ಷಣ ಸಚಿವರಾಗಿ", "C. ಸಮಾಜ ಕಲ್ಯಾಣ ಸಚಿವರಾಗಿ", "D. ರಕ್ಷಣಾ ಸಚಿವರಾಗಿ"],
+            correct: 2
+        },
+
+        // ಕಲಿಕಾ ಫಲ - ೧೭.೪ (೧೫ ಪ್ರಶ್ನೆಗಳು)
+        {
+            q: "37. ಭಾರತದ ಜನಪ್ರಿಯ ಸಮಾಜವಾದಿ ಹೋರಾಟಗಾರರಾದ ಇವರನ್ನು ಜನರು ಪ್ರೀತಿಯಿಂದ 'ಲೋಕ ನಾಯಕ್' ಎಂದು ಕರೆಯುತ್ತಾರೆ.",
+            opts: ["A. ನೇತಾಜಿ ಸುಭಾಸ್ ಚಂದ್ರ ಬೋಸ್", "B. ಜೆ.ಪಿ. ನಾರಾಯಣ", "C. ಜವಾಹರ್ ಲಾಲ್ ನೆಹರೂ", "D. ಗಾಂಧೀಜಿ"],
+            correct: 1
+        },
+        {
+            q: "38. ಸಂವಿಧಾನದ ರಚನಾ ಸಭೆ : ಡಾ. ಬಾಬು ರಾಜೇಂದ್ರ ಪ್ರಸಾದ್ :: ಕರಡು ರಚನಾ ಸಮಿತಿ : ___________",
+            opts: ["A. ಜವಾಹರ್ ಲಾಲ್ ನೆಹರು", "B. ಮೋತಿಲಾಲ್ ನೆಹರು", "C. ನೇತಾಜಿ ಸುಭಾಸ್ ಚಂದ್ರ ಬೋಸ್", "D. ಡಾ|| ಬಿ.ಆರ್ ಅಂಬೇಡ್ಕರ್"],
+            correct: 3
+        },
+        {
+            q: "39. ಸುಭಾಷ್ ಚಂದ್ರ ಬೋಸರ ರಾಜಕೀಯ ಪ್ರವೇಶಕ್ಕೆ ಪ್ರೇರಣೆಯಾದ 'ದೇಶ ಬಂಧು' ಎಂಬ ಬಿರುದಾಂಕಿತರಾದವರು.",
+            opts: ["A. ಸಿ ಆರ್ ದಾಸ್", "B. ಸುಭಾಷ್ ಚಂದ್ರ ಬೋಸ್", "C. ಸರ್ದಾರ್ ವಲ್ಲಭಬಾಯ್ ಪಟೇಲ್", "D. ಯಾರೂ ಅಲ್ಲ"],
+            correct: 0
+        },
+        {
+            q: "40. ಇವರು ಸ್ವಾತಂತ್ರ್ಯ ನಂತರದಲ್ಲಿ ಭೂದಾನ ಚಳುವಳಿಯಲ್ಲಿ ಗುರುತಿಸಿಕೊಂಡರು.",
+            opts: ["A. ಜಯಪ್ರಕಾಶ್ ನಾರಾಯಣ್", "B. ನೆಹರು", "C. ವಿನೋಬಾ ಭಾವೆ", "D. ನರೇಂದ್ರ ದೇವ್"],
+            correct: 2
+        },
+        {
+            q: "41. 'ಸಂಪೂರ್ಣ ಕ್ರಾಂತಿ' ಎಂಬ ಆಂದೋಲನವನ್ನು ಹುಟ್ಟುಹಾಕಿದ ಸಮಾಜವಾದಿ ನಾಯಕ.",
+            opts: ["A. ಅಂಬೇಡ್ಕರ್", "B. ಜಯಪ್ರಕಾಶ್ ನಾರಾಯಣ್", "C. ಮಹಾತ್ಮಾ ಗಾಂಧೀಜಿ", "D. ನೆಹರು"],
+            correct: 1
+        },
+        {
+            q: "42. ಜವಾಹರಲಾಲ್ ನೆಹರು ರವರು ತಾವೊಬ್ಬ 'ಸಮಾಜವಾದಿ' ಎಂದು ಗುರುತಿಸಿಕೊಂಡರೂ ತಾತ್ವಿಕವಾಗಿ ಇವರ ಜೊತೆಗಿದ್ದರು.",
+            opts: ["A. ವಲ್ಲಭಬಾಯಿ ಪಟೇಲ್", "B. ಮೌಲಾನ ಅಬುಲ್ ಕಲಾಂ ಆಜಾದ್", "C. ಮಹಾತ್ಮ ಗಾಂಧೀಜಿ", "D. ಸುಭಾಷ್ ಚಂದ್ರ ಬೋಸ್"],
+            correct: 2
+        },
+        {
+            q: "43. ಗಾಂಧೀಜಿಯವರ ರಾಜನೀತಿಯನ್ನು ವಿರೋಧಿಸಿ ಕಾಂಗ್ರೆಸ್ ಪಕ್ಷದಿಂದ ಹೊರಬಂದು ಫಾರ್ವರ್ಡ್ ಬ್ಲಾಕ್ ಎಂಬ ಹೊಸ ಪಕ್ಷವನ್ನು ಸಂಘಟಿಸಿದ ಈ ನಾಯಕರು.",
+            opts: ["A. ಭಗತ್ ಸಿಂಗ್", "B. ವಿ. ಡಿ. ಸಾವರ್ಕರ್", "C. ಸುಭಾಷ್ ಚಂದ್ರ ಬೋಸ್", "D. ಚಿತ್ತ ರಂಜನ್ ದಾಸ್"],
+            correct: 2
+        },
+        {
+            q: "44. ಭಾರತದ ಸ್ವಾತಂತ್ರ್ಯ ಹೋರಾಟಕ್ಕಾಗಿ ಜರ್ಮನಿಯ ಸರ್ವಾಧಿಕಾರಿಯಾದ ಹಿಟ್ಲರ್ ನೊಂದಿಗೆ ಒಪ್ಪಂದ ಮಾಡಿಕೊಂಡ ಪ್ರಮುಖ ನಾಯಕರು ಇವರು.",
+            opts: ["A. ನೇತಾಜಿ", "B. ಗಾಂಧೀಜಿ", "C. ಸಾವರ್ಕರ್", "D. ಚಂದ್ರಶೇಖರ್ ಆಜಾದ್"],
+            correct: 0
+        },
+        {
+            q: "45. ನೇತಾಜಿ ಅವರು ಐ.ಎನ್.ಎ ಸೈನ್ಯ ಕಟ್ಟಲು ಪ್ರಮುಖ ಕಾರಣ ಇದಾಗಿತ್ತು.",
+            opts: ["A. ಬ್ರಿಟಿಷರನ್ನು ಭಾರತದಿಂದ ಹೊರಹಾಕಲು", "B. ಬ್ರಿಟಿಷರಿಗೆ ಭಾರತದಲ್ಲಿ ರಾಜಕೀಯ ಅಧಿಕಾರವನ್ನು ನೀಡಲು", "C. ಬ್ರಿಟಿಷರನ್ನು ಭಾರತದಲ್ಲಿ ಉಳಿಸಿಕೊಳ್ಳಲು", "D. ಈ ಮೇಲಿನ ಯಾವುದೂ ಅಲ್ಲ"],
+            correct: 0
+        },
+        {
+            q: "46. ಈ ಕಾರಣಕ್ಕಾಗಿ ಸುಭಾಷ್ ಚಂದ್ರ ಬೋಸರನ್ನು ನೇತಾಜಿ ಎಂದು ಕರೆಯಲಾಯಿತು.",
+            opts: ["A. ಸ್ವಾತಂತ್ರ್ಯ ಹೋರಾಟಕ್ಕಾಗಿ", "B. ಐ. ಎನ್. ಎ. ನಾಯಕತ್ವ ವಹಿಸಿಕೊಂಡಿದ್ದಕ್ಕಾಗಿ", "C. ಹಿಟ್ಲರ್ ನನ್ನು ಭೇಟಿಯಾಗಿದ್ದಕ್ಕಾಗಿ", "D. ವಿದೇಶದಲ್ಲಿ ಸೈನ್ಯ ಕಟ್ಟಿದ್ದಕ್ಕಾಗಿ"],
+            correct: 1
+        },
+        {
+            q: "47. ಐಎನ್ಎ ಸೈನಿಕರಲ್ಲಿ ಸ್ವಾತಂತ್ರ್ಯದ ಉತ್ಸಾಹವನ್ನು ತುಂಬಲು \"ನೀವು ರಕ್ತವನ್ನು ನೀಡಿದರೆ ನಾನು ನಿಮಗೆ ಸ್ವಾತಂತ್ರ್ಯವನ್ನು ನೀಡುತ್ತೇನೆ\" ಎಂದು ದಿಟ್ಟತನದ ಕರೆ ನೀಡಿದವರು.",
+            opts: ["A. ಸಾವರ್ಕರ್", "B. ಭಗತ್ ಸಿಂಗ್", "C. ಚಂದ್ರಶೇಖರ್ ಆಜಾದ್", "D. ಸುಭಾಷ್ ಚಂದ್ರ ಬೋಸ್"],
+            correct: 3
+        },
+        {
+            q: "48. ಭಾರತದ ಸ್ವಾತಂತ್ರ್ಯ ಹೋರಾಟದಲ್ಲಿ ಬೌದ್ಧಿಕವಾಗಿ ದಲಿತ ಮತ್ತು ಇತರ ಶೋಷಿತ ವರ್ಗಗಳ ಶ್ರೇಯೋಭಿವೃದ್ಧಿಗಾಗಿ ಶ್ರಮಿಸಿದ ದೊಡ್ಡ ಹೋರಾಟಗಾರರು ಇವರು.",
+            opts: ["A. ಬಿ ಆರ್ ಅಂಬೇಡ್ಕರ್", "B. ಮಹಾತ್ಮ ಗಾಂಧೀಜಿ", "C. ಜ್ಯೋತಿಬಾಫುಲೆ", "D. ವಿವೇಕಾನಂದರು"],
+            correct: 0
+        },
+        {
+            q: "49. ಸಾಮಾಜಿಕ ಬದಲಾವಣೆಯನ್ನು ಸಂವಿಧಾನಾತ್ಮಕ ಮಾರ್ಗದಲ್ಲೇ ಪಡೆಯಬೇಕೆಂಬ ಸಂಕಲ್ಪ ಮತ್ತು ಕಾರ್ಯಶೀಲತೆ ಇವರ ವಿಶೇಷ ಗುಣಗಳಾಗಿದ್ದವು.",
+            opts: ["A. ಮಹಾತ್ಮ ಗಾಂಧೀಜಿ", "B. ಗೋಪಾಲಕೃಷ್ಣ ಗೋಖಲೆ", "C. ಬಿ ಆರ್ ಅಂಬೇಡ್ಕರ್", "D. ದಾದಾಬಾಯಿ ನವರೋಜಿ"],
+            correct: 2
+        },
+        {
+            q: "50. ದಲಿತರಲ್ಲಿ ಜಾಗೃತಿ ಮತ್ತು ಸ್ವಾಭಿಮಾನವನ್ನು ಉಂಟು ಮಾಡಲು 'ಮೂಕ ನಾಯಕ' ಮತ್ತು 'ಬಹಿಷ್ಕೃತ ಭಾರತ' ಎಂಬ ಪತ್ರಿಕೆಗಳನ್ನು ಪ್ರಕಟಿಸಿದವರು.",
+            opts: ["A. ಬಿಪಿನ್ ಚಂದ್ರ ಪಾಲ್", "B. ಬಾಲಗಂಗಾಧರ ತಿಲಕ್", "C. ಬಿ ಆರ್ ಅಂಬೇಡ್ಕರ್", "D. ಗಾಂಧೀಜಿ"],
+            correct: 2
+        },
+        {
+            q: "51. ಅಂಬೇಡ್ಕರ್ ಅವರು 1956 ಡಿಸೆಂಬರ್ 6ರಂದು ತೀರಿಕೊಳ್ಳುವ ಕೆಲವು ದಿನಗಳ ಮುಂಚೆ ಈ ಮತಕ್ಕೆ ಮತಾಂತರಗೊಂಡಿದ್ದರು.",
+            opts: ["A. ಬೌದ್ಧ ಮತ", "B. ಜೈನ ಮತ", "C. ಇಸ್ಲಾಂಮತ", "D. ಕ್ರೈಸ್ತ ಮತ"],
+            correct: 0
+        }
+    ];
+
+    let currentQIndex = 0;
+    let score = 0;
+    let isUltraMode = false;
+    let timerInterval;
+    let timeRemaining = 15;
+
+    function toggleUltraMode() {
+        isUltraMode = !isUltraMode;
+        document.body.classList.toggle('ultra-mode');
+        const btn = document.getElementById('ultraBtn');
+        btn.innerText = isUltraMode ? "⚡ ULTRA MODE: ON" : "⚡ ULTRA MODE: OFF";
+        restartQuiz();
+    }
+
+    function loadQuestion() {
+        clearInterval(timerInterval);
+        
+        if (currentQIndex >= questionsData.length) {
+            showResults();
+            return;
+        }
+
+        const currentQ = questionsData[currentQIndex];
+        document.getElementById("qText").innerText = currentQ.q;
+        document.getElementById("progressText").innerText = `ಪ್ರಶ್ನೆ ${currentQIndex + 1} / ${questionsData.length}`;
+        
+        const optsContainer = document.getElementById("optsBox");
+        optsContainer.innerHTML = "";
+
+        currentQ.opts.forEach((optText, index) => {
+            const button = document.createElement("button");
+            button.className = "opt-btn";
+            button.innerText = optText;
+            button.onclick = () => checkAnswer(index, currentQ.correct);
+            optsContainer.appendChild(button);
+        });
+
+        if (isUltraMode) {
+            startTimer();
+        }
+    }
+
+    function startTimer() {
+        timeRemaining = 15;
+        const timerBar = document.getElementById("timerBar");
+        timerBar.style.width = "100%";
+
+        timerInterval = setInterval(() => {
+            timeRemaining--;
+            timerBar.style.width = (timeRemaining / 15) * 100 + "%";
+            if (timeRemaining <= 0) {
+                clearInterval(timerInterval);
+                nextQuestion();
+            }
+        }, 1000);
+    }
+
+    function checkAnswer(selectedIdx, correctIdx) {
+        clearInterval(timerInterval);
+        const buttons = document.querySelectorAll(".opt-btn");
+
+        buttons.forEach((btn, idx) => {
+            btn.disabled = true;
+            if (idx === correctIdx) {
+                btn.classList.add("correct");
+            }
+            if (idx === selectedIdx && selectedIdx !== correctIdx) {
+                btn.classList.add("wrong");
+            }
+        });
+
+        if (selectedIdx === correctIdx) {
+            score++;
+        }
+    }
+
+    function nextQuestion() {
+        currentQIndex++;
+        loadQuestion();
+    }
+
+    function showResults() {
+        document.getElementById("quiz-body").style.display = "none";
+        document.getElementById("result-box").style.display = "block";
+        document.getElementById("scoreVal").innerText = score;
+    }
+
+    function restartQuiz() {
+        currentQIndex = 0;
+        score = 0;
+        document.getElementById("quiz-body").style.display = "block";
+        document.getElementById("result-box").style.display = "none";
+        loadQuestion();
+    }
+
+    loadQuestion();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>೭ನೇ ತರಗತಿ ಸಮಾಜ ವಿಜ್ಞಾನ - ಅಧ್ಯಾಯ ೧೦: ಕೇಂದ್ರ ಸರ್ಕಾರ</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Arial, 'Tunga', sans-serif;
+        }
+        body {
+            background-color: #e2e8f0;
+            margin: 0;
+            padding: 20px;
+            transition: background 0.4s ease, color 0.4s ease;
+        }
+        /* Ultra Mode Theme */
+        body.ultra-mode {
+            background-color: #090d16;
+            color: #f1f5f9;
+        }
+        .quiz-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+            border: 2px solid #cbd5e1;
+        }
+        body.ultra-mode .quiz-container {
+            background: #131c2e;
+            box-shadow: 0 0 25px rgba(59, 130, 246, 0.4);
+            border-color: #3b82f6;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+        body.ultra-mode .header {
+            border-bottom-color: #1e293b;
+        }
+        .ultra-btn {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.95rem;
+            box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3);
+            transition: 0.3s;
+        }
+        body.ultra-mode .ultra-btn {
+            background: #ef4444;
+            box-shadow: 0 0 15px #ef4444;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        .timer-container {
+            width: 100%;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            display: none;
+            overflow: hidden;
+        }
+        body.ultra-mode .timer-container {
+            display: block;
+            background: #334155;
+        }
+        .timer-bar {
+            height: 100%;
+            background: #ef4444;
+            width: 100%;
+            transition: width 1s linear;
+        }
+        .question {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            line-height: 1.5;
+            white-space: pre-line;
+        }
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+        .opt-btn {
+            background: #f8fafc;
+            border: 2px solid #cbd5e1;
+            padding: 14px 18px;
+            border-radius: 10px;
+            text-align: left;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.2s;
+            color: inherit;
+        }
+        body.ultra-mode .opt-btn {
+            background: #1e293b;
+            border-color: #334155;
+        }
+        .opt-btn:hover:not([disabled]) {
+            border-color: #3b82f6;
+            background: #eff6ff;
+        }
+        body.ultra-mode .opt-btn:hover:not([disabled]) {
+            background: #0f172a;
+            border-color: #60a5fa;
+        }
+        .correct {
+            background-color: #d1fae5 !important;
+            border-color: #10b981 !important;
+            color: #065f46 !important;
+            font-weight: bold;
+        }
+        .wrong {
+            background-color: #fee2e2 !important;
+            border-color: #ef4444 !important;
+            color: #991b1b !important;
+        }
+        body.ultra-mode .correct {
+            background-color: #064e3b !important;
+            color: #a7f3d0 !important;
+        }
+        body.ultra-mode .wrong {
+            background-color: #7f1d1d !important;
+            color: #fecaca !important;
+        }
+        .footer {
+            margin-top: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .next-btn {
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+        .next-btn:hover {
+            background: #059669;
+        }
+        .score-card {
+            text-align: center;
+            padding: 20px;
+        }
+        .score-card h2 {
+            font-size: 2rem;
+            color: #3b82f6;
+        }
+    </style>
+</head>
+<body>
+
+<div class="quiz-container">
+    <div class="header">
+        <div>
+            <h3 style="margin:0;">೭ನೇ ತರಗತಿ - ಸಮಾಜ ವಿಜ್ಞಾನ</h3>
+            <small>ಅಧ್ಯಾಯ ೧೦: ಕೇಂದ್ರ ಸರ್ಕಾರ</small>
+        </div>
+        <button class="ultra-btn" onclick="toggleUltraMode()" id="ultraBtn">⚡ ULTRA MODE: OFF</button>
+    </div>
+
+    <div class="timer-container">
+        <div class="timer-bar" id="timerBar"></div>
+    </div>
+
+    <div id="quiz-body">
+        <div class="question" id="qText">ಪ್ರಶ್ನೆ ಲೋಡ್ ಆಗುತ್ತಿದೆ...</div>
+        <div class="options-grid" id="optsBox"></div>
+
+        <div class="footer">
+            <span id="progressText" style="font-weight: bold;">ಪ್ರಶ್ನೆ 1 / 23</span>
+            <button class="next-btn" onclick="nextQuestion()" id="nextBtn">ಮುಂದಿನ ಪ್ರಶ್ನೆ ➔</button>
+        </div>
+    </div>
+
+    <div id="result-box" class="score-card" style="display: none;">
+        <h2>ಅಭಿನಂದನೆಗಳು! 🎉</h2>
+        <p style="font-size: 1.2rem;">ನಿಮ್ಮ ಒಟ್ಟು ಅಂಕಗಳು: <strong id="scoreVal">0</strong> / 23</p>
+        <button class="next-btn" onclick="restartQuiz()">ಮತ್ತೆ ಪರೀಕ್ಷೆ ಬರೆಯಿರಿ</button>
+    </div>
+</div>
+
+<script>
+    // ಪ್ರಶ್ನಾಕೋಠಿಯ ಅಧ್ಯಾಯ-೧೦ ರಲ್ಲಿರುವ ಎಲ್ಲಾ ೨೩ ಬಹುಆಯ್ಕೆ ಪ್ರಶ್ನೆಗಳು ಮತ್ತು ಉತ್ತರಗಳು
+    const questionsData = [
+        {
+            q: "1. ಭಾರತದ ಒಕ್ಕೂಟದಲ್ಲಿರುವ ಒಟ್ಟು ರಾಜ್ಯಗಳು ಮತ್ತು ಕೇಂದ್ರಡಳಿತ ಪ್ರದೇಶಗಳು……",
+            opts: ["A. 29 ರಾಜ್ಯಗಳು ಮತ್ತು 9 ಕೇಂದ್ರಡಳಿತ ಪ್ರದೇಶಗಳು", "B. 28 ರಾಜ್ಯಗಳು ಮತ್ತು 9 ಕೇಂದ್ರಡಳಿತ ಪ್ರದೇಶಗಳು", "C. 29 ರಾಜ್ಯಗಳು ಮತ್ತು 8 ಕೇಂದ್ರಡಳಿತ ಪ್ರದೇಶಗಳು", "D. 28 ರಾಜ್ಯಗಳು ಮತ್ತು 8 ಕೇಂದ್ರಡಳಿತ ಪ್ರದೇಶಗಳು"],
+            correct: 3
+        },
+        {
+            q: "2. ಲೋಕಸಭೆ : ಸಂಸತ್ತಿನ ಕೆಳಮನೆ :: ರಾಜ್ಯಸಭೆ : _______________",
+            opts: ["A. ಸಂಸತ್ತಿನ ಮೇಲ್ಮನೆ", "B. ಸಂಸತ್ತು (Parliament)", "C. ಸಂಸತ್ತಿನ ಕೆಳಮನೆ", "D. ಸಂಸತ್ತಿನ ಸಾಮಾನ್ಯರ ಸಭೆ"],
+            correct: 0
+        },
+        {
+            q: "3. ಕೇಂದ್ರ ಶಾಸಕಾಂಗವು ಈ ಎರಡು ಸದನಗಳಿಂದ ಕಾರ್ಯನಿರ್ವಹಿಸುತ್ತದೆ.",
+            opts: ["A. ಲೋಕಸಭೆ ಮತ್ತು ವಿಧಾನಸಭೆ", "B. ರಾಜ್ಯಸಭೆ ಮತ್ತು ವಿಧಾನಪರಿಷತ್ತು", "C. ವಿಧಾನಪರಿಷತ್ತು ಮತ್ತು ವಿಧಾನಸಭೆ", "D. ಲೋಕಸಭೆ ಮತ್ತು ರಾಜ್ಯಸಭೆ"],
+            correct: 3
+        },
+        {
+            q: "4. ಸಂಸತ್ತಿನ ಕೆಳಮನೆಯು ಹೊಂದಿರಬಹುದಾದ ಗರಿಷ್ಠ ಸದಸ್ಯರ ಸಂಖ್ಯೆ____",
+            opts: ["A. 545", "B. 250", "C. 238", "D. 552"],
+            correct: 3
+        },
+        {
+            q: "5. ರಾಷ್ಟ್ರಪತಿಗಳು ನಾಮಕರಣ ಮಾಡುವ ಸದಸ್ಯರನ್ನೂ ಒಳಗೊಂಡಂತೆ ರಾಜ್ಯಸಭೆಯ ಸದಸ್ಯರ ಗರಿಷ್ಠ ಸಂಖ್ಯೆ.",
+            opts: ["A. 545", "B. 250", "C. 552", "D. 238"],
+            correct: 1
+        },
+        {
+            q: "6. ಮೇಲ್ಮನೆಯ 250 ಸದಸ್ಯರಲ್ಲಿ 238 ಸದಸ್ಯರನ್ನು ಎಲ್ಲಾ ರಾಜ್ಯಗಳ ವಿಧಾನಸಭಾ ಸದಸ್ಯರು ಆಯ್ಕೆ ಮಾಡಿದರೆ, ಇನ್ನುಳಿದ ಸದಸ್ಯರು ಆಯ್ಕೆಯಾಗುವ ಕ್ರಮವು ಹೀಗಿದೆ...",
+            opts: ["A. ಪ್ರಜೆಗಳಿಂದ ನೇರವಾಗಿ ಆಯ್ಕೆಯಾಗುವರು", "B. ರಾಷ್ಟ್ರಪತಿಯವರು ನಾಮಕರಣ ಮಾಡುವರು", "C. ಲೋಕಸಭೆಯ ಸದಸ್ಯರು ಆಯ್ಕೆ ಮಾಡುವರು", "D. ಪ್ರಧಾನಮಂತ್ರಿಯವರು ತಮ್ಮ ವಿವೇಚನೆ ಬಳಸಿ ಆಯ್ಕೆ ಮಾಡುವರು"],
+            correct: 1
+        },
+        {
+            q: "7. ಧಾರವಾಡದ ಆನಂದ ಎಂಬುವರು ಲೋಕಸಭಾ ಸದಸ್ಯರಾಗಲು ಬಯಸಿದರೆ, ಅವರಿಗೆ ಇರಬೇಕಾದ ಕನಿಷ್ಠ ವಯಸ್ಸು__",
+            opts: ["A. 21", "B. 25", "C. 30", "D. 35"],
+            correct: 1
+        },
+        {
+            q: "8. ನವಲಗುಂದ ಪಟ್ಟಣದ ಸುನೀತಾ ಎಂಬ ಮಹಿಳೆಯು ಸಂಸತ್ತಿನ ಮೇಲ್ಮನೆಯ ಸದಸ್ಯರಾಗಲು ಬಯಸಿದರೆ, ಅವರಿಗೆ ಇರಬೇಕಾದ ಕನಿಷ್ಠ ವಯಸ್ಸು.......",
+            opts: ["A. 18", "B. 25", "C. 30", "D. 35"],
+            correct: 2
+        },
+        {
+            q: "9. ಇವರು ರಾಜ್ಯಸಭೆಯ ಪದನಿಮಿತ್ತ ಸಭಾಧ್ಯಕ್ಷರು",
+            opts: ["A. ರಾಷ್ಟ್ರಪತಿ", "B. ಉಪ ರಾಷ್ಟ್ರಪತಿ", "C. ಪ್ರಧಾನ ಮಂತ್ರಿ", "D. ರಾಜ್ಯಪಾಲರು"],
+            correct: 1
+        },
+        {
+            q: "10. ಹಣಕಾಸಿನ ವಿಧೇಯಕವನ್ನು (ಬಿಲ್) ಮೊದಲು ಮಂಡಿಸಬೇಕಾಗಿರುವುದು.",
+            opts: ["A. ಲೋಕಸಭೆಯಲ್ಲಿ", "B. ರಾಜ್ಯಸಭೆಯಲ್ಲಿ", "C. ಲೋಕಸಭೆ ಮತ್ತು ರಾಜ್ಯಸಭೆಯ ಎರಡೂ ಕಡೆ", "D. ಯಾವುದೂ ಅಲ್ಲ"],
+            correct: 0
+        },
+        {
+            q: "11. ಕೇಂದ್ರ ಕಾರ್ಯಾಂಗವು ಒಳಗೊಂಡಿರುವುದು.",
+            opts: ["A. ಲೋಕಸಭೆ ಮತ್ತು ರಾಜ್ಯಸಭೆಯ ಸದಸ್ಯರು", "B. ವಿಧಾನಸಭೆ ಸದಸ್ಯರು ಮತ್ತು ವಿಧಾನ ಪರಿಷತ್ತು ಸದಸ್ಯರು", "C. ರಾಜ್ಯಪಾಲ, ಮುಖ್ಯಮಂತ್ರಿ, ರಾಜ್ಯ ಮಂತ್ರಿಮಂಡಲ", "D. ರಾಷ್ಟ್ರಪತಿ, ಪ್ರಧಾನಮಂತ್ರಿ, ಮತ್ತು ಕೇಂದ್ರ ಮಂತ್ರಿಮಂಡಲ"],
+            correct: 3
+        },
+        {
+            q: "12. ಕೇಂದ್ರ ಶಾಸಕಾಂಗವು ಇವರನ್ನು ಒಳಗೊಂಡಿರುವುದು.",
+            opts: ["A. ಲೋಕಸಭೆ ಮತ್ತು ರಾಜ್ಯಸಭೆಯ ಸದಸ್ಯರು", "B. ವಿಧಾನಸಭೆ ಸದಸ್ಯರು ಮತ್ತು ವಿಧಾನ ಪರಿಷತ್ತು ಸದಸ್ಯರು", "C. ರಾಜ್ಯಪಾಲ, ಮುಖ್ಯಮಂತ್ರಿ, ರಾಜ್ಯ ಮಂತ್ರಿಮಂಡಲ", "D. ರಾಷ್ಟ್ರಪತಿ, ಪ್ರಧಾನಮಂತ್ರಿ, ಮತ್ತು ಕೇಂದ್ರ ಮಂತ್ರಿಮಂಡಲ"],
+            correct: 0
+        },
+        {
+            q: "13. ಭಾರತ ಗಣರಾಜ್ಯದ ಅತ್ಯುನ್ನತ ಅಧಿಕಾರಿ….",
+            opts: ["A. ಪ್ರಧಾನಮಂತ್ರಿ", "B. ಉಪಪ್ರಧಾನಿ", "C. ರಾಷ್ಟ್ರಪತಿ", "D. ಉಪರಾಷ್ಟ್ರಪತಿ"],
+            correct: 2
+        },
+        {
+            q: "14. ನಾವೆಲ್ಲರೂ ಭಾರತದ ಪ್ರಜೆಗಳಾಗಿದ್ದೇವೆ. ಹಾಗಾದರೆ ನಮ್ಮ ರಾಷ್ಟ್ರದ ಪ್ರಪ್ರಥಮ ಪ್ರಜೆ ಎಂದು ಕರೆಯುವುದು....",
+            opts: ["A. ಪ್ರಧಾನ ಮಂತ್ರಿಗೆ", "B. ರಾಷ್ಟ್ರಪತಿಗೆ", "C. ರಾಜ್ಯಪಾಲರಿಗೆ", "D. ಗ್ರಾಮ ಪಂಚಾಯಿತಿ ಅಧ್ಯಕ್ಷರಿಗೆ"],
+            correct: 1
+        },
+        {
+            q: "15. ಭಾರತದ ರಾಷ್ಟ್ರಪತಿಯವರ ಅಧಿಕೃತ ನಿವಾಸ...",
+            opts: ["A. ರಾಷ್ಟ್ರಪತಿ ಭವನ", "B. ಸಂಸತ್ ಭವನ", "C. ಪ್ರಧಾನಿ ನಿವಾಸ", "D. ರಾಜ ಭವನ"],
+            correct: 0
+        },
+        {
+            q: "16. ಭಾರತದ ರಾಷ್ಟ್ರಪತಿಯಾಗಲು ಬಯಸುವ ಭಾರತೀಯ ಪೌರನಿಗಿರಬೇಕಾದ ಅರ್ಹತಾದಾಯಕ ಕನಿಷ್ಠ ವಯಸ್ಸು...",
+            opts: ["A. 35", "B. 30", "C. 25", "D. 28"],
+            correct: 0
+        },
+        {
+            q: "17. ನ್ಯಾಯಾಲಯದಿಂದ ಮರಣದಂಡನೆಗೊಳಗಾದ ಅಪರಾಧಿಯೊಬ್ಬನು ತನಗೆ ಕ್ಷಮಾದಾನ ನೀಡುವಂತೆ ಅಥವಾ ಶಿಕ್ಷೆಯನ್ನು ಕಡಿಮೆಗೊಳಿಸಿಕೊಳ್ಳಲು ಬಯಸಿದನು. ಹಾಗಾದರೆ ಅವನು ಯಾರಲ್ಲಿ ಮನವಿ ಮಾಡಿಕೊಳ್ಳಬಹುದು?",
+            opts: ["A. ಪ್ರಧಾನಮಂತ್ರಿ", "B. ಮುಖ್ಯಮಂತ್ರಿ", "C. ರಾಷ್ಟ್ರಪತಿ", "D. ಸುಪ್ರೀಂಕೋರ್ಟ್ ನ ನ್ಯಾಯಾಧೀಶರು"],
+            correct: 2
+        },
+        {
+            q: "18. ಭಾರತದ ರಾಷ್ಟ್ರಪತಿಯವರ ಅಧಿಕಾರಾವಧಿ……………",
+            opts: ["A. 5 ವರ್ಷ", "B. 6 ವರ್ಷ", "C. 4 ವರ್ಷ", "D. 2 ವರ್ಷ"],
+            correct: 0
+        },
+        {
+            q: "19. ರಕ್ಷಣಾಪಡೆಗಳ ಮೇಲಿನ ಸರ್ವೋಚ್ಚ ಅಧಿಕಾರದ ಜೊತೆಗೆ ಯುದ್ಧ ಸಾರುವ ಅಧಿಕಾರವನ್ನೂ ಇವರಿಗೆ ನೀಡಲಾಗಿದೆ...",
+            opts: ["A. ಪ್ರಧಾನಮಂತ್ರಿ", "B. ಉಪರಾಷ್ಟ್ರಪತಿ", "C. ಸುಪ್ರೀಂಕೋರ್ಟ್ ನ ನ್ಯಾಯಾಧೀಶರು", "D. ರಾಷ್ಟ್ರಪತಿ"],
+            correct: 3
+        },
+        {
+            q: "20. ಪ್ರಧಾನಮಂತ್ರಿಯವರಿಗೆ ಸಂಬಂಧಿಸಿದ ಸರಿಯಾದ ಹೇಳಿಕೆ.....",
+            opts: ["A. ರಾಷ್ಟ್ರಪತಿಯವರ ಗೈರು ಹಾಜರಿಯಲ್ಲಿ ಅವರ ಕೆಲಸ ಕಾರ್ಯಗಳನ್ನು ನೋಡಿಕೊಳ್ಳುತ್ತಾರೆ.", "B. ರಕ್ಷಣಾ ಪಡೆಗಳ ಮೇಲಿನ ಸರ್ವೋಚ್ಚ ಅಧಿಕಾರ ಇವರಿಗಿದೆ.", "C. ಸದನದಲ್ಲಿ ಶಿಸ್ತು ಶಾಂತಿ, ಹಾಗೂ ಸಂಯಮ ಕಾಪಾಡುವುದು.", "D. ಸಚಿವ ಸಂಪುಟದ ಪುನರ್ರಚನೆಯ ಅಧಿಕಾರ ಇವರಿಗಿದೆ."],
+            correct: 3
+        },
+        {
+            q: "21. ಭಾರತದ ಪ್ರಧಾನಮಂತ್ರಿಯವರನ್ನು ನೇಮಕ ಮಾಡುವವರು....",
+            opts: ["A. ಸರ್ವೋಚ್ಚ ನ್ಯಾಯಾಲಯದ ನ್ಯಾಯಾಧೀಶರು", "B. ರಾಷ್ಟ್ರಪತಿಗಳು", "C. ಉಪ ರಾಷ್ಟ್ರಪತಿಗಳು", "D. ಲೋಕಸಭೆಯ ಅಧ್ಯಕ್ಷರು"],
+            correct: 1
+        },
+        {
+            q: "22. ಕೇಂದ್ರ ಮಂತ್ರಿಮಂಡಲವು ವಜಾಗೊಳ್ಳುವ ಸಂದರ್ಭ.",
+            opts: ["A. ಪ್ರಧಾನಮಂತ್ರಿಯು ರಾಜೀನಾಮೆ ನೀಡಿದಾಗ", "B. ಪ್ರಧಾನಿಯವರು ಯಾವುದೇ ಸಚಿವರ ರಾಜೀನಾಮೆ ಕೇಳಿದಾಗ", "C. ಲೋಕಸಭೆಯು ಅವಿಶ್ವಾಸ ಗೊತ್ತುವಳಿ ಮಂಡಿಸಿ ಬಹುಮತ ಸಾಬೀತುಪಡಿಸಿದಾಗ", "D. ಮಂತ್ರಿಮಂಡಲವು ಲೋಕಸಭೆಗೆ ಬದ್ಧವಾಗಿರುವಾಗ"],
+            correct: 2
+        },
+        {
+            q: "23. ಇವರ ಸಲಹೆ ಮೇರೆಗೆ ರಾಷ್ಟ್ರಪತಿಯವರು ಉಳಿದ ಸಚಿವರ ನೇಮಕ ಮಾಡುತ್ತಾರೆ.",
+            opts: ["A. ಉಪ ರಾಷ್ಟ್ರಪತಿ", "B. ಪ್ರಧಾನಮಂತ್ರಿ", "C. ರಾಜ್ಯಪಾಲರು", "D. ಸುಪ್ರೀಂಕೋರ್ಟ್ ನ ನ್ಯಾಯಾಧೀಶರು"],
+            correct: 1
+        }
+    ];
+
+    let currentQIndex = 0;
+    let score = 0;
+    let isUltraMode = false;
+    let timerInterval;
+    let timeRemaining = 15;
+
+    function toggleUltraMode() {
+        isUltraMode = !isUltraMode;
+        document.body.classList.toggle('ultra-mode');
+        const btn = document.getElementById('ultraBtn');
+        btn.innerText = isUltraMode ? "⚡ ULTRA MODE: ON" : "⚡ ULTRA MODE: OFF";
+        restartQuiz();
+    }
+
+    function loadQuestion() {
+        clearInterval(timerInterval);
+        
+        if (currentQIndex >= questionsData.length) {
+            showResults();
+            return;
+        }
+
+        const currentQ = questionsData[currentQIndex];
+        document.getElementById("qText").innerText = currentQ.q;
+        document.getElementById("progressText").innerText = `ಪ್ರಶ್ನೆ ${currentQIndex + 1} / ${questionsData.length}`;
+        
+        const optsContainer = document.getElementById("optsBox");
+        optsContainer.innerHTML = "";
+
+        currentQ.opts.forEach((optText, index) => {
+            const button = document.createElement("button");
+            button.className = "opt-btn";
+            button.innerText = optText;
+            button.onclick = () => checkAnswer(index, currentQ.correct);
+            optsContainer.appendChild(button);
+        });
+
+        if (isUltraMode) {
+            startTimer();
+        }
+    }
+
+    function startTimer() {
+        timeRemaining = 15;
+        const timerBar = document.getElementById("timerBar");
+        timerBar.style.width = "100%";
+
+        timerInterval = setInterval(() => {
+            timeRemaining--;
+            timerBar.style.width = (timeRemaining / 15) * 100 + "%";
+            if (timeRemaining <= 0) {
+                clearInterval(timerInterval);
+                nextQuestion();
+            }
+        }, 1000);
+    }
+
+    function checkAnswer(selectedIdx, correctIdx) {
+        clearInterval(timerInterval);
+        const buttons = document.querySelectorAll(".opt-btn");
+
+        buttons.forEach((btn, idx) => {
+            btn.disabled = true;
+            if (idx === correctIdx) {
+                btn.classList.add("correct");
+            }
+            if (idx === selectedIdx && selectedIdx !== correctIdx) {
+                btn.classList.add("wrong");
+            }
+        });
+
+        if (selectedIdx === correctIdx) {
+            score++;
+        }
+    }
+
+    function nextQuestion() {
+        currentQIndex++;
+        loadQuestion();
+    }
+
+    function showResults() {
+        document.getElementById("quiz-body").style.display = "none";
+        document.getElementById("result-box").style.display = "block";
+        document.getElementById("scoreVal").innerText = score;
+    }
+
+    function restartQuiz() {
+        currentQIndex = 0;
+        score = 0;
+        document.getElementById("quiz-body").style.display = "block";
+        document.getElementById("result-box").style.display = "none";
+        loadQuestion();
+    }
+
+    loadQuestion();
+</script>
+
+</body>
+</html>

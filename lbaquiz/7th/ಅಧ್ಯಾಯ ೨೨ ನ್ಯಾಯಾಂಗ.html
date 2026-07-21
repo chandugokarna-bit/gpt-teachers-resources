@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>೭ನೇ ತರಗತಿ ಸಮಾಜ ವಿಜ್ಞಾನ - ಅಧ್ಯಾಯ ೨೨: ನ್ಯಾಯಾಂಗ</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Arial, 'Tunga', sans-serif;
+        }
+        body {
+            background-color: #e2e8f0;
+            margin: 0;
+            padding: 20px;
+            transition: background 0.4s ease, color 0.4s ease;
+        }
+        /* Ultra Mode Theme */
+        body.ultra-mode {
+            background-color: #090d16;
+            color: #f1f5f9;
+        }
+        .quiz-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+            border: 2px solid #cbd5e1;
+        }
+        body.ultra-mode .quiz-container {
+            background: #131c2e;
+            box-shadow: 0 0 25px rgba(59, 130, 246, 0.4);
+            border-color: #3b82f6;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+        body.ultra-mode .header {
+            border-bottom-color: #1e293b;
+        }
+        .ultra-btn {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.95rem;
+            box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3);
+            transition: 0.3s;
+        }
+        body.ultra-mode .ultra-btn {
+            background: #ef4444;
+            box-shadow: 0 0 15px #ef4444;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        .timer-container {
+            width: 100%;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            display: none;
+            overflow: hidden;
+        }
+        body.ultra-mode .timer-container {
+            display: block;
+            background: #334155;
+        }
+        .timer-bar {
+            height: 100%;
+            background: #ef4444;
+            width: 100%;
+            transition: width 1s linear;
+        }
+        .question {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            line-height: 1.5;
+            white-space: pre-line;
+        }
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+        .opt-btn {
+            background: #f8fafc;
+            border: 2px solid #cbd5e1;
+            padding: 14px 18px;
+            border-radius: 10px;
+            text-align: left;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.2s;
+            color: inherit;
+        }
+        body.ultra-mode .opt-btn {
+            background: #1e293b;
+            border-color: #334155;
+        }
+        .opt-btn:hover:not([disabled]) {
+            border-color: #3b82f6;
+            background: #eff6ff;
+        }
+        body.ultra-mode .opt-btn:hover:not([disabled]) {
+            background: #0f172a;
+            border-color: #60a5fa;
+        }
+        .correct {
+            background-color: #d1fae5 !important;
+            border-color: #10b981 !important;
+            color: #065f46 !important;
+            font-weight: bold;
+        }
+        .wrong {
+            background-color: #fee2e2 !important;
+            border-color: #ef4444 !important;
+            color: #991b1b !important;
+        }
+        body.ultra-mode .correct {
+            background-color: #064e3b !important;
+            color: #a7f3d0 !important;
+        }
+        body.ultra-mode .wrong {
+            background-color: #7f1d1d !important;
+            color: #fecaca !important;
+        }
+        .footer {
+            margin-top: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .next-btn {
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+        .next-btn:hover {
+            background: #059669;
+        }
+        .score-card {
+            text-align: center;
+            padding: 20px;
+        }
+        .score-card h2 {
+            font-size: 2rem;
+            color: #3b82f6;
+        }
+    </style>
+</head>
+<body>
+
+<div class="quiz-container">
+    <div class="header">
+        <div>
+            <h3 style="margin:0;">೭ನೇ ತರಗತಿ - ಸಮಾಜ ವಿಜ್ಞಾನ</h3>
+            <small>ಅಧ್ಯಾಯ ೨೨: ನ್ಯಾಯಾಂಗ</small>
+        </div>
+        <button class="ultra-btn" onclick="toggleUltraMode()" id="ultraBtn">⚡ ULTRA MODE: OFF</button>
+    </div>
+
+    <div class="timer-container">
+        <div class="timer-bar" id="timerBar"></div>
+    </div>
+
+    <div id="quiz-body">
+        <div class="question" id="qText">ಪ್ರಶ್ನೆ ಲೋಡ್ ಆಗುತ್ತಿದೆ...</div>
+        <div class="options-grid" id="optsBox"></div>
+
+        <div class="footer">
+            <span id="progressText" style="font-weight: bold;">ಪ್ರಶ್ನೆ 1 / 16</span>
+            <button class="next-btn" onclick="nextQuestion()" id="nextBtn">ಮುಂದಿನ ಪ್ರಶ್ನೆ ➔</button>
+        </div>
+    </div>
+
+    <div id="result-box" class="score-card" style="display: none;">
+        <h2>ಅಭಿನಂದನೆಗಳು! 🎉</h2>
+        <p style="font-size: 1.2rem;">ನಿಮ್ಮ ಒಟ್ಟು ಅಂಕಗಳು: <strong id="scoreVal">0</strong> / 16</p>
+        <button class="next-btn" onclick="restartQuiz()">ಮತ್ತೆ ಪರೀಕ್ಷೆ ಬರೆಯಿರಿ</button>
+    </div>
+</div>
+
+<script>
+    // ಅಧ್ಯಾಯ-೨೨ ರ ಎಲ್ಲಾ ೧೬ ಬಹುಆಯ್ಕೆ ಪ್ರಶ್ನೆಗಳು ಮತ್ತು ಉತ್ತರಗಳು
+    const questionsData = [
+        {
+            q: "1. ಭಾರತದ ನ್ಯಾಯಾಂಗ ವ್ಯವಸ್ಥೆಯಲ್ಲಿ ಅಂತಿಮ ತೀರ್ಪನ್ನು ಪುನರ್ ಪರಿಶೀಲಿಸಬಹುದಾದ ನ್ಯಾಯಾಲಯ.",
+            opts: ["A. ಸುಪ್ರೀಂ ಕೋರ್ಟ್ (ಸರ್ವೋಚ್ಚ ನ್ಯಾಯಾಲಯ)", "B. ಹೈಕೋರ್ಟ್ (ಉಚ್ಛ ನ್ಯಾಯಾಲಯ)", "C. ಜಿಲ್ಲಾ ನ್ಯಾಯಾಲಯ", "D. ಮ್ಯಾಜಿಸ್ಟ್ರೇಟ್ ನ್ಯಾಯಾಲಯ"],
+            correct: 0
+        },
+        {
+            q: "2. ನಮ್ಮ ದೇಶದ ಸರ್ವೋಚ್ಚ ನ್ಯಾಯಾಲಯದ ನ್ಯಾಯಾಧೀಶರನ್ನು ನೇಮಕ ಮಾಡುವ ಅಧಿಕಾರ ಇವರಿಗಿದೆ.",
+            opts: ["A. ರಾಜ್ಯಪಾಲರು", "B. ಪ್ರಧಾನಮಂತ್ರಿಗಳು", "C. ರಾಷ್ಟ್ರಪತಿಗಳು", "D. ಹೈಕೋರ್ಟ್‌ನ ನ್ಯಾಯಾಧೀಶರು"],
+            correct: 2
+        },
+        {
+            q: "3. ಶಾಲೆಯಲ್ಲಿ ವಿದ್ಯಾರ್ಥಿಯು ಸರ್ವೋಚ್ಚ ನ್ಯಾಯಾಲಯ ಎಲ್ಲಿದೆ ಸರ್ ಎಂದು ಶಿಕ್ಷಕರನ್ನು ಕೇಳಿದನು. ಅದಕ್ಕೆ ಶಿಕ್ಷಕರು ನಮ್ಮ ದೇಶದ ರಾಜಧಾನಿಯಲ್ಲಿದೆ ಎಂದು ಸುಳಿವು ನೀಡಿದರು. ಹಾಗಾದರೆ ಸರ್ವೋಚ್ಚ ನ್ಯಾಯಾಲಯ ಇರುವುದು:",
+            opts: ["A. ಬೆಂಗಳೂರು", "B. ಕಲ್ಕತ್ತಾ", "C. ಮುಂಬೈ", "D. ಹೊಸ ದೆಹಲಿ"],
+            correct: 3
+        },
+        {
+            q: "4. ನಮ್ಮ ದೇಶದಲ್ಲಿನ ನ್ಯಾಯಾಲಯಗಳಿಗೆ ಸಂಬಂಧಿಸಿದ ತಪ್ಪಾದ ಹೇಳಿಕೆ ಗುರುತಿಸಿ.",
+            opts: [
+                "A. ನ್ಯಾಯಾಲಯಗಳು ಪಕ್ಷಪಾತವಿಲ್ಲದೆ ಸ್ವತಂತ್ರವಾಗಿ ಕಾರ್ಯ ನಿರ್ವಹಿಸುತ್ತವೆ.",
+                "B. ನ್ಯಾಯಾಲಯಗಳು ಶಾಸಕಾಂಗವು ರೂಪಿಸಿದ ಕಾಯ್ದೆಗಳ ಅರ್ಥ ವಿವರಣೆ ನೀಡುತ್ತವೆ.",
+                "C. ನ್ಯಾಯಾಲಯಗಳು ಶಾಸಕಾಂಗ ಇಲ್ಲವೇ ಕಾರ್ಯಾಂಗಗಳ ನಿಯಂತ್ರಣಕ್ಕೆ ಒಳಪಟ್ಟಿವೆ.",
+                "D. ನ್ಯಾಯಾಲಯಗಳು ವ್ಯಕ್ತಿಗಳ ನಡುವೆ ಮತ್ತು ವ್ಯಕ್ತಿ ಹಾಗೂ ಸರ್ಕಾರಗಳ ನಡುವೆ ವಿವಾದದಲ್ಲಿ ತೀರ್ಪು ಕೊಡುತ್ತವೆ."
+            ],
+            correct: 2
+        },
+        {
+            q: "5. ಉಚ್ಛ ನ್ಯಾಯಾಲಯದ ನ್ಯಾಯಾಧೀಶರ ನಿವೃತ್ತಿ ವಯಸ್ಸು : 62 ವರ್ಷ :: ಸುಪ್ರೀಂ ಕೋರ್ಟಿನ ನ್ಯಾಯಾಧೀಶರ ನಿವೃತ್ತಿಯ ವಯಸ್ಸು : ______________",
+            opts: ["A. 65 ವರ್ಷ", "B. 62 ವರ್ಷ", "C. 60 ವರ್ಷ", "D. 58 ವರ್ಷ"],
+            correct: 0
+        },
+        {
+            q: "6. ಭಾರತ ನ್ಯಾಯಾಂಗ ವ್ಯವಸ್ಥೆಯಲ್ಲಿ ರಾಜ್ಯ ಮಟ್ಟದಲ್ಲಿರುವ ಅತ್ಯುನ್ನತ ನ್ಯಾಯಾಲಯವಿದು...",
+            opts: ["A. ಸರ್ವೋಚ್ಚ ನ್ಯಾಯಾಲಯ", "B. ರಾಜ್ಯ ನ್ಯಾಯಾಲಯ (ಹೈಕೋರ್ಟ್)", "C. ಅಧೀನ ನ್ಯಾಯಾಲಯಗಳು", "D. ಲೋಕ್ ಅದಾಲತ್ (ಜನತಾ ನ್ಯಾಯಾಲಯ)"],
+            correct: 1
+        },
+        {
+            q: "7. ಕರ್ನಾಟಕ ರಾಜ್ಯದ ಅತ್ಯುನ್ನತ ನ್ಯಾಯಾಲಯವಾದ ಹೈಕೋರ್ಟ್ ಇರುವುದು.",
+            opts: ["A. ಹೊಸದೆಹಲಿ", "B. ಬೆಂಗಳೂರು", "C. ಕಲಬುರಗಿ", "D. ಧಾರವಾಡ"],
+            correct: 1
+        },
+        {
+            q: "8. ಭಾರತದಲ್ಲಿರುವ ಒಟ್ಟು ಉಚ್ಛ ನ್ಯಾಯಾಲಯ (ಹೈಕೋರ್ಟ್) ಗಳ ಸಂಖ್ಯೆ.",
+            opts: ["A. 25", "B. 28", "C. 34", "D. 2"],
+            correct: 0
+        },
+        {
+            q: "9. ರಾಷ್ಟ್ರಪತಿಯವರು ಉಚ್ಛ ನ್ಯಾಯಾಲಯದ 'ಮುಖ್ಯ ನ್ಯಾಯಾಧೀಶ'ರನ್ನು ನೇಮಕ ಮಾಡುವಾಗ ಇವರೊಂದಿಗೆ ಸಮಾಲೋಚಿಸುವರು.",
+            opts: [
+                "A. ಸರ್ವೋಚ್ಚ ನ್ಯಾಯಾಲಯದ ಮುಖ್ಯ ನ್ಯಾಯಾಧೀಶರು",
+                "B. ರಾಜ್ಯಪಾಲರು",
+                "C. ಪ್ರಧಾನಮಂತ್ರಿ ಮತ್ತು ರಾಜ್ಯಪಾಲರು",
+                "D. ಸರ್ವೋಚ್ಚ ನ್ಯಾಯಾಲಯ ಮುಖ್ಯ ನ್ಯಾಯಾಧೀಶರು ಮತ್ತು ರಾಜ್ಯಪಾಲರು"
+            ],
+            correct: 3
+        },
+        {
+            q: "10. ಸರ್ವೋಚ್ಚ ನ್ಯಾಯಾಲಯದ ಅಧೀನದಲ್ಲಿರುವ ನ್ಯಾಯಾಲಯವು...",
+            opts: ["A. ಜಿಲ್ಲಾ ನ್ಯಾಯಾಲಯಗಳು", "B. ತಾಲೂಕಾ ನ್ಯಾಯಾಲಯಗಳು", "C. ಉಚ್ಛ ನ್ಯಾಯಾಲಯಗಳು", "D. ನಗರ ನ್ಯಾಯಾಲಯಗಳು"],
+            correct: 2
+        },
+        {
+            q: "11. ಅಧೀನ ನ್ಯಾಯಾಲಯಗಳು ನೀಡಿದ ತೀರ್ಪಿನ ವಿರುದ್ಧ ಅಪೀಲು (ಮೇಲ್ಮನವಿ) ಸಲ್ಲಿಸಬೇಕಾದಲ್ಲಿ ನಾವು ಹೋಗಬೇಕಾಗಿರುವುದು ...",
+            opts: ["A. ಸುಪ್ರೀಂ ಕೋರ್ಟ್", "B. ಜಿಲ್ಲಾ ನ್ಯಾಯಾಲಯಗಳು", "C. ಲೋಕ್ ಅದಾಲತ್", "D. ಉಚ್ಛ ನ್ಯಾಯಾಲಯ"],
+            correct: 3
+        },
+        {
+            q: "12. ಕಡಿಮೆ ವೆಚ್ಚದಲ್ಲಿ, ಶೀಘ್ರವಾಗಿ ಮತ್ತು ಹೊಂದಾಣಿಕೆ ಮುಖಾಂತರ ವ್ಯಾಜ್ಯಗಳನ್ನು ತೀರ್ಮಾನ ಮಾಡುವ ನ್ಯಾಯಾಲಯವೇ ...",
+            opts: ["A. ನಗರ ನ್ಯಾಯಾಲಯ", "B. ಉಚ್ಛ ನ್ಯಾಯಾಲಯ", "C. ಜಿಲ್ಲಾ ಮತ್ತು ತಾಲೂಕು ನ್ಯಾಯಾಲಯ", "D. ಲೋಕ್ ಅದಾಲತ್ (ಜನತಾ ನ್ಯಾಯಾಲಯ)"],
+            correct: 3
+        },
+        {
+            q: "13. ಕಾನೂನುಗಳಿಗೆ ತಕ್ಕಂತೆ ನ್ಯಾಯ ನಿರ್ಣಯ ನೀಡುವ ಪ್ರತ್ಯೇಕ ವ್ಯವಸ್ಥೆಯನ್ನು ನಾವು ಹೇಗೆ ಅರ್ಥೈಸಬಹುದು.",
+            opts: ["A. ಕಾನೂನು ಮತ್ತು ನ್ಯಾಯಾಂಗ", "B. ಶಾಸಕಾಂಗ ಮತ್ತು ಕಾರ್ಯಾಂಗ", "C. ಶಾಸಕಾಂಗ ಮತ್ತು ನ್ಯಾಯಾಂಗ", "D. ನ್ಯಾಯಾಂಗ"],
+            correct: 3
+        },
+        {
+            q: "14. ಸರ್ವೋಚ್ಚ ನ್ಯಾಯಾಲಯಕ್ಕೆ ಸಂಬಂಧಿಸಿದಂತೆ ತಪ್ಪಾದ ಹೇಳಿಕೆಯನ್ನು ಪರಿಶೀಲಿಸಿ.",
+            opts: [
+                "A. ಸರ್ವೋಚ್ಚ ನ್ಯಾಯಾಲಯ ರಾಜ್ಯಮಟ್ಟದ ಅತ್ಯುನ್ನತ ನ್ಯಾಯಾಲಯವಾಗಿದೆ.",
+                "B. ಸರ್ವೋಚ್ಚ ನ್ಯಾಯಾಲಯವು ಹೊಸ ದೆಹಲಿಯಲ್ಲಿದೆ.",
+                "C. ನಮ್ಮ ಸಂವಿಧಾನವು, ದೇಶದ ಏಕತೆಯನ್ನು ಕಾಪಾಡುವ ದೃಷ್ಟಿಯಿಂದ ಸರ್ವೋಚ್ಚ ನ್ಯಾಯಾಲಯವನ್ನು ಸ್ಥಾಪಿಸಿದೆ.",
+                "D. ಸರ್ವೋಚ್ಚ ನ್ಯಾಯಾಲಯದಲ್ಲಿ ನ್ಯಾಯಾಧೀಶರನ್ನು ಒಳಗೊಂಡು 34 ನ್ಯಾಯಾಧೀಶರಿದ್ದಾರೆ."
+            ],
+            correct: 0
+        },
+        {
+            q: "15. ಅಧೀನ ನ್ಯಾಯಾಲಯಗಳಿಗೆ ಸಂಬಂಧಿಸಿದಂತೆ ಈ ಕೆಳಗಿನ ಹೇಳಿಕೆಗಳನ್ನು ಪರಿಶೀಲಿಸಿ.\n1. ಅಧೀನ ನ್ಯಾಯಾಲಯಗಳಲ್ಲಿ ನಾಗರಿಕ ವ್ಯವಹಾರ ನ್ಯಾಯಾಲಯ ಮತ್ತು ದಂಡ ನ್ಯಾಯಾಲಯ ಎಂಬ ಎರಡು ವಿಧಗಳಿವೆ.\n2. ಅಧೀನ ನ್ಯಾಯಾಲಯಗಳು ನೀಡಿದ ತೀರ್ಪಿನ ವಿರುದ್ಧ ಉಚ್ಛ ನ್ಯಾಯಾಲಯಕ್ಕೆ ಮೇಲ್ಮನವಿ ಸಲ್ಲಿಸಬಹುದು.",
+            opts: ["A. ಹೇಳಿಕೆ 1 ಮಾತ್ರ ಸರಿ", "B. ಹೇಳಿಕೆ 2 ಮಾತ್ರ ಸರಿ", "C. ಹೇಳಿಕೆ 1 ಮತ್ತು 2 ಎರಡೂ ಸರಿ", "D. ಹೇಳಿಕೆ 1 ಮತ್ತು 2 ಎರಡೂ ತಪ್ಪು"],
+            correct: 2
+        },
+        {
+            q: "16. ಸಾರ್ವಜನಿಕ ಹಿತಾಸಕ್ತಿ ಮೊಕದ್ದಮೆಗಳಿಗೆ ಸಂಬಂಧಿಸಿದಂತೆ ಈ ಹೇಳಿಕೆಯನ್ನು ಪರಿಶೀಲಿಸಿ.\n1. ರಿಟ್ ಅರ್ಜಿ ಎಂದು ಪರಿಗಣಿಸಿದ ದೂರನ್ನು ನ್ಯಾಯಾಲಯವು ಶುಲ್ಕವಿಲ್ಲದೆ ವಿಚಾರಣೆ ಮಾಡುತ್ತದೆ.\n2. ಸರ್ಕಾರ ಅಥವಾ ಸಾರ್ವಜನಿಕ ಪ್ರಾಧಿಕಾರದಿಂದ ನೊಂದ ಯಾರೇ ಆಗಲಿ ನ್ಯಾಯಾಲಯಕ್ಕೆ ನೇರವಾಗಿ ಬರೆದ ಪತ್ರವನ್ನು ನ್ಯಾಯಾಲಯವು ರಿಟ್ ಅರ್ಜಿಯೆಂದು ಪರಿಗಣಿಸುತ್ತದೆ.",
+            opts: ["A. ಹೇಳಿಕೆ 1 ಮಾತ್ರ ಸರಿ", "B. ಹೇಳಿಕೆ 2 ಮಾತ್ರ ಸರಿ", "C. ಹೇಳಿಕೆ 1 ಮತ್ತು 2 ಎರಡೂ ತಪ್ಪು", "D. ಹೇಳಿಕೆ 1 ಮತ್ತು 2 ಎರಡೂ ಸರಿ"],
+            correct: 3
+        }
+    ];
+
+    let currentQIndex = 0;
+    let score = 0;
+    let isUltraMode = false;
+    let timerInterval;
+    let timeRemaining = 15;
+
+    function toggleUltraMode() {
+        isUltraMode = !isUltraMode;
+        document.body.classList.toggle('ultra-mode');
+        const btn = document.getElementById('ultraBtn');
+        btn.innerText = isUltraMode ? "⚡ ULTRA MODE: ON" : "⚡ ULTRA MODE: OFF";
+        restartQuiz();
+    }
+
+    function loadQuestion() {
+        clearInterval(timerInterval);
+        
+        if (currentQIndex >= questionsData.length) {
+            showResults();
+            return;
+        }
+
+        const currentQ = questionsData[currentQIndex];
+        document.getElementById("qText").innerText = currentQ.q;
+        document.getElementById("progressText").innerText = `ಪ್ರಶ್ನೆ ${currentQIndex + 1} / ${questionsData.length}`;
+        
+        const optsContainer = document.getElementById("optsBox");
+        optsContainer.innerHTML = "";
+
+        currentQ.opts.forEach((optText, index) => {
+            const button = document.createElement("button");
+            button.className = "opt-btn";
+            button.innerText = optText;
+            button.onclick = () => checkAnswer(index, currentQ.correct);
+            optsContainer.appendChild(button);
+        });
+
+        if (isUltraMode) {
+            startTimer();
+        }
+    }
+
+    function startTimer() {
+        timeRemaining = 15;
+        const timerBar = document.getElementById("timerBar");
+        timerBar.style.width = "100%";
+
+        timerInterval = setInterval(() => {
+            timeRemaining--;
+            timerBar.style.width = (timeRemaining / 15) * 100 + "%";
+            if (timeRemaining <= 0) {
+                clearInterval(timerInterval);
+                nextQuestion();
+            }
+        }, 1000);
+    }
+
+    function checkAnswer(selectedIdx, correctIdx) {
+        clearInterval(timerInterval);
+        const buttons = document.querySelectorAll(".opt-btn");
+
+        buttons.forEach((btn, idx) => {
+            btn.disabled = true;
+            if (idx === correctIdx) {
+                btn.classList.add("correct");
+            }
+            if (idx === selectedIdx && selectedIdx !== correctIdx) {
+                btn.classList.add("wrong");
+            }
+        });
+
+        if (selectedIdx === correctIdx) {
+            score++;
+        }
+    }
+
+    function nextQuestion() {
+        currentQIndex++;
+        loadQuestion();
+    }
+
+    function showResults() {
+        document.getElementById("quiz-body").style.display = "none";
+        document.getElementById("result-box").style.display = "block";
+        document.getElementById("scoreVal").innerText = score;
+    }
+
+    function restartQuiz() {
+        currentQIndex = 0;
+        score = 0;
+        document.getElementById("quiz-body").style.display = "block";
+        document.getElementById("result-box").style.display = "none";
+        loadQuestion();
+    }
+
+    loadQuestion();
+</script>
+
+</body>
+</html>

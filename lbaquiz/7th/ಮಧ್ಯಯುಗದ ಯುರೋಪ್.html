@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>೭ನೇ ತರಗತಿ ಸಮಾಜ ವಿಜ್ಞಾನ - ಅಧ್ಯಾಯ ೨: ಮಧ್ಯಯುಗದ ಯುರೋಪ್</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Arial, 'Tunga', sans-serif;
+        }
+        body {
+            background-color: #e2e8f0;
+            margin: 0;
+            padding: 20px;
+            transition: background 0.4s ease, color 0.4s ease;
+        }
+        /* Ultra Mode Theme */
+        body.ultra-mode {
+            background-color: #090d16;
+            color: #f1f5f9;
+        }
+        .quiz-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+            border: 2px solid #cbd5e1;
+        }
+        body.ultra-mode .quiz-container {
+            background: #131c2e;
+            box-shadow: 0 0 25px rgba(59, 130, 246, 0.4);
+            border-color: #3b82f6;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+        body.ultra-mode .header {
+            border-bottom-color: #1e293b;
+        }
+        .ultra-btn {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.95rem;
+            box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3);
+            transition: 0.3s;
+        }
+        body.ultra-mode .ultra-btn {
+            background: #ef4444;
+            box-shadow: 0 0 15px #ef4444;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        .timer-container {
+            width: 100%;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            display: none;
+            overflow: hidden;
+        }
+        body.ultra-mode .timer-container {
+            display: block;
+            background: #334155;
+        }
+        .timer-bar {
+            height: 100%;
+            background: #ef4444;
+            width: 100%;
+            transition: width 1s linear;
+        }
+        .question {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            line-height: 1.5;
+            white-space: pre-line;
+        }
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+        .opt-btn {
+            background: #f8fafc;
+            border: 2px solid #cbd5e1;
+            padding: 14px 18px;
+            border-radius: 10px;
+            text-align: left;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.2s;
+            color: inherit;
+        }
+        body.ultra-mode .opt-btn {
+            background: #1e293b;
+            border-color: #334155;
+        }
+        .opt-btn:hover:not([disabled]) {
+            border-color: #3b82f6;
+            background: #eff6ff;
+        }
+        body.ultra-mode .opt-btn:hover:not([disabled]) {
+            background: #0f172a;
+            border-color: #60a5fa;
+        }
+        .correct {
+            background-color: #d1fae5 !important;
+            border-color: #10b981 !important;
+            color: #065f46 !important;
+            font-weight: bold;
+        }
+        .wrong {
+            background-color: #fee2e2 !important;
+            border-color: #ef4444 !important;
+            color: #991b1b !important;
+        }
+        body.ultra-mode .correct {
+            background-color: #064e3b !important;
+            color: #a7f3d0 !important;
+        }
+        body.ultra-mode .wrong {
+            background-color: #7f1d1d !important;
+            color: #fecaca !important;
+        }
+        .footer {
+            margin-top: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .next-btn {
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+        .next-btn:hover {
+            background: #059669;
+        }
+        .score-card {
+            text-align: center;
+            padding: 20px;
+        }
+        .score-card h2 {
+            font-size: 2rem;
+            color: #3b82f6;
+        }
+    </style>
+</head>
+<body>
+
+<div class="quiz-container">
+    <div class="header">
+        <div>
+            <h3 style="margin:0;">೭ನೇ ತರಗತಿ - ಸಮಾಜ ವಿಜ್ಞಾನ[cite: 1]</h3>
+            <small>ಅಧ್ಯಾಯ ೨: ಮಧ್ಯಯುಗದ ಯುರೋಪ್[cite: 1]</small>
+        </div>
+        <button class="ultra-btn" onclick="toggleUltraMode()" id="ultraBtn">⚡ ULTRA MODE: OFF</button>
+    </div>
+
+    <div class="timer-container">
+        <div class="timer-bar" id="timerBar"></div>
+    </div>
+
+    <div id="quiz-body">
+        <div class="question" id="qText">ಪ್ರಶ್ನೆ ಲೋಡ್ ಆಗುತ್ತಿದೆ...</div>
+        <div class="options-grid" id="optsBox"></div>
+
+        <div class="footer">
+            <span id="progressText" style="font-weight: bold;">ಪ್ರಶ್ನೆ 1 / 55</span>
+            <button class="next-btn" onclick="nextQuestion()" id="nextBtn">ಮುಂದಿನ ಪ್ರಶ್ನೆ ➔</button>
+        </div>
+    </div>
+
+    <div id="result-box" class="score-card" style="display: none;">
+        <h2>ಅಭಿನಂದನೆಗಳು! 🎉</h2>
+        <p style="font-size: 1.2rem;">ನಿಮ್ಮ ಒಟ್ಟು ಅಂಕಗಳು: <strong id="scoreVal">0</strong> / 55</p>
+        <button class="next-btn" onclick="restartQuiz()">ಮತ್ತೆ ಪರೀಕ್ಷೆ ಬರೆಯಿರಿ</button>
+    </div>
+</div>
+
+<script>
+    // ಪ್ರಶ್ನಾಕೋಠಿಯ ಅಧ್ಯಾಯ-೨ ರ (ಕಲಿಕಾ ಫಲ ೨.೧, ೨.೨, ೨.೩) ಎಲ್ಲಾ ೫೫ ಬಹುಆಯ್ಕೆ ಪ್ರಶ್ನೆಗಳು[cite: 1]
+    const questionsData = [
+        // ಕಲಿಕಾ ಫಲ ೨.೧
+        {
+            q: "1. ಪುನರುಜ್ಜೀವನ ಎಂಬ ಪದದ ಅರ್ಥ____________ ಎಂಬುದಾಗಿದೆ[cite: 1].",
+            opts: ["A. ರಿನೈಸಾನ್ಸ್", "B. ಮರು ಹುಟ್ಟು", "C. 'ಎ' ಮಾತ್ರ ಸರಿ", "D. 'ಎ' ಮತ್ತು 'ಬಿ' ಎರಡೂ ಸರಿ"],
+            correct: 3
+        },
+        {
+            q: "2. ಪುನರುಜ್ಜೀವನವು ಸುಮಾರು ಸಾ.ಶ___________ರ ಕಾಲಾವಧಿಯಲ್ಲಿ ಕಂಡುಬಂದಿತು[cite: 1].",
+            opts: ["A. 1400-1600", "B. 1500-1700", "C. 1700-1800", "D. 1900-2000"],
+            correct: 0
+        },
+        {
+            q: "3. ಸುಮಾರು 15 ಮತ್ತು 16ನೇ ಶತಮಾನದಲ್ಲಿ ಯುರೋಪಿಯನ್ ಸಾಹಿತ್ಯ, ಕಲೆ, ವಾಸ್ತುಶಿಲ್ಪ ಮತ್ತು ವಿಜ್ಞಾನ ಕ್ಷೇತ್ರಗಳಲ್ಲಾದ ಹಲವಾರು ಬೆಳವಣಿಗೆಗಳನ್ನು ಸೂಚಿಸುವುದಕ್ಕೆ ________ ಎನ್ನುವರು[cite: 1].",
+            opts: ["A. ರಿನೈಸಾನ್ಸ್", "B. ಮರು ಹುಟ್ಟು", "C. ಪುನರುಜ್ಜೀವನ", "D. ಮೇಲಿನ ಎಲ್ಲವೂ ಸರಿ"],
+            correct: 3
+        },
+        {
+            q: "4. ಪುನರುಜ್ಜೀವನ ಚಳುವಳಿಯು ಬೌದ್ಧಿಕ ಹಾಗೂ ಸಾಂಸ್ಕೃತಿಕ ಕ್ಷೇತ್ರಗಳಲ್ಲಿ ಕಂಡುಬರುವ _____________________ ಬೆಳವಣಿಗೆಯನ್ನು ಅನಾವರಣ ಮಾಡುತ್ತದೆ[cite: 1].",
+            opts: ["A. ಪ್ರಗತಿಶೀಲ", "B. ಸೃಜನಶೀಲ", "C. ಸಂವೇದನಾಶೀಲ", "D. ಸಾಹಿತ್ಯದ"],
+            correct: 1
+        },
+        {
+            q: "5. ಈ ಚಳುವಳಿಯು ಯೂರೋಪ್ ಅನ್ನು ಮಧ್ಯಯುಗದಿಂದ ಆಧುನಿಕ ಯುಗಕ್ಕೆ ಕೊಂಡೊಯ್ಯಿತು[cite: 1].",
+            opts: ["A. ಧಾರ್ಮಿಕ ಚಳುವಳಿ", "B. ಪುನರುಜ್ಜೀವನ ಚಳುವಳಿ", "C. ಸ್ವಾತಂತ್ರ್ಯ ಚಳುವಳಿ", "D. ಸಾಹಿತ್ಯದ ಚಳುವಳಿ"],
+            correct: 1
+        },
+        {
+            q: "6. ಯುರೋಪಿನ ಆಧುನಿಕ ಯುಗಕ್ಕೆ ಕಾರಣವಾದ ಪುನರುಜ್ಜೀವನದ ತವರೂರು[cite: 1].",
+            opts: ["A. ಇಂಗ್ಲೆಂಡ್", "B. ಫ್ರಾನ್ಸ್", "C. ಇಟಲಿ", "D. ಗ್ರೀಕ್"],
+            correct: 2
+        },
+        {
+            q: "7. ಈ ಕೆಳಗಿನ ಎರಡು ಭಾಷೆಗಳು ಯುರೋಪ್ ಖಂಡದ ಅಭಿಜಾತ ಭಾಷೆಗಳು ಆಗಿವೆ[cite: 1].",
+            opts: ["A. ಗ್ರೀಕ್ & ಲ್ಯಾಟಿನ್", "B. ಫ್ರೆಂಚ್ & ರೋಮನ್", "C. ಇಂಗ್ಲಿಷ್ & ಸ್ಪ್ಯಾನಿಷ್", "D. ಗ್ರೀಕ್ & ರೋಮನ್"],
+            correct: 0
+        },
+        {
+            q: "8. ಸಾ.ಶ. 1453ರಲ್ಲಿ ಕಾನ್‌ಸ್ಟಾಂಟಿನೋಪಲ್ ನಗರವನ್ನು ಆಕ್ರಮಣ ಮಾಡಿದ ಟರ್ಕ್ ಸುಲ್ತಾನ______________[cite: 1]",
+            opts: ["A. ಅಹಮ್ಮದ್", "B. ಅಲ್ಲಾವುದ್ದೀನ್", "C. ಕುಬ್ಲಾಯ್ ಖಾನ್", "D. ಮಹಮ್ಮದ"],
+            correct: 3
+        },
+        {
+            q: "9. ಮುದ್ರಣ ಯಂತ್ರವನ್ನು ಕಂಡುಹಿಡಿದ ಜರ್ಮನಿಯ ವಿಜ್ಞಾನಿ[cite: 1]",
+            opts: ["A. ಜಾನ್ ರೈಟ್", "B. ಮಾರ್ಕೋನಿ", "C. ಜಾನ್ ಗುಟೆನ್‌ಬರ್ಗ್", "D. ವಿಲಿಯಂ ಹಾರ್ವೆ"],
+            correct: 2
+        },
+        {
+            q: "10. ಪುನರುಜ್ಜೀವನ ಕಾಲದ ಈ ಮೊದಲ ಲೇಖಕ[cite: 1]",
+            opts: ["A. ಪೆಟ್ರಾರ್ಕ್", "B. ಡಾಂಟೆ", "C. ಬೊಕಾಷಿಯೊ", "D. ಜಾನ್ ಕ್ಯಾಲ್ವಿನ್"],
+            correct: 0
+        },
+        {
+            q: "11. ಡಾಂಟೆ : ದ ಡಿವೈನ್ ಕಾಮಿಡಿ :: ಬೊಕಾಷಿಯೊ : __________________[cite: 1]",
+            opts: ["A. ಕಿಂಗ್ ಲಿಯರ್", "B. ಡೆಕಮೆರನ್", "C. ದ ಪ್ರಿನ್ಸ್", "D. ಮ್ಯಾಕ್‌ಬೆತ್"],
+            correct: 1
+        },
+        {
+            q: "12. ʻಡಾನ್ ಕ್ವಿಹೋಟೆʼ ಎಂಬ ಪ್ರಸಿದ್ಧ ಸಾಹಿತ್ಯ ಕೃತಿಯಲ್ಲಿ ಮಧ್ಯಯುಗದ ಸರದಾರರನ್ನು ಗೇಲಿ ಮಾಡಿದವನು_________________[cite: 1].",
+            opts: ["A. ಸರ್ವಾಂಟೆ", "B. ಡಾಂಟೆ", "C. ಬೊಕಾಷಿಯೊ", "D. ಜಾನ್ ಕ್ಯಾಲ್ವಿನ್"],
+            correct: 0
+        },
+        {
+            q: "13. ಜೂಲಿಯಸ್ ಸೀಸರ್, ರೋಮಿಯೋ ಜೂಲಿಯೆಟ್, ಕಿಂಗ್ ಲಿಯರ್, ಮ್ಯಾಕ್‌ಬೆತ್ ಮುಂತಾದ ನಾಟಕಗಳನ್ನು ರಚಿಸಿದ ಪ್ರಸಿದ್ಧ ಈ ನಾಟಕಕಾರ[cite: 1]",
+            opts: ["A. ಡಾಂಟೆ", "B. ಬೊಕಾಷಿಯೊ", "C. ಸರ್ವಾಂಟಿಸ್", "D. ವಿಲಿಯಮ್ ಷೇಕ್ಸ್‌ಪಿಯರ್"],
+            correct: 3
+        },
+        {
+            q: "14. ʻಡೇವಿಡ್ಸ್ ಪ್ರತಿಮೆʼ ಇದು ಇವರ ಮಹಾನ್ ಶಿಲ್ಪಕೃತಿಯಾಗಿದೆ[cite: 1]",
+            opts: ["A. ಡಾಂಟೆ", "B. ಬೊಕಾಷಿಯೊ", "C. ಡೊನಾಟೆಲೊ", "D. ಮೈಕಲೇಂಜಲ"],
+            correct: 2
+        },
+        {
+            q: "15. ಮೈಕಲೇಂಜಲ ನಿರ್ಮಿಸಿದ ಈ ___________________________ ಪ್ರತಿಮೆ ಭವ್ಯವಾಗಿದೆ[cite: 1].",
+            opts: ["A. ಯೇಸು", "B. ಮಸೀಸ್", "C. ಮೊನಾಲಿಸಾ", "D. ವರ್ಜಿನ್ ಆನ್ ದ ರಾಕ್"],
+            correct: 1
+        },
+        {
+            q: "16. ಸೂರ್ಯನ ಸುತ್ತ ಭೂಮಿ ಸುತ್ತುತ್ತದೆ ಎಂದು ಮೊದಲು ಹೇಳಿದ ಪೋಲೆಂಡಿನ ಈ ವಿಜ್ಞಾನಿ[cite: 1]",
+            opts: ["A. ಕೆಪ್ಲರ್", "B. ಕೊಪರ್ನಿಕಸ್", "C. ಗೆಲಿಲಿಯೊ", "D. ಟಾಲೆಮಿ"],
+            correct: 1
+        },
+        {
+            q: "17. ಭೂಮಿಯ ಸುತ್ತ ಸೂರ್ಯ ಸುತ್ತುವನು ಎಂದು ಹೇಳಿದವರು[cite: 1]",
+            opts: ["A. ಕೊಪರ್ನಿಕಸ್", "B. ಗೆಲಿಲಿಯೊ", "C. ಟಾಲೆಮಿ", "D. ಕೆಪ್ಲರ್"],
+            correct: 2
+        },
+        {
+            q: "18. ದೂರದರ್ಶಕ : ಗೆಲಿಲಿಯೊ :: ಗುರುತ್ವಾಕರ್ಷಣೆ ಬಲ : ____________________[cite: 1]",
+            opts: ["A. ಕೆಪ್ಲರ್", "B. ಸರ್ ಐಸಾಕ್ ನ್ಯೂಟನ್", "C. ವಿಲಿಯಂ ಹಾರ್ವೆ", "D. ಟಾಲೆಮಿ"],
+            correct: 1
+        },
+        {
+            q: "19. ಯೂರೋಪಿನ ರಾಜರುಗಳ ಮಿಲಿಟರಿಯಲ್ಲಿ ಅಪ್ರತಿಮ ಸೇವೆಯನ್ನು ಸಲ್ಲಿಸುತ್ತಿದ್ದವರಿಗೆ ನೀಡುತ್ತಿದ್ದ ಸೇವಾ ಮಾನ್ಯತೆಯನ್ನು ________________ ಎಂದು ಕರೆಯುತ್ತಿದ್ದರು[cite: 1].",
+            opts: ["A. ನೈಟ್ಸ್", "B. ಸರದಾರ", "C. 'ಎ' ಮಾತ್ರ ಸರಿ", "D. 'ಎ' ಮತ್ತು 'ಬಿ' ಎರಡೂ ಸರಿ"],
+            correct: 3
+        },
+        {
+            q: "20. ಪ್ರಾಚೀನ ಗ್ರೀಕ್ ಸಾಹಿತ್ಯವನ್ನು ಅಧ್ಯಯನ ನಡೆಸುತ್ತಿದ್ದ ವಿದ್ವಾಂಸರನ್ನು _________________ ಎಂದು ಕರೆಯಲಾಗುತ್ತಿತ್ತು[cite: 1].",
+            opts: ["A. ಕವ್ಯಾಸಕ್ತರು", "B. ಸಾಹಿತ್ಯಾಸಕ್ತರು", "C. ಮಾನವಾಸಕ್ತರು", "D. ಪಂಡಿತರು"],
+            correct: 2
+        },
+        {
+            q: "21. ಪುನರುಜ್ಜೀವನ ಕಾಲದಲ್ಲಿ ಸ್ವರ್ಗ-ನರಕ ಮತ್ತು ಪರಲೋಕದ ಚಿಂತನೆಯನ್ನು ಪೂರ್ಣವಾಗಿ ಬಿಟ್ಟು _________________ ವಿಷಯಗಳ ಬಗೆಗೆ ತೀವ್ರ ಒಲವು ತಳೆಯಲಾಯಿತು[cite: 1].",
+            opts: ["A. ಇಹಲೋಕ", "B. ಪರಲೋಕ", "C. ಸ್ವರ್ಗ ಲೋಕ", "D. ದೇವಲೋಕ"],
+            correct: 0
+        },
+        {
+            q: "22. ಕಾನ್‌ಸ್ಟಾಂಟಿನೋಪಲ್ ಹಾಗೂ ಬೈಜಾಂಟಿಯನ್ ಎಂದು ಇಂದಿನ ಟರ್ಕಿ ದೇಶದ ಬಂದರು ನಗರವಾದ ________________ ನಗರವನ್ನು ಕರೆಯುತ್ತಿದ್ದರು[cite: 1].",
+            opts: ["A. ರೋಮ್", "B. ಇಸ್ತಾನ್‌ಬುಲ್", "C. ಬಲೂಚಿಸ್ತಾನ್", "D. ಬಾಗ್ದಾದ್"],
+            correct: 1
+        },
+        {
+            q: "23. ಮಾನವನ ದೇಹದಲ್ಲಿ ರಕ್ತ ಪರಿಚಲನೆಯ ಕ್ರಮವನ್ನು ತೋರಿಸಿಕೊಟ್ಟ ವಿಜ್ಞಾನಿ[cite: 1]",
+            opts: ["A. ಗೆಲಿಲಿಯೊ", "B. ಸರ್ ಐಸಾಕ್ ನ್ಯೂಟನ್", "C. ವಿಲಿಯಂ ಹಾರ್ವೆ", "D. ಟಾಲೆಮಿ"],
+            correct: 2
+        },
+        {
+            q: "24. ʻವರ್ಜಿನ್ ಆನ್ ದ ರಾಕ್ಸ್ʼ, ʻದ ಲಾಸ್ಟ್ ಸಪ್ಪರ್ʼ ಮತ್ತು ʻಮೊನಾಲಿಸಾʼ ಈ ಪ್ರಸಿದ್ಧ ವರ್ಣ ಚಿತ್ರಗಳ ಚಿತ್ರಕರನಾದ ಇವನನ್ನು ಗುರುತಿಸಿ[cite: 1].",
+            opts: ["A. ಡಾಂಟೆ", "B. ಬೊಕಾಷಿಯೊ", "C. ಲಿಯೋನಾರ್ಡೋ-ದ-ವಿಂಚಿ", "D. ಮೈಕಲೇಂಜಲ"],
+            correct: 2
+        },
+        {
+            q: "25. ರೋಮ್ ನಗರದಲ್ಲಿರುವ ಈ ಚರ್ಚ್‌ ನ ಹೆಸರು_______________[cite: 1]",
+            opts: ["A. ರೋಮನ್ ಕ್ಯಾಥೋಲಿಕ್ ಚರ್ಚ್‌", "B. ಸೇಂಟ್ ಪೀಟರ್ ಚರ್ಚ್‌", "C. ಸೇಂಟ್ ಫಿಲೋಮಿನಾ ಚರ್ಚ್‌", "D. ಸೇಂಟ್ ಡೇವಿಡ್ಸ್ ಚರ್ಚ್‌"],
+            correct: 1
+        },
+        {
+            q: "26. ವಿಶ್ವ ಪ್ರಸಿದ್ಧ ಈ ಚಿತ್ರವನ್ನು ಗುರುತಿಸಿ (ಮೊನಾಲಿಸಾ ಚಿತ್ರ)[cite: 1].",
+            opts: ["A. ಮಸೀಸ್ ಪ್ರತಿಮೆ", "B. ಡೇವಿಡ್ಸ್ ಪ್ರತಿಮೆ", "C. ಮೊನಾಲಿಸಾ", "D. ವರ್ಜಿನ್ ಆಫ್ ದ ರಾಕ್ಸ್"],
+            correct: 2
+        },
+
+        // ಕಲಿಕಾ ಫಲ ೨.೨
+        {
+            q: "27. ಕ್ರೈಸ್ತ ಧರ್ಮದ ಪ್ರಮುಖ ಪಂಗಡಗಳು ______________[cite: 1]",
+            opts: ["A. ಕ್ಯಾಥೋಲಿಕ್", "B. ಪ್ರೊಟೆಸ್ಟಂಟ್", "C. ಶಿಯಾ ಮತ್ತು ಸುನ್ನಿ", "D. 'ಎ' ಮತ್ತು 'ಬಿ' ಎರಡೂ ಸರಿ"],
+            correct: 3
+        },
+        {
+            q: "28. ಇವರನ್ನು 'ಧಾರ್ಮಿಕ ಸುಧಾರಣೆಯ ಉಷಾ ತಾರೆ' (Morning Star) ಎಂದು ಕರೆಯುತ್ತಾರೆ[cite: 1].",
+            opts: ["A. ಜಾನ್ ವೈಕ್ಲಿಪ್", "B. ಮಾರ್ಟಿನ್ ಲೂಥರ್", "C. ಇಗ್ನೇಷಿಯಸ್ ಲಯೋಲ", "D. ಜಾನ್ ಹಸ್"],
+            correct: 0
+        },
+        {
+            q: "29. \"ನನ್ನ ಆತ್ಮ ಸಾಕ್ಷಿಯ ವಿರುದ್ಧವಾದ ಯಾವುದೇ ವಿಚಾರಗಳನ್ನು ನಾನು ಒಪ್ಪಿಕೊಳ್ಳಲಾರೆ\" ಎಂದು ಹೇಳಿದ ಧಾರ್ಮಿಕ ಸುಧಾರಕ[cite: 1].",
+            opts: ["A. ಜಾನ್ ವೈಕ್ಲಿಪ್", "B. ಮಾರ್ಟಿನ್ ಲೂಥರ್", "C. ಜಾನ್ ಹಸ್", "D. ಇಗ್ನೇಷಿಯಸ್ ಲಯೋಲ"],
+            correct: 2
+        },
+        {
+            q: "30. ಇವುಗಳಿಗೆ 'ಸ್ವರ್ಗದ ರಹದಾರಿ ಪತ್ರ'ಗಳೆಂಬ ಕುರುಡು ನಂಬಿಕೆಗಳನ್ನು ಹುಟ್ಟಿಸಲಾಯಿತು[cite: 1].",
+            opts: ["A. ಪೋಪ್‌ನ ಆಶೀರ್ವಾದ ಪತ್ರ", "B. ಪಾಪ ಕ್ಷಮಾಪಣಾ ಪತ್ರ", "C. ರಾಜಾಜ್ಞೆ", "D. ದೇವರ ಆಜ್ಞೆ"],
+            correct: 1
+        },
+        {
+            q: "31. ಜರ್ಮನಿಯಲ್ಲಿ ಧಾರ್ಮಿಕ ಸುಧಾರಣಾ ಚಳುವಳಿಯನ್ನು ಆರಂಭಿಸಿದ ಈ ನಾಯಕ ಯಾರು[cite: 1]?",
+            opts: ["A. ಜಾನ್ ವೈಕ್ಲಿಪ್", "B. ಇಗ್ನೇಷಿಯಸ್ ಲಯೋಲ", "C. ಜಾನ್ ಹಸ್", "D. ಮಾರ್ಟಿನ್ ಲೂಥರ್"],
+            correct: 3
+        },
+        {
+            q: "32. ಮಾರ್ಟಿನ್ ಲೂಥರ್ ____________________ ಚರ್ಚ್‌ನ ಪಾದ್ರಿ ಆಗಿದ್ದನು[cite: 1].",
+            opts: ["A. ಸಂತ ಪೀಟರ್ ಚರ್ಚ್", "B. ರೋಮನ್ ಕ್ಯಾಥೋಲಿಕ್ ಚರ್ಚ್", "C. ಸಂತ ಅಗಸ್ಟಿನ್ ಚರ್ಚ್", "D. ಪ್ರೊಟೆಸ್ಟಂಟ್ ಚರ್ಚ್"],
+            correct: 2
+        },
+        {
+            q: "33. ಮಾರ್ಟಿನ್ ಲೂಥರ್ ಪಾಪ ಕ್ಷಮಾಪಣ ಪತ್ರಗಳ ಕುರಿತು 95 ಹೇಳಿಕೆಗಳನ್ನು ಬರೆದು ಈ ಚರ್ಚ್‌ನ ಹೆಬ್ಬಾಗಿಲಿಗೆ ಹಚ್ಚಿದನು[cite: 1].",
+            opts: ["A. ಸಂತ ಪೀಟರ್ ಚರ್ಚ್", "B. ರೋಮನ್ ಕ್ಯಾಥೋಲಿಕ್ ಚರ್ಚ್", "C. ಸಂತ ಅಗಸ್ಟಿನ್ ಚರ್ಚ್", "D. ವಿಟೆನ್‌ಬರ್ಗ್ ಚರ್ಚ್"],
+            correct: 3
+        },
+        {
+            q: "34. ಮಾರ್ಟಿನ್ ಲೂಥರ್ ಬೈಬಲ್ ಅನ್ನು ಅನುವಾದಿಸಿದ ಭಾಷೆ[cite: 1].",
+            opts: ["A. ಜರ್ಮನ್", "B. ಇಂಗ್ಲಿಷ್", "C. ಲ್ಯಾಟಿನ್", "D. ರೋಮನ್"],
+            correct: 0
+        },
+        {
+            q: "35. ಚರ್ಚ್‌ನ ಧಾರ್ಮಿಕ ಸೇವೆಗಳಲ್ಲಿ ಲ್ಯಾಟಿನ್ ಭಾಷೆಯ ಬದಲಾಗಿ ಲೂಥರ್ ಬಳಸಲಾರಂಭಿಸಿದ ಭಾಷೆ[cite: 1].",
+            opts: ["A. ಇಂಗ್ಲಿಷ್", "B. ಲ್ಯಾಟಿನ್", "C. ರೋಮನ್", "D. ಜರ್ಮನ್"],
+            correct: 3
+        },
+        {
+            q: "36. ಕ್ಯಾಥೋಲಿಕ್ ಚರ್ಚ್‌ನವರು ಲೂಥರನ ಅನುಯಾಯಿಗಳನ್ನು ಹೀಗೆಂದು ಕರೆದರು[cite: 1].",
+            opts: ["A. ಕ್ಯಾಥೋಲಿಕ್", "B. ಪ್ರೊಟೆಸ್ಟಂಟ್ಸ್", "C. ಜೆಸುಯಿಟ್", "D. 'ಎ' ಮತ್ತು 'ಬಿ' ಎರಡೂ ಸರಿ"],
+            correct: 1
+        },
+        {
+            q: "37. ಪ್ರತಿಯೊಬ್ಬ ವ್ಯಕ್ತಿಯೂ ತನ್ನ ಆತ್ಮಸಾಕ್ಷಿಗೆ ಬದ್ಧವಾಗಿರಬೇಕು ಎಂದು ಪ್ರತಿಪಾದಿಸಿದ ಪ್ರತಿ ಸುಧಾರಣಾ ಚಳುವಳಿಯ ನಾಯಕ (ಚಿತ್ರದಲ್ಲಿರುವಂತೆ)[cite: 1]:",
+            opts: ["A. ಜಾನ್ ವೈಕ್ಲಿಪ್", "B. ಇಗ್ನೇಷಿಯಸ್ ಲಯೋಲ", "C. ಜಾನ್ ಹಸ್", "D. ಮಾರ್ಟಿನ್ ಲೂಥರ್"],
+            correct: 1
+        },
+        {
+            q: "38. ಕ್ಯಾಥೋಲಿಕ್ ಚರ್ಚ್‌ನ ಕುರಿತ ಜನರ ನಂಬಿಕೆಯನ್ನು ಪುನರ್ ಸ್ಥಾಪಿಸಲು 'ಜೀಸಸ್ ಸಂಘ'ವನ್ನು ಸಾ.ಶ. 1541 ರಲ್ಲಿ ಸ್ಥಾಪಿಸಿದವರು[cite: 1].",
+            opts: ["A. ಜಾನ್ ವೈಕ್ಲಿಪ್", "B. ಜಾನ್ ಹಸ್", "C. ಮಾರ್ಟಿನ್ ಲೂಥರ್", "D. ಇಗ್ನೇಷಿಯಸ್ ಲಯೋಲ"],
+            correct: 3
+        },
+        {
+            q: "39. ಕ್ಯಾಥೋಲಿಕ್ ಉಪದೇಶ ಹಾಗೂ ವಿದ್ಯಾ ಪ್ರಸಾರವನ್ನು ಮಾಡಿದ ಜೀಸಸ್ ಸಂಘದ ಅನುಯಾಯಿಗಳು[cite: 1].",
+            opts: ["A. ಕ್ಯಾಥೋಲಿಕ್‌ರು", "B. ಪ್ರೊಟೆಸ್ಟಂಟ್‌ರು", "C. ಜೆಸುಯಿಟರು", "D. ಪೋಪ್‌ರು"],
+            correct: 2
+        },
+
+        // ಕಲಿಕಾ ಫಲ ೨.೩
+        {
+            q: "40. ಸಮುದ್ರ ಯಾನದಂತಹ ಸಾಹಸ ಕಾರ್ಯವನ್ನು ಮೊದಲು ಕೈಗೊಂಡವರು[cite: 1].",
+            opts: ["A. ಪೋರ್ಚುಗೀಸರು", "B. ಫ್ರೆಂಚರು", "C. ಡಚ್ಚರು", "D. ಇಂಗ್ಲಿಷರು"],
+            correct: 0
+        },
+        {
+            q: "41. ಈ ಕೆಳಗಿನ ಯಾವ ದೇಶಗಳಿಗೆ ಸಾಗರ ಮಾರ್ಗವನ್ನು ಕಂಡುಹಿಡಿಯುವುದು ಪೋರ್ಚುಗೀಸ್ ರಾಜಕುಮಾರ ಹೆನ್ರಿಯ ಜೀವನದ ಹಬ್ಬಯಕೆಯಾಗಿತ್ತು[cite: 1]?",
+            opts: ["A. ಶ್ರೀಲಂಕಾ ಮತ್ತು ಮಲೇಷಿಯಾ", "B. ಆಗ್ನೇಯ ಏಷ್ಯಾ ದೇಶಗಳು", "C. ಭಾರತ ಮತ್ತು ಚೀನಾ", "D. ಭಾರತ ಮತ್ತು ಜಪಾನ್"],
+            correct: 2
+        },
+        {
+            q: "42. ಪೋರ್ಚುಗೀಸ್ ರಾಜಕುಮಾರ ಹೆನ್ರಿಯು ನೌಕಾಶಾಲೆಯೊಂದನ್ನು ತೆರೆದಿದ್ದಕ್ಕಾಗಿ ಹೀಗೆಂದು ಜನಪ್ರಿಯನಾಗಿದ್ದನು[cite: 1].",
+            opts: ["A. ಹೆನ್ರಿ ದ ಪ್ರಿನ್ಸ್", "B. ಹೆನ್ರಿ ದ ನ್ಯಾವಿಗೇಟರ್", "C. ಹೆನ್ರಿ ದ ಕಿಂಗ್", "D. ಹೆನ್ರಿ ದ ವಾರಿಯರ್"],
+            correct: 1
+        },
+        {
+            q: "43. ಸಮುದ್ರ ಯಾನವನ್ನು ಪ್ರೋತ್ಸಾಹಿಸುವ ಉದ್ದೇಶದಿಂದ `ಸ್ಕೂಲ್ ಆಫ್ ನ್ಯಾವಿಗೇಷನ್‘ ಎಂಬ ಶಾಲೆಯನ್ನು ಆರಂಭಿಸಿದವರು[cite: 1].",
+            opts: ["A. ಹೆನ್ರಿ", "B. ಡಯಾಸ್", "C. ವಾಸ್ಕೋಡಿಗಾಮಾ", "D. ಕೊಲಂಬಸ್"],
+            correct: 0
+        },
+        {
+            q: "44. ದಕ್ಷಿಣ ಆಫ್ರಿಕಾದ ತುತ್ತ ತುದಿಯನ್ನು ತಲುಪಿದ ಪೋರ್ಚುಗೀಸ್ ನಾವಿಕ[cite: 1].",
+            opts: ["A. ವಾಸ್ಕೋಡಿಗಾಮಾ", "B. ಕ್ರಿಸ್ಟೋಫರ್ ಕೊಲಂಬಸ್", "C. ಫರ್ಡಿನೆಂಡ್ ಮೆಗಲನ್", "D. ಬಾರ್ತಲೋಮಿಯೊ ಡಯಾಸ್"],
+            correct: 3
+        },
+        {
+            q: "45. ಬಾರ್ತಲೋಮಿಯೊ ಡಯಾಸ್ ದಕ್ಷಿಣ ಆಫ್ರಿಕಾದ ತುದಿಯನ್ನು ಹೀಗೆ ಕರೆದನು[cite: 1].\n1. ಕೇಪ್ ಆಫ್ ಸ್ಟಾರ್ಮ್ಸ್ 2. ಬಿರುಗಾಳಿಯ ಭೂಶಿರ 3. ಭರವಸೆಯ ಭೂಶಿರ 4. ಕೇಪ್ ಆಫ್ ಗುಡ್ ಹೋಪ್",
+            opts: ["A. '1' ಮಾತ್ರ ಸರಿ", "B. '1' ಮತ್ತು '2' ಎರಡೂ ಸರಿ", "C. '3' ಮಾತ್ರ ಸರಿ", "D. '3' ಮತ್ತು '4' ಎರಡೂ ಸರಿ"],
+            correct: 1
+        },
+        {
+            q: "46. ಡಯಾಜ್‌ನ ನೌಕಾಯಾನವು ಮುಂದಿನ ಯಾನಕ್ಕೆ ವಿಶ್ವಾಸ ಮೂಡಿಸಿದ್ದರಿಂದ ಆಫ್ರಿಕಾದ ದಕ್ಷಿಣ ತುದಿಯನ್ನು ರಾಜ ಎರಡನೇ ಜಾನ್‌ನು ಹೀಗೆ ಕರೆದ[cite: 1].\n1. ಕೇಪ್ ಆಫ್ ಸ್ಟಾರ್ಮ್ಸ್ 2. ಬಿರುಗಾಳಿಯ ಭೂಶಿರ 3. ಭರವಸೆಯ ಭೂಶಿರ 4. ಕೇಪ್ ಆಫ್ ಗುಡ್ ಹೋಪ್",
+            opts: ["A. '1' ಮಾತ್ರ ಸರಿ", "B. '1' ಮತ್ತು '2' ಎರಡೂ ಸರಿ", "C. '3' ಮಾತ್ರ ಸರಿ", "D. '3' ಮತ್ತು '4' ಎರಡೂ ಸರಿ"],
+            correct: 3
+        },
+        {
+            q: "47. ಭಾರತಕ್ಕೆ ಜಲಮಾರ್ಗವನ್ನು ಕಂಡು ಹಿಡಿದ ಪೋರ್ಚುಗೀಸ್ ನಾವಿಕನಿವನು[cite: 1].",
+            opts: ["A. ವಾಸ್ಕೋಡಿಗಾಮಾ", "B. ಕ್ರಿಸ್ಟೋಫರ್ ಕೊಲಂಬಸ್", "C. ಫರ್ಡಿನೆಂಡ್ ಮೆಗಲನ್", "D. ಬಾರ್ತಲೋಮಿಯೊ ಡಯಾಸ್"],
+            correct: 0
+        },
+        {
+            q: "48. ವಾಸ್ಕೋಡಿಗಾರ್ಮನು ಭಾರತಕ್ಕೆ ಜಲಮಾರ್ಗವನ್ನು ಕಂಡುಹಿಡಿದ ವರ್ಷ[cite: 1].",
+            opts: ["A. ಸಾ.ಶ.1500", "B. ಸಾ.ಶ.1488", "C. ಸಾ.ಶ.1498", "D. ಸಾ.ಶ.1598"],
+            correct: 2
+        },
+        {
+            q: "49. ರಾಜಕುಮಾರ ಹೀನ್ರಿಯ ಹಬ್ಬಯಕೆಯನ್ನು ಸಾಕಾರಗೊಳಿಸಿದ ವಾಸ್ಕೋಡಿಗಾರ್ಮ ಈ ದೇಶದ ನಾವಿಕ[cite: 1].",
+            opts: ["A. ಪೋರ್ಚುಗೀಸ್", "B. ಫ್ರಾನ್ಸ್", "C. ನೇದರ್‌ಲ್ಯಾಂಡ್ಸ್", "D. ಇಂಗ್ಲೆಂಡ್"],
+            correct: 0
+        },
+        {
+            q: "50. ವಾಸ್ಕೋಡಿಗಾರ್ಮನು నిజವಾಗಿ ಬಂದು ಇಳಿದಿದ್ದು ಕಲ್ಲಿಕೋಟೆಯ ಹತ್ತಿರದ ಈ ಸ್ಥಳದಲ್ಲಿ[cite: 1].",
+            opts: ["A. ನಾಂದೇಡ", "B. ಕಾಪು", "C. ಕಪ್ಪಾಡ", "D. ಕೊಚ್ಚಿ"],
+            correct: 2
+        },
+        {
+            q: "51. ನಾವಿಕ ಕ್ರಿಸ್ಟೋಫರ್ ಕೊಲಂಬಸ್ ನ ದೇಶ[cite: 1].",
+            opts: ["A. ಪೋರ್ಚುಗೀಸ್", "B. ಫ್ರಾನ್ಸ್", "C. ನೇದರ್‌ಲ್ಯಾಂಡ್ಸ್", "D. ಸ್ಪೇನ್"],
+            correct: 3
+        },
+        {
+            q: "52. ಭಾರತಕ್ಕೆ ಜಲಮಾರ್ಗ ಕಂಡು ಹಿಡಿಯುವ ಉದ್ದೇಶದಿಂದ ಸಾಗರಯಾನ ಕೈಗೊಂಡು ಭಾರತದ ಬದಲಾಗಿ ಬಹಮಾಸ್ ದ್ವೀಪವನ್ನು ಕಂಡುಹಿಡಿದ ನಾವಿಕ[cite: 1].",
+            opts: ["A. ವಾಸ್ಕೋಡಿಗಾಮಾ", "B. ಕ್ರಿಸ್ಟೋಫರ್ ಕೊಲಂಬಸ್", "C. ಫರ್ಡಿನೆಂಡ್ ಮೆಗಲನ್", "D. ಬಾರ್ತಲೋಮಿಯೊ ಡಯಾಸ್"],
+            correct: 1
+        },
+        {
+            q: "53. ಕ್ರಿಸ್ಟೋಫರ್ ಕೊಲಂಬಸ್‌ನೂ ಅಮೆರಿಕದ ಮೂಲ ನಿವಾಸಿಗಳನ್ನು ಹೀಗೆಂದು ಕರೆದನು[cite: 1].",
+            opts: ["A. ಬ್ಲ್ಯಾಕ್ ಇಂಡಿಯನ್ಸ್", "B. ರೆಡ್ ಇಂಡಿಯನ್ಸ್", "C. ಕೆರಿಬಿಯನ್ಸ್", "D. ಇಂಡಿಯನ್ಸ್"],
+            correct: 1
+        },
+        {
+            q: "54. ದಕ್ಷಿಣ ಅಮೇರಿಕದ ಬ್ರೆಜಿಲ್ ಅನ್ನು ಕಂಡುಹಿಡಿದ ನಾವಿಕ[cite: 1].",
+            opts: ["A. ವೆಸ್ಪುಸಿ", "B. ಕ್ರಿಸ್ಟೋಫರ್ ಕೊಲಂಬಸ್", "C. ಡಯಾಸ್", "D. ಕೆಬ್ರಾಲ್"],
+            correct: 3
+        },
+        {
+            q: "55. ಪ್ರಥಮವಾಗಿ ಭೂಪ್ರದಕ್ಷಿಣೆ ನೌಕಾಯಾನ ಕೈಗೊಂಡ ಶ್ರೇಯಸ್ಸು ಇವನಿಗೆ ಸಲ್ಲುತ್ತದೆ[cite: 1].",
+            opts: ["A. ವೆಸ್ಪುಸಿ", "B. ಕ್ರಿಸ್ಟೋಫರ್ ಕೊಲಂಬಸ್", "C. ಫರ್ಡಿನೆಂಡ್ ಮೆಗಲನ್", "D. ಕೆಬ್ರಾಲ್"],
+            correct: 2
+        }
+    ];
+
+    let currentQIndex = 0;
+    let score = 0;
+    let isUltraMode = false;
+    let timerInterval;
+    let timeRemaining = 15;
+
+    function toggleUltraMode() {
+        isUltraMode = !isUltraMode;
+        document.body.classList.toggle('ultra-mode');
+        const btn = document.getElementById('ultraBtn');
+        btn.innerText = isUltraMode ? "⚡ ULTRA MODE: ON" : "⚡ ULTRA MODE: OFF";
+        restartQuiz();
+    }
+
+    function loadQuestion() {
+        clearInterval(timerInterval);
+        
+        if (currentQIndex >= questionsData.length) {
+            showResults();
+            return;
+        }
+
+        const currentQ = questionsData[currentQIndex];
+        document.getElementById("qText").innerText = currentQ.q;
+        document.getElementById("progressText").innerText = `ಪ್ರಶ್ನೆ ${currentQIndex + 1} / ${questionsData.length}`;
+        
+        const optsContainer = document.getElementById("optsBox");
+        optsContainer.innerHTML = "";
+
+        currentQ.opts.forEach((optText, index) => {
+            const button = document.createElement("button");
+            button.className = "opt-btn";
+            button.innerText = optText;
+            button.onclick = () => checkAnswer(index, currentQ.correct);
+            optsContainer.appendChild(button);
+        });
+
+        if (isUltraMode) {
+            startTimer();
+        }
+    }
+
+    function startTimer() {
+        timeRemaining = 15;
+        const timerBar = document.getElementById("timerBar");
+        timerBar.style.width = "100%";
+
+        timerInterval = setInterval(() => {
+            timeRemaining--;
+            timerBar.style.width = (timeRemaining / 15) * 100 + "%";
+            if (timeRemaining <= 0) {
+                clearInterval(timerInterval);
+                nextQuestion();
+            }
+        }, 1000);
+    }
+
+    function checkAnswer(selectedIdx, correctIdx) {
+        clearInterval(timerInterval);
+        const buttons = document.querySelectorAll(".opt-btn");
+
+        buttons.forEach((btn, idx) => {
+            btn.disabled = true;
+            if (idx === correctIdx) {
+                btn.classList.add("correct");
+            }
+            if (idx === selectedIdx && selectedIdx !== correctIdx) {
+                btn.classList.add("wrong");
+            }
+        });
+
+        if (selectedIdx === correctIdx) {
+            score++;
+        }
+    }
+
+    function nextQuestion() {
+        currentQIndex++;
+        loadQuestion();
+    }
+
+    function showResults() {
+        document.getElementById("quiz-body").style.display = "none";
+        document.getElementById("result-box").style.display = "block";
+        document.getElementById("scoreVal").innerText = score;
+    }
+
+    function restartQuiz() {
+        currentQIndex = 0;
+        score = 0;
+        document.getElementById("quiz-body").style.display = "block";
+        document.getElementById("result-box").style.display = "none";
+        loadQuestion();
+    }
+
+    loadQuestion();
+</script>
+
+</body>
+</html>

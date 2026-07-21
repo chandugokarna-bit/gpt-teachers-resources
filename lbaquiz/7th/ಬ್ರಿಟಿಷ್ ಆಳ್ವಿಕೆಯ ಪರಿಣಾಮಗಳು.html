@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>೭ನೇ ತರಗತಿ ಸಮಾಜ ವಿಜ್ಞಾನ - ಅಧ್ಯಾಯ ೬: ಬ್ರಿಟಿಷ್ ಆಳ್ವಿಕೆಯ ಪರಿಣಾಮಗಳು</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Arial, 'Tunga', sans-serif;
+        }
+        body {
+            background-color: #e2e8f0;
+            margin: 0;
+            padding: 20px;
+            transition: background 0.4s ease, color 0.4s ease;
+        }
+        /* Ultra Mode Theme */
+        body.ultra-mode {
+            background-color: #090d16;
+            color: #f1f5f9;
+        }
+        .quiz-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+            border: 2px solid #cbd5e1;
+        }
+        body.ultra-mode .quiz-container {
+            background: #131c2e;
+            box-shadow: 0 0 25px rgba(59, 130, 246, 0.4);
+            border-color: #3b82f6;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+        body.ultra-mode .header {
+            border-bottom-color: #1e293b;
+        }
+        .ultra-btn {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.95rem;
+            box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3);
+            transition: 0.3s;
+        }
+        body.ultra-mode .ultra-btn {
+            background: #ef4444;
+            box-shadow: 0 0 15px #ef4444;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        .timer-container {
+            width: 100%;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            display: none;
+            overflow: hidden;
+        }
+        body.ultra-mode .timer-container {
+            display: block;
+            background: #334155;
+        }
+        .timer-bar {
+            height: 100%;
+            background: #ef4444;
+            width: 100%;
+            transition: width 1s linear;
+        }
+        .question {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            line-height: 1.5;
+            white-space: pre-line;
+        }
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+        .opt-btn {
+            background: #f8fafc;
+            border: 2px solid #cbd5e1;
+            padding: 14px 18px;
+            border-radius: 10px;
+            text-align: left;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.2s;
+            color: inherit;
+        }
+        body.ultra-mode .opt-btn {
+            background: #1e293b;
+            border-color: #334155;
+        }
+        .opt-btn:hover:not([disabled]) {
+            border-color: #3b82f6;
+            background: #eff6ff;
+        }
+        body.ultra-mode .opt-btn:hover:not([disabled]) {
+            background: #0f172a;
+            border-color: #60a5fa;
+        }
+        .correct {
+            background-color: #d1fae5 !important;
+            border-color: #10b981 !important;
+            color: #065f46 !important;
+            font-weight: bold;
+        }
+        .wrong {
+            background-color: #fee2e2 !important;
+            border-color: #ef4444 !important;
+            color: #991b1b !important;
+        }
+        body.ultra-mode .correct {
+            background-color: #064e3b !important;
+            color: #a7f3d0 !important;
+        }
+        body.ultra-mode .wrong {
+            background-color: #7f1d1d !important;
+            color: #fecaca !important;
+        }
+        .footer {
+            margin-top: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .next-btn {
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+        .next-btn:hover {
+            background: #059669;
+        }
+        .score-card {
+            text-align: center;
+            padding: 20px;
+        }
+        .score-card h2 {
+            font-size: 2rem;
+            color: #3b82f6;
+        }
+    </style>
+</head>
+<body>
+
+<div class="quiz-container">
+    <div class="header">
+        <div>
+            <h3 style="margin:0;">೭ನೇ ತರಗತಿ - ಸಮಾಜ ವಿಜ್ಞಾನ</h3>
+            <small>ಅಧ್ಯಾಯ ೬: ಬ್ರಿಟಿಷ್ ಆಳ್ವಿಕೆಯ ಪರಿಣಾಮಗಳು</small>
+        </div>
+        <button class="ultra-btn" onclick="toggleUltraMode()" id="ultraBtn">⚡ ULTRA MODE: OFF</button>
+    </div>
+
+    <div class="timer-container">
+        <div class="timer-bar" id="timerBar"></div>
+    </div>
+
+    <div id="quiz-body">
+        <div class="question" id="qText">ಪ್ರಶ್ನೆ ಲೋಡ್ ಆಗುತ್ತಿದೆ...</div>
+        <div class="options-grid" id="optsBox"></div>
+
+        <div class="footer">
+            <span id="progressText" style="font-weight: bold;">ಪ್ರಶ್ನೆ 1 / 28</span>
+            <button class="next-btn" onclick="nextQuestion()" id="nextBtn">ಮುಂದಿನ ಪ್ರಶ್ನೆ ➔</button>
+        </div>
+    </div>
+
+    <div id="result-box" class="score-card" style="display: none;">
+        <h2>ಅಭಿನಂದನೆಗಳು! 🎉</h2>
+        <p style="font-size: 1.2rem;">ನಿಮ್ಮ ಒಟ್ಟು ಅಂಕಗಳು: <strong id="scoreVal">0</strong> / 28</p>
+        <button class="next-btn" onclick="restartQuiz()">ಮತ್ತೆ ಪರೀಕ್ಷೆ ಬರೆಯಿರಿ</button>
+    </div>
+</div>
+
+<script>
+    // ಪ್ರಶ್ನಾಕೋಠಿಯ ಅಧ್ಯಾಯ-೬ ರಲ್ಲಿರುವ ಎಲ್ಲಾ ೨೮ ಬಹುಆಯ್ಕೆ ಪ್ರಶ್ನೆಗಳು ಮತ್ತು ಉತ್ತರಗಳು
+    const questionsData = [
+        {
+            q: "1. ಕಂದಾಯ ವಸೂಲಿಗೆಂದು ಹರಾಜು ಮಾಡುವ ವ್ಯವಸ್ಥೆಯನ್ನು ಜಾರಿಗೆ ತಂದ ಗವರ್ನರ್ ಜನರಲ್.",
+            opts: ["A. ವಾರನ್ ಹೇಸ್ಟಿಂಗ್ಸ್", "B. ಕಾರ್ನ್‌ವಾಲೀಸ್", "C. ಥಾಮಸ್ ಮನ್ರೋ", "D. ವಿಲಿಯಂ ಬೆಂಟಿಂಕ್"],
+            correct: 0
+        },
+        {
+            q: "2. ಖಾಯಂ ಜಮೀನ್ದಾರಿ ಪದ್ಧತಿ : ಸಾ.ಶ. 1793 :: ರೈತವಾರಿ ಪದ್ಧತಿ : ____________________",
+            opts: ["A. ಸಾ.ಶ. 1793", "B. ಸಾ.ಶ. 1792", "C. ಸಾ.ಶ. 1833", "D. ಸಾ.ಶ. 1820"],
+            correct: 3
+        },
+        {
+            q: "3. ಖಾಯಂ ಜಮೀನ್ದಾರಿ ಪದ್ಧತಿಯನ್ನು ಜಾರಿಗೆ ತಂದ ಗವರ್ನರ್ ಜನರಲ್.",
+            opts: ["A. ವಾರನ್ ಹೇಸ್ಟಿಂಗ್ಸ್", "B. ಕಾರ್ನ್‌ವಾಲೀಸ್", "C. ಥಾಮಸ್ ಮನ್ರೋ", "D. ವಿಲಿಯಂ ಬೆಂಟಿಂಕ್"],
+            correct: 1
+        },
+        {
+            q: "4. ಖಾಯಂ ಜಮೀನ್ದಾರಿ ಪದ್ಧತಿಯನ್ನು ಜಾರಿಗೊಳಿಸಲಾದ ಪ್ರಾಂತ್ಯಗಳ ಸರಿಯಾದ ಆಯ್ಕೆ:\n1. ಬಂಗಾಳ 2. ಬಿಹಾರ 3. ಒರಿಸ್ಸಾ 4. ಪಂಜಾಬ್",
+            opts: ["A. 1 ಮಾತ್ರ ಸರಿ", "B. 1 ಮತ್ತು 3 ಸರಿ", "C. 1, 2 ಮತ್ತು 3 ಸರಿ", "D. ಎಲ್ಲವೂ ಸರಿ"],
+            correct: 2
+        },
+        {
+            q: "5. ಮಧ್ಯವರ್ತಿಗಳ ಸಹಾಯವಿಲ್ಲದೆ ರೈತನೇ ನೇರವಾಗಿ ಸರ್ಕಾರಕ್ಕೆ ಕಂದಾಯ ಸಂದಾಯ ಮಾಡುವ ಪದ್ಧತಿ.",
+            opts: ["A. ಖಾಯಂ ಜಮೀನ್ದಾರಿ ಪದ್ಧತಿ", "B. ರೈತವಾರಿ ಪದ್ಧತಿ", "C. ಮಹಲ್ವಾರಿ ಪದ್ಧತಿ", "D. ಮನ್ಸಬ್ದಾರಿ ಪದ್ಧತಿ"],
+            correct: 1
+        },
+        {
+            q: "6. ಸರ್ಕಾರ ಮತ್ತು ________________ ರ ನಡುವಿನ ನೇರ ಸಂಬಂಧವೇ ರೈತವಾರಿ ಪದ್ಧತಿಯ ಮುಖ್ಯ ಲಕ್ಷಣವಾಗಿದೆ.",
+            opts: ["A. ಸಾಗುವಳಿದಾರ", "B. ಜಮೀನ್ದಾರ", "C. ಇನಾಮ್ದಾರ", "D. ಜಹಗೀರದಾರ"],
+            correct: 0
+        },
+        {
+            q: "7. ರೈತವಾರಿ ಪದ್ಧತಿಯನ್ನು ಭಾರತದಲ್ಲಿ ಈ ಭಾಗದಲ್ಲಿ ಜಾರಿಗೆ ತರಲಾಯಿತು.",
+            opts: ["A. ಪಶ್ಚಿಮ ಮತ್ತು ಉತ್ತರ ಭಾರತ", "B. ಪೂರ್ವ ಮತ್ತು ಉತ್ತರ ಭಾರತ", "C. ಪಶ್ಚಿಮ ಮತ್ತು ದಕ್ಷಿಣ ಭಾರತ", "D. ಈಶಾನ್ಯ ಮತ್ತು ಉತ್ತರ ಭಾರತ"],
+            correct: 2
+        },
+        {
+            q: "8. ಮದ್ರಾಸ್ ಪ್ರಾಂತ್ಯದಾದ್ಯಂತ ರೈತವಾರಿ ಪದ್ಧತಿಯನ್ನು ಜಾರಿಗೆ ತಂದವನು.",
+            opts: ["A. ವಾರನ್ ಹೇಸ್ಟಿಂಗ್ಸ್", "B. ಕಾರ್ನ್‌ವಾಲೀಸ್", "C. ವಿಲಿಯಂ ಬೆಂಟಿಂಕ್", "D. ಥಾಮಸ್ ಮನ್ರೋ"],
+            correct: 3
+        },
+        {
+            q: "9. ಉತ್ತರ ಪ್ರದೇಶ, ಮಧ್ಯ ಪ್ರದೇಶದ ಕೆಲವು ಭಾಗಗಳು ಮತ್ತು ಪಂಜಾಬಿನಲ್ಲಿ ಮಹಲ್ವಾರಿ ಪದ್ಧತಿಯನ್ನು ಜಾರಿಗೊಳಿಸಿದ್ದು.",
+            opts: ["A. ಸಾ.ಶ. 1793 ರಲ್ಲಿ", "B. ಸಾ.ಶ. 1792 ರಲ್ಲಿ", "C. ಸಾ.ಶ. 1833 ರಲ್ಲಿ", "D. ಸಾ.ಶ. 1820 ರಲ್ಲಿ"],
+            correct: 2
+        },
+        {
+            q: "10. ಸಾ.ಶ. 1833 ರಲ್ಲಿ ವಿಲಿಯಂ ಬೆಂಟಿಂಕ್‌ನು ಮಹಲಾವರಿ ಪದ್ಧತಿಯನ್ನು ಜಾರಿಗೆ ತಂದನು. ಹಾಗಾದರೆ 'ಮಹಲ್' ಎಂದರೆ:",
+            opts: ["A. ಗ್ರಾಮ ಅಥವಾ ಎಸ್ಟೇಟ್", "B. ಗ್ರಾಮ ಅಥವಾ ನಗರ", "C. ನಗರ ಅಥವಾ ಎಸ್ಟೇಟ್", "D. ತಾಲೂಕು ಅಥವಾ ಜಿಲ್ಲೆ"],
+            correct: 0
+        },
+        {
+            q: "11. ಸಾ.ಶ. 1813ರ ಚಾರ್ಟರ್ ಕಾಯ್ದೆಯಲ್ಲಿ ಭಾರತೀಯರ ಶಿಕ್ಷಣಕ್ಕಾಗಿ ಮೀಸಲಿಟ್ಟ ಹಣ.",
+            opts: ["A. ಎರಡು ಲಕ್ಷ ರೂಪಾಯಿಗಳು", "B. ಒಂದು ಲಕ್ಷ ರೂಪಾಯಿಗಳು", "C. ಒಂದು ಕೋಟಿ ರೂಪಾಯಿಗಳು", "D. ನಾಲ್ಕು ಕೋಟಿ ರೂಪಾಯಿಗಳು"],
+            correct: 1
+        },
+        {
+            q: "12. ಹೊಸ ಶಿಕ್ಷಣ ನೀತಿಯನ್ನು ಜಾರಿಗೊಳಿಸಿದ ಕೀರ್ತಿ ಇವರದು.",
+            opts: ["A. ಲಾರ್ಡ್ ಮೆಕಾಲೆ ಮತ್ತು ವಿಲಿಯಂ ಬೆಂಟಿಂಕ್", "B. ಮೋರ್ಲೆ ಮತ್ತು ಮಿಂಟೋ", "C. ಲಾರ್ಡ್ ಮೆಕಾಲೆ ಮತ್ತು ಚಾರ್ಲ್ಸ್ ವುಡ್", "D. ಮಾಂಟೆಗು ಮತ್ತು ಚೆಲ್ಮ್ಸ್‌ಫರ್ಡ್"],
+            correct: 2
+        },
+        {
+            q: "13. ಸಾ.ಶ. 1835 ರಲ್ಲಿ ಪಾಶ್ಚಾತ್ಯ ವಿಜ್ಞಾನ ಮತ್ತು ಇಂಗ್ಲಿಷ್ ಮಾಧ್ಯಮದ ಪರವಾಗಿ ಶಿಕ್ಷಣ ನೀತಿಯನ್ನು ಘೋಷಿಸಿದ ಗವರ್ನರ್ ಜನರಲ್.",
+            opts: ["A. ಚೆಲ್ಮ್ಸ್‌ಫರ್ಡ್", "B. ಚಾರ್ಲ್ಸ್ ವುಡ್", "C. ಲಾರ್ಡ್ ಮೆಕಾಲೆ", "D. ವಿಲಿಯಂ ಬೆಂಟಿಂಕ್"],
+            correct: 3
+        },
+        {
+            q: "14. ಪ್ರಾಚೀನ ಭಾರತದ ಸಾಂಸ್ಕೃತಿಕ ಶ್ರೀಮಂತಿಕೆಯನ್ನು ಪಶ್ಚಿಮದ ಜಗತ್ತಿಗೆ ಪರಿಚಯಿಸಲು `ಏಷಿಯಾಟಿಕ್ ಸೊಸೈಟಿ ಆಫ್ ಬೆಂಗಾಲ್' ಅನ್ನು ಸ್ಥಾಪಿಸಿದವರು.",
+            opts: ["A. ಸರ್. ವಿಲಿಯಂ ಜೋನ್ಸ್", "B. ಸರ್. ವಿಲಿಯಂ ಬೆಂಟಿಂಕ್", "C. ಮ್ಯಾಕ್ಸ್ ಮುಲ್ಲರ್", "D. ಸರ್. ಚಾರ್ಲ್ಸ್ ವಿಲ್ಕಿನ್ಸ್"],
+            correct: 0
+        },
+        {
+            q: "15. `ಏಷಿಯಾಟಿಕ್ ಸೊಸೈಟಿ ಆಫ್ ಬೆಂಗಾಲ್' ಸ್ಥಾಪನೆಯಾದ ವರ್ಷ.",
+            opts: ["A. ಸಾ.ಶ. 1783", "B. ಸಾ.ಶ. 1784", "C. ಸಾ.ಶ. 1785", "D. ಸಾ.ಶ. 1786"],
+            correct: 1
+        },
+        {
+            q: "16. ಭಗವದ್ಗೀತೆ ಇಂಗ್ಲಿಷಿಗೆ ಭಾಷಾಂತರ : ಸರ್ ಚಾರ್ಲ್ಸ್ ವಿಲ್ಕಿನ್ಸ್ :: ಋಗ್ವೇದ ಮತ್ತಿತರ ಕೃತಿಗಳ ಇಂಗ್ಲಿಷ್‌ಗೆ ಭಾಷಾಂತರ : _______________________",
+            opts: ["A. ಮ್ಯಾಕ್ಸ್ ಮುಲ್ಲರ್", "B. ಸರ್. ಚಾರ್ಲ್ಸ್ ವಿಲ್ಕಿನ್ಸ್", "C. ಸರ್. ವಿಲಿಯಂ ಜೋನ್ಸ್", "D. ಬಿ.ಎಲ್.ರೈಸ್"],
+            correct: 0
+        },
+        {
+            q: "17. ಬ್ರಿಟಿಷರು ಹೊಸ ಶಿಕ್ಷಣ ನೀತಿಯನ್ನು ರೂಪಿಸಿದ ಕಾಲ:",
+            opts: ["A. ಸಾ.ಶ 1851", "B. ಸಾ.ಶ 1852", "C. ಸಾ.ಶ 1853", "D. ಸಾ.ಶ 1854"],
+            correct: 3
+        },
+        {
+            q: "18. ಸಾ.ಶ. 1857 ರಲ್ಲಿ ಬ್ರಿಟಿಷರು ಈ ಕೆಳಗಿನ ಸ್ಥಳಗಳಲ್ಲಿ ವಿಶ್ವವಿದ್ಯಾಲಯಗಳನ್ನು ಸ್ಥಾಪಿಸಿದರು.",
+            opts: ["A. ಕಲ್ಕತ್ತಾ, ಮುಂಬೈ, ಮತ್ತು ಮದ್ರಾಸ್", "B. ಕಲ್ಕತ್ತಾ, ಮುಂಬೈ, ಮತ್ತು ದೆಹಲಿ", "C. ಕಲ್ಕತ್ತಾ, ಹೈದರಾಬಾದ್ ಮತ್ತು ಬಿಹಾರ", "D. ಕಲ್ಕತ್ತಾ, ಮದ್ರಾಸ್, ಮತ್ತು ಮೈಸೂರು"],
+            correct: 0
+        },
+        {
+            q: "19. ಇಂಗ್ಲಿಷ್ ಭಾಷೆಯು ಆಡಳಿತದ ಅಧಿಕೃತ ಭಾಷೆಯಾದ ಕಾಲಮಾನ.",
+            opts: ["A. ಸಾ.ಶ. 1844", "B. ಸಾ.ಶ. 1845", "C. ಸಾ.ಶ. 1846", "D. ಸಾ.ಶ. 1847"],
+            correct: 0
+        },
+        {
+            q: "20. ಭಾರತದ ಗುಡಿ ಕೈಗಾರಿಕೆಗಳನ್ನು ಅವನತಿಯತ್ತ ತಳ್ಳಿದ ಬ್ರಿಟಿಷರ ನೀತಿ...",
+            opts: ["A. ಎಫ್.ಡಿ.ಐ. ನೀತಿ", "B. ನಿಬಂಧಿತ ವ್ಯಾಪಾರ ನೀತಿ", "C. ಮುಕ್ತ ವ್ಯಾಪಾರ ನೀತಿ", "D. ಸುಂಕ ರಹಿತ ವ್ಯಾಪಾರ ನೀತಿ"],
+            correct: 2
+        },
+        {
+            q: "21. ಇವರು ಸಂಪತ್ತಿನ ಸೋರಿಕೆ ಸಿದ್ಧಾಂತವನ್ನು ಮಂಡಿಸಿದವರು.",
+            opts: ["A. ಆಡಂ ಸ್ಮಿತ್", "B. ದಾದಾಬಾಯಿ ನವರೋಜಿ", "C. ಕೌಟಿಲ್ಯ", "D. ಅರಿಸ್ಟಾಟಲ್"],
+            correct: 1
+        },
+        {
+            q: "22. ಆಧುನಿಕ ಅರ್ಥಶಾಸ್ತ್ರದ ಪಿತಾಮಹ...",
+            opts: ["A. ಆಡಂ ಸ್ಮಿತ್", "B. ಪ್ಲೇಟೋ", "C. ಕೌಟಿಲ್ಯ", "D. ಅರಿಸ್ಟಾಟಲ್"],
+            correct: 0
+        },
+        {
+            q: "23. ಭಾರತದಲ್ಲಿ ಆಳ್ವಿಕೆ ನಡೆಸುತ್ತಿದ್ದ ಬ್ರಿಟಿಷರನ್ನು ಸುಲಿಗೆಕೋರರು ಎಂದು ಬಣ್ಣಿಸಿದವರು.",
+            opts: ["A. ದಾದಾಬಾಯಿ ನವರೋಜಿ", "B. ಗಾಂಧೀಜಿ", "C. ಅಂಬೇಡ್ಕರ್", "D. ಆಡಂ ಸ್ಮಿತ್"],
+            correct: 3
+        },
+        {
+            q: "24. ರೆಗುಲೇಟಿಂಗ್ ಕಾಯ್ದೆ : ಸಾ.ಶ. 1773 :: ಪಿಟ್ಸ್ ಇಂಡಿಯಾ ಕಾಯ್ದೆ : __________",
+            opts: ["A. ಸಾ.ಶ. 1771", "B. ಸಾ.ಶ. 1773", "C. ಸಾ.ಶ. 1784", "D. ಸಾ.ಶ. 1794"],
+            correct: 2
+        },
+        {
+            q: "25. ರೆಗುಲೇಟಿಂಗ್ ಕಾಯ್ದೆಯನ್ನು ಜಾರಿಗೊಳಿಸಿದ ಭಾರತದ ಗವರ್ನರ್ ಜನರಲ್ ________________",
+            opts: ["A. ವಾರನ್ ಹೇಸ್ಟಿಂಗ್ಸ್", "B. ಕಾರ್ನ್‌ವಾಲೀಸ್", "C. ವಿಲಿಯಂ ಬೆಂಟಿಂಕ್", "D. ಥಾಮಸ್ ಮನ್ರೋ"],
+            correct: 0
+        },
+        {
+            q: "26. ಮಾರ್ಲೆ-ಮಿಂಟೋ ಸುಧಾರಣೆಗಳು : ಸಾ.ಶ. 1909 :: ಮಾಂಟೆಗು-ಚೆಲ್ಮ್ಸ್‌ಫರ್ಡ್ ಸುಧಾರಣೆಗಳು : ___________",
+            opts: ["A. ಸಾ.ಶ. 1784", "B. ಸಾ.ಶ. 1909", "C. ಸಾ.ಶ. 1919", "D. ಸಾ.ಶ. 1935"],
+            correct: 2
+        },
+        {
+            q: "27. ಈ ಶಾಸನದ ಪ್ರಕಾರ ಪ್ರಾಂತ್ಯಗಳು ಮತ್ತು ರಾಜ್ಯಗಳ ಒಕ್ಕೂಟದಿಂದ ಭಾರತದ ಒಕ್ಕೂಟದ ರಚನೆಯಾಯಿತು.",
+            opts: ["A. ಸಾ.ಶ. 1884", "B. ಸಾ.ಶ. 1918", "C. ಸಾ.ಶ. 1919", "D. ಸಾ.ಶ. 1935"],
+            correct: 3
+        },
+        {
+            q: "28. ಹೊಂದಿಸಿ ಬರೆಯಿರಿ:\n೧. ವಾರನ್ ಹೇಸ್ಟಿಂಗ್ಸ್ - ಇ) ಕಂದಾಯ ವಸೂಲಿಯ ಹರಾಜು ವ್ಯವಸ್ಥೆ\n೨. ಕಾರ್ನ್‌ವಾಲೀಸ್ - ಅ) ಖಾಯಂ ಜಮೀನ್ದಾರಿ ಪದ್ಧತಿ\n೩. ಥಾಮಸ್ ಮನ್ರೋ - ಉ) ರೈತವಾರಿ ಪದ್ಧತಿ\n೪. ವಿಲಿಯಂ ಬೆಂಟಿಂಕ್ - ಆ) ಇಂಗ್ಲಿಷ್ ಶಿಕ್ಷಣ ನೀತಿ\n೫. ದಾದಾಬಾಯಿ ನವರೋಜಿ - ಈ) ಸಂಪತ್ತಿನ ಸೋರಿಕೆ ಸಿದ್ಧಾಂತ",
+            opts: ["A. 1-ಇ, 2-ಅ, 3-ಉ, 4-ಆ, 5-ಈ", "B. 1-ಅ, 2-ಆ, 3-ಇ, 4-ಈ, 5-ಉ", "C. 1-ಉ, 2-ಈ, 3-ಇ, 4-ಆ, 5-ಅ", "D. 1-ಇ, 2-ಅ, 3-ಈ, 4-ಆ, 5-ಉ"],
+            correct: 0
+        }
+    ];
+
+    let currentQIndex = 0;
+    let score = 0;
+    let isUltraMode = false;
+    let timerInterval;
+    let timeRemaining = 15;
+
+    function toggleUltraMode() {
+        isUltraMode = !isUltraMode;
+        document.body.classList.toggle('ultra-mode');
+        const btn = document.getElementById('ultraBtn');
+        btn.innerText = isUltraMode ? "⚡ ULTRA MODE: ON" : "⚡ ULTRA MODE: OFF";
+        restartQuiz();
+    }
+
+    function loadQuestion() {
+        clearInterval(timerInterval);
+        
+        if (currentQIndex >= questionsData.length) {
+            showResults();
+            return;
+        }
+
+        const currentQ = questionsData[currentQIndex];
+        document.getElementById("qText").innerText = currentQ.q;
+        document.getElementById("progressText").innerText = `ಪ್ರಶ್ನೆ ${currentQIndex + 1} / ${questionsData.length}`;
+        
+        const optsContainer = document.getElementById("optsBox");
+        optsContainer.innerHTML = "";
+
+        currentQ.opts.forEach((optText, index) => {
+            const button = document.createElement("button");
+            button.className = "opt-btn";
+            button.innerText = optText;
+            button.onclick = () => checkAnswer(index, currentQ.correct);
+            optsContainer.appendChild(button);
+        });
+
+        if (isUltraMode) {
+            startTimer();
+        }
+    }
+
+    function startTimer() {
+        timeRemaining = 15;
+        const timerBar = document.getElementById("timerBar");
+        timerBar.style.width = "100%";
+
+        timerInterval = setInterval(() => {
+            timeRemaining--;
+            timerBar.style.width = (timeRemaining / 15) * 100 + "%";
+            if (timeRemaining <= 0) {
+                clearInterval(timerInterval);
+                nextQuestion();
+            }
+        }, 1000);
+    }
+
+    function checkAnswer(selectedIdx, correctIdx) {
+        clearInterval(timerInterval);
+        const buttons = document.querySelectorAll(".opt-btn");
+
+        buttons.forEach((btn, idx) => {
+            btn.disabled = true;
+            if (idx === correctIdx) {
+                btn.classList.add("correct");
+            }
+            if (idx === selectedIdx && selectedIdx !== correctIdx) {
+                btn.classList.add("wrong");
+            }
+        });
+
+        if (selectedIdx === correctIdx) {
+            score++;
+        }
+    }
+
+    function nextQuestion() {
+        currentQIndex++;
+        loadQuestion();
+    }
+
+    function showResults() {
+        document.getElementById("quiz-body").style.display = "none";
+        document.getElementById("result-box").style.display = "block";
+        document.getElementById("scoreVal").innerText = score;
+    }
+
+    function restartQuiz() {
+        currentQIndex = 0;
+        score = 0;
+        document.getElementById("quiz-body").style.display = "block";
+        document.getElementById("result-box").style.display = "none";
+        loadQuestion();
+    }
+
+    loadQuestion();
+</script>
+
+</body>
+</html>

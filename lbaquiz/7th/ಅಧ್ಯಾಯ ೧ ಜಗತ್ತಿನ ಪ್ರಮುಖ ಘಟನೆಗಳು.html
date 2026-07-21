@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>೭ನೇ ತರಗತಿ ಸಮಾಜ ವಿಜ್ಞಾನ - ಅಧ್ಯಾಯ ೧: ಜಗತ್ತಿನ ಪ್ರಮುಖ ಘಟನೆಗಳು</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Arial, 'Tunga', sans-serif;
+        }
+        body {
+            background-color: #e2e8f0;
+            margin: 0;
+            padding: 20px;
+            transition: background 0.4s ease, color 0.4s ease;
+        }
+        /* Ultra Mode Theme */
+        body.ultra-mode {
+            background-color: #090d16;
+            color: #f1f5f9;
+        }
+        .quiz-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+            border: 2px solid #cbd5e1;
+        }
+        body.ultra-mode .quiz-container {
+            background: #131c2e;
+            box-shadow: 0 0 25px rgba(59, 130, 246, 0.4);
+            border-color: #3b82f6;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+        body.ultra-mode .header {
+            border-bottom-color: #1e293b;
+        }
+        .ultra-btn {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.95rem;
+            box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3);
+            transition: 0.3s;
+        }
+        body.ultra-mode .ultra-btn {
+            background: #ef4444;
+            box-shadow: 0 0 15px #ef4444;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        .timer-container {
+            width: 100%;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            display: none;
+            overflow: hidden;
+        }
+        body.ultra-mode .timer-container {
+            display: block;
+            background: #334155;
+        }
+        .timer-bar {
+            height: 100%;
+            background: #ef4444;
+            width: 100%;
+            transition: width 1s linear;
+        }
+        .question {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+        .opt-btn {
+            background: #f8fafc;
+            border: 2px solid #cbd5e1;
+            padding: 14px 18px;
+            border-radius: 10px;
+            text-align: left;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.2s;
+            color: inherit;
+        }
+        body.ultra-mode .opt-btn {
+            background: #1e293b;
+            border-color: #334155;
+        }
+        .opt-btn:hover:not([disabled]) {
+            border-color: #3b82f6;
+            background: #eff6ff;
+        }
+        body.ultra-mode .opt-btn:hover:not([disabled]) {
+            background: #0f172a;
+            border-color: #60a5fa;
+        }
+        .correct {
+            background-color: #d1fae5 !important;
+            border-color: #10b981 !important;
+            color: #065f46 !important;
+            font-weight: bold;
+        }
+        .wrong {
+            background-color: #fee2e2 !important;
+            border-color: #ef4444 !important;
+            color: #991b1b !important;
+        }
+        body.ultra-mode .correct {
+            background-color: #064e3b !important;
+            color: #a7f3d0 !important;
+        }
+        body.ultra-mode .wrong {
+            background-color: #7f1d1d !important;
+            color: #fecaca !important;
+        }
+        .footer {
+            margin-top: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .next-btn {
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+        .next-btn:hover {
+            background: #059669;
+        }
+        .score-card {
+            text-align: center;
+            padding: 20px;
+        }
+        .score-card h2 {
+            font-size: 2rem;
+            color: #3b82f6;
+        }
+    </style>
+</head>
+<body>
+
+<div class="quiz-container">
+    <div class="header">
+        <div>
+            <h3 style="margin:0;">೭ನೇ ತರಗತಿ - ಸಮಾಜ ವಿಜ್ಞಾನ[cite: 1]</h3>
+            <small>ಅಧ್ಯಾಯ ೧: ಜಗತ್ತಿನ ಪ್ರಮುಖ ಘಟನೆಗಳು[cite: 1]</small>
+        </div>
+        <button class="ultra-btn" onclick="toggleUltraMode()" id="ultraBtn">⚡ ULTRA MODE: OFF</button>
+    </div>
+
+    <div class="timer-container">
+        <div class="timer-bar" id="timerBar"></div>
+    </div>
+
+    <div id="quiz-body">
+        <div class="question" id="qText">ಪ್ರಶ್ನೆ ಲೋಡ್ ಆಗುತ್ತಿದೆ...</div>
+        <div class="options-grid" id="optsBox"></div>
+
+        <div class="footer">
+            <span id="progressText" style="font-weight: bold;">ಪ್ರಶ್ನೆ 1 / 26</span>
+            <button class="next-btn" onclick="nextQuestion()" id="nextBtn">ಮುಂದಿನ ಪ್ರಶ್ನೆ ➔</button>
+        </div>
+    </div>
+
+    <div id="result-box" class="score-card" style="display: none;">
+        <h2>ಅಭಿನಂದನೆಗಳು! 🎉</h2>
+        <p style="font-size: 1.2rem;">ನಿಮ್ಮ ಒಟ್ಟು ಅಂಕಗಳು: <strong id="scoreVal">0</strong> / 26</p>
+        <button class="next-btn" onclick="restartQuiz()">ಮತ್ತೆ ಪರೀಕ್ಷೆ ಬರೆಯಿರಿ</button>
+    </div>
+</div>
+
+<script>
+    // ಪ್ರಶ್ನಾಕೋಠಿಯ ಅಧ್ಯಾಯ-೧ ರಲ್ಲಿರುವ ಎಲ್ಲಾ ೨೬ ಬಹುಆಯ್ಕೆ ಪ್ರಶ್ನೆಗಳು ಮತ್ತು ಉತ್ತರಗಳು[cite: 1]
+    const questionsData = [
+        {
+            q: "1. ಪೀಟರ್‌ ಪ್ರತಿ ರವಿವಾರ ಚರ್ಚ್‌ಗೆ ಪ್ರಾರ್ಥನೆ ಸಲ್ಲಿಸಲು ಹೋಗುವನು. ಹಾಗಾದರೆ ಪೀಟರ್‌ನ ಧರ್ಮದ ಸಂಸ್ಥಾಪಕರು[cite: 1]:",
+            opts: ["A. ಮಹಮ್ಮದ್ ಪೈಗಂಬರ", "B. ಏಸುಕ್ರಿಸ್ತ", "C. ವರ್ಧಮಾನ ಮಹಾವೀರ", "D. ಗೌತಮ ಬುದ್ಧ"],
+            correct: 1
+        },
+        {
+            q: "2. ʻಖುರಾನ್‌ʼ : ಇಸ್ಲಾಂ ಧರ್ಮ :: ʻಬೈಬಲ್ʼ : ________________[cite: 1]",
+            opts: ["A. ಬೌದ್ಧ ಧರ್ಮ", "B. ಜೈನ ಧರ್ಮ", "C. ಕ್ರೈಸ್ತ ಧರ್ಮ", "D. ಸಿಖ್ ಧರ್ಮ"],
+            correct: 2
+        },
+        {
+            q: "3. ʻಜೀಸಸ್ʼ ಎಂದರೆ ಕನ್ನಡದಲ್ಲಿ ʻಏಸುʼ ಎಂದರ್ಥ. ಹಾಗಾದರೆ `ಕ್ರೈಸ್ಟ್` ಎಂಬ ಪದದ ಅರ್ಥ[cite: 1]:",
+            opts: ["A. ರಕ್ಷಕ", "B. ಪೋಷಕ", "C. ಭಗವಂತ", "D. ಪ್ರಭು"],
+            correct: 0
+        },
+        {
+            q: "4. ಬೆತ್ಲಹಂ ಎಂಬುದು _______________ ನು ಜನಿಸಿದ ಸ್ಥಳವಾಗಿದೆ[cite: 1].",
+            opts: ["A. ಮಹಮ್ಮದ್ ಪೈಗಂಬರ", "B. ಜೀಸಸ್ ಕ್ರಿಸ್ತ", "C. ಅಲೆಕ್ಸಾಂಡರ", "D. ಭಗವಾನ್ ಬುದ್ಧ"],
+            correct: 1
+        },
+        {
+            q: "5. ಶಿಕ್ಷಕರು ಏಸುಕ್ರಿಸ್ತನ ತಾಯಿಯ ಹೆಸರು ಏನು ಎಂದು ವಿದ್ಯಾರ್ಥಿಗಳಿಗೆ ಕೇಳಿದಾಗ, ಮಕ್ಕಳ ಉತ್ತರ ಇದಾಗಿರುತ್ತದೆ[cite: 1]:",
+            opts: ["A. ಮೇರಿ", "B. ಮೀಸಸ್", "C. ರೇಚಲ್", "D. ಅಮೀನಾ"],
+            correct: 0
+        },
+        {
+            q: "6. ಏಸುಕ್ರಿಸ್ತನ ಬೋಧನೆಗಳಿಗೆ ಸಂಬಂಧಿಸಿದಂತೆ ತಪ್ಪಾದ ಆಯ್ಕೆ[cite: 1]:",
+            opts: ["A. ನಾವೆಲ್ಲ ದೇವರ ಮಕ್ಕಳು; ನಾವೆಲ್ಲ ಸಹೋದರರು.", "B. ಪಾಪಗಳನ್ನು ಮಾಡದೆ ಶುದ್ಧ ಜೀವನ ನಡೆಸಬೇಕು.", "C. ನಿಮ್ಮ ನೆರೆಯವನನ್ನು ನಿಮ್ಮಂತೆ ಪ್ರೀತಿಸಿ.", "D. ಬ್ರಹ್ಮಚರ್ಯವನ್ನು ಪಾಲಿಸಬೇಕು."],
+            correct: 3
+        },
+        {
+            q: "7. ಏಸುವಿನ ಕಾಲಾನಂತರ ಅವನ ಹನ್ನೆರಡು ಜನ ಪ್ರಮುಖ ಶಿಷ್ಯರ ಉತ್ಸಾಹದ ಪ್ರಚಾರದ ಪರಿಣಾಮವಾಗಿ ಕ್ರೈಸ್ತ ಧರ್ಮಕ್ಕೆ ಮಾನ್ಯತೆ ನೀಡಿದ ಜಗತ್ತಿನ ಮೊಟ್ಟ ಮೊದಲ ಸಾಮ್ರಾಜ್ಯ ಇದು[cite: 1]:",
+            opts: ["A. ರೋಮನ್ ಸಾಮ್ರಾಜ್ಯ", "B. ಖಲೀಫರ ಸಾಮ್ರಾಜ್ಯ", "C. ಗ್ರೀಕ್ ಸಾಮ್ರಾಜ್ಯ", "D. ಬ್ರಿಟನ್ ಸಾಮ್ರಾಜ್ಯ"],
+            correct: 0
+        },
+        {
+            q: "8. ಕ್ರೈಸ್ತರ ಪ್ರಮುಖ ಗುರುಗಳನ್ನು ಹೀಗೆಂದು ಕರೆಯುತ್ತಾರೆ[cite: 1]:",
+            opts: ["A. ಖಲೀಫರು", "B. ಪೋಪ್‌ರು", "C. ಮಹಮ್ಮದರು", "D. ಪಾದ್ರಿಗಳು"],
+            correct: 1
+        },
+        {
+            q: "9. ಇಟಲಿಯ ರೋಮ್‌ ನಗರದಲ್ಲಿ ಇರುವ ಈ ಪ್ರಸಿದ್ಧ ಚರ್ಚ್[cite: 1]:",
+            opts: ["A. ಸೇಂಟ್ ಮೇರಿ ಚರ್ಚ್", "B. ರೋಮನ್ ಕ್ಯಾಥೋಲಿಕ್ ಚರ್ಚ್", "C. ರೋಮನ್ ಪ್ರೊಟೆಸ್ಟಂಟ್ ಚರ್ಚ್", "D. ಸೇಂಟ್ ಫಿಲೋಮಿನಾ ಚರ್ಚ್"],
+            correct: 1
+        },
+        {
+            q: "10. ರಂಜಾನ್ ಹಬ್ಬದಂದು ರಹೀಮನು ಸತೀಶನನ್ನು ಹಬ್ಬಕ್ಕೆ ಮನೆಗೆ ಕರೆಯುತ್ತಾನೆ. ಆ ಸಂದರ್ಭದಲ್ಲಿ ಸತೀಶನು ಇಸ್ಲಾಂ ಧರ್ಮದ ಸಂಸ್ಥಾಪಕರು ಯಾರು ಎಂದು ರಹೀಮನನ್ನು ಕೇಳುತ್ತಾನೆ. ಆಗ ರಹೀಮ್ ನೀಡಿದ ಉತ್ತರ ಏನಾಗಿತ್ತು[cite: 1]?",
+            opts: ["A. ಭಗವಾನ್ ಬುದ್ಧ", "B. ಏಸುಕ್ರಿಸ್ತ", "C. ಮಹಮ್ಮದ್ ಪೈಗಂಬರ", "D. ಖಲೀಫ"],
+            correct: 2
+        },
+        {
+            q: "11. ಪೈಗಂಬರ್ ಎಂದರೆ______________\n1. ದೇವರ ಸಂದೇಶವನ್ನು ಸಾರುವವರು 2. ಪ್ರವಾದಿ 3. ಸಂತ 4. ಸೇವಕ[cite: 1]",
+            opts: ["A. 1 ಮಾತ್ರ ಸರಿ", "B. 2 ಮಾತ್ರ ಸರಿ", "C. 1 ಮತ್ತು 2 ಎರಡೂ ಸರಿ", "D. ಮೇಲಿನ ಎಲ್ಲವೂ ಸರಿ"],
+            correct: 2
+        },
+        {
+            q: "12. ಮಹಮ್ಮದರ ತಂದೆ : ಅಬ್ದುಲ್ಲಾ :: ಮಹಮ್ಮದರ ತಾಯಿ : _________________[cite: 1]",
+            opts: ["A. ಫಾತಿಮಾ", "B. ಮೇರಿ", "C. ಖದೀಜಾ", "D. ಅಮೀನಾ"],
+            correct: 3
+        },
+        {
+            q: "13. ಮಹಮ್ಮದ್ ಪೈಗಂಬರರ ಸಂದೇಶಗಳನ್ನು ಈ ಗ್ರಂಥದಲ್ಲಿ ಸಂಗ್ರಹಿಸಲಾಗಿದೆ[cite: 1].",
+            opts: ["A. ಗ್ರಂಥ ಸಾಹೇಬ್", "B. ಖುರಾನ್", "C. ಬೈಬಲ್", "D. ಭಗವದ್ಗೀತಾ"],
+            correct: 1
+        },
+        {
+            q: "14. ಮುಸ್ಲಿಂ : ದೇವರಿಗೆ ಶರಣಾದವರು :: ಇಸ್ಲಾಂ : ________________[cite: 1]",
+            opts: ["A. ಶರಣಾಗತಿ", "B. ಸಂತ", "C. ಪ್ರವಾದಿ", "D. ಹೋರಾಟ"],
+            correct: 0
+        },
+        {
+            q: "15. ಇಸ್ಲಾಮ್‌ನ ಬೋಧನೆಗಳು:\n1. ಅಲ್ಲಾಹನ ಹೊರತು ಬೇರೆ ದೇವರಿಲ್ಲ\n2. ಮಹಮ್ಮದ್ ಅವರು ದೇವರ ಪ್ರವಾದಿ\n3. ದೇವರನ್ನು ಮೂರ್ತಿಯ ರೂಪದಲ್ಲಿ ಪೂಜಿಸಬಾರದು\n4. ಪ್ರತಿಯೊಬ್ಬ ಮುಸಲ್ಮಾನನು ನಮಾಜ್ ಮಾಡಬೇಕು[cite: 1].",
+            opts: ["A. 1 ಮತ್ತು 3 ಸರಿ", "B. 1, 2 ಮತ್ತು 3 ಸರಿ", "C. 1 ಮಾತ್ರ ಸರಿ", "D. ಮೇಲಿನ ಎಲ್ಲವೂ ಸರಿ"],
+            correct: 3
+        },
+        {
+            q: "16. ಮಹಮ್ಮದರ ಉತ್ತರಾಧಿಕಾರಿಗಳನ್ನು ________ ಎನ್ನುವರು[cite: 1].",
+            opts: ["A. ಖಲೀಫ", "B. ಪೈಗಂಬರ", "C. ಪ್ರವಾದಿ", "D. ಖಾಜ"],
+            correct: 0
+        },
+        {
+            q: "17. ರೂಬಾಯತ್ ಮತ್ತು ಷಹನಾಮ _________________ ಭಾಷೆಯ ಶ್ರೇಷ್ಠ ಕೃತಿಗಳು ಆಗಿವೆ[cite: 1].",
+            opts: ["A. ಅರೇಬಿಯನ್", "B. ಉರ್ದು", "C. ಪರ್ಷಿಯನ್", "D. ಹಿಂದಿ"],
+            correct: 2
+        },
+        {
+            q: "18. ಆಯುರ್ವೇದ ವೈದ್ಯ ಪದ್ಧತಿಯು ಭಾರತೀಯರ ಕೊಡುಗೆಯಾದರೆ, ಯುನಾನಿ ಎಂಬ ವೈದ್ಯ ಪದ್ಧತಿಯು ಇವರ ಕೊಡುಗೆಯಾಗಿದೆ[cite: 1]:",
+            opts: ["A. ಅರಬ್ಬರ", "B. ಪರ್ಷಿಯನ್ನರ", "C. ಗ್ರೀಕರ", "D. ಯುರೋಪಿಯನ್ನರ"],
+            correct: 0
+        },
+        {
+            q: "19. ಯಹೂದಿಗಳು, ಕ್ರೈಸ್ತರು ಹಾಗೂ ಮುಸಲ್ಮಾನರ ಪವಿತ್ರ ಭೂಮಿಯಾದ ಜೆರೂಸಲೆಮ್ ಪ್ರದೇಶಕ್ಕಾಗಿ ನಡೆದ ಧರ್ಮಯುದ್ಧಗಳಿಗೆ __________ ಎನ್ನುವರು[cite: 1].",
+            opts: ["A. ಕ್ರುಸೇಡ್ಸ್", "B. ವಿಶ್ವ ಯುದ್ಧಗಳು", "C. ಜಹಾದ್", "D. ಜಾಗತಿಕ ಯುದ್ಧ"],
+            correct: 0
+        },
+        {
+            q: "20. ಕುಬ್ಲಾಯ್ ಖಾನನಿಗೆ ಸಂಬಂಧಿಸಿದಂತೆ ಈ ಕೆಳಗಿನ ಯಾವ ಹೇಳಿಕೆ/ಹೇಳಿಕೆಗಳು ಸರಿ[cite: 1]?\n1. ಚೆಂಗೀಸ್ ಖಾನ್ ನ ಮೊಮ್ಮಗ 2. ಚೀನಾದ ಚಕ್ರವರ್ತಿಯಾಗಿದ್ದನು 3. ಉತ್ತಮ ಆಡಳಿತಗಾರ 4. ದಯಾಳು ಸಾಮ್ರಾಟ",
+            opts: ["A. 1 ಮತ್ತು 3 ಸರಿ", "B. 1, 2 ಮತ್ತು 3 ಸರಿ", "C. ಮೇಲಿನ ಎಲ್ಲವೂ ಸರಿ", "D. ಯಾವುದೂ ಸರಿ ಇಲ್ಲ"],
+            correct: 2
+        },
+        {
+            q: "21. ಒಟ್ಟೋಮನ್ ಎಂಬ ಮಿಲಿಟರಿ ರಾಜ್ಯವನ್ನು ಕಟ್ಟಿದವರು ____________[cite: 1]",
+            opts: ["A. ಅರಬ್ಬರು", "B. ಪರ್ಷಿಯನ್ನರು", "C. ಗ್ರೀಕರು", "D. ಟರ್ಕರು"],
+            correct: 3
+        },
+        {
+            q: "22. ಕಾಲಗತಿಯಲ್ಲಿ ಅವನತಿ ಕಂಡ ಕುಬ್ಲಾಯ್ ಖಾನನ ಸಾಮ್ರಾಜ್ಯವನ್ನು ಮತ್ತೊಮ್ಮೆ ಕಟ್ಟಿದವರು[cite: 1]:",
+            opts: ["A. ಬಾಬರ್", "B. ತೈಮೂರ್", "C. ಚೆಂಗೀಸ್ ಖಾನ್", "D. ಮಾವೋತ್ಸೆ ತುಂಗ್"],
+            correct: 1
+        },
+        {
+            q: "23. ಇದು ಮುಸಲ್ಮಾನರ ಪವಿತ್ರ ಸ್ಥಳ ___________[cite: 1]",
+            opts: ["A. ಕಬಾ", "B. ಜೆರೂಸಲೈಮ್", "C. ರೋಮ್", "D. ವ್ಯಾಟಿಕನ್ ಸಿಟಿ"],
+            correct: 0
+        },
+        {
+            q: "24. ಇದು ಪ್ಯಾಲೆಸ್ಟೈನ್ ರಾಜಧಾನಿ _________________[cite: 1]",
+            opts: ["A. ಕಬಾ", "B. ಜೆರೂಸಲೈಮ್", "C. ಬಾಗ್ದಾದ್", "D. ವ್ಯಾಟಿಕನ್ ಸಿಟಿ"],
+            correct: 1
+        },
+        {
+            q: "25. ಪ್ರಸಿದ್ಧ ಮಂಗೋಲರ ನಾಯಕ (ಚಿತ್ರದಲ್ಲಿರುವಂತೆ)[cite: 1]:",
+            opts: ["A. ಕುಬ್ಲಾಯ್ ಖಾನ್", "B. ತೈಮೂರ್", "C. ಚೆಂಗೀಸ್ ಖಾನ್", "D. ಮಾವೋತ್ಸೆ ತುಂಗ್"],
+            correct: 2
+        },
+        {
+            q: "26. ಚೀನಾದ ಪ್ರಸಿದ್ಧ ಚಕ್ರವರ್ತಿ[cite: 1]:",
+            opts: ["A. ಕುಬ್ಲಾಯ್ ಖಾನ್", "B. ತೈಮೂರ್", "C. ಚೆಂಗೀಸ್ ಖಾನ್", "D. ಮಾವೋತ್ಸೆ ತುಂಗ್"],
+            correct: 0
+        }
+    ];
+
+    let currentQIndex = 0;
+    let score = 0;
+    let isUltraMode = false;
+    let timerInterval;
+    let timeRemaining = 15;
+
+    function toggleUltraMode() {
+        isUltraMode = !isUltraMode;
+        document.body.classList.toggle('ultra-mode');
+        const btn = document.getElementById('ultraBtn');
+        btn.innerText = isUltraMode ? "⚡ ULTRA MODE: ON" : "⚡ ULTRA MODE: OFF";
+        restartQuiz();
+    }
+
+    function loadQuestion() {
+        clearInterval(timerInterval);
+        
+        if (currentQIndex >= questionsData.length) {
+            showResults();
+            return;
+        }
+
+        const currentQ = questionsData[currentQIndex];
+        document.getElementById("qText").innerText = currentQ.q;
+        document.getElementById("progressText").innerText = `ಪ್ರಶ್ನೆ ${currentQIndex + 1} / ${questionsData.length}`;
+        
+        const optsContainer = document.getElementById("optsBox");
+        optsContainer.innerHTML = "";
+
+        currentQ.opts.forEach((optText, index) => {
+            const button = document.createElement("button");
+            button.className = "opt-btn";
+            button.innerText = optText;
+            button.onclick = () => checkAnswer(index, currentQ.correct);
+            optsContainer.appendChild(button);
+        });
+
+        if (isUltraMode) {
+            startTimer();
+        }
+    }
+
+    function startTimer() {
+        timeRemaining = 15;
+        const timerBar = document.getElementById("timerBar");
+        timerBar.style.width = "100%";
+
+        timerInterval = setInterval(() => {
+            timeRemaining--;
+            timerBar.style.width = (timeRemaining / 15) * 100 + "%";
+            if (timeRemaining <= 0) {
+                clearInterval(timerInterval);
+                // ಸಮಯ ಮುಗಿದರೆ ಮುಂದಿನ ಪ್ರಶ್ನೆಗೆ ಜಂಪ್ ಮಾಡುತ್ತದೆ
+                nextQuestion();
+            }
+        }, 1000);
+    }
+
+    function checkAnswer(selectedIdx, correctIdx) {
+        clearInterval(timerInterval);
+        const buttons = document.querySelectorAll(".opt-btn");
+
+        buttons.forEach((btn, idx) => {
+            btn.disabled = true;
+            if (idx === correctIdx) {
+                btn.classList.add("correct");
+            }
+            if (idx === selectedIdx && selectedIdx !== correctIdx) {
+                btn.classList.add("wrong");
+            }
+        });
+
+        if (selectedIdx === correctIdx) {
+            score++;
+        }
+    }
+
+    function nextQuestion() {
+        currentQIndex++;
+        loadQuestion();
+    }
+
+    function showResults() {
+        document.getElementById("quiz-body").style.display = "none";
+        document.getElementById("result-box").style.display = "block";
+        document.getElementById("scoreVal").innerText = score;
+    }
+
+    function restartQuiz() {
+        currentQIndex = 0;
+        score = 0;
+        document.getElementById("quiz-body").style.display = "block";
+        document.getElementById("result-box").style.display = "none";
+        loadQuestion();
+    }
+
+    // ಆರಂಭದಲ್ಲಿ ಪ್ರಶ್ನೆಯನ್ನು ಲೋಡ್ ಮಾಡುವುದು
+    loadQuestion();
+</script>
+
+</body>
+</html>

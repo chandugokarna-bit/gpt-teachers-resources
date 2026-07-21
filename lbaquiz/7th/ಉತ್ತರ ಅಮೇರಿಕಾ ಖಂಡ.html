@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>೭ನೇ ತರಗತಿ ಸಮಾಜ ವಿಜ್ಞಾನ - ಅಧ್ಯಾಯ ೧೩: ಉತ್ತರ ಅಮೇರಿಕಾ ಖಂಡ</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Arial, 'Tunga', sans-serif;
+        }
+        body {
+            background-color: #e2e8f0;
+            margin: 0;
+            padding: 20px;
+            transition: background 0.4s ease, color 0.4s ease;
+        }
+        /* Ultra Mode Theme */
+        body.ultra-mode {
+            background-color: #090d16;
+            color: #f1f5f9;
+        }
+        .quiz-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+            border: 2px solid #cbd5e1;
+        }
+        body.ultra-mode .quiz-container {
+            background: #131c2e;
+            box-shadow: 0 0 25px rgba(59, 130, 246, 0.4);
+            border-color: #3b82f6;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+        body.ultra-mode .header {
+            border-bottom-color: #1e293b;
+        }
+        .ultra-btn {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.95rem;
+            box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3);
+            transition: 0.3s;
+        }
+        body.ultra-mode .ultra-btn {
+            background: #ef4444;
+            box-shadow: 0 0 15px #ef4444;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        .timer-container {
+            width: 100%;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            display: none;
+            overflow: hidden;
+        }
+        body.ultra-mode .timer-container {
+            display: block;
+            background: #334155;
+        }
+        .timer-bar {
+            height: 100%;
+            background: #ef4444;
+            width: 100%;
+            transition: width 1s linear;
+        }
+        .question {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            line-height: 1.5;
+            white-space: pre-line;
+        }
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+        .opt-btn {
+            background: #f8fafc;
+            border: 2px solid #cbd5e1;
+            padding: 14px 18px;
+            border-radius: 10px;
+            text-align: left;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.2s;
+            color: inherit;
+        }
+        body.ultra-mode .opt-btn {
+            background: #1e293b;
+            border-color: #334155;
+        }
+        .opt-btn:hover:not([disabled]) {
+            border-color: #3b82f6;
+            background: #eff6ff;
+        }
+        body.ultra-mode .opt-btn:hover:not([disabled]) {
+            background: #0f172a;
+            border-color: #60a5fa;
+        }
+        .correct {
+            background-color: #d1fae5 !important;
+            border-color: #10b981 !important;
+            color: #065f46 !important;
+            font-weight: bold;
+        }
+        .wrong {
+            background-color: #fee2e2 !important;
+            border-color: #ef4444 !important;
+            color: #991b1b !important;
+        }
+        body.ultra-mode .correct {
+            background-color: #064e3b !important;
+            color: #a7f3d0 !important;
+        }
+        body.ultra-mode .wrong {
+            background-color: #7f1d1d !important;
+            color: #fecaca !important;
+        }
+        .footer {
+            margin-top: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .next-btn {
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+        .next-btn:hover {
+            background: #059669;
+        }
+        .score-card {
+            text-align: center;
+            padding: 20px;
+        }
+        .score-card h2 {
+            font-size: 2rem;
+            color: #3b82f6;
+        }
+    </style>
+</head>
+<body>
+
+<div class="quiz-container">
+    <div class="header">
+        <div>
+            <h3 style="margin:0;">೭ನೇ ತರಗತಿ - ಸಮಾಜ ವಿಜ್ಞಾನ</h3>
+            <small>ಅಧ್ಯಾಯ ೧೩: ಉತ್ತರ ಅಮೇರಿಕಾ ಖಂಡ</small>
+        </div>
+        <button class="ultra-btn" onclick="toggleUltraMode()" id="ultraBtn">⚡ ULTRA MODE: OFF</button>
+    </div>
+
+    <div class="timer-container">
+        <div class="timer-bar" id="timerBar"></div>
+    </div>
+
+    <div id="quiz-body">
+        <div class="question" id="qText">ಪ್ರಶ್ನೆ ಲೋಡ್ ಆಗುತ್ತಿದೆ...</div>
+        <div class="options-grid" id="optsBox"></div>
+
+        <div class="footer">
+            <span id="progressText" style="font-weight: bold;">ಪ್ರಶ್ನೆ 1 / 32</span>
+            <button class="next-btn" onclick="nextQuestion()" id="nextBtn">ಮುಂದಿನ ಪ್ರಶ್ನೆ ➔</button>
+        </div>
+    </div>
+
+    <div id="result-box" class="score-card" style="display: none;">
+        <h2>ಅಭಿನಂದನೆಗಳು! 🎉</h2>
+        <p style="font-size: 1.2rem;">ನಿಮ್ಮ ಒಟ್ಟು ಅಂಕಗಳು: <strong id="scoreVal">0</strong> / 32</p>
+        <button class="next-btn" onclick="restartQuiz()">ಮತ್ತೆ ಪರೀಕ್ಷೆ ಬರೆಯಿರಿ</button>
+    </div>
+</div>
+
+<script>
+    // ಪ್ರಶ್ನಾಕೋಠಿಯ ಅಧ್ಯಾಯ-೧೩ ರಲ್ಲಿರುವ ಎಲ್ಲಾ ೩೨ ಬಹುಆಯ್ಕೆ ಪ್ರಶ್ನೆಗಳು ಮತ್ತು ಉತ್ತರಗಳು
+    const questionsData = [
+        {
+            q: "1. ”ಇದು ಇತ್ತೀಚೆಗೆ ಕಂಡು ಹಿಡಿದ ಭೂಖಂಡ” ಎಂದು ಗುರುಗಳು ವಿವರಿಸಿದರು. ಆ ಖಂಡವೆಂದರೆ:",
+            opts: ["A) ಏಷ್ಯಾ", "B) ಉ.ಅಮೇರಿಕಾ", "C) ದ. ಅಮೇರಿಕಾ", "D) ಯುರೋಪ್"],
+            correct: 1
+        },
+        {
+            q: "2. ಉತ್ತರ ಅಮೇರಿಕವು ಜಗತ್ತಿನ ಅತಿ ಶ್ರೀಮಂತ ಮತ್ತು ಆರ್ಥಿಕವಾಗಿ ಪ್ರಾಬಲ್ಯ ಹೊಂದಿದ ಖಂಡವಾಗಿ ಬೆಳೆಯಲು ಕಾರಣ:",
+            opts: ["A) ಹೇರಳವಾದ ಸಂಪನ್ಮೂಲ ಮತ್ತು ಉತ್ತಮ ಸಾರಿಗೆ", "B) ವಿಸ್ತಾರವಾದ ಸ್ಥಳೀಯ ಮಾರುಕಟ್ಟೆ", "C) ಅಂತರರಾಷ್ಟ್ರೀಯ ವ್ಯಾಪಾರ ಸಂಬಂಧ", "D) ಮೇಲಿನ ಎಲ್ಲವೂ"],
+            correct: 3
+        },
+        {
+            q: "3. ಉತ್ತರ ಅಮೇರಿಕವು ಭೂಗ್ರಹದ ಈ ಭಾಗದಲ್ಲಿ ನೆಲೆಗೊಂಡಿದೆ:",
+            opts: ["A) ಸಮಭಾಜಕವೃತ್ತದ ಉತ್ತರ", "B) ಸಮಭಾಜಕವೃತ್ತದ ದಕ್ಷಿಣ", "C) ಸಮಭಾಜಕವೃತ್ತದ ಮೇಲೆ", "D) ಮೇಲಿನ ಎಲ್ಲವೂ"],
+            correct: 0
+        },
+        {
+            q: "4. ಜನಸಂಖ್ಯೆ ಮತ್ತು ವಿಸ್ತೀರ್ಣದಲ್ಲಿ ಜಗತ್ತಿನ ದೊಡ್ಡ ಖಂಡ ಏಷ್ಯಾ, ಹಾಗಾದರೆ ಭೂ ವಿಸ್ತೀರ್ಣದಲ್ಲಿ ಜಗತ್ತಿನ ಮೂರನೇ ಖಂಡ _____",
+            opts: ["A) ಏಷ್ಯಾ", "B) ಆಫ್ರಿಕಾ", "C) ದ. ಅಮೇರಿಕಾ", "D) ಉ.ಅಮೇರಿಕಾ"],
+            correct: 3
+        },
+        {
+            q: "5. ಉತ್ತರ ಅಮೇರಿಕಾ ಖಂಡದಲ್ಲಿ 24 ದೇಶಗಳಿವೆ. ಈ ಖಂಡವು ವಿಸ್ತೀರ್ಣದಲ್ಲಿ ಭಾರತಕ್ಕಿಂತ ____ಪಟ್ಟು ದೊಡ್ಡದು.",
+            opts: ["A) 5", "B) 6", "C) 7", "D) 8"],
+            correct: 2
+        },
+        {
+            q: "6. ಈ ಕೆಳಗಂಡವುಗಳಲ್ಲಿ ಉತ್ತರ ಅಮೇರಿಕಾ ಖಂಡದಲ್ಲಿರದ ದೇಶ..",
+            opts: ["A) ಕೆನಡಾ", "B) ಯು.ಎಸ್.ಎ", "C) ಮೆಕ್ಸಿಕೋ", "D) ಭಾರತ"],
+            correct: 3
+        },
+        {
+            q: "7. ದೇಶಗಳು ಮತ್ತು ಅವುಗಳ ವೈಶಿಷ್ಟತೆಯನ್ನು ಹೊಂದಿಸಿ ಬರೆಯಿರಿ:\n೧. ಮೆಕ್ಸಿಕೋ - ಡಿ. ಮಾಯನ್ ನಾಗರಿಕತೆ\n೨. ಕೆನಡಾ - ಸಿ. ಹಿಮ ಕರಡಿ\n೩. ಯು.ಎಸ್.ಎ - ಬಿ. ವಾಲ್ನಟ್ಸ್\n೪. ವೆಸ್ಟ್ ಇಂಡೀಸ್ - ಎ. ಕ್ರಿಕೆಟ್",
+            opts: ["A) 1-ಡಿ, 2-ಸಿ, 3-ಬಿ, 4-ಎ", "B) 1-ಎ, 2-ಬಿ, 3-ಸಿ, 4-ಡಿ", "C) 1-ಎ, 2-ಸಿ, 3-ಬಿ, 4-ಡಿ", "D) 1-ಬಿ, 2-ಡಿ, 3-ಎ, 4-ಸಿ"],
+            correct: 0
+        },
+        {
+            q: "8. ಕೆಳಗಂಡವುಗಳಲ್ಲಿ ಉತ್ತರ ಅಮೇರಿಕಾದಲ್ಲಿ ಕಂಡು ಬರದ ಪರ್ವತ ಸರಣಿ ಇದು.",
+            opts: ["A) ರಾಕಿ ಪರ್ವತಸರಣಿ", "B) ಅಲಸ್ಕಾ ಪರ್ವತಸರಣಿ", "C) ಮ್ಯಾಕೆಂಜಲ ಪರ್ವತಸರಣಿ", "D) ಹಿಮಾಲಯ ಪರ್ವತಸರಣಿ"],
+            correct: 3
+        },
+        {
+            q: "9. ಕೊಲರಾಡೊ ಪ್ರಸ್ಥಭೂಮಿಯನ್ನು ತನ್ನ ಅಪಾರ ಸವಕಳಿಯ ಮೂಲಕ “ಪ್ರಪಂಚದ ಪ್ರಾಕೃತಿಕ ಅದ್ಭುತ” ಎಂದು ಕರೆಯಲಾದ “ಮಹಾಗಂದರ” (ಗ್ರ್ಯಾಂಡ್ ಕ್ಯಾನಿಯನ್) ವನ್ನು ನಿರ್ಮಿಸಿದ ನದಿ.",
+            opts: ["A) ಮಿಸ್ಸೂರಿ", "B) ನೈಲ್", "C) ಕೊಲರಾಡೊ", "D) ಮಿಸ್ಸಿಸ್ಸಿಪ್ಪಿ"],
+            correct: 2
+        },
+        {
+            q: "10. ಅಮೇರಿಕ ಸಂಯುಕ್ತ ಸಂಸ್ಥಾನದ ಯೆಲ್ಲೋಸ್ಟೋನ್ ರಾಷ್ಟ್ರೀಯ ಉದ್ಯಾನ ವನದಲ್ಲಿರುವ “ಓಲ್ಡ್ ಫೇಥ್‌ಫುಲ್ ಗೈಸರ್” ಎಂಬುದು _________",
+            opts: ["A) ನದಿ", "B) ಸರೋವರ", "C) ಜೀವಂತ ಜ್ವಾಲಾಮುಖಿ", "D) ಬಿಸಿ ನೀರಿನ ಬುಗ್ಗೆ"],
+            correct: 3
+        },
+        {
+            q: "11. ಉತ್ತರ ಅಮೇರಿಕಾದ ಮಹಾ ಮತ್ತು ಕೇಂದ್ರೀಯ ಮೈದಾನಗಳ ಉತ್ತರಭಾಗವು ಹಿಮಹಾಳೆಗಳಿಂದ ಜಲಾನಯನ ತಗ್ಗುಗಳು ನಿರ್ಮಾಣಗೊಂಡಿವೆ. ಇಲ್ಲಿ ಹಿಮಹಾಳೆಗಳೆಂದರೆ…",
+            opts: ["A) ಶಿಲೆಗಳು", "B) ಹಿಮನದಿ", "C) ಮಾರುತಗಳು", "D) ಅಂತರ್ಜಲ"],
+            correct: 1
+        },
+        {
+            q: "12. “ಧೂಳಿನ ಬೋಗುಣಿ” (ಡಸ್ಟ್ ಬೌಲ್) ಎಂದರೆ..",
+            opts: ["A) ಆಮ್ಲ ಮಳೆ", "B) ಸ್ಥಳೀಯ ಸುಂಟರಗಾಳಿ", "C) ನದಿ ಪ್ರವಾಹ", "D) ಪದಾರ್ಥ ತಯಾರಿಸುವ ಸಲಕರಣೆ"],
+            correct: 1
+        },
+        {
+            q: "13. ಭಾರತದ ದಖನ್ ಪ್ರಸ್ಥಭೂಮಿಯಂತೆ ಜಗತ್ತಿನ ಕೆಲವು ಅತಿ ಪ್ರಾಚೀನ ಶಿಲೆಗಳಿಂದ ನಿರ್ಮಾಣವಾದ ಉತ್ತರ ಅಮೇರಿಕಾದ ಪ್ರಾಕೃತಿಕ ವಿಭಾಗ…",
+            opts: ["A) ಕೆನಡಿಯನ್ ಭೂಫಲಕ", "B) ಅಪಲೇಶಿಯನ್ ಉನ್ನತ ಪ್ರದೇಶ", "C) ರಾಕಿ ಪರ್ವತಗಳು", "D) ಮೇಲಿನ ಯಾವುದೂ ಅಲ್ಲ"],
+            correct: 0
+        },
+        {
+            q: "14. ಅಜ್ಜಿಯು “ಜೋಳ ತಿಂದವ್ವ ತೀಳ” ಎಂಬ ಮಾತನ್ನು ಹೇಳುತ್ತಾ ತನ್ನ ಮೊಮ್ಮಗನಿಗೆ ಊಟ ಮಾಡಿಸುತ್ತಿದ್ದಾಳೆ. ಹಾಗಾದರೆ ʼಪ್ರಪಂಚದ ಗೋದಿಯ ಕಣಜʼ ಅಥವಾ ʼರೊಟ್ಟಿಯ ಬುಟ್ಟಿʼ ಎಂದು ____________ಅನ್ನು ಕರೆಯುತ್ತಾರೆ.",
+            opts: ["A) ಟೈಗಾ", "B) ಪ್ರೈರೀಸ್", "C) ಪಂಪಾಸ್", "D) ಸುಡಾನ್"],
+            correct: 1
+        },
+        {
+            q: "15. ಒಂದು ವರ್ಷದ ಅವಧಿಯಲ್ಲಿ 3 ತಿಂಗಳುಗಳ ಕಾಲ ಹಿಮರೂಪದಲ್ಲಿರುವ ಉತ್ತರ ಅಮೇರಿಕಾದ ನದಿ ಇದು.",
+            opts: ["A) ಮಿಸ್ಸಿಸ್ಸಿಪ್ಪಿ", "B) ಸೆಂಟ್ ಲಾರೆನ್ಸ್", "C) ಮಿಸ್ಸೋರಿ", "D) ಯಾವುದೂ ಅಲ್ಲ"],
+            correct: 2
+        },
+        {
+            q: "16. ಇದು ಉತ್ತರ ಅಮೇರಿಕಾದಲ್ಲಿರುವ ಸರೋವರವಲ್ಲ…",
+            opts: ["A) ಹ್ಯೂರಾನ್", "B) ಮಿಚಿಗನ್", "C) ಒಂಟಾರಿಯೋ", "D) ದಾಲ್"],
+            correct: 3
+        },
+        {
+            q: "17. ಉತ್ತರ ಅಮೇರಿಕದ ಕೇಂದ್ರ ಮತ್ತು ದಕ್ಷಿಣ ಪ್ರದೇಶಗಳು ಹರಿಕೇನ್ಸ್ ಮತ್ತು ಟೊರ್ನಾಡೊಗಳಂತಹ ತೀವ್ರವಾದ _____ ಪ್ರದೇಶಗಳಾಗಿವೆ.",
+            opts: ["A) ನದಿ ಪ್ರವಾಹ", "B) ಮರಣಾಂತಿಕ ಕಾಯಿಲೆ", "C) ಬಿರುಗಾಳಿ", "D) ಸಾಂಕ್ರಾಮಿಕ ರೋಗ"],
+            correct: 2
+        },
+        {
+            q: "18. ಮಿಸ್ಸಿಸ್ಸಿಪ್ಪಿ-ಮಿಸ್ಸೋರಿ ಮಹಾನದಿ ಮುಖಜಭೂಮಿಗಳ ಮಧ್ಯೆ ಇರುವ ವಿಶಾಲವಾದ ಹುಲ್ಲುಗಾವಲನ್ನು ಹೀಗೆನ್ನುವರು.",
+            opts: ["A) ಸವನ್ನಾ", "B) ಪ್ರೈರೀಸ್", "C) ಪಂಪಾಸಿ", "D) ಮೇಲಿನ ಯಾವುದೂ ಅಲ್ಲ"],
+            correct: 1
+        },
+        {
+            q: "19. ಈ ಕೆಳಗಿನ ಹೇಳಿಕೆಗಳನ್ನು ಪರಿಶೀಲಿಸಿರಿ:\n೧. ಸೆಂಟ್ ಲಾರೆನ್ಸ್ ಅಮೇರಿಕದ ಸಂಯುಕ್ತ ಸಂಸ್ಥಾನ ಮತ್ತು ಕೆನಡಾಗಳ ಅತಿ ಪ್ರಮುಖ ನದಿಯಾಗಿದೆ.\n೨. ಇದು ಒಂದು ವರ್ಷದ ಅವಧಿಯಲ್ಲಿ 6 ತಿಂಗಳುಗಳ ಕಾಲ ಹಿಮದ ರೂಪದಲ್ಲಿರುತ್ತದೆ.",
+            opts: ["A) 1 ಮಾತ್ರ ಸರಿ", "B) 1 ಮತ್ತು 2 ತಪ್ಪಾಗಿವೆ", "C) 1 ಮತ್ತು 2 ಸರಿಯಾಗಿವೆ", "D) 2 ಮಾತ್ರ ಸರಿ"],
+            correct: 0
+        },
+        {
+            q: "20. ಪರಿಸರ ದಿನಾಚರಣೆ ಸಂದರ್ಭದಲ್ಲಿ ಶಿಕ್ಷಕರು ಸಸಿ ನೆಟ್ಟು ಸಸ್ಯ ಸಂಪತ್ತಿನ ಮಹತ್ವ ತಿಳಿಸಿದರು. ಹಾಗಾದರೆ ಪ್ರಪಂಚದ ಅತ್ಯಧಿಕ ಮರದ ಉತ್ಪನ್ನಗಳ ರಫ್ತು ಮಾಡುವ ದೇಶ.",
+            opts: ["A) ಯು.ಎಸ್. ಎ", "B) ಕೆನಡಾ", "C) ಭಾರತ", "D) ಬರ್ಮಾ"],
+            correct: 1
+        },
+        {
+            q: "21. ಉತ್ತರ ಅಮೇರಿಕ ಖಂಡದ ಪಶ್ಚಿಮ ಭಾಗದಲ್ಲಿ ಮರುಭೂಮಿಯಂತಹ ಪರಿಸ್ಥಿತಿಗಳನ್ನು ಕಾಣಬಹುದಾಗಿದೆ. ಹಾಗಾದರೆ ಇಲ್ಲಿ “ಮರುಭೂಮಿಗಳ ಚಳಿಗಾಲ” ಎಂದರೆ…",
+            opts: ["A) ಮರುಭೂಮಿಗಳ ಹಗಲು", "B) ಮರುಭೂಮಿಗಳ ರಾತ್ರಿ", "C) ಎ & ಬಿ", "D) ಮೇಲಿನ ಯಾವುದೂ ಅಲ್ಲ"],
+            correct: 1
+        },
+        {
+            q: "22. ಉತ್ತರ ಅಮೇರಿಕ ಖಂಡದ ಸಂಯುಕ್ತ ರಾಜ್ಯ ಹಾಗೂ ಮೆಕ್ಸಿಕೋದ ವಿಶಾಲ ಪ್ರದೇಶಗಳಲ್ಲಿ ಬೆಳೆಯಲ್ಪಡುವ “ಕಾರ್ನ್” ಎಂದು ಪ್ರಖ್ಯಾತಿ ಪಡೆದ ಬೆಳೆ..",
+            opts: ["A) ಗೋಧಿ", "B) ಆಲೂಗಡ್ಡೆ", "C) ಬಾರ್ಲಿ", "D) ಮೆಕ್ಕೆಜೋಳ"],
+            correct: 3
+        },
+        {
+            q: "23. ಉತ್ತರ ಅಮರಿಕ ಖಂಡದ ಅತಿ ದೊಡ್ಡ ನದಿಯಾದ ಮಿಸ್ಸಿಸ್ಸಿಪ್ಪಿ ನದಿಯ ಕಣಿವೆಯುದ್ದಕ್ಕೂ ಕಂಡು ಬರುವ ಬೆಳೆ..",
+            opts: ["A) ರಾಗಿ", "B) ಭತ್ತ", "C) ಹತ್ತಿ", "D) ಗೋಧಿ"],
+            correct: 2
+        },
+        {
+            q: "24. ವಿಶ್ವದಲ್ಲಿ ಸಕ್ಕರೆ ಉತ್ಪಾದನೆಯ 3ನೇಯ ಅತಿದೊಡ್ಡ ರಾಷ್ಟ್ರವಾಗಿರುವ _______ ಅನ್ನು “ವಿಶ್ವದ ಸಕ್ಕರೆ ಬೋಗುಣಿ” ಎನ್ನುವರು.",
+            opts: ["A) ಚೀನಾ", "B) ರಷ್ಯಾ", "C) ಕ್ಯೂಬಾ", "D) ಭಾರತ"],
+            correct: 2
+        },
+        {
+            q: "25. ಈ ದೇಶವು ಉತ್ತರ ಅಮೇರಿಕದ ಶೇ. 90 ರಷ್ಟು ದ್ರಾಕ್ಷಿಯನ್ನು ಬಳಸಿ ದ್ರಾಕ್ಷಾರಸ ಉತ್ಪಾದಿಸುವ ಕಾರಣ “ದ್ರಾಕ್ಷಾರಸದ ರಾಜ್ಯ” ಎನ್ನುವರು.",
+            opts: ["A) ಕ್ಯೂಬಾ", "B) ಮೆಕ್ಸಿಕೋ", "C) ಮಲೇಷಿಯಾ", "D) ಕ್ಯಾಲಿಫೋರ್ನಿಯಾ"],
+            correct: 3
+        },
+        {
+            q: "26. ನಾವು ಪ್ರತಿ ನಿತ್ಯ ಇಂಧನವಾಗಿ ಬಳಸುವ “ಕಲ್ಲೆಣ್ಣೆ” ಯನ್ನು ಹೀಗೆನ್ನುವರು.",
+            opts: ["A) ಡೀಸೆಲ್", "B) ಸೀಮೆಎಣ್ಣೆ", "C) ಕಲ್ಲಿದ್ದಲು", "D) ಪೆಟ್ರೋಲಿಯಂ"],
+            correct: 1
+        },
+        {
+            q: "27. ನಾವು ಮನೆಯಲ್ಲಿ ವಿದ್ಯುತ್ ಸಂಪರ್ಕ ಪಡೆಯಲು ವೈರ್ ಒಳಗೆ ಬಳಸುವ ತಾಮ್ರದ ತಂತಿ ತುಂಬಾ ಮಹತ್ವದ್ದಾಗಿದೆ. ಪ್ರಪಂಚದಲ್ಲಿ ಅತ್ಯಧಿಕ ತಾಮ್ರವನ್ನು ಉತ್ಪಾದಿಸುವ ರಾಷ್ಟ್ರ_____",
+            opts: ["A) ಯು.ಎಸ್. ಎ", "B) ಕೆನಡಾ", "C) ಭಾರತ", "D) ರಷ್ಯಾ"],
+            correct: 0
+        },
+        {
+            q: "28. ಅಮೇರಿಕ ದೇಶದ ಈ ನಗರವನ್ನು ಪ್ರಪಂಚದ “ಉಕ್ಕಿನ ನಗರ” ಎನ್ನುವರು.",
+            opts: ["A) ಪಿಟ್ಸ್ ಬರ್ಗ್", "B) ಮೆಕ್ಸಿಕೋ", "C) ಲಂಡನ್", "D) ಕ್ಯಾಲಿಫೋರ್ನಿಯಾ"],
+            correct: 0
+        },
+        {
+            q: "29. ಅಮೇರಿಕ ದೇಶವು_____",
+            opts: ["A) ಪ್ರಪಂಚದ ಅತ್ಯಧಿಕ ಕಲ್ಲಿದ್ದಲು ರಫ್ತು ಮಾಡುವ ದೇಶ", "B) ವಿಶ್ವದಲ್ಲೇ ಅಧಿಕ ಅಣುಶಕ್ತಿ ಉತ್ಪಾದಿಸುವ ರಾಷ್ಟ್ರ", "C) ಪ್ರಮುಖ ಪೆಟ್ರೋಲಿಯಂ ಉತ್ಪಾದಕ ರಾಷ್ಟ್ರ", "D) ಮೇಲಿನ ಎಲ್ಲವೂ ಸರಿ"],
+            correct: 3
+        },
+        {
+            q: "30. ʼಧೂಳಿನ ಬೋಗುಣಿʼ ಎಂಬುದು ಅಮೇರಿಕ ಹಾಗೂ ಕೆನಡಾದ ಪ್ರೈರೀಸ್‌ನಲ್ಲಿ ಕೃಷಿಗೆ ಅನಾಹುತವನ್ನು ಉಂಟುಮಾಡುವ _____ ಆಗಿದೆ.",
+            opts: ["A) ನದಿ", "B) ಹಿಮನದಿ", "C) ಬೆಳೆ ರೋಗ", "D) ಸುಂಟರಗಾಳಿ"],
+            correct: 3
+        },
+        {
+            q: "31. ಈ ಕೆಳಗಿನ ಹೇಳಿಕೆಗಳನ್ನು ಪರಿಶೀಲಿಸಿರಿ:\n೧. ಸೆಂಟ್ ಲಾರೆನ್ಸ್ ಅಮೇರಿಕದ ಸಂಯುಕ್ತ ಸಂಸ್ಥಾನ ಮತ್ತು ಕೆನಡಾಗಳ ಅತಿ ಪ್ರಮುಖ ನದಿಯಾಗಿದೆ.\n೨. ಇದು ಒಂದು ವರ್ಷದ ಅವಧಿಯಲ್ಲಿ 6 ತಿಂಗಳುಗಳ ಕಾಲ ಹಿಮದ ರೂಪದಲ್ಲಿರುತ್ತದೆ.",
+            opts: ["A) 1 ಮತ್ತು 2 ಸರಿಯಾಗಿವೆ", "B) 1 ಮತ್ತು 2 ತಪ್ಪಾಗಿವೆ", "C) 1 ಮಾತ್ರ ಸರಿ", "D) 2 ಮಾತ್ರ ಸರಿ"],
+            correct: 2
+        },
+        {
+            q: "32. ʼಪೋರ್ಕುಪೈನ್ʼ ಎಂಬುದು ಉತ್ತರ ಅಮೇರಿಕದಲ್ಲಿ ಕಂಡು ಬರುವ _______ ಆಗಿದೆ.",
+            opts: ["A) ಸಸ್ಯ", "B) ನದಿ", "C) ವನ್ಯಜೀವಿ", "D) ಪಕ್ಕಿ"],
+            correct: 2
+        }
+    ];
+
+    let currentQIndex = 0;
+    let score = 0;
+    let isUltraMode = false;
+    let timerInterval;
+    let timeRemaining = 15;
+
+    function toggleUltraMode() {
+        isUltraMode = !isUltraMode;
+        document.body.classList.toggle('ultra-mode');
+        const btn = document.getElementById('ultraBtn');
+        btn.innerText = isUltraMode ? "⚡ ULTRA MODE: ON" : "⚡ ULTRA MODE: OFF";
+        restartQuiz();
+    }
+
+    function loadQuestion() {
+        clearInterval(timerInterval);
+        
+        if (currentQIndex >= questionsData.length) {
+            showResults();
+            return;
+        }
+
+        const currentQ = questionsData[currentQIndex];
+        document.getElementById("qText").innerText = currentQ.q;
+        document.getElementById("progressText").innerText = `ಪ್ರಶ್ನೆ ${currentQIndex + 1} / ${questionsData.length}`;
+        
+        const optsContainer = document.getElementById("optsBox");
+        optsContainer.innerHTML = "";
+
+        currentQ.opts.forEach((optText, index) => {
+            const button = document.createElement("button");
+            button.className = "opt-btn";
+            button.innerText = optText;
+            button.onclick = () => checkAnswer(index, currentQ.correct);
+            optsContainer.appendChild(button);
+        });
+
+        if (isUltraMode) {
+            startTimer();
+        }
+    }
+
+    function startTimer() {
+        timeRemaining = 15;
+        const timerBar = document.getElementById("timerBar");
+        timerBar.style.width = "100%";
+
+        timerInterval = setInterval(() => {
+            timeRemaining--;
+            timerBar.style.width = (timeRemaining / 15) * 100 + "%";
+            if (timeRemaining <= 0) {
+                clearInterval(timerInterval);
+                nextQuestion();
+            }
+        }, 1000);
+    }
+
+    function checkAnswer(selectedIdx, correctIdx) {
+        clearInterval(timerInterval);
+        const buttons = document.querySelectorAll(".opt-btn");
+
+        buttons.forEach((btn, idx) => {
+            btn.disabled = true;
+            if (idx === correctIdx) {
+                btn.classList.add("correct");
+            }
+            if (idx === selectedIdx && selectedIdx !== correctIdx) {
+                btn.classList.add("wrong");
+            }
+        });
+
+        if (selectedIdx === correctIdx) {
+            score++;
+        }
+    }
+
+    function nextQuestion() {
+        currentQIndex++;
+        loadQuestion();
+    }
+
+    function showResults() {
+        document.getElementById("quiz-body").style.display = "none";
+        document.getElementById("result-box").style.display = "block";
+        document.getElementById("scoreVal").innerText = score;
+    }
+
+    function restartQuiz() {
+        currentQIndex = 0;
+        score = 0;
+        document.getElementById("quiz-body").style.display = "block";
+        document.getElementById("result-box").style.display = "none";
+        loadQuestion();
+    }
+
+    loadQuestion();
+</script>
+
+</body>
+</html>

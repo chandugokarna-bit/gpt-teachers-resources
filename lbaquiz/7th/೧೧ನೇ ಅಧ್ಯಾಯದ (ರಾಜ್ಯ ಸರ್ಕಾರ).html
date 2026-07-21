@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>೭ನೇ ತರಗತಿ ಸಮಾಜ ವಿಜ್ಞಾನ - ಅಧ್ಯಾಯ ೧೧: ರಾಜ್ಯ ಸರ್ಕಾರ</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Arial, 'Tunga', sans-serif;
+        }
+        body {
+            background-color: #e2e8f0;
+            margin: 0;
+            padding: 20px;
+            transition: background 0.4s ease, color 0.4s ease;
+        }
+        /* Ultra Mode Theme */
+        body.ultra-mode {
+            background-color: #090d16;
+            color: #f1f5f9;
+        }
+        .quiz-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+            border: 2px solid #cbd5e1;
+        }
+        body.ultra-mode .quiz-container {
+            background: #131c2e;
+            box-shadow: 0 0 25px rgba(59, 130, 246, 0.4);
+            border-color: #3b82f6;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+        body.ultra-mode .header {
+            border-bottom-color: #1e293b;
+        }
+        .ultra-btn {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.95rem;
+            box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3);
+            transition: 0.3s;
+        }
+        body.ultra-mode .ultra-btn {
+            background: #ef4444;
+            box-shadow: 0 0 15px #ef4444;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        .timer-container {
+            width: 100%;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            display: none;
+            overflow: hidden;
+        }
+        body.ultra-mode .timer-container {
+            display: block;
+            background: #334155;
+        }
+        .timer-bar {
+            height: 100%;
+            background: #ef4444;
+            width: 100%;
+            transition: width 1s linear;
+        }
+        .question {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            line-height: 1.5;
+            white-space: pre-line;
+        }
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+        .opt-btn {
+            background: #f8fafc;
+            border: 2px solid #cbd5e1;
+            padding: 14px 18px;
+            border-radius: 10px;
+            text-align: left;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.2s;
+            color: inherit;
+        }
+        body.ultra-mode .opt-btn {
+            background: #1e293b;
+            border-color: #334155;
+        }
+        .opt-btn:hover:not([disabled]) {
+            border-color: #3b82f6;
+            background: #eff6ff;
+        }
+        body.ultra-mode .opt-btn:hover:not([disabled]) {
+            background: #0f172a;
+            border-color: #60a5fa;
+        }
+        .correct {
+            background-color: #d1fae5 !important;
+            border-color: #10b981 !important;
+            color: #065f46 !important;
+            font-weight: bold;
+        }
+        .wrong {
+            background-color: #fee2e2 !important;
+            border-color: #ef4444 !important;
+            color: #991b1b !important;
+        }
+        body.ultra-mode .correct {
+            background-color: #064e3b !important;
+            color: #a7f3d0 !important;
+        }
+        body.ultra-mode .wrong {
+            background-color: #7f1d1d !important;
+            color: #fecaca !important;
+        }
+        .footer {
+            margin-top: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .next-btn {
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+        .next-btn:hover {
+            background: #059669;
+        }
+        .score-card {
+            text-align: center;
+            padding: 20px;
+        }
+        .score-card h2 {
+            font-size: 2rem;
+            color: #3b82f6;
+        }
+    </style>
+</head>
+<body>
+
+<div class="quiz-container">
+    <div class="header">
+        <div>
+            <h3 style="margin:0;">೭ನೇ ತರಗತಿ - ಸಮಾಜ ವಿಜ್ಞಾನ</h3>
+            <small>ಅಧ್ಯಾಯ ೧೧: ರಾಜ್ಯ ಸರ್ಕಾರ</small>
+        </div>
+        <button class="ultra-btn" onclick="toggleUltraMode()" id="ultraBtn">⚡ ULTRA MODE: OFF</button>
+    </div>
+
+    <div class="timer-container">
+        <div class="timer-bar" id="timerBar"></div>
+    </div>
+
+    <div id="quiz-body">
+        <div class="question" id="qText">ಪ್ರಶ್ನೆ ಲೋಡ್ ಆಗುತ್ತಿದೆ...</div>
+        <div class="options-grid" id="optsBox"></div>
+
+        <div class="footer">
+            <span id="progressText" style="font-weight: bold;">ಪ್ರಶ್ನೆ 1 / 13</span>
+            <button class="next-btn" onclick="nextQuestion()" id="nextBtn">ಮುಂದಿನ ಪ್ರಶ್ನೆ ➔</button>
+        </div>
+    </div>
+
+    <div id="result-box" class="score-card" style="display: none;">
+        <h2>ಅಭಿನಂದನೆಗಳು! 🎉</h2>
+        <p style="font-size: 1.2rem;">ನಿಮ್ಮ ಒಟ್ಟು ಅಂಕಗಳು: <strong id="scoreVal">0</strong> / 13</p>
+        <button class="next-btn" onclick="restartQuiz()">ಮತ್ತೆ ಪರೀಕ್ಷೆ ಬರೆಯಿರಿ</button>
+    </div>
+</div>
+
+<script>
+    // ಪ್ರಶ್ನಾಕೋಠಿಯ ಅಧ್ಯಾಯ-೧೧ ರಲ್ಲಿರುವ ಎಲ್ಲಾ ೧೩ ಬಹುಆಯ್ಕೆ ಪ್ರಶ್ನೆಗಳು ಮತ್ತು ಉತ್ತರಗಳು
+    const questionsData = [
+        {
+            q: "1. ರಾಜ್ಯ ಶಾಸನಗಳನ್ನು ರೂಪಿಸುವ ರಾಜ್ಯ ಶಾಸಕಾಂಗವು ಒಳಗೊಂಡಿರುವುದು.",
+            opts: ["A. ಲೋಕಸಭೆ ಸದಸ್ಯರು ಮತ್ತು ರಾಜ್ಯಸಭೆ ಸದಸ್ಯರು.", "B. ರಾಜ್ಯಪಾಲರು ಮತ್ತು ವಿಧಾನ ಮಂಡಲ.", "C. ರಾಜ್ಯಪಾಲ, ಮುಖ್ಯಮಂತ್ರಿ, ರಾಜ್ಯ ಮಂತ್ರಿ ಮಂಡಲ.", "D. ರಾಷ್ಟ್ರಪತಿ, ಪ್ರಧಾನ ಮಂತ್ರಿ, ಕೇಂದ್ರ ಮಂತ್ರಿ ಮಂಡಲ."],
+            correct: 1
+        },
+        {
+            q: "2. ಕರ್ನಾಟಕದಲ್ಲಿ ದ್ವಿಸದನ ಪದ್ಧತಿ ಇದೆ. ಹಾಗಾದರೆ ಈ ಕೆಳಗಿನ ಹೇಳಿಕೆಗಳಲ್ಲಿ ದ್ವಿಸದನ ಪದ್ಧತಿಯನ್ನು ನಿರೂಪಿಸುವ ಆಯ್ಕೆ.",
+            opts: ["A. ಶಾಸಕಾಂಗವು ವಿಧಾನಸಭೆ ಮತ್ತು ವಿಧಾನ ಪರಿಷತ್ತು ಎಂಬ ಎರಡು ಸದನಗಳನ್ನು ಒಳಗೊಂಡಿರುವುದು.", "B. ಶಾಸಕಾಂಗವು ವಿಧಾನಸಭೆಯನ್ನು ಮಾತ್ರ ಒಳಗೊಂಡಿರುವುದು.", "C. ಭಾರತದ ಆರು ರಾಜ್ಯಗಳಲ್ಲಿ ಶಾಸಕಾಂಗವು ವಿಧಾನಸಭೆ ಮತ್ತು ವಿಧಾನ ಪರಿಷತ್ತು ಹೊಂದಿರುವುದು.", "D. ಕರ್ನಾಟಕದಲ್ಲಿ ವಿಧಾನ ಸಭೆ ಮತ್ತು ವಿಧಾನ ಪರಿಷತ್ತು ಎಂಬ ಎರಡು ಸದನಗಳಿರುವುದು."],
+            correct: 0
+        },
+        {
+            q: "3. ಕರ್ನಾಟಕ ವಿಧಾನ ಸಭೆ : 224 ಸ್ಥಾನಗಳು :: ಕರ್ನಾಟಕ ವಿಧಾನ ಪರಿಷತ್ತಿನ ಸ್ಥಾನ : ____",
+            opts: ["A. 224", "B. 545", "C. 223", "D. 75"],
+            correct: 3
+        },
+        {
+            q: "4. ನೀವು ಕರ್ನಾಟಕದಲ್ಲಿ ವಿಧಾನಸಭೆಯ (ಎಮ್.ಎಲ್.ಎ) ಸದಸ್ಯರಾಗಲು ಬಯಸಿದರೆ ನಿಮಗಿರಬೇಕಾದ ಕನಿಷ್ಠ ವಯಸ್ಸು...",
+            opts: ["A. 18", "B. 21", "C. 25", "D. 30"],
+            correct: 2
+        },
+        {
+            q: "5. ನೀವು ವಿಧಾನ ಪರಿಷತ್ತಿನ ಸದಸ್ಯರಾಗಿ ಆಯ್ಕೆಯಾಗಿದ್ದೀರಿ ಎಂದು ಭಾವಿಸಿಕೊಳ್ಳಿ. ಹಾಗಾದರೆ ನೀವು ಸೇವೆ ಸಲ್ಲಿಸಬಹುದಾದ ಅಧಿಕಾರಾವಧಿ...",
+            opts: ["A. 5 ವರ್ಷ", "B. 6 ವರ್ಷ", "C. 30 ವರ್ಷ", "D. ಇಚ್ಛಿಸಿದ ವರ್ಷಗಳಷ್ಟು."],
+            correct: 1
+        },
+        {
+            q: "6. ರಾಜ್ಯ ಕಾರ್ಯಾಂಗವು ಇವುಗಳನ್ನು ಒಳಗೊಂಡಿದೆ...",
+            opts: ["A. ರಾಷ್ಟ್ರಪತಿ, ಪ್ರಧಾನಮಂತ್ರಿ ಮತ್ತು ಕೇಂದ್ರ ಮಂತ್ರಿ ಮಂಡಲ", "B. ರಾಜ್ಯಪಾಲ, ಮುಖ್ಯಮಂತ್ರಿ, ರಾಜ್ಯ ಮಂತ್ರಿ ಮಂಡಲ", "C. ಲೋಕಸಭೆ ಮತ್ತು ರಾಜ್ಯಸಭೆಯ ಸದಸ್ಯರು", "D. ವಿಧಾನಸಭೆ ಮತ್ತು ವಿಧಾನ ಪರಿಷತ್ತಿನ ಸದಸ್ಯರು."],
+            correct: 1
+        },
+        {
+            q: "7. ರಾಜ್ಯದ ಪ್ರಥಮ ಪ್ರಜೆಯನ್ನು ನೇಮಕ ಮಾಡುವವರು....",
+            opts: ["A. ಮುಖ್ಯಮಂತ್ರಿ", "B. ಹೈಕೋರ್ಟ್ ನ್ಯಾಯಾಧೀಶರು", "C. ಪ್ರಧಾನಮಂತ್ರಿ", "D. ರಾಷ್ಟ್ರಾಧ್ಯಕ್ಷರು"],
+            correct: 3
+        },
+        {
+            q: "8. ರಾಜ್ಯದಲ್ಲಿ ಸಾಂವಿಧಾನಿಕವಾಗಿ ಮಾತ್ರವೇ ಕಾರ್ಯಾಂಗದ ಮುಖ್ಯಸ್ಥರು.",
+            opts: ["A. ರಾಜ್ಯಪಾಲರು", "B. ರಾಷ್ಟ್ರಾಧ್ಯಕ್ಷರು", "C. ಮುಖ್ಯಮಂತ್ರಿ", "D. ಪ್ರಧಾನ ಮಂತ್ರಿ"],
+            correct: 0
+        },
+        {
+            q: "9. ಪ್ರಸ್ತುತ ಕರ್ನಾಟಕದ ರಾಜ್ಯದ ರಾಜ್ಯಪಾಲರ ಅಧಿಕಾರಾವಧಿ....",
+            opts: ["A. 6 ವರ್ಷ", "B. 5 ವರ್ಷ", "C. 4 ವರ್ಷ", "D. ರಾಜ್ಯಪಾಲರು ಇಚ್ಛಿಸಿದಷ್ಟು ವರ್ಷ"],
+            correct: 1
+        },
+        {
+            q: "10. ರಾಜ್ಯದಲ್ಲಿ ಸಾಂವಿಧಾನಿಕವಾಗಿ ಅಸ್ಥಿರತೆ ಉಂಟಾದಾಗ ರಾಷ್ಟ್ರಪತಿಯವರಿಗೆ ವರದಿ ನೀಡಬೇಕಾಗಿರುವವರು.",
+            opts: ["A. ಮುಖ್ಯಮಂತ್ರಿ", "B. ಹೈಕೋರ್ಟ್‌ ನ ನ್ಯಾಯಾಧೀಶರು", "C. ವಿರೋಧ ಪಕ್ಷದ ನಾಯಕರು", "D. ರಾಜ್ಯಪಾಲರು."],
+            correct: 3
+        },
+        {
+            q: "11. ಕೇಂದ್ರ ಸರ್ಕಾರದ ಮುಖ್ಯಸ್ಥರು : ಪ್ರಧಾನ ಮಂತ್ರಿ :: ರಾಜ್ಯ ಸರ್ಕಾರದ ಮುಖ್ಯಸ್ಥರು : _______",
+            opts: ["A. ರಾಷ್ಟ್ರಾಧ್ಯಕ್ಷರು", "B. ಮುಖ್ಯಮಂತ್ರಿ", "C. ರಾಜ್ಯಪಾಲರು", "D. ವಿಧಾನಸಭೆ ಸಭಾಪತಿ"],
+            correct: 1
+        },
+        {
+            q: "12. ರಾಜ್ಯ ಕಾರ್ಯಾಂಗದ ನೈಜ ಮುಖ್ಯಸ್ಥರಾದ ಮುಖ್ಯಮಂತ್ರಿಗಳನ್ನು ನೇಮಕ ಮಾಡುವವರು.",
+            opts: ["A. ರಾಜ್ಯಪಾಲರು", "B. ರಾಷ್ಟ್ರಾಧ್ಯಕ್ಷರು", "C. ಪ್ರಧಾನಮಂತ್ರಿ", "D. ಹೈಕೋರ್ಟ್ ನ್ಯಾಯಾಧೀಶರು"],
+            correct: 0
+        },
+        {
+            q: "13. ರಾಜ್ಯ ಸರ್ಕಾರದಲ್ಲಿ ಮಂತ್ರಿಗಳಿಗೆ ಖಾತೆಗಳನ್ನು ನೀಡುವ, ಬದಲಾಯಿಸುವ, ಹಾಗೂ ಮಂತ್ರಿಗಳನ್ನು ಪದಚ್ಯುತಗೊಳಿಸುವ ಅಧಿಕಾರ ಇವರಿಗಿದೆ.",
+            opts: ["A. ರಾಜ್ಯಪಾಲರು", "B. ಪ್ರಧಾನ ಮಂತ್ರಿ", "C. ಮುಖ್ಯಮಂತ್ರಿ", "D. ವಿಧಾನಸಭೆ ಸಭಾಪತಿ (ಸ್ಪೀಕರ್)"],
+            correct: 2
+        }
+    ];
+
+    let currentQIndex = 0;
+    let score = 0;
+    let isUltraMode = false;
+    let timerInterval;
+    let timeRemaining = 15;
+
+    function toggleUltraMode() {
+        isUltraMode = !isUltraMode;
+        document.body.classList.toggle('ultra-mode');
+        const btn = document.getElementById('ultraBtn');
+        btn.innerText = isUltraMode ? "⚡ ULTRA MODE: ON" : "⚡ ULTRA MODE: OFF";
+        restartQuiz();
+    }
+
+    function loadQuestion() {
+        clearInterval(timerInterval);
+        
+        if (currentQIndex >= questionsData.length) {
+            showResults();
+            return;
+        }
+
+        const currentQ = questionsData[currentQIndex];
+        document.getElementById("qText").innerText = currentQ.q;
+        document.getElementById("progressText").innerText = `ಪ್ರಶ್ನೆ ${currentQIndex + 1} / ${questionsData.length}`;
+        
+        const optsContainer = document.getElementById("optsBox");
+        optsContainer.innerHTML = "";
+
+        currentQ.opts.forEach((optText, index) => {
+            const button = document.createElement("button");
+            button.className = "opt-btn";
+            button.innerText = optText;
+            button.onclick = () => checkAnswer(index, currentQ.correct);
+            optsContainer.appendChild(button);
+        });
+
+        if (isUltraMode) {
+            startTimer();
+        }
+    }
+
+    function startTimer() {
+        timeRemaining = 15;
+        const timerBar = document.getElementById("timerBar");
+        timerBar.style.width = "100%";
+
+        timerInterval = setInterval(() => {
+            timeRemaining--;
+            timerBar.style.width = (timeRemaining / 15) * 100 + "%";
+            if (timeRemaining <= 0) {
+                clearInterval(timerInterval);
+                nextQuestion();
+            }
+        }, 1000);
+    }
+
+    function checkAnswer(selectedIdx, correctIdx) {
+        clearInterval(timerInterval);
+        const buttons = document.querySelectorAll(".opt-btn");
+
+        buttons.forEach((btn, idx) => {
+            btn.disabled = true;
+            if (idx === correctIdx) {
+                btn.classList.add("correct");
+            }
+            if (idx === selectedIdx && selectedIdx !== correctIdx) {
+                btn.classList.add("wrong");
+            }
+        });
+
+        if (selectedIdx === correctIdx) {
+            score++;
+        }
+    }
+
+    function nextQuestion() {
+        currentQIndex++;
+        loadQuestion();
+    }
+
+    function showResults() {
+        document.getElementById("quiz-body").style.display = "none";
+        document.getElementById("result-box").style.display = "block";
+        document.getElementById("scoreVal").innerText = score;
+    }
+
+    function restartQuiz() {
+        currentQIndex = 0;
+        score = 0;
+        document.getElementById("quiz-body").style.display = "block";
+        document.getElementById("result-box").style.display = "none";
+        loadQuestion();
+    }
+
+    loadQuestion();
+</script>
+
+</body>
+</html>
