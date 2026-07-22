@@ -2,1221 +2,1454 @@
 <html lang="kn">
 <head>
 <meta charset="UTF-8">
-<title>ವಿಡಿಯೋಗಳು</title>
+<title>ವಿಡಿಯೋಗಳು - ಜಿಪಿಟಿ ಶಿಕ್ಷಕರ ಶೈಕ್ಷಣಿಕ ಸಂಪನ್ಮೂಲಗಳು</title>
+<meta name="viewport" content="width=1200, initial-scale=0.3, maximum-scale=2.0, user-scalable=yes">
 
 <style>
-body {
-  font-family: "Noto Sans Kannada", Arial, sans-serif;
-  background: #f5f5f5;
-  padding: 15px;
-  margin: 0;
-}
+  /* 🌌 ಸಿಂಥ್‌ವೇವ್ ಅಲ್ಟ್ರಾ-ಮಾಡರ್ನ್ ಥೀಮ್ */
+  :root {
+    --synth-dark: #070913;
+    --neon-pink: #ff007f;
+    --neon-cyan: #00f2fe;
+    --neon-gold: #fbbf24;
+    --neon-purple: #9d4edd;
+    --grid-glow: rgba(0, 242, 254, 0.1);
+  }
 
-h2 {
-  background: #009688;
-  color: white;
-  padding: 15px;
-  border-radius: 6px;
-  margin-top: 10px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-}
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif, "Noto Sans Kannada";
+    background-color: var(--synth-dark);
+    background-image: 
+      linear-gradient(var(--grid-glow) 2px, transparent 2px),
+      linear-gradient(90deg, var(--grid-glow) 2px, transparent 2px);
+    background-size: 40px 40px;
+    color: #f8fafc;
+    padding: 20px;
+    margin: 0;
+    min-width: 1200px;
+    border: 6px solid var(--neon-cyan);
+    animation: bodyGlow 6s linear infinite alternate;
+    min-height: 100vh;
+  }
 
-.class {
-  background: #ffffff;
-  padding: 14px;
-  margin: 12px 0;
-  border-left: 6px solid #3f51b5;
-  cursor: pointer;
-  font-weight: bold;
-  font-size: 18px;
-  border-radius: 0 6px 6px 0;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-  transition: 0.2s;
-}
+  h2 {
+    background: linear-gradient(135deg, #0f172a, #1e293b);
+    color: var(--neon-gold);
+    padding: 18px 25px;
+    border-radius: 12px;
+    margin-top: 10px;
+    border: 2px solid var(--neon-gold);
+    box-shadow: 0 0 20px rgba(251, 191, 36, 0.25);
+    font-size: 26px;
+    font-weight: 800;
+  }
 
-.class:hover {
-  background: #f0f2f9;
-}
+  /* 🎬 16:9 ಅಲ್ಟ್ರಾ ಮಾಡರ್ನ್ ಯೂಟ್ಯೂಬ್ ಥಿಯೇಟರ್ ಸ್ಕ್ರೀನ್ */
+  .theatre-box {
+    width: 100%;
+    max-width: 960px;
+    margin: 20px auto 35px auto;
+    background: #000000;
+    border: 3px solid var(--neon-cyan);
+    border-radius: 20px;
+    padding: 10px;
+    box-shadow: 0 0 35px rgba(0, 242, 254, 0.35);
+    position: relative;
+  }
 
-.subjects, .videos {
-  display: none;
-  margin-left: 15px;
-}
+  .screen-aspect-ratio-wrapper {
+    position: relative;
+    width: 100%;
+    padding-top: 56.25%; /* 16:9 Ratio */
+    border-radius: 12px;
+    overflow: hidden;
+    background: #030712;
+  }
 
-.subject {
-  background: #e3f2fd;
-  padding: 12px;
-  margin: 10px 0;
-  border-left: 5px solid #2196f3;
-  cursor: pointer;
-  font-weight: bold;
-  border-radius: 0 6px 6px 0;
-  font-size: 16px;
-  transition: 0.2s;
-}
+  .screen-aspect-ratio-wrapper iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
 
-.subject:hover {
-  background: #d0e7ff;
-}
+  /* ಸ್ಕ್ರೀನ್ ಆರಂಭದ ಪ್ಲೇಸ್‌ಹೋಲ್ಡರ್ */
+  .screen-placeholder {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: radial-gradient(circle, #1e0b36 0%, #050110 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 5;
+    text-align: center;
+    padding: 20px;
+  }
 
-/* 📱 ಚೌಕ ಗ್ರಿಡ್ ವಿನ್ಯಾಸ (Responsive Video Grid) */
-.video-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 20px;
-  padding: 15px 0;
-}
+  .pulse-icon {
+    font-size: 60px;
+    animation: float 3s ease-in-out infinite;
+    margin-bottom: 12px;
+  }
 
-/* ಪ್ರತಿ ವೀಡಿಯೋ ಚೌಕ ಕಾರ್ಡ್‌ನ ವಿನ್ಯಾಸ */
-.video-card {
-  background-color: #ffffff;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-  transition: transform 0.2s, box-shadow 0.2s;
-  text-decoration: none;
-  color: #333;
-  display: flex;
-  flex-direction: column;
-}
+  .control-panel {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 12px;
+  }
 
-.video-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 6px 12px rgba(0,0,0,0.15);
-}
+  .control-btn {
+    background: linear-gradient(135deg, #1e293b, #0f172a);
+    border: 2px solid var(--neon-cyan);
+    color: #fff;
+    padding: 8px 22px;
+    font-size: 14.5px;
+    font-weight: bold;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
 
-/* ಯೂಟ್ಯೂಬ್ ಥಂಬ್‌ನೇಲ್ ಬಾಕ್ಸ್ (16:9 ಅನುಪಾತ) */
-.thumbnail-box {
-  position: relative;
-  width: 100%;
-  padding-top: 56.25%; 
-  background-color: #000;
-}
+  .control-btn:hover {
+    background: var(--neon-cyan);
+    color: #000;
+    box-shadow: 0 0 15px var(--neon-cyan);
+    transform: scale(1.05);
+  }
 
-.thumbnail-box img {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
+  /* 🏫 ಅಕಾರ್ಡಿಯನ್ ತರಗತಿ ಬಾರ್‌ಗಳು */
+  .class {
+    background: rgba(30, 41, 59, 0.8);
+    padding: 16px;
+    margin: 15px 0;
+    border-left: 6px solid var(--neon-pink);
+    border-radius: 0 10px 10px 0;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 20px;
+    color: #f8fafc;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    transition: all 0.3s ease;
+    border-top: 1px solid rgba(255,255,255,0.05);
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
 
-/* ಕೆಂಪು ಪ್ಲೇ ಬಟನ್ ಐಕಾನ್ */
-.play-btn {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background-color: rgba(255, 0, 0, 0.9);
-  color: white;
-  padding: 8px 14px;
-  border-radius: 50%;
-  font-size: 16px;
-  font-weight: bold;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-}
+  .class:hover {
+    background: rgba(51, 65, 85, 0.9);
+    border-left-color: var(--neon-cyan);
+    padding-left: 22px;
+  }
 
-/* ಪಾಠದ ಶೀರ್ಷಿಕೆ ಭಾಗ */
-.video-info {
-  padding: 12px;
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  background: #ffffff;
-}
+  .subjects, .videos {
+    display: none;
+    margin-left: 15px;
+  }
 
-.video-info h4 {
-  margin: 0 0 5px 0;
-  font-size: 14px;
-  color: #1b5e20;
-  line-height: 1.4;
-}
+  .subject {
+    background: rgba(15, 23, 42, 0.9);
+    padding: 14px;
+    margin: 12px 0;
+    border-left: 5px solid var(--neon-cyan);
+    cursor: pointer;
+    font-weight: bold;
+    border-radius: 0 8px 8px 0;
+    font-size: 17px;
+    color: #e2e8f0;
+    transition: all 0.25s ease;
+  }
 
-.coming-soon {
-  display: inline-block;
-  padding: 8px 15px;
-  background: #ffebee;
-  color: #c62828;
-  font-weight: bold;
-  border-radius: 4px;
-  font-size: 14px;
-}
+  .subject:hover {
+    background: rgba(30, 41, 59, 0.95);
+    border-left-color: var(--neon-gold);
+    color: var(--neon-gold);
+  }
+
+  /* 📱 ಚೌಕ ಗ್ರಿಡ್ ವಿನ್ಯಾಸ (Responsive Video Grid) */
+  .video-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+    padding: 15px 0;
+  }
+
+  /* ಪ್ರತಿ ವೀಡಿಯೋ ಕಾರ್ಡ್‌ನ ವಿನ್ಯಾಸ */
+  .video-card {
+    background-color: rgba(15, 23, 42, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
+    text-decoration: none;
+    color: #f8fafc;
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+  }
+
+  .video-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 8px 20px rgba(0, 242, 254, 0.25);
+    border-color: var(--neon-cyan);
+  }
+
+  /* ಯೂಟ್ಯೂಬ್ ಥಂಬ್‌ನೇಲ್ ಬಾಕ್ಸ್ (16:9 ಅನುಪಾತ) */
+  .thumbnail-box {
+    position: relative;
+    width: 100%;
+    padding-top: 56.25%; 
+    background-color: #000;
+  }
+
+  .thumbnail-box img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* ಪ್ಲೇ ಬಟನ್ ಐಕಾನ್ */
+  .play-btn {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(255, 0, 127, 0.85);
+    color: white;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    font-weight: bold;
+    box-shadow: 0 0 15px rgba(255, 0, 127, 0.6);
+    transition: all 0.3s ease;
+  }
+
+  .video-card:hover .play-btn {
+    background-color: var(--neon-cyan);
+    color: #000;
+    box-shadow: 0 0 20px var(--neon-cyan);
+    transform: translate(-50%, -50%) scale(1.15);
+  }
+
+  /* ಪಾಠದ ಶೀರ್ಷಿಕೆ ಭಾಗ */
+  .video-info {
+    padding: 14px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background: rgba(15, 23, 42, 0.95);
+  }
+
+  .video-info h4 {
+    margin: 0;
+    font-size: 14px;
+    color: #e2e8f0;
+    line-height: 1.4;
+    font-weight: 600;
+  }
+
+  .coming-soon {
+    display: inline-block;
+    padding: 8px 16px;
+    background: rgba(239, 68, 68, 0.15);
+    color: #f87171;
+    font-weight: bold;
+    border-radius: 6px;
+    font-size: 14px;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-8px); }
+  }
+
+  @keyframes bodyGlow {
+    0% { border-color: var(--neon-cyan); }
+    50% { border-color: var(--neon-pink); }
+    100% { border-color: var(--neon-gold); }
+  }
 </style>
 
 <script>
-function toggle(id) {
-  let el = document.getElementById(id);
-  if (el.style.display === "block" || el.style.display === "grid") {
-    el.style.display = "none";
-  } else {
-    // ವಿಡಿಯೋಸ್ ಕಂಟೇನರ್ ಆಗಿದ್ದರೆ ಗ್ರಿಡ್ ಮಾದರಿಯಲ್ಲಿ ಓಪನ್ ಮಾಡುತ್ತದೆ
-    if (el.classList.contains('videos')) {
-      el.style.display = "grid";
+  // 🎯 ವಿಷಯ ಮತ್ತು ತರಗತಿ ಅಕಾರ್ಡಿಯನ್ ಟಾಗಲ್
+  function toggle(id) {
+    let el = document.getElementById(id);
+    if (el.style.display === "block" || el.style.display === "grid") {
+      el.style.display = "none";
     } else {
-      el.style.display = "block";
+      if (el.classList.contains('videos')) {
+        el.style.display = "grid";
+      } else {
+        el.style.display = "block";
+      }
     }
   }
-}
+
+  // 📺 ವೆಬ್‌ಸೈಟ್‌ ಒಳಗಡೆಯೇ ಯೂಟ್ಯೂಬ್ ಪ್ಲೇ ಮಾಡುವ ಸ್ಟ್ರೀಮಿಂಗ್ ಫಂಕ್ಷನ್
+  function streamVideo(videoUrl, videoTitle) {
+    let videoId = "";
+
+    // Shorts ಅಥವಾ Normal YouTube URL ನಿಂದ Video ID ಪಡೆಯುವುದು
+    if (videoUrl.includes("shorts/")) {
+      videoId = videoUrl.split("shorts/")[1].split("?")[0];
+    } else if (videoUrl.includes("youtu.be/")) {
+      videoId = videoUrl.split("youtu.be/")[1].split("?")[0];
+    } else if (videoUrl.includes("watch?v=")) {
+      videoId = videoUrl.split("watch?v=")[1].split("&")[0];
+    }
+
+    if (!videoId) {
+      alert("ವಿಡಿಯೋ ಲಿಂಕ್ ದೋಷಪೂರಿತವಾಗಿದೆ!");
+      return;
+    }
+
+    // ಪ್ಲೇಸ್‌ಹೋಲ್ಡರ್ ಮುಚ್ಚುವುದು
+    document.getElementById('video-placeholder').style.display = 'none';
+
+    // ಎಂಬೆಡ್ ಪ್ಲೇಯರ್ ಐಫ್ರೇಮ್‌ಗೆ ಲಿಂಕ್ ಸೆಟ್ ಮಾಡುವುದು (Autoplay ಜೊತೆಗೆ)
+    let embedUrl = "https://www.youtube.com/embed/" + videoId + "?autoplay=1&rel=0";
+    document.getElementById('main-youtube-frame').src = embedUrl;
+
+    // ಸ್ಮೂತ್ ಆಗಿ ಮೇಲಿನ ಥಿಯೇಟರ್ ಸ್ಕ್ರೀನ್‌ಗೆ ಸ್ಕ್ರೋಲ್ ಮಾಡುವುದು
+    document.getElementById('main-theatre-screen').scrollIntoView({ 
+      behavior: 'smooth', 
+      block: 'center' 
+    });
+  }
+
+  // 🔲 ಪೂರ್ತಿ ಪರದೆ (Full Screen) ಫಂಕ್ಷನ್
+  function togglePlayerFullscreen() {
+    let target = document.getElementById('fullscreen-target');
+    let frame = document.getElementById('main-youtube-frame');
+
+    if (!frame.src || frame.src === "" || frame.src.endsWith("about:blank")) {
+      alert("ಖಾಲಿ ಸ್ಕ್ರೀನ್ ಅನ್ನು ಫುಲ್ ಸ್ಕ್ರೀನ್ ಮಾಡಲು ಸಾಧ್ಯವಿಲ್ಲ! ಮೊದಲು ಯಾವುದಾದರೂ ವಿಡಿಯೋ ಆಯ್ಕೆ ಮಾಡಿ.");
+      return;
+    }
+
+    if (!document.fullscreenElement) {
+      if (target.requestFullscreen) {
+        target.requestFullscreen();
+      } else if (target.webkitRequestFullscreen) {
+        target.webkitRequestFullscreen();
+      } else if (target.msRequestFullscreen) {
+        target.msRequestFullscreen();
+      }
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      }
+    }
+  }
 </script>
 </head>
 <body>
 
-<h2>📺 ವಿಡಿಯೋಗಳು</h2>
+<h2>📺 ಎಐ & ಶೈಕ್ಷಣಿಕ ವಿಡಿಯೋ ಪಾಠಗಳ ಥಿಯೇಟರ್</h2>
 
-<div class="class" onclick="toggle('class6')">6ನೇ ತರಗತಿ</div>
+<!-- 🎬 ವೆಬ್‌ಸೈಟ್‌ ಒಳಗಡೆ ಪ್ಲೇ ಆಗುವ ಬೃಹತ್ 16:9 ಸ್ಕ್ರೀನ್ -->
+<div class="theatre-box" id="main-theatre-screen">
+  <div class="screen-aspect-ratio-wrapper" id="fullscreen-target">
+    
+    <!-- ಪ್ಲೇಸ್‌ಹೋಲ್ಡರ್ -->
+    <div class="screen-placeholder" id="video-placeholder">
+      <div class="pulse-icon">🎬</div>
+      <h3 style="margin:0 0 8px 0; color: var(--neon-cyan); text-shadow: 0 0 10px var(--neon-cyan);">
+        ವಿಡಿಯೋ ಥಿಯೇಟರ್ ಸ್ಕ್ರೀನ್ ಸಿದ್ಧವಾಗಿದೆ
+      </h3>
+      <p style="opacity:0.85; font-size:14.5px; max-width:450px; margin:0 auto; color:#cbd5e1;">
+        ವಿಡಿಯೋ ವೀಕ್ಷಿಸಲು ಕೆಳಗಿನ ತರಗತಿ ಹಾಗೂ ವಿಷಯವನ್ನು ಆಯ್ಕೆ ಮಾಡಿ, ವಿಡಿಯೋ ಕಾರ್ಡ್ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ!
+      </p>
+    </div>
+    
+    <!-- ಯೂಟ್ಯೂಬ್ ಎಂಬೆಡ್ ಐಫ್ರೇಮ್ -->
+    <iframe id="main-youtube-frame" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+  </div>
+
+  <!-- ಪ್ಲೇಯರ್ ಕಂಟ್ರೋಲರ್ -->
+  <div class="control-panel">
+    <button class="control-btn" onclick="togglePlayerFullscreen()">🔲 Full Screen (ಪೂರ್ತಿ ಪರದೆ)</button>
+  </div>
+</div>
+
+<!-- ==================== 6ನೇ ತರಗತಿ ==================== -->
+<div class="class" onclick="toggle('class6')">🎒 6ನೇ ತರಗತಿ</div>
 <div class="subjects" id="class6">
 
-  <div class="subject" onclick="toggle('c6-kan')">ಕನ್ನಡ</div>
+  <!-- ಕನ್ನಡ -->
+  <div class="subject" onclick="toggle('c6-kan')">🟡 ಕನ್ನಡ</div>
   <div class="videos video-grid" id="c6-kan">
     
-    <a href="https://youtu.be/xRiP2XLG7zc" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/xRiP2XLG7zc', 'ದೊಡ್ಡವರ ದಾರಿ')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/xRiP2XLG7zc/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>ದೊಡ್ಡವರ ದಾರಿ, ವಿಡಿಯೋ ಪಾಠ</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/MLQju8ga4ZM" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/MLQju8ga4ZM', 'ಡಾ. ರಾಜಕುಮಾರ್')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/MLQju8ga4ZM/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>ಡಾ. ರಾಜಕುಮಾರ್, ವಿಡಿಯೋ ಪಾಠ</h4></div>
-    </a>
+    </div>
     
-    <a href="https://youtu.be/Y6mTpGLWivw" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/Y6mTpGLWivw', 'ಮಂಗಳ ಗ್ರಹದಲ್ಲಿ ಪುಟ್ಟಿ')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/Y6mTpGLWivw/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>ಮಂಗಳ ಗ್ರಹದಲ್ಲಿ ಪುಟ್ಟಿ, ವಿಡಿಯೋ ಪಾಠ</h4></div>
-    </a>
+    </div>
 
   </div>
 
-  <div class="subject" onclick="toggle('c6-eng')">English</div>
+  <!-- English -->
+  <div class="subject" onclick="toggle('c6-eng')">🟣 English</div>
   <div class="videos video-grid" id="c6-eng">
     
-    <a href="https://youtu.be/i2FPzc0AOg4" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/i2FPzc0AOg4', 'A CHAT WITH A GRASSHOPPER')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/i2FPzc0AOg4/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>A CHAT WITH A GRASSHOPPER LESSON FULL VIDEO</h4></div>
-    </a>
+    </div>
   
-    <a href="https://youtu.be/7zdoTgzyx7g" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/7zdoTgzyx7g', 'The Rainbow poem')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/7zdoTgzyx7g/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>The Rainbow poem FULL VIDEO</h4></div>
-    </a>
+    </div>
   
-    <a href="https://youtu.be/jIz985TMHSc" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/jIz985TMHSc', 'The Scholar\'s Mother Tongue')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/jIz985TMHSc/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>The Scholar's Mother Tongue FULL VIDEO</h4></div>
-    </a>
+    </div>
  
-    <a href="https://youtu.be/Ejk-FjIB_Ac" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/Ejk-FjIB_Ac', 'The King\'s Ministers')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/Ejk-FjIB_Ac/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>The King's Ministers FULL VIDEO</h4></div>
-    </a>
+    </div>
   
-    <a href="https://youtu.be/k92r0pG192M" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/k92r0pG192M', 'The Light House')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/k92r0pG192M/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>The Light House FULL VIDEO</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/NF-vbUl9H_A" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/NF-vbUl9H_A', 'How do Bees Make Honey')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/NF-vbUl9H_A/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>How do Bees Make Honey video lesson</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/MRk9kY9vIis" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/MRk9kY9vIis', 'Where there is a will there is a way')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/MRk9kY9vIis/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>Where there is a will there is a way video lesson</h4></div>
-    </a>
+    </div>
     
   </div>
 
-  <div class="subject" onclick="toggle('c6-hin')">ಹಿಂದಿ</div>
+  <!-- ಹಿಂದಿ -->
+  <div class="subject" onclick="toggle('c6-hin')">💗 ಹಿಂದಿ</div>
   <div class="videos" id="c6-hin">
     <span class="coming-soon">Coming Soon</span>
   </div>
 
-  <div class="subject" onclick="toggle('c6-math')">ಗಣಿತ</div>
+  <!-- ಗಣಿತ -->
+  <div class="subject" onclick="toggle('c6-math')">🟢 ಗಣಿತ</div>
   <div class="videos" id="c6-math">
     <span class="coming-soon">Coming Soon</span>
   </div>
 
-  <div class="subject" onclick="toggle('c6-sci')">ವಿಜ್ಞಾನ</div>
+  <!-- ವಿಜ್ಞಾನ -->
+  <div class="subject" onclick="toggle('c6-sci')">🟢 ವಿಜ್ಞಾನ</div>
   <div class="videos video-grid" id="c6-sci">
     
-    <a href="https://youtube.com/shorts/CkZxLNQX9HE" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtube.com/shorts/CkZxLNQX9HE', 'ವಿಜ್ಞಾನ ಅದ್ಭುತ ಪ್ರಪಂಚ')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/CkZxLNQX9HE/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>ವಿಜ್ಞಾನ ಅದ್ಭುತ ಪ್ರಪಂಚ – ವಿಡಿಯೋ</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/mHwQAfrvgyU" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/mHwQAfrvgyU', 'ಕಪ್ಪೆಯ ಜೀವನ ಚಕ್ರ')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/mHwQAfrvgyU/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>ಕಪ್ಪೆಯ ಜೀವನ ಚಕ್ರ – ವಿಡಿಯೋ</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/ovOJ2cs1iWQ" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/ovOJ2cs1iWQ', 'ಅಳತೆ ಮತ್ತು ಚಲನೆ')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/ovOJ2cs1iWQ/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>ಅಳತೆ ಮತ್ತು ಚಲನೆ – ವಿಡಿಯೋ</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/preGRDzLp2Q" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/preGRDzLp2Q', 'ಜೀವ ವೈವಿಧ್ಯತೆಯ ಅರಿವು')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/preGRDzLp2Q/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>ಜೀವ ವೈವಿಧ್ಯತೆಯ ಅರಿವು – ವಿಡಿಯೋ</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/9PMRH6lmf5Q" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/9PMRH6lmf5Q', 'ಆಹಾರದ ಪಯಣ')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/9PMRH6lmf5Q/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>ಆಹಾರದ ಪಯಣ – ವಿಡಿಯೋ</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/Agyp8Tx8q6s" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/Agyp8Tx8q6s', 'ವಿಜ್ಞಾನ ಅದ್ಭುತ ಪ್ರಪಂಚ')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/Agyp8Tx8q6s/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>ವಿಜ್ಞಾನ ಅದ್ಭುತ ಪ್ರಪಂಚ – ವಿಡಿಯೋ</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/4uKD2JfTkyA" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/4uKD2JfTkyA', 'Natures Treasures EM')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/4uKD2JfTkyA/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>Natures Treasures EM– ವಿಡಿಯೋ</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/yOpvpmfm-w8" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/yOpvpmfm-w8', 'ನಿಸರ್ಗದ ಸಂಪತ್ತು')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/yOpvpmfm-w8/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>ನಿಸರ್ಗದ ಸಂಪತ್ತು ವಿಡಿಯೋ ಪಾಠ</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/LqTqss_gdUg" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/LqTqss_gdUg', 'Diversity in the living world')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/LqTqss_gdUg/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>Diversity in the living world. Part 1 VIDEO</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/yDmfptAK7Ws" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/yDmfptAK7Ws', 'Diversity in the living world Part 2')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/yDmfptAK7Ws/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>Diversity in the living world. Part 2 VIDEO</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/LUilIUEDPHI" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/LUilIUEDPHI', 'ನಮ್ಮ ಸುತ್ತಲಿನ ಸಾಮಾಗ್ರಿಗಳು')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/LUilIUEDPHI/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>ನಮ್ಮ ಸುತ್ತಲಿನ ಸಾಮಾಗ್ರಿಗಳು ವಿಡಿಯೋ ಪಾಠ</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/BSd7_yIIYLI" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/BSd7_yIIYLI', 'Materials around us')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/BSd7_yIIYLI/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>Materials around us video lesson</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/RlpLAzQd5Lg" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/RlpLAzQd5Lg', 'ಕಾಂತಗಳ ಅನ್ವೇಷಣೆ')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/RlpLAzQd5Lg/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>ಕಾಂತಗಳ ಅನ್ವೇಷಣೆ ವಿಡಿಯೋ ಪಾಠ</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/ycxqpBQs3cA" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/ycxqpBQs3cA', 'Exploring Magnets')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/ycxqpBQs3cA/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>Exploring Magnets video lesson</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/6PzReJsN8ZA" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/6PzReJsN8ZA', 'ಬೇರ್ಪಡಿಸುವಿಕೆಯ ವಿಧಾನಗಳು')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/6PzReJsN8ZA/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>ದೈನಂದಿನ ಜೀವನದಲ್ಲಿ ಬೇರ್ಪಡಿಸುವಿಕೆಯ ವಿಧಾನಗಳು ವಿಡಿಯೋ ಪಾಠ</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/WK_dIeAEyfw" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/WK_dIeAEyfw', 'Methods of separation')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/WK_dIeAEyfw/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>Methods of separation in everyday life video lesson</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/93zCY2dGPc8" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/93zCY2dGPc8', 'ತಾಪ ಮತ್ತು ಅದರ ಮಾಪನ')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/93zCY2dGPc8/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>ತಾಪ ಮತ್ತು ಅದರ ಮಾಪನ ವಿಡಿಯೋ ಪಾಠ</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/l8fvtA-Bk8k" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/l8fvtA-Bk8k', 'Temperature and its measurement')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/l8fvtA-Bk8k/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>Temperature and its measurement video lesson</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/JSoEJBuETTc" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/JSoEJBuETTc', 'ಭೂಮಿಯಿಂದ ಆಚೆಗೆ')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/JSoEJBuETTc/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>ಭೂಮಿಯಿಂದ ಆಚೆಗೆ ವಿಡಿಯೋ ಪಾಠ</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/aLR3o7IYXNM" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/aLR3o7IYXNM', 'Beyond the earth')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/aLR3o7IYXNM/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>Beyond the earth video lesson</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/bzYCcdmbYug" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/bzYCcdmbYug', 'ನೀರಿನ ಸ್ಥಿತಿಗಳ ಮೂಲಕ ಒಂದು ಪಯಣ')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/bzYCcdmbYug/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>ನೀರಿನ ಸ್ಥಿತಿಗಳ ಮೂಲಕ ಒಂದು ಪಯಣ ವಿಡಿಯೋ ಪಾಠ</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/WUaLjgvLgj4" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/WUaLjgvLgj4', 'A journey through states of water')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/WUaLjgvLgj4/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>A journey through states of water video lesson</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/jGiVJlRz9ro" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/jGiVJlRz9ro', 'ಜೀವಿಗಳು ಅವುಗಳ ಗುಣಗಳ ಅನ್ವೇಷಣೆ')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/jGiVJlRz9ro/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>ಜೀವಿಗಳು ಅವುಗಳ ಗುಣಗಳ ಅನ್ವೇಷಣೆ ವಿಡಿಯೋ ಪಾಠ</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/WIx_1Iicx1o" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/WIx_1Iicx1o', 'Living creature exploring characteristics')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/WIx_1Iicx1o/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>Living creature exploring there characteristics video lesson</h4></div>
-    </a>
+    </div>
 
   </div>
 
-  <div class="subject" onclick="toggle('c6-social')">ಸಮಾಜ ವಿಜ್ಞಾನ</div>
+  <!-- ಸಮಾಜ ವಿಜ್ಞಾನ -->
+  <div class="subject" onclick="toggle('c6-social')">🔵 ಸಮಾಜ ವಿಜ್ಞಾನ</div>
   <div class="videos video-grid" id="c6-social">
     
-    <a href="https://youtu.be/N6KfYEtDmGk" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/N6KfYEtDmGk', 'ವಿಜಯನಗರ ಸಾಮ್ರಾಜ್ಯ')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/N6KfYEtDmGk/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>ವಿಜಯನಗರ ಸಾಮ್ರಾಜ್ಯ-ವಾಸ್ತುಶಿಲ್ಪ ಮತ್ತು ಮೂರ್ತಿಶಿಲ್ಪ – ವಿಡಿಯೋ</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/6Er_RVwSldw" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/6Er_RVwSldw', 'ವಿಜಯನಗರ ಸಾಮ್ರಾಜ್ಯ ಸ್ಥಾಪನೆ')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/6Er_RVwSldw/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>ವಿಜಯನಗರ ಸಾಮ್ರಾಜ್ಯ-ಸ್ಥಾಪನೆ-ಹರಿಹರ-ಪ್ರೌಢದೇವರಾಯ – ವಿಡಿಯೋ</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/sv83fywDM4c" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/sv83fywDM4c', 'ಕೃಷ್ಣದೇವರಾಯ')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/sv83fywDM4c/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>ವಿಜಯನಗರ ಸಾಮ್ರಾಜ್ಯ-ಕೃಷ್ಣದೇವರಾಯ – ವಿಡಿಯೋ</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/kU1Y6Pt1MKg" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/kU1Y6Pt1MKg', 'ರಕ್ಕಸತಂಗಡಿ ಕದನ')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/kU1Y6Pt1MKg/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>ವಿಜಯನಗರ ಸಾಮ್ರಾಜ್ಯ-ರಕ್ಕಸತಂಗಡಿ ಕದನ – ವಿಡಿಯೋ</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/url_dz7F4sw" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/url_dz7F4sw', 'ಪೌರ ಮತ್ತು ಪೌರತ್ವ')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/url_dz7F4sw/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>ಪೌರ ಮತ್ತು ಪೌರತ್ವ – ವಿಡಿಯೋ</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/Z8ZFt6EpRds" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/Z8ZFt6EpRds', 'ಪ್ರಭುತ್ವದ ಪ್ರಕಾರಗಳು')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/Z8ZFt6EpRds/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>ಪ್ರಭುತ್ವದ ಪ್ರಕಾರಗಳು – ವಿಡಿಯೋ</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/G-mOhz12tgA" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/G-mOhz12tgA', 'ದೆಹಲಿಯ ಸುಲ್ತಾನರು')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/G-mOhz12tgA/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>ದೆಹಲಿಯ ಸುಲ್ತಾನರು – ವಿಡಿಯೋ</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/Fqk7MthGo-w" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/Fqk7MthGo-w', 'ಇತಿಹಾಸದ ಆರಂಭಕಾಲ')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/Fqk7MthGo-w/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>ಇತಿಹಾಸದ ಆರಂಭಕಾಲ – ವಿಡಿಯೋ</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/0nKIzQHr3cA" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/0nKIzQHr3cA', 'ಇತಿಹಾಸದ ಪರಿಚಯ')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/0nKIzQHr3cA/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>ಇತಿಹಾಸದ ಪರಿಚಯ – ವಿಡಿಯೋ</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/yIU0urh0r5M" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/yIU0urh0r5M', 'ನಮ್ಮ ಸಂವಿಧಾನ')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/yIU0urh0r5M/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>ನಮ್ಮ ಸಂವಿಧಾನ – ವಿಡಿಯೋ</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/dftpoUMn90Q" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/dftpoUMn90Q', 'ಬೆಂಗಳೂರು ವಿಭಾಗ')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/dftpoUMn90Q/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>ನಮ್ಮ ಹೆಮ್ಮೆಯ ಕರ್ನಾಟಕ ಬೆಂಗಳೂರು ವಿಭಾಗ – ವಿಡಿಯೋ</h4></div>
-    </a>
+    </div>
 
-     <a href="https://youtu.be/vIjK3DoisKU" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/vIjK3DoisKU', 'ಮೈಸೂರು ವಿಭಾಗ')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/vIjK3DoisKU/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
-      <div class="video-info"><h4>ನಮ್ಮ ಹೆಮ್ಮೆಯ ಕರ್ನಾಟಕ ಮೂಸೂರು ವಿಭಾಗ – ವಿಡಿಯೋ</h4></div>
-    </a>
+      <div class="video-info"><h4>ನಮ್ಮ ಹೆಮ್ಮೆಯ ಕರ್ನಾಟಕ ಮೈಸೂರು ವಿಭಾಗ – ವಿಡಿಯೋ</h4></div>
+    </div>
 
-    <a href="https://youtu.be/CXuk0Wpn3ns" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/CXuk0Wpn3ns', 'ಕಲಬುರಗಿ ವಿಭಾಗ')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/CXuk0Wpn3ns/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>ನಮ್ಮ ಹೆಮ್ಮೆಯ ಕರ್ನಾಟಕ ಕಲಬುರಗಿ ವಿಭಾಗ – ವಿಡಿಯೋ</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/5zN9-AAhppI" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/5zN9-AAhppI', 'ಬೆಳಗಾವಿ ವಿಭಾಗ')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/5zN9-AAhppI/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>ನಮ್ಮ ಹೆಮ್ಮೆಯ ಕರ್ನಾಟಕ ಬೆಳಗಾವಿ ವಿಭಾಗ – ವಿಡಿಯೋ</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/-kLWLk5kjZA" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/-kLWLk5kjZA', 'ವೇದಗಳ ಕಾಲ1')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/-kLWLk5kjZA/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>ವೇದಗಳ ಕಾಲ1 – ವಿಡಿಯೋ</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/GapxfsCA7Fs" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/GapxfsCA7Fs', 'ವೇದಗಳ ಕಾಲ2')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/GapxfsCA7Fs/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>ವೇದಗಳ ಕಾಲ2 – ವಿಡಿಯೋ</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/iKsl3vRnNlo" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/iKsl3vRnNlo', 'ಭಕ್ತಿ ಪಂಥ ಹಾಗೂ ಸೂಫಿ ಪರಂಪರೆ')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/iKsl3vRnNlo/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>ಭಕ್ತಿ ಪಂಥ ಹಾಗೂ ಸೂಫಿ ಪರಂಪರೆ – ವಿಡಿಯೋ</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/F6SQqlPpbto" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/F6SQqlPpbto', 'ಗ್ಲೋಬ್‌ ಮತ್ತು ನಕಾಶೆಗಳು')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/F6SQqlPpbto/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>ಗ್ಲೋಬ್‌ ಮತ್ತು ನಕಾಶೆಗಳು part 1 – ವಿಡಿಯೋ</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/E1-vwuAbXLw" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/E1-vwuAbXLw', 'ಪ್ರಜಾಪ್ರಭುತ್ವ')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/E1-vwuAbXLw/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>ಪ್ರಜಾಪ್ರಭುತ್ವ – ವಿಡಿಯೋ</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/eZJ8SSHN94g" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/eZJ8SSHN94g', 'ದಕ್ಷಿಣ ಭಾರತದ ರಾಜಮನೆತನಗಳು')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/eZJ8SSHN94g/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>ದಕ್ಷಿಣ ಭಾರತದ ರಾಜಮನೆತನಗಳು – ವಿಡಿಯೋ</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/0ciTw4fPCOg" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/0ciTw4fPCOg', 'ರಾಜ್ಯನಿರ್ದೇಶಕ ತತ್ವಗಳು')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/0ciTw4fPCOg/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>ರಾಜ್ಯನಿರ್ದೇಶಕ ತತ್ವಗಳು – ವಿಡಿಯೋ</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/eFmz1kCjPDQ" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/eFmz1kCjPDQ', 'ರಾಷ್ಟ್ರೀಯ ಚಿಹ್ನೆಗಳು')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/eFmz1kCjPDQ/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>ರಾಷ್ಟ್ರೀಯ ಚಿಹ್ನೆಗಳು – ವಿಡಿಯೋ</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/H3jdsE6ezMA" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/H3jdsE6ezMA', 'ರಾಷ್ಟ್ರೀಯ ಭಾವೈಕ್ಯತೆ')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/H3jdsE6ezMA/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>ರಾಷ್ಟ್ರೀಯ ಭಾವೈಕ್ಯತೆ – ವಿಡಿಯೋ</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/F9cn2joDFMU" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/F9cn2joDFMU', 'ಮಾನವ ಹಕ್ಕುಗಳು')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/F9cn2joDFMU/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>ಮಾನವ ಹಕ್ಕುಗಳು ಮೂಲಭೂತ ಹಕ್ಕುಗಳು ಮತ್ತು ಕರ್ತವ್ಯಗಳು – ವಿಡಿಯೋ</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/CW4ajW8rWUA" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/CW4ajW8rWUA', 'ಹಸಿರು ಧರ್ಮಗಳ ಉದಯ')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/CW4ajW8rWUA/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>ಹಸಿರು ಧರ್ಮಗಳ ಉದಯ – ವಿಡಿಯೋ</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/PxdO8eDMBzc" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/PxdO8eDMBzc', 'ಭಾರತದ ಪ್ರಾಕೃತಿಕ ವಿಭಾಗಗಳು')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/PxdO8eDMBzc/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>ಭಾರತದ ಪ್ರಾಕೃತಿಕ ವಿಭಾಗಗಳು ವಿಡಿಯೋ ಪಾಠ</h4></div>
-    </a>
+    </div>
     
-    <a href="https://youtu.be/fs4qT9S8CN0" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/fs4qT9S8CN0', 'ಬಹುಮನಿ ಸಾಮ್ರಾಜ್ಯ')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/fs4qT9S8CN0/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>ಬಹುಮನಿ ಸಾಮ್ರಾಜ್ಯ-ವಿಡಿಯೋ ಪಾಠ</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/DqTPMYEc8lI" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/DqTPMYEc8lI', 'ಮೊಘಲರು')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/DqTPMYEc8lI/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>ಮೊಘಲರು -ವಿಡಿಯೋ ಪಾಠ</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/lgoRdsy86bo" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/lgoRdsy86bo', 'ವಿಜಯಪುರದ ಆದಿಲ್ ಶಾಹಿಗಳು')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/lgoRdsy86bo/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>ವಿಜಯಪುರದ ಆದಿಲ್ ಶಾಹಿಗಳು ವಿಡಿಯೋ ಪಾಠ</h4></div>
-    </a>
+    </div>
     
   </div>
 
 </div>
 
-<div class="class" onclick="toggle('class7')">7ನೇ ತರಗತಿ</div>
+<!-- ==================== 7ನೇ ತರಗತಿ ==================== -->
+<div class="class" onclick="toggle('class7')">🎒 7ನೇ ತರಗತಿ</div>
 <div class="subjects" id="class7">
 
-  <div class="subject" onclick="toggle('c7-kan')">ಕನ್ನಡ</div>
+  <!-- ಕನ್ನಡ -->
+  <div class="subject" onclick="toggle('c7-kan')">🟡 ಕನ್ನಡ</div>
   <div class="videos video-grid" id="c7-kan">
     
-    <a href="https://youtu.be/pYeHKRk7n9I" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/pYeHKRk7n9I', 'ಪುಟ್ಟಜ್ಜಿ ಪುಟ್ಟಜ್ಜಿ ಕಥೆ ಹೇಳು')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/pYeHKRk7n9I/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>ಪುಟ್ಟಜ್ಜಿ ಪುಟ್ಟಜ್ಜಿ ಕಥೆ ಹೇಳು ವಿಡಿಯೋ ಪಾಠ</h4></div>
-    </a>
+    </div>
     
-    <a href="https://youtu.be/aT_GeIBL-uA" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/aT_GeIBL-uA', 'ಸಂಕ್ರಾಂತಿಯ ಸುಖ ದು:ಖ')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/aT_GeIBL-uA/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>ಸಂಕ್ರಾಂತಿಯ ಸುಖ ದು:ಖ – ವಿಡಿಯೋ</h4></div>
-    </a>
+    </div>
     
-    <a href="https://youtu.be/rfgPMVl_BZc" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/rfgPMVl_BZc', 'ತಿರುಕನ ಕನಸು')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/rfgPMVl_BZc/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>ತಿರುಕನ ಕನಸು – ವಿಡಿಯೋ</h4></div>
-    </a>
+    </div>
     
   </div>
 
-  <div class="subject" onclick="toggle('c7-eng')">English</div>
+  <!-- English -->
+  <div class="subject" onclick="toggle('c7-eng')">🟣 English</div>
   <div class="videos video-grid" id="c7-eng">
     
-    <a href="https://youtu.be/ige-rTkvk7w" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/ige-rTkvk7w', 'EKALAVYA LESSON')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/ige-rTkvk7w/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>EKALAVYA LESSON FULL VIDEO</h4></div>
-    </a>
+    </div>
  
-    <a href="https://youtu.be/AGpskQ2Z4Xg" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/AGpskQ2Z4Xg', 'Avoid Plastic')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/AGpskQ2Z4Xg/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>Avoid Plastic LESSON FULL VIDEO</h4></div>
-    </a>
+    </div>
  
-    <a href="https://youtu.be/p7X5oBy7ohs" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/p7X5oBy7ohs', 'Healthy Life')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/p7X5oBy7ohs/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>Healthy Life LESSON FULL VIDEO</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/vpC5UlImqUw" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/vpC5UlImqUw', 'Why God Made Teachers')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/vpC5UlImqUw/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>Why God Made Teachers Poem FULL VIDEO</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/f6mk0MRc5pY" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/f6mk0MRc5pY', 'Awareness Poem')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/f6mk0MRc5pY/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>Awareness Poem FULL VIDEO</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/pbujf3zd6k4" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/pbujf3zd6k4', 'Gymnastic clock Poem')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/pbujf3zd6k4/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>Gymnastic clock Poem FULL VIDEO</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/xbxmz_2Ei5E" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/xbxmz_2Ei5E', 'Leg Trap Prose')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/xbxmz_2Ei5E/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>Leg Trap Prose FULL VIDEO</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/IKjN7Ynv-sg" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/IKjN7Ynv-sg', 'Wonder Bowl Prose')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/IKjN7Ynv-sg/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>Wonder Bowl Prose FULL VIDEO Lesson</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/iLkg-Otl-bw" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/iLkg-Otl-bw', 'ABOU BEN ADHEM poem')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/iLkg-Otl-bw/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>ABOU BEN ADHEM poem Animated video lesson</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/MtUpd2Jj6tM" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/MtUpd2Jj6tM', 'Mountain climbing poem')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/MtUpd2Jj6tM/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>Mountain climbing poem Animated video lesson</h4></div>
-    </a>
+    </div>
 
   </div>
 
-  <div class="subject" onclick="toggle('c7-hin')">ಹಿಂದಿ</div>
+  <!-- ಹಿಂದಿ -->
+  <div class="subject" onclick="toggle('c7-hin')">💗 ಹಿಂದಿ</div>
   <div class="videos video-grid" id="c7-hin">
     
-    <a href="https://youtu.be/zv8AaiJ4clA" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/zv8AaiJ4clA', 'पडना है जी पडना है')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/zv8AaiJ4clA/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>पडना है जी पडना है - विडियो पाठ</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/PmxpSh6n5pk" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/PmxpSh6n5pk', 'अद्यापक ओर विद्यार्थि')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/PmxpSh6n5pk/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>अद्यापक ओर विद्यार्थि विडियो पाठ</h4></div>
-    </a>
+    </div>
 
   </div>
 
-  <div class="subject" onclick="toggle('c7-math')">ಗಣಿತ</div>
+  <!-- ಗಣಿತ -->
+  <div class="subject" onclick="toggle('c7-math')">🟢 ಗಣಿತ</div>
   <div class="videos" id="c7-math">
     <span class="coming-soon">Coming Soon</span>
   </div>
 
-  <div class="subject" onclick="toggle('c7-sci')">ವಿಜ್ಞಾನ</div>
+  <!-- ವಿಜ್ಞಾನ -->
+  <div class="subject" onclick="toggle('c7-sci')">🟢 ವಿಜ್ಞಾನ</div>
   <div class="videos video-grid" id="c7-sci">
     
-    <a href="https://youtu.be/gsunS1SAAUY" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/gsunS1SAAUY', 'Ever evolving world EM')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/gsunS1SAAUY/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>Ever evolving world EM– ವಿಡಿಯೋ</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/w2wz7O_Ahjg" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/w2wz7O_Ahjg', 'ನಿರಂತರವಾಗಿ ಬದಲಾಗುತ್ತಿರುವ ವಿಜ್ಞಾನ ಜಗತ್ತು')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/w2wz7O_Ahjg/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>ನಿರಂತರವಾಗಿ ಬದಲಾಗುತ್ತಿರುವ ವಿಜ್ಞಾನ ಜಗತ್ತು KM ವಿಡಿಯೋ ಪಾಠ</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/9Tx27uvMpxI" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/9Tx27uvMpxI', 'Exploring substances: acid basic')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/9Tx27uvMpxI/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>Exploring substances: acid basic and neutral EM– ವಿಡಿಯೋ</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/uwVU7DItR9o" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/uwVU7DItR9o', 'Change around us EM')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/uwVU7DItR9o/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>Change around us EM– ವಿಡಿಯೋ</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/b3EuJaKAIFs" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/b3EuJaKAIFs', 'ದೈನಂದಿನ ಬದಲಾವಣೆಗಳ ವಿಜ್ಞಾನ')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/b3EuJaKAIFs/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>ದೈನಂದಿನ ಬದಲಾವಣೆಗಳ ವಿಜ್ಞಾನ KM– ವಿಡಿಯೋ</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/cGXSU_iyzz0" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/cGXSU_iyzz0', 'ಹದಿಹರೆಯ: ಬೆಳವಣಿಗೆ ಮತ್ತು ಬದಲಾವಣೆ')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/cGXSU_iyzz0/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>ಹದಿಹರೆಯ: ಬೆಳವಣಿಗೆ ಮತ್ತು ಬದಲಾವಣೆ KM– ವಿಡಿಯೋ</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/fpbUDknDBXQ" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/fpbUDknDBXQ', 'Journey of adolescence EM')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/fpbUDknDBXQ/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>Journey of adolescence EM– ವಿಡಿಯೋ</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/2fCCopswNd8" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/2fCCopswNd8', 'ಲೋಹಗಳು ಮತ್ತು ಅಲೋಹಗಳ ಪ್ರಪಂಚ')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/2fCCopswNd8/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>ಲೋಹಗಳು ಮತ್ತು ಅಲೋಹಗಳ ಪ್ರಪಂಚ KM– ವಿಡಿಯೋ</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/QU3IvXLgJzA" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/QU3IvXLgJzA', 'Metals and nonmetals EM')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/QU3IvXLgJzA/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>Metals and nonmetals EM– ವಿಡಿಯೋ</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/Smi_fEH0n7I" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/Smi_fEH0n7I', 'Measurement of time EM')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/Smi_fEH0n7I/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>Measurement of time EM– ವಿಡಿಯೋ</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/5UX5BGpD3wk" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/5UX5BGpD3wk', 'ಸಮಯ ಮತ್ತು ಚಲನೆಯ ಮಾಪನ')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/5UX5BGpD3wk/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>ಸಮಯ ಮತ್ತು ಚಲನೆಯ ಮಾಪನ KM– ವಿಡಿಯೋ</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/_ZaRzxLFsY0" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/_ZaRzxLFsY0', 'Live process in plants EM')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/_ZaRzxLFsY0/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>Live process in plants EM– ವಿಡಿಯೋ</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/mUQ1SFRoUZE" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/mUQ1SFRoUZE', 'Life process in animals EM')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/mUQ1SFRoUZE/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>Life process in animals EM– ವಿಡಿಯೋ</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/ggqmVTsRUgs" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/ggqmVTsRUgs', 'ಸಸ್ಯಗಳಲ್ಲಿನ ಜೀವನ ಪ್ರಕ್ರಿಯೆಗಳು')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/ggqmVTsRUgs/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>ಸಸ್ಯಗಳಲ್ಲಿನ ಜೀವನ ಪ್ರಕ್ರಿಯೆಗಳು KM– ವಿಡಿಯೋ</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/SiERUyOtv7w" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/SiERUyOtv7w', 'ಪ್ರಾಣಿಗಳಲ್ಲಿನ ಜೀವನ ಪ್ರಕ್ರಿಯೆಗಳು')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/SiERUyOtv7w/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>ಪ್ರಾಣಿಗಳಲ್ಲಿನ ಜೀವನ ಪ್ರಕ್ರಿಯೆಗಳು KM– ವಿಡಿಯೋ</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/nE76spFuQto" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/nE76spFuQto', 'ವಿದ್ಯುತ್ ಸರ್ಕ್ಯೂಟ್ ಗಳು')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/nE76spFuQto/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>ವಿದ್ಯುತ್ ಸರ್ಕ್ಯೂಟ್ ಗಳು ಮತ್ತು ಅವುಗಳ ಘಟಕಗಳು KM– ವಿಡಿಯೋ</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/-qDPDyR7WG4" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/-qDPDyR7WG4', 'Electricity: circuits EM')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/-qDPDyR7WG4/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>Electricity: circuits and their components EM– ವಿಡಿಯೋ</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/c43SPvOttnU" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/c43SPvOttnU', 'Light shadows and reflection EM')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/c43SPvOttnU/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>Light shadows and reflection EM– ವಿಡಿಯೋ</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/lWYwJSf5Xos" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/lWYwJSf5Xos', 'Heat transfer in nature EM')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/lWYwJSf5Xos/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>Heat transfer in nature EM– ವಿಡಿಯೋ</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/a_-EqbvUOf4" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/a_-EqbvUOf4', 'ಬೆಳಕು, ನೆರಳುಗಳು ಮತ್ತು ಪ್ರತಿಬಿಂಬ')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/a_-EqbvUOf4/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>ಬೆಳಕು, ನೆರಳುಗಳು ಮತ್ತು ಪ್ರತಿಬಿಂಬ KM– ವಿಡಿಯೋ</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/RQg5UTo0g30" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/RQg5UTo0g30', 'ಪ್ರಕೃತಿಯಲ್ಲಿ ಶಾಖ ವರ್ಗಾವಣೆ')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/RQg5UTo0g30/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>ಪ್ರಕೃತಿಯಲ್ಲಿ ಶಾಖ ವರ್ಗಾವಣೆ KM– ವಿಡಿಯೋ</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/aPqBuY4EdTY" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/aPqBuY4EdTY', 'ಆಮ್ಲೀಯ ಮೂಲ ಮತ್ತು ತಟಸ್ಥ ಪದಾರ್ಥಗಳು')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/aPqBuY4EdTY/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>ಆಮ್ಲೀಯ ಮೂಲ ಮತ್ತು ತಟಸ್ಥ ಪದಾರ್ಥಗಳನ್ನು ಅನ್ವೇಶಿಸುವುದು KM– ವಿಡಿಯೋ</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/aLJMPl4YHwg" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/aLJMPl4YHwg', 'Exploring substances acid basic EM')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/aLJMPl4YHwg/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>Exploring substances acid basic and neutral EM– ವಿಡಿಯೋ</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/jij5SEk-RZs" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/jij5SEk-RZs', 'ಭೂಮಿ ಚಂದ್ರ ಮತ್ತು ಸೂರ್ಯ')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/jij5SEk-RZs/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>ಭೂಮಿ ಚಂದ್ರ ಮತ್ತು ಸೂರ್ಯ KM– ವಿಡಿಯೋ</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/6kVJ_gHqV6Y" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/6kVJ_gHqV6Y', 'Earth moon and the sun EM')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/6kVJ_gHqV6Y/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>Earth moon and the sun EM– ವಿಡಿಯೋ</h4></div>
-    </a>
+    </div>
 
   </div>
 
-  <div class="subject" onclick="toggle('c7-social')">ಸಮಾಜ ವಿಜ್ಞಾನ</div>
+  <!-- ಸಮಾಜ ವಿಜ್ಞಾನ -->
+  <div class="subject" onclick="toggle('c7-social')">🔵 ಸಮಾಜ ವಿಜ್ಞಾನ</div>
   <div class="videos video-grid" id="c7-social">
     
-    <a href="https://youtu.be/eoTkLeLWHJ0" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/eoTkLeLWHJ0', 'ಧರ್ಮಸ್ಥಾಪಕರು ಮತ್ತು ಅವರ ಬೋಧನೆಗಳು')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/eoTkLeLWHJ0/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>ಧರ್ಮಸ್ಥಾಪಕರು ಮತ್ತು ಅವರ ಬೋಧನೆಗಳು– ವಿಡಿಯೋ</h4></div>
-    </a>
+    </div>
   
-    <a href="https://youtu.be/9QgansDrTiE" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/9QgansDrTiE', 'ಲೋಕಸಭೆ ಸದಸ್ಯರ ಅರ್ಹತೆಗಳು')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/9QgansDrTiE/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>ಲೋಕಸಭೆ ಸದಸ್ಯರ ಅರ್ಹತೆಗಳು– ವಿಡಿಯೋ</h4></div>
-    </a>
+    </div>
     
-    <a href="https://youtu.be/kvWg9iBh3lU" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/kvWg9iBh3lU', 'ಭಕ್ತಿಪಂಥ1')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/kvWg9iBh3lU/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>ಭಕ್ತಿಪಂಥ1– ವಿಡಿಯೋ</h4></div>
-    </a>
+    </div>
     
-    <a href="https://youtube.com/shorts/_H7zvVM5QxY" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtube.com/shorts/_H7zvVM5QxY', 'ಕಳಿಂಗ ಯುದ್ಧ')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/_H7zvVM5QxY/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>ಕಳಿಂಗ ಯುದ್ಧ– ವಿಡಿಯೋ</h4></div>
-    </a>
+    </div>
     
-    <a href="https://youtu.be/JIAiQR0bUcA" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/JIAiQR0bUcA', 'ಸ್ವತಂತ್ರ್ಯ ಚಳುವಳಿ-ಅಸಹಕಾರ ಚಳವಳಿ')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/JIAiQR0bUcA/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>ಸ್ವತಂತ್ರ್ಯ ಚಳುವಳಿ-ಅಸಹಕಾರ ಚಳವಳಿ– ವಿಡಿಯೋ</h4></div>
-    </a>
+    </div>
     
-    <a href="https://youtu.be/681cNfg7qjc" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/681cNfg7qjc', 'ಅಂಟಾರ್ಟಿಕಾ ಖಂಡ')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/681cNfg7qjc/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>ಅಂಟಾರ್ಟಿಕಾ ಖಂಡ– ವಿಡಿಯೋ</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/vVhI1TZFUGk" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/vVhI1TZFUGk', 'ದಕ್ಷಿಣ ಅಮೆರಿಕ ಖಂಡ')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/vVhI1TZFUGk/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>ದಕ್ಷಿಣ ಅಮೆರಿಕ ಖಂಡದ ವಿಡಿಯೋ ಪಾಠ</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/w3e8uMsDZWE" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/w3e8uMsDZWE', 'ಉತ್ತರ ಅಮೆರಿಕ ಖಂಡ')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/w3e8uMsDZWE/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>ಉತ್ತರ ಅಮೆರಿಕ ಖಂಡದ ವಿಡಿಯೋ ಪಾಠ</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/ESDmdITSpq4" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/ESDmdITSpq4', 'Social and religious reformers in india')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/ESDmdITSpq4/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>Social and religious reformers in india EM video lesson</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/OX1dsK7JFRE" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/OX1dsK7JFRE', 'FIRST WAR OF INDIAN INDEPENDENCE')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/OX1dsK7JFRE/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>FIRST WAR OF INDIAN INDEPENDENCE (1857 – 58 C.E) EM Video lesson</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/9i7GucRwRuY" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/9i7GucRwRuY', 'UNIFICATION OF KARNATAKA')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/9i7GucRwRuY/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>UNIFICATION OF KARNATAKA AND BORDER DISPUTES EM video lesson</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/Pezp3hFLeHU" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/Pezp3hFLeHU', 'FREEDOM MOVEMENT')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/Pezp3hFLeHU/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>FREEDOM MOVEMENT EM video lesson</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/BcoOGGpxb9A" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/BcoOGGpxb9A', 'KARNATAKA - ECONOMIC TRANSFORMATION')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/BcoOGGpxb9A/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>KARNATAKA - ECONOMIC AND SOCIAL TRANSFORMATION EM video lesson</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/G3wkXVdt1A4" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/G3wkXVdt1A4', 'PRO-SOCIAL MOVEMENTS OF KARNATAKA')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/G3wkXVdt1A4/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>PRO-SOCIAL MOVEMENTS OF KARNATAKA EM Video lesson</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/g1VTvC-5wig" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/g1VTvC-5wig', 'PRO-SOCIAL MOVEMENTS OF KARNATAKA 2')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/g1VTvC-5wig/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>PRO-SOCIAL MOVEMENTS OF KARNATAKA 2 EM video lesson</h4></div>
-    </a>
+    </div>
 
-    <a href="https://youtu.be/T5uBwT7jrvQ" target="_blank" class="video-card">
+    <div class="video-card" onclick="streamVideo('https://youtu.be/T5uBwT7jrvQ', 'PROGRESS IN DIFFERENT FIELDS')">
       <div class="thumbnail-box">
         <img src="https://img.youtube.com/vi/T5uBwT7jrvQ/mqdefault.jpg" alt="Thumbnail">
         <div class="play-btn">▶</div>
       </div>
       <div class="video-info"><h4>PROGRESS IN DIFFERENT FIELDS EM video lesson</h4></div>
-    </a>
+    </div>
 
   </div>
 
 </div>
-  
-<div class="class" onclick="toggle('class8')">8ನೇ ತರಗತಿ</div>
+
+<!-- ==================== 8ನೇ ತರಗತಿ ==================== -->
+<div class="class" onclick="toggle('class8')">🎒 8ನೇ ತರಗತಿ</div>
 <div class="subjects" id="class8">
 
-  <div class="subject" onclick="toggle('c8-kan')">ಕನ್ನಡ</div>
+  <div class="subject" onclick="toggle('c8-kan')">🟡 ಕನ್ನಡ</div>
   <div class="videos" id="c8-kan">
     <span class="coming-soon">Coming Soon</span>
   </div>
 
-  <div class="subject" onclick="toggle('c8-eng')">English</div>
+  <div class="subject" onclick="toggle('c8-eng')">🟣 English</div>
   <div class="videos" id="c8-eng">
     <span class="coming-soon">Coming Soon</span>
   </div>
 
-  <div class="subject" onclick="toggle('c8-hin')">ಹಿಂದಿ</div>
+  <div class="subject" onclick="toggle('c8-hin')">💗 ಹಿಂದಿ</div>
   <div class="videos" id="c8-hin">
     <span class="coming-soon">Coming Soon</span>
   </div>
 
-  <div class="subject" onclick="toggle('c8-math')">ಗಣಿತ</div>
+  <div class="subject" onclick="toggle('c8-math')">🟢 ಗಣಿತ</div>
   <div class="videos" id="c8-math">
     <span class="coming-soon">Coming Soon</span>
   </div>
 
-  <div class="subject" onclick="toggle('c8-sci')">ವಿಜ್ಞಾನ</div>
+  <div class="subject" onclick="toggle('c8-sci')">🟢 ವಿಜ್ಞಾನ</div>
   <div class="videos" id="c8-sci">
     <span class="coming-soon">Coming Soon</span>
   </div>
 
-  <div class="subject" onclick="toggle('c8-social')">ಸಮಾಜ ವಿಜ್ಞಾನ</div>
+  <div class="subject" onclick="toggle('c8-social')">🔵 ಸಮಾಜ ವಿಜ್ಞಾನ</div>
   <div class="videos" id="c8-social">
     <span class="coming-soon">Coming Soon</span>
   </div>
