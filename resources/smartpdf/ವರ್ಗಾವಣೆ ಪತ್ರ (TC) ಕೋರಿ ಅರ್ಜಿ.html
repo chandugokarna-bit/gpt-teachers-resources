@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+  <meta charset="UTF-8">
+  <title>ವರ್ಗಾವಣೆ ಪತ್ರ (TC) ಅರ್ಜಿಯ ಮಾದರಿ ಜನರೇಟರ್ - TC Application Generator</title>
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif, "Noto Sans Kannada";
+      margin: 0;
+      padding: 15px;
+      background-color: #0f172a;
+      color: #f8fafc;
+    }
+
+    .form-container {
+      max-width: 800px;
+      margin: 0 auto 30px auto;
+      background: #1e293b;
+      padding: 25px;
+      border-radius: 12px;
+      border: 2px solid #38bdf8;
+      box-shadow: 0 0 20px rgba(56, 189, 248, 0.2);
+    }
+
+    .form-container h2 {
+      margin-top: 0;
+      color: #fbbf24;
+      text-align: center;
+      border-bottom: 2px solid #38bdf8;
+      padding-bottom: 10px;
+      font-size: 22px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .form-group.full-width {
+      grid-column: span 2;
+    }
+
+    label {
+      font-size: 13.5px;
+      font-weight: bold;
+      color: #cbd5e1;
+      margin-bottom: 5px;
+    }
+
+    input, select, textarea {
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #475569;
+      background: #0f172a;
+      color: #fff;
+      font-size: 14px;
+      font-family: inherit;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: #38bdf8;
+      outline: none;
+    }
+
+    .btn-container {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .btn-print {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: #fff;
+      border: none;
+      padding: 12px 30px;
+      font-size: 16px;
+      font-weight: bold;
+      border-radius: 30px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+      transition: transform 0.2s;
+    }
+
+    .btn-print:hover {
+      transform: scale(1.05);
+      background: linear-gradient(135deg, #059669, #10b981);
+    }
+
+    /* 🖨️ A4 ಪ್ರಿಂಟ್/PDF ವರ್ಗಾವಣೆ ಪತ್ರ ಅರ್ಜಿಯ ಲೇಔಟ್ */
+    #tc-preview {
+      width: 210mm;
+      min-height: 297mm;
+      padding: 20mm;
+      margin: 0 auto;
+      background: #ffffff;
+      color: #000000;
+      border: 4px solid #1e3a8a;
+      box-sizing: border-box;
+      position: relative;
+      font-family: "Noto Sans Kannada", 'Times New Roman', serif;
+    }
+
+    .tc-header {
+      text-align: center;
+      border-bottom: 2px solid #1e3a8a;
+      padding-bottom: 10px;
+      margin-bottom: 20px;
+    }
+
+    .tc-header h3 {
+      margin: 0;
+      font-size: 16px;
+      color: #1e3a8a;
+    }
+
+    .tc-header h2 {
+      margin: 5px 0;
+      font-size: 20px;
+      color: #000;
+      font-weight: 900;
+    }
+
+    .tc-title {
+      text-align: center;
+      margin: 20px 0;
+    }
+
+    .tc-title span {
+      font-size: 18px;
+      font-weight: bold;
+      border-bottom: 2px solid #000;
+      padding-bottom: 3px;
+      text-transform: uppercase;
+    }
+
+    .tc-address-block {
+      font-size: 15px;
+      line-height: 1.8;
+      margin-bottom: 20px;
+    }
+
+    .tc-subject {
+      font-size: 15px;
+      font-weight: bold;
+      margin: 15px 0;
+      padding-left: 20px;
+    }
+
+    .tc-body {
+      font-size: 15px;
+      line-height: 2;
+      text-align: justify;
+      margin-bottom: 30px;
+    }
+
+    .fill-val {
+      font-weight: bold;
+      border-bottom: 1px dotted #000;
+      padding: 0 6px;
+      color: #1e3a8a;
+    }
+
+    .tc-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-top: 50px;
+      font-size: 15px;
+      font-weight: bold;
+    }
+
+    @media print {
+      body {
+        background: #fff;
+        padding: 0;
+        margin: 0;
+      }
+      .form-container, .no-print {
+        display: none !important;
+      }
+      #tc-preview {
+        border: 2px solid #000;
+        margin: 0;
+        width: 100%;
+        min-height: 100vh;
+        box-shadow: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 📝 ಸಾರ್ವಜನಿಕರು ಮತ್ತು ಪೋಷಕರು ವಿವರ ಭರ್ತಿ ಮಾಡುವ ಫಾರ್ಮ್ -->
+  <div class="form-container no-print">
+    <h2>📄 ವರ್ಗಾವಣೆ ಪತ್ರ (TC) ಕೋರಿ ಅರ್ಜಿ - ಫಾರ್ಮ್</h2>
+    <div class="form-grid">
+      
+      <div class="form-group full-width">
+        <label>ಶಾಲೆಯ ಹೆಸರು (School Name):</label>
+        <input type="text" id="in-school" value="ಸರ್ಕಾರಿ ಹಿರಿಯ ಪ್ರಾಥಮಿಕ ಶಾಲೆ, ಚಂದಿಯಾ ನಂ. ೧" oninput="updateTc()">
+      </div>
+
+      <div class="form-group">
+        <label>ಸ್ಥಳ / ತಾಲೂಕು (Location/Taluk):</label>
+        <input type="text" id="in-place" value="ಕಾರವಾರ" oninput="updateTc()">
+      </div>
+
+      <div class="form-group">
+        <label>ಜಿಲ್ಲೆ (District):</label>
+        <input type="text" id="in-district" value="ಉತ್ತರ ಕನ್ನಡ" oninput="updateTc()">
+      </div>
+
+      <div class="form-group">
+        <label>ಅರ್ಜಿದಾರರ (ಪೋಷಕರ) ಹೆಸರು (Parent/Applicant Name):</label>
+        <input type="text" id="in-pname" placeholder="ಪೋಷಕರ ಹೆಸರು..." oninput="updateTc()">
+      </div>
+
+      <div class="form-group">
+        <label>ವಿದ್ಯಾರ್ಥಿಯ ಹೆಸರು (Student Name):</label>
+        <input type="text" id="in-sname" placeholder="ವಿದ್ಯಾರ್ಥಿಯ ಹೆಸರು..." oninput="updateTc()">
+      </div>
+
+      <div class="form-group">
+        <label>SATS ID / ಕ್ರ.ಸಂ (SATS Number):</label>
+        <input type="text" id="in-sats" placeholder="10 ಅಂಕಿಗಳ SATS ID" oninput="updateTc()">
+      </div>
+
+      <div class="form-group">
+        <label>ವ್ಯಾಸಂಗ ಮಾಡುತ್ತಿದ್ದ ತರಗತಿ (Class Studied):</label>
+        <select id="in-class" onchange="updateTc()">
+          <option value="೧ ನೇ">೧ ನೇ ತರಗತಿ</option>
+          <option value="೨ ನೇ">೨ ನೇ ತರಗತಿ</option>
+          <option value="೩ ನೇ">೩ ನೇ ತರಗತಿ</option>
+          <option value="೪ ನೇ">೪ ನೇ ತರಗತಿ</option>
+          <option value="೫ ನೇ">೫ ನೇ ತರಗತಿ</option>
+          <option value="೬ ನೇ">೬ ನೇ ತರಗತಿ</option>
+          <option value="೭ ನೇ" selected>೭ ನೇ ತರಗತಿ</option>
+          <option value="೮ ನೇ">೮ ನೇ ತರಗತಿ</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>ಶೈಕ್ಷಣಿಕ ವರ್ಷ (Academic Year):</label>
+        <input type="text" id="in-year" value="2025-26" oninput="updateTc()">
+      </div>
+
+      <div class="form-group full-width">
+        <label>ವರ್ಗಾವಣೆ ಪತ್ರ ಕೋರಲು ಕಾರಣ (Reason for TC):</label>
+        <input type="text" id="in-reason" value="ಉನ್ನತ ಶಿಕ್ಷಣಕ್ಕಾಗಿ / ಕುಟುಂಬದ ಸ್ಥಳಾಂತರದ ಪ್ರಯುಕ್ತ" oninput="updateTc()">
+      </div>
+
+      <div class="form-group">
+        <label>ಸೇರಲಿರುವ ಹೊಸ ಶಾಲೆಯ ಹೆಸರು (New School Name):</label>
+        <input type="text" id="in-newschool" placeholder="ಹೊಸ ಶಾಲೆಯ ಹೆಸರು..." oninput="updateTc()">
+      </div>
+
+      <div class="form-group">
+        <label>ಅರ್ಜಿ ಸಲ್ಲಿಸುವ ದಿನಾಂಕ (Application Date):</label>
+        <input type="date" id="in-date" onchange="updateTc()">
+      </div>
+
+    </div>
+
+    <div class="btn-container">
+      <button class="btn-print" onclick="window.print()">📥 PDF ಆಗಿ ಸೇವ್ ಮಾಡಿ / ಪ್ರಿಂಟ್ ಮಾಡಿ (Save as PDF)</button>
+    </div>
+  </div>
+
+  <!-- 📄 ಲೈವ್ PDF ಪ್ರಿವ್ಯೂ (ವರ್ಗಾವಣೆ ಪತ್ರ ಅರ್ಜಿಯ ವಿನ್ಯಾಸ) -->
+  <div id="tc-preview">
+    <div class="tc-header">
+      <h3>ಶಾಲಾ ಶಿಕ್ಷಣ ಮತ್ತು ಸಾಕ್ಷರತಾ ಇಲಾಖೆ</h3>
+      <h2 id="out-school">ಸರ್ಕಾರಿ ಹಿರಿಯ ಪ್ರಾಥಮಿಕ ಶಾಲೆ, ಚಂದಿಯಾ ನಂ. ೧</h2>
+      <p>ತಾಲೂಕು: <span id="out-place">ಕಾರವಾರ</span> | ಜಿಲ್ಲೆ: <span id="out-district">ಉತ್ತರ ಕನ್ನಡ</span></p>
+    </div>
+
+    <div class="tc-title">
+      <span>ವರ್ಗಾವಣೆ ಪತ್ರ (T.C.) ನೀಡುವಂತೆ ಕೋರಿ ಅರ್ಜಿ</span>
+    </div>
+
+    <div class="tc-address-block">
+      <b>ಇಂದ:</b><br>
+      <span class="fill-val" id="out-pname">_______________________</span><br>
+      ತಂದೆ/ತಾಯಿ: <span class="fill-val" id="out-sname-parent">_______________________</span><br>
+      ಸ್ಥಳ: <span id="out-footer-place-top">ಕಾರವಾರ</span>
+      <br><br>
+      <b>ಗೆ:</b><br>
+      ಮುಖ್ಯ ಶಿಕ್ಷಕರು / ಶಾಲಾ ಆಡಳಿತ ಮಂಡಳಿ,<br>
+      <span id="out-school-to">ಸರ್ಕಾರಿ ಹಿರಿಯ ಪ್ರಾಥಮಿಕ ಶಾಲೆ, ಚಂದಿಯಾ ನಂ. ೧</span><br>
+      ತಾಲೂಕು: <span id="out-place-to">ಕಾರವಾರ</span>, ಜಿಲ್ಲೆ: <span id="out-district-to">ಉತ್ತರ ಕನ್ನಡ</span>.
+    </div>
+
+    <div class="tc-subject">
+      ವಿಷಯ: ನನ್ನ ಮಗ / ಮಗಳ ವರ್ಗಾವಣೆ ಪತ್ರ (Transfer Certificate) ನೀಡುವ ಬಗ್ಗೆ.
+    </div>
+
+    <div class="tc-body">
+      ಮಾನ್ಯರೇ,<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ಮೇಲ್ಕಂಡ ವಿಷಯಕ್ಕೆ ಸಂಬಂಧಿಸಿದಂತೆ, ನನ್ನ ಮಗ / ಮಗಳಾದ ಕುಮಾರ / ಕುಮಾರಿ <span class="fill-val" id="out-sname">_______________________</span> (SATS ID: <span class="fill-val" id="out-sats">__________</span>) ಇವರು ನಿಮ್ಮ ಶಾಲೆಯಲ್ಲಿ <span class="fill-val" id="out-year">2025-26</span> ನೇ ಶೈಕ್ಷಣಿಕ ಸಾಲಿನಲ್ಲಿ <span class="fill-val" id="out-class">೭ ನೇ</span> ತರಗತಿಯಲ್ಲಿ ವ್ಯಾಸಂಗ ಮಾಡುತ್ತಿದ್ದು / ಮಾಡಿರುತ್ತಾರೆ.
+      <br><br>
+      ಪ್ರಸ್ತುತ <span class="fill-val" id="out-reason">ಉನ್ನತ ಶಿಕ್ಷಣಕ್ಕಾಗಿ / ಕುಟುಂಬದ ಸ್ಥಳಾಂತರದ ಪ್ರಯುಕ್ತ</span>, ಮಗನನ್ನು/ಮಗಳನ್ನು <span class="fill-val" id="out-newschool">_______________________</span> ಶಾಲೆಗೆ ಸೇರಿಸಬೇಕಾಗಿರುವುದರಿಂದ, ನಮಗೆ ಶಾಲಾ ವರ್ಗಾವಣೆ ಪತ್ರದ (T.C.) ಅಗತ್ಯವಿರುತ್ತದೆ.
+      <br><br>
+      ಆದ್ದರಿಂದ ದಯವಿಟ್ಟು ನನ್ನ ಮಗ / ಮಗಳ ವರ್ಗಾವಣೆ ಪತ್ರವನ್ನು (Transfer Certificate) ಶೀಘ್ರವಾಗಿ ನೀಡಿ ಸಹಕರಿಸಬೇಕಾಗಿ ತಮ್ಮಲ್ಲಿ ವಿನಂತಿಸಿಕೊಳ್ಳುತ್ತೇನೆ. ಶಾಲೆಯ ಯಾವುದೇ ಶುಲ್ಕ ಬಾಕಿ ಇರುವುದಿಲ್ಲ.
+    </div>
+
+    <div class="tc-footer">
+      <div>
+        ದಿನಾಂಕ: <span id="out-date">24/07/2026</span><br>
+        ಸ್ಥಳ: <span id="out-footer-place">ಕಾರವಾರ</span>
+      </div>
+      <div style="text-align: right;">
+        ತಮ್ಮ ನಂಬುಗೆಯ,<br><br><br>
+        ___________________________<br>
+        (ಪೋಷಕರ / ಅರ್ಜಿದಾರರ ಸಹಿ)
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function updateTc() {
+      let school = document.getElementById('in-school').value || 'ಶಾಲೆಯ ಹೆಸರು';
+      let place = document.getElementById('in-place').value || 'ಸ್ಥಳ';
+      let district = document.getElementById('in-district').value || 'ಜಿಲ್ಲೆ';
+
+      document.getElementById('out-school').innerText = school;
+      document.getElementById('out-school-to').innerText = school;
+      document.getElementById('out-place').innerText = place;
+      document.getElementById('out-place-to').innerText = place;
+      document.getElementById('out-district').innerText = district;
+      document.getElementById('out-district-to').innerText = district;
+
+      let pname = document.getElementById('in-pname').value || '_______________________';
+      let sname = document.getElementById('in-sname').value || '_______________________';
+
+      document.getElementById('out-pname').innerText = pname;
+      document.getElementById('out-sname-parent').innerText = sname;
+      document.getElementById('out-sname').innerText = sname;
+
+      document.getElementById('out-sats').innerText = document.getElementById('in-sats').value || '__________';
+      document.getElementById('out-class').innerText = document.getElementById('in-class').value;
+      document.getElementById('out-year').innerText = document.getElementById('in-year').value || '2025-26';
+      document.getElementById('out-reason').innerText = document.getElementById('in-reason').value || '_______________________';
+      document.getElementById('out-newschool').innerText = document.getElementById('in-newschool').value || '_______________________';
+
+      let dateVal = document.getElementById('in-date').value;
+      let formattedDate = '24/07/2026';
+      if(dateVal) {
+        let parts = dateVal.split('-');
+        formattedDate = parts[2] + '/' + parts[1] + '/' + parts[0];
+      }
+      document.getElementById('out-date').innerText = formattedDate;
+      document.getElementById('out-footer-place').innerText = place;
+      document.getElementById('out-footer-place-top').innerText = place;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      let today = new Date().toISOString().split('T')[0];
+      document.getElementById('in-date').value = today;
+      updateTc();
+    });
+  </script>
+</body>
+</html>

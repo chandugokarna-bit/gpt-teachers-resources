@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+  <meta charset="UTF-8">
+  <title>ವಿದ್ಯಾರ್ಥಿ ಪ್ರಗತಿ ಪತ್ರ / ಅಂಕಪಟ್ಟಿ ಜನರೇಟರ್ - Progress Card Generator</title>
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif, "Noto Sans Kannada";
+      margin: 0;
+      padding: 15px;
+      background-color: #0f172a;
+      color: #f8fafc;
+    }
+
+    .form-container {
+      max-width: 950px;
+      margin: 0 auto 30px auto;
+      background: #1e293b;
+      padding: 25px;
+      border-radius: 12px;
+      border: 2px solid #38bdf8;
+      box-shadow: 0 0 20px rgba(56, 189, 248, 0.2);
+    }
+
+    .form-container h2 {
+      margin-top: 0;
+      color: #fbbf24;
+      text-align: center;
+      border-bottom: 2px solid #38bdf8;
+      padding-bottom: 10px;
+      font-size: 22px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .full-width {
+      grid-column: span 3;
+    }
+
+    label {
+      font-size: 13px;
+      font-weight: bold;
+      color: #cbd5e1;
+      margin-bottom: 4px;
+    }
+
+    input, select {
+      padding: 8px 10px;
+      border-radius: 6px;
+      border: 1px solid #475569;
+      background: #0f172a;
+      color: #fff;
+      font-size: 13.5px;
+    }
+
+    input:focus, select:focus {
+      border-color: #38bdf8;
+      outline: none;
+    }
+
+    .marks-input-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+      background: #0f172a;
+      border-radius: 8px;
+      overflow-x: auto;
+      display: block;
+    }
+
+    .marks-input-table th, .marks-input-table td {
+      border: 1px solid #334155;
+      padding: 8px;
+      text-align: center;
+      min-width: 70px;
+    }
+
+    .marks-input-table th {
+      background: #1e293b;
+      color: #fbbf24;
+      font-size: 12px;
+    }
+
+    .marks-input-table input {
+      width: 100%;
+      text-align: center;
+      padding: 6px;
+    }
+
+    .btn-container {
+      text-align: center;
+      margin-top: 25px;
+    }
+
+    .btn-print {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: #fff;
+      border: none;
+      padding: 12px 32px;
+      font-size: 16px;
+      font-weight: bold;
+      border-radius: 30px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+      transition: transform 0.2s;
+    }
+
+    .btn-print:hover {
+      transform: scale(1.05);
+    }
+
+    /* 🖨️ A4 ಪ್ರಿಂಟ್/PDF ಅಂಕಪಟ್ಟಿ ಲೇಔಟ್ */
+    #marks-card-preview {
+      width: 210mm;
+      min-height: 297mm;
+      padding: 12mm;
+      margin: 0 auto;
+      background: #ffffff;
+      color: #000000;
+      border: 4px double #1e3a8a;
+      box-sizing: border-box;
+      position: relative;
+      font-family: "Noto Sans Kannada", 'Times New Roman', serif;
+    }
+
+    .card-header {
+      text-align: center;
+      border-bottom: 2px solid #1e3a8a;
+      padding-bottom: 8px;
+      margin-bottom: 12px;
+    }
+
+    .card-header h3 {
+      margin: 0;
+      font-size: 15px;
+      color: #1e3a8a;
+    }
+
+    .card-header h2 {
+      margin: 4px 0;
+      font-size: 19px;
+      color: #000;
+      font-weight: 900;
+    }
+
+    .card-header p {
+      margin: 2px 0;
+      font-size: 12.5px;
+      font-weight: bold;
+    }
+
+    .student-info-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 6px 15px;
+      font-size: 13px;
+      margin-bottom: 12px;
+      background: #f8fafc;
+      padding: 8px 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+    }
+
+    .student-info-grid div span {
+      font-weight: bold;
+      color: #1e3a8a;
+    }
+
+    .out-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 12px;
+      font-size: 11.5px;
+    }
+
+    .out-table th, .out-table td {
+      border: 1px solid #000;
+      padding: 5px 3px;
+      text-align: center;
+    }
+
+    .out-table th {
+      background-color: #f1f5f9;
+      font-weight: bold;
+      font-size: 11px;
+    }
+
+    .out-table td.sub-name {
+      text-align: left;
+      font-weight: bold;
+      padding-left: 6px;
+      font-size: 12px;
+    }
+
+    .total-row td {
+      font-weight: bold;
+      background-color: #e2e8f0;
+      font-size: 12px;
+    }
+
+    .grade-legend {
+      display: flex;
+      justify-content: space-around;
+      border: 1px solid #000;
+      padding: 6px;
+      font-size: 11px;
+      font-weight: bold;
+      background: #f8fafc;
+      margin-bottom: 15px;
+    }
+
+    .summary-box {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13.5px;
+      font-weight: bold;
+      border: 2px solid #1e3a8a;
+      padding: 8px 15px;
+      background: #eff6ff;
+      margin-bottom: 20px;
+    }
+
+    .card-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-top: 30px;
+      font-size: 13px;
+      font-weight: bold;
+    }
+
+    @media print {
+      body {
+        background: #fff;
+        padding: 0;
+        margin: 0;
+      }
+      .form-container, .no-print {
+        display: none !important;
+      }
+      #marks-card-preview {
+        border: 4px double #000;
+        margin: 0;
+        width: 100%;
+        min-height: 100vh;
+        box-shadow: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 📝 ಸಾರ್ವಜನಿಕರು ಮತ್ತು ಶಿಕ್ಷಕರು ವಿವರ ಮತ್ತು ಅಂಕಗಳನ್ನು ಭರ್ತಿ ಮಾಡುವ ಫಾರ್ಮ್ -->
+  <div class="form-container no-print">
+    <h2>📊 ವಿದ್ಯಾರ್ಥಿ ಅಂಕಪಟ್ಟಿ & ಪ್ರಗತಿ ಪತ್ರ ಜನರೇಟರ್</h2>
+    
+    <div class="form-grid">
+      <div class="form-group full-width">
+        <label>ಶಾಲೆಯ ಹೆಸರು (School Name):</label>
+        <input type="text" id="in-school" value="ಸರ್ಕಾರಿ ಹಿರಿಯ ಪ್ರಾಥಮಿಕ ಶಾಲೆ, ಚಂದಿಯಾ ನಂ. ೧" oninput="generateTable()">
+      </div>
+
+      <div class="form-group">
+        <label>ಸ್ಥಳ / ತಾಲೂಕು (Location/Taluk):</label>
+        <input type="text" id="in-place" value="ಕಾರವಾರ" oninput="generateTable()">
+      </div>
+
+      <div class="form-group">
+        <label>ಜಿಲ್ಲೆ (District):</label>
+        <input type="text" id="in-district" value="ಉತ್ತರ ಕನ್ನಡ" oninput="generateTable()">
+      </div>
+
+      <div class="form-group">
+        <label>ಶೈಕ್ಷಣಿಕ ವರ್ಷ (Academic Year):</label>
+        <input type="text" id="in-year" value="2025-26" oninput="generateTable()">
+      </div>
+
+      <div class="form-group">
+        <label>ತರಗತಿ ವಿಭಾಗವನ್ನು ಆಯ್ಕೆ ಮಾಡಿ (Class):</label>
+        <select id="in-class-group" onchange="generateTable()">
+          <option value="primary">೧ ರಿಂದ ೫ ನೇ ತರಗತಿ (4 ವಿಷಯಗಳು)</option>
+          <option value="higher" selected>೬ ರಿಂದ ೮ ನೇ ತರಗತಿ (6 ವಿಷಯಗಳು)</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>ತರಗತಿ (Class Name):</label>
+        <input type="text" id="in-class-num" value="೭ ನೇ ತರಗತಿ" oninput="generateTable()">
+      </div>
+
+      <div class="form-group">
+        <label>ವಿದ್ಯಾರ್ಥಿಯ ಹೆಸರು (Student Name):</label>
+        <input type="text" id="in-sname" placeholder="ವಿದ್ಯಾರ್ಥಿಯ ಹೆಸರು..." oninput="generateTable()">
+      </div>
+
+      <div class="form-group">
+        <label>SATS / ಹಾಜರಾತಿ ಸಂಖ್ಯೆ (SATS/Roll No):</label>
+        <input type="text" id="in-sats" placeholder="SATS ID..." oninput="generateTable()">
+      </div>
+
+      <div class="form-group">
+        <label>ತಂದೆ / ತಾಯಿಯ ಹೆಸರು (Parent Name):</label>
+        <input type="text" id="in-pname" placeholder="ಪೋಷಕರ ಹೆಸರು..." oninput="generateTable()">
+      </div>
+    </div>
+
+    <h3 style="color: #38bdf8; margin-bottom: 10px; font-size: 16px;">📝 ವಿಷಯವಾರು ಅಂಕಗಳನ್ನು ನಮೂದಿಸಿ (Enter Subject Marks):</h3>
+    <div id="dynamic-marks-form"></div>
+
+    <div class="btn-container">
+      <button class="btn-print" onclick="window.print()">📥 PDF ಆಗಿ ಸೇವ್ ಮಾಡಿ / ಪ್ರಿಂಟ್ ಮಾಡಿ (Save as PDF)</button>
+    </div>
+  </div>
+
+  <!-- 📄 ಲೈವ್ A4 ಪ್ರಗತಿ ಪತ್ರ ಪ್ರಿವ್ಯೂ -->
+  <div id="marks-card-preview">
+    <div class="card-header">
+      <h3>ಕರ್ನಾಟಕ ಸರ್ಕಾರ - ಶಾಲಾ ಶಿಕ್ಷಣ ಮತ್ತು ಸಾಕ್ಷರತಾ ಇಲಾಖೆ</h3>
+      <h2 id="out-school">ಸರ್ಕಾರಿ ಹಿರಿಯ ಪ್ರಾಥಮಿಕ ಶಾಲೆ, ಚಂದಿಯಾ ನಂ. ೧</h2>
+      <p>ತಾಲೂಕು: <span id="out-place">ಕಾರವಾರ</span> | ಜಿಲ್ಲೆ: <span id="out-district">ಉತ್ತರ ಕನ್ನಡ</span></p>
+      <p style="font-size: 14px; color: #1e3a8a; margin-top: 4px;">🎓 ವಿದ್ಯಾರ್ಥಿಯ ವಾರ್ಷಿಕ ಪ್ರಗತಿ ಪತ್ರ (PROGRESS CARD) - <span id="out-year">2025-26</span></p>
+    </div>
+
+    <div class="student-info-grid">
+      <div>ವಿದ್ಯಾರ್ಥಿಯ ಹೆಸರು: <span id="out-sname">__________________</span></div>
+      <div>ತರಗತಿ: <span id="out-class">೭ ನೇ ತರಗತಿ</span></div>
+      <div>SATS ID / ಕ್ರ.ಸಂ: <span id="out-sats">__________</span></div>
+      <div>ಪೋಷಕರ ಹೆಸರು: <span id="out-pname">__________________</span></div>
+    </div>
+
+    <!-- ಅಂಕಗಳ ಪಟ್ಟಿ ಟೇಬಲ್ -->
+    <table class="out-table">
+      <thead>
+        <tr id="out-table-header"></tr>
+      </thead>
+      <tbody id="out-table-body"></tbody>
+      <tfoot id="out-table-footer"></tfoot>
+    </table>
+
+    <!-- ಗ್ರೇಡ್ ಮಾಹಿತಿ -->
+    <div class="grade-legend">
+      <span>90-100%: A+</span>
+      <span>70-89%: A</span>
+      <span>50-69%: B+</span>
+      <span>31-49%: B</span>
+      <span>0-30%: C</span>
+    </div>
+
+    <!-- ಒಟ್ಟು ಫಲಿತಾಂಶ ಸಾರಾಂಶ -->
+    <div class="summary-box">
+      <div>ಒಟ್ಟು ಅಂಕಗಳು: <span id="out-grand-total">0</span> / <span id="out-max-total">600</span></div>
+      <div>ಶೇಕಡಾವಾರು: <span id="out-percentage">0%</span></div>
+      <div>ಅಂತಿಮ ಗ್ರೇಡ್: <span id="out-final-grade" style="color: #1e3a8a;">-</span></div>
+    </div>
+
+    <div class="card-footer">
+      <div>
+        ದಿನಾಂಕ: _________________<br>
+        ಸ್ಥಳ: <span id="out-footer-place">ಕಾರವಾರ</span>
+      </div>
+      <div style="text-align: center;">
+        ತರಗತಿ ಶಿಕ್ಷಕರ ಸಹಿ<br>
+        (Class Teacher)
+      </div>
+      <div style="text-align: right;">
+        ಮುಖ್ಯ ಶಿಕ್ಷಕರ ಸಹಿ ಮತ್ತು ಮೊಹರು<br>
+        (Head Master Seal)
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const primarySubjects = ["ಕನ್ನಡ (Kannada)", "ಇಂಗ್ಲಿಷ್ (English)", "ಗಣಿತ (Mathematics)", "ಪರಿಸರ ಅಧ್ಯಯನ (EVS)"];
+    const higherSubjects = ["ಕನ್ನಡ (Kannada)", "ಇಂಗ್ಲಿಷ್ (English)", "ಹಿಂದಿ (Hindi)", "ಗಣಿತ (Mathematics)", "ವಿಜ್ಞಾನ (Science)", "ಸಮಾಜ ವಿಜ್ಞಾನ (Social Sci)"];
+
+    // ಶೇಕಡಾವಾರು ಆಧಾರದ ಮೇಲೆ ಗ್ರೇಡ್ ಪಡೆಯುವ ಫಂಕ್ಷನ್
+    function calculateGrade(obtained, max) {
+      if (!max || max === 0) return { g: '-', color: '#000' };
+      let pct = (obtained / max) * 100;
+      if (pct >= 90) return { g: 'A+', color: '#15803d' };
+      if (pct >= 70) return { g: 'A', color: '#16a34a' };
+      if (pct >= 50) return { g: 'B+', color: '#d97706' };
+      if (pct >= 31) return { g: 'B', color: '#ea580c' };
+      return { g: 'C', color: '#dc2626' };
+    }
+
+    function generateTable() {
+      const group = document.getElementById('in-class-group').value;
+      const subjects = (group === 'primary') ? primarySubjects : higherSubjects;
+
+      const maxMarks = (group === 'primary') ? 
+        { fa1: 15, fa2: 15, sa1: 20, fa3: 15, fa4: 15, sa2: 20, total: 100 } : 
+        { fa1: 10, fa2: 10, sa1: 30, fa3: 10, fa4: 10, sa2: 30, total: 100 };
+
+      let formHtml = `
+        <table class="marks-input-table">
+          <thead>
+            <tr>
+              <th>ವಿಷಯ (Subject)</th>
+              <th>FA-1 (${maxMarks.fa1})</th>
+              <th>FA-2 (${maxMarks.fa2})</th>
+              <th>SA-1 (${maxMarks.sa1})</th>
+              <th>FA-3 (${maxMarks.fa3})</th>
+              <th>FA-4 (${maxMarks.fa4})</th>
+              <th>SA-2 (${maxMarks.sa2})</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+
+      subjects.forEach((sub, idx) => {
+        formHtml += `
+          <tr>
+            <td style="text-align: left; font-weight: bold; color: #fff;">${sub}</td>
+            <td><input type="number" id="fa1-${idx}" min="0" max="${maxMarks.fa1}" value="${Math.round(maxMarks.fa1*0.8)}" oninput="updatePreview()"></td>
+            <td><input type="number" id="fa2-${idx}" min="0" max="${maxMarks.fa2}" value="${Math.round(maxMarks.fa2*0.8)}" oninput="updatePreview()"></td>
+            <td><input type="number" id="sa1-${idx}" min="0" max="${maxMarks.sa1}" value="${Math.round(maxMarks.sa1*0.8)}" oninput="updatePreview()"></td>
+            <td><input type="number" id="fa3-${idx}" min="0" max="${maxMarks.fa3}" value="${Math.round(maxMarks.fa3*0.8)}" oninput="updatePreview()"></td>
+            <td><input type="number" id="fa4-${idx}" min="0" max="${maxMarks.fa4}" value="${Math.round(maxMarks.fa4*0.8)}" oninput="updatePreview()"></td>
+            <td><input type="number" id="sa2-${idx}" min="0" max="${maxMarks.sa2}" value="${Math.round(maxMarks.sa2*0.8)}" oninput="updatePreview()"></td>
+          </tr>
+        `;
+      });
+
+      formHtml += `</tbody></table>`;
+      document.getElementById('dynamic-marks-form').innerHTML = formHtml;
+
+      updatePreview();
+    }
+
+    function updatePreview() {
+      const group = document.getElementById('in-class-group').value;
+      const subjects = (group === 'primary') ? primarySubjects : higherSubjects;
+      const maxMarks = (group === 'primary') ? 
+        { fa1: 15, fa2: 15, sa1: 20, fa3: 15, fa4: 15, sa2: 20, total: 100 } : 
+        { fa1: 10, fa2: 10, sa1: 30, fa3: 10, fa4: 10, sa2: 30, total: 100 };
+
+      // ಹೆಡರ್ ಅಪ್ಡೇಟ್
+      document.getElementById('out-school').innerText = document.getElementById('in-school').value || 'ಶಾಲೆಯ ಹೆಸರು';
+      document.getElementById('out-place').innerText = document.getElementById('in-place').value || 'ಸ್ಥಳ';
+      document.getElementById('out-district').innerText = document.getElementById('in-district').value || 'ಜಿಲ್ಲೆ';
+      document.getElementById('out-year').innerText = document.getElementById('in-year').value || '2025-26';
+      document.getElementById('out-class').innerText = document.getElementById('in-class-num').value || 'ತರಗತಿ';
+      document.getElementById('out-sname').innerText = document.getElementById('in-sname').value || '__________________';
+      document.getElementById('out-sats').innerText = document.getElementById('in-sats').value || '__________';
+      document.getElementById('out-pname').innerText = document.getElementById('in-pname').value || '__________________';
+      document.getElementById('out-footer-place').innerText = document.getElementById('in-place').value || 'ಸ್ಥಳ';
+
+      // 🎯 ಟೇಬಲ್ ಹೆಡರ್ (ಪ್ರತಿ ಪರೀಕ್ಷೆಗೂ Marks & Grade ಕಾಲಂಗಳು)
+      document.getElementById('out-table-header').innerHTML = `
+        <th>ವಿಷಯಗಳು</th>
+        <th>FA1 (${maxMarks.fa1})</th><th>Gr</th>
+        <th>FA2 (${maxMarks.fa2})</th><th>Gr</th>
+        <th>SA1 (${maxMarks.sa1})</th><th>Gr</th>
+        <th>FA3 (${maxMarks.fa3})</th><th>Gr</th>
+        <th>FA4 (${maxMarks.fa4})</th><th>Gr</th>
+        <th>SA2 (${maxMarks.sa2})</th><th>Gr</th>
+        <th>ಒಟ್ಟು (100)</th><th>ಗ್ರೇಡ್</th>
+      `;
+
+      let grandTotal = 0;
+      let sumFA1 = 0, sumFA2 = 0, sumSA1 = 0, sumFA3 = 0, sumFA4 = 0, sumSA2 = 0;
+
+      let bodyHtml = '';
+
+      subjects.forEach((sub, idx) => {
+        let f1 = parseFloat(document.getElementById(`fa1-${idx}`)?.value || 0);
+        let f2 = parseFloat(document.getElementById(`fa2-${idx}`)?.value || 0);
+        let s1 = parseFloat(document.getElementById(`sa1-${idx}`)?.value || 0);
+        let f3 = parseFloat(document.getElementById(`fa3-${idx}`)?.value || 0);
+        let f4 = parseFloat(document.getElementById(`fa4-${idx}`)?.value || 0);
+        let s2 = parseFloat(document.getElementById(`sa2-${idx}`)?.value || 0);
+
+        sumFA1 += f1; sumFA2 += f2; sumSA1 += s1;
+        sumFA3 += f3; sumFA4 += f4; sumSA2 += s2;
+
+        let subTotal = f1 + f2 + s1 + f3 + f4 + s2;
+        grandTotal += subTotal;
+
+        // ಪ್ರತಿ ಪರೀಕ್ಷೆಯ ಗ್ರೇಡ್
+        let gF1 = calculateGrade(f1, maxMarks.fa1);
+        let gF2 = calculateGrade(f2, maxMarks.fa2);
+        let gS1 = calculateGrade(s1, maxMarks.sa1);
+        let gF3 = calculateGrade(f3, maxMarks.fa3);
+        let gF4 = calculateGrade(f4, maxMarks.fa4);
+        let gS2 = calculateGrade(s2, maxMarks.sa2);
+        let gTot = calculateGrade(subTotal, 100);
+
+        bodyHtml += `
+          <tr>
+            <td class="sub-name">${sub}</td>
+            <td>${f1}</td><td style="color:${gF1.color}; font-weight:bold;">${gF1.g}</td>
+            <td>${f2}</td><td style="color:${gF2.color}; font-weight:bold;">${gF2.g}</td>
+            <td>${s1}</td><td style="color:${gS1.color}; font-weight:bold;">${gS1.g}</td>
+            <td>${f3}</td><td style="color:${gF3.color}; font-weight:bold;">${gF3.g}</td>
+            <td>${f4}</td><td style="color:${gF4.color}; font-weight:bold;">${gF4.g}</td>
+            <td>${s2}</td><td style="color:${gS2.color}; font-weight:bold;">${gS2.g}</td>
+            <td style="font-weight:bold;">${subTotal}</td>
+            <td style="color:${gTot.color}; font-weight:bold;">${gTot.g}</td>
+          </tr>
+        `;
+      });
+
+      document.getElementById('out-table-body').innerHTML = bodyHtml;
+
+      // 🎯 ಕೊನೆಯ ಸಾಲು: ಪ್ರತಿಯೊಂದು ಪರೀಕ್ಷೆಯ ಒಟ್ಟು ಅಂಕಗಳು & ಗ್ರೇಡ್‌ಗಳು
+      let maxFA1Total = subjects.length * maxMarks.fa1;
+      let maxFA2Total = subjects.length * maxMarks.fa2;
+      let maxSA1Total = subjects.length * maxMarks.sa1;
+      let maxFA3Total = subjects.length * maxMarks.fa3;
+      let maxFA4Total = subjects.length * maxMarks.fa4;
+      let maxSA2Total = subjects.length * maxMarks.sa2;
+      let maxGrandTotal = subjects.length * 100;
+
+      let gTotFA1 = calculateGrade(sumFA1, maxFA1Total);
+      let gTotFA2 = calculateGrade(sumFA2, maxFA2Total);
+      let gTotSA1 = calculateGrade(sumSA1, maxSA1Total);
+      let gTotFA3 = calculateGrade(sumFA3, maxFA3Total);
+      let gTotFA4 = calculateGrade(sumFA4, maxFA4Total);
+      let gTotSA2 = calculateGrade(sumSA2, maxSA2Total);
+      let gFinalTot = calculateGrade(grandTotal, maxGrandTotal);
+
+      let footerHtml = `
+        <tr class="total-row">
+          <td class="sub-name">ಒಟ್ಟು ಅಂಕಗಳು (Total)</td>
+          <td>${sumFA1}</td><td style="color:${gTotFA1.color}">${gTotFA1.g}</td>
+          <td>${sumFA2}</td><td style="color:${gTotFA2.color}">${gTotFA2.g}</td>
+          <td>${sumSA1}</td><td style="color:${gTotSA1.color}">${gTotSA1.g}</td>
+          <td>${sumFA3}</td><td style="color:${gTotFA3.color}">${gTotFA3.g}</td>
+          <td>${sumFA4}</td><td style="color:${gTotFA4.color}">${gTotFA4.g}</td>
+          <td>${sumSA2}</td><td style="color:${gTotSA2.color}">${gTotSA2.g}</td>
+          <td>${grandTotal}</td>
+          <td style="color:${gFinalTot.color}">${gFinalTot.g}</td>
+        </tr>
+      `;
+
+      document.getElementById('out-table-footer').innerHTML = footerHtml;
+
+      // ಸಾರಾಂಶ ಲೆಕ್ಕಾಚಾರ
+      let percentage = (grandTotal / maxGrandTotal) * 100;
+
+      document.getElementById('out-grand-total').innerText = grandTotal;
+      document.getElementById('out-max-total').innerText = maxGrandTotal;
+      document.getElementById('out-percentage').innerText = percentage.toFixed(2) + '%';
+      document.getElementById('out-final-grade').innerText = gFinalTot.g;
+      document.getElementById('out-final-grade').style.color = gFinalTot.color;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      generateTable();
+    });
+  </script>
+</body>
+</html>

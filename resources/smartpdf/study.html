@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+  <meta charset="UTF-8">
+  <title>ವಿದ್ಯಾರ್ಥಿ ಅಧ್ಯಯನ ಪ್ರಮಾಣ ಪತ್ರ - Study Certificate Generator</title>
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif, "Noto Sans Kannada";
+      margin: 0;
+      padding: 15px;
+      background-color: #0f172a;
+      color: #f8fafc;
+    }
+
+    .form-container {
+      max-width: 800px;
+      margin: 0 auto 30px auto;
+      background: #1e293b;
+      padding: 25px;
+      border-radius: 12px;
+      border: 2px solid #38bdf8;
+      box-shadow: 0 0 20px rgba(56, 189, 248, 0.2);
+    }
+
+    .form-container h2 {
+      margin-top: 0;
+      color: #fbbf24;
+      text-align: center;
+      border-bottom: 2px solid #38bdf8;
+      padding-bottom: 10px;
+      font-size: 22px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .form-group.full-width {
+      grid-column: span 2;
+    }
+
+    label {
+      font-size: 13.5px;
+      font-weight: bold;
+      color: #cbd5e1;
+      margin-bottom: 5px;
+    }
+
+    input, select {
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #475569;
+      background: #0f172a;
+      color: #fff;
+      font-size: 14px;
+    }
+
+    input:focus, select:focus {
+      border-color: #38bdf8;
+      outline: none;
+    }
+
+    .btn-container {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .btn-print {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: #fff;
+      border: none;
+      padding: 12px 30px;
+      font-size: 16px;
+      font-weight: bold;
+      border-radius: 30px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+      transition: transform 0.2s;
+    }
+
+    .btn-print:hover {
+      transform: scale(1.05);
+      background: linear-gradient(135deg, #059669, #10b981);
+    }
+
+    /* 🖨️ A4 ಪ್ರಿಂಟ್/PDF ಪ್ರಮಾಣಪತ್ರ ಲೇಔಟ್ (ಪ್ರಿಂಟ್ ತೆಗೆದಾಗ ಮಾತ್ರ ಪರ್ಫೆಕ್ಟ್ ಕಾಣಿಸುತ್ತದೆ) */
+    #certificate-preview {
+      width: 210mm;
+      min-height: 297mm;
+      padding: 20mm;
+      margin: 0 auto;
+      background: #ffffff;
+      color: #000000;
+      border: 8px double #1e3a8a;
+      box-sizing: border-box;
+      position: relative;
+      font-family: "Noto Sans Kannada", 'Times New Roman', serif;
+    }
+
+    .cert-header {
+      text-align: center;
+      border-bottom: 2px solid #1e3a8a;
+      padding-bottom: 12px;
+      margin-bottom: 25px;
+    }
+
+    .cert-header h3 {
+      margin: 0;
+      font-size: 18px;
+      color: #1e3a8a;
+    }
+
+    .cert-header h2 {
+      margin: 5px 0;
+      font-size: 22px;
+      color: #000;
+      font-weight: 900;
+    }
+
+    .cert-header p {
+      margin: 2px 0;
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    .cert-title {
+      text-align: center;
+      margin: 25px 0;
+    }
+
+    .cert-title span {
+      font-size: 20px;
+      font-weight: bold;
+      border-bottom: 2px solid #000;
+      padding-bottom: 4px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .cert-body {
+      font-size: 16px;
+      line-height: 2.2;
+      text-align: justify;
+      margin-bottom: 40px;
+    }
+
+    .fill-val {
+      font-weight: bold;
+      border-bottom: 1px dotted #000;
+      padding: 0 8px;
+      color: #1e3a8a;
+    }
+
+    .cert-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-top: 60px;
+      font-size: 15px;
+      font-weight: bold;
+    }
+
+    .footer-left { text-align: left; }
+    .footer-right { text-align: right; }
+
+    /* 🖨️ ಪ್ರಿಂಟ್ ಮೀಡಿಯಾ ಸೆಟ್ಟಿಂಗ್ಸ್ (ಪ್ರಿಂಟ್ ಕಮಾಂಡ್ ಕೊಟ್ಟಾಗ ಫಾರ್ಮ್ ಮತ್ತು ಬಟನ್‌ಗಳನ್ನು ಹೈಡ್ ಮಾಡುತ್ತದೆ) */
+    @media print {
+      body {
+        background: #fff;
+        padding: 0;
+        margin: 0;
+      }
+      .form-container, .no-print {
+        display: none !important;
+      }
+      #certificate-preview {
+        border: 6px double #000;
+        margin: 0;
+        width: 100%;
+        min-height: 100vh;
+        box-shadow: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 📝 ಸಾರ್ವಜನಿಕರು ಮತ್ತು ಶಿಕ್ಷಕರು ವಿವರ ಭರ್ತಿ ಮಾಡುವ ಫಾರ್ಮ್ -->
+  <div class="form-container no-print">
+    <h2>📜 ವಿದ್ಯಾರ್ಥಿ ಅಧ್ಯಯನ ಪ್ರಮಾಣ ಪತ್ರ ಫಾರ್ಮ್ (Study Certificate Form)</h2>
+    <div class="form-grid">
+      
+      <div class="form-group full-width">
+        <label>ಶಾಲೆಯ ಹೆಸರು (School Name):</label>
+        <input type="text" id="in-school" value="ಸರ್ಕಾರಿ ಹಿರಿಯ ಪ್ರಾಥಮಿಕ ಶಾಲೆ, ಚಂದಿಯಾ ನಂ. ೧" oninput="updateCert()">
+      </div>
+
+      <div class="form-group">
+        <label>ಸ್ಥಳ / ತಾಲೂಕು (Location/Taluk):</label>
+        <input type="text" id="in-place" value="ಕಾರವಾರ" oninput="updateCert()">
+      </div>
+
+      <div class="form-group">
+        <label>ಜಿಲ್ಲೆ (District):</label>
+        <input type="text" id="in-district" value="ಉತ್ತರ ಕನ್ನಡ" oninput="updateCert()">
+      </div>
+
+      <div class="form-group">
+        <label>DISE ಕೋಡ್ (School DISE Code):</label>
+        <input type="text" id="in-dise" value="29140401201" oninput="updateCert()">
+      </div>
+
+      <div class="form-group">
+        <label>ಪ್ರಮಾಣ ಪತ್ರ ಸಂಖ್ಯೆ (Ref No):</label>
+        <input type="text" id="in-ref" value="GHP/SC/2026/01" oninput="updateCert()">
+      </div>
+
+      <div class="form-group">
+        <label>ವಿದ್ಯಾರ್ಥಿಯ ಹೆಸರು (Student Name):</label>
+        <input type="text" id="in-sname" placeholder="ಉದಾ: ಕುಮಾರ / ಕುಮಾರಿ ..." oninput="updateCert()">
+      </div>
+
+      <div class="form-group">
+        <label>ತಂದೆಯ ಹೆಸರು (Father Name):</label>
+        <input type="text" id="in-fname" placeholder="ತಂದೆಯ ಹೆಸರು..." oninput="updateCert()">
+      </div>
+
+      <div class="form-group">
+        <label>ತಾಯಿಯ ಹೆಸರು (Mother Name):</label>
+        <input type="text" id="in-mname" placeholder="ತಾಯಿಯ ಹೆಸರು..." oninput="updateCert()">
+      </div>
+
+      <div class="form-group">
+        <label>SATS ಸಂಖ್ಯೆ (Student SATS ID):</label>
+        <input type="text" id="in-sats" placeholder="10 ಅಂಕಿಗಳ SATS ID" oninput="updateCert()">
+      </div>
+
+      <div class="form-group">
+        <label>ಯಾವ ತರಗತಿಯಿಂದ (From Class):</label>
+        <select id="in-from-class" onchange="updateCert()">
+          <option value="೧ ನೇ">೧ ನೇ ತರಗತಿ</option>
+          <option value="೨ ನೇ">೨ ನೇ ತರಗತಿ</option>
+          <option value="೩ ನೇ">೩ ನೇ ತರಗತಿ</option>
+          <option value="೪ ನೇ">೪ ನೇ ತರಗತಿ</option>
+          <option value="೫ ನೇ">೫ ನೇ ತರಗತಿ</option>
+          <option value="೬ ನೇ" selected>೬ ನೇ ತರಗತಿ</option>
+          <option value="೭ ನೇ">೭ ನೇ ತರಗತಿ</option>
+          <option value="೮ ನೇ">೮ ನೇ ತರಗತಿ</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>ಯಾವ ತರಗತಿಯವರೆಗೆ (To Class):</label>
+        <select id="in-to-class" onchange="updateCert()">
+          <option value="೧ ನೇ">೧ ನೇ ತರಗತಿ</option>
+          <option value="೨ ನೇ">೨ ನೇ ತರಗತಿ</option>
+          <option value="೩ ನೇ">೩ ನೇ ತರಗತಿ</option>
+          <option value="೪ ನೇ">೪ ನೇ ತರಗತಿ</option>
+          <option value="೫ ನೇ">೫ ನೇ ತರಗತಿ</option>
+          <option value="೬ ನೇ">೬ ನೇ ತರಗತಿ</option>
+          <option value="೭ ನೇ" selected>೭ ನೇ ತರಗತಿ</option>
+          <option value="೮ ನೇ">೮ ನೇ ತರಗತಿ</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>ಅಧ್ಯಯನ ಮಾಡಿದ ವರ್ಷಗಳು (Academic Years):</label>
+        <input type="text" id="in-years" value="2023-24 ರಿಂದ 2025-26" oninput="updateCert()">
+      </div>
+
+      <div class="form-group">
+        <label>ಮಾಧ್ಯಮ (Medium):</label>
+        <select id="in-medium" onchange="updateCert()">
+          <option value="ಕನ್ನಡ">ಕನ್ನಡ ಮಾಧ್ಯಮ</option>
+          <option value="ಇಂಗ್ಲಿಷ್">ಇಂಗ್ಲಿಷ್ ಮಾಧ್ಯಮ</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>ಹುಟ್ಟಿದ ದಿನಾಂಕ (Date of Birth):</label>
+        <input type="date" id="in-dob" onchange="updateCert()">
+      </div>
+
+      <div class="form-group">
+        <label>ದಿನಾಂಕ (Issue Date):</label>
+        <input type="date" id="in-date" onchange="updateCert()">
+      </div>
+
+    </div>
+
+    <div class="btn-container">
+      <button class="btn-print" onclick="window.print()">📥 PDF ಆಗಿ ಸೇವ್ ಮಾಡಿ / ಪ್ರಿಂಟ್ ಮಾಡಿ (Save as PDF)</button>
+    </div>
+  </div>
+
+  <!-- 📄 ಲೈವ್ PDF ಪ್ರಿವ್ಯೂ (ಪ್ರಮಾಣಪತ್ರ ವಿನ್ಯಾಸ) -->
+  <div id="certificate-preview">
+    <div class="cert-header">
+      <h3>ಕರ್ನಾಟಕ ಸರ್ಕಾರ</h3>
+      <h3>ಸಾರ್ವಜನಿಕ ಶಿಕ್ಷಣ ಇಲಾಖೆ / ಶಾಲಾ ಶಿಕ್ಷಣ ಮತ್ತು ಸಾಕ್ಷರತಾ ಇಲಾಖೆ</h3>
+      <h2 id="out-school">ಸರ್ಕಾರಿ ಹಿರಿಯ ಪ್ರಾಥಮಿಕ ಶಾಲೆ, ಚಂದಿಯಾ ನಂ. ೧</h2>
+      <p>ತಾಲೂಕು: <span id="out-place">ಕಾರವಾರ</span> | ಜಿಲ್ಲೆ: <span id="out-district">ಉತ್ತರ ಕನ್ನಡ</span></p>
+      <p>DISE CODE: <span id="out-dise">29140401201</span></p>
+    </div>
+
+    <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 14px; margin-bottom: 10px;">
+      <div>ಸಂಖ್ಯೆ / Ref No: <span id="out-ref">GHP/SC/2026/01</span></div>
+      <div>ದಿನಾಂಕ / Date: <span id="out-date">24/07/2026</span></div>
+    </div>
+
+    <div class="cert-title">
+      <span>ವಿದ್ಯಾರ್ಥಿ ಅಧ್ಯಯನ ಪ್ರಮಾಣ ಪತ್ರ</span>
+    </div>
+
+    <div class="cert-body">
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ಈ ಮೂಲಕ ದೃಢೀಕರಿಸುವುದೇನೆಂದರೆ, ಶ್ರೀ/ಶ್ರೀಮತಿ <span class="fill-val" id="out-fname">__________________</span> ಹಾಗೂ ಶ್ರೀಮತಿ <span class="fill-val" id="out-mname">__________________</span> ಇವರ ಮಗ/ಮಗಳಾದ ಕುಮಾರ/ಕುಮಾರಿ <span class="fill-val" id="out-sname">__________________</span> (SATS ID: <span class="fill-val" id="out-sats">__________</span>) ಇವರು ನಮ್ಮ ಶಾಲೆಯಲ್ಲಿ <span class="fill-val" id="out-from-class">೬ ನೇ</span> ತರಗತಿಯಿಂದ <span class="fill-val" id="out-to-class">೭ ನೇ</span> ತರಗತಿಯವರೆಗೆ <span class="fill-val" id="out-years">2023-24 ರಿಂದ 2025-26</span> ನೇ ಶೈಕ್ಷಣಿಕ ಸಾಲಿನಲ್ಲಿ <span class="fill-val" id="out-medium">ಕನ್ನಡ</span> ಮಾಧ್ಯಮದಲ್ಲಿ ನಿಯಮಿತವಾಗಿ ವ್ಯಾಸಂಗ ಮಾಡಿರುತ್ತಾರೆ.
+      <br><br>
+      ಶಾಲಾ ದಾಖಲಾತಿ ರಿಜಿಸ್ಟರ್ ಪ್ರಕಾರ ವಿದ್ಯಾರ್ಥಿಯ ಹುಟ್ಟಿದ ದಿನಾಂಕ: <span class="fill-val" id="out-dob">DD/MM/YYYY</span> ಆಗಿರುತ್ತದೆ.
+      <br><br>
+      ಈ ಅವಧಿಯಲ್ಲಿ ವಿದ್ಯಾರ್ಥಿಯ ನಡತೆ ಮತ್ತು ಚಾರಿತ್ರ್ಯವು <span class="fill-val">ಉತ್ತಮವಾಗಿರುತ್ತದೆ</span> ಎಂದು ಪ್ರಮಾಣೀಕರಿಸಲಾಗಿದೆ.
+    </div>
+
+    <div class="cert-footer">
+      <div class="footer-left">
+        ಸ್ಥಳ: <span id="out-footer-place">ಕಾರವಾರ</span><br>
+        ದಿನಾಂಕ: <span id="out-footer-date">24/07/2026</span>
+      </div>
+      <div class="footer-right">
+        <br><br>
+        ಮುಖ್ಯ ಶಿಕ್ಷಕರ ಸಹಿ ಮತ್ತು ಮೊಹರು<br>
+        (Head Master Signature & Seal)
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 🎯 ಫಾರ್ಮ್ ಟೈಪ್ ಮಾಡಿದಾಗ ಲೈವ್ ಆಗಿ ಸರ್ಟಿಫಿಕೇಟ್ ಅಪ್ಡೇಟ್ ಮಾಡುವ ಜಾವಾಸ್ಕ್ರಿಪ್ಟ್ ಫಂಕ್ಷನ್
+    function updateCert() {
+      document.getElementById('out-school').innerText = document.getElementById('in-school').value || 'ಶಾಲೆಯ ಹೆಸರು';
+      document.getElementById('out-place').innerText = document.getElementById('in-place').value || 'ಸ್ಥಳ';
+      document.getElementById('out-district').innerText = document.getElementById('in-district').value || 'ಜಿಲ್ಲೆ';
+      document.getElementById('out-dise').innerText = document.getElementById('in-dise').value || '----------------';
+      document.getElementById('out-ref').innerText = document.getElementById('in-ref').value || '---';
+
+      document.getElementById('out-sname').innerText = document.getElementById('in-sname').value || '__________________';
+      document.getElementById('out-fname').innerText = document.getElementById('in-fname').value || '__________________';
+      document.getElementById('out-mname').innerText = document.getElementById('in-mname').value || '__________________';
+      document.getElementById('out-sats').innerText = document.getElementById('in-sats').value || '__________';
+
+      document.getElementById('out-from-class').innerText = document.getElementById('in-from-class').value;
+      document.getElementById('out-to-class').innerText = document.getElementById('in-to-class').value;
+      document.getElementById('out-years').innerText = document.getElementById('in-years').value || '___________';
+      document.getElementById('out-medium').innerText = document.getElementById('in-medium').value;
+
+      let dobVal = document.getElementById('in-dob').value;
+      if(dobVal) {
+        let parts = dobVal.split('-');
+        document.getElementById('out-dob').innerText = parts[2] + '/' + parts[1] + '/' + parts[0];
+      } else {
+        document.getElementById('out-dob').innerText = 'DD/MM/YYYY';
+      }
+
+      let dateVal = document.getElementById('in-date').value;
+      let formattedDate = '24/07/2026';
+      if(dateVal) {
+        let parts = dateVal.split('-');
+        formattedDate = parts[2] + '/' + parts[1] + '/' + parts[0];
+      }
+      document.getElementById('out-date').innerText = formattedDate;
+      document.getElementById('out-footer-date').innerText = formattedDate;
+      document.getElementById('out-footer-place').innerText = document.getElementById('in-place').value || 'ಸ್ಥಳ';
+    }
+
+    // ಇಂದಿನ ದಿನಾಂಕವನ್ನು ಆಟೋ ಫಿಲ್ ಮಾಡುವುದು
+    document.addEventListener('DOMContentLoaded', () => {
+      let today = new Date().toISOString().split('T')[0];
+      document.getElementById('in-date').value = today;
+      updateCert();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+  <meta charset="UTF-8">
+  <title>ಶಾಲಾ ಸಂಸತ್ತು ಸಚಿವರ ಪ್ರಮಾಣ ಪತ್ರ - School Cabinet Minister Certificate Generator</title>
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif, "Noto Sans Kannada";
+      margin: 0;
+      padding: 15px;
+      background-color: #0f172a;
+      color: #f8fafc;
+    }
+
+    .form-container {
+      max-width: 850px;
+      margin: 0 auto 30px auto;
+      background: #1e293b;
+      padding: 25px;
+      border-radius: 12px;
+      border: 2px solid #38bdf8;
+      box-shadow: 0 0 20px rgba(56, 189, 248, 0.2);
+    }
+
+    .form-container h2 {
+      margin-top: 0;
+      color: #fbbf24;
+      text-align: center;
+      border-bottom: 2px solid #38bdf8;
+      padding-bottom: 10px;
+      font-size: 22px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .form-group.full-width {
+      grid-column: span 2;
+    }
+
+    label {
+      font-size: 13.5px;
+      font-weight: bold;
+      color: #cbd5e1;
+      margin-bottom: 5px;
+    }
+
+    input, select {
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #475569;
+      background: #0f172a;
+      color: #fff;
+      font-size: 14px;
+      font-family: inherit;
+    }
+
+    input:focus, select:focus {
+      border-color: #38bdf8;
+      outline: none;
+    }
+
+    .btn-container {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .btn-print {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: #fff;
+      border: none;
+      padding: 12px 30px;
+      font-size: 16px;
+      font-weight: bold;
+      border-radius: 30px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+      transition: transform 0.2s;
+    }
+
+    .btn-print:hover {
+      transform: scale(1.05);
+      background: linear-gradient(135deg, #059669, #10b981);
+    }
+
+    /* 🖨️ A4 ಲ್ಯಾಂಡ್‌ಸ್ಕೇಪ್ (Landscape) ಶಾಲಾ ಸಂಸತ್ತು ಪ್ರಮಾಣ ಪತ್ರ ವಿನ್ಯಾಸ */
+    #cert-preview {
+      width: 297mm;
+      height: 210mm;
+      padding: 15mm;
+      margin: 0 auto;
+      background: linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%);
+      color: #000000;
+      box-sizing: border-box;
+      position: relative;
+      font-family: "Noto Sans Kannada", 'Georgia', serif;
+      border: 12px solid #1e3a8a;
+      outline: 4px solid #0284c7;
+      outline-offset: -8px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      text-align: center;
+    }
+
+    .cert-corner-decor {
+      position: absolute;
+      width: 50px;
+      height: 50px;
+      border: 3px solid #0284c7;
+    }
+    .top-left { top: 12px; left: 12px; border-right: none; border-bottom: none; }
+    .top-right { top: 12px; right: 12px; border-left: none; border-bottom: none; }
+    .bottom-left { bottom: 12px; left: 12px; border-right: none; border-top: none; }
+    .bottom-right { bottom: 12px; right: 12px; border-left: none; border-top: none; }
+
+    .cert-header h3 {
+      margin: 0;
+      font-size: 18px;
+      color: #1e3a8a;
+      letter-spacing: 1px;
+    }
+
+    .cert-header h1 {
+      margin: 5px 0 0 0;
+      font-size: 26px;
+      color: #0369a1;
+      font-weight: 900;
+    }
+
+    .cert-header p {
+      margin: 3px 0 0 0;
+      font-size: 14px;
+      font-weight: bold;
+      color: #475569;
+    }
+
+    .cert-main-title {
+      margin: 12px 0 8px 0;
+    }
+
+    .cert-main-title span {
+      font-size: 30px;
+      font-weight: 900;
+      color: #1e3a8a;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      border-bottom: 2px dashed #0284c7;
+      padding-bottom: 4px;
+    }
+
+    .cert-body {
+      font-size: 18px;
+      line-height: 2.2;
+      color: #1e293b;
+      padding: 0 30px;
+    }
+
+    .fill-val {
+      font-weight: bold;
+      font-size: 22px;
+      color: #1e3a8a;
+      border-bottom: 2px solid #0284c7;
+      padding: 0 10px;
+      display: inline-block;
+    }
+
+    .fill-val-sm {
+      font-weight: bold;
+      font-size: 19px;
+      color: #0369a1;
+      border-bottom: 1px dotted #000;
+      padding: 0 8px;
+    }
+
+    .cert-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      padding: 0 30px;
+      margin-top: 10px;
+    }
+
+    .footer-box {
+      text-align: center;
+      font-size: 14.5px;
+      font-weight: bold;
+      color: #1e293b;
+    }
+
+    .seal-badge {
+      width: 85px;
+      height: 85px;
+      background: radial-gradient(circle, #0284c7, #1e3a8a);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-weight: bold;
+      font-size: 12px;
+      box-shadow: 0 0 15px rgba(2, 132, 199, 0.4);
+      border: 3px dashed #fff;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    @media print {
+      @page {
+        size: A4 landscape;
+        margin: 0;
+      }
+      body {
+        background: #fff;
+        padding: 0;
+        margin: 0;
+      }
+      .form-container, .no-print {
+        display: none !important;
+      }
+      #cert-preview {
+        box-shadow: none;
+        width: 100vw;
+        height: 100vh;
+        margin: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 📝 ಶಾಲಾ ಸಂಸತ್ತಿನ ವಿವರ ಭರ್ತಿ ಮಾಡುವ ಫಾರ್ಮ್ -->
+  <div class="form-container no-print">
+    <h2>🏛️ ಶಾಲಾ ಸಂಸತ್ತು ಸಚಿವರ ಪ್ರಮಾಣ ಪತ್ರ ಜನರೇಟರ್</h2>
+    <div class="form-grid">
+      
+      <div class="form-group full-width">
+        <label>ಶಾಲೆಯ ಹೆಸರು (School Name):</label>
+        <input type="text" id="in-school" value="ಸರ್ಕಾರಿ ಹಿರಿಯ ಪ್ರಾಥಮಿಕ ಶಾಲೆ, ಚಂದಿಯಾ ನಂ. ೧" oninput="updateCert()">
+      </div>
+
+      <div class="form-group">
+        <label>ಸ್ಥಳ / ತಾಲೂಕು (Location/Taluk):</label>
+        <input type="text" id="in-place" value="ಕಾರವಾರ" oninput="updateCert()">
+      </div>
+
+      <div class="form-group">
+        <label>ಜಿಲ್ಲೆ (District):</label>
+        <input type="text" id="in-district" value="ಉತ್ತರ ಕನ್ನಡ" oninput="updateCert()">
+      </div>
+
+      <div class="form-group">
+        <label>ವಿದ್ಯಾರ್ಥಿಯ ಹೆಸರು (Student Name):</label>
+        <input type="text" id="in-name" placeholder="ಸಚಿವರಾಗಿ ಆಯ್ಕೆಯಾದ ವಿದ್ಯಾರ್ಥಿಯ ಹೆಸರು..." oninput="updateCert()">
+      </div>
+
+      <div class="form-group">
+        <label>ತರಗತಿ (Class):</label>
+        <input type="text" id="in-class" value="೭ ನೇ ತರಗತಿ" oninput="updateCert()">
+      </div>
+
+      <div class="form-group">
+        <label>ಸಚಿವ ಸಂಪುಟದ ಹುದ್ದೆ (Ministry / Designation):</label>
+        <select id="in-ministry" onchange="updateCert()">
+          <option value="ಮುಖ್ಯಮಂತ್ರಿ (Chief Minister)" selected>ಮುಖ್ಯಮಂತ್ರಿ (Chief Minister)</option>
+          <option value="ಉಪ ಮುಖ್ಯಮಂತ್ರಿ (Deputy Chief Minister)">ಉಪ ಮುಖ್ಯಮಂತ್ರಿ (Deputy Chief Minister)</option>
+          <option value="ಶಿಕ್ಷಣ ಸಚಿವರು (Education Minister)">ಶಿಕ್ಷಣ ಸಚಿವರು (Education Minister)</option>
+          <option value="ಗೃಹ / ಶಿಸ್ತು ಸಚಿವರು (Home Minister)">ಗೃಹ / ಶಿಸ್ತು ಸಚಿವರು (Home Minister)</option>
+          <option value="ಆರೋಗ್ಯ & ನೈರ್ಮಲ್ಯ ಸಚಿವರು (Health Minister)">ಆರೋಗ್ಯ & ನೈರ್ಮಲ್ಯ ಸಚಿವರು (Health Minister)</option>
+          <option value="ಆಹಾರ & ಬಿಸಿಯೂಟ ಸಚಿವರು (Food Minister)">ಆಹಾರ & ಬಿಸಿಯೂಟ ಸಚಿವರು (Food Minister)</option>
+          <option value="ಕ್ರೀಡಾ & ಸಾಂಸ್ಕೃತಿಕ ಸಚಿವರು (Sports Minister)">ಕ್ರೀಡಾ & ಸಾಂಸ್ಕೃತಿಕ ಸಚಿವರು (Sports Minister)</option>
+          <option value="ಗ್ರಂಥಾಲಯ ಸಚಿವರು (Library Minister)">ಗ್ರಂಥಾಲಯ ಸಚಿವರು (Library Minister)</option>
+          <option value="ತೋಟಗಾರಿಕೆ & ಪರಿಸರ ಸಚಿವರು (Eco Minister)">ತೋಟಗಾರಿಕೆ & ಪರಿಸರ ಸಚಿವರು (Eco Minister)</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>ಶೈಕ್ಷಣಿಕ ಸಾಲು (Academic Year):</label>
+        <input type="text" id="in-year" value="2025-26" oninput="updateCert()">
+      </div>
+
+      <div class="form-group">
+        <label>ಪ್ರಮಾಣ ವಚನ ಸ್ವೀಕರಿಸಿದ ದಿನಾಂಕ (Issue Date):</label>
+        <input type="date" id="in-date" onchange="updateCert()">
+      </div>
+
+    </div>
+
+    <div class="btn-container">
+      <button class="btn-print" onclick="window.print()">📥 PDF ಆಗಿ ಸೇವ್ ಮಾಡಿ / ಪ್ರಿಂಟ್ ಮಾಡಿ (Save as PDF)</button>
+    </div>
+  </div>
+
+  <!-- 📄 ಲೈವ್ A4 ಲ್ಯಾಂಡ್‌ಸ್ಕೇಪ್ ಶಾಲಾ ಸಂಸತ್ತು ಪ್ರಮಾಣ ಪತ್ರ ಪ್ರಿವ್ಯೂ -->
+  <div id="cert-preview">
+    <div class="cert-corner-decor top-left"></div>
+    <div class="cert-corner-decor top-right"></div>
+    <div class="cert-corner-decor bottom-left"></div>
+    <div class="cert-corner-decor bottom-right"></div>
+
+    <div class="cert-header">
+      <h3>ಕರ್ನಾಟಕ ಸರ್ಕಾರ - ಶಾಲಾ ಶಿಕ್ಷಣ ಮತ್ತು ಸಾಕ್ಷರತಾ ಇಲಾಖೆ</h3>
+      <h1 id="out-school">ಸರ್ಕಾರಿ ಹಿರಿಯ ಪ್ರಾಥಮಿಕ ಶಾಲೆ, ಚಂದಿಯಾ ನಂ. ೧</h1>
+      <p>ತಾಲೂಕು: <span id="out-place">ಕಾರವಾರ</span> | ಜಿಲ್ಲೆ: <span id="out-district">ಉತ್ತರ ಕನ್ನಡ</span></p>
+    </div>
+
+    <div class="cert-main-title">
+      <span>🏛️ ಶಾಲಾ ಮಂತ್ರಿಮಂಡಲ - ನಿಯೋಜನಾ ಪ್ರಮಾಣ ಪತ್ರ</span>
+    </div>
+
+    <div class="cert-body">
+      ಶ್ರೀ/ಕುಮಾರಿ/ಕುಮಾರ <span class="fill-val" id="out-name">_______________________</span>,<br>
+      ತರಗತಿ: <span class="fill-val-sm" id="out-class">೭ ನೇ ತರಗತಿ</span> ಇವರು <span class="fill-val-sm" id="out-year">2025-26</span> ನೇ ಶೈಕ್ಷಣಿಕ ಸಾಲಿನ ಶಾಲಾ ಸಂಸತ್ತು ಚುನಾವಣೆಯಲ್ಲಿ ಪ್ರಜಾಸತ್ತಾತ್ಮಕವಾಗಿ ಆಯ್ಕೆಯಾಗಿ,<br>
+      ಶಾಲಾ ಸಂಸತ್ತಿನ <span class="fill-val" id="out-ministry">ಮುಖ್ಯಮಂತ್ರಿ</span> ಆಗಿ ಅಧಿಕಾರ ವಹಿಸಿಕೊಂಡಿರುತ್ತಾರೆ.<br>
+      ಶಾಲೆ ಹಾಗೂ ವಿದ್ಯಾರ್ಥಿಗಳ ಹಿತದೃಷ್ಟಿಯಿಂದ ತಮ್ಮ ಕರ್ತವ್ಯ ಮತ್ತು ಜವಾಬ್ದಾರಿಗಳನ್ನು ದಕ್ಷತೆಯಿಂದ ನಿರ್ವಹಿಸಲಿ ಎಂದು ಪ್ರಮಾಣೀಕರಿಸಲಾಗಿದೆ.
+    </div>
+
+    <div class="cert-footer">
+      <div class="footer-box">
+        ದಿನಾಂಕ: <span id="out-date">24/07/2026</span><br>
+        ಸ್ಥಳ: <span id="out-footer-place">ಕಾರವಾರ</span>
+      </div>
+
+      <div class="seal-badge">
+        ★ ಶಾಲಾ ★<br>ಸಂಸತ್ತು<br>ಮೊಹರು
+      </div>
+
+      <div class="footer-box" style="text-align: center;">
+        <br>
+        ___________________________<br>
+        ಸಂಸತ್ತು ಮಾರ್ಗದರ್ಶಿ ಶಿಕ್ಷಕರು
+      </div>
+
+      <div class="footer-box" style="text-align: right;">
+        <br>
+        ___________________________<br>
+        ಮುಖ್ಯ ಶಿಕ್ಷಕರ ಸಹಿ
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function updateCert() {
+      document.getElementById('out-school').innerText = document.getElementById('in-school').value || 'ಶಾಲೆಯ ಹೆಸರು';
+      document.getElementById('out-place').innerText = document.getElementById('in-place').value || 'ಸ್ಥಳ';
+      document.getElementById('out-district').innerText = document.getElementById('in-district').value || 'ಜಿಲ್ಲೆ';
+      
+      document.getElementById('out-name').innerText = document.getElementById('in-name').value || '_______________________';
+      document.getElementById('out-class').innerText = document.getElementById('in-class').value || '_______';
+      document.getElementById('out-year').innerText = document.getElementById('in-year').value || '2025-26';
+      document.getElementById('out-ministry').innerText = document.getElementById('in-ministry').value;
+
+      let dateVal = document.getElementById('in-date').value;
+      let formattedDate = '24/07/2026';
+      if(dateVal) {
+        let parts = dateVal.split('-');
+        formattedDate = parts[2] + '/' + parts[1] + '/' + parts[0];
+      }
+      document.getElementById('out-date').innerText = formattedDate;
+      document.getElementById('out-footer-place').innerText = document.getElementById('in-place').value || 'ಸ್ಥಳ';
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      let today = new Date().toISOString().split('T')[0];
+      document.getElementById('in-date').value = today;
+      updateCert();
+    });
+  </script>
+</body>
+</html>
