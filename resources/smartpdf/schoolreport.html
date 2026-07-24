@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಶಾಲಾ ವರದಿ ತಯಾರಕ</title>
+    <!-- Google Kannada Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Kannada:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        * { 
+            box-sizing: border-box; 
+            font-family: 'Noto Sans Kannada', 'Segoe UI', sans-serif; 
+        }
+        body { background-color: #f4f7f6; margin: 0; padding: 15px; }
+        
+        .portal-header {
+            background: linear-gradient(135deg, #1e3d59, #17b978);
+            color: white;
+            padding: 15px;
+            text-align: center;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .portal-header h1 { margin: 0; font-size: 20px; font-weight: 700; }
+
+        .form-container {
+            background: white;
+            padding: 18px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 25px;
+        }
+        
+        .form-group { margin-bottom: 12px; }
+        label { font-weight: 600; display: block; margin-bottom: 5px; color: #333; }
+        input[type="text"], textarea {
+            width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 15px;
+        }
+        
+        .char-counter {
+            font-size: 13px; color: #d32f2f; text-align: right; margin-top: 4px; font-weight: bold;
+        }
+
+        .page-block-input {
+            border: 2px solid #1e3d59;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            background: #fdfdfd;
+        }
+
+        .page-block-title {
+            color: #1e3d59;
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 5px;
+        }
+
+        .btn-group { display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap; }
+        button {
+            padding: 10px 16px; border: none; border-radius: 5px; 
+            font-weight: 700; color: white; cursor: pointer; font-size: 14px;
+        }
+        .btn-add { background-color: #27ae60; }
+        .btn-remove { background-color: #c0392b; }
+        .btn-dl-img { background-color: #008cba; margin-top: 8px; }
+        .btn-pdf { background-color: #e74c3c; width: 100%; font-size: 16px; padding: 12px; }
+
+        /* A4 ಪ್ರೀವ್ಯೂ ಸೆಟ್ಟಿಂಗ್ಸ್ */
+        #print-area {
+            width: 100%;
+            max-width: 750px;
+            margin: 0 auto;
+        }
+
+        .a4-page {
+            width: 100%;
+            height: 980px;
+            background: white;
+            padding: 30px;
+            box-sizing: border-box;
+            position: relative;
+            margin-bottom: 25px;
+            
+            border: 12px solid #1e3d59;
+            outline: 3px double #ff6e40;
+            outline-offset: -8px;
+
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow: hidden;
+        }
+
+        .header-section {
+            text-align: center;
+            border-bottom: 2px dashed #ff6e40;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+            flex-shrink: 0;
+        }
+        
+        .school-name {
+            font-size: 26px;
+            font-weight: 800;
+            color: #1e3d59;
+            margin: 0 0 6px 0;
+            line-height: 1.2;
+        }
+        
+        .main-event-title {
+            font-size: 24px;
+            font-weight: 800;
+            color: #ff6e40;
+            margin: 0 0 8px 0;
+            line-height: 1.2;
+        }
+
+        .sub-event-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin: 4px 0 2px 0;
+            background: #eef4f8;
+            padding: 5px 16px;
+            display: inline-block;
+            border-radius: 4px;
+            border-left: 4px solid #1e3d59;
+        }
+
+        /* ಫೋಟೋ ಎತ್ತರ ಹೆಚ್ಚಿಸಲಾಗಿದೆ ಇದರಿಂದ ಪೇಜ್ ಖಾಲಿ ಕಾಣಿಸುವುದಿಲ್ಲ */
+        .photo-container {
+            width: 100%;
+            height: 380px;
+            overflow: hidden;
+            border-radius: 6px;
+            border: 2px solid #ccc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #fafafa;
+            margin-bottom: 15px;
+            flex-shrink: 0;
+        }
+
+        .photo-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .content-container {
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 5px;
+            background: #fcfcfc;
+            border-radius: 6px;
+            border: 1px solid #f0f0f0;
+        }
+
+        /* 250 ಅಕ್ಷರಗಳು ಇಡೀ ಜಾಗದಲ್ಲಿ ಸೂಕ್ತವಾಗಿ ತುಂಬುವಂತೆ ಡಿಸೈನ್ */
+        .content-section {
+            width: 100%;
+            font-size: 22px;
+            line-height: 1.8;
+            color: #2c3e50;
+            text-align: justify;
+            white-space: pre-line;
+            word-wrap: break-word;
+            font-weight: 500;
+        }
+
+        .footer-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 15px;
+            font-weight: 700;
+            color: #444;
+            margin-top: 10px;
+            border-top: 2px solid #eee;
+            padding-top: 8px;
+            flex-shrink: 0;
+        }
+
+        /* 🖨️ A4 ಪ್ರಿಂಟ್ ಸೆಟ್ಟಿಂಗ್ಸ್ */
+        @media print {
+            @page {
+                size: A4 portrait;
+                margin: 0mm;
+            }
+            html, body {
+                height: 100%;
+                margin: 0 !important;
+                padding: 0 !important;
+                background: white;
+            }
+            .portal-header, .form-container, hr, h3, .btn-group, .btn-dl-img { 
+                display: none !important; 
+            }
+            #print-area { 
+                width: 100% !important; 
+                margin: 0 !important;
+            }
+            .a4-page {
+                width: 100% !important;
+                height: 297mm !important;
+                max-height: 297mm !important;
+                margin: 0 !important;
+                padding: 15mm !important;
+                page-break-after: always;
+                page-break-inside: avoid;
+                box-sizing: border-box !important;
+                border: 12px solid #1e3d59 !important;
+                outline: 3px double #ff6e40 !important;
+                outline-offset: -8px !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="portal-header">
+        <h1>ಶಿಕ್ಷಕರ ಶೈಕ್ಷಣಿಕ ಸಂಪನ್ಮೂಲಗಳು, ಕಾರವಾರ (ಉತ್ತರ ಕನ್ನಡ)</h1>
+    </div>
+
+    <div class="form-container">
+        <h2 style="margin-top:0;">ವರದಿ ಮಾಹಿತಿ ಭರ್ತಿ ಮಾಡಿ</h2>
+        
+        <div class="form-group">
+            <label>1. ಶಾಲೆಯ ಹೆಸರು (ಎಲ್ಲಾ ಪುಟಗಳಿಗೂ):</label>
+            <input type="text" id="inputSchool" placeholder="ಉದಾ: ಸರ್ಕಾರಿ ಹಿರಿಯ ಪ್ರಾಥಮಿಕ ಶಾಲೆ..." oninput="updateAllPages()">
+        </div>
+
+        <div class="form-group">
+            <label>2. ಮುಖ್ಯ ಕಾರ್ಯಕ್ರಮದ ಹೆಸರು (ಎಲ್ಲಾ ಪುಟಗಳಿಗೂ):</label>
+            <input type="text" id="inputMainEvent" placeholder="ಉದಾ: ವಾರ್ಷಿಕ ಕ್ರೀಡಾಕೂಟ" oninput="updateAllPages()">
+        </div>
+
+        <hr style="margin: 20px 0; border: 0; border-top: 1px solid #ddd;">
+
+        <div id="pages-input-container">
+            <div class="page-block-input" id="input-block-1">
+                <div class="page-block-title">ಪುಟ 1 - ವಿವರಗಳು</div>
+                <div class="form-group">
+                    <label>ಉಪ ಶೀರ್ಷಿಕೆ (Sub-Title):</label>
+                    <input type="text" id="subTitle-1" placeholder="ಉದಾ: ಉದ್ಘಾಟನಾ ಸಮಾರಂಭ" oninput="updatePageContent(1)">
+                </div>
+                <div class="form-group">
+                    <label>ಪುಟ 1 ರ ಫೋಟೋ ಅಪ್ಲೋಡ್ ಮಾಡಿ:</label>
+                    <input type="file" id="fileInput-1" accept="image/*" onchange="loadPagePhoto(event, 1)">
+                    <button class="btn-dl-img" id="downloadBtn-1" style="display:none;" onclick="downloadPhoto(1)">📷 ಫೋಟೋ ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ</button>
+                </div>
+                <div class="form-group">
+                    <label>ಪುಟ 1 ರ ವರದಿ ವಿವರ (ಗರಿಷ್ಠ 300 ಅಕ್ಷರಗಳು):</label>
+                    <textarea id="details-1" rows="4" maxlength="300" placeholder="ಇಲ್ಲಿ ಪ್ರತ್ಯೇಕವಾಗಿ ಮೊದಲ ಪುಟದ ವರದಿ ಬರೆಯಿರಿ..." oninput="updatePageContent(1)"></textarea>
+                    <div class="char-counter" id="counter-1">ಉಳಿದಿರುವ ಅಕ್ಷರಗಳು: 300</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="btn-group">
+            <button class="btn-add" onclick="addNewPageInput()">+ ಇನ್ನೊಂದು ಪುಟ ಸೇರಿಸಿ (Add Page)</button>
+            <button class="btn-remove" onclick="removeLastPageInput()">- ಕೊನೆಯ ಪುಟ ತೆಗೆಯಿರಿ</button>
+        </div>
+
+        <div class="btn-group" style="margin-top:20px;">
+            <button class="btn-pdf" onclick="saveAsPDF()">A4 PDF ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ</button>
+        </div>
+    </div>
+
+    <hr>
+    <h3 style="text-align: center;">ವರದಿಯ ಪ್ರೀವ್ಯೂ (Preview)</h3>
+
+    <div id="print-area">
+        <div class="a4-page" id="page-card-1">
+            <div class="header-section">
+                <h1 class="school-name" id="displaySchool-1">ನಿಮ್ಮ ಶಾಲೆಯ ಹೆಸರು</h1>
+                <h2 class="main-event-title" id="displayMainEvent-1">ಮುಖ್ಯ ಕಾರ್ಯಕ್ರಮದ ಹೆಸರು</h2>
+                <div class="sub-event-title" id="displaySubTitle-1">ಉಪ ಶೀರ್ಷಿಕೆ 1</div>
+            </div>
+            
+            <div class="photo-container" id="photoBox-1">
+                <span style="color: #aaa; padding: 20px;">[ಅಪ್ಲೋಡ್ ಮಾಡಿದ ಫೋಟೋ 1 ಇಲ್ಲಿ ಬರಲಿದೆ]</span>
+            </div>
+
+            <div class="content-container">
+                <div class="content-section" id="displayDetails-1">
+                    ಇಲ್ಲಿ ಮೊದಲ ಪುಟದ ವರದಿಯ ವಿವರಗಳು ಮೂಡಿಬರುತ್ತವೆ...
+                </div>
+            </div>
+            
+            <div class="footer-info">
+                <span id="displayDate-1"></span>
+                <span>ಪುಟ : 1</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let pageCount = 1;
+        const photoDataStore = {};
+        const todayDate = "ದಿನಾಂಕ: " + new Date().toLocaleDateString('kn-IN');
+        document.getElementById('displayDate-1').innerText = todayDate;
+
+        function updateAllPages() {
+            const school = document.getElementById('inputSchool').value || "ನಿಮ್ಮ ಶಾಲೆಯ ಹೆಸರು";
+            const mainEvent = document.getElementById('inputMainEvent').value || "ಮುಖ್ಯ ಕಾರ್ಯಕ್ರಮದ ಹೆಸರು";
+
+            for (let i = 1; i <= pageCount; i++) {
+                const sElem = document.getElementById(`displaySchool-${i}`);
+                const mElem = document.getElementById(`displayMainEvent-${i}`);
+                if (sElem) sElem.innerText = school;
+                if (mElem) mElem.innerText = mainEvent;
+            }
+        }
+
+        function updatePageContent(pageNum) {
+            const subTitle = document.getElementById(`subTitle-${pageNum}`).value;
+            const detailsInput = document.getElementById(`details-${pageNum}`);
+            const details = detailsInput.value;
+
+            const remaining = 300 - details.length;
+            const counterElem = document.getElementById(`counter-${pageNum}`);
+            if (counterElem) {
+                counterElem.innerText = `ಉಳಿದಿರುವ ಅಕ್ಷರಗಳು: ${remaining}`;
+            }
+
+            document.getElementById(`displaySubTitle-${pageNum}`).innerText = subTitle || `ಉಪ ಶೀರ್ಷಿಕೆ ${pageNum}`;
+            document.getElementById(`displayDetails-${pageNum}`).innerText = details || `ಇಲ್ಲಿ ಪುಟ ${pageNum} ರ ವರದಿಯ ವಿವರಗಳು ಮೂಡಿಬರುತ್ತವೆ...`;
+        }
+
+        function loadPagePhoto(event, pageNum) {
+            const photoBox = document.getElementById(`photoBox-${pageNum}`);
+            const file = event.target.files[0];
+            const downloadBtn = document.getElementById(`downloadBtn-${pageNum}`);
+
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const imgSrc = e.target.result;
+                    photoBox.innerHTML = `<img src="${imgSrc}" alt="Page Photo ${pageNum}">`;
+                    photoDataStore[pageNum] = imgSrc;
+                    if(downloadBtn) downloadBtn.style.display = 'inline-block';
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function downloadPhoto(pageNum) {
+            const imgSrc = photoDataStore[pageNum];
+            if (imgSrc) {
+                const a = document.createElement('a');
+                a.href = imgSrc;
+                a.download = `Report_Photo_Page_${pageNum}.png`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            } else {
+                alert("ಮೊದಲು ಫೋಟೋ ಅಪ್ಲೋಡ್ ಮಾಡಿ!");
+            }
+        }
+
+        function addNewPageInput() {
+            pageCount++;
+            
+            const inputContainer = document.getElementById('pages-input-container');
+            const newInputBlock = document.createElement('div');
+            newInputBlock.className = 'page-block-input';
+            newInputBlock.id = `input-block-${pageCount}`;
+            newInputBlock.innerHTML = `
+                <div class="page-block-title">ಪುಟ ${pageCount} - ವಿವರಗಳು</div>
+                <div class="form-group">
+                    <label>ಉಪ ಶೀರ್ಷಿಕೆ (Sub-Title):</label>
+                    <input type="text" id="subTitle-${pageCount}" placeholder="ಉದಾ: ಸಾಂಸ್ಕೃತಿಕ ಕಾರ್ಯಕ್ರಮಗಳು" oninput="updatePageContent(${pageCount})">
+                </div>
+                <div class="form-group">
+                    <label>ಪುಟ ${pageCount} ರ ಫೋಟೋ ಅಪ್ಲೋಡ್ ಮಾಡಿ:</label>
+                    <input type="file" id="fileInput-${pageCount}" accept="image/*" onchange="loadPagePhoto(event, ${pageCount})">
+                    <button class="btn-dl-img" id="downloadBtn-${pageCount}" style="display:none;" onclick="downloadPhoto(${pageCount})">📷 ಫೋಟೋ ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ</button>
+                </div>
+                <div class="form-group">
+                    <label>ಪುಟ ${pageCount} ರ ವರದಿ ವಿವರ (ಗರಿಷ್ಠ 300 ಅಕ್ಷರಗಳು):</label>
+                    <textarea id="details-${pageCount}" rows="4" maxlength="300" placeholder="ಇಲ್ಲಿ ಪ್ರತ್ಯೇಕವಾಗಿ ಪುಟ ${pageCount} ರ ವರದಿ ಬರೆಯಿರಿ..." oninput="updatePageContent(${pageCount})"></textarea>
+                    <div class="char-counter" id="counter-${pageCount}">ಉಳಿದಿರುವ ಅಕ್ಷರಗಳು: 300</div>
+                </div>
+            `;
+            inputContainer.appendChild(newInputBlock);
+
+            const printArea = document.getElementById('print-area');
+            const newA4Page = document.createElement('div');
+            newA4Page.className = 'a4-page';
+            newA4Page.id = `page-card-${pageCount}`;
+            newA4Page.innerHTML = `
+                <div class="header-section">
+                    <h1 class="school-name" id="displaySchool-${pageCount}"></h1>
+                    <h2 class="main-event-title" id="displayMainEvent-${pageCount}"></h2>
+                    <div class="sub-event-title" id="displaySubTitle-${pageCount}">ಉಪ ಶೀರ್ಷಿಕೆ ${pageCount}</div>
+                </div>
+                
+                <div class="photo-container" id="photoBox-${pageCount}">
+                    <span style="color: #aaa; padding: 20px;">[ಅಪ್ಲೋಡ್ ಮಾಡಿದ ಫೋಟೋ ${pageCount} ಇಲ್ಲಿ ಬರಲಿದೆ]</span>
+                </div>
+
+                <div class="content-container">
+                    <div class="content-section" id="displayDetails-${pageCount}">
+                        ಇಲ್ಲಿ ಪುಟ ${pageCount} ರ ವರದಿಯ ವಿವರಗಳು ಮೂಡಿಬರುತ್ತವೆ...
+                    </div>
+                </div>
+                
+                <div class="footer-info">
+                    <span>${todayDate}</span>
+                    <span>ಪುಟ : ${pageCount}</span>
+                </div>
+            `;
+            printArea.appendChild(newA4Page);
+
+            updateAllPages();
+        }
+
+        function removeLastPageInput() {
+            if (pageCount > 1) {
+                const inputBlock = document.getElementById(`input-block-${pageCount}`);
+                const pageCard = document.getElementById(`page-card-${pageCount}`);
+                
+                if (inputBlock) inputBlock.remove();
+                if (pageCard) pageCard.remove();
+                delete photoDataStore[pageCount];
+                
+                pageCount--;
+            }
+        }
+
+        function saveAsPDF() {
+            window.print();
+        }
+    </script>
+</body>
+</html>
