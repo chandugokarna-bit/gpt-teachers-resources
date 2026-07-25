@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಕೋನ ರಚನೆ (Angle Construction)</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f9f9;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 30px;
+            border-top: 8px solid #009688;
+        }
+        h1 {
+            color: #00796B;
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        p.desc {
+            font-size: 18px;
+            color: #555;
+            margin-bottom: 25px;
+        }
+        .input-section {
+            background-color: #e0f2f1;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        input[type="number"] {
+            font-size: 20px;
+            padding: 10px;
+            width: 120px;
+            text-align: center;
+            border: 2px solid #009688;
+            border-radius: 5px;
+            outline: none;
+        }
+        .btn {
+            font-size: 18px;
+            padding: 12px 25px;
+            margin-left: 10px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            color: white;
+            font-weight: bold;
+            background-color: #009688;
+            transition: 0.3s;
+        }
+        .btn:hover {
+            background-color: #00796B;
+        }
+        .canvas-container {
+            position: relative;
+            background-color: #fafafa;
+            border: 2px dashed #ccc;
+            border-radius: 10px;
+            display: inline-block;
+            padding: 20px;
+        }
+        canvas {
+            display: block;
+        }
+        .info {
+            font-size: 22px;
+            font-weight: bold;
+            color: #E64A19;
+            margin-top: 20px;
+            min-height: 30px;
+        }
+        .steps {
+            text-align: left;
+            background-color: #fff9c4;
+            padding: 15px 25px;
+            border-radius: 10px;
+            margin-top: 25px;
+            border-left: 5px solid #fbc02d;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>📐 ಕೋನ ರಚನೆ ಕಲಿಯೋಣ ✏️</h1>
+        <p class="desc">ಕೋನಮಾಪಕವನ್ನು (Protractor) ಬಳಸಿ ಕೋನವನ್ನು ಹೇಗೆ ರಚಿಸುವುದು ಎಂದು ನೋಡೋಣ.</p>
+
+        <div class="input-section">
+            <label for="angleInput" style="font-size: 20px; font-weight: bold;">ಕೋನವನ್ನು ನಮೂದಿಸಿ (0° ದಿಂದ 180°): </label>
+            <input type="number" id="angleInput" placeholder="ಉದಾ: 60" min="0" max="180">
+            <button class="btn" onclick="startAnimation()">ರಚಿಸಿ (Draw)</button>
+        </div>
+
+        <div class="canvas-container">
+            <canvas id="canvas" width="600" height="350"></canvas>
+        </div>
+
+        <div class="info" id="statusText"></div>
+
+        <div class="steps" id="stepsBox" style="display: none;">
+            <strong>ರಚನೆಯ ಹಂತಗಳು:</strong>
+            <ol>
+                <li>ಒಂದು ಸರಳ ರೇಖೆಯನ್ನು ಎಳೆಯಿರಿ (ತಳದ ರೇಖೆ).</li>
+                <li>ಕೋನಮಾಪಕದ ಕೇಂದ್ರ ಬಿಂದುವನ್ನು ರೇಖೆಯ ಆರಂಭಿಕ ಬಿಂದುವಿನ ಮೇಲಿಡಿ.</li>
+                <li>ಕೋನಮಾಪಕದ 0° ರೇಖೆಯು ನಿಮ್ಮ ತಳದ ರೇಖೆಯೊಂದಿಗೆ ನೇರವಾಗಿರುವಂತೆ ನೋಡಿಕೊಳ್ಳಿ.</li>
+                <li>ನೀವು ನಮೂದಿಸಿದ ಕೋನದ ಅಳತೆಯನ್ನು ಗುರುತಿಸಿ ಮತ್ತು ಕೇಂದ್ರ ಬಿಂದುವಿನಿಂದ ಆ ಗುರುತಿಗೆ ಒಂದು ರೇಖೆಯನ್ನು ಎಳೆಯಿರಿ.</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById("canvas");
+        const ctx = canvas.getContext("2d");
+        
+        const centerX = 300;
+        const centerY = 300; // Positioned near bottom
+        const radius = 220;
+
+        let targetAngle = 0;
+        let currentAngle = 0;
+        let animationId;
+
+        // Draw initial static protractor
+        drawScene(0);
+
+        function drawProtractor() {
+            // Draw semi-circle
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, radius, Math.PI, 0, false);
+            ctx.fillStyle = "rgba(0, 150, 136, 0.1)";
+            ctx.fill();
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = "#00796B";
+            ctx.stroke();
+            ctx.closePath();
+
+            // Draw center point
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, 5, 0, 2 * Math.PI);
+            ctx.fillStyle = "#D32F2F";
+            ctx.fill();
+            ctx.closePath();
+
+            // Draw base line
+            ctx.beginPath();
+            ctx.moveTo(centerX - radius - 20, centerY);
+            ctx.lineTo(centerX + radius + 20, centerY);
+            ctx.strokeStyle = "#333";
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Draw degree ticks
+            for (let i = 0; i <= 180; i += 10) {
+                let rad = (i * Math.PI) / 180;
+                let isMajor = (i % 30 === 0);
+                let tickLength = isMajor ? 15 : 8;
+                
+                let startX = centerX + (radius - tickLength) * Math.cos(-rad);
+                let startY = centerY + (radius - tickLength) * Math.sin(-rad);
+                let endX = centerX + radius * Math.cos(-rad);
+                let endY = centerY + radius * Math.sin(-rad);
+
+                ctx.beginPath();
+                ctx.moveTo(startX, startY);
+                ctx.lineTo(endX, endY);
+                ctx.strokeStyle = "#00796B";
+                ctx.lineWidth = isMajor ? 2 : 1;
+                ctx.stroke();
+
+                // Draw numbers
+                if (isMajor) {
+                    let textX = centerX + (radius - 35) * Math.cos(-rad);
+                    let textY = centerY + (radius - 35) * Math.sin(-rad);
+                    ctx.fillStyle = "#333";
+                    ctx.font = "14px Arial";
+                    ctx.textAlign = "center";
+                    ctx.textBaseline = "middle";
+                    ctx.fillText(i + "°", textX, textY);
+                }
+            }
+        }
+
+        function drawScene(angle) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawProtractor();
+
+            // Draw active base line segment (0 degree side)
+            ctx.beginPath();
+            ctx.moveTo(centerX, centerY);
+            ctx.lineTo(centerX + radius, centerY);
+            ctx.strokeStyle = "#D32F2F";
+            ctx.lineWidth = 4;
+            ctx.stroke();
+
+            // Draw moving angle line
+            let rad = (angle * Math.PI) / 180;
+            let endX = centerX + radius * Math.cos(-rad);
+            let endY = centerY + radius * Math.sin(-rad);
+
+            ctx.beginPath();
+            ctx.moveTo(centerX, centerY);
+            ctx.lineTo(endX, endY);
+            ctx.strokeStyle = "#D32F2F";
+            ctx.lineWidth = 4;
+            ctx.stroke();
+
+            // Draw angle arc
+            if (angle > 0) {
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, 50, 0, -rad, true);
+                ctx.strokeStyle = "#FF9800";
+                ctx.lineWidth = 3;
+                ctx.stroke();
+                
+                // Angle text near arc
+                let textRad = (-rad) / 2;
+                let textX = centerX + 70 * Math.cos(textRad);
+                let textY = centerY + 70 * Math.sin(textRad);
+                ctx.fillStyle = "#D32F2F";
+                ctx.font = "bold 18px Arial";
+                ctx.fillText(Math.floor(angle) + "°", textX, textY);
+            }
+        }
+
+        function animate() {
+            if (currentAngle < targetAngle) {
+                currentAngle += 1; // Speed of animation
+                if (currentAngle > targetAngle) currentAngle = targetAngle;
+                drawScene(currentAngle);
+                animationId = requestAnimationFrame(animate);
+            } else {
+                cancelAnimationFrame(animationId);
+                let status = document.getElementById("statusText");
+                status.innerText = `✅ ${targetAngle}° ಕೋನ ರಚನೆ ಪೂರ್ಣಗೊಂಡಿದೆ!`;
+                document.getElementById("stepsBox").style.display = "block";
+            }
+        }
+
+        function startAnimation() {
+            let inputVal = document.getElementById("angleInput").value;
+            let parsedVal = parseInt(inputVal);
+
+            if (isNaN(parsedVal) || parsedVal < 0 || parsedVal > 180) {
+                alert("ದಯವಿಟ್ಟು 0 ಮತ್ತು 180 ರ ನಡುವಿನ ಸರಿಯಾದ ಕೋನವನ್ನು ನಮೂದಿಸಿ.");
+                return;
+            }
+
+            cancelAnimationFrame(animationId);
+            targetAngle = parsedVal;
+            currentAngle = 0;
+            
+            document.getElementById("statusText").innerText = "ರಚನೆಯಾಗುತ್ತಿದೆ... (Drawing...)";
+            document.getElementById("stepsBox").style.display = "none";
+            
+            animate();
+        }
+    </script>
+</body>
+</html>

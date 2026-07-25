@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಗಣಿತದಲ್ಲಿ ವಿನ್ಯಾಸಗಳು - Interactive Quiz</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Noto+Sans+Kannada:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', 'Noto Sans Kannada', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        }
+        .option-btn {
+            transition: all 0.2s ease;
+            border: 2px solid #e2e8f0;
+        }
+        .option-btn:hover {
+            border-color: #667eea;
+            background-color: #f7fafc;
+        }
+        .option-btn.selected {
+            border-color: #667eea;
+            background-color: #ebf4ff;
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.5);
+        }
+        .correct { border-color: #48bb78 !important; background-color: #f0fff4 !important; }
+        .wrong { border-color: #f56565 !important; background-color: #fff5f5 !important; }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in { animation: fadeIn 0.4s ease-out forwards; }
+    </style>
+</head>
+<body class="p-4 md:p-8 flex flex-col items-center">
+
+    <div class="max-w-3xl w-full text-white mb-8 text-center">
+        <h1 class="text-3xl md:text-4xl font-bold mb-2">ಘಟಕ - 1: ಗಣಿತದಲ್ಲಿ ವಿನ್ಯಾಸಗಳು</h1>
+        <p class="text-lg opacity-90">Interactive Assessment Quiz (6th Grade Mathematics)</p>
+    </div>
+
+    <div class="max-w-3xl w-full glass-card p-6 md:p-10 mb-8">
+        <!-- Progress Tracker -->
+        <div class="mb-8">
+            <div class="flex justify-between items-center mb-2 text-sm font-semibold text-gray-600">
+                <span id="progress-text">Question 1 of 20</span>
+                <span id="score-text">Score: 0</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-3">
+                <div id="progress-bar" class="bg-indigo-600 h-3 rounded-full transition-all duration-500" style="width: 5%"></div>
+            </div>
+        </div>
+
+        <div id="quiz-container">
+            <!-- Questions will be injected here by JS -->
+            <div id="question-box" class="fade-in">
+                <h2 id="question-text" class="text-xl md:text-2xl font-bold text-gray-800 mb-6"></h2>
+                <div id="options-container" class="space-y-4">
+                    <!-- Options go here -->
+                </div>
+                <div id="input-container" class="hidden">
+                    <input type="text" id="blank-input" class="w-full p-4 border-2 border-gray-200 rounded-xl focus:border-indigo-500 outline-none transition-all" placeholder="ನಿಮ್ಮ ಉತ್ತರವನ್ನು ಇಲ್ಲಿ ಬರೆಯಿರಿ...">
+                </div>
+            </div>
+
+            <div class="mt-10 flex justify-between">
+                <button id="feedback-btn" class="hidden px-6 py-3 rounded-xl font-bold text-white transition-all"></button>
+                <button id="next-btn" onclick="nextQuestion()" class="ml-auto bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-xl font-bold shadow-lg transform hover:-translate-y-1 active:scale-95 transition-all">
+                    Next Question
+                </button>
+            </div>
+        </div>
+
+        <!-- Result Screen -->
+        <div id="result-screen" class="hidden text-center fade-in">
+            <div class="mb-6">
+                <svg class="w-24 h-24 text-green-500 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+            </div>
+            <h2 class="text-3xl font-bold text-gray-800 mb-4">ಅಭಿನಂದನೆಗಳು!</h2>
+            <p class="text-xl text-gray-600 mb-8">ನೀವು ರಸಪ್ರಶ್ನೆಯನ್ನು ಯಶಸ್ವಿಯಾಗಿ ಪೂರ್ಣಗೊಳಿಸಿದ್ದೀರಿ.</p>
+            <div class="bg-indigo-50 rounded-2xl p-8 mb-8">
+                <p class="text-sm text-indigo-600 uppercase tracking-widest font-bold mb-2">ನಿಮ್ಮ ಅಂಕಗಳು</p>
+                <p id="final-score" class="text-6xl font-black text-indigo-900">0/20</p>
+            </div>
+            <button onclick="location.reload()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-10 py-4 rounded-2xl font-bold shadow-xl transition-all">
+                ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ
+            </button>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="max-w-3xl w-full text-center text-white opacity-70 text-sm">
+        <p>Source Document: 6thLBAMathsKM (1).pdf - Chapter 1 Patterns in Mathematics</p>
+    </footer>
+
+    <script>
+        const quizData = [
+            {
+                type: "mcq",
+                question: "9, 18, 27, 36, ಈ ಸಂಖ್ಯಾ ಶ್ರೇಣಿಯ ಮುಂದಿನ ಸಂಖ್ಯೆ ಯಾವುದು?",
+                options: ["100", "81", "45", "65"],
+                correct: 2, // 45
+                hint: "ಇದು 9 ರ ಮಗ್ಗಿ (Table of 9)."
+            },
+            {
+                type: "mcq",
+                question: "5, 10, 20, 40 ಈ ಶ್ರೇಣಿಯ ಮುಂದಿನ ಎರಡು ಸಂಖ್ಯೆಗಳು ಯಾವುವು?",
+                options: ["80, 160", "60, 80", "40, 50", "50, 60"],
+                correct: 0, // 80, 160
+                hint: "ಪ್ರತಿ ಸಂಖ್ಯೆಯು ಹಿಂದಿನ ಸಂಖ್ಯೆಯ ಎರಡರಷ್ಟು (Double)."
+            },
+            {
+                type: "mcq",
+                question: "1, 4, 9, 16 ಈ ಶ್ರೇಣಿಯ ಮುಂದಿನ ಸಂಖ್ಯೆ ಯಾವುದು?",
+                options: ["15", "25", "49", "20"],
+                correct: 1, // 25
+                hint: "ಇವು ವರ್ಗ ಸಂಖ್ಯೆಗಳು (Square Numbers: 1x1, 2x2, 3x3, 4x4...)."
+            },
+            {
+                type: "mcq",
+                question: "1, 11, 111, 1111 ಈ ಶ್ರೇಣಿಯ ಮುಂದಿನ ಪದ ಯಾವುದು?",
+                options: ["111111", "111", "11111", "1111111"],
+                correct: 2, // 11111
+                hint: "ಪ್ರತಿ ಬಾರಿ ಒಂದು '1' ಹೆಚ್ಚಾಗುತ್ತಿದೆ."
+            },
+            {
+                type: "mcq",
+                question: "A1, B2, C3, D4, ... F6 ಈ ಸರಣಿಯಲ್ಲಿ ಬಿಟ್ಟು ಹೋದ ಪದ ಯಾವುದು?",
+                options: ["E5", "D5", "E8", "F5"],
+                correct: 0, // E5
+                hint: "ಅಕ್ಷರ ಮತ್ತು ಸಂಖ್ಯೆ ಎರಡೂ ಕ್ರಮವಾಗಿವೆ."
+            },
+            {
+                type: "mcq",
+                question: "2, 4, 8, 16, 34, 64 ಈ ಶ್ರೇಣಿಯಲ್ಲಿನ ತಪ್ಪು ಸಂಖ್ಯೆ ಯಾವುದು?",
+                options: ["2", "8", "64", "34"],
+                correct: 3, // 34 should be 32
+                hint: "ಇದು 2 ರ ಘಾತಗಳು (Powers of 2: 2, 4, 8, 16, 32, 64)."
+            },
+            {
+                type: "mcq",
+                question: "AVAVAV ಈ ವಿನ್ಯಾಸವನ್ನು ಮುಂದುವರೆಸಿದಾಗ ಬರುವ ಮುಂದಿನ ಪದ:",
+                options: ["B", "A", "VA", "AV"],
+                correct: 3, // AV
+                hint: "ವಿನ್ಯಾಸವು AV ಪುನರಾವರ್ತನೆಯಾಗುತ್ತಿದೆ."
+            },
+            {
+                type: "mcq",
+                question: "AB, BC, CD, DE ಈ ವಿನ್ಯಾಸದಲ್ಲಿ 5ನೇ ಪದ ಯಾವುದು?",
+                options: ["FG", "DF", "EF", "EE"],
+                correct: 2, // EF
+                hint: "ಪ್ರತಿ ಪದವು ಹಿಂದಿನ ಪದದ ಕೊನೆಯ ಅಕ್ಷರದಿಂದ ಆರಂಭವಾಗುತ್ತದೆ."
+            },
+            {
+                type: "mcq",
+                question: "2, 6, 12, 20, 30 ಈ ಶ್ರೇಣಿಯ ಮುಂದಿನ ಸಂಖ್ಯೆ ಯಾವುದು?",
+                options: ["36", "40", "42", "48"],
+                correct: 2, // 42
+                hint: "ವ್ಯತ್ಯಾಸವನ್ನು ನೋಡಿ: 4, 6, 8, 10, 12..."
+            },
+            {
+                type: "fill",
+                question: "1, 3, 6, 10, 15.... ಇವುಗಳನ್ನು ಯಾವ ಸಂಖ್ಯೆಗಳು ಎನ್ನುವರು?",
+                answer: "ತ್ರಿಕೋನೀಯ",
+                hint: "ಇಂಗ್ಲಿಷ್‌ನಲ್ಲಿ 'Triangular Numbers' ಎನ್ನುತ್ತಾರೆ."
+            },
+            {
+                type: "fill",
+                question: "1, 4, 9, 16, 25.... ಇವುಗಳನ್ನು ಯಾವ ಸಂಖ್ಯೆಗಳು ಎನ್ನುವರು?",
+                answer: "ವರ್ಗ",
+                hint: "ಇಂಗ್ಲಿಷ್‌ನಲ್ಲಿ 'Square Numbers' ಎನ್ನುತ್ತಾರೆ."
+            },
+            {
+                type: "fill",
+                question: "1, 8, 27, 64 ಈ ಶ್ರೇಣಿಯ ಮುಂದಿನ ಸಂಖ್ಯೆ ಯಾವುದು?",
+                answer: "125",
+                hint: "ಇವು ಘನ ಸಂಖ್ಯೆಗಳು (Cube Numbers: 1³, 2³, 3³, 4³, 5³)."
+            },
+            {
+                type: "mcq",
+                question: "ಮೊದಲ ಮೂರು ಕ್ರಮಾನುಗತ ಬೆಸ ಸಂಖ್ಯೆಗಳ ಮೊತ್ತ ಎಷ್ಟು? (1+3+5)",
+                options: ["6", "9", "12", "15"],
+                correct: 1, // 9
+                hint: "1 + 3 + 5 ಕೂಡಿಸಿರಿ."
+            },
+            {
+                type: "mcq",
+                question: "ಮೂರನೇ ತ್ರಿಕೋನೀಯ ಸಂಖ್ಯೆ ಯಾವುದು?",
+                options: ["3", "5", "6", "10"],
+                correct: 2, // 6
+                hint: "1, 3, 6, 10..."
+            },
+            {
+                type: "boolean",
+                question: "ಸಂಖ್ಯೆಗಳು, ಆಕೃತಿಗಳು ಅಥವಾ ಅಕ್ಷರಗಳನ್ನು ಬಳಸಿಕೊಂಡು ವಿನ್ಯಾಸಗಳನ್ನು ನಿರ್ಮಿಸಬಹುದು.",
+                options: ["ಸರಿ (True)", "ತಪ್ಪು (False)"],
+                correct: 0
+            },
+            {
+                type: "boolean",
+                question: "1, 3, 5, 7, 9 ... ಈ ಶ್ರೇಣಿಯು ಬೆಸ ಸಂಖ್ಯೆಗಳ ವಿನ್ಯಾಸ ಹೊಂದಿದೆ.",
+                options: ["ಸರಿ (True)", "ತಪ್ಪು (False)"],
+                correct: 0
+            },
+            {
+                type: "boolean",
+                question: "ಎಲ್ಲಾ ಸಂಖ್ಯಾ ವಿನ್ಯಾಸಗಳು ಕೇವಲ ಏರಿಕೆ ಕ್ರಮದಲ್ಲಿ ಮಾತ್ರ ಇರಬೇಕು.",
+                options: ["ಸರಿ (True)", "ತಪ್ಪು (False)"],
+                correct: 1 // False
+            },
+            {
+                type: "boolean",
+                question: "ವಿನ್ಯಾಸವು ಶ್ರೇಣಿಯ ಮುಂದಿನ ಸಂಖ್ಯೆ ಅಥವಾ ಆಕೃತಿಯನ್ನು ಊಹಿಸಲು ಸಹಾಯ ಮಾಡುವುದು.",
+                options: ["ಸರಿ (True)", "ತಪ್ಪು (False)"],
+                correct: 0
+            },
+            {
+                type: "boolean",
+                question: "100, 90, 80, 70 ಈ ಸರಣಿಯು ಸಾಮಾನ್ಯ ವ್ಯತ್ಯಾಸ ಹೊಂದಿರುವ ವಿನ್ಯಾಸವನ್ನು ಹೊಂದಿದೆ.",
+                options: ["ಸರಿ (True)", "ತಪ್ಪು (False)"],
+                correct: 0
+            },
+            {
+                type: "mcq",
+                question: "3, 6, 9, 12... ಈ ವಿನ್ಯಾಸದ ಮುಂದಿನ ಸಂಖ್ಯೆ ಯಾವುದು?",
+                options: ["13", "14", "15", "18"],
+                correct: 2, // 15
+                hint: "ಇದು 3 ರ ಮಗ್ಗಿ."
+            }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let answered = false;
+
+        function loadQuestion() {
+            answered = false;
+            const q = quizData[currentQuestion];
+            const qBox = document.getElementById('question-box');
+            const qText = document.getElementById('question-text');
+            const optionsContainer = document.getElementById('options-container');
+            const inputContainer = document.getElementById('input-container');
+            const feedbackBtn = document.getElementById('feedback-btn');
+            
+            // Reset UI
+            qBox.classList.remove('fade-in');
+            void qBox.offsetWidth; // Trigger reflow
+            qBox.classList.add('fade-in');
+            
+            feedbackBtn.classList.add('hidden');
+            document.getElementById('next-btn').innerText = (currentQuestion === quizData.length - 1) ? "Show Results" : "Next Question";
+            
+            // Update Progress
+            document.getElementById('progress-text').innerText = `Question ${currentQuestion + 1} of ${quizData.length}`;
+            document.getElementById('progress-bar').style.width = `${((currentQuestion + 1) / quizData.length) * 100}%`;
+            document.getElementById('score-text').innerText = `Score: ${score}`;
+
+            qText.innerText = q.question;
+
+            if (q.type === "mcq" || q.type === "boolean") {
+                inputContainer.classList.add('hidden');
+                optionsContainer.classList.remove('hidden');
+                optionsContainer.innerHTML = '';
+                
+                q.options.forEach((opt, index) => {
+                    const btn = document.createElement('button');
+                    btn.className = "option-btn w-full text-left p-4 rounded-xl font-medium text-gray-700 hover:shadow-md transition-all";
+                    btn.innerText = opt;
+                    btn.onclick = () => checkAnswer(index, btn);
+                    optionsContainer.appendChild(btn);
+                });
+            } else if (q.type === "fill") {
+                optionsContainer.classList.add('hidden');
+                inputContainer.classList.remove('hidden');
+                const input = document.getElementById('blank-input');
+                input.value = '';
+                input.onkeypress = (e) => {
+                    if(e.key === 'Enter') checkFillAnswer();
+                };
+            }
+        }
+
+        function checkAnswer(index, btn) {
+            if (answered) return;
+            answered = true;
+            
+            const q = quizData[currentQuestion];
+            const feedbackBtn = document.getElementById('feedback-btn');
+            
+            if (index === q.correct) {
+                score++;
+                btn.classList.add('correct', 'font-bold', 'text-green-700');
+                showFeedback("ಸರಿಯಾದ ಉತ್ತರ! 🎉", "bg-green-500");
+            } else {
+                btn.classList.add('wrong', 'text-red-700');
+                // Highlight correct answer
+                const btns = document.querySelectorAll('.option-btn');
+                btns[q.correct].classList.add('correct', 'font-bold', 'text-green-700');
+                showFeedback(`ತಪ್ಪು. ಸರಿಯಾದ ಉತ್ತರ: ${q.options[q.correct]}`, "bg-red-500");
+            }
+            document.getElementById('score-text').innerText = `Score: ${score}`;
+        }
+
+        function checkFillAnswer() {
+            if (answered) return;
+            const input = document.getElementById('blank-input');
+            const userVal = input.value.trim().toLowerCase();
+            const correctVal = quizData[currentQuestion].answer.toLowerCase();
+            
+            answered = true;
+            if (userVal.includes(correctVal) || correctVal.includes(userVal) && userVal.length > 1) {
+                score++;
+                input.classList.add('border-green-500', 'bg-green-50');
+                showFeedback("ಸರಿಯಾದ ಉತ್ತರ! 🌟", "bg-green-500");
+            } else {
+                input.classList.add('border-red-500', 'bg-red-50');
+                showFeedback(`ತಪ್ಪು. ಸರಿಯಾದ ಉತ್ತರ: ${quizData[currentQuestion].answer}`, "bg-red-500");
+            }
+            document.getElementById('score-text').innerText = `Score: ${score}`;
+        }
+
+        function showFeedback(text, colorClass) {
+            const fb = document.getElementById('feedback-btn');
+            fb.innerText = text;
+            fb.className = `px-6 py-3 rounded-xl font-bold text-white fade-in ${colorClass}`;
+            fb.classList.remove('hidden');
+        }
+
+        function nextQuestion() {
+            if (!answered && quizData[currentQuestion].type === "fill") {
+                checkFillAnswer();
+                return;
+            }
+            if (!answered) {
+                alert("ಮುಂದೆ ಹೋಗುವ ಮೊದಲು ದಯವಿಟ್ಟು ಉತ್ತರವನ್ನು ಆರಿಸಿ.");
+                return;
+            }
+
+            currentQuestion++;
+            if (currentQuestion < quizData.length) {
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            document.getElementById('quiz-container').classList.add('hidden');
+            document.getElementById('result-screen').classList.remove('hidden');
+            document.getElementById('final-score').innerText = `${score} / ${quizData.length}`;
+            document.getElementById('progress-bar').style.width = "100%";
+        }
+
+        // Initialize quiz on load
+        window.onload = loadQuestion;
+
+    </script>
+</body>
+</html>
