@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ದ್ವಿಭಾಷಾ ಶಬ್ದಕೋಶ ಹಾಗೂ ಸ್ಪೋಕನ್ ಇಂಗ್ಲಿಷ್ ಟೂಲ್</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+        body {
+            background-color: #f0f4f8;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            background: #ffffff;
+            width: 100%;
+            max-width: 650px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        .header h1 {
+            color: #1e293b;
+            font-size: 24px;
+            margin: 0 0 8px 0;
+        }
+        .header p {
+            color: #64748b;
+            font-size: 14px;
+            margin: 0;
+        }
+        
+        /* Direction Switcher Button */
+        .mode-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 25px;
+        }
+        .mode-switch {
+            background: #e2e8f0;
+            border-radius: 30px;
+            padding: 4px;
+            display: flex;
+            gap: 4px;
+            width: 100%;
+            max-width: 400px;
+        }
+        .mode-btn {
+            flex: 1;
+            padding: 10px 16px;
+            border: none;
+            border-radius: 25px;
+            background: transparent;
+            color: #475569;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .mode-btn.active {
+            background: #2563eb;
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+
+        /* Text Box Styling */
+        .box-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+        label {
+            display: block;
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 8px;
+            font-size: 15px;
+        }
+        textarea {
+            width: 100%;
+            height: 110px;
+            padding: 14px;
+            border: 2px solid #cbd5e1;
+            border-radius: 12px;
+            font-size: 16px;
+            resize: none;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        textarea:focus {
+            border-color: #2563eb;
+        }
+        .output-box {
+            background-color: #f8fafc;
+            color: #0f172a;
+            font-weight: 500;
+        }
+
+        /* Buttons & Audio */
+        .button-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+        }
+        .status-text {
+            font-size: 13px;
+            color: #64748b;
+        }
+        .audio-btn {
+            background-color: #10b981;
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: background 0.2s;
+        }
+        .audio-btn:hover {
+            background-color: #059669;
+        }
+
+        .tips-card {
+            background-color: #f1f5f9;
+            border-left: 4px solid #2563eb;
+            padding: 12px 16px;
+            border-radius: 6px;
+            margin-top: 25px;
+            font-size: 13px;
+            color: #475569;
+        }
+        .tips-card ul {
+            margin: 6px 0 0 0;
+            padding-left: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>🗣️ ದ್ವಿಭಾಷಾ ಶಬ್ದಕೋಶ ಹಾಗೂ ಸ್ಪೋಕನ್ ಇಂಗ್ಲಿಷ್ ಟೂಲ್</h1>
+        <p>ಕನ್ನಡ ↔ ಇಂಗ್ಲಿಷ್ ಶಬ್ದಾರ್ಥ ಹಾಗೂ ಉಚ್ಚಾರಣೆ ಕಲಿಯುವ ಅತ್ಯುತ್ತಮ ಸಾಧನ</p>
+    </div>
+
+    <!-- Switch Mode Buttons -->
+    <div class="mode-container">
+        <div class="mode-switch">
+            <button class="mode-btn active" id="btnKnToEn" onclick="setMode('kn-en')">ಕನ್ನಡ ➔ English</button>
+            <button class="mode-btn" id="btnEnToKn" onclick="setMode('en-kn')">English ➔ ಕನ್ನಡ</button>
+        </div>
+    </div>
+
+    <!-- Input Box -->
+    <div class="box-group">
+        <label id="inputLabel" for="inputText">ಕನ್ನಡ ಶಬ್ದ ಅಥವಾ ವಾಕ್ಯ ನಮೂದಿಸಿ:</label>
+        <textarea id="inputText" placeholder="ಇಲ್ಲಿ ಟೈಪ್ ಮಾಡಿ... (ಉದಾ: ಪುಸ್ತಕ)"></textarea>
+    </div>
+
+    <!-- Output Box & Audio Button -->
+    <div class="box-group">
+        <label id="outputLabel" for="outputText">English Meaning / Translation:</label>
+        <textarea id="outputText" class="output-box" readonly placeholder="ಅರ್ಥ/ಅನುವಾದ ಇಲ್ಲಿ ಬರಲಿದೆ..."></textarea>
+        
+        <div class="button-row">
+            <span id="status" class="status-text"></span>
+            <button id="speakerBtn" class="audio-btn" onclick="playAudio()">🔊 ಉಚ್ಚಾರಣೆ ಕೇಳಿ (Listen)</button>
+        </div>
+    </div>
+
+    <!-- Help Tips -->
+    <div class="tips-card">
+        <strong>💡 ಬಳಕೆ ಮಾಡುವ ವಿಧಾನ:</strong>
+        <ul>
+            <li>ಮೇಲಿರುವ ಬಟನ್ ಬಳಸಿ **ಕನ್ನಡ ➔ ಇಂಗ್ಲಿಷ್** ಅಥವಾ **ಇಂಗ್ಲಿಷ್ ➔ ಕನ್ನಡ** ಮೋಡ್ ಆಯ್ಕೆ ಮಾಡಿ.</li>
+            <li>ಮೊದಲ ಬಾಕ್ಸ್‌ನಲ್ಲಿ ಶಬ್ದ/ವಾಕ್ಯ ಟೈಪ್ ಮಾಡಿದ ತಕ್ಷಣ ಎರಡನೇ ಬಾಕ್ಸ್‌ನಲ್ಲಿ ಅರ್ಥ ಬರಲಿದೆ.</li>
+            <li>**"🔊 ಉಚ್ಚಾರಣೆ ಕೇಳಿ"** ಬಟನ್ ಕ್ಲಿಕ್ ಮಾಡಿ ಆ ಶಬ್ದದ ಸರಿಯಾದ ಉಚ್ಚಾರಣೆಯನ್ನು ಆಡಿಯೋ ಮೂಲಕ ಕೇಳಬಹುದು.</li>
+        </ul>
+    </div>
+</div>
+
+<script>
+    let currentMode = 'kn-en'; 
+    let debounceTimer;
+
+    const inputText = document.getElementById('inputText');
+    const outputText = document.getElementById('outputText');
+    const inputLabel = document.getElementById('inputLabel');
+    const outputLabel = document.getElementById('outputLabel');
+    const statusText = document.getElementById('status');
+    const btnKnToEn = document.getElementById('btnKnToEn');
+    const btnEnToKn = document.getElementById('btnEnToKn');
+
+    // Switch Language Mode Function
+    function setMode(mode) {
+        currentMode = mode;
+        inputText.value = '';
+        outputText.value = '';
+        statusText.innerText = '';
+
+        if (mode === 'kn-en') {
+            btnKnToEn.classList.add('active');
+            btnEnToKn.classList.remove('active');
+            inputLabel.innerText = 'ಕನ್ನಡ ಶಬ್ದ ಅಥವಾ ವಾಕ್ಯ ನಮೂದಿಸಿ:';
+            outputLabel.innerText = 'English Meaning / Translation:';
+            inputText.placeholder = 'ಇಲ್ಲಿ ಟೈಪ್ ಮಾಡಿ... (ಉದಾ: ಪುಸ್ತಕ)';
+        } else {
+            btnEnToKn.classList.add('active');
+            btnKnToEn.classList.remove('active');
+            inputLabel.innerText = 'Enter English Word or Sentence:';
+            outputLabel.innerText = 'ಕನ್ನಡ ಅರ್ಥ / ಅನುವಾದ:';
+            inputText.placeholder = 'Type here... (e.g. Teacher)';
+        }
+    }
+
+    // Auto translate logic
+    inputText.addEventListener('input', () => {
+        clearTimeout(debounceTimer);
+        const query = inputText.value.trim();
+
+        if (!query) {
+            outputText.value = '';
+            statusText.innerText = '';
+            return;
+        }
+
+        statusText.innerText = 'ಅನುವಾದಿಸಲಾಗುತ್ತಿದೆ...';
+
+        debounceTimer = setTimeout(() => {
+            translateText(query);
+        }, 500);
+    });
+
+    // Translate API Request
+    async function translateText(text) {
+        const langPair = (currentMode === 'kn-en') ? 'kn|en' : 'en|kn';
+        
+        try {
+            const response = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${langPair}`);
+            const data = await response.json();
+
+            if (data && data.responseData && data.responseData.translatedText) {
+                outputText.value = data.responseData.translatedText;
+                statusText.innerText = '';
+            } else {
+                statusText.innerText = 'ಅರ್ಥ ಹುಡುಕಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ.';
+            }
+        } catch (error) {
+            statusText.innerText = 'ನೆಟ್‌ವರ್ಕ್ ಪರಿಶೀಲಿಸಿ.';
+        }
+    }
+
+    // Text-to-Speech (Audio)
+    function playAudio() {
+        const textToSpeech = outputText.value.trim();
+        
+        if (!textToSpeech) {
+            alert('ಧ್ವನಿ ಕೇಳಲು ಮೊದಲು ಯಾವುದೇ ಶಬ್ದವನ್ನು ಟೈಪ್ ಮಾಡಿ.');
+            return;
+        }
+
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel(); 
+            const utterance = new SpeechSynthesisUtterance(textToSpeech);
+            
+            if (currentMode === 'kn-en') {
+                utterance.lang = 'en-US';
+                utterance.rate = 0.85; // Niḍāna audio for learning pronunciation
+            } else {
+                utterance.lang = 'kn-IN';
+                utterance.rate = 0.9;
+            }
+
+            window.speechSynthesis.speak(utterance);
+        } else {
+            alert('ನಿಮ್ಮ ಬ್ರೌಸರ್‌ನಲ್ಲಿ ಆಡಿಯೋ ಫೀಚರ್ ಬೆಂಬಲಿಸುತ್ತಿಲ್ಲ.');
+        }
+    }
+</script>
+
+</body>
+</html>
