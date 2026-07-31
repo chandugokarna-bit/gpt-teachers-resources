@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FLN App</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f0f4f8;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 15px;
+        }
+
+        .fln-header {
+            font-size: 2.8rem;
+            font-weight: 900;
+            color: #1e3a8a;
+            text-align: center;
+            margin: 10px 0 20px 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .main-container {
+            width: 100%;
+            max-width: 500px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .section-card {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border: 2px solid #e2e8f0;
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            color: #0f172a;
+            margin-bottom: 15px;
+            text-align: center;
+            padding-bottom: 8px;
+            border-bottom: 3px solid #3b82f6;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .btn {
+            background-color: #eff6ff;
+            color: #1d4ed8;
+            border: 2px solid #bfdbfe;
+            padding: 14px 10px;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s ease;
+        }
+
+        .btn:hover {
+            background-color: #3b82f6;
+            color: white;
+        }
+
+        .subjects-container {
+            display: none;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 2px dashed #cbd5e1;
+        }
+
+        .subject-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+
+        .btn-subject {
+            background-color: #ecfdf5;
+            color: #047857;
+            border: 2px solid #a7f3d0;
+        }
+
+        .btn-subject:hover {
+            background-color: #10b981;
+            color: white;
+        }
+
+        /* ಹೊಸ ಪುಟಗಳು (Activities & Quiz) */
+        .page {
+            display: none;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        .back-btn {
+            background-color: #f1f5f9;
+            color: #475569;
+            border: 1px solid #cbd5e1;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-bottom: 15px;
+        }
+
+        .act-card {
+            background: white;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border-left: 5px solid #3b82f6;
+        }
+
+        .act-title {
+            font-weight: bold;
+            color: #1e293b;
+            margin-bottom: 5px;
+        }
+
+        .quiz-option {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            padding: 12px;
+            border-radius: 10px;
+            margin: 8px 0;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .quiz-option:hover {
+            background: #e2e8f0;
+        }
+
+        .score-box {
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #059669;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ================= 1. ಹೋಮ್ ಪೇಜ್ ================= -->
+    <div id="homePage" class="page active">
+        <div class="fln-header">FLN</div>
+        
+        <div class="main-container">
+            <!-- ಬಾಕ್ಸ್ 1: ಕಲಿಕಾ ಫಲಗಳು -->
+            <div class="section-card">
+                <h2 class="section-title">🎯 ಕಲಿಕಾ ಫಲಗಳು</h2>
+                <div class="grid-container">
+                    <button class="btn" onclick="showOutcomes(3)">3 ನೇ ತರಗತಿ</button>
+                    <button class="btn" onclick="showOutcomes(4)">4 ನೇ ತರಗತಿ</button>
+                    <button class="btn" onclick="showOutcomes(5)">5 ನೇ ತರಗತಿ</button>
+                    <button class="btn" onclick="showOutcomes(6)">6 ನೇ ತರಗತಿ</button>
+                    <button class="btn" onclick="showOutcomes(7)">7 ನೇ ತರಗತಿ</button>
+                    <button class="btn" onclick="showOutcomes(8)">8 ನೇ ತರಗತಿ</button>
+                </div>
+            </div>
+
+            <!-- ಬಾಕ್ಸ್ 2: ತರಗತಿಗಳು -->
+            <div class="section-card">
+                <h2 class="section-title">📚 ತರಗತಿಗಳು</h2>
+                <div class="grid-container">
+                    <button class="btn" onclick="selectClass(3)">3 ನೇ ತರಗತಿ</button>
+                    <button class="btn" onclick="selectClass(4)">4 ನೇ ತರಗತಿ</button>
+                    <button class="btn" onclick="selectClass(5)">5 ನೇ ತರಗತಿ</button>
+                    <button class="btn" onclick="selectClass(6)">6 ನೇ ತರಗತಿ</button>
+                    <button class="btn" onclick="selectClass(7)">7 ನೇ ತರಗತಿ</button>
+                    <button class="btn" onclick="selectClass(8)">8 ನೇ ತರಗತಿ</button>
+                </div>
+
+                <div id="subjectsSection" class="subjects-container">
+                    <div id="selectedClassText" style="text-align:center; font-weight:bold; margin-bottom:10px; color:#059669;"></div>
+                    <div class="subject-grid">
+                        <button class="btn btn-subject" onclick="openSubjectPage('ಕನ್ನಡ')">ಕನ್ನಡ</button>
+                        <button class="btn btn-subject" onclick="openSubjectPage('ಇಂಗ್ಲಿಷ್')">ಇಂಗ್ಲಿಷ್</button>
+                        <button class="btn btn-subject" onclick="openSubjectPage('ಗಣಿತ')">ಗಣಿತ</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= 2. ಚಟುವಟಿಕೆಗಳ ಪೇಜ್ ================= -->
+    <div id="activityPage" class="page">
+        <button class="back-btn" onclick="goHome()">⬅ ಹಿಂತಿರುಗಿ</button>
+        <div class="section-card">
+            <h2 id="activityPageTitle" class="section-title">ಚಟುವಟಿಕೆಗಳು</h2>
+            
+            <div class="act-card">
+                <div class="act-title">📝 ಚಟುವಟಿಕೆ 1: ಚಿತ್ರ ನೋಡಿ ಹೆಸರಿಸು</div>
+                <p style="color:#64748b; font-size:0.9rem;">ಅಕ್ಷರ ಕಲಿಕೆ ಮತ್ತು ಬುನಾದಿ ಪದಗಳ ಅಭ್ಯಾಸ.</p>
+            </div>
+
+            <div class="act-card">
+                <div class="act-title">🎧 ಚಟುವಟಿಕೆ 2: ಧ್ವನಿ ಕೇಳಿ ಉತ್ತರ ನೀಡು</div>
+                <p style="color:#64748b; font-size:0.9rem;">ಶ್ರವಣ ಮತ್ತು ಉಚ್ಚಾರಣೆ ಅಭ್ಯಾಸ.</p>
+            </div>
+
+            <div class="act-card" style="border-left-color: #10b981; cursor: pointer;" onclick="startQuiz()">
+                <div class="act-title" style="color: #047857;">🧩 ಚಟುವಟಿಕೆ 3: FLN ಇಂಟರಾಕ್ಟಿವ್ ಕ್ವಿಜ್</div>
+                <p style="color:#047857; font-size:0.9rem;">ಕ್ಲಿಕ್ ಮಾಡಿ ಆಟವಾಡಿ ಅಭ್ಯಾಸ ಮಾಡಿ ➔</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= 3. ಕ್ವಿಜ್ ಪೇಜ್ ================= -->
+    <div id="quizPage" class="page">
+        <button class="back-btn" onclick="openSubjectPage(currentSubject)">⬅ ಹಿಂತಿರುಗಿ</button>
+        <div class="section-card">
+            <h2 class="section-title">🎮 FLN ಕ್ವಿಜ್ ಆಟ</h2>
+            
+            <div id="quizContainer">
+                <p id="quizQuestion" style="font-size:1.1rem; font-weight:bold; margin-bottom:15px; text-align:center;"></p>
+                <div id="quizOptions"></div>
+                <div id="quizScore" class="score-box"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= 4. ಕಲಿಕಾ ಫಲಗಳ ಪೇಜ್ ================= -->
+    <div id="outcomesPage" class="page">
+        <button class="back-btn" onclick="goHome()">⬅ ಹಿಂತಿರುಗಿ</button>
+        <div class="section-card">
+            <h2 id="outcomesTitle" class="section-title">ಕಲಿಕಾ ಫಲಗಳು</h2>
+            <div id="outcomesContent" style="line-height:1.6; color:#334155;"></div>
+        </div>
+    </div>
+
+    <script>
+        let selectedClass = 3;
+        let currentSubject = '';
+        let score = 0;
+
+        function selectClass(classNum) {
+            selectedClass = classNum;
+            document.getElementById('subjectsSection').style.display = 'block';
+            document.getElementById('selectedClassText').innerText = classNum + " ನೇ ತರಗತಿಯ ವಿಷಯವನ್ನು ಆಯ್ಕೆಮಾಡಿ:";
+        }
+
+        function goHome() {
+            showPage('homePage');
+        }
+
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+        }
+
+        function openSubjectPage(subject) {
+            currentSubject = subject;
+            document.getElementById('activityPageTitle').innerText = selectedClass + "ನೇ ತರಗತಿ - " + subject;
+            showPage('activityPage');
+        }
+
+        function showOutcomes(classNum) {
+            document.getElementById('outcomesTitle').innerText = classNum + " ನೇ ತರಗತಿಯ ಕಲಿಕಾ ಫಲಗಳು (Learning Outcomes)";
+            document.getElementById('outcomesContent').innerHTML = `
+                <ul>
+                    <li><b>L.O. 1:</b> ಸರಳ ಶಬ್ದಗಳನ್ನು ಸರಿಯಾದ ಉಚ್ಚಾರಣೆಯೊಂದಿಗೆ ಓದುವುದು.</li>
+                    <li><b>L.O. 2:</b> ಸಂಖ್ಯೆಗಳನ್ನು ಗುರುತಿಸುವುದು ಮತ್ತು ಎಣಿಕೆ ಮಾಡುವುದು.</li>
+                    <li><b>L.O. 3:</b> ದೈನಂದಿನ ಜೀವನದ ಸರಳ ಲೆಕ್ಕಾಚಾರಗಳನ್ನು ಗ್ರಹಿಸುವುದು.</li>
+                </ul>
+            `;
+            showPage('outcomesPage');
+        }
+
+        // ---------------- ಕ್ವಿಜ್ ಡೇಟಾ ಮತ್ತು ಲಾಗಿಕ್ ----------------
+        const sampleQuestions = [
+            {
+                q: "ಕೆಳಗಿನವುಗಳಲ್ಲಿ ಯಾವುದು ಸ್ವರ ಅಕ್ಷರ?",
+                options: ["ಕ", "ಅ", "ಗ", "ಚ"],
+                ans: "ಅ"
+            },
+            {
+                q: "5 + 3 ರ ಮೊತ್ತ ಎಷ್ಟು?",
+                options: ["7", "8", "9", "6"],
+                ans: "8"
+            }
+        ];
+
+        function startQuiz() {
+            score = 0;
+            showPage('quizPage');
+            loadQuestion(0);
+        }
+
+        function loadQuestion(index) {
+            if(index >= sampleQuestions.length) {
+                document.getElementById('quizQuestion').innerText = "🎉 ಕ್ವಿಜ್ ಪೂರ್ಣಗೊಂಡಿದೆ!";
+                document.getElementById('quizOptions').innerHTML = '';
+                document.getElementById('quizScore').innerText = "ನಿಮ್ಮ ಒಟ್ಟು ಅಂಕಗಳು: " + score + " / " + sampleQuestions.length;
+                return;
+            }
+
+            let qData = sampleQuestions[index];
+            document.getElementById('quizQuestion').innerText = (index + 1) + ". " + qData.q;
+            
+            let optionsHTML = '';
+            qData.options.forEach(opt => {
+                optionsHTML += `<div class="quiz-option" onclick="checkAnswer('${opt}', '${qData.ans}', ${index})">${opt}</div>`;
+            });
+            
+            document.getElementById('quizOptions').innerHTML = optionsHTML;
+            document.getElementById('quizScore').innerText = "ಅಂಕ: " + score;
+        }
+
+        function checkAnswer(selected, correct, index) {
+            if(selected === correct) {
+                alert("ಸಾಧು! ಸರಿಯಾದ ಉತ್ತರ 👍");
+                score++;
+            } else {
+                alert("ತಪ್ಪು ಉತ್ತರ! ಸರಿಯಾದ ಉತ್ತರ: " + correct);
+            }
+            loadQuestion(index + 1);
+        }
+    </script>
+</body>
+</html>
