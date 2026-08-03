@@ -156,26 +156,26 @@
             const wallZ = (roomDepth / 2) - 0.05; 
 
             const galleryLayout = [
-                // Front Wall (ಮುಂಭಾಗದ ಗೋಡೆ - 4 ಬೋರ್ಡ್‌ಗಳು)
+                // Front Wall (ಮುಂಭಾಗದ ಗೋಡೆ)
                 { id: 0, url: imagesList[0], w: 7.2, h: 5.0, pos: [0, 0.5, -wallZ], rot: [0, 0, 0], normal: [0, 0, 1] },
                 { id: 1, url: imagesList[1], w: 6.2, h: 4.4, pos: [-10.5, 0.5, -wallZ], rot: [0, 0, 0], normal: [0, 0, 1] },
                 { id: 2, url: imagesList[2], w: 6.2, h: 4.4, pos: [10.5, 0.5, -wallZ], rot: [0, 0, 0], normal: [0, 0, 1] },
                 { id: 3, url: imagesList[3], w: 6.2, h: 4.4, pos: [-19, 0.5, -wallZ], rot: [0, 0, 0], normal: [0, 0, 1] },
                 
-                // Left Wall (ಎಡ ಗೋಡೆ - 4 ಬೋರ್ಡ್‌ಗಳು)
+                // Left Wall (ಎಡ ಗೋಡೆ)
                 { id: 4, url: imagesList[4], w: 6.2, h: 4.4, pos: [-wallX, 0.5, -16.5], rot: [0, Math.PI/2, 0], normal: [1, 0, 0] },
                 { id: 5, url: imagesList[5], w: 6.2, h: 4.4, pos: [-wallX, 0.5, -5.5], rot: [0, Math.PI/2, 0], normal: [1, 0, 0] },
                 { id: 6, url: imagesList[6], w: 6.2, h: 4.4, pos: [-wallX, 0.5, 5.5], rot: [0, Math.PI/2, 0], normal: [1, 0, 0] },
                 { id: 7, url: imagesList[7], w: 6.2, h: 4.4, pos: [-wallX, 0.5, 16.5], rot: [0, Math.PI/2, 0], normal: [1, 0, 0] },
                 
-                // Back Wall (ಹಿಂಭಾಗದ ಗೋಡೆ - 5 ಬೋರ್ಡ್‌ಗಳು)
+                // Back Wall (ಹಿಂಭಾಗದ ಗೋಡೆ)
                 { id: 8, url: imagesList[8], w: 6.2, h: 4.4, pos: [-18, 0.5, wallZ], rot: [0, Math.PI, 0], normal: [0, 0, -1] },
                 { id: 9, url: imagesList[9], w: 6.2, h: 4.4, pos: [-9, 0.5, wallZ], rot: [0, Math.PI, 0], normal: [0, 0, -1] },
                 { id: 10, url: imagesList[10], w: 6.2, h: 4.4, pos: [0, 0.5, wallZ], rot: [0, Math.PI, 0], normal: [0, 0, -1] },
                 { id: 11, url: imagesList[11], w: 6.2, h: 4.4, pos: [9, 0.5, wallZ], rot: [0, Math.PI, 0], normal: [0, 0, -1] },
                 { id: 12, url: imagesList[12], w: 6.2, h: 4.4, pos: [18, 0.5, wallZ], rot: [0, Math.PI, 0], normal: [0, 0, -1] },
                 
-                // Right Wall (ಬಲ ಗೋಡೆ - 4 ಬೋರ್ಡ್‌ಗಳು)
+                // Right Wall (ಬಲ ಗೋಡೆ)
                 { id: 13, url: imagesList[13], w: 6.2, h: 4.4, pos: [wallX, 0.5, 16.5], rot: [0, -Math.PI/2, 0], normal: [-1, 0, 0] },
                 { id: 14, url: imagesList[14], w: 6.2, h: 4.4, pos: [wallX, 0.5, 5.5], rot: [0, -Math.PI/2, 0], normal: [-1, 0, 0] },
                 { id: 15, url: imagesList[15], w: 6.2, h: 4.4, pos: [wallX, 0.5, -5.5], rot: [0, -Math.PI/2, 0], normal: [-1, 0, 0] },
@@ -226,14 +226,9 @@
             
             const artMesh = new THREE.Mesh(artGeo, artMat);
             
+            // 🎯 ಮೇಲ್ಭಾಗ ಮತ್ತು ಕೆಳಭಾಗ ಸಂಪೂರ್ಣವಾಗಿ ಫುಲ್ ಫಿಟ್ (0 ಗ್ಯಾಪ್) ಆಗಲು Vertical Distance Formula ಬಳಸಲಾಗಿದೆ
             const vFOV = (camera.fov * Math.PI) / 180;
-            let distanceForHeight = (height / 2) / Math.tan(vFOV / 2);
-            
-            const aspect = window.innerWidth / window.innerHeight;
-            let distanceForWidth = (width / 2) / Math.tan((camera.fov * aspect * Math.PI) / 360);
-            
-            // 🎯 ಜೂಮ್ ಅನ್ನು ಹೆಚ್ಚಿಸಲು ಕ್ಯಾಮೆರಾ ದೂರದ ಮಲ್ಟಿಪ್ಲೈಯರ್ ಅನ್ನು 1.10 ಕ್ಕೆ ಹೊಂದಿಸಲಾಗಿದೆ (ಇನ್ನಷ್ಟು ಹತ್ತಿರ ಬರುತ್ತದೆ)
-            let distance = Math.max(distanceForHeight, distanceForWidth) * 1.10; 
+            let distance = (height / 2) / Math.tan(vFOV / 2); // 100% ಕರಾರುವಕ್ಕಾದ ವರ್ಟಿಕಲ್ ಫಿಟ್
 
             const camPos = position.clone().add(normal.clone().multiplyScalar(distance));
 
