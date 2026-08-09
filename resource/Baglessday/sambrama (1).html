@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಸಂಭ್ರಮ ಶನಿವಾರ - ಪ್ರೀಮಿಯಂ 3D ಸಿಂಗಲ್ ಪೇಜ್ ಆಲ್ಬಮ್</title>
+    
+    <!-- jQuery ಮತ್ತು Turn.js ಲೈಬ್ರರಿಗಳು (3D ಫ್ಲಿಪ್ ಎಫೆಕ್ಟ್ ಕೆಲಸ ಮಾಡಲು ಅತ್ಯಗತ್ಯ) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/turn.js/3/turn.min.js"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation; /* ಮೊಬೈಲ್ ಟಚ್ ಸ್ಮೂತ್ ಮಾಡಲು */
+        }
+        body {
+            background-color: #0d1117;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            width: 100vw;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+            color: #fff;
+            padding: 10px;
+        }
+
+        /* ಮೇಲ್ಭಾಗದ ಹೆಡರ್ */
+        .album-header {
+            width: 100%;
+            text-align: center;
+            padding: 10px;
+            background: linear-gradient(to right, #161b22, #0d1117, #161b22);
+            border-bottom: 2px solid #30363d;
+            position: static;
+            margin-bottom: 15px;
+        }
+        .album-header h1 {
+            font-size: 1.3rem;
+            color: #fbbf24;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+        }
+        .album-header p {
+            font-size: 0.8rem;
+            color: #8b949e;
+            margin-top: 4px;
+        }
+
+        /* ಅಲ್ಟ್ರಾ ಮಾಡರ್ನ್ ಡಿಜಿಟಲ್ ಆಲ್ಬಮ್ ಸ್ಕ್ರೀನ್ ಕಂಟೈನರ್ */
+        .modern-theater-screen {
+            width: 100%;
+            max-width: 1160px;
+            background: #090d16;
+            border: 1px solid #1e293b;
+            border-radius: 16px;
+            padding: 10px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        /* ಟಾಪ್ ಬಾರ್ ವಿನ್ಯಾಸ */
+        .screen-top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #111827;
+            padding: 8px 15px;
+            border-radius: 8px;
+            border: 1px solid #1f2937;
+        }
+        .live-indicator {
+            font-size: 11px;
+            font-weight: bold;
+            color: #ef4444;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            letter-spacing: 1px;
+        }
+        .blink-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #ef4444;
+            border-radius: 50%;
+            display: inline-block;
+            animation: blink 1.5s infinite;
+        }
+        .screen-branding {
+            font-size: 11px;
+            color: #fbbf24;
+            font-weight: 600;
+            text-align: center;
+        }
+        .fullscreen-hint {
+            font-size: 11px;
+            color: #9ca3af;
+        }
+
+        /* ಥಿಯೇಟರ್ ವ್ಯೂಪೋರ್ಟ್ */
+        .theater-viewport {
+            position: relative;
+            background: #020617;
+            border-radius: 12px;
+            padding: 10px;
+            border: 1px solid rgba(251, 191, 36, 0.15);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            width: 100%;
+        }
+
+        /* ಆಲ್ಬಮ್ ಹೊಂದಿಕೊಳ್ಳುವ ಪ್ರಮುಖ ಬಾಕ್ಸ್ */
+        .actual-screen-content {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        #flipbook {
+            box-shadow: 0px 20px 50px rgba(0, 0, 0, 0.8);
+            background-color: #161b22;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+
+        /* ಪ್ರತಿ ಸಿಂಗಲ್ ಪೇಜ್ ಡಿಸೈನ್ */
+        #flipbook .page {
+            background-color: #161b22;
+            overflow: hidden;
+            border-radius: 8px;
+        }
+
+        /* ಪಿಪಿಟಿ ಇಮೇಜ್ ಇಡೀ ಸ್ಕ್ರೀನ್ ತುಂಬಿಕೊಳ್ಳಲು */
+        #flipbook img {
+            width: 100%;
+            height: 100%;
+            object-fit: fill; 
+            display: block;
+            cursor: pointer;
+        }
+
+        /* ನಿಯಾನ್ ಗ್ಲೋ ಎಫೆಕ್ಟ್‌ಗಳು */
+        .glow-effect-top {
+            position: absolute;
+            top: -50px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            height: 60px;
+            background: radial-gradient(circle, rgba(251, 191, 36, 0.15) 0%, rgba(0,0,0,0) 70%);
+            pointer-events: none;
+        }
+        .glow-effect-bottom {
+            position: absolute;
+            bottom: -50px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            height: 60px;
+            background: radial-gradient(circle, rgba(251, 191, 36, 0.1) 0%, rgba(0,0,0,0) 70%);
+            pointer-events: none;
+        }
+
+        /* ಫುಟರ್ ಬಾರ್ ವಿನ್ಯಾಸ */
+        .screen-footer-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px 10px;
+        }
+        .theme-tag {
+            font-size: 12px;
+            font-weight: bold;
+            color: #38bdf8;
+        }
+        .interactive-status {
+            font-size: 11px;
+            color: #6b7280;
+        }
+
+        /* ಮೊಬೈಲ್ ಸ್ಕ್ರೀನ್ ಹೊಂದಾಣಿಕೆಗಾಗಿ ಮಾಧ್ಯಮ ಪ್ರಶ್ನೆಗಳು (Media Queries) */
+        @media (max-width: 600px) {
+            .fullscreen-hint { display: none; }
+            .screen-branding { font-size: 9px; }
+            .modern-theater-screen { padding: 5px; border-radius: 10px; }
+            .album-header h1 { font-size: 1.1rem; }
+        }
+
+        @keyframes blink {
+            0% { opacity: 0.2; }
+            50% { opacity: 1; }
+            100% { opacity: 0.2; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ಆಲ್ಬಮ್ ಟೈಟಲ್ ಹೆಡರ್ -->
+    <div class="album-header">
+        <h1>🎉 ಸಂಭ್ರಮ ಶನಿವಾರ - ಪ್ರೀಮಿಯಂ 3D ಸಿಂಗಲ್ ಪೇಜ್ ಆಲ್ಬಮ್</h1>
+        <p>ವಿಷಯ: ಮಾದಕ ವಸ್ತುಗಳ ದುರುಪಯೋಗ ತಡೆಗಟ್ಟುವಿಕೆ ಮತ್ತು ನಿರ್ವಹಣೆ</p>
+    </div>
+
+    <!-- ಮಾಡರ್ನ್ ಥಿಯೇಟರ್ ಸ್ಕ್ರೀನ್ ಕಂಟೈನರ್ -->
+    <div class="modern-theater-screen">
+        <div class="screen-top-bar">
+            <div class="live-indicator">
+                <span class="blink-dot"></span> 3D LIVE
+            </div>
+            <div class="screen-branding">ಜಿಪಿಟಿ ಶಿಕ್ಷಕರ ಶೈಕ್ಷಣಿಕ ಸಂಪನ್ಮೂಲಗಳು</div>
+            <div class="fullscreen-hint">💡 Use Keyboard ❮ ❯ to Flip</div>
+        </div>
+
+        <div class="theater-viewport">
+            <div class="glow-effect-top"></div>
+            
+            <div class="actual-screen-content">
+                <!-- 3D ಫ್ಲಿಪ್ ಬುಕ್ ಬ್ಲಾಕ್ -->
+                <div id="flipbook">
+                    <div><img src="https://raw.githubusercontent.com/chandugokarna-bit/gpt-teachers-resources/main/resources/sambrama/july/Slide1.JPG" alt="Slide 1"></div>
+                    <div><img src="https://raw.githubusercontent.com/chandugokarna-bit/gpt-teachers-resources/main/resources/sambrama/july/Slide2.JPG" alt="Slide 2"></div>
+                    <div><img src="https://raw.githubusercontent.com/chandugokarna-bit/gpt-teachers-resources/main/resources/sambrama/july/Slide3.JPG" alt="Slide 3"></div>
+                    <div><img src="https://raw.githubusercontent.com/chandugokarna-bit/gpt-teachers-resources/main/resources/sambrama/july/Slide4.JPG" alt="Slide 4"></div>
+                    <div><img src="https://raw.githubusercontent.com/chandugokarna-bit/gpt-teachers-resources/main/resources/sambrama/july/Slide5.JPG" alt="Slide 5"></div>
+                    <div><img src="https://raw.githubusercontent.com/chandugokarna-bit/gpt-teachers-resources/main/resources/sambrama/july/Slide6.JPG" alt="Slide 6"></div>
+                    <div><img src="https://raw.githubusercontent.com/chandugokarna-bit/gpt-teachers-resources/main/resources/sambrama/july/Slide7.JPG" alt="Slide 7"></div>
+                    <div><img src="https://raw.githubusercontent.com/chandugokarna-bit/gpt-teachers-resources/main/resources/sambrama/july/Slide8.JPG" alt="Slide 8"></div>
+                    <div><img src="https://raw.githubusercontent.com/chandugokarna-bit/gpt-teachers-resources/main/resources/sambrama/july/Slide9.JPG" alt="Slide 9"></div>
+                    <div><img src="https://raw.githubusercontent.com/chandugokarna-bit/gpt-teachers-resources/main/resources/sambrama/july/Slide10.JPG" alt="Slide 10"></div>
+                    <div><img src="https://raw.githubusercontent.com/chandugokarna-bit/gpt-teachers-resources/main/resources/sambrama/july/Slide11.JPG" alt="Slide 11"></div>
+                    <div><img src="https://raw.githubusercontent.com/chandugokarna-bit/gpt-teachers-resources/main/resources/sambrama/july/Slide12.JPG" alt="Slide 12"></div>
+                </div>
+            </div>
+
+            <div class="glow-effect-bottom"></div>
+        </div>
+
+        <div class="screen-footer-bar">
+            <div class="theme-tag">🎉 ಸಂಭ್ರಮ ಶನಿವಾರ</div>
+            <div class="interactive-status">🖱️ Tap corners to flip</div>
+        </div>
+    </div>
+
+    <!-- ಜಾವಾಸ್ಕ್ರಿಪ್ಟ್ ಆಕ್ಷನ್ ಕೋಡ್ -->
+    <script type="text/javascript">
+        $(document).ready(function() {
+            var oWidth = 1000;
+            var oHeight = 562;
+            var ratio = oWidth / oHeight;
+
+            // ಮೊಬೈಲ್ ಮತ್ತು ಡೆಸ್ಕ್‌ಟಾಪ್ ಅಳತೆಗೆ ತಕ್ಕಂತೆ ಸೈಜ್ ಲೆಕ್ಕ ಹಾಕುವ ಫಂಕ್ಷನ್
+            function resizeBook() {
+                var containerWidth = $(".actual-screen-content").width();
+                var newWidth = Math.min(oWidth, containerWidth);
+                var newHeight = newWidth / ratio;
+
+                if ($("#flipbook").turn("is")) {
+                    $("#flipbook").turn("size", newWidth, newHeight);
+                } else {
+                    // Turn.js ಇನಿಶಿಯಲೈಸೇಶನ್
+                    $("#flipbook").turn({
+                        display: 'single', 
+                        width: newWidth,
+                        height: newHeight, 
+                        autoCenter: true,
+                        duration: 700, // ಮೊಬೈಲ್ ನಲ್ಲಿ ವೇಗವಾಗಿ ಲೋಡ್ ಆಗಲು ಸ್ಪೀಡ್ ಹೆಚ್ಚಿಸಲಾಗಿದೆ
+                        acceleration: true
+                    });
+                }
+            }
+
+            // ಮೊದಲು ರನ್ ಮಾಡಿ ನಂತರ ಸ್ಕ್ರೀನ್ ಬದಲಾದಾಗಲೂ ರಿಸೈಸ್ ಮಾಡುವುದು
+            resizeBook();
+            $(window).resize(function() {
+                resizeBook();
+            });
+
+            // ಚಿತ್ರದ ಮೇಲೆ ಟ್ಯಾಪ್/ಕ್ಲಿಕ್ ಮಾಡಿದಾಗ ಸ್ಮೂತ್ ಆಗಿ ಪುಟ ಬದಲಾಗುವ ಫಂಕ್ಷನ್
+            $("#flipbook").bind("click", function(e) {
+                var bookOffset = $(this).offset();
+                var clickX = e.pageX - bookOffset.left;
+                
+                if (clickX > $(this).width() / 2) {
+                    $("#flipbook").turn("next");
+                } else {
+                    $("#flipbook").turn("previous");
+                }
+            });
+        });
+
+        // ಕೀಬೋರ್ಡ್ ಶಾರ್ಟ್ ಕಟ್
+        $(window).bind('keydown', function(e){
+            if (e.keyCode == 37) {
+                $('#flipbook').turn('previous');
+            } else if (e.keyCode == 39) {
+                $('#flipbook').turn('next');
+            }
+        });
+    </script>
+
+</body>
+</html>
