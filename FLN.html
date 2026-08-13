@@ -331,7 +331,7 @@
             </div>
         </div>
 
-        <!-- ================= 3C. ಚಟುವಟಿಕೆಗಳು - 4 ಕಲಿಕಾ ಫಲಗಳ ಪ್ರತ್ಯೇಕ ಬಾಕ್ಸ್‌ಗಳಷ್ಟೇ ಇರುವ ಪೇಜ್ ================= -->
+        <!-- ================= 3C. ಚಟುವಟಿಕೆಗಳು - 4 ಕಲಿಕಾ ಫಲಗಳ ಪ್ರತ್ಯೇಕ ಬಾಕ್ಸ್‌ಗಳ ಪೇಜ್ ================= -->
         <div id="pageActivitiesOutcomes" class="page">
             <button class="back-nav-btn" onclick="navigateTo('pageActivitiesSubject')">❮ ವಿಷಯಗಳ ಪುಟಕ್ಕೆ</button>
             <div class="glass-card">
@@ -341,7 +341,7 @@
             </div>
         </div>
 
-        <!-- ================= 3D. ಚಟುವಟಿಕೆಗಳು - ಕಲಿಕಾ ಫಲ ಕ್ಲಿಕ್ ಮಾಡಿದ ಮೇಲೆ ಓಪನ್ ಆಗುವ 1-10 ಚಟುವಟಿಕೆಗಳ ಹೊಸ ಪೇಜ್ ================= -->
+        <!-- ================= 3D. ಚಟುವಟಿಕೆಗಳು - 10 ಚಟುವಟಿಕೆಗಳ ಹೊಸ ಪೇಜ್ ================= -->
         <div id="pageTenActivities" class="page">
             <button class="back-nav-btn" onclick="navigateTo('pageActivitiesOutcomes')">❮ ಕಲಿಕಾ ಫಲಗಳ ಪುಟಕ್ಕೆ</button>
             <div class="glass-card">
@@ -360,7 +360,7 @@
         let selectedSubject = 'ಕನ್ನಡ';
         let selectedOutcomeIndex = 0;
 
-        // 📄 PDF ನಿಂದ ನಿಖರವಾಗಿ ಸಂಗ್ರಹಿಸಿದ 4-8 ನೇ ತರಗತಿಯ 1 ರಿಂದ 4 ನೇ FLN ಕಲಿಕಾ ಫಲಗಳು
+        // 📄 4-8 ನೇ ತರಗತಿಯ 1 ರಿಂದ 4 ನೇ FLN ಕಲಿಕಾ ಫಲಗಳು[cite: 1]
         const flnData = {
             4: {
                 'ಕನ್ನಡ': [
@@ -503,7 +503,6 @@
             navigateTo('pageActivitiesSubject');
         }
 
-        // 4 ಕಲಿಕಾ ಫಲಗಳ ಪ್ರತ್ಯೇಕ ಬಾಕ್ಸ್ ತೋರಿಸುವ ಪೇಜ್
         function showOutcomeBoxesForActivities(subject) {
             selectedSubject = subject;
             document.getElementById('actOutcomesBadge').innerText = selectedClass + " ನೇ ತರಗತಿ - " + subject;
@@ -524,7 +523,6 @@
             navigateTo('pageActivitiesOutcomes');
         }
 
-        // ಕಲಿಕಾ ಫಲ ಕ್ಲಿಕ್ ಮಾಡಿದಾಗ 10 ಚಟುವಟಿಕೆಗಳು ತೆರೆದುಕೊಳ್ಳುವ ಪೇಜ್
         function openTenActivitiesPage(outcomeIdx) {
             selectedOutcomeIndex = outcomeIdx;
             let outcomeText = flnData[selectedClass][selectedSubject][outcomeIdx];
@@ -541,9 +539,25 @@
             navigateTo('pageTenActivities');
         }
 
-        // ಚಟುವಟಿಕೆ ಬಟನ್ ಕ್ಲಿಕ್ ಮಾಡಿದಾಗ
+        // 🔗 📂 🎯 DYNAMIC FOLDER ROUTER FOR GITHUB ACTIVITIES 🎯 📂 🔗
         function launchGame(actNum) {
-            alert(selectedClass + "ನೇ ತರಗತಿಯ " + selectedSubject + " ವಿಷಯದ, ಕಲಿಕಾ ಫಲ " + (selectedOutcomeIndex + 1) + " ರ 'ಚಟುವಟಿಕೆ " + actNum + "' ಓಪನ್ ಆಗುತ್ತಿದೆ...");
+            // Class mapping: 4 -> 4th, 5 -> 5th, etc.
+            let classFolder = selectedClass + "th"; 
+
+            // Subject mapping: ಕನ್ನಡ -> kan, English -> eng, ಗಣಿತ -> mat
+            let subjectFolder = "kan";
+            if (selectedSubject === 'English') subjectFolder = "eng";
+            if (selectedSubject === 'ಗಣಿತ') subjectFolder = "mat";
+
+            // Outcome mapping: 0 -> 1st, 1 -> 2nd, 2 -> 3rd, 3 -> 4th
+            const outcomeFolders = ["1st", "2nd", "3rd", "4th"];
+            let outcomeFolder = outcomeFolders[selectedOutcomeIndex] || "1st";
+
+            // Dynamic Path Creation
+            let targetUrl = `FLN/${classFolder}/${subjectFolder}/${outcomeFolder}/activity ${actNum}.html`;
+
+            // Redirect to GitHub Page
+            window.location.href = targetUrl;
         }
     </script>
 </body>
