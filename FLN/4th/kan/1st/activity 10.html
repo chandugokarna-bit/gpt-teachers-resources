@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಆಕ್ಟಿವಿಟಿ 10 - ಚಿತ್ರ ವಾಕ್ಯ ಗ್ರಹಿಕೆ</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tiro+Kannada&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body { background: linear-gradient(135deg, #059669, #047857); color: #fff; font-family: 'Poppins', 'Tiro Kannada', serif; padding: 20px; display: flex; justify-content: center; }
+        .card { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); border-radius: 20px; padding: 25px; max-width: 650px; width: 100%; text-align: center; }
+        h2 { color: #a7f3d0; margin-bottom: 15px; }
+        .passage { background: rgba(0,0,0,0.3); padding: 15px; border-left: 4px solid #a7f3d0; border-radius: 10px; font-size: 1.15rem; text-align: left; margin-bottom: 20px; line-height: 1.6; }
+        .options { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        button { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 15px; border-radius: 12px; font-size: 1.1rem; cursor: pointer; }
+        button:hover { background: #a7f3d0; color: #000; font-weight: bold; }
+    </style>
+</head>
+<body>
+<div class="card">
+    <h2>🎨 ಆಕ್ಟಿವಿಟಿ 10: ಚಿತ್ರ-ವಾಕ್ಯ ಹೊಂದಾಣಿಕೆ</h2>
+    <div style="margin-bottom:15px">ಪ್ರಶ್ನೆ: <span id="q-no">1</span>/7</div>
+    <div class="passage" id="passage"></div>
+    <div class="options" id="options"></div>
+</div>
+<script>
+const data = [
+    { p: "ಬಾನಿನಲ್ಲಿ ಕಪ್ಪು ಮೋಡಗಳು ಕವಿದು ಜೋರಾಗಿ ಮಳೆ ಸುರಿಯುತ್ತಿದೆ.", q: "ಈ ಸನ್ನಿವೇಶಕ್ಕೆ ಹೊಂದುವ ಚಿತ್ರ/ಪ್ರತೀಕ ಯಾವುದು?", opts: ["🌧️ ಮಳೆ ಸುರಿಯುವುದು", "☀️ ಬಿಸಿಲು", "❄️ ಹಿಮಪಾತ", "🔥 ಬೆಂಕಿ"], ans: "🌧️ ಮಳೆ ಸುರಿಯುವುದು" },
+    { p: "ರಾಜು ಮೈದಾನದಲ್ಲಿ ಗೆಳೆಯರೊಂದಿಗೆ ಕಾಲ್ಚೆಂಡು (ಫುಟ್‌ಬಾಲ್) ಆಡುತ್ತಿದ್ದಾನೆ.", q: "ಯಾವ ಆಟವನ್ನು ಸೂಚಿಸುತ್ತದೆ?", opts: ["⚽ ಫುಟ್‌ಬಾಲ್", "🏏 ಕ್ರಿಕೆಟ್", "Chess ಚದುರಂಗ", "🏸 ಷಟಲ್"], ans: "⚽ ಫುಟ್‌ಬಾಲ್" },
+    { p: "ಸೀತಾ ತೋಟದಲ್ಲಿದ್ದ ಕೆಂಪು ಗುಲಾಬಿ ಹೂವನ್ನು ನೋಡಿ ಸಂತೋಷಪಟ್ಟಳು.", q: "ಯಾವ ಹೂವನ್ನು ಸೂಚಿಸುತ್ತದೆ?", opts: ["🌹 ಗುಲಾಬಿ", "🌻 ಸೂರ್ಯಕಾಂತಿ", "🪷 ಕಮಲ", "🌼 ಸೇವಂತಿ"], ans: "🌹 ಗುಲಾಬಿ" },
+    { p: "ಶಾಲಾ ಗಂಟೆ ಬಾರಿಸಿದ ತಕ್ಷಣ ಮಕ್ಕಳು ತರಗತಿಗೆ ಹೋದರು.", q: "ಯಾವ ವಸ್ತುವಿನ ಸದ್ದು?", opts: ["🔔 ಶಾಲಾ ಗಂಟೆ", "⏰ ಅಲಾರಾಂ", "🥁 ಡೋಲು", "Phone ಫೋನ್"], ans: "🔔 ಶಾಲಾ ಗಂಟೆ" },
+    { p: "ಅಜ್ಜಿಯು ರಾತ್ರಿ ಬಾನಿನಲ್ಲಿ ಕಳೆಯುವ ನಕ್ಷತ್ರಗಳನ್ನು ತೋರಿಸಿದರು.", q: "ಯಾವುದು ಆಕಾಶದಲ್ಲಿದೆ?", opts: ["⭐ ನಕ್ಷತ್ರಗಳು", "🎈 ಬಲೂನ್", "✈️ ವಿಮಾನ", "‍🌈 ಕಾಮನಬಿಲ್ಲು"], ans: "⭐ ನಕ್ಷತ್ರಗಳು" },
+    { p: "ಬೆಕ್ಕು ಹಾಲಿನ ಬಟ್ಟಲನ್ನು ಕಂಡು ಚಾಪೆ ಮೇಲೆ ಕುಳಿತು ಹಾಲು ಕುಡಿಯಿತು.", q: "ಯಾವ ಪ್ರಾಣಿಯ ವಿಷಯ?", opts: ["🐱 ಬೆಕ್ಕು", "🐶 ನಾಯಿ", "🐰 ಮೊಲ", "🦊 ನರಿ"], ans: "🐱 ಬೆಕ್ಕು" },
+    { p: "ಅಪ್ಪ ಚಂದದ ಕೆಂಪು ಬಣ್ಣದ ಕಾರಿನಲ್ಲಿ ಎಲ್ಲರನ್ನೂ ಪ್ರವಾಸಕ್ಕೆ ಕರೆದೊಯ್ದರು.", q: "ಯಾವ ವಾಹನ?", opts: ["🚗 ಕೆಂಪು ಕಾರು", "🚌 ಬಸ್ಸು", "🚂 ರೈಲು", "🚲 ಸೈಕಲ್"], ans: "🚗 ಕೆಂಪು ಕಾರು" }
+];
+let idx = 0;
+function loadQuestion() {
+    document.getElementById('q-no').innerText = idx + 1;
+    document.getElementById('passage').innerText = data[idx].p + "\n\n" + data[idx].q;
+    const optsDiv = document.getElementById('options');
+    optsDiv.innerHTML = '';
+    data[idx].opts.forEach(o => {
+        const btn = document.createElement('button');
+        btn.innerText = o;
+        btn.onclick = () => {
+            if(o === data[idx].ans) alert("ಸರಿಯಾದ ಹೊಂದಾಣಿಕೆ! 🎉");
+            else alert("ತಪ್ಪು ಹೊಂದಾಣಿಕೆ!");
+            idx++; if(idx < data.length) loadQuestion(); else alert("ಎಲ್ಲಾ 10 ಆಕ್ಟಿವಿಟಿಗಳು ಯಶಸ್ವಿಯಾಗಿ ಪೂರ್ಣಗೊಂಡವು! 🏆");
+        };
+        optsDiv.appendChild(btn);
+    });
+}
+loadQuestion();
+</script>
+</body>
+</html>

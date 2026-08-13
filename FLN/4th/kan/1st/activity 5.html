@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಆಕ್ಟಿವಿಟಿ 5 - ಪದಗಳ ಅರ್ಥ</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tiro+Kannada&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body { background: linear-gradient(135deg, #1e3a8a, #1d4ed8); color: #fff; font-family: 'Poppins', 'Tiro Kannada', serif; padding: 20px; display: flex; justify-content: center; }
+        .card { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); border-radius: 20px; padding: 25px; max-width: 650px; width: 100%; text-align: center; }
+        h2 { color: #60a5fa; margin-bottom: 15px; }
+        .passage { background: rgba(0,0,0,0.3); padding: 15px; border-left: 4px solid #60a5fa; border-radius: 10px; font-size: 1.15rem; text-align: left; margin-bottom: 20px; line-height: 1.6; }
+        .options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        button { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 12px; border-radius: 12px; font-size: 1rem; cursor: pointer; }
+        button:hover { background: #60a5fa; color: #000; font-weight: bold; }
+    </style>
+</head>
+<body>
+<div class="card">
+    <h2>🔤 ಆಕ್ಟಿವಿಟಿ 5: ಪದಗಳ ಅರ್ಥ ಪತ್ತೆ</h2>
+    <div style="margin-bottom:15px">ಪ್ರಶ್ನೆ: <span id="q-no">1</span>/7</div>
+    <div class="passage" id="passage"></div>
+    <div class="options" id="options"></div>
+</div>
+<script>
+const data = [
+    { p: "ರಾಜು ಶಾಲೆಯಲ್ಲಿ 'ಅತ್ಯುತ್ತಮ' ಅಂಕಗಳನ್ನು ಪಡೆದು ಪ್ರಥಮ ಸ್ಥಾನ ಗಳಿಸಿದನು.", q: "ಇಲ್ಲಿ 'ಅತ್ಯುತ್ತಮ' ಎಂದರೆ ಏನು?", opts: ["ತುಂಬಾ ಒಳ್ಳೆಯ", "ಸುಮಾರಾದ", "ಕಡಿಮೆ", "ತೀರಾ ಕೆಟ್ಟ"], ans: "ತುಂಬಾ ಒಳ್ಳೆಯ" },
+    { p: "ಕಾಡಿನಲ್ಲಿ ಪ್ರಾಣಿಗಳು 'ಸೌಹಾರ್ದತೆ'ಯಿಂದ ಬಾಳುತ್ತಿದ್ದವು.", q: "ಇಲ್ಲಿ 'ಸೌಹಾರ್ದತೆ' ಪದದ ಅರ್ಥವೇನು?", opts: ["ಸ್ನೇಹ ಮತ್ತು ಸೌಹಾರ್ದ", "ಜಗಳ", "ದ್ವೇಷ", "ಬಯ"], ans: "ಸ್ನೇಹ ಮತ್ತು ಸೌಹಾರ್ದ" },
+    { p: "ಬೇಸಿಗೆಯಲ್ಲಿ ಸೂರ್ಯನ 'ಶಾಖ' ಹೆಚ್ಚಾಗಿರುತ್ತದೆ.", q: "ಇಲ್ಲಿ 'ಶಾಖ' ಪದದ ಅರ್ಥವೇನು?", opts: ["ಬೆಳಕು", "ಬಿಸಿ/ಬೆಚ್ಚನೆ", "ತಂಪು", "ನೀರು"], ans: "ಬಿಸಿ/ಬೆಚ್ಚನೆ" },
+    { p: "ಮಕ್ಕಳು ಗುರುಗಳಿಗೆ 'ಗೌರವ' ನೀಡಬೇಕು.", q: "ಇಲ್ಲಿ 'ಗೌರವ' ಎಂದರೆ?", opts: ["ಆದರ/ಮರ್ಯಾದೆ", "ಹೆದರಿಕೆ", "ಕೋಪ", "ಉಡುಗೊರೆ"], ans: "ಆದರ/ಮರ್ಯಾದೆ" },
+    { p: "ರೈತರು ಜಮೀನಿನಲ್ಲಿ 'ಶ್ರಮಪಟ್ಟು' ಕೆಲಸ ಮಾಡುತ್ತಾರೆ.", q: "ಇಲ್ಲಿ 'ಶ್ರಮಪಟ್ಟು' ಎಂದರೆ ಅರ್ಥವೇನು?", opts: ["ಕಷ್ಟಪಟ್ಟು", "ಸುಲಭವಾಗಿ", "ಕುಳಿತು", "ನಿದ್ರಿಸಿ"], ans: "ಕಷ್ಟಪಟ್ಟು" },
+    { p: "ಹಬ್ಬದ ದಿನ ಎಲ್ಲರೂ 'ನೂತನ' ಬಟ್ಟೆಗಳನ್ನು ಧರಿಸುತ್ತಾರೆ.", q: "ಇಲ್ಲಿ 'ನೂತನ' ಎಂದರೆ?", opts: ["ಹಳೆಯ", "ಹೊಸ", "ಹರಿದ", "ಬಣ್ಣವಿಲ್ಲದ"], ans: "ಹೊಸ" },
+    { p: "ಆಕಾಶದಲ್ಲಿ ನಕ್ಷತ್ರಗಳು 'ಪ್ರಕಾಶಮಾನವಾಗಿ' ಹೊಳೆಯುತ್ತಿದ್ದವು.", q: "ಇಲ್ಲಿ 'ಪ್ರಕಾಶಮಾನವಾಗಿ' ಎಂದರೆ?", opts: ["ಕಾಂತಿಯುತವಾಗಿ/ಬೆಳಕಿನಿಂದ", "ಕತ್ತಲಾಗಿ", "ಸಣ್ಣದಾಗಿ", "ವೇಗವಾಗಿ"], ans: "ಕಾಂತಿಯುತವಾಗಿ/ಬೆಳಕಿನಿಂದ" }
+];
+let idx = 0;
+function loadQuestion() {
+    document.getElementById('q-no').innerText = idx + 1;
+    document.getElementById('passage').innerText = data[idx].p + "\n\n" + data[idx].q;
+    const optsDiv = document.getElementById('options');
+    optsDiv.innerHTML = '';
+    data[idx].opts.forEach(o => {
+        const btn = document.createElement('button');
+        btn.innerText = o;
+        btn.onclick = () => {
+            if(o === data[idx].ans) alert("ಸರಿಯಾದ ಅರ್ಥ! 👏");
+            else alert("ತಪ್ಪು! ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.");
+            idx++; if(idx < data.length) loadQuestion(); else alert("ಆಕ್ಟಿವಿಟಿ ಮುಗಿಯಿತು!");
+        };
+        optsDiv.appendChild(btn);
+    });
+}
+loadQuestion();
+</script>
+</body>
+</html>

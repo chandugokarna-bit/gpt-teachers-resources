@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಆಕ್ಟಿವಿಟಿ 4 - ಸತ್ಯವೋ ಅಸತ್ಯವೋ</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tiro+Kannada&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body { background: linear-gradient(135deg, #831843, #9f1239); color: #fff; font-family: 'Poppins', 'Tiro Kannada', serif; padding: 20px; display: flex; justify-content: center; }
+        .card { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); border-radius: 20px; padding: 25px; max-width: 650px; width: 100%; text-align: center; }
+        h2 { color: #f472b6; margin-bottom: 15px; }
+        .passage { background: rgba(0,0,0,0.3); padding: 15px; border-left: 4px solid #f472b6; border-radius: 10px; font-size: 1.15rem; text-align: left; margin-bottom: 20px; line-height: 1.6; }
+        .options { display: flex; justify-content: center; gap: 20px; }
+        button { border: none; color: #fff; padding: 15px 30px; border-radius: 12px; font-size: 1.2rem; cursor: pointer; font-weight: bold; }
+        .btn-true { background: #22c55e; }
+        .btn-false { background: #ef4444; }
+    </style>
+</head>
+<body>
+<div class="card">
+    <h2>⚡ ಆಕ್ಟಿವಿಟಿ 4: ಸತ್ಯವೋ? ಅಸತ್ಯವೋ?</h2>
+    <div style="margin-bottom:15px">ಪ್ರಶ್ನೆ: <span id="q-no">1</span>/7</div>
+    <div class="passage" id="passage"></div>
+    <div class="options">
+        <button class="btn-true" onclick="check('ಸರಿ')">✔️ ಸರಿ</button>
+        <button class="btn-false" onclick="check('ತಪ್ಪು')">❌ ತಪ್ಪು</button>
+    </div>
+</div>
+<script>
+const data = [
+    { p: "ಆನೆಯು ದೊಡ್ಡ ಕಿವಿಗಳನ್ನು ಹೊಂದಿದೆ ಮತ್ತು ಅದು ಸಸ್ಯಹಾರಿ ಪ್ರಾಣಿಯಾಗಿದೆ.", stmt: "ಹೇಳಿಕೆ: ಆನೆಯು ಮಾಂಸಾಹಾರಿ ಪ್ರಾಣಿಯಾಗಿದೆ.", ans: "ತಪ್ಪು" },
+    { p: "ಬೆಳಗ್ಗೆ ಸೂರ್ಯನು ಮೂಡಿನ ಕಡೆ ಉದಯಿಸುತ್ತಾನೆ.", stmt: "ಹೇಳಿಕೆ: ಸೂರ್ಯನು ಪೂರ್ವದಲ್ಲಿ ಉದಯಿಸುತ್ತಾನೆ.", ans: "ಸರಿ" },
+    { p: "ಮೀನುಗಳು ನೀರಿನಲ್ಲಿ ಈಜುತ್ತವೆ ಮತ್ತು ಕಿವಿರುಗಳಿಂದ ಉಸಿರಾಡುತ್ತವೆ.", stmt: "ಹೇಳಿಕೆ: ಮೀನುಗಳು ನೆಲದ ಮೇಲೆ ವಾಸಿಸುತ್ತವೆ.", ans: "ತಪ್ಪು" },
+    { p: "ಅವ್ವ ಅಡುಗೆಮನೆಯಲ್ಲಿ ರುಚಿಯಾದ ದೋಸೆ ಮಾಡುತ್ತಿದ್ದಾಳೆ.", stmt: "ಹೇಳಿಕೆ: ಅವ್ವ ದೋಸೆ ಮಾಡುತ್ತಿದ್ದಾಳೆ.", ans: "ಸರಿ" },
+    { p: "ಗಿಳಿ ಹಸಿರು ಬಣ್ಣದಲ್ಲಿದ್ದು, ಕೆಂಪು ಮೂತಿಯನ್ನು ಹೊಂದಿದೆ.", stmt: "ಹೇಳಿಕೆ: ಗಿಳಿಯ ಮೂತಿ ಹಳದಿ ಬಣ್ಣದಲ್ಲಿದೆ.", ans: "ತಪ್ಪು" },
+    { p: "ಮಳೆಯು ಬಂದರೆ ಕೆರೆ ಅಚ್ಚುಕಟ್ಟಾಗಿ ತುಂಬುತ್ತದೆ.", stmt: "ಹೇಳಿಕೆ: ಮಳೆಯಿಂದ ಕೆರೆಗಳು ತುಂಬುತ್ತವೆ.", ans: "ಸರಿ" },
+    { p: "ನಾವು ಶಾಲೆಗೆ ತಡವಾಗಿ ಹೋಗುವುದು ಒಳ್ಳೆ ಅಭ್ಯಾಸ.", stmt: "ಹೇಳಿಕೆ: ಸಮಯಪಾಲನೆ ಉತ್ತಮ ಅಭ್ಯಾಸವಾಗಿದೆ.", ans: "ಸರಿ" }
+];
+let idx = 0;
+function loadQuestion() {
+    document.getElementById('q-no').innerText = idx + 1;
+    document.getElementById('passage').innerText = data[idx].p + "\n\n" + data[idx].stmt;
+}
+function check(userAns) {
+    if(userAns === data[idx].ans) alert("ಸರಿಯಾದ ಉತ್ತರ! 👍");
+    else alert("ತಪ್ಪು ಉತ್ತರ! ❌");
+    idx++; if(idx < data.length) loadQuestion(); else alert("ಆಕ್ಟಿವಿಟಿ ಪೂರ್ಣಗೊಂಡಿದೆ!");
+}
+loadQuestion();
+</script>
+</body>
+</html>

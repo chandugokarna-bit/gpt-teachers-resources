@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಆಕ್ಟಿವಿಟಿ 1 - ಸುಳಿವು ಗ್ರಹಿಕೆ</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tiro+Kannada&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body { background: linear-gradient(135deg, #0f172a, #1e1b4b); color: #fff; font-family: 'Poppins', 'Tiro Kannada', serif; padding: 20px; display: flex; justify-content: center; }
+        .card { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); border-radius: 20px; padding: 25px; max-width: 650px; width: 100%; text-align: center; backdrop-filter: blur(10px); }
+        h2 { color: #facc15; margin-bottom: 15px; }
+        .passage { background: rgba(0,0,0,0.3); padding: 15px; border-left: 4px solid #38bdf8; border-radius: 10px; font-size: 1.15rem; text-align: left; margin-bottom: 20px; line-height: 1.6; }
+        .options { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        button { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 12px; border-radius: 12px; font-size: 1rem; cursor: pointer; transition: 0.2s; }
+        button:hover { background: #38bdf8; color: #000; font-weight: bold; }
+        .score-board { margin-bottom: 15px; font-size: 1rem; color: #4ade80; }
+        #feedback { margin-top: 15px; font-weight: bold; height: 25px; }
+    </style>
+</head>
+<body>
+<div class="card">
+    <h2>🧩 ಆಕ್ಟಿವಿಟಿ 1: ಸುಳಿವು ಗ್ರಹಿಕೆ (Riddle Sleuth)</h2>
+    <div class="score-board">ಪ್ರಶ್ನೆ: <span id="q-no">1</span>/7 | ಅಂಕಗಳು: <span id="score">0</span></div>
+    <div class="passage" id="passage"></div>
+    <div class="options" id="options"></div>
+    <div id="feedback"></div>
+</div>
+<script>
+const data = [
+    { p: "🦁 'ನಾನು ಕಾಡಿನ ರಾಜ. ನನ್ನ ಗರ್ಜನೆ ಕೇಳಿದರೆ ಎಲ್ಲ ಪ್ರಾಣಿಗಳು ಹೆದರುತ್ತವೆ. ನಾನು ಮಾಂಸ ತಿನ್ನುತ್ತೇನೆ.'", q: "ಈ ವಿವರಣೆ ಯಾರ ಬಗ್ಗೆ ಹೇಳುತ್ತಿದೆ?", opts: ["ಆನೆ", "ಸಿಂಹ", "ಕೋತಿ", "ಜಿಂಕೆ"], ans: "ಸಿಂಹ" },
+    { p: "🌧️ 'ನಾನು ಆಕಾಶದಿಂದ ಬೀಳುತ್ತೇನೆ. ಬೆಳೆ ಬೆಳೆಯಲು ನನ್ನ ಅಗತ್ಯವಿದೆ. ರೈತರಿಗೆ ನಾನು ಎಂದರೆ ತುಂಬಾ ಇಷ್ಟ.'", q: "ಇಲ್ಲಿ ಹೇಳಲಾದ ವಿಷಯ ಯಾವುದು?", opts: ["ಮಳೆ", "ಬೆಳಕು", "ಗಾಳಿ", "ಬೆಂಕಿ"], ans: "ಮಳೆ" },
+    { p: "📚 'ನನ್ನಲ್ಲಿ ಹಲವು ಪುಟಗಳಿವೆ. ನನ್ನನ್ನು ಓದಿದರೆ ಜ್ಞಾನ ಸಿಗುತ್ತದೆ. ಮಕ್ಕಳು ನನ್ನನ್ನು ಚೀಲದಲ್ಲಿ ಇಟ್ಟುಕೊಳ್ಳುತ್ತಾರೆ.'", q: "ಈ ವಸ್ತುವಿನ ಹೆಸರೇನು?", opts: ["ಪೆನ್ಸಿಲ್", "ಪುಸ್ತಕ", "ಚೀಲ", "ಮೇಜು"], ans: "ಪುಸ್ತಕ" },
+    { p: " Peacock 'ನನಗೆ ಸುಂದರವಾದ ಗರಿಗಳಿವೆ. ಮಳೆ ಬರುವಾಗ ನಾನು ನವಿಲಾಗಿ ನರ್ತಿಸುತ್ತೇನೆ. ನಾನು ಭಾರತದ ರಾಷ್ಟ್ರೀಯ ಪಕ್ಷಿ.'", q: "ಈ ಪಕ್ಷಿ ಯಾವುದು?", opts: ["ಗರುಡ", "ನವಿಲು", "ಕಾಗೆ", "ಗಿಳಿ"], ans: "ನವಿಲು" },
+    { p: "🌳 'ನಾನು ಉಸಿರಾಡಲು ಗಾಳಿ ನೀಡುತ್ತೇನೆ. ನನಗೆ ಹೂವು ಮತ್ತು ಹಣ್ಣುಗಳಿವೆ. ಪಕ್ಷಿಗಳು ನನ್ನಲ್ಲಿ ಗೂಡು ಕಟ್ಟುತ್ತವೆ.'", q: "ಇದು ಯಾವುದರ ಕುರಿತು ಹೇಳುತ್ತದೆ?", opts: ["ಮರ", "ಕಲ್ಲು", "ನದಿ", "ಮನೆ"], ans: "ಮರ" },
+    { p: "☀️ 'ನಾನು ಬೆಳಿಗ್ಗೆ ಮೂಡುತ್ತೇನೆ. ಜಗತ್ತಿಗೆ ಬೆಳಕು ಮತ್ತು ಶಾಖ ನೀಡುತ್ತೇನೆ. ಸಂಜೆ ಮುಳುಗುತ್ತೇನೆ.'", q: "ಈ ಸುಳಿವು ಯಾರಿಗೆ ಸಂಬಂಧಿಸಿದೆ?", opts: ["ಚಂದ್ರ", "ಸೂರ್ಯ", "ನಕ್ಷತ್ರ", "ಮೋಡ"], ans: "ಸೂರ್ಯ" },
+    { p: "🐄 'ನಾನು ಸಾಕುಪ್ರಾಣಿ. ಜನರಿಗೆ ಸಿಹಿಯಾದ ಹಾಲು ನೀಡುತ್ತೇನೆ. ನನ್ನ ಕರು ತುಂಬಾ ಮುದ್ದು.'", q: "ಈ ಪ್ರಾಣಿ ಯಾವುದು?", opts: ["ನಾಯಿ", "ಹಸು", "ಬೆಕ್ಕು", "ಕುದುರೆ"], ans: "ಹಸು" }
+];
+let idx = 0, score = 0;
+function loadQuestion() {
+    document.getElementById('q-no').innerText = idx + 1;
+    document.getElementById('passage').innerText = data[idx].p + "\n\n" + data[idx].q;
+    const optsDiv = document.getElementById('options');
+    optsDiv.innerHTML = '';
+    data[idx].opts.forEach(o => {
+        const btn = document.createElement('button');
+        btn.innerText = o;
+        btn.onclick = () => {
+            if(o === data[idx].ans) {
+                score += 10;
+                document.getElementById('score').innerText = score;
+                document.getElementById('feedback').innerText = "ಸರಿಯಾದ ಉತ್ತರ! 🎉";
+                document.getElementById('feedback').style.color = "#4ade80";
+            } else {
+                document.getElementById('feedback').innerText = "ತಪ್ಪು ಉತ್ತರ! ❌";
+                document.getElementById('feedback').style.color = "#f87171";
+            }
+            setTimeout(() => { idx++; if(idx < data.length) loadQuestion(); else alert("ಆಟ ಮುಗಿಯಿತು! ಒಟ್ಟು ಅಂಕ: " + score); }, 1200);
+        };
+        optsDiv.appendChild(btn);
+    });
+}
+loadQuestion();
+</script>
+</body>
+</html>

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ಆಕ್ಟಿವಿಟಿ 8 - ತಪ್ಪಾದ ವಾಕ್ಯ ಪತ್ತೆ</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tiro+Kannada&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body { background: linear-gradient(135deg, #b91c1c, #7f1d1d); color: #fff; font-family: 'Poppins', 'Tiro Kannada', serif; padding: 20px; display: flex; justify-content: center; }
+        .card { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); border-radius: 20px; padding: 25px; max-width: 650px; width: 100%; text-align: center; }
+        h2 { color: #fca5a5; margin-bottom: 15px; }
+        .passage { background: rgba(0,0,0,0.3); padding: 15px; border-left: 4px solid #ef4444; border-radius: 10px; font-size: 1.1rem; text-align: left; margin-bottom: 20px; line-height: 1.6; }
+        .options { display: flex; flex-direction: column; gap: 10px; }
+        button { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 12px; border-radius: 12px; font-size: 1rem; cursor: pointer; text-align: left; }
+        button:hover { background: #ef4444; color: #fff; }
+    </style>
+</head>
+<body>
+<div class="card">
+    <h2>🚫 ಆಕ್ಟಿವಿಟಿ 8: ತಪ್ಪಾದ ವಾಕ್ಯ ಪತ್ತೆ ಮಾಡಿ</h2>
+    <div style="margin-bottom:15px">ಪ್ರಶ್ನೆ: <span id="q-no">1</span>/7</div>
+    <div class="passage" id="passage">ಕೆಳಗಿನ ವಾಕ್ಯಗಳಲ್ಲಿ ಗುಂಪಿಗೆ ಸೇರದ/ವಿಷಯಕ್ಕೆ ಸಂಬಂಧವಿಲ್ಲದ ವಾಕ್ಯವನ್ನು ಆಯ್ಕೆ ಮಾಡಿ:</div>
+    <div class="options" id="options"></div>
+</div>
+<script>
+const data = [
+    { opts: ["ನವಿಲು ಭಾರತದ ರಾಷ್ಟ್ರೀಯ ಪಕ್ಷಿ.", "ಅದು ಮಳೆಯಲ್ಲಿ ನರ್ತಿಸುತ್ತದೆ.", "ಆನೆಯು ದೊಡ್ಡ ಪ್ರಾಣಿಯಾಗಿದೆ.", "ನವಿಲಿಗೆ ಸುಂದರ ಗರಿಗಳಿವೆ."], ans: "ಆನೆಯು ದೊಡ್ಡ ಪ್ರಾಣಿಯಾಗಿದೆ." },
+    { opts: ["ಹಾಲು ಆರೋಗ್ಯಕ್ಕೆ ತುಂಬಾ ಒಳ್ಳೆಯದು.", "ಹಸುವಿನಿಂದ ನಮಗೆ ಹಾಲು ಸಿಗುತ್ತದೆ.", "ಪ್ರತಿದಿನ ಹಾಲು ಕುಡಿಯಬೇಕು.", "ಕಾರುಗಳು ವೇಗವಾಗಿ ಓಡುತ್ತವೆ."], ans: "ಕಾರುಗಳು ವೇಗವಾಗಿ ಓಡುತ್ತವೆ." },
+    { opts: ["ಸೂರ್ಯನು ಆಕಾಶದಲ್ಲಿದ್ದಾನೆ.", "ಅವನು ಬೆಳಕು ನೀಡುತ್ತಾನೆ.", "ನಾವು ರಾತ್ರಿ ಚಂದ್ರನನ್ನು ನೋಡುತ್ತೇವೆ.", "ಸೂರ್ಯನು ಪಶ್ಚಿಮದಲ್ಲಿ ಉದಯಿಸುತ್ತಾನೆ."], ans: "ಸೂರ್ಯನು ಪಶ್ಚಿಮದಲ್ಲಿ ಉದಯಿಸುತ್ತಾನೆ." },
+    { opts: ["ಶಾಲೆಯಲ್ಲಿ ಶಿಕ್ಷಕರು ಪಾಠ ಮಾಡುತ್ತಾರೆ.", "ನಾವು ಗ್ರಂಥಾಲಯದಲ್ಲಿ ಓದುತ್ತೇವೆ.", "ಮೀನು ನೀರಿನಲ್ಲಿ ഈಜುತ್ತದೆ.", "ಮಕ್ಕಳು ಮೈದಾನದಲ್ಲಿ ಆಡುತ್ತಾರೆ."], ans: "ಮೀನು ನೀರಿನಲ್ಲಿ ഈಜುತ್ತದೆ." },
+    { opts: ["ಮರಗಳು ನಮಗೆ ನೆರಳು ನೀಡುತ್ತವೆ.", "ಅವುಗಳಿಂದ ಆಮ್ಲಜನಕ ಸಿಗುತ್ತದೆ.", "ಮರಗಳನ್ನು ಕಡಿಯುವುದು ಒಳ್ಳೆಯದು.", "ಮರಗಳಲ್ಲಿ ಪಕ್ಷಿಗಳು ವಾಸಿಸುತ್ತವೆ."], ans: "ಮರಗಳನ್ನು ಕಡಿಯುವುದು ಒಳ್ಳೆಯದು." },
+    { opts: ["ದೋಸೆಯು ರುಚಿಯಾದ ಸಿಹಿತಿಂಡಿ.", "ಅಮ್ಮ ಬಿಸಿಯಾದ ದೋಸೆ ಮಾಡಿದರು.", "ನಾವು ಚಟ್ನಿಯೊಂದಿಗೆ ತಿಂದೆವು.", "ದೋಸೆಯನ್ನು ಅಕ್ಕಿಯಿಂದ ಮಾಡುತ್ತಾರೆ."], ans: "ದೋಸೆಯು ರುಚಿಯಾದ ಸಿಹಿತಿಂಡಿ." },
+    { opts: ["ಪುಸ್ತಕಗಳು ಜ್ಞಾನ ನೀಡುತ್ತವೆ.", "ಪುಸ್ತಕದ ಹಾಳೆಗಳನ್ನು ಹರಿಯಬಾರದು.", "ನಾವು ಪುಸ್ತಕಗಳನ್ನು ಸ್ವಚ್ಛವಾಗಿಡಬೇಕು.", "ಟಿವಿ ನೋಡುವುದು ಕಣ್ಣಿಗೆ ತುಂಬಾ ಒಳ್ಳೆಯದು."], ans: "ಟಿವಿ ನೋಡುವುದು ಕಣ್ಣಿಗೆ ತುಂಬಾ ಒಳ್ಳೆಯದು." }
+];
+let idx = 0;
+function loadQuestion() {
+    document.getElementById('q-no').innerText = idx + 1;
+    const optsDiv = document.getElementById('options');
+    optsDiv.innerHTML = '';
+    data[idx].opts.forEach(o => {
+        const btn = document.createElement('button');
+        btn.innerText = o;
+        btn.onclick = () => {
+            if(o === data[idx].ans) alert("ಸರಿಯಾದ ಗುರುತು! ಇದು ಗುಂಪಿಗೆ ಸೇರುವುದಿಲ್ಲ. 🎯");
+            else alert("ತಪ್ಪು! ಇದು ವಿಷಯಕ್ಕೆ ಸಂಬಂಧಿಸಿದೆ.");
+            idx++; if(idx < data.length) loadQuestion(); else alert("ಆಕ್ಟಿವಿಟಿ ಮುಗಿಯಿತು!");
+        };
+        optsDiv.appendChild(btn);
+    });
+}
+loadQuestion();
+</script>
+</body>
+</html>
