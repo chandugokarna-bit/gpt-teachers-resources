@@ -4,13 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FLN MITRA - Ultra Modern Edition</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800;900&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-dark: #070913;
-            --card-bg: rgba(20, 26, 45, 0.75);
+            --bg-dark: #05070f;
+            --card-bg: rgba(15, 20, 35, 0.85);
             --neon-blue: #00f0ff;
-            --neon-purple: #7000ff;
+            --neon-purple: #9d00ff;
             --neon-pink: #ff007f;
             --neon-green: #00ff87;
             --neon-gold: #ffb703;
@@ -28,8 +28,11 @@
         body {
             background-color: var(--bg-dark);
             background-image: 
-                radial-gradient(circle at 10% 20%, rgba(112, 0, 255, 0.25) 0%, transparent 40%),
-                radial-gradient(circle at 90% 80%, rgba(0, 240, 255, 0.2) 0%, transparent 40%);
+                radial-gradient(circle at 20% 30%, rgba(157, 0, 255, 0.25) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(0, 240, 255, 0.25) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(255, 0, 127, 0.15) 0%, transparent 50%);
+            background-size: 200% 200%;
+            animation: bgMove 10s ease infinite;
             min-height: 100vh;
             display: flex;
             justify-content: center;
@@ -37,6 +40,12 @@
             padding: 15px;
             color: var(--text-light);
             overflow-x: hidden;
+        }
+
+        @keyframes bgMove {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
         .app-viewport {
@@ -48,193 +57,251 @@
             position: relative;
         }
 
+        /* 🎇 SPLASH SCREEN (ಅನಿಮೇಷನ್ & ಸೌಂಡ್) */
+        #splashScreen {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: radial-gradient(circle, #1a0b2e 0%, #000000 100%);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            transition: opacity 0.5s ease-out;
+        }
+
+        .splash-title {
+            font-size: 3.5rem;
+            font-weight: 900;
+            letter-spacing: 3px;
+            background: linear-gradient(135deg, var(--neon-blue), var(--neon-green), var(--neon-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: splashPulse 1.5s infinite alternate, popIn 1s ease-out;
+        }
+
+        .splash-sub {
+            font-size: 1rem;
+            color: #fff;
+            letter-spacing: 2px;
+            margin-top: 10px;
+            text-transform: uppercase;
+            text-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+            animation: fadeInSub 2s ease-in-out forwards;
+        }
+
+        @keyframes splashPulse {
+            0% { filter: drop-shadow(0 0 15px rgba(0,240,255,0.6)); transform: scale(1); }
+            100% { filter: drop-shadow(0 0 35px rgba(255,0,127,0.8)); transform: scale(1.05); }
+        }
+        @keyframes popIn { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        @keyframes fadeInSub { 0% { opacity: 0; transform: translateY(20px); } 100% { opacity: 1; transform: translateY(0); } }
+
         /* 🌟 Ultra Header */
         .neon-header {
             text-align: center;
             margin: 15px 0 25px 0;
+            padding-top: 10px;
         }
 
         .neon-header h1 {
-            font-size: 2.6rem;
-            font-weight: 800;
+            font-size: 2.8rem;
+            font-weight: 900;
             letter-spacing: 2px;
             background: linear-gradient(135deg, var(--neon-blue), var(--neon-pink));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 20px rgba(0, 240, 255, 0.5);
+            text-shadow: 0 0 20px rgba(0, 240, 255, 0.4);
+            animation: titleGlow 2s infinite alternate;
         }
 
-        .neon-header p {
-            font-size: 0.8rem;
-            color: rgba(255, 255, 255, 0.7);
-            letter-spacing: 1px;
+        @keyframes titleGlow {
+            0% { filter: drop-shadow(0 0 10px rgba(0,240,255,0.3)); }
+            100% { filter: drop-shadow(0 0 20px rgba(255,0,127,0.6)); }
         }
 
         /* Pages & Transitions */
-        .page {
-            display: none;
-            width: 100%;
-            animation: fadeInSlide 0.3s ease-out forwards;
-        }
+        .page { display: none; width: 100%; animation: fadeInSlide 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+        .page.active { display: block; }
+        @keyframes fadeInSlide { from { opacity: 0; transform: translateY(20px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
 
-        .page.active {
-            display: block;
-        }
-
-        @keyframes fadeInSlide {
-            from { opacity: 0; transform: translateY(15px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Glass Cards */
+        /* Glass Cards with Animated Borders */
         .glass-card {
             background: var(--card-bg);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             border-radius: 20px;
-            padding: 20px;
+            padding: 22px;
             margin-bottom: 25px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5), inset 0 0 15px rgba(255,255,255,0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 45px rgba(0, 240, 255, 0.2), inset 0 0 20px rgba(255,255,255,0.08);
         }
 
         .card-title {
-            font-size: 1.1rem;
-            font-weight: 600;
+            font-size: 1.2rem;
+            font-weight: 700;
             margin-bottom: 18px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
             color: #ffffff;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            padding-bottom: 10px;
+            border-bottom: 2px dashed rgba(255, 255, 255, 0.15);
+            padding-bottom: 12px;
         }
 
         /* Grids */
         .grid-1 { display: grid; grid-template-columns: 1fr; gap: 14px; }
         .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
         .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-        .grid-activities { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 15px; }
+        .grid-activities { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-top: 15px; }
 
         /* Neon Buttons */
         .neon-btn {
-            background: rgba(15, 23, 42, 0.8);
+            background: rgba(10, 15, 30, 0.9);
             color: var(--text-light);
-            border: 1px solid rgba(0, 240, 255, 0.3);
+            border: 2px solid rgba(0, 240, 255, 0.4);
             padding: 16px 12px;
             border-radius: 14px;
-            font-size: 0.95rem;
-            font-weight: 600;
+            font-size: 1rem;
+            font-weight: 700;
             cursor: pointer;
-            transition: all 0.25s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             text-align: center;
+            position: relative;
+            overflow: hidden;
         }
+
+        .neon-btn::before {
+            content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
+            background: linear-gradient(to right, transparent, rgba(255,255,255,0.3), transparent);
+            transform: skewX(-20deg); transition: 0.5s;
+        }
+        .neon-btn:hover::before { left: 150%; }
 
         .neon-btn:hover, .neon-btn:active {
-            transform: translateY(-2px);
+            transform: translateY(-3px) scale(1.03);
             border-color: var(--neon-blue);
-            box-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
-            color: var(--neon-blue);
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.5), inset 0 0 10px rgba(0, 240, 255, 0.3);
+            color: #fff;
         }
 
-        .neon-btn-pink { border-color: rgba(255, 0, 127, 0.3); }
-        .neon-btn-pink:hover, .neon-btn-pink:active { border-color: var(--neon-pink); box-shadow: 0 0 15px rgba(255, 0, 127, 0.5); color: var(--neon-pink); }
+        .neon-btn-pink { border-color: rgba(255, 0, 127, 0.4); }
+        .neon-btn-pink:hover { border-color: var(--neon-pink); box-shadow: 0 0 20px rgba(255, 0, 127, 0.6), inset 0 0 10px rgba(255, 0, 127, 0.3); }
 
-        .neon-btn-green { border-color: rgba(0, 255, 135, 0.3); }
-        .neon-btn-green:hover, .neon-btn-green:active { border-color: var(--neon-green); box-shadow: 0 0 15px rgba(0, 255, 135, 0.5); color: var(--neon-green); }
+        .neon-btn-green { border-color: rgba(0, 255, 135, 0.4); }
+        .neon-btn-green:hover { border-color: var(--neon-green); box-shadow: 0 0 20px rgba(0, 255, 135, 0.6), inset 0 0 10px rgba(0, 255, 135, 0.3); }
 
-        .neon-btn-gold { border-color: rgba(255, 183, 3, 0.3); }
-        .neon-btn-gold:hover, .neon-btn-gold:active { border-color: var(--neon-gold); box-shadow: 0 0 15px rgba(255, 183, 3, 0.5); color: var(--neon-gold); }
+        .neon-btn-gold { border-color: rgba(255, 183, 3, 0.4); }
+        .neon-btn-gold:hover { border-color: var(--neon-gold); box-shadow: 0 0 20px rgba(255, 183, 3, 0.6), inset 0 0 10px rgba(255, 183, 3, 0.3); }
+
+        .neon-btn-purple { border-color: rgba(157, 0, 255, 0.4); }
+        .neon-btn-purple:hover { border-color: var(--neon-purple); box-shadow: 0 0 20px rgba(157, 0, 255, 0.6), inset 0 0 10px rgba(157, 0, 255, 0.3); }
 
         /* Back Button */
         .back-nav-btn {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             color: var(--text-light);
-            padding: 10px 16px;
+            padding: 10px 18px;
             border-radius: 12px;
-            font-size: 0.85rem;
-            font-weight: 600;
+            font-size: 0.9rem;
+            font-weight: 700;
             cursor: pointer;
-            margin-bottom: 18px;
+            margin-bottom: 20px;
             display: inline-flex;
             align-items: center;
             gap: 8px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s;
         }
 
-        /* Outcome Box Style for Activities */
+        .back-nav-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: var(--neon-blue);
+            color: var(--neon-blue);
+            transform: translateX(-5px);
+        }
+
+        /* Outcome / Activity Boxes */
         .outcome-box-btn {
-            background: rgba(255, 255, 255, 0.04);
+            background: rgba(0, 0, 0, 0.2);
             border: 1px solid var(--neon-green);
-            border-radius: 14px;
-            padding: 16px;
-            margin-bottom: 14px;
+            border-radius: 16px;
+            padding: 18px;
+            margin-bottom: 15px;
             cursor: pointer;
-            transition: all 0.25s ease;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            position: relative;
         }
 
         .outcome-box-btn:hover {
-            background: rgba(0, 255, 135, 0.1);
-            transform: scale(1.02);
+            background: rgba(0, 255, 135, 0.15);
+            transform: scale(1.03);
             border-color: #ffffff;
-            box-shadow: 0 0 20px rgba(0, 255, 135, 0.4);
+            box-shadow: 0 0 25px rgba(0, 255, 135, 0.5);
         }
 
-        .outcome-box-title {
-            color: var(--neon-green);
-            font-weight: 700;
-            font-size: 0.95rem;
-            margin-bottom: 6px;
-        }
-
-        .outcome-box-desc {
-            color: #e2e8f0;
-            font-size: 0.88rem;
-            line-height: 1.5;
-        }
+        .outcome-box-title { color: var(--neon-green); font-weight: 800; font-size: 1.05rem; margin-bottom: 8px; }
+        .outcome-box-desc { color: #e2e8f0; font-size: 0.9rem; line-height: 1.6; }
 
         .neon-badge {
             display: inline-block;
-            padding: 4px 10px;
+            padding: 6px 14px;
             border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            background: rgba(112, 0, 255, 0.2);
-            color: var(--neon-blue);
+            font-size: 0.8rem;
+            font-weight: 800;
+            background: rgba(112, 0, 255, 0.3);
+            color: #fff;
             border: 1px solid var(--neon-purple);
-            margin-bottom: 10px;
+            margin-bottom: 12px;
+            box-shadow: 0 0 10px rgba(112,0,255,0.4);
         }
 
         .act-grid-btn {
-            background: rgba(15, 23, 42, 0.9);
+            background: linear-gradient(145deg, rgba(20,20,40,0.9), rgba(40,20,50,0.9));
             border: 1px solid var(--neon-pink);
             color: #fff;
-            padding: 14px 10px;
-            border-radius: 12px;
-            font-size: 0.88rem;
-            font-weight: 600;
+            padding: 16px 10px;
+            border-radius: 14px;
+            font-size: 0.95rem;
+            font-weight: 700;
             cursor: pointer;
             text-align: center;
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
 
         .act-grid-btn:hover {
             background: var(--neon-pink);
             color: #ffffff;
-            box-shadow: 0 0 15px rgba(255, 0, 127, 0.6);
-            transform: translateY(-2px);
+            box-shadow: 0 0 20px rgba(255, 0, 127, 0.7);
+            transform: translateY(-3px) scale(1.05);
         }
     </style>
 </head>
 <body>
+
+    <!-- 🎵 ಸೌಂಡ್ ಫೈಲ್ (ಆಟೋಮ್ಯಾಟಿಕ್ ಪ್ಲೇ ಆಗಲು ಪ್ರಯತ್ನಿಸುತ್ತದೆ) -->
+    <audio id="splashSound" src="https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3" preload="auto"></audio>
+
+    <!-- 🎇 SPLASH SCREEN -->
+    <div id="splashScreen" onclick="hideSplash()">
+        <h1 class="splash-title">FLN MITRA</h1>
+        <p class="splash-sub">Foundational Literacy & Numeracy</p>
+    </div>
 
     <div class="app-viewport">
 
         <!-- HEADER -->
         <header class="neon-header">
             <h1>FLN MITRA</h1>
-            <p>FOUNDATIONAL LITERACY & NUMERACY</p>
         </header>
 
         <!-- ================= 1. HOME PAGE ================= -->
@@ -260,9 +327,19 @@
                 </div>
             </div>
 
+            <!-- Option 3: ಬೇಸಿಕ್ ಆಕ್ಟಿವಿಟೀಸ್ (ಹೊಸ ಸೇರ್ಪಡೆ) -->
+            <div class="glass-card" style="border-color: rgba(157, 0, 255, 0.4);">
+                <div class="card-title">
+                    <span style="color: var(--neon-purple);">🔤</span> ಬೇಸಿಕ್ ಆಕ್ಟಿವಿಟೀಸ್ (Basic Activities)
+                </div>
+                <div class="grid-1">
+                    <button class="neon-btn neon-btn-purple" onclick="openBasicSubjectsPage()">ಬೇಸಿಕ್ ಆಕ್ಟಿವಿಟೀಸ್ ಆರಂಭಿಸಿ ➔</button>
+                </div>
+            </div>
+
         </div>
 
-        <!-- ================= 2A. ಕಲಿಕಾ ಫಲಗಳು - ತರಗತಿ ಆಯ್ಕೆ ================= -->
+        <!-- ================= OPTION 1: OUTCOMES FLOW ================= -->
         <div id="pageOutcomesClass" class="page">
             <button class="back-nav-btn" onclick="navigateTo('pageHome')">❮ ಮುಖ್ಯ ಪುಟಕ್ಕೆ</button>
             <div class="glass-card">
@@ -277,7 +354,6 @@
             </div>
         </div>
 
-        <!-- ================= 2B. ಕಲಿಕಾ ಫಲಗಳು - ವಿಷಯ ಆಯ್ಕೆ ================= -->
         <div id="pageOutcomesSubject" class="page">
             <button class="back-nav-btn" onclick="navigateTo('pageOutcomesClass')">❮ ತರಗತಿಗಳ ಪುಟಕ್ಕೆ</button>
             <div class="glass-card">
@@ -291,7 +367,6 @@
             </div>
         </div>
 
-        <!-- ================= 2C. ಕಲಿಕಾ ಫಲಗಳು - ಅಂತಿಮ ಪ್ರದರ್ಶನ ================= -->
         <div id="pageOutcomesFinal" class="page">
             <button class="back-nav-btn" onclick="navigateTo('pageOutcomesSubject')">❮ ವಿಷಯಗಳ ಪುಟಕ್ಕೆ</button>
             <div class="glass-card">
@@ -302,7 +377,7 @@
         </div>
 
 
-        <!-- ================= 3A. ಚಟುವಟಿಕೆಗಳು - ತರಗತಿ ಆಯ್ಕೆ ================= -->
+        <!-- ================= OPTION 2: ACTIVITIES FLOW ================= -->
         <div id="pageActivitiesClass" class="page">
             <button class="back-nav-btn" onclick="navigateTo('pageHome')">❮ ಮುಖ್ಯ ಪುಟಕ್ಕೆ</button>
             <div class="glass-card">
@@ -317,7 +392,6 @@
             </div>
         </div>
 
-        <!-- ================= 3B. ಚಟುವಟಿಕೆಗಳು - ವಿಷಯ ಆಯ್ಕೆ ================= -->
         <div id="pageActivitiesSubject" class="page">
             <button class="back-nav-btn" onclick="navigateTo('pageActivitiesClass')">❮ ತರಗತಿಗಳ ಪುಟಕ್ಕೆ</button>
             <div class="glass-card">
@@ -331,7 +405,6 @@
             </div>
         </div>
 
-        <!-- ================= 3C. ಚಟುವಟಿಕೆಗಳು - 4 ಕಲಿಕಾ ಫಲಗಳ ಪ್ರತ್ಯೇಕ ಬಾಕ್ಸ್‌ಗಳ ಪೇಜ್ ================= -->
         <div id="pageActivitiesOutcomes" class="page">
             <button class="back-nav-btn" onclick="navigateTo('pageActivitiesSubject')">❮ ವಿಷಯಗಳ ಪುಟಕ್ಕೆ</button>
             <div class="glass-card">
@@ -341,14 +414,35 @@
             </div>
         </div>
 
-        <!-- ================= 3D. ಚಟುವಟಿಕೆಗಳು - 10 ಚಟುವಟಿಕೆಗಳ ಹೊಸ ಪೇಜ್ ================= -->
         <div id="pageTenActivities" class="page">
             <button class="back-nav-btn" onclick="navigateTo('pageActivitiesOutcomes')">❮ ಕಲಿಕಾ ಫಲಗಳ ಪುಟಕ್ಕೆ</button>
             <div class="glass-card">
                 <span class="neon-badge" id="tenActBadge">ಕಲಿಕಾ ಫಲ 1</span>
-                <div id="selectedOutcomeDetail" style="font-size:0.88rem; margin-bottom:15px; color:#e2e8f0; border-bottom:1px dashed rgba(255,255,255,0.1); padding-bottom:10px;"></div>
+                <div id="selectedOutcomeDetail" style="font-size:0.9rem; margin-bottom:15px; color:#e2e8f0; border-bottom:2px dashed rgba(255,255,255,0.15); padding-bottom:12px; font-weight:600;"></div>
                 <div class="card-title"><span style="color: var(--neon-pink);">🎮</span> 10 ಇಂಟರಾಕ್ಟಿವ್ ಚಟುವಟಿಕೆಗಳು</div>
                 <div class="grid-activities" id="tenActivitiesBtnContainer"></div>
+            </div>
+        </div>
+
+        <!-- ================= OPTION 3: BASIC ACTIVITIES FLOW (ಹೊಸದು) ================= -->
+        <div id="pageBasicSubjects" class="page">
+            <button class="back-nav-btn" onclick="navigateTo('pageHome')">❮ ಮುಖ್ಯ ಪುಟಕ್ಕೆ</button>
+            <div class="glass-card" style="border-color: var(--neon-purple);">
+                <div class="card-title"><span style="color: var(--neon-purple);">🔤</span> ಬೇಸಿಕ್: ವಿಷಯ ಆಯ್ಕೆಮಾಡಿ</div>
+                <div class="grid-3">
+                    <button class="neon-btn neon-btn-purple" onclick="showBasicTenActivities('ಕನ್ನಡ')">ಕನ್ನಡ</button>
+                    <button class="neon-btn neon-btn-purple" onclick="showBasicTenActivities('English')">English</button>
+                    <button class="neon-btn neon-btn-purple" onclick="showBasicTenActivities('ಗಣಿತ')">ಗಣಿತ</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="pageBasicTenActivities" class="page">
+            <button class="back-nav-btn" onclick="navigateTo('pageBasicSubjects')">❮ ವಿಷಯಗಳ ಪುಟಕ್ಕೆ</button>
+            <div class="glass-card" style="border-color: var(--neon-purple);">
+                <span class="neon-badge" id="basicActBadge" style="background: rgba(0, 240, 255, 0.2); border-color: var(--neon-blue);">ಬೇಸಿಕ್ - ಕನ್ನಡ</span>
+                <div class="card-title"><span style="color: var(--neon-pink);">🎮</span> 10 ಬೇಸಿಕ್ ಚಟುವಟಿಕೆಗಳು</div>
+                <div class="grid-activities" id="basicTenActivitiesBtnContainer"></div>
             </div>
         </div>
 
@@ -356,11 +450,38 @@
 
     <!-- 🔮 APP DATA & LOGIC SCRIPT -->
     <script>
+        // --- 🎇 Splash Screen Logic ---
+        let splashActive = true;
+        
+        window.onload = () => {
+            // ಆಟೋಮ್ಯಾಟಿಕ್ ಪ್ಲೇ ಪ್ರಯತ್ನ
+            let sound = document.getElementById('splashSound');
+            sound.volume = 0.5;
+            sound.play().catch(e => console.log("Sound needs user interaction first."));
+
+            // 3.5 ಸೆಕೆಂಡ್ ನಂತರ ಹೋಮ್ ಪೇಜ್‌ಗೆ ಹೋಗಲು
+            setTimeout(() => {
+                if (splashActive) hideSplash();
+            }, 3500);
+        };
+
+        function hideSplash() {
+            splashActive = false;
+            let sound = document.getElementById('splashSound');
+            sound.play().catch(e => {}); // ಕ್ಲಿಕ್ ಮಾಡಿದಾಗ ಸೌಂಡ್ ಪ್ಲೇ ಆಗುತ್ತದೆ
+            
+            const splash = document.getElementById('splashScreen');
+            splash.style.opacity = '0';
+            setTimeout(() => { splash.style.display = 'none'; }, 500);
+        }
+
+        // --- Core Variables ---
         let selectedClass = 4;
         let selectedSubject = 'ಕನ್ನಡ';
         let selectedOutcomeIndex = 0;
+        let basicSubject = 'ಕನ್ನಡ';
 
-        // 📄 4-8 ನೇ ತರಗತಿಯ 1 ರಿಂದ 4 ನೇ FLN ಕಲಿಕಾ ಫಲಗಳು[cite: 1]
+        // 📄 4-8 ನೇ ತರಗತಿಯ 1 ರಿಂದ 4 ನೇ FLN ಕಲಿಕಾ ಫಲಗಳು (Citation [1])
         const flnData = {
             4: {
                 'ಕನ್ನಡ': [
@@ -473,43 +594,35 @@
 
         // --- Option 1: Outcomes Flow ---
         function openOutcomesClassPage() { navigateTo('pageOutcomesClass'); }
-        
         function selectOutcomesClass(cNum) {
             selectedClass = cNum;
             document.getElementById('outcomesClassBadge').innerText = cNum + " ನೇ ತರಗತಿ (ಕಲಿಕಾ ಫಲಗಳು)";
             navigateTo('pageOutcomesSubject');
         }
-
         function showFinalOutcomes(subject) {
             selectedSubject = subject;
             document.getElementById('outcomesFinalBadge').innerText = selectedClass + " ನೇ ತರಗತಿ - " + subject;
-            
             let list = flnData[selectedClass][subject];
             let html = "";
             list.forEach(item => {
-                html += `<div style="background:rgba(255,255,255,0.04); border-left:4px solid var(--neon-gold); border-radius:12px; padding:14px; margin-bottom:12px; font-size:0.9rem;">${item}</div>`;
+                html += `<div style="background:rgba(0,0,0,0.3); border-left:4px solid var(--neon-gold); border-radius:12px; padding:16px; margin-bottom:14px; font-size:0.95rem; font-weight:600;">${item}</div>`;
             });
-
             document.getElementById('outcomesListContainer').innerHTML = html;
             navigateTo('pageOutcomesFinal');
         }
 
         // --- Option 2: Activities Flow ---
         function openActivitiesClassPage() { navigateTo('pageActivitiesClass'); }
-
         function selectActivitiesClass(cNum) {
             selectedClass = cNum;
             document.getElementById('activitiesClassBadge').innerText = cNum + " ನೇ ತರಗತಿ (ಚಟುವಟಿಕೆಗಳು)";
             navigateTo('pageActivitiesSubject');
         }
-
         function showOutcomeBoxesForActivities(subject) {
             selectedSubject = subject;
             document.getElementById('actOutcomesBadge').innerText = selectedClass + " ನೇ ತರಗತಿ - " + subject;
-
             let list = flnData[selectedClass][subject];
             let html = "";
-
             list.forEach((item, index) => {
                 html += `
                     <div class="outcome-box-btn" onclick="openTenActivitiesPage(${index})">
@@ -518,47 +631,62 @@
                     </div>
                 `;
             });
-
             document.getElementById('activitiesOutcomesBoxContainer').innerHTML = html;
             navigateTo('pageActivitiesOutcomes');
         }
-
         function openTenActivitiesPage(outcomeIdx) {
             selectedOutcomeIndex = outcomeIdx;
             let outcomeText = flnData[selectedClass][selectedSubject][outcomeIdx];
-
             document.getElementById('tenActBadge').innerText = selectedClass + "ನೇ ತರಗತಿ | " + selectedSubject + " - ಕಲಿಕಾ ಫಲ " + (outcomeIdx + 1);
             document.getElementById('selectedOutcomeDetail').innerText = outcomeText;
-
             let html = "";
             for(let i = 1; i <= 10; i++) {
                 html += `<button class="act-grid-btn" onclick="launchGame(${i})">ಚಟುವಟಿಕೆ ${i}</button>`;
             }
-
             document.getElementById('tenActivitiesBtnContainer').innerHTML = html;
             navigateTo('pageTenActivities');
         }
 
-        // 🔗 📂 🎯 DYNAMIC FOLDER ROUTER FOR GITHUB ACTIVITIES 🎯 📂 🔗
         function launchGame(actNum) {
-            // Class mapping: 4 -> 4th, 5 -> 5th, etc.
             let classFolder = selectedClass + "th"; 
-
-            // Subject mapping: ಕನ್ನಡ -> kan, English -> eng, ಗಣಿತ -> mat
             let subjectFolder = "kan";
             if (selectedSubject === 'English') subjectFolder = "eng";
             if (selectedSubject === 'ಗಣಿತ') subjectFolder = "mat";
 
-            // Outcome mapping: 0 -> 1st, 1 -> 2nd, 2 -> 3rd, 3 -> 4th
             const outcomeFolders = ["1st", "2nd", "3rd", "4th"];
             let outcomeFolder = outcomeFolders[selectedOutcomeIndex] || "1st";
 
-            // Dynamic Path Creation
             let targetUrl = `FLN/${classFolder}/${subjectFolder}/${outcomeFolder}/activity ${actNum}.html`;
-
-            // Redirect to GitHub Page
             window.location.href = targetUrl;
         }
+
+        // --- Option 3: Basic Activities Flow ---
+        function openBasicSubjectsPage() { navigateTo('pageBasicSubjects'); }
+        
+        function showBasicTenActivities(subject) {
+            basicSubject = subject;
+            document.getElementById('basicActBadge').innerText = "ಬೇಸಿಕ್ - " + subject;
+            
+            let html = "";
+            for(let i = 1; i <= 10; i++) {
+                // Purple matching style for Basic Activities
+                html += `<button class="act-grid-btn" style="border-color: var(--neon-purple);" onmouseover="this.style.background='var(--neon-purple)'" onmouseout="this.style.background='linear-gradient(145deg, rgba(20,20,40,0.9), rgba(40,20,50,0.9))'" onclick="launchBasicGame(${i})">ಚಟುವಟಿಕೆ ${i}</button>`;
+            }
+            document.getElementById('basicTenActivitiesBtnContainer').innerHTML = html;
+            navigateTo('pageBasicTenActivities');
+        }
+
+        function launchBasicGame(actNum) {
+            // Folder mapping: kan, eng, mat
+            let subjectFolder = "kan";
+            if (basicSubject === 'English') subjectFolder = "eng";
+            if (basicSubject === 'ಗಣಿತ') subjectFolder = "mat";
+
+            // GitHub route for Basic Activities: FLN/basic/kan/activity 1.html
+            let targetUrl = `FLN/basic/${subjectFolder}/activity ${actNum}.html`;
+            window.location.href = targetUrl;
+        }
+
     </script>
 </body>
 </html>
