@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>3D AI ಶಿಕ್ಷಕ - ಸಮಾಜ ವಿಜ್ಞಾನ | GPT Teachers Resources</title>
+    <title>3D AI ಶಿಕ್ಷಕ - 6, 7 ಮತ್ತು 8ನೇ ತರಗತಿ ಸಮಾಜ ವಿಜ್ಞಾನ</title>
     <style>
         * {
             box-sizing: border-box;
@@ -29,7 +29,7 @@
             position: relative;
         }
 
-        /* Top AI Speech Box */
+        /* Top Speech Box for AI Response */
         #robot-speech {
             position: absolute;
             top: 15px;
@@ -42,7 +42,7 @@
             font-size: 1.05rem;
             line-height: 1.4;
             width: 90%;
-            max-width: 500px;
+            max-width: 520px;
             max-height: 25vh;
             overflow-y: auto;
             display: none;
@@ -59,7 +59,7 @@
             z-index: 1;
         }
 
-        /* Bottom UI Panel - Fixed Height for Mobile */
+        /* Bottom Controls UI */
         #ui-container {
             width: 100%;
             background: rgba(15, 23, 42, 0.98);
@@ -114,9 +114,7 @@
             white-space: nowrap;
         }
 
-        button:active {
-            transform: scale(0.95);
-        }
+        button:active { transform: scale(0.95); }
 
         button.mic-active {
             background: #ef4444;
@@ -131,7 +129,7 @@
 
         #loading-overlay {
             position: absolute;
-            top: 35%;
+            top: 40%;
             left: 50%;
             transform: translate(-50%, -50%);
             color: #38bdf8;
@@ -150,12 +148,12 @@
 
     <div id="app-container">
         <div id="loading-overlay">3D AI ಶಿಕ್ಷಕ ಸಿದ್ಧವಾಗುತ್ತಿದೆ...</div>
-        <div id="robot-speech">ನಮಸ್ಕಾರ! ನಾನು ನಿಮ್ಮ ಸಮಾಜ ವಿಜ್ಞಾನ AI ಶಿಕ್ಷಕ. 6 ಮತ್ತು 7ನೇ ತರಗತಿಯ ಸಮಾಜ ವಿಜ್ಞಾನದ ಯಾವುದೇ ಪ್ರಶ್ನೆ ಕೇಳಿ!</div>
+        <div id="robot-speech">ನಮಸ್ಕಾರ! ನಾನು ನಿಮ್ಮ 6, 7 ಮತ್ತು 8ನೇ ತರಗತಿಯ ಸಮಾಜ ವಿಜ್ಞಾನ AI ಶಿಕ್ಷಕ. ಪಠ್ಯಪುಸ್ತಕದ ಯಾವುದೇ ಪ್ರಶ್ನೆ ಕೇಳಿ!</div>
 
         <!-- 3D Canvas Area -->
         <div id="canvas-container"></div>
 
-        <!-- Bottom Controls -->
+        <!-- Controls -->
         <div id="ui-container">
             <div class="status-box" id="status">ಪ್ರಶ್ನೆ ಕೇಳಲು ಮೈಕ್ ಒತ್ತಿ ಅಥವಾ ಟೈಪ್ ಮಾಡಿ...</div>
             <div class="controls">
@@ -167,6 +165,7 @@
     </div>
 
     <script>
+        // 1. Three.js Scene Setup
         const container = document.getElementById('canvas-container');
         const scene = new THREE.Scene();
         scene.background = new THREE.Color(0x0f172a);
@@ -197,15 +196,13 @@
             const isMobile = width < 600;
 
             camera.aspect = width / height;
-            
-            // Camera position tuned for mobile screen
-            camera.position.set(0, isMobile ? 1.5 : 1.2, isMobile ? 7.5 : 4.5);
+            camera.position.set(0, isMobile ? 1.5 : 1.2, isMobile ? 6.2 : 4.2);
             camera.updateProjectionMatrix();
 
             if (robotModel) {
-                const scale = isMobile ? 0.20 : 0.30;
+                const scale = isMobile ? 0.22 : 0.30;
                 robotModel.scale.set(scale, scale, scale);
-                robotModel.position.set(0, isMobile ? -0.2 : -0.3, 0);
+                robotModel.position.set(0, isMobile ? -0.1 : -0.2, 0);
             }
         }
 
@@ -220,6 +217,8 @@
                 const idleAnim = gltf.animations.find(a => a.name === 'Idle' || a.name === 'Wave') || gltf.animations[0];
                 if (idleAnim) mixer.clipAction(idleAnim).play();
             }
+        }, undefined, (err) => {
+            document.getElementById('loading-overlay').innerText = '3D ಮಾದರಿ ಲೋಡ್ ಮಾಡಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ.';
         });
 
         const clock = new THREE.Clock();
@@ -236,8 +235,24 @@
             adjustLayout();
         });
 
-        // Gemini AI Setup
+        // 2. Class 6, 7 & 8 Social Science Knowledge Context Injection
         const GEMINI_API_KEY = "AIzaSyAEug0pNy4uR2HSkRjGwikj6SkXkTagvkQ";
+
+        const TEXTBOOK_CONTEXT = `
+        ನೀವು ಕರ್ನಾಟಕ ರಾಜ್ಯ ಪಠ್ಯಕ್ರಮದ 6ನೇ, 7ನೇ ಮತ್ತು 8ನೇ ತರಗತಿಯ ಸಮಾಜ ವಿಜ್ಞಾನ (ಭಾಗ 1 ಮತ್ತು ಭಾಗ 2) ವಿಷಯದ AI ಶಿಕ್ಷಕರು.
+        ಕೆಳಗಿನ ಪಠ್ಯಪುಸ್ತಕದ ವಿಷಯಗಳನ್ನು ಆಧರಿಸಿ ವಿದ್ಯಾರ್ಥಿ ಕೇಳುವ ಯಾವುದೇ ಪ್ರಶ್ನೆಗೆ ಸರಳ, ನಿಖರ ಹಾಗೂ ಸ್ಪಷ್ಟ ಕನ್ನಡದಲ್ಲಿ (2 ರಿಂದ 3 ವಾಕ್ಯಗಳಲ್ಲಿ) ಉತ್ತರಿಸಿ:
+
+        [6ನೇ ತರಗತಿ]: ಇತಿಹಾಸದ ಪಿತಾಮಹ ಹೆರೊಡೋಟಸ್, ಸಾಹಿತ್ಯಿಕ/ಪ್ರಾಕ್ತನ ಆಧಾರಗಳು. ಕರ್ನಾಟಕದ 4 ವಿಭಾಗಗಳು (ಬೆಂಗಳೂರು, ಮೈಸೂರು, ಕಲಬುರಗಿ, ಬೆಳಗಾವಿ). ಮೌರ್ಯರು, ಕುಶಾನರು, ಗುಪ್ತರು, ವರ್ಧನರು, ರಜಪೂತರು, ದೆಹಲಿ ಸುಲ್ತಾನರು, ವಿಜಯನಗರ (ಕೃಷ್ಣದೇವರಾಯ), ಬಹಮನಿ, ಮೊಘಲರು (ಅಕ್ಬರ್), ಮರಾಠರು (ಶಿವಾಜಿ), ಶಂಕರಾಚಾರ್ಯರು, ರಾಮಾನುಜರು, ಬಸವೇಶ್ವರರು, ಮಧ್ವಾಚಾರ್ಯರು.
+
+        [7ನೇ ತರಗತಿ]: ಯೇಸುಕ್ರಿಸ್ತ, ಪ್ರವಾದಿ ಮಹಮ್ಮದ್, ಧರ್ಮಯುದ್ಧಗಳು, ಪುನರುಜ್ಜಿವನ (ಇಟಲಿ, ದ ವಿಂಚಿ), ಧಾರ್ಮಿಕ ಸುಧಾರಣೆ (ಮಾರ್ಟಿನ್ ಲೂಥರ್), ಭೌಗೋಳಿಕ ಅನ್ವೇಷಣೆಗಳು (ವಾಸ್ಕೋಡಿಗಾಮ 1498). ಐರೋಪ್ಯರ ಆಗಮನ, ಪ್ಲಾಸಿ & ಬಕ್ಸಾರ್ ಕದನಗಳು, ಮೈಸೂರು ಸಂಸ್ಥಾನ (ಹೈದರ್ ಅಲಿ, ಟಿಪ್ಪು ಸುಲ್ತಾನ್), 19ನೇ ಶತಮಾನದ ಸುಧಾರಣೆಗಳು (ಬ್ರಹ್ಮ ಸಮಾಜ, ಆರ್ಯ ಸಮಾಜ, ವಿವೇಕಾನಂದ, ಅಂಬೇಡ್ಕರ್), 1857ರ ಸಂಗ್ರಾಮ, ಸ್ವಾತಂತ್ರ್ಯ ಚಳುವಳಿ (ಗಾಂಧಿ ಯುಗ), ಕರ್ನಾಟಕ ಏಕೀಕರಣ (1956), ಪ್ರಜಾಪ್ರಭುತ್ವ & ಜಾಗತಿಕ ಭೂಗೋಳ.
+
+        [8ನೇ ತರಗತಿ ಮುಖ್ಯಾಂಶಗಳು]:
+        - ಇತಿಹಾಸ: ಆಧಾರಗಳು (ಸಾಹಿತ್ಯಿಕ, ಪ್ರಾಕ್ತನ, ಮೌಖಿಕ - ಹಲ್ಮಿಡಿ ಶಾಸನ, ನಾಣ್ಯಶಾಸ್ತ್ರ, C-14 ಕಾರ್ಬನ್ ಡ 현). ಭರತವರ್ಷ & ಪ್ರಾಗೈತಿಹಾಸಿಕ ಕಾಲ (ಹಳೆ, ಮಧ್ಯ, ನವ ಶಿಲಾಯುಗ). ಪ್ರಾಚೀನ ನಾಗರಿಕತೆಗಳು (ಸಿಂಧೂ-ಸರಸ್ವತಿ - ಹರಪ್ಪ, ಮೊಹೆಂಜೋದಾರೊ, ಲೋಥಾಲ್ ಹಡಗುಕಟ್ಟೆ; ವೇದಗಳ ಕಾಲ - ಋಗ್ವೇದ, ಯಜುರ್ವೇದ, ಸಾಮವೇದ, ಅಥರ್ವವೇದ, ವರ್ಣವ್ಯವಸ್ಥೆ). ಜಗತ್ತಿನ ನಾಗರಿಕತೆಗಳು (ಈಜಿಪ್ಟ್ - ನೈಲ್ ನದಿ, ಮಮ್ಮಿ, ಪಿರಮಿಡ್; ಮೆಸಪಟೊಮಿಯ - ಜಿಗ್ಗುರಟ್, ಹಮ್ಮುರಬಿ ಶಾಸನ, ತೂಗುವ ಉದ್ಯಾನ; ಚೀನಾ - ಹವಾಂಗೊ ನದಿ, ಮಹಾಗೋಡೆ, ಪಿಂಗಾಣಿ; ಗ್ರೀಕ್ - ಅಲೆಕ್ಸಾಂಡರ್, ಒಲಿಂಪಿಕ್ಸ್; ರೋಮ್ - ಗ್ಲಾಡಿಯೇಟರ್, ಜೂಲಿಯಸ್ ಸೀಸರ್; ಕೊಲಂಬಿಯಾ - ಮಾಯ, ಆಸ್ಟೆಕ್, ಇಂಕಾ). ಸನಾತನ ಧರ್ಮ (ಶೃತಿಗಳು, ಸ್ಮೃತಿಗಳು, ವೇದಾಂಗ, ದರ್ಶನಗಳು). ಜೈನ & ಬೌದ್ಧ ಧರ್ಮಗಳು (ವರ್ಧಮಾನ ಮಹಾವೀರ - ತ್ರಿರತ್ನಗಳು; ಗೌತಮ ಬುದ್ಧ - ಚತುರಾರ್ಯ ಸತ್ಯಗಳು, ಅಷ್ಟಾಂಗ ಮಾರ್ಗ, ಸಾರನಾಥ). ಮೌರ್ಯರು & ಕುಶಾಣರು (ಚಾಣಕ್ಯನ ಅರ್ಥಶಾಸ್ತ್ರ, ಅಶೋಕನ ಕಳಿಂಗ ಯುದ್ಧ, ಕನಿಷ್ಕನ ಶಕ ಯುಗ). ಗುಪ್ತರು & ವರ್ಧನರು (ಸಮುದ್ರಗುಪ್ತ - ಕವಿರಾಜ, ಕಾಳಿದಾಸ - ಶಾಕುಂತಲ, ಹರ್ಷವರ್ಧನ, ನಳಂದಾ ವಿಶ್ವವಿದ್ಯಾಲಯ). ದಕ್ಷಿಣ ಭಾರತದ ರಾಜವಂಶಗಳು (ಶಾತವಾಹನರು - ಗೌತಮೀಪುತ್ರ ಶಾತಕರ್ಣಿ; ಕದಂಬರು - ಮಯೂರವರ್ಮ, ಬನವಾಸಿ; ಗಂಗರು - ದುರ್ವಿನೀತ, ಶ್ರವಣಬೆಳಗೊಳದ ಗೊಮ್ಮಟೇಶ್ವರ; ಬಾದಾಮಿ ಚಾಳುಕ್ಯರು - ಇಮ್ಮಡಿ പുಲಿಕೇಶಿ, ಐಹೊಳೆ, ಪಟ್ಟದಕಲ್ಲು; ಕಂಚಿಯ ಪಲ್ಲವರು - ನರಸಿಂಹವರ್ಮ, ಮಹಾಬಲಿಪುರಂ; ಮಾನ್ಯಖೇಟದ ರಾಷ್ಟ್ರಕೂಟರು - ಅಮೋಘವರ್ಷ ನೃಪತುಂಗ - ಕವಿರಾಜಮಾರ್ಗ, ಎಲ್ಲೋರಾದ ಕೈಲಾಸನಾಥ ದೇವಾಲಯ; ಕಲ್ಯಾಣದ ಚಾಳುಕ್ಯರು - 6ನೇ ವಿಕ್ರಮಾದಿತ್ಯ, ವಿಶ್ವಗುರು ಬಸವಣ್ಣ - ವಚನ ಚಳವಳಿ; ಚೋಳರು - ರಾಜರಾಜ ಚೋಳ, ಬೃಹದೀಶ್ವರ ದೇವಾಲಯ; ಹೊಯ್ಸಳರು - ವಿಷ್ಣುವರ್ಧನ, ಬೇಲೂರು-ಹಳೇಬೀಡು).
+        - ರಾಜ್ಯಶಾಸ್ತ್ರ / ಪೌರನೀತಿ: ರಾಜ್ಯಶಾಸ್ತ್ರದ ಅರ್ಥ & ಪ್ರಾಮುಖ್ಯತೆ (ಪಿತಾಮಹ ಅರಿಸ್ಟಾಟಲ್ - 'ಪಾಲಿಟಿಕ್ಸ್'). ಪೌರ ಮತ್ತು ಪೌರತ್ವ (ಸಹಜ & ಸಹಜೀಕೃತ ಪೌರತ್ವ, ಏಕಪೌರತ್ವ & ದ್ವಿಪೌರತ್ವ, ಪೌರತ್ವ ಕಾಯಿದೆ 1955). ಪ್ರಜಾಪ್ರಭುತ್ವ (ಪ್ರತ್ಯಕ್ಷ & ಪರೋಕ್ಷ, ಸಾರ್ವತ್ರಿಕ ವಯಸ್ಕ ಮತದಾನ - 18 ವರ್ಷ, ಅಬ್ರಹಾಂ ಲಿಂಕನ್). ಸ್ಥಳೀಯ ಸ್ವಯಂ ಸರ್ಕಾರಗಳು (73ನೇ & 74ನೇ ತಿದ್ದುಪಡಿ 1993, ಪಂಚಾಯತ್ ರಾಜ್ - ಗ್ರಾಮ, ತಾಲೂಕು, ಜಿಲ್ಲಾ ಪಂಚಾಯಿತಿ; ನಗರ ಸ್ಥಳೀಯ ಸಂಸ್ಥೆಗಳು - ಪಟ್ಟಣ ಪಂಚಾಯಿತಿ, ಪುರಸಭೆ, ನಗರಸಭೆ, ಮಹಾನಗರ ಪಾಲಿಕೆ, ಬಿಬಿಎಂಪಿ).
+        - ಸಮಾಜಶಾಸ್ತ್ರ: ಮಾನವ ಮತ್ತು ಸಮಾಜ (ಸಮಾಜಶಾಸ್ತ್ರದ ಪಿತಾಮಹ ಆಗಸ್ಟ್ ಕಾಮೆ, ಮಾನವನು ಸಮಾಜಜೀವಿ, ಸಾಮಾಜೀಕರಣ, ಆಂಗಿಕ ಭಾಷೆ), ಮಾನವ ಮತ್ತು ಸಂಸ್ಕೃತಿ (ಆಚಾರ ವಿಚಾರ, ಲೋಕರೂಢಿಗಳು), ದಿನನಿತ್ಯದ ಜೀವನದಲ್ಲಿ ಸಮಾಜಶಾಸ್ತ್ರ (ಪಾತ್ರ ಪ್ರಜ್ಞೆ), ಸಮಾಜದ ಪ್ರಕಾರಗಳು (ಬೇಟೆಯಾಡುವ, ಪಶುಪಾಲನಾ, ಕೃಷಿಕ, ಕೈಗಾರಿಕಾ ಸಮಾಜ).
+        - ಭೂಗೋಳ ಶಾಸ್ತ್ರ: ಭೂಮಿ-ನಮ್ಮ ಜೀವಂತ ಗ್ರಹ (ಜಲಾವೃತ ಗ್ರಹ, ಅಕ್ಷಾಂಶ & ರೇಖಾಂಶ, ಪ್ರಪಂಚದ ವೇಳೆ), ಶಿಲಾಗೋಳ (ಭೂಖಂಡಗಳು, ಪ್ರಸ್ಥಭೂಮಿ, ಅಗ್ನಿಪರ್ವತ, ಭೂಕಂಪ), ವಾಯುಗೋಳ (ವಾಯುಮಂಡಲದ ಪದರಗಳು, ಉಷ್ಣಾಂಶ, ಮಾರುತಗಳು, ಮಳೆ), ಜಲಗೋಳ (ಖಂಡಾವರಣ ಪ್ರದೇಶ, ಆಳಸಾಗರ ಮೈದಾನ, ಸಾಗರ ಪ್ರವಾಹಗಳು - ಗಲ್ಫ್ ಸ್ಟ್ರೀಮ್, ಉಬ್ಬರವಿಳಿತಗಳು, ಸಾಗರ ಸಂರಕ್ಷಣೆ), ಜೀವಗೋಳ (ಜೀವ ವೈವಿಧ್ಯತೆ, ಪರಿಸರ ಮಾಲಿನ್ಯ - ವಾಯು, ಜಲ, ಮಣ್ಣು, ಶಬ್ದ ಮಾಲಿನ್ಯ, ಜಾಗತಿಕ ತಾಪಮಾನ, ಹಸಿರುಮನೆ ಪರಿಣಾಮ, ಆಮ್ಲಮಳೆ).
+        - ಅರ್ಥಶಾಸ್ತ್ರ & ವ್ಯವಹಾರ ಅಧ್ಯಯನ: ಅರ್ಥಶಾಸ್ತ್ರದ ಅರ್ಥ & ಮಹತ್ವ (ಆಡಂ ಸ್ಮಿತ್ - ಅರ್ಥಶಾಸ್ತ್ರದ ಪಿತಾಮಹ), ಮೂಲ ಪರಿಕಲ್ಪನೆಗಳು (ಬೇಡಿಕೆ, ಪೂರೈಕೆ, ಉತ್ಪಾದನೆ, ವಿತರಣೆ, ಅನುಭೋಗ, ಉಪಯುಕ್ತತೆ, ಬೆಲೆ, ಲಾಭ), ವ್ಯವಹಾರ - ಅರ್ಥ & ಪ್ರಾಮುಖ್ಯತೆ, ವಿವಿಧ ವ್ಯವಹಾರ ಸಂಘಟನೆಗಳು (ಏಕವ್ಯಕ್ತಿ ಒಡೆತನ, ಪಾಲುದಾರಿಕೆ, ಜಂಟಿ ಹಿಂದೂ ಕುಟುಂಬ, ಸಹಕಾರಿ ಸಂಘಗಳು), ದೊಡ್ಡ ಪ್ರಮಾಣದ ವ್ಯವಹಾರ ಸಂಘಟನೆಗಳು (ಜಂಟಿ ಬಂಡವಾಳ ಸಂಸ್ಥೆಗಳು, ಸಾರ್ವಜನಿಕ ವಲಯದ ಉದ್ದಿಮೆಗಳು).
+        `;
 
         async function fetchAIResponse(questionText) {
             const statusBox = document.getElementById('status');
@@ -250,11 +265,10 @@
 
             statusBox.innerText = "ಉತ್ತರವನ್ನು AI ಯೋಚಿಸುತ್ತಿದೆ...";
 
-            const promptText = `ನೀವು ಕರ್ನಾಟಕ ರಾಜ್ಯ ಪಠ್ಯಕ್ರಮದ 6 ಮತ್ತು 7ನೇ ತರಗತಿಯ ಸಮಾಜ ವಿಜ್ಞಾನ ವಿಷಯದ AI ಶಿಕ್ಷಕರು. ವಿದ್ಯಾರ್ಥಿ ಕೇಳಿದ ಪ್ರಶ್ನೆಗೆ ಅತ್ಯಂತ ಸರಳ, ನಿಖರ ಹಾಗೂ ಸ್ಪಷ್ಟವಾದ ಕನ್ನಡದಲ್ಲಿ ಗರಿಷ್ಠ 2 ರಿಂದ 3 ವಾಕ್ಯಗಳಲ್ಲಿ ಉತ್ತರಿಸಿ.
-            ಪ್ರಶ್ನೆ: ${trimmedQ}`;
+            const promptText = `${TEXTBOOK_CONTEXT}\n\nವಿದ್ಯಾರ್ಥಿಯ ಪ್ರಶ್ನೆ: ${trimmedQ}`;
 
             try {
-                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${GEMINI_API_KEY}`, {
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ contents: [{ parts: [{ text: promptText }] }] })
@@ -265,6 +279,8 @@
                 if (data.candidates && data.candidates[0].content && data.candidates[0].content.parts[0].text) {
                     const reply = data.candidates[0].content.parts[0].text;
                     showAndSpeakReply(reply);
+                } else if (data.error) {
+                    statusBox.innerText = `ದೋಷ: ${data.error.message}`;
                 } else {
                     statusBox.innerText = "ದೋಷ: ಉತ್ತರ ಪಡೆಯಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ.";
                 }
@@ -290,6 +306,7 @@
             }
         }
 
+        // 3. Speech Recognition & Controls
         const micBtn = document.getElementById('mic-btn');
         const sendBtn = document.getElementById('send-btn');
         const userInput = document.getElementById('user-input');
