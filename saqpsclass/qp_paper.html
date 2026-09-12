@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ಪ್ರಶ್ನೆ ಪತ್ರಿಕೆ - 6ನೇ ಸಮಾಜ ವಿಜ್ಞಾನ</title>
+<link href="https://fonts.googleapis.com/css2?family=Tiro+Kannada&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<!-- ನಮ್ಮ ಸಮಗ್ರ ಪ್ರಶ್ನೆಗಳ ಬ್ಯಾಂಕ್ ಲಿಂಕ್ -->
+<script src="questions_bank.js"></script>
+<style>
+  :root {
+    --primary: #1e3a8a;
+    --primary-light: #2563eb;
+    --accent: #059669;
+    --danger: #dc2626;
+    --bg: #cbd5e1;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Tiro Kannada', 'Inter', sans-serif; }
+  body { background-color: var(--bg); color: #000; padding: 15px; font-size: 13.5px; }
+
+  /* ನಿಯಂತ್ರಣ ಫಲಕ */
+  .studio-panel {
+    background: #ffffff;
+    max-width: 900px;
+    margin: 0 auto 15px auto;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    overflow: hidden;
+    border-top: 5px solid var(--primary);
+  }
+  .panel-header {
+    background: var(--primary);
+    color: white;
+    padding: 10px 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .panel-body { padding: 14px 18px; }
+
+  .btn-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .btn {
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    text-decoration: none;
+  }
+  .btn-primary { background: var(--primary); color: #fff; }
+  .btn-accent { background: var(--accent); color: #fff; }
+  .btn-secondary { background: #475569; color: #fff; }
+
+  /* A4 ಪ್ರಿಂಟ್ ಶೀಟ್ */
+  .sheet {
+    background: #ffffff;
+    width: 210mm;
+    min-height: 297mm;
+    height: auto;
+    padding: 12mm 15mm;
+    margin: 0 auto 20px auto;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    box-sizing: border-box;
+  }
+
+  .doc-header {
+    text-align: center;
+    border-bottom: 2px solid #000;
+    padding-bottom: 4px;
+    margin-bottom: 6px;
+  }
+  .doc-header h2 { font-size: 16px; font-weight: bold; }
+  .doc-header p { font-size: 12.5px; font-weight: bold; margin-top: 2px; }
+
+  .meta-bar {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1.5px solid #000;
+    padding: 3px 0;
+    margin-bottom: 10px;
+    font-weight: bold;
+    font-size: 12.5px;
+  }
+
+  /* ವಿಭಾಗಗಳ ಹೆಡಿಂಗ್ */
+  .section-head {
+    font-weight: bold;
+    font-size: 13px;
+    margin: 12px 0 6px 0;
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1.5px solid #000;
+    padding: 4px 8px;
+    background: #f1f5f9;
+  }
+  .section-head:first-child { margin-top: 0; }
+
+  /* ಪ್ರಶ್ನೆಗಳ ಸಾಲು */
+  .q-row {
+    display: flex;
+    margin-bottom: 10px;
+    gap: 6px;
+    align-items: flex-start;
+    font-size: 13px;
+    line-height: 1.35;
+    background: #fafafa;
+    padding: 6px;
+    border-radius: 6px;
+    border: 1px solid #e2e8f0;
+  }
+  .q-num { font-weight: bold; min-width: 24px; }
+  .q-content { flex: 1; }
+
+  .mcq-opts {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 4px 8px;
+    margin-top: 4px;
+    padding-left: 4px;
+    font-size: 12px;
+  }
+
+  /* ಪ್ರಶ್ನೆ ಬದಲಾವಣೆ ಪರಿಕರಗಳು (ವೆಬ್‌ನಲ್ಲಿ ಮಾತ್ರ) */
+  .q-tools-bar {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-top: 6px;
+  }
+  .q-changer-select {
+    width: 100%;
+    font-size: 11px;
+    padding: 5px 8px;
+    border-radius: 4px;
+    border: 1.5px solid #2563eb;
+    background: #eff6ff;
+    cursor: pointer;
+    font-weight: bold;
+  }
+
+  .custom-editor-box {
+    background: #f0fdf4;
+    border: 1.5px solid #059669;
+    border-radius: 6px;
+    padding: 8px 12px;
+    margin-top: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .custom-editor-box textarea, .custom-editor-box input {
+    font-size: 12px;
+    padding: 5px 8px;
+    border: 1px solid #cbd5e1;
+    border-radius: 4px;
+    font-family: inherit;
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 6mm 8mm;
+  }
+  @media print {
+    body { background: #ffffff; padding: 0; }
+    .no-print, .q-tools-bar, .studio-panel { display: none !important; }
+    .sheet {
+      width: 100% !important;
+      border: none !important;
+      box-shadow: none !important;
+      padding: 6mm 10mm !important;
+      margin: 0 !important;
+    }
+    .q-row {
+      background: transparent !important;
+      border: none !important;
+      padding: 0 !important;
+      margin-bottom: 6px !important;
+      font-size: 12px !important;
+      line-height: 1.25 !important;
+    }
+    .section-head {
+      background: #f1f5f9 !important;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+      margin: 8px 0 4px 0 !important;
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- ನಿಯಂತ್ರಣ ಪಟ್ಟಿ -->
+<div class="studio-panel no-print">
+  <div class="panel-header">
+    <h2 style="font-size: 14.5px;">ಹಂತ ೪: ಪ್ರಶ್ನೆ ಪತ್ರಿಕೆ ಸಿದ್ಧತೆ (Question Paper Builder)</h2>
+    <span style="font-size: 12px; background: rgba(255,255,255,0.2); padding: 3px 8px; border-radius: 4px;">6ನೇ ಸಮಾಜ ವಿಜ್ಞಾನ</span>
+  </div>
+  <div class="panel-body">
+    <div class="btn-bar">
+      <div>
+        <a href="analysis.html" class="btn btn-secondary">⬅ ಹಿಂದಿನ ಹಂತ (ವಿಶ್ಲೇಷಣೆ)</a>
+        <button class="btn btn-accent" style="margin-left: 8px;" onclick="window.print()">🖨️ ಪ್ರಶ್ನೆ ಪತ್ರಿಕೆ ಮುದ್ರಿಸಿ (Print A4)</button>
+      </div>
+      <div>
+        <span style="font-size: 12px; font-weight: bold; color: var(--primary); margin-right: 12px;">
+          ಒಟ್ಟು: 24 ಪ್ರಶ್ನೆಗಳು (40 ಅಂಕಗಳು)
+        </span>
+        <a href="key_answers.html" class="btn btn-primary">ಮುಂದಿನ ಹಂತ: ಕೀ ಉತ್ತರಗಳು ➔</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ಮುದ್ರಿತ ಪ್ರಶ್ನೆ ಪತ್ರಿಕೆ ಪುಟ -->
+<div class="sheet">
+  <div class="doc-header">
+    <h2><span id="qp_school">ಸರಕಾರಿ ಹಿರಿಯ ಪ್ರಾಥಮಿಕ ಶಾಲೆ, ಚೆಂಡಿಯಾ 1</span>, ತಾ: <span id="qp_taluk">ಕಾರವಾರ</span>, ಜಿ: <span id="qp_dist">ಉತ್ತರ ಕನ್ನಡ</span></h2>
+    <p><strong id="qp_exam">1ನೇ ಸಂಕಲನಾತ್ಮಕ ಮೌಲ್ಯಮಾಪನ 2025-26</strong> | ವಿಷಯ: <strong>ಸಮಾಜ ವಿಜ್ಞಾನ</strong></p>
+  </div>
+  <div class="meta-bar">
+    <span>ತರಗತಿ: 6ನೇ ತರಗತಿ</span>
+    <span>ಸಮಯ: 90 ನಿಮಿಷ</span>
+    <span>ಗರಿಷ್ಠ ಅಂಕಗಳು: 40</span>
+  </div>
+
+  <div id="qp_render_container"></div>
+</div>
+
+<script>
+// ಡೀಫಾಲ್ಟ್ 24 ಸಕ್ರಿಯ ಪ್ರಶ್ನೆಗಳು
+let ACTIVE_PAPER = [];
+
+window.onload = function() {
+  loadHeaderDetails();
+  initDefaultActiveQuestions();
+  renderQuestionPaper();
+};
+
+function loadHeaderDetails() {
+  const raw = localStorage.getItem('SS6_DESIGN_DATA');
+  if (raw) {
+    try {
+      const data = JSON.parse(raw);
+      if (data.school) document.getElementById('qp_school').innerText = data.school;
+      if (data.taluk) document.getElementById('qp_taluk').innerText = data.taluk;
+      if (data.district) document.getElementById('qp_dist').innerText = data.district;
+      if (data.exam) document.getElementById('qp_exam').innerText = data.exam;
+    } catch (e) { console.error("Stored data load error", e); }
+  }
+}
+
+function initDefaultActiveQuestions() {
+  // ಸ್ಥಳೀಯವಾಗಿ ಈ ಹಿಂದೆ ಬದಲಾವಣೆ ಮಾಡಿದ್ದರೆ ಅದನ್ನು ಪಡೆಯುವುದು
+  const saved = localStorage.getItem('SS6_ACTIVE_PAPER');
+  if (saved) {
+    try {
+      ACTIVE_PAPER = JSON.parse(saved);
+      if (ACTIVE_PAPER.length === 24) return;
+    } catch(e) {}
+  }
+
+  // ಇಲ್ಲವಾದಲ್ಲಿ LBA ಡೇಟಾಬೇಸ್‌ನಿಂದ ಅಧಿಕೃತ ಪ್ರಶ್ನೆಗಳನ್ನು ಲೋಡ್ ಮಾಡಿಕೊಳ್ಳುವುದು
+  ACTIVE_PAPER = [
+    // I. ಬಿಟ್ಟ ಸ್ಥಳ (1 ಅಂಕ)
+    { ...LBA_DATABASE.find(q => q.id === "U3_F01") },
+    { ...LBA_DATABASE.find(q => q.id === "U1_F02") },
+    { ...LBA_DATABASE.find(q => q.id === "U8_F01") },
+    { ...LBA_DATABASE.find(q => q.id === "U11_F01") },
+
+    // II. ಬಹುಆಯ್ಕೆ (1 ಅಂಕ)
+    { ...LBA_DATABASE.find(q => q.id === "U3_M01") },
+    { ...LBA_DATABASE.find(q => q.id === "U3_M02") },
+    { ...LBA_DATABASE.find(q => q.id === "U11_M01") },
+    { ...LBA_DATABASE.find(q => q.id === "U10_M01") },
+
+    // III. ಒಂದು ವಾಕ್ಯ (1 ಅಂಕ)
+    { ...LBA_DATABASE.find(q => q.id === "U1_S01") },
+    { ...LBA_DATABASE.find(q => q.id === "U5_S01") },
+    { ...LBA_DATABASE.find(q => q.id === "U8_S01") },
+    { ...LBA_DATABASE.find(q => q.id === "U11_S01") },
+
+    // IV. ಕಿರು ಉತ್ತರ (2 ಅಂಕ)
+    { ...LBA_DATABASE.find(q => q.id === "U4_K01") },
+    { ...LBA_DATABASE.find(q => q.id === "U2_K01") },
+    { ...LBA_DATABASE.find(q => q.id === "U3_K01") },
+    { ...LBA_DATABASE.find(q => q.id === "U5_K01") },
+    { ...LBA_DATABASE.find(q => q.id === "U6_K01") },
+    { ...LBA_DATABASE.find(q => q.id === "U7_K01") },
+    { ...LBA_DATABASE.find(q => q.id === "U7_K03") },
+    { ...LBA_DATABASE.find(q => q.id === "U9_K01") },
+    { ...LBA_DATABASE.find(q => q.id === "U8_K01") },
+    { ...LBA_DATABASE.find(q => q.id === "U10_K01") },
+
+    // V. ವಿವರಣಾತ್ಮಕ ಹಾಗೂ ನಕ್ಷೆ (4 ಅಂಕ)
+    { ...LBA_DATABASE.find(q => q.id === "U6_L01") },
+    { ...LBA_DATABASE.find(q => q.id === "U12_M01") }
+  ];
+}
+
+function renderQuestionPaper() {
+  const container = document.getElementById('qp_render_container');
+  let h = '';
+
+  // ಭಾಗ I
+  h += `<div class="section-head"><span>I. ಸೂಕ್ತ ಪದಗಳಿಂದ ಬಿಟ್ಟ ಸ್ಥಳವನ್ನು ಭರ್ತಿ ಮಾಡಿ.</span><span>4 × 1 = 4</span></div>`;
+  for(let i=0; i<4; i++) { h += renderQuestionBlock(ACTIVE_PAPER[i], i, 1); }
+
+  // ಭಾಗ II
+  h += `<div class="section-head"><span>II. ಕೆಳಗಿನ ಪ್ರಶ್ನೆಗಳಿಗೆ ನೀಡಲಾಗಿರುವ ನಾಲ್ಕು ಆಯ್ಕೆಗಳಲ್ಲಿ ಸರಿಯಾದ ಉತ್ತರವನ್ನು ಆರಿಸಿ ಬರೆಯಿರಿ.</span><span>4 × 1 = 4</span></div>`;
+  for(let i=4; i<8; i++) { h += renderQuestionBlock(ACTIVE_PAPER[i], i, 1); }
+
+  // ಭಾಗ III
+  h += `<div class="section-head"><span>III. ಕೆಳಗಿನ ಪ್ರಶ್ನೆಗಳಿಗೆ ಒಂದು ವಾಕ್ಯದಲ್ಲಿ ಉತ್ತರಿಸಿ.</span><span>4 × 1 = 4</span></div>`;
+  for(let i=8; i<12; i++) { h += renderQuestionBlock(ACTIVE_PAPER[i], i, 1); }
+
+  // ಭಾಗ IV
+  h += `<div class="section-head"><span>IV. ಕೆಳಗಿನ ಪ್ರಶ್ನೆಗಳಿಗೆ ಎರಡರಿಂದ ಮೂರು ವಾಕ್ಯಗಳಲ್ಲಿ ಉತ್ತರಿಸಿ.</span><span>10 × 2 = 20</span></div>`;
+  for(let i=12; i<22; i++) { h += renderQuestionBlock(ACTIVE_PAPER[i], i, 2); }
+
+  // ಭಾಗ V
+  h += `<div class="section-head"><span>V. ಕೆಳಗಿನ ಪ್ರಶ್ನೆಗಳಿಗೆ ವಿವರವಾಗಿ ಉತ್ತರಿಸಿ / ನಕ್ಷೆ ಕಾರ್ಯ.</span><span>2 × 4 = 8</span></div>`;
+  for(let i=22; i<24; i++) { h += renderQuestionBlock(ACTIVE_PAPER[i], i, 4); }
+
+  container.innerHTML = h;
+}
+
+function renderQuestionBlock(q, idx, targetMarks) {
+  let optHtml = '';
+  if (q.opts && q.opts.length > 0) {
+    optHtml = `<div class="mcq-opts">
+      <div>A) ${q.opts[0]}</div><div>B) ${q.opts[1]}</div>
+      <div>C) ${q.opts[2]}</div><div>D) ${q.opts[3]}</div>
+    </div>`;
+  }
+
+  // ಡ್ರಾಪ್‌ಡೌನ್‌ಗಾಗಿ ಆಯಾ ಪಾಠಕ್ಕೆ ಸೇರಿದ ಎಲ್ಲಾ ಪ್ರಶ್ನೆಗಳನ್ನು ಪಡೆಯುವುದು
+  // (ಮೊದಲು ಅದೇ ಅಂಕದ ಪ್ರಶ್ನೆಗಳು, ನಂತರ ಆ ಪಾಠದ ಇತರೆ ಎಲ್ಲಾ ಪ್ರಶ್ನೆಗಳು ಸಿಗುತ್ತವೆ)
+  let availableQs = LBA_DATABASE.filter(item => item.unit.trim() === q.unit.trim() && item.marks === targetMarks);
+  if (availableQs.length < 6) {
+    let allUnitQs = LBA_DATABASE.filter(item => item.unit.trim() === q.unit.trim());
+    availableQs = [...new Set([...availableQs, ...allUnitQs])];
+  }
+
+  let selectOptions = availableQs.map(item => `
+    <option value="${item.id}" ${item.id === q.id ? 'selected' : ''}>
+      [${item.marks} ಅಂಕ - ${item.obj}] ${item.q.substring(0, 85)}...
+    </option>
+  `).join('');
+
+  let customMcqInputs = '';
+  if (idx >= 4 && idx < 8) { // MCQ ಗಳಿಗಾಗಿ 4 ಆಯ್ಕೆಗಳು
+    let oA = q.opts ? q.opts[0] : '';
+    let oB = q.opts ? q.opts[1] : '';
+    let oC = q.opts ? q.opts[2] : '';
+    let oD = q.opts ? q.opts[3] : '';
+    customMcqInputs = `
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:4px; margin-top:2px;">
+        <input type="text" placeholder="ಆಯ್ಕೆ A" id="c_opt_a_${idx}" value="${oA}" oninput="onCustomChange(${idx})">
+        <input type="text" placeholder="ಆಯ್ಕೆ B" id="c_opt_b_${idx}" value="${oB}" oninput="onCustomChange(${idx})">
+        <input type="text" placeholder="ಆಯ್ಕೆ C" id="c_opt_c_${idx}" value="${oC}" oninput="onCustomChange(${idx})">
+        <input type="text" placeholder="ಆಯ್ಕೆ D" id="c_opt_d_${idx}" value="${oD}" oninput="onCustomChange(${idx})">
+      </div>
+    `;
+  }
+
+  return `
+    <div class="q-row">
+      <div class="q-num">${idx+1}.</div>
+      <div class="q-content">
+        <div>${q.q}</div>
+        ${optHtml}
+        <div class="q-tools-bar no-print">
+          <select class="q-changer-select" onchange="onQuestionChange(${idx}, this.value)">
+            <option value="CUSTOM" style="background:#dcfce7; color:#15803d; font-weight:bold;">➕ ನಿಮ್ಮದೇ ಪ್ರಶ್ನೆ ಟೈಪ್ ಮಾಡಿ (ಕಸ್ಟಮ್)</option>
+            ${selectOptions}
+          </select>
+          <div class="custom-editor-box" id="c_box_${idx}" style="display:none;">
+            <textarea placeholder="ಇಲ್ಲಿ ನಿಮ್ಮ ಸ್ವಂತ ಪ್ರಶ್ನೆಯನ್ನು ಟೈಪ್ ಮಾಡಿ..." id="c_q_${idx}" rows="2" oninput="onCustomChange(${idx})">${q.q}</textarea>
+            ${customMcqInputs}
+            <input type="text" placeholder="ಇಲ್ಲಿ ಈ ಪ್ರಶ್ನೆಗೆ ಸರಿಯಾದ ಉತ್ತರವನ್ನು ಟೈಪ್ ಮಾಡಿ..." id="c_a_${idx}" value="${q.a}" oninput="onCustomChange(${idx})">
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function onQuestionChange(index, selectedId) {
+  if (selectedId === "CUSTOM") {
+    document.getElementById(`c_box_${index}`).style.display = 'flex';
+  } else {
+    document.getElementById(`c_box_${index}`).style.display = 'none';
+    const found = LBA_DATABASE.find(item => item.id === selectedId);
+    if (found) {
+      ACTIVE_PAPER[index] = { ...found };
+      saveAndRerender();
+    }
+  }
+}
+
+function onCustomChange(index) {
+  ACTIVE_PAPER[index].q = document.getElementById(`c_q_${index}`).value;
+  ACTIVE_PAPER[index].a = document.getElementById(`c_a_${index}`).value;
+
+  if (index >= 4 && index < 8) {
+    const oA = document.getElementById(`c_opt_a_${index}`).value;
+    const oB = document.getElementById(`c_opt_b_${index}`).value;
+    const oC = document.getElementById(`c_opt_c_${index}`).value;
+    const oD = document.getElementById(`c_opt_d_${index}`).value;
+    ACTIVE_PAPER[index].opts = [oA, oB, oC, oD];
+  }
+
+  localStorage.setItem('SS6_ACTIVE_PAPER', JSON.stringify(ACTIVE_PAPER));
+}
+
+function saveAndRerender() {
+  localStorage.setItem('SS6_ACTIVE_PAPER', JSON.stringify(ACTIVE_PAPER));
+  renderQuestionPaper();
+}
+</script>
+
+</body>
+</html>
+
