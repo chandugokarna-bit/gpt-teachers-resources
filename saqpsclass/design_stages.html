@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ಪ್ರಶ್ನಾಪತ್ರಿಕೆ ರಚನಾ ಹಂತಗಳು - 6ನೇ ಸಮಾಜ ವಿಜ್ಞಾನ</title>
+<link href="https://fonts.googleapis.com/css2?family=Tiro+Kannada&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #1e3a8a;
+    --primary-light: #2563eb;
+    --accent: #059669;
+    --danger: #dc2626;
+    --bg: #cbd5e1;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Tiro Kannada', 'Inter', sans-serif; }
+  body { background-color: var(--bg); color: #000; padding: 15px; font-size: 13.5px; }
+
+  /* ಕಂಟ್ರೋಲ್ ಪ್ಯಾನೆಲ್ */
+  .studio-panel {
+    background: #ffffff;
+    max-width: 1000px;
+    margin: 0 auto 20px auto;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    overflow: hidden;
+    border-top: 5px solid var(--primary);
+  }
+  .panel-header {
+    background: var(--primary);
+    color: white;
+    padding: 12px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .panel-body { padding: 18px; }
+
+  .settings-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .field { display: flex; flex-direction: column; gap: 3px; }
+  .field label { font-weight: 600; font-size: 12px; color: #475569; }
+  .field input {
+    padding: 6px 10px;
+    border: 1.5px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 13px;
+    font-family: inherit;
+  }
+
+  .interactive-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 16px;
+    background: #f1f5f9;
+    padding: 14px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+  }
+  .interactive-grid h4 { margin-bottom: 8px; color: var(--primary); font-size: 13px; }
+
+  .unit-scroll-box {
+    max-height: 220px;
+    overflow-y: auto;
+    background: #ffffff;
+    border: 1.5px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 6px 10px;
+  }
+  .unit-row {
+    display: grid;
+    grid-template-columns: 1fr 65px 65px;
+    align-items: center;
+    padding: 4px 0;
+    gap: 6px;
+    border-bottom: 1px dashed #e2e8f0;
+  }
+  .unit-row:last-child { border-bottom: none; }
+  .unit-input {
+    width: 60px;
+    padding: 4px;
+    border: 1.5px solid #94a3b8;
+    border-radius: 4px;
+    text-align: center;
+    font-weight: bold;
+    font-size: 12px;
+  }
+
+  .btn-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid #e2e8f0;
+    padding-top: 12px;
+  }
+  .btn {
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    text-decoration: none;
+  }
+  .btn-primary { background: var(--primary); color: #fff; }
+  .btn-accent { background: var(--accent); color: #fff; }
+
+  /* A4 ಶೀಟ್ ಪ್ರಿಂಟ್ ಪೇಜ್ */
+  .sheet {
+    background: #ffffff;
+    width: 210mm;
+    min-height: 297mm;
+    padding: 12mm 15mm;
+    margin: 0 auto 25px auto;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    box-sizing: border-box;
+  }
+  .doc-header {
+    text-align: center;
+    border-bottom: 2px solid #000;
+    padding-bottom: 4px;
+    margin-bottom: 6px;
+  }
+  .doc-header h2 { font-size: 15.5px; font-weight: bold; }
+  .doc-header p { font-size: 12.5px; font-weight: bold; margin-top: 1px; }
+  .doc-header h3 { font-size: 14px; font-weight: bold; margin-top: 2px; }
+
+  .meta-bar {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1.5px solid #000;
+    padding: 3px 0;
+    margin-bottom: 8px;
+    font-weight: bold;
+    font-size: 12px;
+  }
+
+  table { 
+    width: 100%; 
+    border-collapse: collapse; 
+    margin-bottom: 8px; 
+    font-size: 11.5px;
+  }
+  th, td { 
+    border: 1px solid #000; 
+    padding: 4px 3px; 
+    text-align: center; 
+    vertical-align: middle;
+  }
+  th { background: #f8fafc; font-weight: bold; }
+  .text-left { text-align: left; padding-left: 6px; }
+  .font-bold { font-weight: bold; }
+
+  @media print {
+    body { background: #ffffff; padding: 0; }
+    .no-print { display: none !important; }
+    .sheet { width: 100%; border: none; box-shadow: none; padding: 6mm 10mm; margin: 0; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ಕಂಟ್ರೋಲರ್ ಪ್ಯಾನೆಲ್ (ಸ್ಕ್ರೀನ್ ಮೇಲೆ ಮಾತ್ರ) -->
+<div class="studio-panel no-print">
+  <div class="panel-header">
+    <h2 style="font-size: 15px;">ಹಂತ ೧: ಪ್ರಶ್ನಾಪತ್ರಿಕೆ ರಚನಾ ಹಂತಗಳ ಸಂರಚನೆ (Design Stages)</h2>
+    <span style="font-size: 12px; background: rgba(255,255,255,0.2); padding: 3px 8px; border-radius: 4px;">6ನೇ ಸಮಾಜ ವಿಜ್ಞಾನ</span>
+  </div>
+  <div class="panel-body">
+    <div class="settings-grid">
+      <div class="field">
+        <label>ಶಾಲೆಯ ಹೆಸರು:</label>
+        <input type="text" id="cfg_school" value="ಸರಕಾರಿ ಹಿರಿಯ ಪ್ರಾಥಮಿಕ ಶಾಲೆ, ಚೆಂಡಿಯಾ 1" oninput="updateHeaderDetails()">
+      </div>
+      <div class="field">
+        <label>ತಾಲೂಕು:</label>
+        <input type="text" id="cfg_taluk" value="ಕಾರವಾರ" oninput="updateHeaderDetails()">
+      </div>
+      <div class="field">
+        <label>ಜಿಲ್ಲೆ:</label>
+        <input type="text" id="cfg_district" value="ಉತ್ತರ ಕನ್ನಡ" oninput="updateHeaderDetails()">
+      </div>
+      <div class="field">
+        <label>ವಿಷಯ ಶಿಕ್ಷಕರು:</label>
+        <input type="text" id="cfg_teacher" value="ಶ್ರೀ ಚಂದ್ರಕಾಂತ ಗೌಡ, ಸ.ಶಿ." oninput="updateHeaderDetails()">
+      </div>
+      <div class="field">
+        <label>ಪರೀಕ್ಷೆಯ ಹೆಸರು:</label>
+        <input type="text" id="cfg_exam" value="1ನೇ ಸಂಕಲನಾತ್ಮಕ ಮೌಲ್ಯಮಾಪನ 2025-26" oninput="updateHeaderDetails()">
+      </div>
+    </div>
+
+    <div class="interactive-grid">
+      <!-- ಉದ್ದಿಶ್ಯವಾರು ಕಂಟ್ರೋಲ್ -->
+      <div>
+        <h4>🎯 1. ಉದ್ದಿಶ್ಯವಾರು ಶೇಕಡಾವಾರು (%):</h4>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+          <div class="field">
+            <label>ಜ್ಞಾನ %:</label>
+            <input type="number" id="inp_k" value="25" min="0" max="100" oninput="recalculateAll()">
+          </div>
+          <div class="field">
+            <label>ತಿಳುವಳಿಕೆ %:</label>
+            <input type="number" id="inp_u" value="45" min="0" max="100" oninput="recalculateAll()">
+          </div>
+          <div class="field">
+            <label>ಅಭಿವ್ಯಕ್ತಿ/ಅನ್ವಯ %:</label>
+            <input type="number" id="inp_a" value="20" min="0" max="100" oninput="recalculateAll()">
+          </div>
+          <div class="field">
+            <label>ಪ್ರಶಂಸೆ/ಕೌಶಲ %:</label>
+            <input type="number" id="inp_s" value="10" min="0" max="100" oninput="recalculateAll()">
+          </div>
+        </div>
+        <p id="pct_status" style="margin-top:8px; font-size:11.5px; font-weight:bold; color:var(--accent);">ಒಟ್ಟು ಮೊತ್ತ: 100% (ಸಮತೋಲಿತವಾಗಿದೆ)</p>
+      </div>
+
+      <!-- ಘಟಕವಾರು ಅಂಕಗಳ ಕಂಟ್ರೋಲ್ -->
+      <div>
+        <h4>📚 2. ಪ್ರತಿ ಪಾಠಗಳಿಗೂ ಅಂಕ ಮತ್ತು ಪ್ರಶ್ನಾ ಸಂಖ್ಯೆ:</h4>
+        <div class="unit-scroll-box" id="units_editor_box"></div>
+        <div style="display:flex; justify-content:space-between; margin-top:6px; font-weight:bold; font-size:12px;">
+          <span>ಒಟ್ಟು ಅಂಕಗಳು: <span id="dyn_ctrl_marks" style="color:var(--primary);">40</span></span>
+          <span>ಒಟ್ಟು ಪ್ರಶ್ನೆಗಳು: <span id="dyn_ctrl_qs" style="color:var(--primary);">24</span></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-bar">
+      <div>
+        <button class="btn btn-accent" onclick="window.print()">🖨️ ಈ ಪುಟ ಮುದ್ರಿಸಿ (Print A4)</button>
+      </div>
+      <div>
+        <!-- ಮುಂದಿನ ಹಂತಕ್ಕೆ ಲಿಂಕ್ -->
+        <a href="blueprint.html" class="btn btn-primary">ಮುಂದಿನ ಹಂತ: ನೀಲಿನಕ್ಷೆ (Blueprint) ➔</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ಮುದ್ರಣ ಪುಟ: ರಚನಾ ಹಂತಗಳು -->
+<div class="sheet">
+  <div class="doc-header">
+    <h2><span id="p_school">ಸರಕಾರಿ ಹಿರಿಯ ಪ್ರಾಥಮಿಕ ಶಾಲೆ, ಚೆಂಡಿಯಾ 1</span>, ತಾ: <span id="p_taluk">ಕಾರವಾರ</span>, ಜಿ: <span id="p_dist">ಉತ್ತರ ಕನ್ನಡ</span></h2>
+    <p>ವಿಷಯ ಶಿಕ್ಷಕರು: <span id="p_teacher">ಶ್ರೀ ಚಂದ್ರಕಾಂತ ಗೌಡ, ಸ.ಶಿ.</span></p>
+    <h3 style="text-decoration: underline;">ಪ್ರಶ್ನಾಪತ್ರಿಕೆ ರಚನಾ ಹಂತಗಳು (Design Stages)</h3>
+  </div>
+  <div class="meta-bar">
+    <span>ತರಗತಿ: 6ನೇ ತರಗತಿ</span>
+    <span>ವಿಷಯ: ಸಮಾಜ ವಿಜ್ಞಾನ</span>
+    <span>ಒಟ್ಟು ಅಂಕಗಳು: <span class="lbl_tot_marks">40</span></span>
+    <span>ಒಟ್ಟು ಪ್ರಶ್ನೆಗಳು: <span class="lbl_tot_qs">24</span></span>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+    <!-- 01. ಉದ್ದಿಶ್ಯವಾರು -->
+    <div>
+      <h4 style="margin-bottom:4px; font-size:12px;">01. ಉದ್ದಿಶ್ಯವಾರು ಅಂಕಗಳ ಹಂಚಿಕೆ</h4>
+      <table>
+        <thead>
+          <tr><th style="width:42%;">ಉದ್ದಿಶ್ಯಗಳು</th><th style="width:18%;">ಪ್ರಶ್ನೆ</th><th style="width:18%;">ಅಂಕ</th><th style="width:22%;">ಶೇಕಡಾ</th></tr>
+        </thead>
+        <tbody id="tbl_obj_body"></tbody>
+      </table>
+    </div>
+
+    <!-- 03. ಪ್ರಶ್ನೆಗಳ ಸ್ವರೂಪವಾರು -->
+    <div>
+      <h4 style="margin-bottom:4px; font-size:12px;">03. ಪ್ರಶ್ನೆಗಳ ಸ್ವರೂಪವಾರು ಹಂಚಿಕೆ</h4>
+      <table>
+        <thead>
+          <tr><th style="width:42%;">ಪ್ರಶ್ನೆಯ ಸ್ವರೂಪ</th><th style="width:18%;">ಪ್ರಶ್ನೆ</th><th style="width:18%;">ಅಂಕ</th><th style="width:22%;">ಶೇಕಡಾ</th></tr>
+        </thead>
+        <tbody id="tbl_form_body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 1.18fr 0.82fr; gap: 14px; margin-top: 4px;">
+    <!-- 02. ಘಟಕವಾರು -->
+    <div>
+      <h4 style="margin-bottom:4px; font-size:12px;">02. ಘಟಕವಾರು (ಪಾಠವಾರು) ಅಂಕಗಳ ಹಂಚಿಕೆ</h4>
+      <table>
+        <thead>
+          <tr><th style="width:8%;">ಕ್ರ.ಸಂ</th><th style="width:52%;">ಘಟಕದ ಹೆಸರು</th><th style="width:12%;">ಪ್ರಶ್ನೆ</th><th style="width:12%;">ಅಂಕ</th><th style="width:16%;">ಶೇಕಡಾ</th></tr>
+        </thead>
+        <tbody id="tbl_unit_body"></tbody>
+      </table>
+    </div>
+
+    <!-- 04. ಕಠಿಣತೆಯ ಮಟ್ಟವಾರು -->
+    <div>
+      <h4 style="margin-bottom:4px; font-size:12px;">04. ಕಠಿಣತೆಯ ಮಟ್ಟವಾರು ಹಂಚಿಕೆ</h4>
+      <table>
+        <thead>
+          <tr><th style="width:42%;">ಕಠಿಣತೆಯ ಮಟ್ಟ</th><th style="width:18%;">ಪ್ರಶ್ನೆ</th><th style="width:18%;">ಅಂಕ</th><th style="width:22%;">ಶೇಕಡಾ</th></tr>
+        </thead>
+        <tbody id="tbl_diff_body"></tbody>
+      </table>
+      
+      <div style="margin-top: 15px; font-size: 11px; line-height: 1.5; background: #f8fafc; padding: 6px; border: 1px solid #cbd5e1; border-radius: 4px;">
+        <strong>ಸೂಚನೆ:</strong> ಈ ಮೇಲಿನ ಹಂತಗಳ ನಿಖರ ಅಂಕ ವಿತರಣೆಯ ಆಧಾರದ ಮೇಲೆ ಮುಂದಿನ ಹಂತವಾದ 'ನೀಲಿನಕ್ಷೆ (Blueprint)' ರೂಪಿಸಲಾಗುತ್ತದೆ.
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ಪಾಠಗಳ ಪಟ್ಟಿ (LBA ಆಧಾರಿತ)
+const UNITS = [
+  { id: 1, name: "ಇತಿಹಾಸ ಪರಿಚಯ ಮತ್ತು ಆರಂಭಿಕ ಸಮಾಜ", marks: 2, q: 2 },
+  { id: 2, name: "ಭಾರತ ನಮ್ಮ ಹೆಮ್ಮೆ", marks: 2, q: 1 },
+  { id: 3, name: "ನಮ್ಮ ಹೆಮ್ಮೆಯ ಕರ್ನಾಟಕ", marks: 5, q: 4 },
+  { id: 4, name: "ವೇದಕಾಲದ ಸಂಸ್ಕೃತಿ", marks: 2, q: 1 },
+  { id: 5, name: "ಹೊಸ ಧರ್ಮಗಳ ಉದಯ", marks: 3, q: 2 },
+  { id: 6, name: "ದಕ್ಷಿಣ ಭಾರತದ ಪ್ರಾಚೀನ ರಾಜವಂಶಗಳು", marks: 6, q: 2 },
+  { id: 7, name: "ಪೌರ ಮತ್ತು ಪೌರತ್ವ", marks: 4, q: 2 },
+  { id: 8, name: "ನಮ್ಮ ಸಂವಿಧಾನ", marks: 4, q: 3 },
+  { id: 9, name: "ಪ್ರಭುತ್ವದ ಪ್ರಕಾರಗಳು", marks: 2, q: 1 },
+  { id: 10, name: "ಗ್ಲೋಬ್ ಮತ್ತು ನಕಾಶೆಗಳು", marks: 3, q: 2 },
+  { id: 11, name: "ಭೂಮಿಯ ಸ್ವರೂಪ", marks: 3, q: 3 },
+  { id: 12, name: "ಭಾರತದ ನಕ್ಷೆ", marks: 4, q: 1 }
+];
+
+window.onload = function() {
+  renderUnitsEditor();
+  recalculateAll();
+};
+
+function updateHeaderDetails() {
+  document.getElementById('p_school').innerText = document.getElementById('cfg_school').value;
+  document.getElementById('p_taluk').innerText = document.getElementById('cfg_taluk').value;
+  document.getElementById('p_dist').innerText = document.getElementById('cfg_district').value;
+  document.getElementById('p_teacher').innerText = document.getElementById('cfg_teacher').value;
+}
+
+function renderUnitsEditor() {
+  const container = document.getElementById('units_editor_box');
+  let html = '';
+  UNITS.forEach((u, idx) => {
+    html += `
+      <div class="unit-row">
+        <span style="font-size:11.5px; font-weight:600;">${idx+1}. ${u.name}</span>
+        <input type="number" class="unit-input" id="u_m_${idx}" value="${u.marks}" min="0" max="20" oninput="onUnitChange(${idx}, 'marks', this.value)">
+        <input type="number" class="unit-input" id="u_q_${idx}" value="${u.q}" min="0" max="15" oninput="onUnitChange(${idx}, 'q', this.value)">
+      </div>
+    `;
+  });
+  container.innerHTML = html;
+}
+
+function onUnitChange(idx, type, val) {
+  val = parseInt(val) || 0;
+  if(type === 'marks') UNITS[idx].marks = val;
+  if(type === 'q') UNITS[idx].q = val;
+  recalculateAll();
+}
+
+// ಸಂಪೂರ್ಣ ನೈಜ-ಸಮಯದ ಮರು-ಲೆಕ್ಕಾಚಾರ
+function recalculateAll() {
+  // 1. ಒಟ್ಟು ಅಂಕ ಮತ್ತು ಪ್ರಶ್ನೆಗಳ ಲೆಕ್ಕ
+  let totalMarks = 0;
+  let totalQs = 0;
+  UNITS.forEach(u => {
+    totalMarks += u.marks;
+    totalQs += u.q;
+  });
+
+  document.getElementById('dyn_ctrl_marks').innerText = totalMarks;
+  document.getElementById('dyn_ctrl_qs').innerText = totalQs;
+  document.querySelectorAll('.lbl_tot_marks').forEach(e => e.innerText = totalMarks);
+  document.querySelectorAll('.lbl_tot_qs').forEach(e => e.innerText = totalQs);
+
+  // 2. ಘಟಕವಾರು ಕೋಷ್ಟಕ ಭರ್ತಿ
+  let unitHtml = '';
+  UNITS.forEach((u, i) => {
+    let pct = totalMarks > 0 ? ((u.marks * 100) / totalMarks).toFixed(1) : 0;
+    unitHtml += `
+      <tr>
+        <td>${i+1}</td>
+        <td class="text-left">${u.name}</td>
+        <td>${u.q}</td>
+        <td>${u.marks}</td>
+        <td>${pct}%</td>
+      </tr>
+    `;
+  });
+  unitHtml += `
+    <tr class="font-bold" style="background:#f1f5f9;">
+      <td colspan="2">ಒಟ್ಟು</td>
+      <td>${totalQs}</td>
+      <td>${totalMarks}</td>
+      <td>100%</td>
+    </tr>
+  `;
+  document.getElementById('tbl_unit_body').innerHTML = unitHtml;
+
+  // 3. ಉದ್ದಿಶ್ಯವಾರು ಕೋಷ್ಟಕ ಭರ್ತಿ
+  const k_pct = parseFloat(document.getElementById('inp_k').value) || 0;
+  const u_pct = parseFloat(document.getElementById('inp_u').value) || 0;
+  const a_pct = parseFloat(document.getElementById('inp_a').value) || 0;
+  const s_pct = parseFloat(document.getElementById('inp_s').value) || 0;
+  const sum_pct = k_pct + u_pct + a_pct + s_pct;
+
+  const stat = document.getElementById('pct_status');
+  if(sum_pct === 100) {
+    stat.style.color = "var(--accent)";
+    stat.innerText = "ಒಟ್ಟು ಮೊತ್ತ: 100% (ಸಮತೋಲಿತವಾಗಿದೆ)";
+  } else {
+    stat.style.color = "var(--danger)";
+    stat.innerText = `ಒಟ್ಟು ಮೊತ್ತ: ${sum_pct}% (ದಯವಿಟ್ಟು 100% ಗೆ ಸರಿಪಡಿಸಿ)`;
+  }
+
+  const k_m = Math.round((k_pct / 100) * totalMarks);
+  const u_m = Math.round((u_pct / 100) * totalMarks);
+  const a_m = Math.round((a_pct / 100) * totalMarks);
+  const s_m = totalMarks - (k_m + u_m + a_m);
+
+  const k_q = Math.max(1, Math.round(totalQs * (k_pct / 100)));
+  const u_q = Math.max(1, Math.round(totalQs * (u_pct / 100)));
+  const a_q = Math.max(1, Math.round(totalQs * (a_pct / 100)));
+  const s_q = Math.max(1, totalQs - (k_q + u_q + a_q));
+
+  let objHtml = `
+    <tr><td class="text-left">ಜ್ಞಾನ (Knowledge)</td><td>${k_q}</td><td>${k_m}</td><td>${k_pct}%</td></tr>
+    <tr><td class="text-left">ತಿಳುವಳಿಕೆ (Understanding)</td><td>${u_q}</td><td>${u_m}</td><td>${u_pct}%</td></tr>
+    <tr><td class="text-left">ಅಭಿವ್ಯಕ್ತಿ / ಅನ್ವಯ (Application)</td><td>${a_q}</td><td>${a_m}</td><td>${a_pct}%</td></tr>
+    <tr><td class="text-left">ಪ್ರಶಂಸೆ / ಕೌಶಲ (Skill)</td><td>${s_q}</td><td>${s_m}</td><td>${s_pct}%</td></tr>
+    <tr class="font-bold" style="background:#f1f5f9;"><td>ಒಟ್ಟು</td><td>${totalQs}</td><td>${totalMarks}</td><td>100%</td></tr>
+  `;
+  document.getElementById('tbl_obj_body').innerHTML = objHtml;
+
+  // 4. ಪ್ರಶ್ನೆಗಳ ಸ್ವರೂಪವಾರು ಕೋಷ್ಟಕ (ಕರ್ನಾಟಕ ಶಾಲಾ ಮಾದರಿ: 1 ಅಂಕ, 2 ಅಂಕ, 4 ಅಂಕ)
+  // 12 ವ.ಉ (1 ಅಂಕ), 10 ಕಿ.ಉ (2 ಅಂಕ), 2 ವಿ.ಉ (4 ಅಂಕ) = 40 ಅಂಕಗಳು
+  let q_v = 12, q_k = 10, q_d = 2;
+  let m_v = 12, m_k = 20, m_d = 8;
+  if(totalMarks !== 40) {
+    m_v = Math.round(totalMarks * 0.3);
+    m_k = Math.round(totalMarks * 0.5);
+    m_d = totalMarks - (m_v + m_k);
+    q_v = m_v;
+    q_k = Math.round(m_k / 2);
+    q_d = Math.round(m_d / 4);
+  }
+  let formHtml = `
+    <tr><td class="text-left">ವಸ್ತುನಿಷ್ಠ ಪ್ರಶ್ನೆಗಳು (1 ಅಂಕ)</td><td>${q_v}</td><td>${m_v}</td><td>${((m_v*100)/totalMarks).toFixed(0)}%</td></tr>
+    <tr><td class="text-left">ಕಿರು ಉತ್ತರ ಪ್ರಶ್ನೆಗಳು (2 ಅಂಕ)</td><td>${q_k}</td><td>${m_k}</td><td>${((m_k*100)/totalMarks).toFixed(0)}%</td></tr>
+    <tr><td class="text-left">ವಿವರಣಾತ್ಮಕ / ನಕ್ಷೆ (4 ಅಂಕ)</td><td>${q_d}</td><td>${m_d}</td><td>${((m_d*100)/totalMarks).toFixed(0)}%</td></tr>
+    <tr class="font-bold" style="background:#f1f5f9;"><td>ಒಟ್ಟು</td><td>${q_v + q_k + q_d}</td><td>${totalMarks}</td><td>100%</td></tr>
+  `;
+  document.getElementById('tbl_form_body').innerHTML = formHtml;
+
+  // 5. ಕಠಿಣತೆಯ ಮಟ್ಟವಾರು ಕೋಷ್ಟಕ (ಸುಲಭ 30%, ಸಾಧಾರಣ 50%, ಕಠಿಣ 20%)
+  const diff_easy_m = Math.round(totalMarks * 0.3);
+  const diff_avg_m = Math.round(totalMarks * 0.5);
+  const diff_hard_m = totalMarks - (diff_easy_m + diff_avg_m);
+
+  const diff_easy_q = Math.round(totalQs * 0.3);
+  const diff_avg_q = Math.round(totalQs * 0.5);
+  const diff_hard_q = totalQs - (diff_easy_q + diff_avg_q);
+
+  let diffHtml = `
+    <tr><td class="text-left">ಸುಲಭ (Easy)</td><td>${diff_easy_q}</td><td>${diff_easy_m}</td><td>30%</td></tr>
+    <tr><td class="text-left">ಸಾಧಾರಣ (Average)</td><td>${diff_avg_q}</td><td>${diff_avg_m}</td><td>50%</td></tr>
+    <tr><td class="text-left">ಕಠಿಣ (Difficult)</td><td>${diff_hard_q}</td><td>${diff_hard_m}</td><td>20%</td></tr>
+    <tr class="font-bold" style="background:#f1f5f9;"><td>ಒಟ್ಟು</td><td>${totalQs}</td><td>${totalMarks}</td><td>100%</td></tr>
+  `;
+  document.getElementById('tbl_diff_body').innerHTML = diffHtml;
+
+  // ಮುಂದಿನ ನೀಲಿನಕ್ಷೆ ಪುಟಕ್ಕಾಗಿ ಈ ಡೇಟಾವನ್ನು ಬ್ರೌಸರ್ ಮೆಮೊರಿಯಲ್ಲಿ (localStorage) ಉಳಿಸುವುದು
+  const designData = {
+    school: document.getElementById('cfg_school').value,
+    taluk: document.getElementById('cfg_taluk').value,
+    district: document.getElementById('cfg_district').value,
+    teacher: document.getElementById('cfg_teacher').value,
+    exam: document.getElementById('cfg_exam').value,
+    totalMarks: totalMarks,
+    totalQs: totalQs,
+    units: UNITS,
+    objectives: { k_m, u_m, a_m, s_m, k_pct, u_pct, a_pct, s_pct }
+  };
+  localStorage.setItem('SS6_DESIGN_DATA', JSON.stringify(designData));
+}
+</script>
+
+</body>
+</html>
