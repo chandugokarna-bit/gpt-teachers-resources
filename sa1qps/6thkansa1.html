@@ -143,11 +143,55 @@
     font-weight: 600;
     font-size: 13px;
     color: #475569;
+    white-space: nowrap;
   }
   .tab-btn.active {
     background: #ffffff;
     color: var(--primary);
     border-top: 3px solid var(--primary);
+  }
+
+  /* Page-Fit Floating Controls */
+  .page-fit-bar {
+    position: absolute;
+    top: 6px;
+    right: 10px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 3px 6px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+    z-index: 100;
+  }
+  .page-fit-label {
+    font-size: 10.5px;
+    font-weight: bold;
+    color: #475569;
+    margin-right: 4px;
+  }
+  .fit-btn {
+    width: 26px;
+    height: 24px;
+    font-size: 13px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border: 1px solid #94a3b8;
+    background: #ffffff;
+    border-radius: 4px;
+    color: #1e293b;
+    transition: all 0.15s;
+    user-select: none;
+  }
+  .fit-btn:hover {
+    background: #2563eb;
+    color: #ffffff;
+    border-color: #2563eb;
   }
 
   .sheet {
@@ -159,6 +203,7 @@
     box-shadow: 0 4px 6px rgba(0,0,0,0.05);
     box-sizing: border-box;
     position: relative;
+    transform-origin: top center;
   }
 
   .sheet-landscape {
@@ -266,6 +311,26 @@
     font-size: 11.5px;
   }
 
+  /* Oral Plain Questions Styling */
+  .oral-list-container {
+    margin-top: 10px;
+  }
+  .oral-q-item {
+    font-size: 13.5px;
+    line-height: 1.55;
+    padding: 5px 0;
+    border-bottom: 1px dashed #e2e8f0;
+    display: flex;
+    gap: 8px;
+  }
+  .oral-q-item:last-child {
+    border-bottom: none;
+  }
+  .oral-q-num {
+    font-weight: bold;
+    min-width: 26px;
+  }
+
   .q-tools-bar {
     display: flex;
     flex-direction: column;
@@ -306,8 +371,9 @@
 
   @media print {
     html, body { background: #ffffff !important; padding: 0 !important; margin: 0 !important; color: #000000 !important; }
-    .no-print, .q-tools-bar, .studio-panel, .nav-tabs, .custom-editor-box { display: none !important; }
+    .no-print, .q-tools-bar, .studio-panel, .nav-tabs, .custom-editor-box, .page-fit-bar { display: none !important; }
     .q-row { background: transparent !important; border: none !important; padding: 0 !important; margin-bottom: 5px !important; }
+    .oral-q-item { border-bottom: none !important; padding: 4px 0 !important; }
     .sheet { width: 100% !important; height: auto !important; min-height: auto !important; margin: 0 !important; padding: 6mm 10mm !important; box-shadow: none !important; page-break-after: always !important; break-after: page !important; }
     .sheet-landscape { page: blueprint_page !important; padding: 5mm 10mm !important; }
     .sheet:last-child { page-break-after: avoid !important; break-after: avoid !important; }
@@ -343,7 +409,7 @@
       </div>
       <div class="field">
         <label>ಪರೀಕ್ಷೆಯ ಹೆಸರು:</label>
-        <input type="text" id="cfg_exam" value="1ನೇ ಸಂಕಲನಾತ್ಮಕ ಮೌಲ್ಯಮಾಪನ 2025-26">
+        <input type="text" id="cfg_exam" value="1ನೇ ಸಂಕಲನಾತ್ಮಕ ಮೌಲ್ಯಮಾಪನ 2026-27">
       </div>
       <div class="field">
         <label>ಪರೀಕ್ಷಾ ಸಮಯ:</label>
@@ -409,10 +475,17 @@
   <button class="tab-btn" onclick="showTab('tab_qp', this)">4. ಪ್ರಶ್ನೆ ಪತ್ರಿಕೆ</button>
   <button class="tab-btn" onclick="showTab('tab_key1', this)">5. ಉತ್ತರ ಪತ್ರಿಕೆ (ಭಾಗ-1)</button>
   <button class="tab-btn" onclick="showTab('tab_key2', this)">6. ಉತ್ತರ ಪತ್ರಿಕೆ (ಭಾಗ-2)</button>
+  <button class="tab-btn" onclick="showTab('tab_oral', this)">7. ಮೌಖಿಕ ಪ್ರಶ್ನೆಗಳು (20)</button>
 </div>
 
 <!-- ಪುಟ 1: ರಚನಾ ಹಂತಗಳು -->
 <div class="sheet tab-page" id="tab_stages">
+  <div class="page-fit-bar no-print">
+    <span class="page-fit-label">Page Fit:</span>
+    <button class="fit-btn" onclick="adjustPageFit('tab_stages', 1)" title="Expand / Fill Page">+</button>
+    <button class="fit-btn" onclick="adjustPageFit('tab_stages', -1)" title="Shrink / Fit Content">-</button>
+    <button class="fit-btn" onclick="resetPageFit('tab_stages')" title="Reset Spacing">↺</button>
+  </div>
   <div class="doc-header">
     <h2><span class="dyn_school"></span>, ತಾ: <span class="dyn_taluk"></span>, ಜಿ: <span class="dyn_dist"></span></h2>
     <p>ವಿಷಯ ಶಿಕ್ಷಕರು: <span class="dyn_teacher"></span></p>
@@ -470,6 +543,12 @@
 
 <!-- ಪುಟ 2: ನೀಲಿನಕ್ಷೆ -->
 <div class="sheet sheet-landscape tab-page" id="tab_blueprint">
+  <div class="page-fit-bar no-print">
+    <span class="page-fit-label">Page Fit:</span>
+    <button class="fit-btn" onclick="adjustPageFit('tab_blueprint', 1)" title="Expand / Fill Page">+</button>
+    <button class="fit-btn" onclick="adjustPageFit('tab_blueprint', -1)" title="Shrink / Fit Content">-</button>
+    <button class="fit-btn" onclick="resetPageFit('tab_blueprint')" title="Reset Spacing">↺</button>
+  </div>
   <div class="doc-header">
     <h2><span class="dyn_school"></span>, ತಾ: <span class="dyn_taluk"></span>, ಜಿ: <span class="dyn_dist"></span></h2>
     <p>ವಿಷಯ ಶಿಕ್ಷಕರು: <span class="dyn_teacher"></span></p>
@@ -509,6 +588,12 @@
 
 <!-- ಪುಟ 3: ಪ್ರಶ್ನಾವಾರು ವಿಶ್ಲೇಷಣೆ -->
 <div class="sheet tab-page" id="tab_analysis">
+  <div class="page-fit-bar no-print">
+    <span class="page-fit-label">Page Fit:</span>
+    <button class="fit-btn" onclick="adjustPageFit('tab_analysis', 1)" title="Expand / Fill Page">+</button>
+    <button class="fit-btn" onclick="adjustPageFit('tab_analysis', -1)" title="Shrink / Fit Content">-</button>
+    <button class="fit-btn" onclick="resetPageFit('tab_analysis')" title="Reset Spacing">↺</button>
+  </div>
   <div class="doc-header">
     <h2><span class="dyn_school"></span>, ತಾ: <span class="dyn_taluk"></span>, ಜಿ: <span class="dyn_dist"></span></h2>
     <p>ವಿಷಯ ಶಿಕ್ಷಕರು: <span class="dyn_teacher"></span></p>
@@ -540,6 +625,12 @@
 
 <!-- ಪುಟ 4: ಪ್ರಶ್ನೆ ಪತ್ರಿಕೆ -->
 <div class="sheet tab-page" id="tab_qp">
+  <div class="page-fit-bar no-print">
+    <span class="page-fit-label">Page Fit:</span>
+    <button class="fit-btn" onclick="adjustPageFit('tab_qp', 1)" title="Expand / Fill Page">+</button>
+    <button class="fit-btn" onclick="adjustPageFit('tab_qp', -1)" title="Shrink / Fit Content">-</button>
+    <button class="fit-btn" onclick="resetPageFit('tab_qp')" title="Reset Spacing">↺</button>
+  </div>
   <div class="doc-header">
     <h2><span class="dyn_school"></span>, ತಾ: <span class="dyn_taluk"></span>, ಜಿ: <span class="dyn_dist"></span></h2>
     <p><strong class="dyn_exam">1ನೇ ಸಂಕಲನಾತ್ಮಕ ಮೌಲ್ಯಮಾಪನ 2025-26</strong> | ವಿಷಯ: <strong>ಪ್ರಥಮ ಭಾಷೆ ಕನ್ನಡ</strong></p>
@@ -555,6 +646,12 @@
 
 <!-- ಪುಟ 5: ಉತ್ತರ ಪತ್ರಿಕೆ 1 -->
 <div class="sheet tab-page" id="tab_key1">
+  <div class="page-fit-bar no-print">
+    <span class="page-fit-label">Page Fit:</span>
+    <button class="fit-btn" onclick="adjustPageFit('tab_key1', 1)" title="Expand / Fill Page">+</button>
+    <button class="fit-btn" onclick="adjustPageFit('tab_key1', -1)" title="Shrink / Fit Content">-</button>
+    <button class="fit-btn" onclick="resetPageFit('tab_key1')" title="Reset Spacing">↺</button>
+  </div>
   <div class="doc-header">
     <h2><span class="dyn_school"></span>, ತಾ: <span class="dyn_taluk"></span>, ಜಿ: <span class="dyn_dist"></span></h2>
     <p>ವಿಷಯ ಶಿಕ್ಷಕರು: <span class="dyn_teacher"></span></p>
@@ -580,6 +677,12 @@
 
 <!-- ಪುಟ 6: ಉತ್ತರ ಪತ್ರಿಕೆ 2 -->
 <div class="sheet tab-page" id="tab_key2">
+  <div class="page-fit-bar no-print">
+    <span class="page-fit-label">Page Fit:</span>
+    <button class="fit-btn" onclick="adjustPageFit('tab_key2', 1)" title="Expand / Fill Page">+</button>
+    <button class="fit-btn" onclick="adjustPageFit('tab_key2', -1)" title="Shrink / Fit Content">-</button>
+    <button class="fit-btn" onclick="resetPageFit('tab_key2')" title="Reset Spacing">↺</button>
+  </div>
   <div class="doc-header">
     <h2><span class="dyn_school"></span>, ತಾ: <span class="dyn_taluk"></span>, ಜಿ: <span class="dyn_dist"></span></h2>
     <p>ವಿಷಯ ಶಿಕ್ಷಕರು: <span class="dyn_teacher"></span></p>
@@ -603,6 +706,50 @@
   </table>
 </div>
 
+<!-- ಪುಟ 7: ಮೌಖಿಕ ಪ್ರಶ್ನೆಗಳು (Oral Assessment 20 Questions - Clean Layout, No Boxes/Units/Answers) -->
+<div class="sheet tab-page" id="tab_oral">
+  <div class="page-fit-bar no-print">
+    <span class="page-fit-label">Page Fit:</span>
+    <button class="fit-btn" onclick="adjustPageFit('tab_oral', 1)" title="Expand / Fill Page">+</button>
+    <button class="fit-btn" onclick="adjustPageFit('tab_oral', -1)" title="Shrink / Fit Content">-</button>
+    <button class="fit-btn" onclick="resetPageFit('tab_oral')" title="Reset Spacing">↺</button>
+  </div>
+  <div class="doc-header">
+    <h2><span class="dyn_school"></span>, ತಾ: <span class="dyn_taluk"></span>, ಜಿ: <span class="dyn_dist"></span></h2>
+    <p>ವಿಷಯ ಶಿಕ್ಷಕರು: <span class="dyn_teacher"></span></p>
+    <h3 style="text-decoration: underline;">ಮೌಖಿಕ ಮೌಲ್ಯಾಂಕನ ಪ್ರಶ್ನೆಕೋಠಿ (Oral Assessment - Semester 1)</h3>
+  </div>
+  <div class="meta-bar">
+    <span>ತರಗತಿ: 6ನೇ ತರಗತಿ</span>
+    <span>ವಿಷಯ: ಪ್ರಥಮ ಭಾಷೆ ಕನ್ನಡ</span>
+    <span>ಒಟ್ಟು ಪ್ರಶ್ನೆಗಳು: 20</span>
+    <span>ಮೌಲ್ಯಾಂಕನ: ಮೌಖಿಕ (ಆಲಿಸುವಿಕೆ ಮತ್ತು ಮಾತುಗಾರಿಕೆ)</span>
+  </div>
+
+  <div class="oral-list-container" id="oral_list_body">
+    <div class="oral-q-item"><span class="oral-q-num">1.</span><span>ಸ್ವತಂತ್ರ ಭಾರತದ ಪ್ರಥಮ ರಾಷ್ಟ್ರಾಧ್ಯಕ್ಷರು ಯಾರು?</span></div>
+    <div class="oral-q-item"><span class="oral-q-num">2.</span><span>ವಿದ್ಯಾರ್ಥಿಗಳಿಗೆ ಬುದ್ಧಿ ಕಲಿಸಲು ಜಾಕಿರ್ ಹುಸೇನರು ಯಾವ ವೇಷ ಹಾಕಿದ್ದರು?</span></div>
+    <div class="oral-q-item"><span class="oral-q-num">3.</span><span>ಪುಸ್ತಕಗಳ ಪುಟಗಳನ್ನು ಹರಿಯುವುದು ಏಕೆ ಒಳ್ಳೆಯ ಅಭ್ಯಾಸವಲ್ಲ?</span></div>
+    <div class="oral-q-item"><span class="oral-q-num">4.</span><span>ಗಂಧರ್ವ ಸೇನಾ ಯಾರು?</span></div>
+    <div class="oral-q-item"><span class="oral-q-num">5.</span><span>ಮಂತ್ರಿಯು ರಾಜನ ಒಡ್ಡೋಲಗಕ್ಕೆ ಬಂದು ಏನೆಂದು ಹೇಳಿದನು?</span></div>
+    <div class="oral-q-item"><span class="oral-q-num">6.</span><span>ರಾಜನ ಅಂತಃಪುರದಲ್ಲಿ ರಾಣಿಯರು ಗಹಗಹಿಸಿ ನಗಲು ಕಾರಣವೇನು?</span></div>
+    <div class="oral-q-item"><span class="oral-q-num">7.</span><span>ಶ್ರೀಕೃಷ್ಣನನ್ನು ಕಾಣಲು ಸುಧಾಮನು ಅವನಿಗಾಗಿ ಏನನ್ನು ತಂದಿದ್ದನು?</span></div>
+    <div class="oral-q-item"><span class="oral-q-num">8.</span><span>ಶ್ರೀಕೃಷ್ಣ ಮತ್ತು ಸುಧಾಮರು ಎಲ್ಲಿ ಜೊತೆಯಾಗಿ ವಿದ್ಯಾಭ್ಯಾಸ ಮಾಡಿದರು?</span></div>
+    <div class="oral-q-item"><span class="oral-q-num">9.</span><span>ಡಾ. ರಾಜಕುಮಾರ್ ಅವರ ಮೊದಲ ಹೆಸರೇನು?</span></div>
+    <div class="oral-q-item"><span class="oral-q-num">10.</span><span>ಡಾ. ರಾಜಕುಮಾರ್ ನಾಯಕರಾಗಿ ಅಭಿನಯಿಸಿದ ಮೊದಲ ಚಲನಚಿತ್ರ ಯಾವುದು?</span></div>
+    <div class="oral-q-item"><span class="oral-q-num">11.</span><span>ಕರ್ನಾಟಕ ಸರ್ಕಾರವು ಡಾ. ರಾಜಕುಮಾರ್ ಅವರಿಗೆ ನೀಡಿದ ಅತ್ಯುನ್ನತ ಪ್ರಶಸ್ತಿ ಯಾವುದು?</span></div>
+    <div class="oral-q-item"><span class="oral-q-num">12.</span><span>ಭೂಮಿಯ ಪೋಷಕ ಯಾರು?</span></div>
+    <div class="oral-q-item"><span class="oral-q-num">13.</span><span>ಸೂರ್ಯನಿಂದ ನಾವು ಕಲಿಯಬೇಕಾದ ಮುಖ್ಯ ಪಾಠ ಯಾವುದು?</span></div>
+    <div class="oral-q-item"><span class="oral-q-num">14.</span><span>ಪುಟ್ಟಿಗೆ ಯಾರ ಹಾಗೆ ಆಗಸದಲ್ಲಿ ಹಾರುವ ಮನಸ್ಸಿತ್ತು?</span></div>
+    <div class="oral-q-item"><span class="oral-q-num">15.</span><span>ಮಂಗಳ ಗ್ರಹದಿಂದ ಭೂಮಿಗೆ ಮರಳಿದ ಪುಟ್ಟಿ ಜನರಲ್ಲಿ ಏನನ್ನು ಉಳಿಸಲು ಬೇಡಿಕೊಂಡಳು?</span></div>
+    <div class="oral-q-item"><span class="oral-q-num">16.</span><span>ಡಾ. ಬಿ.ಆರ್. ಅಂಬೇಡ್ಕರ್ ಅವರ ಪೂರ್ಣ ಹೆಸರೇನು?</span></div>
+    <div class="oral-q-item"><span class="oral-q-num">17.</span><span>ಸಂವಿಧಾನ ಶಿಲ್ಪಿ ಎಂದು ಯಾರನ್ನು ಕರೆಯಲಾಗುತ್ತದೆ?</span></div>
+    <div class="oral-q-item"><span class="oral-q-num">18.</span><span>ಮಗು ಹಣ್ಣಿನ ಅಂಗಡಿಯ ಮುಂದೆ ಏನು ಮಾಡುತ್ತದೆ?</span></div>
+    <div class="oral-q-item"><span class="oral-q-num">19.</span><span>'ಮಗು ಮತ್ತು ಹಣ್ಣುಗಳು' ಪದ್ಯದಲ್ಲಿ ಉಲ್ಲೇಖಿಸಲಾದ ಅಪರೂಪದ ಹಣ್ಣು ಯಾವುದು?</span></div>
+    <div class="oral-q-item"><span class="oral-q-num">20.</span><span>'ಕೈ ಕೆಸರಾದರೆ ಬಾಯಿ ಮೊಸರು' ಎಂಬ ಗಾದೆ ಮಾತಿನ ಒಳಾರ್ಥವೇನು?</span></div>
+  </div>
+</div>
+
 <script>
 // ಅಧಿಕೃತ ನೀಲಿನಕ್ಷೆಯ 10 ಘಟಕಗಳು
 const MASTER_UNITS = [
@@ -620,22 +767,73 @@ const MASTER_UNITS = [
 
 const WEIGHTS = [1, 2, 4, 1, 2, 4, 1, 2, 4, 1, 2, 4];
 
-// PDF ಮಾಡೆಲ್ SA-1 ನೀಲಿನಕ್ಷೆಯ ನಿಖರ 24 ಪ್ರಶ್ನೆ ಮತ್ತು 40 ಅಂಕಗಳ ಮ್ಯಾಟ್ರಿಕ್ಸ್:
-// Col 0,1,2: ಜ್ಞಾನ (1,2,4)
-// Col 3,4,5: ತಿಳಿವಳಿಕೆ/ಗ್ರಹಿಕೆ (1,2,4)
-// Col 6,7,8: ಅಭಿವ್ಯಕ್ತಿ/ಅನ್ವಯ (1,2,4)
-// Col 9,10,11: ಪ್ರಶಂಸೆ/ಕೌಶಲ (1,2,4)
+// Page-Fit Zoom and Spacing Controller
+const PAGE_FIT_STATE = {};
+
+function adjustPageFit(pageId, step) {
+  if (!PAGE_FIT_STATE[pageId]) {
+    PAGE_FIT_STATE[pageId] = { font: 100, space: 100 };
+  }
+  PAGE_FIT_STATE[pageId].font += (step * 3);
+  PAGE_FIT_STATE[pageId].space += (step * 6);
+
+  if (PAGE_FIT_STATE[pageId].font < 70) PAGE_FIT_STATE[pageId].font = 70;
+  if (PAGE_FIT_STATE[pageId].font > 150) PAGE_FIT_STATE[pageId].font = 150;
+
+  applyPageFit(pageId);
+}
+
+function resetPageFit(pageId) {
+  PAGE_FIT_STATE[pageId] = { font: 100, space: 100 };
+  applyPageFit(pageId);
+}
+
+function applyPageFit(pageId) {
+  const page = document.getElementById(pageId);
+  if (!page) return;
+  const state = PAGE_FIT_STATE[pageId] || { font: 100, space: 100 };
+  const fontRatio = state.font / 100;
+  const spaceRatio = state.space / 100;
+
+  const tables = page.querySelectorAll('table');
+  tables.forEach(t => {
+    t.style.fontSize = (11 * fontRatio) + 'px';
+  });
+  const cells = page.querySelectorAll('th, td');
+  cells.forEach(c => {
+    c.style.padding = (3.5 * spaceRatio) + 'px ' + (2 * spaceRatio) + 'px';
+  });
+  const qRows = page.querySelectorAll('.q-row');
+  qRows.forEach(r => {
+    r.style.marginBottom = (8 * spaceRatio) + 'px';
+    r.style.padding = (6 * spaceRatio) + 'px';
+    r.style.fontSize = (12.5 * fontRatio) + 'px';
+  });
+  const secHeads = page.querySelectorAll('.section-head');
+  secHeads.forEach(s => {
+    s.style.marginTop = (10 * spaceRatio) + 'px';
+    s.style.marginBottom = (6 * spaceRatio) + 'px';
+    s.style.padding = (3 * spaceRatio) + 'px ' + (6 * spaceRatio) + 'px';
+    s.style.fontSize = (12.5 * fontRatio) + 'px';
+  });
+  const oralItems = page.querySelectorAll('.oral-q-item');
+  oralItems.forEach(item => {
+    item.style.padding = (5 * spaceRatio) + 'px 0';
+    item.style.fontSize = (13.5 * fontRatio) + 'px';
+  });
+}
+
 const DEFAULT_BLUEPRINT_MATRIX = [
-  [1, 0, 0,  0, 0, 0,  0, 1, 0,  0, 0, 0], // U1: ದೊಡ್ಡವರ ದಾರಿ - 2 Q, 3 M [Q1(1M-K), Q21(2M-App)]
-  [2, 0, 0,  0, 1, 0,  0, 1, 0,  0, 0, 0], // U2: ಗಂಧರ್ವ ಸೇನ - 4 Q, 6 M [Q3(1M-K), Q8(1M-K), Q14(2M-Und), Q20(2M-App)]
-  [0, 0, 0,  0, 0, 0,  0, 1, 0,  0, 0, 1], // U3: ಕೃಷ್ಣ-ಸುಧಾಮ - 2 Q, 6 M [Q17(2M-App), Q23(4M-Skill)]
-  [1, 0, 0,  0, 1, 0,  0, 0, 0,  0, 0, 0], // U4: ಡಾ ರಾಜಕುಮಾರ್ - 2 Q, 3 M [Q6(1M-K), Q16(2M-Und)]
-  [2, 0, 0,  0, 1, 0,  0, 0, 0,  0, 0, 0], // U5: ಬೇಸಿಗೆ - 3 Q, 4 M [Q2(1M-K), Q5(1M-K), Q15(2M-Und)]
-  [0, 1, 0,  0, 1, 0,  0, 0, 0,  0, 0, 0], // U6: ಮಂಗಳ ಗ್ರಹದಲ್ಲಿ ಪುಟ್ಟಿ - 2 Q, 4 M [Q19(2M-Und), Q22(2M-K)]
-  [1, 0, 0,  0, 0, 0,  0, 1, 0,  0, 0, 0], // U7: ನೀ ಹೋದ ಮರುದಿನ - 2 Q, 3 M [Q7(1M-K), Q18(2M-App)]
-  [1, 0, 0,  0, 1, 0,  0, 0, 0,  0, 0, 0], // U8: ಮಗು ಮತ್ತು ಹಣ್ಣುಗಳು - 2 Q, 3 M [Q4(1M-K), Q13(2M-Und)]
-  [0, 0, 0,  4, 0, 0,  0, 0, 0,  0, 0, 0], // U9: ವ್ಯಾಕರಣಾಂಶಗಳು - 4 Q, 4 M [Q9, Q10, Q11, Q12 (1M-MCQ)]
-  [0, 0, 0,  0, 0, 0,  0, 0, 1,  0, 0, 0]  // U10: ಗಾದೆ ವಿಸ್ತರಣೆ - 1 Q, 4 M [Q24(4M-App)]
+  [1, 0, 0,  0, 0, 0,  0, 1, 0,  0, 0, 0], // U1: ದೊಡ್ಡವರ ದಾರಿ
+  [2, 0, 0,  0, 1, 0,  0, 1, 0,  0, 0, 0], // U2: ಗಂಧರ್ವ ಸೇನ
+  [0, 0, 0,  0, 0, 0,  0, 1, 0,  0, 0, 1], // U3: ಕೃಷ್ಣ-ಸುಧಾಮ
+  [1, 0, 0,  0, 1, 0,  0, 0, 0,  0, 0, 0], // U4: ಡಾ ರಾಜಕುಮಾರ್
+  [2, 0, 0,  0, 1, 0,  0, 0, 0,  0, 0, 0], // U5: ಬೇಸಿಗೆ
+  [0, 1, 0,  0, 1, 0,  0, 0, 0,  0, 0, 0], // U6: ಮಂಗಳ ಗ್ರಹದಲ್ಲಿ ಪುಟ್ಟಿ
+  [1, 0, 0,  0, 0, 0,  0, 1, 0,  0, 0, 0], // U7: ನೀ ಹೋದ ಮರುದಿನ
+  [1, 0, 0,  0, 1, 0,  0, 0, 0,  0, 0, 0], // U8: ಮಗು ಮತ್ತು ಹಣ್ಣುಗಳು
+  [0, 0, 0,  4, 0, 0,  0, 0, 0,  0, 0, 0], // U9: ವ್ಯಾಕರಣಾಂಶಗಳು
+  [0, 0, 0,  0, 0, 0,  0, 0, 1,  0, 0, 0]  // U10: ಗಾದೆ ವಿಸ್ತರಣೆ
 ];
 
 let BLUEPRINT_MATRIX = JSON.parse(JSON.stringify(DEFAULT_BLUEPRINT_MATRIX));
@@ -647,10 +845,14 @@ const LBA_DATABASE = [
   { id: "6K_U1_02", unit: "ದೊಡ್ಡವರ ದಾರಿ", section: "direct", marks: 1, obj: "ಜ್ಞಾನ", spec: "ಸ್ಮರಿಸುತ್ತಾನೆ", diff: "ಸಾಧಾರಣ", time: 2, q: "ಯಾವುದು ಒಳ್ಳೆಯ ಅಭ್ಯಾಸವಲ್ಲವೆಂದು ಪ್ರಸಾದರು ಮಕ್ಕಳಿಗೆ ಹೇಳಿದರು?", a: "ಪುಸ್ತಕದ ಪುಟಗಳನ್ನು ಹರಿಯುವುದು ಒಳ್ಳೆಯ ಅಭ್ಯಾಸವಲ್ಲ ಎಂದು ಪ್ರಸಾದರು ಮಕ್ಕಳಿಗೆ ಹೇಳಿದರು." },
   { id: "6K_U1_03", unit: "ದೊಡ್ಡವರ ದಾರಿ", section: "direct", marks: 1, obj: "ಜ್ಞಾನ", spec: "ಸ್ಮರಿಸುತ್ತಾನೆ", diff: "ಸುಲಭ", time: 2, q: "ಸ್ವತಂತ್ರ ಭಾರತದ ಪ್ರಥಮ ರಾಷ್ಟ್ರಾಧ್ಯಕ್ಷರು ಯಾರು?", a: "ಡಾ. ಬಾಬು ರಾಜೇಂದ್ರ ಪ್ರಸಾದ್." },
   { id: "6K_U1_04", unit: "ದೊಡ್ಡವರ ದಾರಿ", section: "direct", marks: 1, obj: "ಜ್ಞಾನ", spec: "ಸ್ಮರಿಸುತ್ತಾನೆ", diff: "ಸಾಧಾರಣ", time: 2, q: "ಜಾಕಿರ್ ಹುಸೇನ್ ರ ಆದೇಶ ಏನಾಗಿತ್ತು?", a: "ವಿದ್ಯಾರ್ಥಿಗಳು ಶಿಸ್ತು ಮತ್ತು ಸ್ವಚ್ಛತೆಯನ್ನು ರೂಢಿಸಿಕೊಳ್ಳಬೇಕೆಂಬುದು ಜಾಕಿರ್ ಹುಸೇನ್ ರ ಆದೇಶವಾಗಿತ್ತು." },
+  { id: "6K_U1_04B", unit: "ದೊಡ್ಡವರ ದಾರಿ", section: "direct", marks: 1, obj: "ಜ್ಞಾನ", spec: "ಸ್ಮರಿಸುತ್ತಾನೆ", diff: "ಸುಲಭ", time: 2, q: "ಜಾಮಿಯಾ ಮಿಲಿಯಾ ವಿಶ್ವವಿದ್ಯಾಲಯ ಎಲ್ಲಿದೆ?", a: "ಜಾಮಿಯಾ ಮಿಲಿಯಾ ವಿಶ್ವವಿದ್ಯಾಲಯ ದೆಹಲಿಯಲ್ಲಿದೆ." },
+
   { id: "6K_U1_05", unit: "ದೊಡ್ಡವರ ದಾರಿ", section: "blank", marks: 1, obj: "ಜ್ಞಾನ", spec: "ಸ್ಮರಿಸುತ್ತಾನೆ", diff: "ಸುಲಭ", time: 2, q: "ರಾಜೇಂದ್ರ ಪ್ರಸಾದರು ಮಕ್ಕಳಿಗೆ ____________ ಕೊಟ್ಟರು.", a: "ಕಾಸು (ಹಣ)" },
   { id: "6K_U1_06", unit: "ದೊಡ್ಡವರ ದಾರಿ", section: "blank", marks: 1, obj: "ಜ್ಞಾನ", spec: "ಸ್ಮರಿಸುತ್ತಾನೆ", diff: "ಸುಲಭ", time: 2, q: "ಜಾಮಿಯಾ ಮಿಲಿಯಾ ವಿಶ್ವವಿದ್ಯಾಲಯದ ಸ್ಥಾಪಕರು ____________.", a: "ಜಾಕಿರ್ ಹುಸೇನ್" },
   { id: "6K_U1_07", unit: "ದೊಡ್ಡವರ ದಾರಿ", section: "blank", marks: 1, obj: "ಜ್ಞಾನ", spec: "ಸ್ಮರಿಸುತ್ತಾನೆ", diff: "ಸುಲಭ", time: 2, q: "ದೊಡ್ಡವರ ದಾರಿ ಪಾಠದ ಲೇಖಕರು ____________.", a: "ಬೆ.ಗೋ. ರಮೇಶ್" },
   { id: "6K_U1_08", unit: "ದೊಡ್ಡವರ ದಾರಿ", section: "blank", marks: 1, obj: "ಜ್ಞಾನ", spec: "ಸ್ಮರಿಸುತ್ತಾನೆ", diff: "ಸುಲಭ", time: 2, q: "ಪುಸ್ತಕದ ಪುಟಗಳನ್ನು ಹರಿಯುವುದು ____________.", a: "ತಪ್ಪು (ಒಳ್ಳೆಯ ಅಭ್ಯಾಸವಲ್ಲ)" },
+  { id: "6K_U1_08B", unit: "ದೊಡ್ಡವರ ದಾರಿ", section: "blank", marks: 1, obj: "ಜ್ಞಾನ", spec: "ಸ್ಮರಿಸುತ್ತಾನೆ", diff: "ಸುಲಭ", time: 2, q: "ಪ್ರಸಾದರು ತಾವು ____________ ಸೇವಕ ಎಂದು ಹೇಳುತ್ತಿದ್ದರು.", a: "ಜನತೆಯ (ಜನಕ)" },
+
   { id: "6K_U1_09", unit: "ದೊಡ್ಡವರ ದಾರಿ", section: "short", marks: 2, obj: "ಅಭಿವ್ಯಕ್ತಿ / ಅನ್ವಯ", spec: "ವಿವರಿಸುತ್ತಾನೆ", diff: "ಸಾಧಾರಣ", time: 4, q: "ರಾಜೇಂದ್ರ ಪ್ರಸಾದ್ ಅವರ ವ್ಯಕ್ತಿತ್ವವನ್ನು ನಿಮ್ಮ ಮಾತುಗಳಲ್ಲಿ ಬರೆಯಿರಿ.", a: "ರಾಜೇಂದ್ರ ಪ್ರಸಾದರು ರಾಷ್ಟ್ರಪತಿಗಳಾಗಿದ್ದರೂ ಸರಳ ಜೀವನ ನಡೆಸಿದವರು. ಅವರು ಕೋಪವನ್ನು ಹತ್ತಿಕ್ಕಬಲ್ಲವರಾಗಿದ್ದರು. ಬಾಳಿನಲ್ಲಿ ಶಿಸ್ತು, ಸಂಯಮ, ಸಮಯಪಾಲನೆಗೆ ಅಪಾರ ಮಹತ್ವ ನೀಡುತ್ತಿದ್ದರು." },
   { id: "6K_U1_10", unit: "ದೊಡ್ಡವರ ದಾರಿ", section: "short", marks: 2, obj: "ಅಭಿವ್ಯಕ್ತಿ / ಅನ್ವಯ", spec: "ವಿವರಿಸುತ್ತಾನೆ", diff: "ಸಾಧಾರಣ", time: 4, q: "ರಾಜೇಂದ್ರ ಪ್ರಸಾದರು ಪುಸ್ತಕದ ಮಹತ್ವವನ್ನು ಮಕ್ಕಳಿಗೆ ಹೇಗೆ ತಿಳಿಸಿದರು?", a: "ಪುಸ್ತಕಗಳು ಜ್ಞಾನಭಂಡಾರ, ನಮ್ಮ ತಿಳುವಳಿಕೆ ಹೆಚ್ಚಿಸುವ ಆಕರಗಳು. ಪುಟಗಳನ್ನು ಹರಿದು ಹಾಕುವುದು ಒಳ್ಳೆಯದಲ್ಲ ಎಂದು ಮಕ್ಕಳಿಗೆ ತಿಳಿಹೇಳಿ ಪುಸ್ತಕದ ಮಹತ್ವ ತಿಳಿಸಿದರು." },
   { id: "6K_U1_11", unit: "ದೊಡ್ಡವರ ದಾರಿ", section: "short", marks: 2, obj: "ಅಭಿವ್ಯಕ್ತಿ / ಅನ್ವಯ", spec: "ವಿವರಿಸುತ್ತಾನೆ", diff: "ಸಾಧಾರಣ", time: 4, q: "ಜಾಕಿರ್ ಹುಸೇನರು ಮಾಡಿದ ಉಪಾಯದಿಂದ ವಿದ್ಯಾರ್ಥಿಗಳಲ್ಲಿ ಉಂಟಾದ ಬದಲಾವಣೆಗಳೇನು?", a: "ಹುಸೇನರು ಬೂಟ್ ಪಾಲಿಶ್ ಮಾಡುವ ವೇಷ ಧರಿಸಿ ಕುಳಿತಿದ್ದನ್ನು ಕಂಡ ವಿದ್ಯಾರ್ಥಿಗಳು ನಾಚಿ ನೀರಾಗಿ, ಅಂದಿನಿಂದ ನೀಟಾಗಿ ಬಟ್ಟೆ ಧರಿಸಿ ಬೂಟುಗಳಿಗೆ ಪಾಲಿಶ್ ಮಾಡಿಕೊಂಡು ಕಾಲೇಜಿಗೆ ಬರತೊಡಗಿದರು." },
@@ -659,62 +861,94 @@ const LBA_DATABASE = [
   { id: "6K_U2_01", unit: "ಗಂಧರ್ವ ಸೇನ", section: "direct", marks: 1, obj: "ಜ್ಞಾನ", spec: "ಸ್ಮರಿಸುತ್ತಾನೆ", diff: "ಸುಲಭ", time: 2, q: "ಗಂಧರ್ವ ಸೇನಾ ಯಾರು?", a: "ಮಡಿವಾಳತಿಯ ಪ್ರೀತಿಯ ಕತ್ತೆ." },
   { id: "6K_U2_02", unit: "ಗಂಧರ್ವ ಸೇನ", section: "direct", marks: 1, obj: "ಜ್ಞಾನ", spec: "ಸ್ಮರಿಸುತ್ತಾನೆ", diff: "ಸುಲಭ", time: 2, q: "ಮಂತ್ರಿಯು ರಾಜನಿಗೆ ಏನೆಂದು ಹೇಳಿದನು?", a: "ಮಹಾರಾಜರೇ ಗಂಧರ್ವ ಸೇನರು ತೀರಿಕೊಂಡರಂತೆ ಎಂದು ಮಂತ್ರಿ ಹೇಳಿದನು." },
   { id: "6K_U2_03", unit: "ಗಂಧರ್ವ ಸೇನ", section: "direct", marks: 1, obj: "ಜ್ಞಾನ", spec: "ಸ್ಮರಿಸುತ್ತಾನೆ", diff: "ಸುಲಭ", time: 2, q: "ರಾಣಿಯರ ನಗುವಿಗೆ ಕಾರಣವೇನು?", a: "ರಾಜ ಮತ್ತು ಅವನ ಆಸ್ಥಾನಿಕರ ಮೂರ್ಖತನವನ್ನು ನೋಡಿ ರಾಣಿಯರು ನಗುತ್ತಲೇ ಇದ್ದರು." },
+  { id: "6K_U2_03B", unit: "ಗಂಧರ್ವ ಸೇನ", section: "direct", marks: 1, obj: "ಜ್ಞಾನ", spec: "ಸ್ಮರಿಸುತ್ತಾನೆ", diff: "ಸುಲಭ", time: 2, q: "ಗಂಧರ್ವ ಸೇನ ತೀರಿಕೊಂಡ ವಿಷಯವನ್ನು ರಾಜ ಯಾರಿಗೆ ಹೇಳಿದನು?", a: "ರಾಜನು ತನ್ನ ಅಂತಃಪುರದಲ್ಲಿ ರಾಣಿಯರಿಗೆ ಹೇಳಿದನು." },
+  { id: "6K_U2_03C", unit: "ಗಂಧರ್ವ ಸೇನ", section: "direct", marks: 1, obj: "ಜ್ಞಾನ", spec: "ಸ್ಮರಿಸುತ್ತಾನೆ", diff: "ಸುಲಭ", time: 2, q: "ರಾಜನು ಮಂತ್ರಿಯನ್ನು ಏನೆಂದು ಪ್ರಶ್ನಿಸಿದನು?", a: "'ಮಂತ್ರಿಗಳೇ, ಯಾರು ಈ ಗಂಧರ್ವ ಸೇನಾ?' ಎಂದು ಪ್ರಶ್ನಿಸಿದನು." },
+
   { id: "6K_U2_04", unit: "ಗಂಧರ್ವ ಸೇನ", section: "blank", marks: 1, obj: "ಜ್ಞಾನ", spec: "ಸ್ಮರಿಸುತ್ತಾನೆ", diff: "ಸುಲಭ", time: 2, q: "ಸೇವಕಿ ____________ ಬುದ್ಧಿಯವಳು.", a: "ಚುರುಕು" },
   { id: "6K_U2_05", unit: "ಗಂಧರ್ವ ಸೇನ", section: "blank", marks: 1, obj: "ಜ್ಞಾನ", spec: "ಸ್ಮರಿಸುತ್ತಾನೆ", diff: "ಸುಲಭ", time: 2, q: "ರಾಜನ ಒಡ್ಡೋಲಗಕ್ಕೆ ಅಳುತ್ತಾ ಬಂದವರು ____________.", a: "ಮಂತ್ರಿ" },
+  { id: "6K_U2_05B", unit: "ಗಂಧರ್ವ ಸೇನ", section: "blank", marks: 1, obj: "ಜ್ಞಾನ", spec: "ಸ್ಮರಿಸುತ್ತಾನೆ", diff: "ಸುಲಭ", time: 2, q: "ಅಂತಃಪುರ ಎಂದರೆ ____________ ವಾಸಿಸುವ ಸ್ಥಳ.", a: "ರಾಣಿಯರು" },
+
   { id: "6K_U2_06", unit: "ಗಂಧರ್ವ ಸೇನ", section: "context", marks: 2, obj: "ತಿಳುವಳಿಕೆ", spec: "ಸಂಗ್ರಹಿಸಿ ಬರೆಯುತ್ತಾನೆ", diff: "ಸಾಧಾರಣ", time: 6, q: "ಸಂದರ್ಭ ಸಹಿತ ವಿವರಿಸಿ: 'ಮಹಾರಾಜರೇ ಗಂಧರ್ವ ಸೇನರು ತೀರಿಕೊಂಡರಂತೆ'", a: "ಆಯ್ಕೆ: ಗಂಧರ್ವ ಸೇನ ಪಾಠ. ಸಂದರ್ಭ: ಪಡೆಯ ಮುಖ್ಯಸ್ಥನು ಅಳುತ್ತಿರುವುದನ್ನು ಕಂಡು ಮಂತ್ರಿಯು ತಾನೂ ಅಳುತ್ತಾ ಒಡ್ಡೋಲಗದಲ್ಲಿದ್ದ ರಾಜನ ಬಳಿ ಬಂದು ಈ ಮಾತನ್ನು ಹೇಳಿದನು." },
   { id: "6K_U2_07", unit: "ಗಂಧರ್ವ ಸೇನ", section: "context", marks: 2, obj: "ತಿಳುವಳಿಕೆ", spec: "ಸಂಗ್ರಹಿಸಿ ಬರೆಯುತ್ತಾನೆ", diff: "ಸಾಧಾರಣ", time: 6, q: "ಸಂದರ್ಭ ಸಹಿತ ವಿವರಿಸಿ: 'ರಾಜ ಅಲ್ಲಿಯೂ ಕರುಳು ಕಿತ್ತು ಬರುವಂತೆ ಅಳತೊಡಗಿದ'", a: "ಆಯ್ಕೆ: ಗಂಧರ್ವ ಸೇನ ಪಾಠ. ಸಂದರ್ಭ: ಗಂಧರ್ವ ಸೇನರು ತೀರಿಕೊಂಡ ಸುದ್ದಿಯನ್ನು ಮಂತ್ರಿಯಿಂದ ಕೇಳಿದ ರಾಜನು ಅಂತಃಪುರಕ್ಕೆ ಬಂದು ರಾಣಿಯರೆದುರು ದುಃಖಿಸುವಾಗ ಈ ಮಾತು ಬಂದಿದೆ." },
   { id: "6K_U2_08", unit: "ಗಂಧರ್ವ ಸೇನ", section: "context", marks: 2, obj: "ತಿಳುವಳಿಕೆ", spec: "ಸಂಗ್ರಹಿಸಿ ಬರೆಯುತ್ತಾನೆ", diff: "ಸಾಧಾರಣ", time: 6, q: "ಸಂದರ್ಭ ಸಹಿತ ವಿವರಿಸಿ: 'ನಿನ್ನೆ ರಾತ್ರಿ ಕಣ್ಣು ಮುಚ್ಕೊಂಡ್ಲಿಟ್ಟ'", a: "ಆಯ್ಕೆ: ಗಂಧರ್ವ ಸೇನ ಪಾಠ. ಸಂದರ್ಭ: ಗಂಧರ್ವ ಸೇನಾ ಯಾರೆಂದು ವಿಚಾರಿಸಲು ಬಂದ ಮಂತ್ರಿ ಮತ್ತು ಪಡೆಯ ಮುಖ್ಯಸ್ಥನಿಗೆ ಮಡಿವಾಳತಿ ತನ್ನ ಪ್ರೀತಿಯ ಕತ್ತೆ ಸತ್ತಿದ್ದನ್ನು ದುಃಖದಿಂದ ತಿಳಿಸುವಾಗ ಈ ಮಾತನ್ನು ಹೇಳಿದಳು." },
+  { id: "6K_U2_08B", unit: "ಗಂಧರ್ವ ಸೇನ", section: "context", marks: 2, obj: "ತಿಳುವಳಿಕೆ", spec: "ಸಂಗ್ರಹಿಸಿ ಬರೆಯುತ್ತಾನೆ", diff: "ಸಾಧಾರಣ", time: 6, q: "ಸಂದರ್ಭ ಸಹಿತ ವಿವರಿಸಿ: 'ಒಂದು ಕುರಿ ಹಳ್ಳಕ್ಕೆ ಬಿದ್ದರೆ ಎಲ್ಲಾ ಬಿದ್ದವು'", a: "ಆಯ್ಕೆ: ಗಂಧರ್ವ ಸೇನ ಪಾಠ. ಸಂದರ್ಭ: ಸತ್ತದ್ದು ಮಡಿವಾಳತಿಯ ಕತ್ತೆ ಎಂದು ತಿಳಿದಾಗ ಆಸ್ಥಾನಿಕರ ಅಂಧಾನುಕರಣೆಯನ್ನು ಕುರಿತು ಈ ಗಾದೆ ಮಾತನ್ನು ಬಳಸಲಾಗಿದೆ." },
+
   { id: "6K_U2_09", unit: "ಗಂಧರ್ವ ಸೇನ", section: "short", marks: 2, obj: "ಅಭಿವ್ಯಕ್ತಿ / ಅನ್ವಯ", spec: "ವಿವರಿಸುತ್ತಾನೆ", diff: "ಸಾಧಾರಣ", time: 4, q: "ಮಂತ್ರಿ ಮತ್ತು ಪಡೆಯ ಮುಖ್ಯಸ್ಥನ ನಡುವೆ ನಡೆದ ಸಂವಾದವನ್ನು ತಿಳಿಸಿ.", a: "ಮಂತ್ರಿಯು ಪಡೆಯ ಮುಖ್ಯಸ್ಥನಲ್ಲಿ 'ಗಂಧರ್ವ ಸೇನರು ಯಾರು?' ಎಂದಾಗ, ಮುಖ್ಯಸ್ಥನು 'ಅವರು ಯಾರೆಂದು ನನಗೂ ತಿಳಿಯದು, ನನ್ನ ಹೆಂಡತಿ ಅಳುತ್ತಿದ್ದುದನ್ನು ನೋಡಿ ಬಂದು ನಿಮಗೆ ಹೇಳಿದೆ' ಎಂದನು." },
   { id: "6K_U2_10", unit: "ಗಂಧರ್ವ ಸೇನ", section: "short", marks: 2, obj: "ಅಭಿವ್ಯಕ್ತಿ / ಅನ್ವಯ", spec: "ವಿವರಿಸುತ್ತಾನೆ", diff: "ಸಾಧಾರಣ", time: 4, q: "ಗಂಧರ್ವ ಸೇನ ಯಾರೆಂದು ತಿಳಿಯಲು ಮಂತ್ರಿಯು ಮಾಡಿದ ಪ್ರಯತ್ನಗಳೇನು?", a: "ಮಂತ್ರಿಯು ಮೊದಲು ಸೇನಾ ಮುಖ್ಯಸ್ಥನನ್ನು, ನಂತರ ಅವನ ಹೆಂಡತಿಯನ್ನು, ಕೊನೆಗೆ ಕೆರೆಯ ಬಳಿಯಿದ್ದ ಮಡಿವಾಳತಿಯನ್ನು ವಿಚಾರಿಸಿದಾಗ ಸತ್ತವನು ಮಡಿವಾಳತಿಯ ಕತ್ತೆಯೆಂದು ತಿಳಿಯಿತು." },
+  { id: "6K_U2_11", unit: "ಗಂಧರ್ವ ಸೇನ", section: "short", marks: 2, obj: "ಅಭಿವ್ಯಕ್ತಿ / ಅನ್ವಯ", spec: "ವಿವರಿಸುತ್ತಾನೆ", diff: "ಸಾಧಾರಣ", time: 4, q: "ಮಡಿವಾಳಿಯು ತನ್ನ ಪ್ರೀತಿಯ ಕತ್ತೆ ಸತ್ತಾಗ ವ್ಯಕ್ತಪಡಿಸಿದ ನೋವೇನು?", a: "ಮಡಿವಾಳಿಯು ಬಾಯಿಬಡಿದುಕೊಳ್ಳುತ್ತಾ, 'ನನ್ನ ಮಗನಿಗಿಂತ ಹೆಚ್ಚಾಗಿ ಸಾಕಿದ್ದೆ, ಎಲ್ಲಾ ವ್ಯವಹಾರ ನೋಡಿಕೊಳ್ಳುತ್ತಿತ್ತು, ನಿನ್ನೆ ರಾತ್ರಿ ಕಣ್ಣುಮುಚ್ಚಿ ನನ್ನ ಹೊಟ್ಟೆ ಮೇಲೆ ಕಲ್ಲುಹಾಕಿತು' ಎಂದು ಕಣ್ಣೀರಿಟ್ಟಳು." },
 
   // ಪಾಠ 3: ಕೃಷ್ಣ-ಸುಧಾಮ
   { id: "6K_U3_01", unit: "ಕೃಷ್ಣ-ಸುಧಾಮ", section: "direct", marks: 1, obj: "ಜ್ಞಾನ", spec: "ಸ್ಮರಿಸುತ್ತಾನೆ", diff: "ಸಾಧಾರಣ", time: 2, q: "ಕೃಷ್ಣನನ್ನು ನೋಡಲು ಸುಧಾಮನು ಅವನಿಗಾಗಿ ಏನನ್ನು ಬಟ್ಟೆಯಲ್ಲಿ ಕಟ್ಟಿಕೊಂಡು ಹೋಗಿದ್ದನು?", a: "ಸುಧಾಮನು ಕೃಷ್ಣನಿಗಾಗಿ ಅವಲಕ್ಕಿಯನ್ನು ಬಟ್ಟೆಯಲ್ಲಿ ಕಟ್ಟಿಕೊಂಡು ಹೋಗಿದ್ದನು." },
   { id: "6K_U3_02", unit: "ಕೃಷ್ಣ-ಸುಧಾಮ", section: "direct", marks: 1, obj: "ಜ್ಞಾನ", spec: "ಸ್ಮರಿಸುತ್ತಾನೆ", diff: "ಸಾಧಾರಣ", time: 2, q: "ಗುರುಕುಲದಲ್ಲಿ ಸುಧಾಮನಿಗೆ ಸ್ನೇಹಿತನಾಗಿದ್ದವರು ಯಾರು?", a: "ಶ್ರೀಕೃಷ್ಣ." },
   { id: "6K_U3_03", unit: "ಕೃಷ್ಣ-ಸುಧಾಮ", section: "direct", marks: 1, obj: "ಜ್ಞಾನ", spec: "ಸ್ಮರಿಸುತ್ತಾನೆ", diff: "ಸಾಧಾರಣ", time: 2, q: "ಶ್ರೀಕೃಷ್ಣನ ಬಳಿ ಸಹಾಯ ಕೇಳಲು ಸುಧಾಮನಿಗೆ ಹೇಳಿದವರು ಯಾರು?", a: "ಸುಧಾಮನ ಹೆಂಡತಿ." },
+  { id: "6K_U3_03B", unit: "ಕೃಷ್ಣ-ಸುಧಾಮ", section: "direct", marks: 1, obj: "ಜ್ಞಾನ", spec: "ಸ್ಮರಿಸುತ್ತಾನೆ", diff: "ಸಾಧಾರಣ", time: 2, q: "ಸುಧಾಮ ಯಾವುದನ್ನು ಮಾನವ ಧರ್ಮ ಎನ್ನುತ್ತಾನೆ?", a: "ಜೀವನದಲ್ಲಿ ಬಂದ ಕಷ್ಟ-ಸುಖಗಳನ್ನು ಸಮಚಿತ್ತದಿಂದ ಅನುಭವಿಸುವುದೇ ಮಾನವ ಧರ್ಮ ಎನ್ನುತ್ತಾನೆ." },
+
   { id: "6K_U3_04", unit: "ಕೃಷ್ಣ-ಸುಧಾಮ", section: "short", marks: 2, obj: "ಅಭಿವ್ಯಕ್ತಿ / ಅನ್ವಯ", spec: "ವಿವರಿಸುತ್ತಾನೆ", diff: "ಸಾಧಾರಣ", time: 4, q: "ಕೃಷ್ಣ ಮತ್ತು ಸುಧಾಮರ ಗೆಳೆತನದ ಬಗ್ಗೆ ನಿಮ್ಮ ಮಾತುಗಳಲ್ಲಿ ಬರೆಯಿರಿ.", a: "ಕೃಷ್ಣ-ಸುಧಾಮರದ್ದು ನಿಸ್ವಾರ್ಥ ಗೆಳೆತನ. ಸುಧಾಮ ಬಡವನಾಗಿದ್ದರೂ ಕೃಷ್ಣ ಪ್ರೀತಿಯಿಂದ ಬರಮಾಡಿಕೊಂಡು ಸತ್ಕರಿಸಿದನು. ಗೆಳೆಯ ಕೇಳದೆಯೇ ಅವನ ಬಡತನ ನಿವಾರಿಸಿ ಗುಡಿಸಲನ್ನು ಅರಮನೆಯನ್ನಾಗಿಸಿದನು." },
+  { id: "6K_U3_04B", unit: "ಕೃಷ್ಣ-ಸುಧಾಮ", section: "short", marks: 2, obj: "ಅಭಿವ್ಯಕ್ತಿ / ಅನ್ವಯ", spec: "ವಿವರಿಸುತ್ತಾನೆ", diff: "ಸಾಧಾರಣ", time: 4, q: "ಕೃಷ್ಣನು ಸುಧಾಮನಿಗೆ ಮನೆಯನ್ನು ನಿರ್ಮಿಸಿಕೊಟ್ಟ ಸಂದರ್ಭವನ್ನು ವಿವರಿಸಿ.", a: "ಸುಧಾಮ ದ್ವಾರಕೆಗೆ ಬಂದ ದಿನವೇ ಕೃಷ್ಣನು ಸೇವಕರನ್ನು ಕಳುಹಿಸಿ ಸುಧಾಮನ ಗುಡಿಸಲಿನ ಜಾಗದಲ್ಲಿ ಭವ್ಯ ಅರಮನೆ ಕಟ್ಟಿಸಿ, ಕುಟುಂಬಕ್ಕೆ ಧನಧಾನ್ಯ ಮತ್ತು ರೇಷ್ಮೆ ಉಡುಪುಗಳನ್ನು ನೀಡಿದನು." },
+
   { id: "6K_U3_05", unit: "ಕೃಷ್ಣ-ಸುಧಾಮ", section: "long", marks: 4, obj: "ಪ್ರಶಂಸೆ / ಕೌಶಲ", spec: "ಮೆಚ್ಚುವನು", diff: "ಕಠಿಣ", time: 10, q: "ಕೃಷ್ಣ ಮತ್ತು ಸುಧಾಮ ಇವರಿಬ್ಬರಲ್ಲಿ ಯಾರ ಗುಣಗಳನ್ನು ಮೆಚ್ಚುವಿರಿ? ಏಕೆ? ವಿವರಿಸಿ.", a: "ಶ್ರೀಕೃಷ್ಣನ ಗುಣಗಳನ್ನು ಹೆಚ್ಚು ಮೆಚ್ಚುತ್ತೇನೆ. ಏಕೆಂದರೆ: 1) ನಿಜವಾದ ಸ್ನೇಹ: ಬಡ ಸುಧಾಮನನ್ನು ಗೌರವಿಸಿ ಅರಮನೆಗೆ ಕರೆದೊಯ್ದದ್ದು. 2) ಅಹಂಕಾರವಿಲ್ಲದ ಮನಸ್ಸು: ಪ್ರೀತಿಯಿಂದ ಅವಲಕ್ಕಿ ಸ್ವೀಕರಿಸಿದ್ದು. 3) ಕರುಣೆ: ಸ್ನೇಹಿತ ಕೇಳದಿದ್ದರೂ ಅವನ ಕಷ್ಟ ನೀಗಿಸಿ ವೈಭವ ನೀಡಿದ್ದು. ಇದು ಸ್ನೇಹಕ್ಕೆ ಆದರ್ಶವಾಗಿದೆ." },
+  { id: "6K_U3_05B", unit: "ಕೃಷ್ಣ-ಸುಧಾಮ", section: "long", marks: 4, obj: "ಪ್ರಶಂಸೆ / ಕೌಶಲ", spec: "ಮೆಚ್ಚುವನು", diff: "ಕಠಿಣ", time: 10, q: "ಕೃಷ್ಣ-ಸುಧಾಮ ನಾಟಕದ ಮೂಲಕ ನಾವು ಕಲಿಯಬೇಕಾದ ಮೌಲ್ಯಗಳನ್ನು ವಿವರಿಸಿ.", a: "ಸ್ನೇಹದಲ್ಲಿ ಶ್ರೀಮಂತಿಕೆ-ಬಡತನದ ಭೇದಭಾವ ಇರಬಾರದು. ಸ್ನೇಹಿತರ ಕಷ್ಟಕ್ಕೆ ಪ್ರತ್ಯಕ್ಷವಾಗಿ ಅಥವಾ ಪರೋಕ್ಷವಾಗಿ ಬೆಂಬಲವಾಗಿ ನಿಲ್ಲಬೇಕು ಎಂಬುದನ್ನು ಈ ನಾಟಕ ಕಲಿಸುತ್ತದೆ." },
 
   // ಪಾಠ 4: ಡಾ. ರಾಜಕುಮಾರ್
   { id: "6K_U4_01", unit: "ಡಾ. ರಾಜಕುಮಾರ್", section: "direct", marks: 1, obj: "ಜ್ಞಾನ", spec: "ಸ್ಮರಿಸುತ್ತಾನೆ", diff: "ಸುಲಭ", time: 2, q: "ರಾಜಕುಮಾರ್ ನಾಯಕರಾಗಿ ಅಭಿನಯಿಸಿದ ಮೊದಲ ಚಲನಚಿತ್ರ ಯಾವುದು?", a: "ಬೇಡರ ಕಣ್ಣಪ್ಪ" },
   { id: "6K_U4_02", unit: "ಡಾ. ರಾಜಕುಮಾರ್", section: "direct", marks: 1, obj: "ಜ್ಞಾನ", spec: "ಸ್ಮರಿಸುತ್ತಾನೆ", diff: "ಸುಲಭ", time: 2, q: "ರಾಜಕುಮಾರ್ ಅವರ ಮೊದಲ ಹೆಸರೇನು?", a: "ಮುತ್ತುರಾಜ" },
   { id: "6K_U4_03", unit: "ಡಾ. ರಾಜಕುಮಾರ್", section: "direct", marks: 1, obj: "ಜ್ಞಾನ", spec: "ಸ್ಮರಿಸುತ್ತಾನೆ", diff: "ಸುಲಭ", time: 2, q: "ರಾಜಕುಮಾರ್ ಮೊದಲು ಅಭಿನಯಿಸಿದ ನಾಟಕ ಕಂಪನಿ ಯಾವುದು?", a: "ಗುಬ್ಬಿ ವೀರಣ್ಣನವರ ನಾಟಕ ಕಂಪನಿ." },
+  { id: "6K_U4_03B", unit: "ಡಾ. ರಾಜಕುಮಾರ್", section: "direct", marks: 1, obj: "ಜ್ಞಾನ", spec: "ಸ್ಮರಿಸುತ್ತಾನೆ", diff: "ಸುಲಭ", time: 2, q: "ಮುತ್ತುರಾಜ ಎಂಬ ಹೆಸರನ್ನು ರಾಜಕುಮಾರ್ ಎಂದು ಬದಲಾಯಿಸಿದ ನಿರ್ದೇಶಕರು ಯಾರು?", a: "ಎಚ್.ಎಲ್.ಎನ್. ಸಿಂಹ." },
+
   { id: "6K_U4_04", unit: "ಡಾ. ರಾಜಕುಮಾರ್", section: "blank", marks: 1, obj: "ಜ್ಞಾನ", spec: "ಸ್ಮರಿಸುತ್ತಾನೆ", diff: "ಸುಲಭ", time: 2, q: "ರಾಜಕುಮಾರ್ ಅವರ ಗಾಯನ ____________ ಸಿನಿಮಾದಿಂದ ಆರಂಭಗೊಂಡಿತು.", a: "ಸಂಪತ್ತಿಗೆ ಸವಾಲ್" },
   { id: "6K_U4_05", unit: "ಡಾ. ರಾಜಕುಮಾರ್", section: "blank", marks: 1, obj: "ಜ್ಞಾನ", spec: "ಸ್ಮರಿಸುತ್ತಾನೆ", diff: "ಸುಲಭ", time: 2, q: "ಮೈಸೂರು ವಿಶ್ವವಿದ್ಯಾನಿಲಯವು ರಾಜಕುಮಾರ್ ಅವರಿಗೆ ನೀಡಿದ ಗೌರವ ____________.", a: "ಗೌರವ ಡಾಕ್ಟರೇಟ್ ಪದವಿ" },
   { id: "6K_U4_06", unit: "ಡಾ. ರಾಜಕುಮಾರ್", section: "blank", marks: 1, obj: "ಜ್ಞಾನ", spec: "ಸ್ಮರಿಸುತ್ತಾನೆ", diff: "ಸುಲಭ", time: 2, q: "ರಾಜಕುಮಾರ್ ಅವರ ಪತ್ನಿಯ ಹೆಸರು ____________.", a: "ಪಾರ್ವತಮ್ಮ" },
+  { id: "6K_U4_06B", unit: "ಡಾ. ರಾಜಕುಮಾರ್", section: "blank", marks: 1, obj: "ಜ್ಞಾನ", spec: "ಸ್ಮರಿಸುತ್ತಾನೆ", diff: "ಸುಲಭ", time: 2, q: "ಕರ್ನಾಟಕ ಸರ್ಕಾರವು ರಾಜಕುಮಾರ್ ಅವರಿಗೆ ನೀಡಿದ ಅತ್ಯುನ್ನತ ಪುರಸ್ಕಾರ ____________.", a: "ಕರ್ನಾಟಕ ರತ್ನ" },
+
   { id: "6K_U4_07", unit: "ಡಾ. ರಾಜಕುಮಾರ್", section: "short", marks: 2, obj: "ತಿಳುವಳಿಕೆ", spec: "ಗ್ರಹಿಸುತ್ತಾನೆ", diff: "ಸಾಧಾರಣ", time: 4, q: "ಡಾ. ರಾಜಕುಮಾರ್ ಅವರ ಗಾಯನದ ಬಗ್ಗೆ ವಿವರಿಸಿ.", a: "ಸಂಪತ್ತಿಗೆ ಸವಾಲ್ ಚಿತ್ರದ 'ಯಾರೇ ಕೂಗಾಡಲಿ ಊರೇ ಹೋರಾಡಲಿ' ಹಾಡಿನ ಮೂಲಕ ಗಾಯನ ಆರಂಭಿಸಿದರು. ಜೀವನ ಚೈತ್ರ ಚಿತ್ರದ 'ನಾದಮಯ ಈ ಲೋಕವೆಲ್ಲ' ಹಾಡಿಗೆ ಶ್ರೇಷ್ಠ ಹಿನ್ನೆಲೆ ಗಾಯಕ ರಾಷ್ಟ್ರಪ್ರಶಸ್ತಿ ಪಡೆದರು." },
   { id: "6K_U4_08", unit: "ಡಾ. ರಾಜಕುಮಾರ್", section: "short", marks: 2, obj: "ತಿಳುವಳಿಕೆ", spec: "ಗ್ರಹಿಸುತ್ತಾನೆ", diff: "ಸಾಧಾರಣ", time: 4, q: "ಡಾ. ರಾಜಕುಮಾರ್ ಅವರಿಗೆ ಸಂದ ಪ್ರಮುಖ ಪ್ರಶಸ್ತಿಗಳನ್ನು ತಿಳಿಸಿ.", a: "ಮೈಸೂರು ವಿಶ್ವವಿದ್ಯಾನಿಲಯದ ಗೌರವ ಡಾಕ್ಟರೇಟ್, ಕೇಂದ್ರ ಸರ್ಕಾರದ ಪದ್ಮಭೂಷಣ, ದಾದಾಸಾಹೇಬ್ ಫಾಲ್ಕೆ ಪ್ರಶಸ್ತಿ ಮತ್ತು ಕರ್ನಾಟಕ ಸರ್ಕಾರದ ಕರ್ನಾಟಕ ರತ್ನ ಪ್ರಶಸ್ತಿ." },
+  { id: "6K_U4_09", unit: "ಡಾ. ರಾಜಕುಮಾರ್", section: "short", marks: 2, obj: "ತಿಳುವಳಿಕೆ", spec: "ಗ್ರಹಿಸುತ್ತಾನೆ", diff: "ಸಾಧಾರಣ", time: 4, q: "ಡಾ. ರಾಜಕುಮಾರ್ ಅವರ ಅನನ್ಯ ಕನ್ನಡ ಪ್ರೇಮವನ್ನು ವಿವರಿಸಿ.", a: "ಎಷ್ಟೇ ಆಮಿಷವಿದ್ದರೂ ಕನ್ನಡ ಬಿಟ್ಟು ಅನ್ಯಭಾಷಾ ಚಿತ್ರಗಳಲ್ಲಿ ನಟಿಸಲಿಲ್ಲ. ಕನ್ನಡಕ್ಕೆ ಆದ್ಯತೆ ದೊರಕಿಸಲು ಆರಂಭವಾದ 'ಗೋಕಾಕ್ ಚಳುವಳಿ'ಯ ಮುಂದಾಳತ್ವ ವಹಿಸಿ ಯಶಸ್ಸು ತಂದರು." },
 
   // ಪಾಠ 5: ಬೇಸಿಗೆ
   { id: "6K_U5_01", unit: "ಬೇಸಿಗೆ", section: "direct", marks: 1, obj: "ಜ್ಞಾನ", spec: "ಸ್ಮರಿಸುತ್ತಾನೆ", diff: "ಸುಲಭ", time: 2, q: "ಭೂಮಿಗೆ ಯಾರು ಅನಿವಾರ್ಯ?", a: "ಭೂಮಿಗೆ ಸೂರ್ಯ ಅನಿವಾರ್ಯ." },
   { id: "6K_U5_02", unit: "ಬೇಸಿಗೆ", section: "direct", marks: 1, obj: "ಜ್ಞಾನ", spec: "ಸ್ಮರಿಸುತ್ತಾನೆ", diff: "ಸುಲಭ", time: 2, q: "ಸೂರ್ಯ ಮರೆಯದೆ ಮಾಡಿದ ಕರ್ತವ್ಯವೇನು?", a: "ಜಗತ್ತಿಗೆ ಬೆಳಕನ್ನು ನೀಡುವುದು ಮತ್ತು ಮೋಡ ಕೂಡಿಸಿ ಮಳೆ ತರುವುದು." },
   { id: "6K_U5_03", unit: "ಬೇಸಿಗೆ", section: "direct", marks: 1, obj: "ಜ್ಞಾನ", spec: "ಸ್ಮರಿಸುತ್ತಾನೆ", diff: "ಸಾಧಾರಣ", time: 2, q: "ಬಿರುಬಿಸಿಲಿನಲ್ಲಿ ಯಾವುವು ಕಂಗಾಲಾಗಲಿಲ್ಲ?", a: "ಮರ, ಗಿಡ, ಪೊದೆ, ಬಳ್ಳಿಗಳು ಬಿರುಬಿಸಿಲಿನಲ್ಲಿ ಕಂಗಾಲಾಗಲಿಲ್ಲ." },
+  { id: "6K_U5_03B", unit: "ಬೇಸಿಗೆ", section: "direct", marks: 1, obj: "ಜ್ಞಾನ", spec: "ಸ್ಮರಿಸುತ್ತಾನೆ", diff: "ಸುಲಭ", time: 2, q: "ಭೂಮಿಯ ಪೋಷಕ ಯಾರು?", a: "ಸೂರ್ಯ." },
+
   { id: "6K_U5_04", unit: "ಬೇಸಿಗೆ", section: "blank", marks: 1, obj: "ಜ್ಞಾನ", spec: "ಸ್ಮರಿಸುತ್ತಾನೆ", diff: "ಸುಲಭ", time: 2, q: "ಬೇಸಿಗೆ ಪದ್ಯವನ್ನು ____________ ಕವನ ಸಂಕಲನದಿಂದ ಆಯ್ದುಕೊಳ್ಳಲಾಗಿದೆ.", a: "ಸುಬ್ಬಾಭಟ್ಟರ ಮಗಳೇ" },
   { id: "6K_U5_05", unit: "ಬೇಸಿಗೆ", section: "blank", marks: 1, obj: "ಜ್ಞಾನ", spec: "ಸ್ಮರಿಸುತ್ತಾನೆ", diff: "ಸುಲಭ", time: 2, q: "ಭೂಮಿಯ ಪೋಷಕ ____________.", a: "ಸೂರ್ಯ" },
+  { id: "6K_U5_05B", unit: "ಬೇಸಿಗೆ", section: "blank", marks: 1, obj: "ಜ್ಞಾನ", spec: "ಸ್ಮರಿಸುತ್ತಾನೆ", diff: "ಸುಲಭ", time: 2, q: "ಬೇಸಿಗೆ ಪದ್ಯದ ಕವಿ ____________.", a: "ಬಿ.ಆರ್. ಲಕ್ಷ್ಮಣರಾವ್" },
+
   { id: "6K_U5_06", unit: "ಬೇಸಿಗೆ", section: "poem", marks: 2, obj: "ತಿಳುವಳಿಕೆ", spec: "ಬರೆಯುತ್ತಾನೆ", diff: "ಸಾಧಾರಣ", time: 4, q: "ಪದ್ಯ ಭಾಗವನ್ನು ಪೂರ್ಣಗೊಳಿಸಿರಿ: 'ಸೂರ್ಯನಿಂದ ಕಲಿಯೋಣ... ಧನ್ಯತೆ ಗಳಿಸೋಣ'", a: "ಸೂರ್ಯನಿಂದ ಕಲಿಯೋಣ, ಪ್ರಕೃತಿಯಂತೆ ನಲಿಯೋಣ, ಕಷ್ಟಗಳಿಗಂಜದೆ, ನಮ್ಮ ಕರ್ತವ್ಯ ಮರೆಯದೆ, ನಲಿಯುತ ಬಾಳಿ, ನಲಿವನು ಹಂಚಿ, ಧನ್ಯತೆ ಗಳಿಸೋಣ." },
   { id: "6K_U5_07", unit: "ಬೇಸಿಗೆ", section: "short", marks: 2, obj: "ತಿಳುವಳಿಕೆ", spec: "ಬರೆಯುತ್ತಾನೆ", diff: "ಸಾಧಾರಣ", time: 4, q: "ಸೂರ್ಯನಿಂದ ನಾವು ಯಾವ ಪಾಠವನ್ನು ಕಲಿಯಬೇಕು?", a: "ಸೂರ್ಯನಂತೆ ನಮ್ಮ ಕರ್ತವ್ಯವನ್ನು ಮರೆಯದೆ ಮಾಡಬೇಕು, ಸಂಕಷ್ಟಗಳಿಗೆ ಹೆದರದೆ ಧೈರ್ಯವಾಗಿ ಎದುರಿಸುತ್ತಾ ಧನ್ಯತೆಯ ಜೀವನ ನಡೆಸಬೇಕು." },
+  { id: "6K_U5_08", unit: "ಬೇಸಿಗೆ", section: "short", marks: 2, obj: "ತಿಳುವಳಿಕೆ", spec: "ಬರೆಯುತ್ತಾನೆ", diff: "ಸಾಧಾರಣ", time: 4, q: "ಬೇಸಿಗೆಯಲ್ಲಿ ಸೂರ್ಯ ಏಕೆ ಕಷ್ಟಪಟ್ಟು ದುಡಿಯುತ್ತಾನೆ?", a: "ನದಿ-ಸಮುದ್ರಗಳ ನೀರನ್ನು ಆವಿಯಾಗಿಸಿ, ಬಾನಿನಲ್ಲಿ ಮೋಡಗಳನ್ನು ಕೂಡಿಸಿ ಧರೆಗೆ ತಂಪಾದ ಮಳೆ ಸುರಿಸಲು ಸೂರ್ಯ ಬಿರುಬಿಸಿಲಿನಲ್ಲಿ ದುಡಿಯುತ್ತಾನೆ." },
 
   // ಪಾಠ 6: ಮಂಗಳ ಗ್ರಹದಲ್ಲಿ ಪುಟ್ಟಿ
   { id: "6K_U6_01", unit: "ಮಂಗಳ ಗ್ರಹದಲ್ಲಿ ಪುಟ್ಟಿ", section: "direct", marks: 1, obj: "ಜ್ಞಾನ", spec: "ಸ್ಮರಿಸುತ್ತಾನೆ", diff: "ಸುಲಭ", time: 2, q: "ಪುಟ್ಟಿಗೆ ಯಾರ ಹಾಗೆ ಹಾರುವ ಮನಸ್ಸಿತ್ತು?", a: "ಹಕ್ಕಿಯ ಹಾಗೆ ಹಾರುವ ಮನಸ್ಸಿತ್ತು." },
   { id: "6K_U6_02", unit: "ಮಂಗಳ ಗ್ರಹದಲ್ಲಿ ಪುಟ್ಟಿ", section: "blank", marks: 1, obj: "ಜ್ಞಾನ", spec: "ಸ್ಮರಿಸುತ್ತಾನೆ", diff: "ಸುಲಭ", time: 2, q: "ಒಂದು ದಿನ ಇದ್ದಕ್ಕಿದ್ದಂತೆ ಪುಟ್ಟಿಗೆ ____________ ಬಂದಿತ್ತು.", a: "ರೆಕ್ಕೆಯು" },
   { id: "6K_U6_03", unit: "ಮಂಗಳ ಗ್ರಹದಲ್ಲಿ ಪುಟ್ಟಿ", section: "blank", marks: 1, obj: "ಜ್ಞಾನ", spec: "ಸ್ಮರಿಸುತ್ತಾನೆ", diff: "ಸುಲಭ", time: 2, q: "ಸೌರಮಂಡಲದ ಅತಿ ದೊಡ್ಡ ಗ್ರಹ ____________.", a: "ಗುರು ಗ್ರಹ" },
+
   { id: "6K_U6_04", unit: "ಮಂಗಳ ಗ್ರಹದಲ್ಲಿ ಪುಟ್ಟಿ", section: "short", marks: 2, obj: "ತಿಳುವಳಿಕೆ", spec: "ಗ್ರಹಿಸುತ್ತಾನೆ", diff: "ಸಾಧಾರಣ", time: 4, q: "ಪುಟ್ಟಿ ಹಿಂದೊಂದು ಕಾಲದಲ್ಲಿ ಮಂಗಳ ಗ್ರಹ ಹೇಗಿತ್ತು ಎಂಬುದನ್ನು ಹೇಗೆ ತಿಳಿದುಕೊಂಡಳು?", a: "ಮಂಗಳ ಗ್ರಹದಲ್ಲಿದ್ದ 'ಯೋಗಿ' ಹೆಸರಿನ ಹೆಬ್ಬಂಡೆಯಿಂದ ತಿಳಿದುಕೊಂಡಳು. ಹಿಂದೆ ಜೀವಜಲ, ಮರಗಿಡಗಳಿದ್ದವು, ಮಾನವರು ಮರಗಳನ್ನು ಕಡಿದು ನಾಶಮಾಡಿದ್ದರಿಂದ ಬರಡಾಯಿತು ಎಂದು ತಿಳಿಯಿತು." },
   { id: "6K_U6_05", unit: "ಮಂಗಳ ಗ್ರಹದಲ್ಲಿ ಪುಟ್ಟಿ", section: "short", marks: 2, obj: "ತಿಳುವಳಿಕೆ", spec: "ಗ್ರಹಿಸುತ್ತಾನೆ", diff: "ಸಾಧಾರಣ", time: 4, q: "ಮಂಗಳ ಗ್ರಹದಿಂದ ಭೂಮಿಗೆ ಬಂದ ಪುಟ್ಟಿ ಏನು ಮಾಡಿದಳು?", a: "ಭೂಮಿಗೆ ಬಂದ ಪುಟ್ಟಿ ಜನರಲ್ಲಿ ಹಸಿರನ್ನು ಉಳಿಸಲು ಬೇಡಿಕೊಂಡಳು. ತಾನೂ ಸಹ ಎಳೆ ಸಸಿಗಳನ್ನು ನೆಟ್ಟು ಬೆಳೆಸಿ ಕುಣಿದಾಡಿದಳು." },
+  { id: "6K_U6_05B", unit: "ಮಂಗಳ ಗ್ರಹದಲ್ಲಿ ಪುಟ್ಟಿ", section: "short", marks: 2, obj: "ತಿಳುವಳಿಕೆ", spec: "ಗ್ರಹಿಸುತ್ತಾನೆ", diff: "ಸಾಧಾರಣ", time: 4, q: "ಯೋಗಿ ಹೆಬ್ಬಂಡೆಯು ಮಂಗಳ ಗ್ರಹದ ದುರಂತದ ಬಗ್ಗೆ ಪುಟ್ಟಿಗೆ ಏನು ಹೇಳಿತು?", a: "'ಹಿಂದೆ ಇಲ್ಲೂ ಜೀವಜಲ, ಕಾಡುಗಳಿದ್ದವು. ಮಾನವರು ದುರಾಸೆಯಿಂದ ಮರ ಕಡಿದು ಪರಿಸರ ಕೆಡಿಸಿದ್ದರಿಂದ ಇಂದು ನೀರಿಲ್ಲದ ಕಲ್ಲುಬಂಡೆಯ ಬರಡು ಗ್ರಹವಾಯಿತು' ಎಂದಿತು." },
+
   { id: "6K_U6_06", unit: "ಮಂಗಳ ಗ್ರಹದಲ್ಲಿ ಪುಟ್ಟಿ", section: "author", marks: 2, obj: "ಜ್ಞಾನ", spec: "ಸ್ಮರಿಸುತ್ತಾನೆ", diff: "ಸಾಧಾರಣ", time: 6, q: "ಕವಿ ಸಿ. ಎಂ. ಗೋವಿಂದ ರೆಡ್ಡಿ ಅವರ ಪರಿಚಯ ಬರೆಯಿರಿ.", a: "ಸ್ಥಳ: ಕೋಲಾರ ಜಿಲ್ಲೆಯ ಚೆನ್ನಿಗರಾಯಪುರ. ಕಾಲ: 11-8-1958. ಕೃತಿಗಳು: ಬಣ್ಣದ ಚಿಟ್ಟೆ, ಮಕ್ಕಳ ಮಂದಾರ, ಪದ್ಯ ಹೇಳುವ ಮರ. ಪ್ರಶಸ್ತಿ: ಪೆರ್ಲ ಕಾವ್ಯ ಪ್ರಶಸ್ತಿ, ಕರ್ನಾಟಕ ಸಾಹಿತ್ಯ ಅಕಾಡೆಮಿ ಪ್ರಶಸ್ತಿ." },
+  { id: "6K_U6_07", unit: "ಮಂಗಳ ಗ್ರಹದಲ್ಲಿ ಪುಟ್ಟಿ", section: "author", marks: 2, obj: "ಜ್ಞಾನ", spec: "ಸ್ಮರಿಸುತ್ತಾನೆ", diff: "ಸಾಧಾರಣ", time: 6, q: "ಕವಿ ಬಿ.ಆರ್. ಲಕ್ಷ್ಮಣರಾವ್ ಅವರ ಕವಿ ಪರಿಚಯ ಬರೆಯಿರಿ.", a: "ಸ್ಥಳ: ಚಿಕ್ಕಬಳ್ಳಾಪುರ ತಾಲೂಕಿನ ಚೀಮಂಗಲ. ಕಾಲ: 1946. ಕೃತಿಗಳು: ಗೋಪಿ ಮತ್ತು ಗಾಂಡಲೀನ, ಸುಬ್ಬಾಭಟ್ಟರ ಮಗಳೇ, ಲಿಲ್ಲಿ ಪುಟ್ಟಿಯ ಹಂಬಲ. ಪ್ರಶಸ್ತಿ: ರಾಜ್ಯ ಸಾಹಿತ್ಯ ಅಕಾಡೆಮಿ ಪ್ರಶಸ್ತಿ." },
+  { id: "6K_U6_08", unit: "ಮಂಗಳ ಗ್ರಹದಲ್ಲಿ ಪುಟ್ಟಿ", section: "author", marks: 2, obj: "ಜ್ಞಾನ", spec: "ಸ್ಮರಿಸುತ್ತಾನೆ", diff: "ಸಾಧಾರಣ", time: 6, q: "ಲೇಖಕ ಬೆ.ಗೋ. ರಮೇಶ್ ಅವರ ಕವಿ ಪರಿಚಯ ಬರೆಯಿರಿ.", a: "ಸ್ಥಳ: ಮೈಸೂರು ಜಿಲ್ಲೆಯ ದೊಡ್ಡಹನಸೋಗೆ. ಕೃತಿಗಳು: ವಚನ ಸಾಗರ, ನಮ್ಮ ಗಮಕಿಗಳು, ವಿಶ್ವವಿಖ್ಯಾತ ಮಹಿಳೆಯರು. ಪ್ರಶಸ್ತಿ: ವಚನ ಸಾಹಿತ್ಯ ಅಕಾಡೆಮಿ ಪ್ರಶಸ್ತಿ." },
 
   // ಪಾಠ 7: ನೀ ಹೋದ ಮರುದಿನ
   { id: "6K_U7_01", unit: "ನೀ ಹೋದ ಮರುದಿನ", section: "direct", marks: 1, obj: "ಜ್ಞಾನ", spec: "ಸ್ಮರಿಸುತ್ತಾನೆ", diff: "ಸುಲಭ", time: 2, q: "ಡಾ. ಬಿ.ಆರ್. ಅಂಬೇಡ್ಕರ್ ರವರ ಪೂರ್ಣ ಹೆಸರೇನು?", a: "ಭೀಮರಾವ್ ರಾಮ್‌ಜಿ ಅಂಬೇಡ್ಕರ್." },
   { id: "6K_U7_02", unit: "ನೀ ಹೋದ ಮರುದಿನ", section: "direct", marks: 1, obj: "ಜ್ಞಾನ", spec: "ಸ್ಮರಿಸುತ್ತಾನೆ", diff: "ಸಾಧಾರಣ", time: 2, q: "ಯಾರು ಹೋದ ಮೇಲೆ ನಮ್ಮ ಬದುಕು ಮೊದಲಿನಂತೆ ಆಗಿದೆ?", a: "ಬಾಬಾಸಾಹೇಬ್ ಅಂಬೇಡ್ಕರ್ ಹೋದ ಮೇಲೆ ನಮ್ಮ ಬದುಕು ಮೊದಲಿನಂತೆ ಆಗಿದೆ." },
   { id: "6K_U7_03", unit: "ನೀ ಹೋದ ಮರುದಿನ", section: "blank", marks: 1, obj: "ಜ್ಞಾನ", spec: "ಸ್ಮರಿಸುತ್ತಾನೆ", diff: "ಸುಲಭ", time: 2, q: "ಪ್ರತಿನಿತ್ಯ ಎದ್ದಾಗ ನಮ್ಮ ಸುದ್ದಿ ____________ ಕೇಕು ಹಾಕುವುದು ತಪ್ಪಿಲ್ಲ ನಮಗ.", a: "ಸಂಭ್ರಮವು" },
   { id: "6K_U7_04", unit: "ನೀ ಹೋದ ಮರುದಿನ", section: "blank", marks: 1, obj: "ಜ್ಞಾನ", spec: "ಸ್ಮರಿಸುತ್ತಾನೆ", diff: "ಸುಲಭ", time: 2, q: "ಡಾ. ಚನ್ನಣ್ಣ ವಾಲಿಕಾರ್ ರವರು ____________ ರಂದು ಜನಿಸಿದರು.", a: "1943" },
+
   { id: "6K_U7_05", unit: "ನೀ ಹೋದ ಮರುದಿನ", section: "short", marks: 2, obj: "ಅಭಿವ್ಯಕ್ತಿ / ಅನ್ವಯ", spec: "ವಿವರಿಸುತ್ತಾನೆ", diff: "ಸಾಧಾರಣ", time: 4, q: "ಕೆಳಕಂಡ ಪದ್ಯ ಭಾಗದ ಸಾರಾಂಶ ಬರೆಯಿರಿ: 'ಪ್ರತಿನಿತ್ಯ ಎದ್ದಾಗ ನಮ್ಮ ಸುದ್ದಿ ಸಂಭ್ರಮವು... ಉರಿ ಹಚ್ಚಿ ಬಿಡುತ್ತಾರೆ ಒಳಗ'", a: "ಪ್ರತಿದಿನ ಎದ್ದಾಗ ನಮಗೆ ಸಂತೋಷ ಸಿಗುವುದೆಂಬ ಭ್ರಮೆ ತಪ್ಪಿಲ್ಲ. ಯಾವುದೇ ಕೆಲಸಕ್ಕೆ ಹೋದರೂ ಮೇಲ್ವರ್ಗದವರು ಶೋಷಿಸುತ್ತಾರೆ, ಅವರು ಹೇಳಿದಂತೆ ಕೇಳದಿದ್ದರೆ ಒಳಗೊಳಗೆ ಬೆಂಕಿ ಹೊತ್ತಿಸಿ ನೋವುಂಟುಮಾಡುತ್ತಾರೆ." },
   { id: "6K_U7_06", unit: "ನೀ ಹೋದ ಮರುದಿನ", section: "short", marks: 2, obj: "ಅಭಿವ್ಯಕ್ತಿ / ಅನ್ವಯ", spec: "ವಿವರಿಸುತ್ತಾನೆ", diff: "ಸಾಧಾರಣ", time: 4, q: "ಸಂವಿಧಾನ ರಚನೆಯಲ್ಲಿ ಅಂಬೇಡ್ಕರ್ ರವರ ಪಾತ್ರವೇನು?", a: "ಡಾ. ಅಂಬೇಡ್ಕರ್ ಸಂವಿಧಾನ ಕರಡು ಸಮಿತಿ ಅಧ್ಯಕ್ಷರಾಗಿ ಸಮಗ್ರ, ಪ್ರಗತಿಪರ ಸಂವಿಧಾನ ರೂಪಿಸಿದರು. ಮೂಲಭೂತ ಹಕ್ಕುಗಳು, ಸಾಮಾಜಿಕ ನ್ಯಾಯ ಹಾಗೂ ಸಮಾನತೆ ನೀಡಿದ ಸಂವಿಧಾನ ಶಿಲ್ಪಿ." },
+  { id: "6K_U7_07", unit: "ನೀ ಹೋದ ಮರುದಿನ", section: "short", marks: 2, obj: "ಅಭಿವ್ಯಕ್ತಿ / ಅನ್ವಯ", spec: "ವಿವರಿಸುತ್ತಾನೆ", diff: "ಸಾಧಾರಣ", time: 4, q: "ಕವಿ 'ಬರಡು ಗಿಡ ನಾವು' ಎಂದು ಕರೆಯಲು ಕಾರಣವೇನು?", a: "ದಲಿತರು ಮತ್ತು ಶೋಷಿತರಿಗೆ ಸ್ವಾತಂತ್ರ್ಯ ಸಿಕ್ಕರೂ ಸಮಾನತೆ ಮತ್ತು ಸ್ವಾಭಿಮಾನದ ಫಲ ದೊರೆಯದೆ ಬದುಕು ಹಸನಾಗದಿರುವುದನ್ನು ಕಂಡು ಹೀಗೆ ಹೇಳಿದ್ದಾರೆ." },
 
   // ಪಾಠ 8: ಮಗು ಮತ್ತು ಹಣ್ಣುಗಳು
   { id: "6K_U8_01", unit: "ಮಗು ಮತ್ತು ಹಣ್ಣುಗಳು", section: "direct", marks: 1, obj: "ಜ್ಞಾನ", spec: "ಸ್ಮರಿಸುತ್ತಾನೆ", diff: "ಸುಲಭ", time: 2, q: "ಮಗು ಕಣ್ಣನ್ನು ಎಲ್ಲಿ ಅರಳಿಸುತ್ತದೆ?", a: "ಹಣ್ಣಿನ ಅಂಗಡಿಯ ಮುಂದೆ ಮಗು ಕಣ್ಣರಳಿಸುತ್ತದೆ." },
   { id: "6K_U8_02", unit: "ಮಗು ಮತ್ತು ಹಣ್ಣುಗಳು", section: "direct", marks: 1, obj: "ಜ್ಞಾನ", spec: "ಸ್ಮರಿಸುತ್ತಾನೆ", diff: "ಸಾಧಾರಣ", time: 2, q: "ಅಪರೂಪದ ಹಣ್ಣು ಯಾವುದು?", a: "ಅಂಜೂರ" },
   { id: "6K_U8_03", unit: "ಮಗು ಮತ್ತು ಹಣ್ಣುಗಳು", section: "direct", marks: 1, obj: "ಜ್ಞಾನ", spec: "ಸ್ಮರಿಸುತ್ತಾನೆ", diff: "ಸಾಧಾರಣ", time: 2, q: "ಮಗು ಯಾವ ಹಣ್ಣಿನ ಹಾಗೆ ಬಾಗಬೇಕು?", a: "ಪಕ್ವಗೊಂಡ ಬಾಳೆಯ ಹಣ್ಣಿನ ಹಾಗೆ." },
+
   { id: "6K_U8_04", unit: "ಮಗು ಮತ್ತು ಹಣ್ಣುಗಳು", section: "context", marks: 2, obj: "ತಿಳುವಳಿಕೆ", spec: "ಸಂಗ್ರಹಿಸಿ ಬರೆಯುತ್ತಾನೆ", diff: "ಸಾಧಾರಣ", time: 6, q: "ಸಂದರ್ಭ ಸಹಿತ ವಿವರಿಸಿ: 'ಅಂಜೂರದಂತೆ ಅಪರೂಪವಾಗು'", a: "ಆಯ್ಕೆ: ಎಚ್.ಎಸ್. ಶಿವಪ್ರಕಾಶ್ ರವರ 'ಮಗು ಮತ್ತು ಹಣ್ಣುಗಳು'. ಸಂದರ್ಭ: ಮಗು ಸಮಾಜದಲ್ಲಿ ಬೆಳೆಯುತ್ತಾ ಅಂಜೂರದ ಹಣ್ಣಿನಂತೆ ಶ್ರೇಷ್ಠ ಹಾಗೂ ಅಪರೂಪದ ಗುಣಗಳನ್ನು ಮೈಗೂಡಿಸಿಕೊಳ್ಳಬೇಕೆಂಬ ಸಂದರ್ಭದಲ್ಲಿ ಈ ಮಾತು ಬಂದಿದೆ." },
   { id: "6K_U8_05", unit: "ಮಗು ಮತ್ತು ಹಣ್ಣುಗಳು", section: "context", marks: 2, obj: "ತಿಳುವಳಿಕೆ", spec: "ಸಂಗ್ರಹಿಸಿ ಬರೆಯುತ್ತಾನೆ", diff: "ಸಾಧಾರಣ", time: 6, q: "ಸಂದರ್ಭ ಸಹಿತ ವಿವರಿಸಿ: 'ಕಾಯಿಯಲ್ಲೇ ನಿನ್ನ ಕೆಡವುದಿರಲಿ'", a: "ಆಯ್ಕೆ: ಮಗು ಮತ್ತು ಹಣ್ಣುಗಳು ಪದ್ಯ. ಸಂದರ್ಭ: ಮಗು ಬೆಳೆಯುವ ಹಂತದಲ್ಲೇ ಕೆಟ್ಟ ಗೆಳೆತನ ಅಥವಾ ತೊಂದರೆಗಳಿಂದ ನಾಶವಾಗದೆ ರಕ್ಷಿಸಿಕೊಳ್ಳಬೇಕು ಎಂದು ಕವಿ ಹಾರೈಸುವ ಸಂದರ್ಭ." },
+  { id: "6K_U8_06", unit: "ಮಗು ಮತ್ತು ಹಣ್ಣುಗಳು", section: "context", marks: 2, obj: "ತಿಳುವಳಿಕೆ", spec: "ಸಂಗ್ರಹಿಸಿ ಬರೆಯುತ್ತಾನೆ", diff: "ಸಾಧಾರಣ", time: 6, q: "ಸಂದರ್ಭ ಸಹಿತ ವಿವರಿಸಿ: 'ಎಲ್ಲರಿಗೂ ಒಪ್ಪುವ ಎಲಚಿಯಾಗು'", a: "ಆಯ್ಕೆ: ಮಗು ಮತ್ತು ಹಣ್ಣುಗಳು. ಸಂದರ್ಭ: ಮಗುವು ಎಲ್ಲರ ಪ್ರೀತಿ, ವಿಶ್ವಾಸ ಗಳಿಸುವ ಸರಳ ಹಾಗೂ ಸಿಹಿಯಾದ ಎಲಚಿ ಹಣ್ಣಿನಂತೆ ಬದುಕಬೇಕು ಎಂದು ಕವಿ ಆಶಿಸುವ ಸನ್ನಿವೇಶ." },
 
   // ಪಾಠ 9: ವ್ಯಾಕರಣಾಂಶಗಳು (MCQ ಪ್ರಶ್ನೆಗಳು 9, 10, 11, 12)
   { id: "6K_U9_01", unit: "ವ್ಯಾಕರಣಾಂಶಗಳು", section: "mcq", marks: 1, obj: "ತಿಳುವಳಿಕೆ", spec: "ಆಯ್ಕೆ ಮಾಡುತ್ತಾನೆ", diff: "ಸುಲಭ", time: 2, q: "'ಉಪ್ಪಿಗಿಂತ ರುಚಿಯಿಲ್ಲ ತಾಯಿಗಿಂತ ____________' ಈ ಗಾದೆ ಮಾತನ್ನು ಪೂರ್ಣಗೊಳಿಸಿರಿ:", opts: ["ದೇವರಿಲ್ಲ", "ಸ್ನೇಹಿತನಿಲ್ಲ", "ಬಂಧುವಿಲ್ಲ", "ಗುರುವಿಲ್ಲ"], a: "C) ಬಂಧುವಿಲ್ಲ" },
@@ -723,32 +957,24 @@ const LBA_DATABASE = [
   { id: "6K_U9_04", unit: "ವ್ಯಾಕರಣಾಂಶಗಳು", section: "mcq", marks: 1, obj: "ತಿಳುವಳಿಕೆ", spec: "ಆಯ್ಕೆ ಮಾಡುತ್ತಾನೆ", diff: "ಸುಲಭ", time: 2, q: "'ಮಗು' ಈ ಪದದ ಸರಿಯಾದ ಬಹುವಚನ ರೂಪ:", opts: ["ಮಗು", "ಮಗ", "ಮಗುಗಳು", "ಮಕ್ಕಳು"], a: "D) ಮಕ್ಕಳು" },
   { id: "6K_U9_05", unit: "ವ್ಯಾಕರಣಾಂಶಗಳು", section: "mcq", marks: 1, obj: "ತಿಳುವಳಿಕೆ", spec: "ಆಯ್ಕೆ ಮಾಡುತ್ತಾನೆ", diff: "ಸುಲಭ", time: 2, q: "'ಮೇಲೇರು' (ಮೇಲೆ + ಏರು) ಇದು ಈ ಸಂಧಿಗೆ ಉದಾಹರಣೆ:", opts: ["ಲೋಪ ಸಂಧಿ", "ಆಗಮ ಸಂಧಿ", "ಆದೇಶ ಸಂಧಿ", "ಗುಣ ಸಂಧಿ"], a: "A) ಲೋಪ ಸಂಧಿ" },
   { id: "6K_U9_06", unit: "ವ್ಯಾಕರಣಾಂಶಗಳು", section: "mcq", marks: 1, obj: "ತಿಳುವಳಿಕೆ", spec: "ಆಯ್ಕೆ ಮಾಡುತ್ತಾನೆ", diff: "ಸುಲಭ", time: 2, q: "'ಮರವನ್ನು' (ಮರ + ಅನ್ನು) ಇದು ಯಾವ ಸಂಧಿ:", opts: ["ಲೋಪ ಸಂಧಿ", "ಆಗಮ ಸಂಧಿ", "ಆದೇಶ ಸಂಧಿ", "ವೃದ್ಧಿ ಸಂಧಿ"], a: "B) ಆಗಮ ಸಂಧಿ" },
-  { id: "6K_U9_07", unit: "ವ್ಯಾಕರಣಾಂಶಗಳು", section: "mcq", marks: 1, obj: "ತಿಳುವಳಿಕೆ", spec: "ಆಯ್ಕೆ ಮಾಡುತ್ತಾನೆ", diff: "ಸುಲಭ", time: 2, q: "'ಬೆಟ್ಟದಾವರೆ' (ಬೆಟ್ಟ + ತಾವರೆ) ಪದದಲ್ಲಿರುವ ಸಂಧಿ:", opts: ["ಆಗಮ ಸಂಧಿ", "ಆದೇಶ ಸಂಧಿ", "ಲೋಪ ಸಂಧಿ", "ಯಣ್ ಸಂಧಿ"], a: "B) ಆದೇಶ ಸಂಧಿ" },
-  { id: "6K_U9_08", unit: "ವ್ಯಾಕರಣಾಂಶಗಳು", section: "mcq", marks: 1, obj: "ತಿಳುವಳಿಕೆ", spec: "ಆಯ್ಕೆ ಮಾಡುತ್ತಾನೆ", diff: "ಸುಲಭ", time: 2, q: "'ಕಾವೇರಿ' ಎಂಬುದು ವ್ಯಾಕರಣದ ಪ್ರಕಾರ ಯಾವ ನಾಮಪದ:", opts: ["ರೂಢನಾಮ", "ಅಂಕಿತನಾಮ", "ಅನ್ವರ್ಥನಾಮ", "ಸರ್ವನಾಮ"], a: "B) ಅಂಕಿತನಾಮ" },
 
   // ಪಾಠ 10: ಗಾದೆ ವಿಸ್ತರಣೆ (ಪ್ರಶ್ನೆ 24)
   { id: "6K_U10_01", unit: "ಗಾದೆ ವಿಸ್ತರಣೆ", section: "proverb", marks: 4, obj: "ಅಭಿವ್ಯಕ್ತಿ / ಅನ್ವಯ", spec: "ವಿಸ್ತರಿಸುತ್ತಾನೆ", diff: "ಕಠಿಣ", time: 10, q: "ಗಾದೆ ಮಾತನ್ನು ವಿಸ್ತರಿಸಿ ಬರೆಯಿರಿ: 'ಮಾತು ಬೆಳ್ಳಿ, ಮೌನ ಬಂಗಾರ'", a: "ಗಾದೆಗಳು ವೇದಗಳಿಗೆ ಸಮಾನ. ಮಾತು ಆಡಿದರೆ ಮುತ್ತಿನಂತಿರಬೇಕು. ಆದರೆ ಅತಿಯಾಗಿ ಮಾತನಾಡುವುದು ಆಪತ್ತಿಗೆ ಕಾರಣ. ಸಂದರ್ಭೋಚಿತವಾಗಿ ಮೌನವಾಗಿರುವುದು ಬಂಗಾರದಷ್ಟೇ ಅಮೂಲ್ಯ ಎಂಬುದು ಇದರ ಅರ್ಥ." },
   { id: "6K_U10_02", unit: "ಗಾದೆ ವಿಸ್ತರಣೆ", section: "proverb", marks: 4, obj: "ಅಭಿವ್ಯಕ್ತಿ / ಅನ್ವಯ", spec: "ವಿಸ್ತರಿಸುತ್ತಾನೆ", diff: "ಕಠಿಣ", time: 10, q: "ಗಾದೆ ಮಾತನ್ನು ವಿಸ್ತರಿಸಿ ಬರೆಯಿರಿ: 'ಕೈ ಕೆಸರಾದರೆ ಬಾಯಿ ಮೊಸರು'", a: "ಕಷ್ಟಪಟ್ಟು ಕಾಯಕ ಅಥವಾ ದುಡಿಮೆ ಮಾಡಿದರೆ ಮಾತ್ರ ಜೀವನದಲ್ಲಿ ಸುಖ, ಸಮೃದ್ಧಿ ಸಿಗುತ್ತದೆ. ರೈತ ಹೊಲದಲ್ಲಿ ಮೈಬೆವರಿಳಿಸಿ ದುಡಿದಾಗ ಮಾತ್ರ ಅನ್ನ ತಿನ್ನಲು ಸಾಧ್ಯ ಎಂಬುದೇ ಇದರ ತಿರುಳು." },
-  { id: "6K_U10_03", unit: "ಗಾದೆ ವಿಸ್ತರಣೆ", section: "proverb", marks: 4, obj: "ಅಭಿವ್ಯಕ್ತಿ / ಅನ್ವಯ", spec: "ವಿಸ್ತರಿಸುತ್ತಾನೆ", diff: "ಕಠಿಣ", time: 10, q: "ಗಾದೆ ಮಾತನ್ನು ವಿಸ್ತರಿಸಿ ಬರೆಯಿರಿ: 'ಹಾಸಿಗೆ ಇದ್ದಷ್ಟು ಕಾಲು ಚಾಚು'", a: "ನಮ್ಮ ಆದಾಯ ಮತ್ತು ಶಕ್ತಿಗೆ ತಕ್ಕಂತೆ ವೆಚ್ಚ ಮಾಡಬೇಕು. ದುಂದುವೆಚ್ಚ ಮಾಡದೆ ಮಿತವ್ಯಯದಿಂದ ಬದುಕಿದರೆ ಸಮಾಜದಲ್ಲಿ ನೆಮ್ಮದಿ ಹಾಗೂ ಗೌರವ ಸಿಗುತ್ತದೆ." }
+  { id: "6K_U10_03", unit: "ಗಾದೆ ವಿಸ್ತರಣೆ", section: "proverb", marks: 4, obj: "ಅಭಿವ್ಯಕ್ತಿ / ಅನ್ವಯ", spec: "ವಿಸ್ತರಿಸುತ್ತಾನೆ", diff: "ಕಠಿಣ", time: 10, q: "ಗಾದೆ ಮಾತನ್ನು ವಿಸ್ತರಿಸಿ ಬರೆಯಿರಿ: 'ಹಾಸಿಗೆ ಇದ್ದಷ್ಟು ಕಾಲು ಚಾಚು'", a: "ನಮ್ಮ ಆದಾಯ ಮತ್ತು ಶಕ್ತಿಗೆ ತಕ್ಕಂತೆ ವೆಚ್ಚ ಮಾಡಬೇಕು. ದುಂದುವೆಚ್ಚ ಮಾಡದೆ ಮಿತವ್ಯಯದಿಂದ ಬದುಕಿದರೆ ಸಮಾಜದಲ್ಲಿ ನೆಮ್ಮದಿ ಹಾಗೂ ಗೌರವ ಸಿಗುತ್ತದೆ." },
+  { id: "6K_U10_04", unit: "ಗಾದೆ ವಿಸ್ತರಣೆ", section: "proverb", marks: 4, obj: "ಅಭಿವ್ಯಕ್ತಿ / ಅನ್ವಯ", spec: "ವಿಸ್ತರಿಸುತ್ತಾನೆ", diff: "ಕಠಿಣ", time: 10, q: "ಗಾದೆ ಮಾತನ್ನು ವಿಸ್ತರಿಸಿ ಬರೆಯಿರಿ: 'ಮನಸಿದ್ದರೆ ಮಾರ್ಗ'", a: "ದೃಢಸಂಕಲ್ಪ ಮತ್ತು ಸಾಧಿಸುವ ಛಲವಿದ್ದರೆ ಎಂತಹ ಕಠಿಣ ಸವಾಲನ್ನೂ ಜಯಿಸಬಹುದು. ಕಷ್ಟಗಳಿಗೆ ಹೆದರದೆ ಪ್ರಾಮಾಣಿಕ ಪ್ರಯತ್ನ ಮಾಡಿದರೆ ದಾರಿ ತಾನಾಗಿಯೇ ಗೋಚರಿಸುತ್ತದೆ." },
+  { id: "6K_U10_05", unit: "ಗಾದೆ ವಿಸ್ತರಣೆ", section: "proverb", marks: 4, obj: "ಅಭಿವ್ಯಕ್ತಿ / ಅನ್ವಯ", spec: "ವಿಸ್ತರಿಸುತ್ತಾನೆ", diff: "ಕಠಿಣ", time: 10, q: "ಗಾದೆ ಮಾತನ್ನು ವಿಸ್ತರಿಸಿ ಬರೆಯಿರಿ: 'ವೇದ ಸುಳ್ಳಾದರೂ ಗಾದೆ ಸುಳ್ಳಾಗದು'", a: "ಗಾದೆಗಳು ಹಿರಿಯರ ಜೀವನಾನುಭವದ ಜ್ಞಾನಮುತ್ತುಗಳು. ಅವು ಸಾರ್ವಕಾಲಿಕ ಸತ್ಯವನ್ನು ಸಾರುತ್ತವೆ ಮತ್ತು ಮಾನವನಿಗೆ ಸರಿಯಾದ ಜೀವನ ಮಾರ್ಗವನ್ನು ತೋರುತ್ತವೆ." }
 ];
 
 // SA-1 ಮಾಡೆಲ್ ಪ್ರಶ್ನೆ ಪತ್ರಿಕೆಯ 24 ಸಕ್ರಿಯ ಪ್ರಶ್ನೆಗಳು
 const INITIAL_ACTIVE_IDS = [
-  // I. ಒಂದು ವಾಕ್ಯ (ಪ್ರಶ್ನೆ 1 - 4)
   "6K_U1_01", "6K_U5_01", "6K_U2_01", "6K_U8_01",
-  // II. ಬಿಟ್ಟ ಸ್ಥಳ (ಪ್ರಶ್ನೆ 5 - 8)
   "6K_U5_04", "6K_U4_04", "6K_U7_03", "6K_U2_04",
-  // III. ಸರಿ ಉತ್ತರ ಆರಿಸಿ ಬರೆಯಿರಿ - MCQ (ಪ್ರಶ್ನೆ 9 - 12)
   "6K_U9_01", "6K_U9_02", "6K_U9_03", "6K_U9_04",
-  // IV. ಸಂದರ್ಭ ಸಹಿತ ವಿವರಿಸಿ (ಪ್ರಶ್ನೆ 13 - 14)
   "6K_U8_04", "6K_U2_06",
-  // V. ಪದ್ಯ ಪೂರ್ಣಗೊಳಿಸಿ (ಪ್ರಶ್ನೆ 15)
   "6K_U5_06",
-  // VI. ಎರಡು-ಮೂರು ವಾಕ್ಯ (ಪ್ರಶ್ನೆ 16 - 21)
   "6K_U4_07", "6K_U3_04", "6K_U7_05", "6K_U6_04", "6K_U2_09", "6K_U1_09",
-  // VII. ಕವಿ ಪರಿಚಯ (ಪ್ರಶ್ನೆ 22)
   "6K_U6_06",
-  // VIII. ಮೂರು-ನಾಲ್ಕು ವಾಕ್ಯ / ಗಾದೆ (ಪ್ರಶ್ನೆ 23 - 24)
   "6K_U3_05", "6K_U10_01"
 ];
 
@@ -782,7 +1008,7 @@ function onUnitInputChange(unitIdx) {
 
   let row = new Array(12).fill(0);
   if (targetM > 0 && targetQ > 0) {
-    if (unitIdx === 9) { // ಗಾದೆ ವಿಸ್ತರಣೆ (4 ಅಂಕ)
+    if (unitIdx === 9) {
       row[8] = 1;
     } else {
       let remM = targetM;
@@ -1000,50 +1226,41 @@ function renderAnalysisTable() {
   document.getElementById('analysis_table_body').innerHTML = h;
 }
 
-// ========== ಪ್ರಶ್ನೆ ಪತ್ರಿಕೆ ವಿಭಾಗಗಳು (Strict Model SA-1 Layout) ==========
 function renderQuestionPaperUI() {
   let container = document.getElementById('qp_render_container');
   let h = '';
 
-  // 1. ಒಂದು ವಾಕ್ಯದಲ್ಲಿ ಉತ್ತರಿಸಿ (ಪ್ರಶ್ನೆ 1 - 4)
   h += `<div class="section-head"><span>I. ಒಂದು ಪದ / ವಾಕ್ಯದಲ್ಲಿ ಉತ್ತರಿಸಿ:</span><span>4 × 1 = 4</span></div>`;
   for(let i = 0; i < 4; i++) {
     h += renderSingleQuestion(ACTIVE_PAPER[i], i + 1, "direct");
   }
 
-  // 2. ಬಿಟ್ಟ ಸ್ಥಳ ತುಂಬಿರಿ (ಪ್ರಶ್ನೆ 5 - 8)
   h += `<div class="section-head"><span>II. ಸರಿಯಾದ ಪದಗಳಿಂದ ಬಿಟ್ಟ ಸ್ಥಳ ತುಂಬಿರಿ:</span><span>4 × 1 = 4</span></div>`;
   for(let i = 4; i < 8; i++) {
     h += renderSingleQuestion(ACTIVE_PAPER[i], i + 1, "blank");
   }
 
-  // 3. ನಾಲ್ಕು ಆಯ್ಕೆಗಳಲ್ಲಿ ಸರಿ ಆಯ್ಕೆ ಆರಿಸಿ (MCQ) (ಪ್ರಶ್ನೆ 9 - 12)
   h += `<div class="section-head"><span>III. ಕೆಳಗಿನ ಪ್ರಶ್ನೆಗಳಿಗೆ ನೀಡಿರುವ ಆಯ್ಕೆಗಳಲ್ಲಿ ಸರಿ ಆಯ್ಕೆಯನ್ನು ಆರಿಸಿ ಬರೆಯಿರಿ:</span><span>4 × 1 = 4</span></div>`;
   for(let i = 8; i < 12; i++) {
     h += renderSingleQuestion(ACTIVE_PAPER[i], i + 1, "mcq");
   }
 
-  // 4. ಸಂದರ್ಭ ಸಹಿತ ವಿವರಿಸಿ (ಪ್ರಶ್ನೆ 13 - 14)
   h += `<div class="section-head"><span>IV. ಸಂದರ್ಭ ಸಹಿತ ವಿವರಿಸಿರಿ:</span><span>2 × 2 = 4</span></div>`;
   for(let i = 12; i < 14; i++) {
     h += renderSingleQuestion(ACTIVE_PAPER[i], i + 1, "context");
   }
 
-  // 5. ಪದ್ಯ ಪೂರ್ಣಗೊಳಿಸಿ (ಪ್ರಶ್ನೆ 15)
   h += `<div class="section-head"><span>V. ಪದ್ಯದ ಮುಂದಿನ ಸಾಲುಗಳನ್ನು ಬರೆಯಿರಿ:</span><span>1 × 2 = 2</span></div>`;
   h += renderSingleQuestion(ACTIVE_PAPER[14], 15, "poem");
 
-  // 6. ಎರಡು-ಮೂರು ವಾಕ್ಯಗಳಲ್ಲಿ ಉತ್ತರಿಸಿ (ಪ್ರಶ್ನೆ 16 - 21)
   h += `<div class="section-head"><span>VI. ಈ ಕೆಳಗಿನ ಪ್ರಶ್ನೆಗಳಿಗೆ 2-3 ವಾಕ್ಯಗಳಲ್ಲಿ ಉತ್ತರಿಸಿ:</span><span>6 × 2 = 12</span></div>`;
   for(let i = 15; i < 21; i++) {
     h += renderSingleQuestion(ACTIVE_PAPER[i], i + 1, "short");
   }
 
-  // 7. ಕವಿ ಪರಿಚಯ (ಪ್ರಶ್ನೆ 22)
   h += `<div class="section-head"><span>VII. ಕೊಟ್ಟಿರುವ ಕವಿಯ ಕಾಲ, ಸ್ಥಳ, ಕೃತಿ ಮತ್ತು ಪ್ರಶಸ್ತಿಗಳನ್ನು ಕುರಿತು ಬರೆಯಿರಿ:</span><span>1 × 2 = 2</span></div>`;
   h += renderSingleQuestion(ACTIVE_PAPER[21], 22, "author");
 
-  // 8. ಮೂರು-ನಾಲ್ಕು ವಾಕ್ಯ / ಗಾದೆ ವಿಸ್ತರಣೆ (ಪ್ರಶ್ನೆ 23 - 24)
   h += `<div class="section-head"><span>VIII. ಈ ಕೆಳಗಿನ ಪ್ರಶ್ನೆಗಳಿಗೆ 3-4 ವಾಕ್ಯಗಳಲ್ಲಿ ಉತ್ತರಿಸಿ / ಗಾದೆ ವಿಸ್ತರಿಸಿ:</span><span>2 × 4 = 8</span></div>`;
   h += renderSingleQuestion(ACTIVE_PAPER[22], 23, "long");
   h += renderSingleQuestion(ACTIVE_PAPER[23], 24, "proverb");
@@ -1051,7 +1268,7 @@ function renderQuestionPaperUI() {
   container.innerHTML = h;
 }
 
-// ========== ಡ್ರಾಪ್‌ಡೌನ್‌ನಲ್ಲಿ ಕಟ್ಟುನಿಟ್ಟಾದ ಫಿಲ್ಟರ್ (Strict Matching) ==========
+// ========== STRICT DROPDOWN FILTERING (SAME UNIT, SAME SECTION, SAME MARKS, EXACTLY 5-6 OPTIONS) ==========
 function renderSingleQuestion(q, num, requiredType) {
   let optHtml = '';
   if (q.opts && q.opts.length > 0) {
@@ -1061,17 +1278,27 @@ function renderSingleQuestion(q, num, requiredType) {
     </div>`;
   }
 
-  // ಅದೇ ಪಾಠದ ಮತ್ತು ಅದೇ ವಿಭಾಗದ ಪ್ರಶ್ನೆಗಳನ್ನಷ್ಟೇ ಫಿಲ್ಟರ್ ಮಾಡುವುದು
+  // 1. Strictly filter by exact Unit, exact Section type, and exact Marks
   let dbMatches = LBA_DATABASE.filter(item => {
-    if (item.unit !== q.unit) return false;
-    return item.section === requiredType;
+    return item.unit === q.unit && item.section === requiredType && item.marks === q.marks;
   });
 
-  if (dbMatches.length === 0) {
-    dbMatches = LBA_DATABASE.filter(item => item.unit === q.unit && item.marks === q.marks);
+  // 2. Keep current active question at top if matched
+  let filteredList = [];
+  let currentFound = dbMatches.find(item => item.id === q.id);
+  if (currentFound) {
+    filteredList.push(currentFound);
   }
+  dbMatches.forEach(item => {
+    if (!filteredList.some(f => f.id === item.id)) {
+      filteredList.push(item);
+    }
+  });
 
-  let optionsHtml = dbMatches.map(item => `
+  // 3. Limit strictly to 5 - 6 choices per dropdown
+  filteredList = filteredList.slice(0, 6);
+
+  let optionsHtml = filteredList.map(item => `
     <option value="${item.id}" ${item.id === q.id ? 'selected' : ''}>
       ${item.q.substring(0, 85)}...
     </option>
@@ -1377,6 +1604,38 @@ function downloadWordDoc() {
     `;
   }
 
+  const oralQuestionsOnly = [
+    "ಸ್ವತಂತ್ರ ಭಾರತದ ಪ್ರಥಮ ರಾಷ್ಟ್ರಾಧ್ಯಕ್ಷರು ಯಾರು?",
+    "ವಿದ್ಯಾರ್ಥಿಗಳಿಗೆ ಬುದ್ಧಿ ಕಲಿಸಲು ಜಾಕಿರ್ ಹುಸೇನರು ಯಾವ ವೇಷ ಹಾಕಿದ್ದರು?",
+    "ಪುಸ್ತಕಗಳ ಪುಟಗಳನ್ನು ಹರಿಯುವುದು ಏಕೆ ಒಳ್ಳೆಯ ಅಭ್ಯಾಸವಲ್ಲ?",
+    "ಗಂಧರ್ವ ಸೇನಾ ಯಾರು?",
+    "ಮಂತ್ರಿಯು ರಾಜನ ಒಡ್ಡೋಲಗಕ್ಕೆ ಬಂದು ಏನೆಂದು ಹೇಳಿದನು?",
+    "ರಾಜನ ಅಂತಃಪುರದಲ್ಲಿ ರಾಣಿಯರು ಗಹಗಹಿಸಿ ನಗಲು ಕಾರಣವೇನು?",
+    "ಶ್ರೀಕೃಷ್ಣನನ್ನು ಕಾಣಲು ಸುಧಾಮನು ಅವನಿಗಾಗಿ ಏನನ್ನು ತಂದಿದ್ದನು?",
+    "ಶ್ರೀಕೃಷ್ಣ ಮತ್ತು ಸುಧಾಮರು ಎಲ್ಲಿ ಜೊತೆಯಾಗಿ ವಿದ್ಯಾಭ್ಯಾಸ ಮಾಡಿದರು?",
+    "ಡಾ. ರಾಜಕುಮಾರ್ ಅವರ ಮೊದಲ ಹೆಸರೇನು?",
+    "ಡಾ. ರಾಜಕುಮಾರ್ ನಾಯಕರಾಗಿ ಅಭಿನಯಿಸಿದ ಮೊದಲ ಚಲನಚಿತ್ರ ಯಾವುದು?",
+    "ಕರ್ನಾಟಕ ಸರ್ಕಾರವು ಡಾ. ರಾಜಕುಮಾರ್ ಅವರಿಗೆ ನೀಡಿದ ಅತ್ಯುನ್ನತ ಪ್ರಶಸ್ತಿ ಯಾವುದು?",
+    "ಭೂಮಿಯ ಪೋಷಕ ಯಾರು?",
+    "ಸೂರ್ಯನಿಂದ ನಾವು ಕಲಿಯಬೇಕಾದ ಮುಖ್ಯ ಪಾಠ ಯಾವುದು?",
+    "ಪುಟ್ಟಿಗೆ ಯಾರ ಹಾಗೆ ಆಗಸದಲ್ಲಿ ಹಾರುವ ಮನಸ್ಸಿತ್ತು?",
+    "ಮಂಗಳ ಗ್ರಹದಿಂದ ಭೂಮಿಗೆ ಮರಳಿದ ಪುಟ್ಟಿ ಜನರಲ್ಲಿ ಏನನ್ನು ಉಳಿಸಲು ಬೇಡಿಕೊಂಡಳು?",
+    "ಡಾ. ಬಿ.ಆರ್. ಅಂಬೇಡ್ಕರ್ ಅವರ ಪೂರ್ಣ ಹೆಸರೇನು?",
+    "ಸಂವಿಧಾನ ಶಿಲ್ಪಿ ಎಂದು ಯಾರನ್ನು ಕರೆಯಲಾಗುತ್ತದೆ?",
+    "ಮಗು ಹಣ್ಣಿನ ಅಂಗಡಿಯ ಮುಂದೆ ಏನು ಮಾಡುತ್ತದೆ?",
+    "'ಮಗು ಮತ್ತು ಹಣ್ಣುಗಳು' ಪದ್ಯದಲ್ಲಿ ಉಲ್ಲೇಖಿಸಲಾದ ಅಪರೂಪದ ಹಣ್ಣು ಯಾವುದು?",
+    "'ಕೈ ಕೆಸರಾದರೆ ಬಾಯಿ ಮೊಸರು' ಎಂಬ ಗಾದೆ ಮಾತಿನ ಒಳಾರ್ಥವೇನು?"
+  ];
+
+  let oralWordHtml = '';
+  oralQuestionsOnly.forEach((item, idx) => {
+    oralWordHtml += `
+      <p style="font-size: 11.5pt; line-height: 1.6; margin: 6px 0;">
+        <strong>${idx + 1}.</strong> ${item}
+      </p>
+    `;
+  });
+
   let analysisRows = '';
   let totM_num = 0, totT_num = 0;
   ACTIVE_PAPER.forEach((q, i) => {
@@ -1425,7 +1684,6 @@ function downloadWordDoc() {
       </style>
     </head>
     <body>
-      <!-- ಪುಟ 1: ರಚನಾ ಹಂತಗಳು -->
       <div class="Section1">
         ${headerHtml("ಪ್ರಶ್ನಾಪತ್ರಿಕೆ ರಚನಾ ಹಂತಗಳು")}
         ${metaHtml("6ನೇ ತರಗತಿ", "ಪ್ರಥಮ ಭಾಷೆ ಕನ್ನಡ", `ಒಟ್ಟು ಅಂಕಗಳು: ${totM}`, `ಒಟ್ಟು ಪ್ರಶ್ನೆಗಳು: ${totQ}`)}
@@ -1469,7 +1727,6 @@ function downloadWordDoc() {
 
       <br clear="all" style="page-break-before: always; mso-break-type: section-break;" />
 
-      <!-- ಪುಟ 2: ನೀಲಿನಕ್ಷೆ (Landscape Mode) -->
       <div class="Section2">
         ${headerHtml("ನೀಲಿನಕ್ಷೆ (BLUE PRINT) - A4 LANDSCAPE")}
         ${metaHtml("6ನೇ ತರಗತಿ", "ಪ್ರಥಮ ಭಾಷೆ ಕನ್ನಡ", `ಒಟ್ಟು ಅಂಕಗಳು: ${totM}`, `ಪ್ರಶ್ನೆಗಳ ಸಂಖ್ಯೆ: ${totQ}`)}
@@ -1500,7 +1757,6 @@ function downloadWordDoc() {
 
       <br clear="all" style="page-break-before: always; mso-break-type: section-break;" />
 
-      <!-- ಪುಟ 3: ಪ್ರಶ್ನಾವಾರು ವಿಶ್ಲೇಷಣೆ -->
       <div class="Section1">
         ${headerHtml("ಪ್ರಶ್ನಾವಾರು ವಿಶ್ಲೇಷಣೆ (Question-wise Analysis Sheet)")}
         ${metaHtml("6ನೇ ತರಗತಿ", "ಪ್ರಥಮ ಭಾಷೆ ಕನ್ನಡ", `ಒಟ್ಟು ಪ್ರಶ್ನೆಗಳು: ${totQ}`, `ಒಟ್ಟು ಅಂಕಗಳು: ${totM}`)}
@@ -1523,7 +1779,6 @@ function downloadWordDoc() {
 
       <br clear="all" style="page-break-before: always; mso-break-type: section-break;" />
 
-      <!-- ಪುಟ 4: ಪ್ರಶ್ನೆ ಪತ್ರಿಕೆ -->
       <div class="Section1">
         ${headerHtml("ಪ್ರಶ್ನೆ ಪತ್ರಿಕೆ", exam)}
         ${metaHtml("6ನೇ ತರಗತಿ", "ಸಮಯ: " + time, "", `ಗರಿಷ್ಠ ಅಂಕಗಳು: ${totM}`)}
@@ -1532,7 +1787,6 @@ function downloadWordDoc() {
 
       <br clear="all" style="page-break-before: always; mso-break-type: section-break;" />
 
-      <!-- ಪುಟ 5: ಉತ್ತರ ಪತ್ರಿಕೆ 1 -->
       <div class="Section1">
         ${headerHtml("ಮಾದರಿ ಉತ್ತರ ಪತ್ರಿಕೆ ಮತ್ತು ಮೌಲ್ಯಮಾಪನ ಯೋಜನೆ (ಭಾಗ - ೧)")}
         ${metaHtml("6ನೇ ತರಗತಿ", "ಪ್ರಥಮ ಭಾಷೆ ಕನ್ನಡ", "ಪ್ರಶ್ನೆ 1 ರಿಂದ 12 ರ ಉತ್ತರಗಳು", "")}
@@ -1550,7 +1804,6 @@ function downloadWordDoc() {
 
       <br clear="all" style="page-break-before: always; mso-break-type: section-break;" />
 
-      <!-- ಪುಟ 6: ಉತ್ತರ ಪತ್ರಿಕೆ 2 -->
       <div class="Section1">
         ${headerHtml("ಮಾದರಿ ಉತ್ತರ ಪತ್ರಿಕೆ ಮತ್ತು ಮೌಲ್ಯಮಾಪನ ಯೋಜನೆ (ಭಾಗ - ೨)")}
         ${metaHtml("6ನೇ ತರಗತಿ", "ಪ್ರಥಮ ಭಾಷೆ ಕನ್ನಡ", "ಪ್ರಶ್ನೆ 13 ರಿಂದ 24 ರ ವಿವರವಾದ ಉತ್ತರಗಳು", "")}
@@ -1564,6 +1817,16 @@ function downloadWordDoc() {
           </thead>
           <tbody>${keyP2Rows}</tbody>
         </table>
+      </div>
+
+      <br clear="all" style="page-break-before: always; mso-break-type: section-break;" />
+
+      <div class="Section1">
+        ${headerHtml("ಮೌಖಿಕ ಮೌಲ್ಯಾಂಕನ ಪ್ರಶ್ನೆಕೋಠಿ (Oral Assessment - Semester 1)")}
+        ${metaHtml("6ನೇ ತರಗತಿ", "ಪ್ರಥಮ ಭಾಷೆ ಕನ್ನಡ", "ಮೌಲ್ಯಾಂಕನ: ಮೌಖಿಕ (Listening & Speaking)", "20 ಪ್ರಶ್ನೆಗಳು")}
+        <div>
+          ${oralWordHtml}
+        </div>
       </div>
     </body>
     </html>
