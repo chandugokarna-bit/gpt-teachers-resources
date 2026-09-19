@@ -143,11 +143,55 @@
     font-weight: 600;
     font-size: 13px;
     color: #475569;
+    white-space: nowrap;
   }
   .tab-btn.active {
     background: #ffffff;
     color: var(--primary);
     border-top: 3px solid var(--primary);
+  }
+
+  /* Page-Fit Floating Controls */
+  .page-fit-bar {
+    position: absolute;
+    top: 6px;
+    right: 10px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 3px 6px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+    z-index: 100;
+  }
+  .page-fit-label {
+    font-size: 10.5px;
+    font-weight: bold;
+    color: #475569;
+    margin-right: 4px;
+  }
+  .fit-btn {
+    width: 26px;
+    height: 24px;
+    font-size: 13px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border: 1px solid #94a3b8;
+    background: #ffffff;
+    border-radius: 4px;
+    color: #1e293b;
+    transition: all 0.15s;
+    user-select: none;
+  }
+  .fit-btn:hover {
+    background: #2563eb;
+    color: #ffffff;
+    border-color: #2563eb;
   }
 
   .sheet {
@@ -159,6 +203,7 @@
     box-shadow: 0 4px 6px rgba(0,0,0,0.05);
     box-sizing: border-box;
     position: relative;
+    transform-origin: top center;
   }
 
   .sheet-landscape {
@@ -266,6 +311,26 @@
     font-size: 11.5px;
   }
 
+  /* Oral Plain Questions Styling */
+  .oral-list-container {
+    margin-top: 10px;
+  }
+  .oral-q-item {
+    font-size: 13px;
+    line-height: 1.5;
+    padding: 5px 0;
+    border-bottom: 1px dashed #e2e8f0;
+    display: flex;
+    gap: 8px;
+  }
+  .oral-q-item:last-child {
+    border-bottom: none;
+  }
+  .oral-q-num {
+    font-weight: bold;
+    min-width: 26px;
+  }
+
   .q-tools-bar {
     display: flex;
     flex-direction: column;
@@ -306,8 +371,9 @@
 
   @media print {
     html, body { background: #ffffff !important; padding: 0 !important; margin: 0 !important; color: #000000 !important; }
-    .no-print, .q-tools-bar, .studio-panel, .nav-tabs, .custom-editor-box { display: none !important; }
+    .no-print, .q-tools-bar, .studio-panel, .nav-tabs, .custom-editor-box, .page-fit-bar { display: none !important; }
     .q-row { background: transparent !important; border: none !important; padding: 0 !important; margin-bottom: 5px !important; }
+    .oral-q-item { border-bottom: none !important; padding: 4px 0 !important; }
     .sheet { width: 100% !important; height: auto !important; min-height: auto !important; margin: 0 !important; padding: 6mm 10mm !important; box-shadow: none !important; page-break-after: always !important; break-after: page !important; }
     .sheet-landscape { page: blueprint_page !important; padding: 5mm 10mm !important; }
     .sheet:last-child { page-break-after: avoid !important; break-after: avoid !important; }
@@ -409,10 +475,17 @@
   <button class="tab-btn" onclick="showTab('tab_qp', this)">4. Question Paper</button>
   <button class="tab-btn" onclick="showTab('tab_key1', this)">5. Answer Key (Part 1)</button>
   <button class="tab-btn" onclick="showTab('tab_key2', this)">6. Answer Key (Part 2)</button>
+  <button class="tab-btn" onclick="showTab('tab_oral', this)">7. Oral Questions (20)</button>
 </div>
 
 <!-- Page 1: Design Stages -->
 <div class="sheet tab-page" id="tab_stages">
+  <div class="page-fit-bar no-print">
+    <span class="page-fit-label">Page Fit:</span>
+    <button class="fit-btn" onclick="adjustPageFit('tab_stages', 1)" title="Expand / Fill Page">+</button>
+    <button class="fit-btn" onclick="adjustPageFit('tab_stages', -1)" title="Shrink / Fit Content">-</button>
+    <button class="fit-btn" onclick="resetPageFit('tab_stages')" title="Reset Spacing">↺</button>
+  </div>
   <div class="doc-header">
     <h2><span class="dyn_school"></span>, Taluk: <span class="dyn_taluk"></span>, Dist: <span class="dyn_dist"></span></h2>
     <p>Subject Teacher: <span class="dyn_teacher"></span></p>
@@ -470,6 +543,12 @@
 
 <!-- Page 2: Blueprint -->
 <div class="sheet sheet-landscape tab-page" id="tab_blueprint">
+  <div class="page-fit-bar no-print">
+    <span class="page-fit-label">Page Fit:</span>
+    <button class="fit-btn" onclick="adjustPageFit('tab_blueprint', 1)" title="Expand / Fill Page">+</button>
+    <button class="fit-btn" onclick="adjustPageFit('tab_blueprint', -1)" title="Shrink / Fit Content">-</button>
+    <button class="fit-btn" onclick="resetPageFit('tab_blueprint')" title="Reset Spacing">↺</button>
+  </div>
   <div class="doc-header">
     <h2><span class="dyn_school"></span>, Taluk: <span class="dyn_taluk"></span>, Dist: <span class="dyn_dist"></span></h2>
     <p>Subject Teacher: <span class="dyn_teacher"></span></p>
@@ -509,6 +588,12 @@
 
 <!-- Page 3: Question-wise Analysis -->
 <div class="sheet tab-page" id="tab_analysis">
+  <div class="page-fit-bar no-print">
+    <span class="page-fit-label">Page Fit:</span>
+    <button class="fit-btn" onclick="adjustPageFit('tab_analysis', 1)" title="Expand / Fill Page">+</button>
+    <button class="fit-btn" onclick="adjustPageFit('tab_analysis', -1)" title="Shrink / Fit Content">-</button>
+    <button class="fit-btn" onclick="resetPageFit('tab_analysis')" title="Reset Spacing">↺</button>
+  </div>
   <div class="doc-header">
     <h2><span class="dyn_school"></span>, Taluk: <span class="dyn_taluk"></span>, Dist: <span class="dyn_dist"></span></h2>
     <p>Subject Teacher: <span class="dyn_teacher"></span></p>
@@ -540,6 +625,12 @@
 
 <!-- Page 4: Question Paper -->
 <div class="sheet tab-page" id="tab_qp">
+  <div class="page-fit-bar no-print">
+    <span class="page-fit-label">Page Fit:</span>
+    <button class="fit-btn" onclick="adjustPageFit('tab_qp', 1)" title="Expand / Fill Page">+</button>
+    <button class="fit-btn" onclick="adjustPageFit('tab_qp', -1)" title="Shrink / Fit Content">-</button>
+    <button class="fit-btn" onclick="resetPageFit('tab_qp')" title="Reset Spacing">↺</button>
+  </div>
   <div class="doc-header">
     <h2><span class="dyn_school"></span>, Taluk: <span class="dyn_taluk"></span>, Dist: <span class="dyn_dist"></span></h2>
     <p><strong class="dyn_exam">Summative Assessment-1 (SA-1) 2025-26</strong> | Subject: <strong>English (Second Language)</strong></p>
@@ -555,6 +646,12 @@
 
 <!-- Page 5: Answer Key 1 -->
 <div class="sheet tab-page" id="tab_key1">
+  <div class="page-fit-bar no-print">
+    <span class="page-fit-label">Page Fit:</span>
+    <button class="fit-btn" onclick="adjustPageFit('tab_key1', 1)" title="Expand / Fill Page">+</button>
+    <button class="fit-btn" onclick="adjustPageFit('tab_key1', -1)" title="Shrink / Fit Content">-</button>
+    <button class="fit-btn" onclick="resetPageFit('tab_key1')" title="Reset Spacing">↺</button>
+  </div>
   <div class="doc-header">
     <h2><span class="dyn_school"></span>, Taluk: <span class="dyn_taluk"></span>, Dist: <span class="dyn_dist"></span></h2>
     <p>Subject Teacher: <span class="dyn_teacher"></span></p>
@@ -580,6 +677,12 @@
 
 <!-- Page 6: Answer Key 2 -->
 <div class="sheet tab-page" id="tab_key2">
+  <div class="page-fit-bar no-print">
+    <span class="page-fit-label">Page Fit:</span>
+    <button class="fit-btn" onclick="adjustPageFit('tab_key2', 1)" title="Expand / Fill Page">+</button>
+    <button class="fit-btn" onclick="adjustPageFit('tab_key2', -1)" title="Shrink / Fit Content">-</button>
+    <button class="fit-btn" onclick="resetPageFit('tab_key2')" title="Reset Spacing">↺</button>
+  </div>
   <div class="doc-header">
     <h2><span class="dyn_school"></span>, Taluk: <span class="dyn_taluk"></span>, Dist: <span class="dyn_dist"></span></h2>
     <p>Subject Teacher: <span class="dyn_teacher"></span></p>
@@ -603,8 +706,51 @@
   </table>
 </div>
 
+<!-- Page 7: Oral Assessment (Only 20 Questions - Clean Layout, No Boxes/Units/Answers) -->
+<div class="sheet tab-page" id="tab_oral">
+  <div class="page-fit-bar no-print">
+    <span class="page-fit-label">Page Fit:</span>
+    <button class="fit-btn" onclick="adjustPageFit('tab_oral', 1)" title="Expand / Fill Page">+</button>
+    <button class="fit-btn" onclick="adjustPageFit('tab_oral', -1)" title="Shrink / Fit Content">-</button>
+    <button class="fit-btn" onclick="resetPageFit('tab_oral')" title="Reset Spacing">↺</button>
+  </div>
+  <div class="doc-header">
+    <h2><span class="dyn_school"></span>, Taluk: <span class="dyn_taluk"></span>, Dist: <span class="dyn_dist"></span></h2>
+    <p>Subject Teacher: <span class="dyn_teacher"></span></p>
+    <h3 style="text-decoration: underline;">ORAL ASSESSMENT QUESTIONS (SEMESTER - 1)</h3>
+  </div>
+  <div class="meta-bar">
+    <span>Class: 6th Standard</span>
+    <span>Subject: English (Second Language)</span>
+    <span>Total Questions: 20</span>
+    <span>Evaluation: Oral Assessment</span>
+  </div>
+
+  <div class="oral-list-container" id="oral_list_body">
+    <div class="oral-q-item"><span class="oral-q-num">1.</span><span>Where did Rajiv and his father go on an excursion?</span></div>
+    <div class="oral-q-item"><span class="oral-q-num">2.</span><span>How do modern lighthouses work?</span></div>
+    <div class="oral-q-item"><span class="oral-q-num">3.</span><span>What did people use in lighthouses before electricity?</span></div>
+    <div class="oral-q-item"><span class="oral-q-num">4.</span><span>How many colours are there in a rainbow?</span></div>
+    <div class="oral-q-item"><span class="oral-q-num">5.</span><span>According to the poet, what sails in the rivers?</span></div>
+    <div class="oral-q-item"><span class="oral-q-num">6.</span><span>What is prettier than boats and ships?</span></div>
+    <div class="oral-q-item"><span class="oral-q-num">7.</span><span>Who was the special visitor at Akbar's court?</span></div>
+    <div class="oral-q-item"><span class="oral-q-num">8.</span><span>What was the Pandit's real mother tongue?</span></div>
+    <div class="oral-q-item"><span class="oral-q-num">9.</span><span>What did Birbal use to tickle the Pandit's ear?</span></div>
+    <div class="oral-q-item"><span class="oral-q-num">10.</span><span>Who wrote the poem 'Sympathy'?</span></div>
+    <div class="oral-q-item"><span class="oral-q-num">11.</span><span>What did the proud man give to the poet?</span></div>
+    <div class="oral-q-item"><span class="oral-q-num">12.</span><span>What is greater than gold according to the poet?</span></div>
+    <div class="oral-q-item"><span class="oral-q-num">13.</span><span>What do bees collect from flowers to make honey?</span></div>
+    <div class="oral-q-item"><span class="oral-q-num">14.</span><span>What is the shape of a honeycomb cell?</span></div>
+    <div class="oral-q-item"><span class="oral-q-num">15.</span><span>What is the main duty of field bees?</span></div>
+    <div class="oral-q-item"><span class="oral-q-num">16.</span><span>Why does the gentle robin come to our home?</span></div>
+    <div class="oral-q-item"><span class="oral-q-num">17.</span><span>Why is the hare called a timid animal?</span></div>
+    <div class="oral-q-item"><span class="oral-q-num">18.</span><span>Who is known as the king of the forest?</span></div>
+    <div class="oral-q-item"><span class="oral-q-num">19.</span><span>Which animal did the Lion make his Home Minister?</span></div>
+    <div class="oral-q-item"><span class="oral-q-num">20.</span><span>Who created all things bright, beautiful, great and small?</span></div>
+  </div>
+</div>
+
 <script>
-// Official 6th Standard English Units (From LBA & SA-1 Model Blueprint)
 const MASTER_UNITS = [
   { id: 1, name: "The Lighthouse" },
   { id: 2, name: "The Rainbow (Poem)" },
@@ -619,26 +765,79 @@ const MASTER_UNITS = [
 
 const WEIGHTS = [1, 2, 4, 1, 2, 4, 1, 2, 4, 1, 2, 4];
 
-// EXACT Corrected Blueprint Matrix for 6th Standard English:
-// Columns: K(1,2,4), U(1,2,4), A/Exp(1,2,4), App(1,2,4)
-// Total Questions = 24, Total Marks = 40 (100% Mathematically Exact)
+// Page-Fit Zoom and Spacing Controller
+const PAGE_FIT_STATE = {};
+
+function adjustPageFit(pageId, step) {
+  if (!PAGE_FIT_STATE[pageId]) {
+    PAGE_FIT_STATE[pageId] = { font: 100, space: 100 };
+  }
+  PAGE_FIT_STATE[pageId].font += (step * 3);
+  PAGE_FIT_STATE[pageId].space += (step * 6);
+
+  if (PAGE_FIT_STATE[pageId].font < 70) PAGE_FIT_STATE[pageId].font = 70;
+  if (PAGE_FIT_STATE[pageId].font > 150) PAGE_FIT_STATE[pageId].font = 150;
+
+  applyPageFit(pageId);
+}
+
+function resetPageFit(pageId) {
+  PAGE_FIT_STATE[pageId] = { font: 100, space: 100 };
+  applyPageFit(pageId);
+}
+
+function applyPageFit(pageId) {
+  const page = document.getElementById(pageId);
+  if (!page) return;
+  const state = PAGE_FIT_STATE[pageId] || { font: 100, space: 100 };
+  const fontRatio = state.font / 100;
+  const spaceRatio = state.space / 100;
+
+  const tables = page.querySelectorAll('table');
+  tables.forEach(t => {
+    t.style.fontSize = (11 * fontRatio) + 'px';
+  });
+  const cells = page.querySelectorAll('th, td');
+  cells.forEach(c => {
+    c.style.padding = (3.5 * spaceRatio) + 'px ' + (2 * spaceRatio) + 'px';
+  });
+  const qRows = page.querySelectorAll('.q-row');
+  qRows.forEach(r => {
+    r.style.marginBottom = (8 * spaceRatio) + 'px';
+    r.style.padding = (6 * spaceRatio) + 'px';
+    r.style.fontSize = (12.5 * fontRatio) + 'px';
+  });
+  const secHeads = page.querySelectorAll('.section-head');
+  secHeads.forEach(s => {
+    s.style.marginTop = (10 * spaceRatio) + 'px';
+    s.style.marginBottom = (6 * spaceRatio) + 'px';
+    s.style.padding = (3 * spaceRatio) + 'px ' + (6 * spaceRatio) + 'px';
+    s.style.fontSize = (12.5 * fontRatio) + 'px';
+  });
+  const oralItems = page.querySelectorAll('.oral-q-item');
+  oralItems.forEach(item => {
+    item.style.padding = (5 * spaceRatio) + 'px 0';
+    item.style.fontSize = (13 * fontRatio) + 'px';
+  });
+}
+
 const DEFAULT_BLUEPRINT_MATRIX = [
-  [1, 0, 0,  0, 0, 0,  0, 0, 1,  0, 0, 0], // U1: The Lighthouse - 2 Q, 5 M [Q12(1M-K), Q23(4M-Exp)]
-  [0, 0, 0,  0, 0, 1,  0, 0, 0,  0, 0, 0], // U2: The Rainbow - 1 Q, 4 M [Q11(4M-U memory)]
-  [1, 1, 0,  0, 1, 0,  0, 0, 0,  0, 0, 0], // U3: The Scholar's Mother Tongue - 3 Q, 5 M [Q13(1M-K), Q16(2M-K), Q22(2M-U)]
-  [1, 0, 0,  0, 0, 0,  0, 1, 0,  0, 0, 0], // U4: Sympathy - 2 Q, 3 M [Q14(1M-K), Q17(2M-Exp)]
-  [0, 0, 0,  0, 0, 0,  0, 1, 0,  0, 0, 0], // U5: How Do Bees Make Honey? - 1 Q, 2 M [Q19(2M-Exp)]
-  [1, 1, 0,  0, 0, 0,  0, 0, 0,  0, 0, 0], // U6: Kindness to Animals - 2 Q, 3 M [Q15(1M-K), Q18(2M-K)]
-  [0, 0, 0,  0, 1, 0,  0, 0, 0,  0, 0, 1], // U7: The King's Ministers - 2 Q, 6 M [Q21(2M-U), Q24(4M-App)]
-  [0, 0, 0,  0, 0, 0,  0, 1, 0,  0, 0, 0], // U8: All Things Bright and Beautiful - 1 Q, 2 M [Q20(2M-Exp)]
-  [2, 0, 0,  8, 0, 0,  0, 0, 0,  0, 0, 0]  // U9: Grammar & Vocabulary - 10 Q, 10 M [Q9-Q10(2x1M-K), Q1-Q8(8x1M-U)]
+  [1, 0, 0,  0, 0, 0,  0, 0, 1,  0, 0, 0],
+  [0, 0, 0,  0, 0, 1,  0, 0, 0,  0, 0, 0],
+  [1, 1, 0,  0, 1, 0,  0, 0, 0,  0, 0, 0],
+  [1, 0, 0,  0, 0, 0,  0, 1, 0,  0, 0, 0],
+  [0, 0, 0,  0, 0, 0,  0, 1, 0,  0, 0, 0],
+  [1, 1, 0,  0, 0, 0,  0, 0, 0,  0, 0, 0],
+  [0, 0, 0,  0, 1, 0,  0, 0, 0,  0, 0, 1],
+  [0, 0, 0,  0, 0, 0,  0, 1, 0,  0, 0, 0],
+  [2, 0, 0,  8, 0, 0,  0, 0, 0,  0, 0, 0]
 ];
 
 let BLUEPRINT_MATRIX = JSON.parse(JSON.stringify(DEFAULT_BLUEPRINT_MATRIX));
 
-// ========== Comprehensive LBA Question & Answer Database (6th English) ==========
+// ========== Comprehensive LBA Question & Answer Database (6th English Semester 1) ==========
 const LBA_DATABASE = [
-  // SECTION I: Grammar & Vocabulary MCQ (Questions 1 to 8)
+  // SECTION I: Grammar & Vocabulary MCQ (1 Mark) [6 Options]
   { id: "6E_MCQ_01", unit: "Grammar & Vocabulary", section: "mcq", marks: 1, obj: "Comprehension", spec: "Chooses", diff: "Easy", time: 2, q: "Meaning of the word 'thrilled' is:", opts: ["scared", "excited", "anger", "fun"], a: "B) excited" },
   { id: "6E_MCQ_02", unit: "Grammar & Vocabulary", section: "mcq", marks: 1, obj: "Comprehension", spec: "Chooses", diff: "Easy", time: 2, q: "Find the word that rhymes with 'seas':", opts: ["these", "team", "threw", "though"], a: "A) these" },
   { id: "6E_MCQ_03", unit: "Grammar & Vocabulary", section: "mcq", marks: 1, obj: "Comprehension", spec: "Chooses", diff: "Easy", time: 2, q: "\"We are in the same class, but have opinions about the teacher.\" Find the antonym of the underlined word:", opts: ["identical", "different", "similar", "alike"], a: "B) different" },
@@ -652,106 +851,126 @@ const LBA_DATABASE = [
   { id: "6E_MCQ_11", unit: "Grammar & Vocabulary", section: "mcq", marks: 1, obj: "Comprehension", spec: "Chooses", diff: "Easy", time: 2, q: "Find the antonym of the word 'Dangerous':", opts: ["stop", "save", "safe", "short"], a: "C) safe" },
   { id: "6E_MCQ_12", unit: "Grammar & Vocabulary", section: "mcq", marks: 1, obj: "Comprehension", spec: "Chooses", diff: "Easy", time: 2, q: "Find the rhyming word for 'Way':", opts: ["Day", "Weigh", "Whale", "Hare"], a: "A) Day" },
 
-  // SECTION II: Odd Word Out (Questions 9 to 10)
+  // SECTION II: Odd Word Out (1 Mark) [6 Options]
   { id: "6E_ODD_01", unit: "Grammar & Vocabulary", section: "odd", marks: 1, obj: "Knowledge", spec: "Finds out", diff: "Easy", time: 2, q: "Find the odd word out: Hot, cold, warm, boiling", a: "cold (All others relate to warmth/heat)" },
   { id: "6E_ODD_02", unit: "Grammar & Vocabulary", section: "odd", marks: 1, obj: "Knowledge", spec: "Finds out", diff: "Easy", time: 2, q: "Find the odd word out: Rich, poor, wealthy, well-to-do", a: "poor (All others mean having wealth)" },
   { id: "6E_ODD_03", unit: "Grammar & Vocabulary", section: "odd", marks: 1, obj: "Knowledge", spec: "Finds out", diff: "Easy", time: 2, q: "Find the odd word out: Scholar, Pandit, Teacher, Butcher", a: "Butcher (All others are learned persons/teachers)" },
   { id: "6E_ODD_04", unit: "Grammar & Vocabulary", section: "odd", marks: 1, obj: "Knowledge", spec: "Finds out", diff: "Easy", time: 2, q: "Find the odd word out: Lion, Leopard, Fox, Cow", a: "Cow (Cow is a domestic animal, others are wild)" },
+  { id: "6E_ODD_05", unit: "Grammar & Vocabulary", section: "odd", marks: 1, obj: "Knowledge", spec: "Finds out", diff: "Easy", time: 2, q: "Find the odd word out: sorrow, grief, sadness, joy", a: "joy (All others express sadness)" },
+  { id: "6E_ODD_06", unit: "Grammar & Vocabulary", section: "odd", marks: 1, obj: "Knowledge", spec: "Finds out", diff: "Easy", time: 2, q: "Find the odd word out: Honey, Nectar, Milk, Wax", a: "Milk (All others are related to bees)" },
 
-  // SECTION III: Quote from Memory (Question 11)
+  // SECTION III: Quote from Memory (4 Marks)
   { id: "6E_MEM_01", unit: "The Rainbow (Poem)", section: "memory", marks: 4, obj: "Comprehension", spec: "Grasp", diff: "Average", time: 5, q: "Quote from memory:\nBoats sail ____________________\n______________________________\n______________________________\n__________ than these.", a: "Boats sail in the rivers,\nAnd ships sail on the seas;\nBut clouds that sail across the sky,\nAre prettier far than these." },
   { id: "6E_MEM_02", unit: "The Rainbow (Poem)", section: "memory", marks: 4, obj: "Comprehension", spec: "Grasp", diff: "Average", time: 5, q: "Quote from memory:\nThere are bridges ____________________\n______________________________\n______________________________\n__________ from earth to sky.", a: "There are bridges on the rivers,\nAs pretty as you please;\nBut the bow that bridges heaven,\nAnd overtops the trees,\nAnd builds a road from earth to sky,\nIs prettier far than these." },
-  { id: "6E_MEM_03", unit: "Sympathy (Poem)", section: "memory", marks: 4, obj: "Comprehension", spec: "Grasp", diff: "Average", time: 5, q: "Quote from memory:\nI lay in sorrow ____________________\n______________________________\n______________________________\n__________ kindly word.", a: "I lay in sorrow, deep depressed;\nMy grief a proud man heard;\nHis looks were cold, he gave me gold,\nBut not a kindly word." },
+  { id: "6E_MEM_03", unit: "The Rainbow (Poem)", section: "memory", marks: 4, obj: "Comprehension", spec: "Grasp", diff: "Average", time: 5, q: "Quote from memory (Stanza 1 & 2):\nBoats sail in the rivers,\n______________________________\n______________________________\nAre prettier far than these.", a: "Boats sail in the rivers,\nAnd ships sail on the seas;\nBut clouds that sail across the sky,\nAre prettier far than these." },
 
-  // SECTION IV: Answer in One Word / Sentence (Questions 12 to 15)
-  // Q12: The Lighthouse
+  // SECTION IV: Answer in One Word / Sentence (1 Mark)
+  // Q12: The Lighthouse (1M) [6 Options]
   { id: "6E_VSA_01", unit: "The Lighthouse", section: "one_sentence", marks: 1, obj: "Knowledge", spec: "Recall", diff: "Average", time: 4, q: "Who accompanied Rajiv on the excursion to see the lighthouse?", a: "Rajiv's father accompanied him on the excursion to see the lighthouse." },
   { id: "6E_VSA_02", unit: "The Lighthouse", section: "one_sentence", marks: 1, obj: "Knowledge", spec: "Recall", diff: "Average", time: 4, q: "Where did Rajiv and his father go on an excursion?", a: "Rajiv and his father went to see the lighthouse near the seashore." },
   { id: "6E_VSA_03", unit: "The Lighthouse", section: "one_sentence", marks: 1, obj: "Knowledge", spec: "Recall", diff: "Average", time: 4, q: "How do modern lighthouses work?", a: "Modern lighthouses work using electricity to emit powerful visual light signals." },
   { id: "6E_VSA_04", unit: "The Lighthouse", section: "one_sentence", marks: 1, obj: "Knowledge", spec: "Recall", diff: "Average", time: 4, q: "What is a lighthouse?", a: "A lighthouse is a strong, tall building in the shape of a tower near the seashore with a powerful light at the top." },
+  { id: "6E_VSA_04B", unit: "The Lighthouse", section: "one_sentence", marks: 1, obj: "Knowledge", spec: "Recall", diff: "Average", time: 4, q: "Why was Rajiv thrilled to visit the lighthouse?", a: "Rajiv was thrilled because his father took him out on a visit to see the lighthouse." },
+  { id: "6E_VSA_04C", unit: "The Lighthouse", section: "one_sentence", marks: 1, obj: "Knowledge", spec: "Recall", diff: "Average", time: 4, q: "What did people use in lighthouses before electricity was invented?", a: "People used wood fires and large candles in lighthouses before electricity." },
 
-  // Q13: The Scholar's Mother Tongue
+  // Q13: The Scholar's Mother Tongue (1M) [6 Options]
   { id: "6E_VSA_05", unit: "The Scholar's Mother Tongue", section: "one_sentence", marks: 1, obj: "Knowledge", spec: "Recall", diff: "Average", time: 4, q: "Who admitted his defeat at the end?", a: "The Pandit admitted his defeat at the end." },
   { id: "6E_VSA_06", unit: "The Scholar's Mother Tongue", section: "one_sentence", marks: 1, obj: "Knowledge", spec: "Recall", diff: "Easy", time: 4, q: "What was the Pandit's mother tongue?", a: "The Pandit's mother tongue was Telugu." },
   { id: "6E_VSA_07", unit: "The Scholar's Mother Tongue", section: "one_sentence", marks: 1, obj: "Knowledge", spec: "Recall", diff: "Easy", time: 4, q: "What do you mean by the word 'Scholar'?", a: "Scholar means someone who has studied a subject deeply and knows a lot about it." },
   { id: "6E_VSA_08", unit: "The Scholar's Mother Tongue", section: "one_sentence", marks: 1, obj: "Knowledge", spec: "Recall", diff: "Easy", time: 4, q: "What did Birbal tickle the Pandit's ear with?", a: "Birbal tickled the Pandit's ear with a feather." },
+  { id: "6E_VSA_08B", unit: "The Scholar's Mother Tongue", section: "one_sentence", marks: 1, obj: "Knowledge", spec: "Recall", diff: "Easy", time: 4, q: "Who was the visitor at Akbar's court one day?", a: "A learned Pandit was the visitor at Akbar's court one day." },
+  { id: "6E_VSA_08C", unit: "The Scholar's Mother Tongue", section: "one_sentence", marks: 1, obj: "Knowledge", spec: "Recall", diff: "Average", time: 4, q: "Which word was uttered by the Pandit when his ear was tickled?", a: "The Pandit shouted 'Yevaradhi' in Telugu when his ear was tickled." },
 
-  // Q14: Sympathy (Poem)
+  // Q14: Sympathy (Poem) (1M) [6 Options]
   { id: "6E_VSA_09", unit: "Sympathy (Poem)", section: "one_sentence", marks: 1, obj: "Knowledge", spec: "Recall", diff: "Average", time: 4, q: "\"His looks were cold...\" Who is 'his' referred to?", a: "'His' refers to the proud, rich man in the poem 'Sympathy'." },
   { id: "6E_VSA_10", unit: "Sympathy (Poem)", section: "one_sentence", marks: 1, obj: "Knowledge", spec: "Recall", diff: "Average", time: 4, q: "Who wrote the poem 'Sympathy'?", a: "The poem 'Sympathy' is written by Charles Mackay." },
   { id: "6E_VSA_11", unit: "Sympathy (Poem)", section: "one_sentence", marks: 1, obj: "Knowledge", spec: "Recall", diff: "Average", time: 4, q: "What does the speaker value more than gold?", a: "The speaker values heavenly sympathy much more than gold." },
   { id: "6E_VSA_12", unit: "Sympathy (Poem)", section: "one_sentence", marks: 1, obj: "Knowledge", spec: "Recall", diff: "Average", time: 4, q: "How did the poet repay the proud man's gold?", a: "The poet paid the gold back with erect posture, words of thanks, and blessings." },
+  { id: "6E_VSA_12B", unit: "Sympathy (Poem)", section: "one_sentence", marks: 1, obj: "Knowledge", spec: "Recall", diff: "Average", time: 4, q: "What did the proud man give to the poet?", a: "The proud man gave gold to the poet." },
+  { id: "6E_VSA_12C", unit: "Sympathy (Poem)", section: "one_sentence", marks: 1, obj: "Knowledge", spec: "Recall", diff: "Average", time: 4, q: "Who watched the poet night and day when he was sick?", a: "A poor man watched the poet night and day when he lay in pain." },
 
-  // Q15: Kindness to Animals (Poem)
+  // Q15: Kindness to Animals (Poem) (1M) [6 Options]
   { id: "6E_VSA_13", unit: "Kindness to Animals (Poem)", section: "one_sentence", marks: 1, obj: "Knowledge", spec: "Recall", diff: "Average", time: 4, q: "Where does the little hare lie?", a: "The little hare lies peeping out on the green grass." },
   { id: "6E_VSA_14", unit: "Kindness to Animals (Poem)", section: "one_sentence", marks: 1, obj: "Knowledge", spec: "Recall", diff: "Average", time: 4, q: "Why does the robin come home?", a: "The robin comes home to eat the crumbs saved by the children." },
   { id: "6E_VSA_15", unit: "Kindness to Animals (Poem)", section: "one_sentence", marks: 1, obj: "Knowledge", spec: "Recall", diff: "Average", time: 4, q: "Why do we call the hare a timid animal?", a: "We call the hare a timid animal because it easily gets scared and runs away if anyone approaches it." },
   { id: "6E_VSA_16", unit: "Kindness to Animals (Poem)", section: "one_sentence", marks: 1, obj: "Knowledge", spec: "Recall", diff: "Average", time: 4, q: "What is the little lark doing in the poem?", a: "The little lark is soaring high into the bright sky and singing happily." },
+  { id: "6E_VSA_16B", unit: "Kindness to Animals (Poem)", section: "one_sentence", marks: 1, obj: "Knowledge", spec: "Recall", diff: "Easy", time: 4, q: "Who is the speaker in the poem 'Kindness to Animals'?", a: "The poet is the speaker in the poem 'Kindness to Animals'." },
+  { id: "6E_VSA_16C", unit: "Kindness to Animals (Poem)", section: "one_sentence", marks: 1, obj: "Knowledge", spec: "Recall", diff: "Average", time: 4, q: "In which season does the lark sing happily?", a: "The lark sings happily during the spring season." },
 
-  // SECTION V: Answer in Two or Three Sentences (Questions 16 to 20)
-  // Q16: The Scholar's Mother Tongue
+  // SECTION V: Answer in Two or Three Sentences (2 Marks)
+  // Q16: The Scholar's Mother Tongue (2M) [5 Options]
   { id: "6E_SA_01", unit: "The Scholar's Mother Tongue", section: "short_answer", marks: 2, obj: "Knowledge", spec: "Recall", diff: "Average", time: 5, q: "What did the scholar tell the king and the courtiers?", a: "The scholar told the king and the courtiers that he had mastery over many different languages and could speak all of them fluently." },
   { id: "6E_SA_02", unit: "The Scholar's Mother Tongue", section: "short_answer", marks: 2, obj: "Knowledge", spec: "Recall", diff: "Average", time: 5, q: "What challenge did the Pandit put before the court of Akbar?", a: "The Pandit challenged the emperor and his courtiers to discover what his mother tongue was, as he spoke many languages fluently." },
   { id: "6E_SA_03", unit: "The Scholar's Mother Tongue", section: "short_answer", marks: 2, obj: "Knowledge", spec: "Recall", diff: "Average", time: 5, q: "When does a person speak truly in his mother tongue?", a: "A person speaks truly in his mother tongue in times of distress, danger, sudden surprise, or when he is half asleep." },
+  { id: "6E_SA_03B", unit: "The Scholar's Mother Tongue", section: "short_answer", marks: 2, obj: "Knowledge", spec: "Recall", diff: "Average", time: 5, q: "How did Birbal find out the Pandit's mother tongue?", a: "Birbal entered the Pandit's room at night and tickled his ear with a feather. The sleeping Pandit shouted in Telugu, revealing his mother tongue." },
+  { id: "6E_SA_03C", unit: "The Scholar's Mother Tongue", section: "short_answer", marks: 2, obj: "Knowledge", spec: "Recall", diff: "Average", time: 5, q: "Why was it difficult to guess the Pandit's mother tongue in the beginning?", a: "It was difficult because the Pandit had mastered many languages and could speak all of them fluently without showing any mother tongue accent." },
 
-  // Q17: Sympathy (Poem)
+  // Q17: Sympathy (Poem) (2M) [5 Options]
   { id: "6E_SA_04", unit: "Sympathy (Poem)", section: "short_answer", marks: 2, obj: "Expression", spec: "Written", diff: "Average", time: 5, q: "What values are highlighted in the poor man's action?", a: "The poor man's actions highlight heavenly sympathy, selflessness, kindness, tender nursing, and genuine human care without expecting material rewards." },
   { id: "6E_SA_05", unit: "Sympathy (Poem)", section: "short_answer", marks: 2, obj: "Expression", spec: "Written", diff: "Average", time: 5, q: "How did the proud man help the poet when he was in grief?", a: "The proud man heard the poet's grief with cold looks. He gave the poet gold to help him, but did not offer a single kindly word." },
   { id: "6E_SA_06", unit: "Sympathy (Poem)", section: "short_answer", marks: 2, obj: "Expression", spec: "Written", diff: "Average", time: 5, q: "Why is heavenly sympathy greater than gold?", a: "Gold is material and can easily be repaid, but genuine sympathy and love touch the soul and can never be bought or fully repaid." },
+  { id: "6E_SA_06B", unit: "Sympathy (Poem)", section: "short_answer", marks: 2, obj: "Expression", spec: "Written", diff: "Average", time: 5, q: "How did the poor man nurse the poet back to health?", a: "The poor man bound the poet's head, gave him fresh bread to eat, and watched over him tenderly day and night until he recovered." },
+  { id: "6E_SA_06C", unit: "Sympathy (Poem)", section: "short_answer", marks: 2, obj: "Expression", spec: "Written", diff: "Average", time: 5, q: "Describe the poet's feelings towards the person who showed sympathy.", a: "The poet feels deep gratitude and reverence towards the poor man because his heavenly sympathy brought genuine solace that gold could never provide." },
 
-  // Q18: Kindness to Animals (Poem)
+  // Q18: Kindness to Animals (Poem) (2M) [5 Options]
   { id: "6E_SA_07", unit: "Kindness to Animals (Poem)", section: "short_answer", marks: 2, obj: "Knowledge", spec: "Recall", diff: "Average", time: 5, q: "Give two examples of kindness towards animals.", a: "1. Providing food, water, and bread crumbs to hungry birds and animals.\n2. Treating them gently without hurting, throwing stones, or caging them." },
   { id: "6E_SA_08", unit: "Kindness to Animals (Poem)", section: "short_answer", marks: 2, obj: "Knowledge", spec: "Recall", diff: "Average", time: 5, q: "What advice does the poet give to children in 'Kindness to Animals'?", a: "The poet advises children never to give pain or harm to any gentle, innocent creatures that live and feel pain just like human beings." },
   { id: "6E_SA_09", unit: "Kindness to Animals (Poem)", section: "short_answer", marks: 2, obj: "Knowledge", spec: "Recall", diff: "Average", time: 5, q: "Describe the feelings of the robin and lark as mentioned in the poem.", a: "The robin feels secure coming home for crumbs, while the happy lark soars high up into the bright windows of the sky, singing joyful songs." },
+  { id: "6E_SA_09B", unit: "Kindness to Animals (Poem)", section: "short_answer", marks: 2, obj: "Knowledge", spec: "Recall", diff: "Average", time: 5, q: "How should we treat timid animals like the hare?", a: "We should allow the little hare to peep and play freely on the green grass at the close of the day without chasing or frightening it." },
+  { id: "6E_SA_09C", unit: "Kindness to Animals (Poem)", section: "short_answer", marks: 2, obj: "Knowledge", spec: "Recall", diff: "Average", time: 5, q: "Why should we not disturb birds singing in the morning?", a: "We should not disturb them because their sweet songs bring cheer and harmony to nature during bright spring mornings." },
 
-  // Q19: How Do Bees Make Honey?
+  // Q19: How Do Bees Make Honey? (2M) [5 Options]
   { id: "6E_SA_10", unit: "How Do Bees Make Honey?", section: "short_answer", marks: 2, obj: "Expression", spec: "Written", diff: "Average", time: 5, q: "Describe the work of field bees in making honey.", a: "Field bees are older bees that leave the hive and fly around flowers. Their primary job is to collect sweet nectar and bring it back to the hive." },
   { id: "6E_SA_11", unit: "How Do Bees Make Honey?", section: "short_answer", marks: 2, obj: "Expression", spec: "Written", diff: "Average", time: 5, q: "What is the duty of house bees in the beehive?", a: "House bees stay inside the hive, keep it clean and ventilated, build new hexagonal combs, and process nectar into thick honey." },
   { id: "6E_SA_12", unit: "How Do Bees Make Honey?", section: "short_answer", marks: 2, obj: "Expression", spec: "Written", diff: "Average", time: 5, q: "Why do bees fan their wings over the honeycombs?", a: "Bees vigorously fan their wings to evaporate excess water from the nectar and thicken it into ripe, sweet honey." },
+  { id: "6E_SA_12B", unit: "How Do Bees Make Honey?", section: "short_answer", marks: 2, obj: "Expression", spec: "Written", diff: "Average", time: 5, q: "What changes occur to the nectar inside the bee's stomach?", a: "Inside the bee's honey stomach, nectar gets mixed with special enzymes and proteins that begin transforming natural sugar into honey." },
+  { id: "6E_SA_12C", unit: "How Do Bees Make Honey?", section: "short_answer", marks: 2, obj: "Expression", spec: "Written", diff: "Average", time: 5, q: "What is the final step in the honey-making process inside the hive?", a: "The final step is sealing the full hexagonal honeycomb cells securely with beeswax to preserve the honey." },
 
-  // Q20: All Things Bright and Beautiful (Poem)
+  // Q20: All Things Bright and Beautiful (Poem) (2M) [5 Options]
   { id: "6E_SA_13", unit: "All Things Bright and Beautiful (Poem)", section: "short_answer", marks: 2, obj: "Expression", spec: "Written", diff: "Average", time: 5, q: "What message do you learn from the poem 'All Things Bright and Beautiful'?", a: "God has created everything in the world wonderfully, both great and small. We should appreciate, love, respect, and be thankful for all creations of God." },
   { id: "6E_SA_14", unit: "All Things Bright and Beautiful (Poem)", section: "short_answer", marks: 2, obj: "Expression", spec: "Written", diff: "Average", time: 5, q: "Why did God give us eyes and lips according to the poet?", a: "God gave us eyes to see the marvelous beauty of His creations and lips that we might praise and tell how great Almighty God is." },
   { id: "6E_SA_15", unit: "All Things Bright and Beautiful (Poem)", section: "short_answer", marks: 2, obj: "Expression", spec: "Written", diff: "Average", time: 5, q: "Name the little things mentioned in the poem 'All Things Bright and Beautiful'.", a: "The little things mentioned in the poem are the little glowing flowers that open and the little birds that sing with tiny wings." },
+  { id: "6E_SA_15B", unit: "All Things Bright and Beautiful (Poem)", section: "short_answer", marks: 2, obj: "Expression", spec: "Written", diff: "Average", time: 5, q: "How has God decorated the little flowers and birds?", a: "God has decorated the little flowers with bright, glowing colours and made tiny, delicate wings for the singing birds." },
+  { id: "6E_SA_15C", unit: "All Things Bright and Beautiful (Poem)", section: "short_answer", marks: 2, obj: "Expression", spec: "Written", diff: "Average", time: 5, q: "Why should human beings be thankful to the Almighty God?", a: "We should be thankful because God made all beautiful things and gave us senses to perceive and enjoy the wonders around us." },
 
-  // SECTION VI: Extracts / Reference to Context (Questions 21 to 22)
-  // Q21: The King's Ministers
+  // SECTION VI: Extracts / Reference to Context (2 Marks)
+  // Q21: The King's Ministers (2M Extract) [5 Options]
   { id: "6E_EXT_01", unit: "The King's Ministers", section: "extract", marks: 2, obj: "Comprehension", spec: "Grasp", diff: "Average", time: 4, q: "\"I want you to be my Home Minister.\"\na) Who is 'I' referred to?\nb) Who does he want to be the Home Minister?", a: "a) 'I' refers to the Lion (the king of the forest).\nb) He wants the clever Fox to be his Home Minister." },
   { id: "6E_EXT_02", unit: "The King's Ministers", section: "extract", marks: 2, obj: "Comprehension", spec: "Grasp", diff: "Average", time: 4, q: "\"Where can we get a camel?\"\na) Who asked this question?\nb) What was the reply given?", a: "a) The Lion asked this question to his ministers.\nb) The Crow replied that he had seen a lone camel in the desert far away." },
   { id: "6E_EXT_03", unit: "The King's Ministers", section: "extract", marks: 2, obj: "Comprehension", spec: "Grasp", diff: "Average", time: 4, q: "\"I thank you for this honour, Your Majesty.\"\na) Who is the speaker?\nb) What honour was given to the speaker?", a: "a) The Fox is the speaker.\nb) The Fox was honoured with the post of Home Minister by the Lion." },
+  { id: "6E_EXT_03B", unit: "The King's Ministers", section: "extract", marks: 2, obj: "Comprehension", spec: "Grasp", diff: "Average", time: 4, q: "\"Our king is the brave lion. He has killed your cruel master.\"\na) Who said these words?\nb) To whom were these words addressed?", a: "a) The clever Fox said these words.\nb) These words were addressed to the innocent Camel." },
+  { id: "6E_EXT_03C", unit: "The King's Ministers", section: "extract", marks: 2, obj: "Comprehension", spec: "Grasp", diff: "Average", time: 4, q: "\"You have been a true friend. You shall live with me always.\"\na) Who is the speaker?\nb) Who was called a 'true friend'?", a: "a) The Lion is the speaker.\nb) The loyal Camel was called a 'true friend'." },
 
-  // Q22: The Scholar's Mother Tongue
+  // Q22: The Scholar's Mother Tongue (2M Extract) [5 Options]
   { id: "6E_EXT_04", unit: "The Scholar's Mother Tongue", section: "extract", marks: 2, obj: "Comprehension", spec: "Grasp", diff: "Average", time: 4, q: "\"He tickles his ear with a feather.\"\na) 'He' refers to whom?\nb) Why did he tickle his ear?", a: "a) 'He' refers to the clever minister Birbal.\nb) He tickled the Pandit's ear with a feather while he was asleep to find out his real mother tongue." },
   { id: "6E_EXT_05", unit: "The Scholar's Mother Tongue", section: "extract", marks: 2, obj: "Comprehension", spec: "Grasp", diff: "Average", time: 4, q: "\"Your Majesty, the Pandit's mother tongue is Telugu.\"\na) Who made this statement?\nb) To whom was it said?", a: "a) Birbal made this statement in the court.\nb) It was said to Emperor Akbar." },
   { id: "6E_EXT_06", unit: "The Scholar's Mother Tongue", section: "extract", marks: 2, obj: "Comprehension", spec: "Grasp", diff: "Average", time: 4, q: "\"I have mastery over different languages.\"\na) Who is the speaker?\nb) Why did the speaker say so?", a: "a) The visiting scholar (Pandit) is the speaker.\nb) He said so to boast and challenge the courtiers to find his mother tongue." },
+  { id: "6E_EXT_06B", unit: "The Scholar's Mother Tongue", section: "extract", marks: 2, obj: "Comprehension", spec: "Grasp", diff: "Average", time: 4, q: "\"I can speak many languages fluently.\"\na) Who said this in the royal court?\nb) What challenge did he give following this statement?", a: "a) The learned Pandit said this.\nb) He challenged everyone to discover his mother tongue." },
+  { id: "6E_EXT_06C", unit: "The Scholar's Mother Tongue", section: "extract", marks: 2, obj: "Comprehension", spec: "Grasp", diff: "Average", time: 4, q: "\"In times of distress, a man speaks only in his mother tongue.\"\na) Who explained this principle?\nb) When did the speaker demonstrate this?", a: "a) Birbal explained this principle.\nb) He demonstrated it after discovering the Pandit's mother tongue." },
 
-  // SECTION VII: Three or Four Sentences / Long Answer (Questions 23 to 24)
-  // Q23: The Lighthouse
+  // SECTION VII: Three or Four Sentences / Long Answer (4 Marks)
+  // Q23: The Lighthouse (4M) [5 Options]
   { id: "6E_LA_01", unit: "The Lighthouse", section: "long_answer", marks: 4, obj: "Expression", spec: "Written", diff: "Difficult", time: 8, q: "Why are the lighthouses important to sailors during night time?", a: "Lighthouses emit bright beams of light from tall towers during the night. They provide visual signals to guide ships safely away from dangerous rocks, shoals, and shallow waters. They also warn sailors of nearby hazards and guide them into safe harbours and ports." },
   { id: "6E_LA_02", unit: "The Lighthouse", section: "long_answer", marks: 4, obj: "Expression", spec: "Written", diff: "Difficult", time: 8, q: "Describe a lighthouse in your own words based on the lesson.", a: "A lighthouse is a strong, tall building in the shape of a tower located along the seashore or on islands. It has powerful flashing lights at the top. In ancient times, wood and candle fires were lit. Today, modern lighthouses use electric lamps and automated systems to guide sailors." },
   { id: "6E_LA_03", unit: "The Lighthouse", section: "long_answer", marks: 4, obj: "Expression", spec: "Written", diff: "Difficult", time: 8, q: "How did lighthouses guide sailors before the invention of electricity?", a: "Before electricity was invented, people lit huge wood fires and bonfires on elevated shores and high rocks. Later, candles, oil lamps, and kerosene lanterns with mirrors and lenses were used in towers to warn sailors and keep ships safe." },
+  { id: "6E_LA_03B", unit: "The Lighthouse", section: "long_answer", marks: 4, obj: "Expression", spec: "Written", diff: "Difficult", time: 8, q: "Explain how lighthouses help ships find safe harbours during stormy weather.", a: "During stormy weather, high waves and poor visibility hide dangerous submerged rocks. The powerful, revolving light beam from the lighthouse pierces the darkness, helping captains navigate safely into harbours without running aground." },
+  { id: "6E_LA_03C", unit: "The Lighthouse", section: "long_answer", marks: 4, obj: "Expression", spec: "Written", diff: "Difficult", time: 8, q: "Summarize Rajiv and his father's conversation about the history of lighthouses.", a: "Rajiv asked his father why lighthouses were built. His father explained that ancient sailors used fires on hilltops to navigate. Gradually, tall towers with lamps were built, and today automated electric systems protect seafarers worldwide." },
 
-  // Q24: The King's Ministers
+  // Q24: The King's Ministers (4M) [5 Options]
   { id: "6E_LA_04", unit: "The King's Ministers", section: "long_answer", marks: 4, obj: "Appreciation", spec: "Appreciate", diff: "Difficult", time: 8, q: "Which animal do you appreciate in the lesson 'The King's Ministers' and why?", a: "The camel is most appreciated in the lesson 'The King's Ministers' because he was loyal and faithful to the lion. When the lion burnt his paws in the hot desert sand and could not hunt, the camel carried him safely back to the forest. Unlike the treacherous ministers, the camel remained completely devoted and true to the king." },
   { id: "6E_LA_05", unit: "The King's Ministers", section: "long_answer", marks: 4, obj: "Appreciation", spec: "Appreciate", diff: "Difficult", time: 8, q: "Explain how the fox, leopard, and crow showed their disloyalty to the king.", a: "The fox, leopard, and crow pretended to be loyal ministers, but they were cunning and selfish. When the lion was injured and hungry, they tried to trick the innocent camel into offering himself as prey. They even offered themselves insincerely, knowing the lion would not eat his ministers." },
-  { id: "6E_LA_06", unit: "The King's Ministers", section: "long_answer", marks: 4, obj: "Appreciation", spec: "Appreciate", diff: "Difficult", time: 8, q: "How did the lion reward the camel for his true friendship and loyalty?", a: "The lion recognized the camel's genuine goodness when the camel offered himself to save the king. The lion refused to harm the camel, chased away his cunning ministers, and declared that the camel would live with him happily as his dearest friend for the rest of his life." }
+  { id: "6E_LA_06", unit: "The King's Ministers", section: "long_answer", marks: 4, obj: "Appreciation", spec: "Appreciate", diff: "Difficult", time: 8, q: "How did the lion reward the camel for his true friendship and loyalty?", a: "The lion recognized the camel's genuine goodness when the camel offered himself to save the king. The lion refused to harm the camel, chased away his cunning ministers, and declared that the camel would live with him happily as his dearest friend for the rest of his life." },
+  { id: "6E_LA_06B", unit: "The King's Ministers", section: "long_answer", marks: 4, obj: "Appreciation", spec: "Appreciate", diff: "Difficult", time: 8, q: "Describe how the camel saved the lion's life in the hot desert.", a: "When the lion ventured into the burning desert sand to hunt camel, his paws got scorched severely and he collapsed. The good-hearted camel let the lion climb onto his back and galloped swiftly across the desert to safety." },
+  { id: "6E_LA_06C", unit: "The King's Ministers", section: "long_answer", marks: 4, obj: "Appreciation", spec: "Appreciate", diff: "Difficult", time: 8, q: "What moral lesson does the story of 'The King's Ministers' convey?", a: "The story teaches that true friendship is based on honesty and selfless loyalty, not flattery. Selfish companions who flatter you for benefits will desert or betray you in distress, but a genuine friend stands by you unconditionally." }
 ];
 
-// Initial Active 24 Questions aligned exactly with Model SA-1
 const INITIAL_ACTIVE_IDS = [
-  // I. Multiple Choice Questions (1 to 8)
   "6E_MCQ_01", "6E_MCQ_02", "6E_MCQ_03", "6E_MCQ_04", "6E_MCQ_05", "6E_MCQ_06", "6E_MCQ_07", "6E_MCQ_08",
-  // II. Odd Word Out (9 to 10)
   "6E_ODD_01", "6E_ODD_02",
-  // III. Quote from Memory (11)
   "6E_MEM_01",
-  // IV. Answer in One Word / Sentence (12 to 15)
   "6E_VSA_01", "6E_VSA_05", "6E_VSA_09", "6E_VSA_13",
-  // V. Answer in Two or Three Sentences (16 to 20)
   "6E_SA_01", "6E_SA_04", "6E_SA_07", "6E_SA_10", "6E_SA_13",
-  // VI. Extracts / Context (21 to 22)
   "6E_EXT_01", "6E_EXT_04",
-  // VII. Answer in Three or Four Sentences / Long Answer (23 to 24)
   "6E_LA_01", "6E_LA_04"
 ];
 
@@ -789,9 +1008,9 @@ function onUnitInputChange(unitIdx) {
     let remQ = targetQ;
 
     while (remM >= 4 && remQ >= 1 && (remM - 4 >= remQ - 1)) {
-      if (unitIdx === 6) row[11]++; // Appreciation in King's Ministers
-      else if (unitIdx === 0) row[8]++; // Expression in Lighthouse
-      else row[5]++; // Comprehension in Rainbow
+      if (unitIdx === 6) row[11]++;
+      else if (unitIdx === 0) row[8]++;
+      else row[5]++;
       remM -= 4; remQ--;
     }
     while (remM >= 2 && remQ >= 1 && (remM - 2 >= remQ - 1)) {
@@ -1002,46 +1221,38 @@ function renderAnalysisTable() {
   document.getElementById('analysis_table_body').innerHTML = h;
 }
 
-// ========== 6th English Official Model SA-1 Layout Sections ==========
 function renderQuestionPaperUI() {
   let container = document.getElementById('qp_render_container');
   let h = '';
 
-  // I. Multiple Choice Questions (Q1 to Q8)
   h += `<div class="section-head"><span>I. Four alternatives are given for each of the following questions. Choose the correct alternative and write it:</span><span>8 × 1 = 8</span></div>`;
   for(let i = 0; i < 8; i++) {
     h += renderSingleQuestion(ACTIVE_PAPER[i], i + 1, "mcq");
   }
 
-  // II. Odd Word Out (Q9 to Q10)
   h += `<div class="section-head"><span>II. Find the odd word out in each set:</span><span>2 × 1 = 2</span></div>`;
   for(let i = 8; i < 10; i++) {
     h += renderSingleQuestion(ACTIVE_PAPER[i], i + 1, "odd");
   }
 
-  // III. Quote from Memory (Q11)
   h += `<div class="section-head"><span>III. Quote from memory:</span><span>1 × 4 = 4</span></div>`;
   h += renderSingleQuestion(ACTIVE_PAPER[10], 11, "memory");
 
-  // IV. Answer in One Word / Sentence (Q12 to Q15)
   h += `<div class="section-head"><span>IV. Answer the following questions in a word or a sentence each:</span><span>4 × 1 = 4</span></div>`;
   for(let i = 11; i < 15; i++) {
     h += renderSingleQuestion(ACTIVE_PAPER[i], i + 1, "one_sentence");
   }
 
-  // V. Answer in Two or Three Sentences (Q16 to Q20)
   h += `<div class="section-head"><span>V. Answer the following questions in two or three sentences each:</span><span>5 × 2 = 10</span></div>`;
   for(let i = 15; i < 20; i++) {
     h += renderSingleQuestion(ACTIVE_PAPER[i], i + 1, "short_answer");
   }
 
-  // VI. Extracts / Context (Q21 to Q22)
   h += `<div class="section-head"><span>VI. Read the following extracts and answer the questions that follow:</span><span>2 × 2 = 4</span></div>`;
   for(let i = 20; i < 22; i++) {
     h += renderSingleQuestion(ACTIVE_PAPER[i], i + 1, "extract");
   }
 
-  // VII. Answer in Three or Four Sentences / Long Answer (Q23 to Q24)
   h += `<div class="section-head"><span>VII. Answer the following questions in three or four sentences each:</span><span>2 × 4 = 8</span></div>`;
   for(let i = 22; i < 24; i++) {
     h += renderSingleQuestion(ACTIVE_PAPER[i], i + 1, "long_answer");
@@ -1050,7 +1261,7 @@ function renderQuestionPaperUI() {
   container.innerHTML = h;
 }
 
-// ========== Strict Dropdown Matching Function ==========
+// ========== STRICT DROPDOWN FILTERING (SAME UNIT, SAME SECTION, SAME MARKS, EXACTLY 5-6 OPTIONS) ==========
 function renderSingleQuestion(q, num, requiredType) {
   let optHtml = '';
   if (q.opts && q.opts.length > 0) {
@@ -1060,17 +1271,27 @@ function renderSingleQuestion(q, num, requiredType) {
     </div>`;
   }
 
-  // Strictly filter by unit and question category
+  // 1. Strictly filter by exact Unit, exact Section type, and exact Marks
   let dbMatches = LBA_DATABASE.filter(item => {
-    if (item.unit !== q.unit) return false;
-    return item.section === requiredType;
+    return item.unit === q.unit && item.section === requiredType && item.marks === q.marks;
   });
 
-  if (dbMatches.length === 0) {
-    dbMatches = LBA_DATABASE.filter(item => item.unit === q.unit && item.marks === q.marks);
+  // 2. Keep the current active question at top if matched
+  let filteredList = [];
+  let currentFound = dbMatches.find(item => item.id === q.id);
+  if (currentFound) {
+    filteredList.push(currentFound);
   }
+  dbMatches.forEach(item => {
+    if (!filteredList.some(f => f.id === item.id)) {
+      filteredList.push(item);
+    }
+  });
 
-  let optionsHtml = dbMatches.map(item => `
+  // 3. Limit strictly to 5 - 6 choices per dropdown
+  filteredList = filteredList.slice(0, 6);
+
+  let optionsHtml = filteredList.map(item => `
     <option value="${item.id}" ${item.id === q.id ? 'selected' : ''}>
       ${item.q.replace(/\n/g, ' ').substring(0, 85)}...
     </option>
@@ -1375,6 +1596,38 @@ function downloadWordDoc() {
     `;
   }
 
+  const oralQuestionsOnly = [
+    "Where did Rajiv and his father go on an excursion?",
+    "How do modern lighthouses work?",
+    "What did people use in lighthouses before electricity?",
+    "How many colours are there in a rainbow?",
+    "According to the poet, what sails in the rivers?",
+    "What is prettier than boats and ships?",
+    "Who was the special visitor at Akbar's court?",
+    "What was the Pandit's real mother tongue?",
+    "What did Birbal use to tickle the Pandit's ear?",
+    "Who wrote the poem 'Sympathy'?",
+    "What did the proud man give to the poet?",
+    "What is greater than gold according to the poet?",
+    "What do bees collect from flowers to make honey?",
+    "What is the shape of a honeycomb cell?",
+    "What is the main duty of field bees?",
+    "Why does the gentle robin come to our home?",
+    "Why is the hare called a timid animal?",
+    "Who is known as the king of the forest?",
+    "Which animal did the Lion make his Home Minister?",
+    "Who created all things bright, beautiful, great and small?"
+  ];
+
+  let oralWordHtml = '';
+  oralQuestionsOnly.forEach((item, idx) => {
+    oralWordHtml += `
+      <p style="font-size: 11.5pt; line-height: 1.6; margin: 6px 0;">
+        <strong>${idx + 1}.</strong> ${item}
+      </p>
+    `;
+  });
+
   let analysisRows = '';
   let totM_num = 0, totT_num = 0;
   ACTIVE_PAPER.forEach((q, i) => {
@@ -1423,7 +1676,6 @@ function downloadWordDoc() {
       </style>
     </head>
     <body>
-      <!-- Page 1: Design Stages -->
       <div class="Section1">
         ${headerHtml("QUESTION PAPER DESIGN STAGES")}
         ${metaHtml("6th Standard", "English (Second Language)", `Total Marks: ${totM}`, `Total Questions: ${totQ}`)}
@@ -1467,7 +1719,6 @@ function downloadWordDoc() {
 
       <br clear="all" style="page-break-before: always; mso-break-type: section-break;" />
 
-      <!-- Page 2: Blueprint (Landscape) -->
       <div class="Section2">
         ${headerHtml("BLUE PRINT - A4 LANDSCAPE")}
         ${metaHtml("6th Standard", "English (Second Language)", `Total Marks: ${totM}`, `Total Questions: ${totQ}`)}
@@ -1498,7 +1749,6 @@ function downloadWordDoc() {
 
       <br clear="all" style="page-break-before: always; mso-break-type: section-break;" />
 
-      <!-- Page 3: Question Analysis -->
       <div class="Section1">
         ${headerHtml("QUESTION-WISE ANALYSIS SHEET")}
         ${metaHtml("6th Standard", "English (Second Language)", `Total Questions: ${totQ}`, `Total Marks: ${totM}`)}
@@ -1521,7 +1771,6 @@ function downloadWordDoc() {
 
       <br clear="all" style="page-break-before: always; mso-break-type: section-break;" />
 
-      <!-- Page 4: Question Paper -->
       <div class="Section1">
         ${headerHtml("QUESTION PAPER", exam)}
         ${metaHtml("6th Standard", "Time: " + time, "", `Max Marks: ${totM}`)}
@@ -1530,7 +1779,6 @@ function downloadWordDoc() {
 
       <br clear="all" style="page-break-before: always; mso-break-type: section-break;" />
 
-      <!-- Page 5: Answer Key 1 -->
       <div class="Section1">
         ${headerHtml("MODEL ANSWER KEY (PART - 1)")}
         ${metaHtml("6th Standard", "English", "Answers for Questions 1 to 15", "")}
@@ -1548,7 +1796,6 @@ function downloadWordDoc() {
 
       <br clear="all" style="page-break-before: always; mso-break-type: section-break;" />
 
-      <!-- Page 6: Answer Key 2 -->
       <div class="Section1">
         ${headerHtml("MODEL ANSWER KEY (PART - 2)")}
         ${metaHtml("6th Standard", "English", "Answers for Questions 16 to 24", "")}
@@ -1562,6 +1809,16 @@ function downloadWordDoc() {
           </thead>
           <tbody>${keyP2Rows}</tbody>
         </table>
+      </div>
+
+      <br clear="all" style="page-break-before: always; mso-break-type: section-break;" />
+
+      <div class="Section1">
+        ${headerHtml("ORAL ASSESSMENT QUESTIONS (SEMESTER - 1)")}
+        ${metaHtml("6th Standard", "English", "Evaluation: Oral Assessment", "20 Questions")}
+        <div>
+          ${oralWordHtml}
+        </div>
       </div>
     </body>
     </html>
