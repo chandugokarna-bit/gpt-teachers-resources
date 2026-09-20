@@ -143,11 +143,55 @@
     font-weight: 600;
     font-size: 13px;
     color: #475569;
+    white-space: nowrap;
   }
   .tab-btn.active {
     background: #ffffff;
     color: var(--primary);
     border-top: 3px solid var(--primary);
+  }
+
+  /* Page-Fit Floating Controls */
+  .page-fit-bar {
+    position: absolute;
+    top: 6px;
+    right: 10px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 3px 6px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+    z-index: 100;
+  }
+  .page-fit-label {
+    font-size: 10.5px;
+    font-weight: bold;
+    color: #475569;
+    margin-right: 4px;
+  }
+  .fit-btn {
+    width: 26px;
+    height: 24px;
+    font-size: 13px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border: 1px solid #94a3b8;
+    background: #ffffff;
+    border-radius: 4px;
+    color: #1e293b;
+    transition: all 0.15s;
+    user-select: none;
+  }
+  .fit-btn:hover {
+    background: #2563eb;
+    color: #ffffff;
+    border-color: #2563eb;
   }
 
   .sheet {
@@ -159,6 +203,7 @@
     box-shadow: 0 4px 6px rgba(0,0,0,0.05);
     box-sizing: border-box;
     position: relative;
+    transform-origin: top center;
   }
 
   .sheet-landscape {
@@ -266,6 +311,26 @@
     font-size: 11.5px;
   }
 
+  /* Oral Plain Questions Styling */
+  .oral-list-container {
+    margin-top: 10px;
+  }
+  .oral-q-item {
+    font-size: 13.5px;
+    line-height: 1.55;
+    padding: 5px 0;
+    border-bottom: 1px dashed #e2e8f0;
+    display: flex;
+    gap: 8px;
+  }
+  .oral-q-item:last-child {
+    border-bottom: none;
+  }
+  .oral-q-num {
+    font-weight: bold;
+    min-width: 26px;
+  }
+
   .q-tools-bar {
     display: flex;
     flex-direction: column;
@@ -306,8 +371,9 @@
 
   @media print {
     html, body { background: #ffffff !important; padding: 0 !important; margin: 0 !important; color: #000000 !important; }
-    .no-print, .q-tools-bar, .studio-panel, .nav-tabs, .custom-editor-box { display: none !important; }
+    .no-print, .q-tools-bar, .studio-panel, .nav-tabs, .custom-editor-box, .page-fit-bar { display: none !important; }
     .q-row { background: transparent !important; border: none !important; padding: 0 !important; margin-bottom: 5px !important; }
+    .oral-q-item { border-bottom: none !important; padding: 4px 0 !important; }
     .sheet { width: 100% !important; height: auto !important; min-height: auto !important; margin: 0 !important; padding: 6mm 10mm !important; box-shadow: none !important; page-break-after: always !important; break-after: page !important; }
     .sheet-landscape { page: blueprint_page !important; padding: 5mm 10mm !important; }
     .sheet:last-child { page-break-after: avoid !important; break-after: avoid !important; }
@@ -343,7 +409,7 @@
       </div>
       <div class="field">
         <label>ಪರೀಕ್ಷೆಯ ಹೆಸರು:</label>
-        <input type="text" id="cfg_exam" value="1ನೇ ಸಂಕಲನಾತ್ಮಕ ಮೌಲ್ಯಮಾಪನ 2025-26">
+        <input type="text" id="cfg_exam" value="1ನೇ ಸಂಕಲನಾತ್ಮಕ ಮೌಲ್ಯಮಾಪನ 2026-27">
       </div>
       <div class="field">
         <label>ಪರೀಕ್ಷಾ ಸಮಯ:</label>
@@ -409,10 +475,17 @@
   <button class="tab-btn" onclick="showTab('tab_qp', this)">4. ಪ್ರಶ್ನೆ ಪತ್ರಿಕೆ</button>
   <button class="tab-btn" onclick="showTab('tab_key1', this)">5. ಉತ್ತರ ಪತ್ರಿಕೆ (ಭಾಗ-1)</button>
   <button class="tab-btn" onclick="showTab('tab_key2', this)">6. ಉತ್ತರ ಪತ್ರಿಕೆ (ಭಾಗ-2)</button>
+  <button class="tab-btn" onclick="showTab('tab_oral', this)">7. ಮೌಖಿಕ ಪ್ರಶ್ನೆಗಳು (20)</button>
 </div>
 
 <!-- ಪುಟ 1: ರಚನಾ ಹಂತಗಳು -->
 <div class="sheet tab-page" id="tab_stages">
+  <div class="page-fit-bar no-print">
+    <span class="page-fit-label">Page Fit:</span>
+    <button class="fit-btn" onclick="adjustPageFit('tab_stages', 1)" title="Expand / Fill Page">+</button>
+    <button class="fit-btn" onclick="adjustPageFit('tab_stages', -1)" title="Shrink / Fit Content">-</button>
+    <button class="fit-btn" onclick="resetPageFit('tab_stages')" title="Reset Spacing">↺</button>
+  </div>
   <div class="doc-header">
     <h2><span class="dyn_school"></span>, ತಾ: <span class="dyn_taluk"></span>, ಜಿ: <span class="dyn_dist"></span></h2>
     <p>ವಿಷಯ ಶಿಕ್ಷಕರು: <span class="dyn_teacher"></span></p>
@@ -470,6 +543,12 @@
 
 <!-- ಪುಟ 2: ನೀಲಿನಕ್ಷೆ -->
 <div class="sheet sheet-landscape tab-page" id="tab_blueprint">
+  <div class="page-fit-bar no-print">
+    <span class="page-fit-label">Page Fit:</span>
+    <button class="fit-btn" onclick="adjustPageFit('tab_blueprint', 1)" title="Expand / Fill Page">+</button>
+    <button class="fit-btn" onclick="adjustPageFit('tab_blueprint', -1)" title="Shrink / Fit Content">-</button>
+    <button class="fit-btn" onclick="resetPageFit('tab_blueprint')" title="Reset Spacing">↺</button>
+  </div>
   <div class="doc-header">
     <h2><span class="dyn_school"></span>, ತಾ: <span class="dyn_taluk"></span>, ಜಿ: <span class="dyn_dist"></span></h2>
     <p>ವಿಷಯ ಶಿಕ್ಷಕರು: <span class="dyn_teacher"></span></p>
@@ -488,7 +567,7 @@
         <th rowspan="2" style="width: 3%;">ಕ್ರ. ಸಂ.</th>
         <th rowspan="2" style="width: 25%;">ಘಟಕಗಳ ಹೆಸರು</th>
         <th colspan="3" style="width: 17%;">ಜ್ಞಾನ (Knowledge)</th>
-        <th colspan="3" style="width: 17%;">ತಿಳುವಳಿಕೆ (Understanding)</th>
+        <th colspan="3" style="width: 17%;">ತಿಳಿವಳಿಕೆ (Understanding)</th>
         <th colspan="3" style="width: 17%;">ಅಭಿವ್ಯಕ್ತಿ / ಅನ್ವಯ (Application)</th>
         <th colspan="3" style="width: 13%;">ಪ್ರಶಂಸೆ / ಕೌಶಲ (Skill)</th>
         <th colspan="2" style="width: 8%;">ಒಟ್ಟು</th>
@@ -509,6 +588,12 @@
 
 <!-- ಪುಟ 3: ಪ್ರಶ್ನಾವಾರು ವಿಶ್ಲೇಷಣೆ -->
 <div class="sheet tab-page" id="tab_analysis">
+  <div class="page-fit-bar no-print">
+    <span class="page-fit-label">Page Fit:</span>
+    <button class="fit-btn" onclick="adjustPageFit('tab_analysis', 1)" title="Expand / Fill Page">+</button>
+    <button class="fit-btn" onclick="adjustPageFit('tab_analysis', -1)" title="Shrink / Fit Content">-</button>
+    <button class="fit-btn" onclick="resetPageFit('tab_analysis')" title="Reset Spacing">↺</button>
+  </div>
   <div class="doc-header">
     <h2><span class="dyn_school"></span>, ತಾ: <span class="dyn_taluk"></span>, ಜಿ: <span class="dyn_dist"></span></h2>
     <p>ವಿಷಯ ಶಿಕ್ಷಕರು: <span class="dyn_teacher"></span></p>
@@ -540,6 +625,12 @@
 
 <!-- ಪುಟ 4: ಪ್ರಶ್ನೆ ಪತ್ರಿಕೆ -->
 <div class="sheet tab-page" id="tab_qp">
+  <div class="page-fit-bar no-print">
+    <span class="page-fit-label">Page Fit:</span>
+    <button class="fit-btn" onclick="adjustPageFit('tab_qp', 1)" title="Expand / Fill Page">+</button>
+    <button class="fit-btn" onclick="adjustPageFit('tab_qp', -1)" title="Shrink / Fit Content">-</button>
+    <button class="fit-btn" onclick="resetPageFit('tab_qp')" title="Reset Spacing">↺</button>
+  </div>
   <div class="doc-header">
     <h2><span class="dyn_school"></span>, ತಾ: <span class="dyn_taluk"></span>, ಜಿ: <span class="dyn_dist"></span></h2>
     <p><strong class="dyn_exam">1ನೇ ಸಂಕಲನಾತ್ಮಕ ಮೌಲ್ಯಮಾಪನ 2025-26</strong> | ವಿಷಯ: <strong>ಸಮಾಜ ವಿಜ್ಞಾನ</strong></p>
@@ -555,6 +646,12 @@
 
 <!-- ಪುಟ 5: ಉತ್ತರ ಪತ್ರಿಕೆ 1 -->
 <div class="sheet tab-page" id="tab_key1">
+  <div class="page-fit-bar no-print">
+    <span class="page-fit-label">Page Fit:</span>
+    <button class="fit-btn" onclick="adjustPageFit('tab_key1', 1)" title="Expand / Fill Page">+</button>
+    <button class="fit-btn" onclick="adjustPageFit('tab_key1', -1)" title="Shrink / Fit Content">-</button>
+    <button class="fit-btn" onclick="resetPageFit('tab_key1')" title="Reset Spacing">↺</button>
+  </div>
   <div class="doc-header">
     <h2><span class="dyn_school"></span>, ತಾ: <span class="dyn_taluk"></span>, ಜಿ: <span class="dyn_dist"></span></h2>
     <p>ವಿಷಯ ಶಿಕ್ಷಕರು: <span class="dyn_teacher"></span></p>
@@ -580,6 +677,12 @@
 
 <!-- ಪುಟ 6: ಉತ್ತರ ಪತ್ರಿಕೆ 2 -->
 <div class="sheet tab-page" id="tab_key2">
+  <div class="page-fit-bar no-print">
+    <span class="page-fit-label">Page Fit:</span>
+    <button class="fit-btn" onclick="adjustPageFit('tab_key2', 1)" title="Expand / Fill Page">+</button>
+    <button class="fit-btn" onclick="adjustPageFit('tab_key2', -1)" title="Shrink / Fit Content">-</button>
+    <button class="fit-btn" onclick="resetPageFit('tab_key2')" title="Reset Spacing">↺</button>
+  </div>
   <div class="doc-header">
     <h2><span class="dyn_school"></span>, ತಾ: <span class="dyn_taluk"></span>, ಜಿ: <span class="dyn_dist"></span></h2>
     <p>ವಿಷಯ ಶಿಕ್ಷಕರು: <span class="dyn_teacher"></span></p>
@@ -603,6 +706,50 @@
   </table>
 </div>
 
+<!-- ಪುಟ 7: ಮೌಖಿಕ ಪ್ರಶ್ನೆಗಳು (Semester 1 Only - Clean Layout, No Boxes/Units/Answers) -->
+<div class="sheet tab-page" id="tab_oral">
+  <div class="page-fit-bar no-print">
+    <span class="page-fit-label">Page Fit:</span>
+    <button class="fit-btn" onclick="adjustPageFit('tab_oral', 1)" title="Expand / Fill Page">+</button>
+    <button class="fit-btn" onclick="adjustPageFit('tab_oral', -1)" title="Shrink / Fit Content">-</button>
+    <button class="fit-btn" onclick="resetPageFit('tab_oral')" title="Reset Spacing">↺</button>
+  </div>
+  <div class="doc-header">
+    <h2><span class="dyn_school"></span>, ತಾ: <span class="dyn_taluk"></span>, ಜಿ: <span class="dyn_dist"></span></h2>
+    <p>ವಿಷಯ ಶಿಕ್ಷಕರು: <span class="dyn_teacher"></span></p>
+    <h3 style="text-decoration: underline;">ಮೌಖಿಕ ಮೌಲ್ಯಾಂಕನ ಪ್ರಶ್ನೆಕೋಠಿ (Oral Assessment - Semester 1)</h3>
+  </div>
+  <div class="meta-bar">
+    <span>ತರಗತಿ: 7ನೇ ತರಗತಿ</span>
+    <span>ವಿಷಯ: ಸಮಾಜ ವಿಜ್ಞಾನ</span>
+    <span>ಒಟ್ಟು ಪ್ರಶ್ನೆಗಳು: 20</span>
+    <span>ಮೌಲ್ಯಾಂಕನ: ಮೌಖಿಕ (ಆಲಿಸುವಿಕೆ ಮತ್ತು ಸಂವಹನ)</span>
+  </div>
+
+  <div class="oral-list-container" id="oral_list_body">
+    <div class="oral-q-item"><span class="oral-q-num">1.</span><span>ಕ್ರೈಸ್ತ ಧರ್ಮದ ಪವಿತ್ರ ಗ್ರಂಥ ಯಾವುದು?</span></div>
+    <div class="oral-q-item"><span class="oral-q-num">2.</span><span>ಇಸ್ಲಾಂ ಧರ್ಮದ ಸ್ಥಾಪಕರು ಯಾರು?</span></div>
+    <div class="oral-q-item"><span class="oral-q-num">3.</span><span>ಪುನರುಜ್ಜಿವನ ಎಂದರೆ ಏನು?</span></div>
+    <div class="oral-q-item"><span class="oral-q-num">4.</span><span>ಭಾರತಕ್ಕೆ ಹೊಸ ಜಲಮಾರ್ಗವನ್ನು ಕಂಡುಹಿಡಿದ ನಾವಿಕ ಯಾರು?</span></div>
+    <div class="oral-q-item"><span class="oral-q-num">5.</span><span>ಪ್ಲಾಸಿ ಕದನವು ಯಾವ ವರ್ಷದಲ್ಲಿ ನಡೆಯಿತು?</span></div>
+    <div class="oral-q-item"><span class="oral-q-num">6.</span><span>ಸಹಾಯಕ ಸೈನ್ಯ ಪದ್ಧತಿಯನ್ನು ಜಾರಿಗೆ ತಂದ ಬ್ರಿಟಿಷ್ ಗವರ್ನರ್ ಜನರಲ್ ಯಾರು?</span></div>
+    <div class="oral-q-item"><span class="oral-q-num">7.</span><span>ದತ್ತು ಮಕ್ಕಳಿಗೆ ಹಕ್ಕಿಲ್ಲ ಎಂಬ ನೀತಿಯನ್ನು ಜಾರಿಗೆ ತಂದವರು ಯಾರು?</span></div>
+    <div class="oral-q-item"><span class="oral-q-num">8.</span><span>ಖಾಯಂ ಜಮೀನ್ದಾರಿ ಪದ್ಧತಿಯನ್ನು ಜಾರಿಗೆ ತಂದವರು ಯಾರು?</span></div>
+    <div class="oral-q-item"><span class="oral-q-num">9.</span><span>ಮೈಸೂರಿನ ಹುಲಿ ಎಂದು ಯಾರನ್ನು ಕರೆಯುತ್ತಾರೆ?</span></div>
+    <div class="oral-q-item"><span class="oral-q-num">10.</span><span>ಆಧುನಿಕ ಬೆಂಗಳೂರಿನ ನಿರ್ಮಾಪಕರು ಯಾರು?</span></div>
+    <div class="oral-q-item"><span class="oral-q-num">11.</span><span>ಬ್ರಿಟಿಷರ ವಿರುದ್ಧ ಹೋರಾಡಿದ ಕಿತ್ತೂರಿನ ವೀರರಾಣಿ ಯಾರು?</span></div>
+    <div class="oral-q-item"><span class="oral-q-num">12.</span><span>ಕರ್ನಾಟಕದ ಸಂಗೀತ ಪಿತಾಮಹ ಎಂದು ಯಾರನ್ನು ಕರೆಯುತ್ತಾರೆ?</span></div>
+    <div class="oral-q-item"><span class="oral-q-num">13.</span><span>ಸರ್ಕಾರದ ಮೂರು ಪ್ರಮುಖ ಅಂಗಗಳು ಯಾವುವು?</span></div>
+    <div class="oral-q-item"><span class="oral-q-num">14.</span><span>ಭಾರತದ ಸಂಸತ್ತಿನ ಎರಡು ಸದನಗಳು ಯಾವುವು?</span></div>
+    <div class="oral-q-item"><span class="oral-q-num">15.</span><span>ಲೋಕಸಭೆಯ ಸದಸ್ಯನಾಗಲು ಕನಿಷ್ಠ ವಯಸ್ಸು ಎಷ್ಟು ವರ್ಷ?</span></div>
+    <div class="oral-q-item"><span class="oral-q-num">16.</span><span>ಕರ್ನಾಟಕ ರಾಜ್ಯದ ವಿಧಾನ ಸೌಧ ಎಲ್ಲಿದೆ?</span></div>
+    <div class="oral-q-item"><span class="oral-q-num">17.</span><span>ಭಾರತದಲ್ಲಿ ಅತಿ ಎತ್ತರವಾದ ಪರ್ವತ ಶಿಖರ ಯಾವುದು?</span></div>
+    <div class="oral-q-item"><span class="oral-q-num">18.</span><span>ಪ್ರಪಂಚದ ಗೋಧಿಯ ಕಣಜ ಎಂದು ಯಾವ ಮೈದಾನವನ್ನು ಕರೆಯುತ್ತಾರೆ?</span></div>
+    <div class="oral-q-item"><span class="oral-q-num">19.</span><span>ಪ್ರಪಂಚದಲ್ಲೇ ಅತ್ಯಂತ ಉದ್ದವಾದ ಪರ್ವತ ಸರಣಿ ಯಾವುದು?</span></div>
+    <div class="oral-q-item"><span class="oral-q-num">20.</span><span>ಪ್ರಪಂಚದ ಅತಿ ದೊಡ್ಡ ನದಿ ಯಾವುದು?</span></div>
+  </div>
+</div>
+
 <script>
 // 7ನೇ ತರಗತಿಯ ಅಧಿಕೃತ 14 ಘಟಕಗಳು (LBA ಭಾಗ-1 ಪ್ರಕಾರ)
 const MASTER_UNITS = [
@@ -624,8 +771,63 @@ const MASTER_UNITS = [
 
 const WEIGHTS = [1, 2, 4, 1, 2, 4, 1, 2, 4, 1, 2, 4];
 
+// Page-Fit Zoom and Spacing Controller
+const PAGE_FIT_STATE = {};
+
+function adjustPageFit(pageId, step) {
+  if (!PAGE_FIT_STATE[pageId]) {
+    PAGE_FIT_STATE[pageId] = { font: 100, space: 100 };
+  }
+  PAGE_FIT_STATE[pageId].font += (step * 3);
+  PAGE_FIT_STATE[pageId].space += (step * 6);
+
+  if (PAGE_FIT_STATE[pageId].font < 70) PAGE_FIT_STATE[pageId].font = 70;
+  if (PAGE_FIT_STATE[pageId].font > 150) PAGE_FIT_STATE[pageId].font = 150;
+
+  applyPageFit(pageId);
+}
+
+function resetPageFit(pageId) {
+  PAGE_FIT_STATE[pageId] = { font: 100, space: 100 };
+  applyPageFit(pageId);
+}
+
+function applyPageFit(pageId) {
+  const page = document.getElementById(pageId);
+  if (!page) return;
+  const state = PAGE_FIT_STATE[pageId] || { font: 100, space: 100 };
+  const fontRatio = state.font / 100;
+  const spaceRatio = state.space / 100;
+
+  const tables = page.querySelectorAll('table');
+  tables.forEach(t => {
+    t.style.fontSize = (11 * fontRatio) + 'px';
+  });
+  const cells = page.querySelectorAll('th, td');
+  cells.forEach(c => {
+    c.style.padding = (3.5 * spaceRatio) + 'px ' + (2 * spaceRatio) + 'px';
+  });
+  const qRows = page.querySelectorAll('.q-row');
+  qRows.forEach(r => {
+    r.style.marginBottom = (8 * spaceRatio) + 'px';
+    r.style.padding = (6 * spaceRatio) + 'px';
+    r.style.fontSize = (12.5 * fontRatio) + 'px';
+  });
+  const secHeads = page.querySelectorAll('.section-head');
+  secHeads.forEach(s => {
+    s.style.marginTop = (10 * spaceRatio) + 'px';
+    s.style.marginBottom = (6 * spaceRatio) + 'px';
+    s.style.padding = (3 * spaceRatio) + 'px ' + (6 * spaceRatio) + 'px';
+    s.style.fontSize = (12.5 * fontRatio) + 'px';
+  });
+  const oralItems = page.querySelectorAll('.oral-q-item');
+  oralItems.forEach(item => {
+    item.style.padding = (5 * spaceRatio) + 'px 0';
+    item.style.fontSize = (13.5 * fontRatio) + 'px';
+  });
+}
+
 // 7ನೇ ತರಗತಿಯ ನಿಖರ 24 ಪ್ರಶ್ನೆ ಮತ್ತು 40 ಅಂಕಗಳ ಡಿಫಾಲ್ಟ್ ಬ್ಲೂಪ್ರಿಂಟ್ ಮ್ಯಾಟ್ರಿಕ್ಸ್
-// Columns: K(1,2,4), U(1,2,4), A(1,2,4), S(1,2,4)
 const DEFAULT_BLUEPRINT_MATRIX = [
   [1, 0, 0,  0, 0, 0,  0, 0, 0,  0, 0, 0], // U1: Q1 (1m Blank)
   [0, 0, 0,  1, 1, 0,  0, 0, 0,  0, 0, 0], // U2: Q5 (1m MCQ), Q13 (2m Short)
@@ -655,7 +857,7 @@ const LBA_DATABASE = [
   { id: "7U1_F05", unit: "ಜಗತ್ತಿನ ಪ್ರಮುಖ ಘಟನೆಗಳು", section: "blank", marks: 1, obj: "ಜ್ಞಾನ", spec: "ಸ್ಮರಿಸುತ್ತಾನೆ", diff: "ಸುಲಭ", time: 2, q: "ಪ್ರವಾದಿಯವರು ಮೆಕ್ಕಾದಿಂದ ಮದೀನಕ್ಕೆ ಹೋದ ವರ್ಷದಿಂದ ____________ ಶಕೆ ಆರಂಭವಾಯಿತು.", a: "ಹಿಜರಿ ಶಕೆ" },
   { id: "7U1_F06", unit: "ಜಗತ್ತಿನ ಪ್ರಮುಖ ಘಟನೆಗಳು", section: "blank", marks: 1, obj: "ಜ್ಞಾನ", spec: "ಸ್ಮರಿಸುತ್ತಾನೆ", diff: "ಸುಲಭ", time: 2, q: "ಮಹಮ್ಮದ್ ಪೈಗಂಬರರು ಜನಿಸಿದ ಸ್ಥಳ ____________.", a: "ಮೆಕ್ಕಾ" },
   { id: "7U1_M01", unit: "ಜಗತ್ತಿನ ಪ್ರಮುಖ ಘಟನೆಗಳು", section: "mcq", marks: 1, obj: "ತಿಳುವಳಿಕೆ", spec: "ಆಯ್ಕೆ ಮಾಡುತ್ತಾನೆ", diff: "ಸಾಧಾರಣ", time: 2, q: "ಕ್ರೈಸ್ತ ಧರ್ಮದ ಪರಮ ಗುರುಗಳನ್ನು ಹೀಗೆಂದು ಕರೆಯುತ್ತಾರೆ:", opts: ["ಖಲೀಫರು", "ಪೋಪರು", "ಮಹಮ್ಮದರು", "ಪಾದ್ರಿಗಳು"], a: "B. ಪೋಪರು" },
-  { id: "7U1_M02", unit: "ಜಗತ್ತಿನ ಪ್ರಮುಖ ಘಟನೆಗಳು", section: "mcq", marks: 1, obj: "ತಿಳುವಳಿಕೆ", spec: "ಆಯ್ಕೆ ಮಾಡುತ್ತಾನೆ", diff: "ಸುಲಭ", time: 2, q: "ಮಹಮ್ಮದ್ ಪೈಗಂಬರರ ಸಂದೇಶಗಳನ್ನು ಒಳಗೊಂಡ ಪವಿತ್ರ ಗ್ರಂಥ:", opts: ["ಗುರು ಗ್ರಂಥ ಸಾಹೇಬ್", "ಕುರಾನ್", "ಬೈಬಲ್", "ಭಗವದ್ಗೀತೆ"], a: "B. ಕುರಾನ್" },
+  { id: "7U1_M02", unit: "ಜಗತ್ತಿನ ಪ್ರಮುಖ ಘಟನೆಗಳು", section: "mcq", marks: 1, obj: "ತಿಳುವಳಿಕೆ", spec: "ಆಯ್ಕೆ ಮಾಡುತ್ತಾನೆ", diff: "ಸುಲಭ", time: 2, q: "ಮಹಮ್ಮದ್ ಪೈಗಂಬರರ ಸಂದೇಶಗಳನ್ನು ಒಳಗೊಂಡ ಪವಿತ್ರ ಗ್ರಂಥ:", opts: ["ಗುರು ಗ್ರಂಥ ಸಾಹೇಬ್", "ಕುರಾನ್", "ಬೈಬಲ್", "ಭಗವದ್ಗೀತಾ"], a: "B. ಕುರಾನ್" },
   { id: "7U1_M03", unit: "ಜಗತ್ತಿನ ಪ್ರಮುಖ ಘಟನೆಗಳು", section: "mcq", marks: 1, obj: "ತಿಳುವಳಿಕೆ", spec: "ಆಯ್ಕೆ ಮಾಡುತ್ತಾನೆ", diff: "ಸಾಧಾರಣ", time: 2, q: "ಈ ನಗರವು ಪ್ಯಾಲೆಸ್ತೇನಿನ ರಾಜಧಾನಿಯಾಗಿದೆ:", opts: ["ಕಾಬುಲ್", "ಜೆರೂಸಲೆಂ", "ಬಾಗ್ದಾದ್", "ವ್ಯಾಟಿಕನ್ ಸಿಟಿ"], a: "B. ಜೆರೂಸಲೆಂ" },
   { id: "7U1_S01", unit: "ಜಗತ್ತಿನ ಪ್ರಮುಖ ಘಟನೆಗಳು", section: "direct", marks: 1, obj: "ಜ್ಞಾನ", spec: "ಸ್ಮರಿಸುತ್ತಾನೆ", diff: "ಸುಲಭ", time: 2, q: "ಯೇಸುವಿನ ಕಾಲಾನಂತರ ಕ್ರೈಸ್ತ ಧರ್ಮಕ್ಕೆ ಮಾನ್ಯತೆ ನೀಡಿದ ಮೊದಲ ಸಾಮ್ರಾಜ್ಯ ಯಾವುದು?", a: "ರೋಮನ್ ಸಾಮ್ರಾಜ್ಯ" },
   { id: "7U1_S02", unit: "ಜಗತ್ತಿನ ಪ್ರಮುಖ ಘಟನೆಗಳು", section: "direct", marks: 1, obj: "ಜ್ಞಾನ", spec: "ಸ್ಮರಿಸುತ್ತಾನೆ", diff: "ಸುಲಭ", time: 2, q: "ಮಹಮ್ಮದ್ ಪೈಗಂಬರರ ತಂದೆಯ ಹೆಸರೇನು?", a: "ಅಬ್ದುಲ್ಲಾ" },
@@ -776,17 +978,11 @@ const LBA_DATABASE = [
   { id: "7U14_K01", unit: "ದಕ್ಷಿಣ ಅಮೇರಿಕಾ ಖಂಡ", section: "short", marks: 2, obj: "ಜ್ಞಾನ", spec: "ಹೆಸರಿಸುತ್ತಾನೆ", diff: "ಸುಲಭ", time: 5, q: "ದಕ್ಷಿಣ ಅಮೆರಿಕಾದ ಪ್ರಮುಖ ಹುಲ್ಲುಗಾವಲುಗಳನ್ನು ಹೆಸರಿಸಿ.", a: "ಲಾನೋಸ್ (ವೆನೆಜುವೆಲಾ), ಕಾಂಪಾಸ್ (ಬ್ರೆಜಿಲ್) ಮತ್ತು ಪಂಪಾಸ್ (ಅರ್ಜೆಂಟೀನಾ)." }
 ];
 
-// ಆರಂಭಿಕ 24 ಸಕ್ರಿಯ ಪ್ರಶ್ನೆಗಳ ಐಡಿಗಳು
 const INITIAL_ACTIVE_IDS = [
-  // I. ಬಿಟ್ಟ ಸ್ಥಳ (4 ಪ್ರಶ್ನೆಗಳು)
   "7U1_F01", "7U5_F01", "7U8_F01", "7U13_F01",
-  // II. ಆರಿಸಿ ಬರೆಯಿರಿ (MCQ) (4 ಪ್ರಶ್ನೆಗಳು)
   "7U2_M01", "7U4_M01", "7U13_M01", "7U14_M01",
-  // III. ಒಂದು ವಾಕ್ಯದಲ್ಲಿ ಉತ್ತರಿಸಿ (4 ಪ್ರಶ್ನೆಗಳು)
   "7U9_S01", "7U10_S01", "7U11_S01", "7U14_S01",
-  // IV. ಎರಡು ಮೂರು ವಾಕ್ಯದಲ್ಲಿ ಉತ್ತರಿಸಿ (10 ಪ್ರಶ್ನೆಗಳು)
   "7U2_K01", "7U3_K01", "7U4_K01", "7U5_K01", "7U6_K01", "7U7_K01", "7U8_K01", "7U9_K01", "7U10_K01", "7U11_K01",
-  // V. ವಿವರವಾಗಿ ಉತ್ತರಿಸಿ / ನಕ್ಷೆ (2 ಪ್ರಶ್ನೆಗಳು)
   "7U7_LA01", "7U12_M01"
 ];
 
@@ -954,7 +1150,7 @@ function renderObjectiveTable(colTotalsQ, colTotalsM, grandTotQ, grandTotM, base
 
   let html = `
     <tr><td class="text-left">ಜ್ಞಾನ (Knowledge)</td><td>${q_k}</td><td>${m_k}</td><td>${((m_k*100)/baseM).toFixed(1)}%</td></tr>
-    <tr><td class="text-left">ತಿಳುವಳಿಕೆ (Understanding)</td><td>${q_u}</td><td>${m_u}</td><td>${((m_u*100)/baseM).toFixed(1)}%</td></tr>
+    <tr><td class="text-left">ತಿಳಿವಳಿಕೆ (Understanding)</td><td>${q_u}</td><td>${m_u}</td><td>${((m_u*100)/baseM).toFixed(1)}%</td></tr>
     <tr><td class="text-left">ಅಭಿವ್ಯಕ್ತಿ / ಅನ್ವಯ (Application)</td><td>${q_a}</td><td>${m_a}</td><td>${((m_a*100)/baseM).toFixed(1)}%</td></tr>
     <tr><td class="text-left">ಪ್ರಶಂಸೆ / ಕೌಶಲ (Skill)</td><td>${q_s}</td><td>${m_s}</td><td>${((m_s*100)/baseM).toFixed(1)}%</td></tr>
     <tr class="font-bold" style="background:#f1f5f9;"><td>ಒಟ್ಟು</td><td>${grandTotQ}</td><td>${grandTotM}</td><td>100%</td></tr>
@@ -1038,36 +1234,30 @@ function renderAnalysisTable() {
   document.getElementById('analysis_table_body').innerHTML = h;
 }
 
-// ========== ಪ್ರಶ್ನೆ ಪತ್ರಿಕೆ ವಿಭಾಗಗಳು (Strict 5 Sections) ==========
 function renderQuestionPaperUI() {
   let container = document.getElementById('qp_render_container');
   let h = '';
 
-  // 1. ಬಿಟ್ಟ ಸ್ಥಳವನ್ನು ತುಂಬಿರಿ (4 ಪ್ರಶ್ನೆಗಳು = 4 ಅಂಕಗಳು)
   h += `<div class="section-head"><span>I. ಬಿಟ್ಟ ಸ್ಥಳವನ್ನು ಸೂಕ್ತ ಪದಗಳಿಂದ ಭರ್ತಿ ಮಾಡಿ.</span><span>4 × 1 = 4</span></div>`;
   for(let i = 0; i < 4; i++) {
     h += renderSingleQuestion(ACTIVE_PAPER[i], i + 1, "blank");
   }
 
-  // 2. ಸೂಕ್ತ ಉತ್ತರ ಆರಿಸಿ ಬರೆಯಿರಿ (4 ಪ್ರಶ್ನೆಗಳು = 4 ಅಂಕಗಳು)
   h += `<div class="section-head"><span>II. ಈ ಕೆಳಗೆ ಕೊಟ್ಟಿರುವ ಪ್ರಶ್ನೆಗಳಿಗೆ ಸೂಕ್ತ ಉತ್ತರ ಆರಿಸಿ ಬರೆಯಿರಿ.</span><span>4 × 1 = 4</span></div>`;
   for(let i = 4; i < 8; i++) {
     h += renderSingleQuestion(ACTIVE_PAPER[i], i + 1, "mcq");
   }
 
-  // 3. ಒಂದು ವಾಕ್ಯದಲ್ಲಿ ಉತ್ತರಿಸಿ (4 ಪ್ರಶ್ನೆಗಳು = 4 ಅಂಕಗಳು)
   h += `<div class="section-head"><span>III. ಈ ಕೆಳಗಿನ ಪ್ರಶ್ನೆಗಳಿಗೆ ಒಂದು ವಾಕ್ಯದಲ್ಲಿ ಉತ್ತರಿಸಿ.</span><span>4 × 1 = 4</span></div>`;
   for(let i = 8; i < 12; i++) {
     h += renderSingleQuestion(ACTIVE_PAPER[i], i + 1, "direct");
   }
 
-  // 4. ಎರಡು ಮೂರು ವಾಕ್ಯದಲ್ಲಿ ಉತ್ತರಿಸಿ (10 ಪ್ರಶ್ನೆಗಳು = 20 ಅಂಕಗಳು)
   h += `<div class="section-head"><span>IV. ಈ ಕೆಳಗಿನ ಪ್ರಶ್ನೆಗಳಿಗೆ ಎರಡು ಮೂರು ವಾಕ್ಯದಲ್ಲಿ ಉತ್ತರಿಸಿ.</span><span>10 × 2 = 20</span></div>`;
   for(let i = 12; i < 22; i++) {
     h += renderSingleQuestion(ACTIVE_PAPER[i], i + 1, "short");
   }
 
-  // 5. ನಾಲ್ಕು ಐದು ವಾಕ್ಯಗಳಲ್ಲಿ ವಿವರವಾಗಿ ಉತ್ತರಿಸಿ / ನಕ್ಷೆ (2 ಪ್ರಶ್ನೆಗಳು = 8 ಅಂಕಗಳು)
   h += `<div class="section-head"><span>V. ಈ ಕೆಳಗಿನ ಪ್ರಶ್ನೆಗಳಿಗೆ ನಾಲ್ಕು ಐದು ವಾಕ್ಯಗಳಲ್ಲಿ ವಿವರವಾಗಿ ಉತ್ತರಿಸಿ / ನಕ್ಷೆ ರಚಿಸಿ ಗುರುತಿಸಿ.</span><span>2 × 4 = 8</span></div>`;
   for(let i = 22; i < 24; i++) {
     h += renderSingleQuestion(ACTIVE_PAPER[i], i + 1, (i === 23 ? "map" : "long"));
@@ -1076,7 +1266,6 @@ function renderQuestionPaperUI() {
   container.innerHTML = h;
 }
 
-// ========== ಡ್ರಾಪ್‌ಡೌನ್‌ನಲ್ಲಿ ಕಟ್ಟುನಿಟ್ಟಾದ ಫಿಲ್ಟರ್ (Strict Unit & Section Match) ==========
 function renderSingleQuestion(q, num, requiredType) {
   let optHtml = '';
   if (q.opts && q.opts.length > 0) {
@@ -1086,7 +1275,7 @@ function renderSingleQuestion(q, num, requiredType) {
     </div>`;
   }
 
-  // ಅದೇ ಪಾಠದ ಮತ್ತು ಅದೇ ವಿಭಾಗದ ಪ್ರಶ್ನೆಗಳನ್ನಷ್ಟೇ ಫಿಲ್ಟರ್ ಮಾಡುವುದು
+  // 1. Strictly filter by exact Unit, exact Section type, and exact Marks
   let dbMatches = LBA_DATABASE.filter(item => {
     if (item.unit !== q.unit) return false;
 
@@ -1108,7 +1297,22 @@ function renderSingleQuestion(q, num, requiredType) {
     dbMatches = LBA_DATABASE.filter(item => item.unit === q.unit && item.marks === q.marks);
   }
 
-  let optionsHtml = dbMatches.map(item => `
+  // 2. Keep current active question at top if matched
+  let filteredList = [];
+  let currentFound = dbMatches.find(item => item.id === q.id);
+  if (currentFound) {
+    filteredList.push(currentFound);
+  }
+  dbMatches.forEach(item => {
+    if (!filteredList.some(f => f.id === item.id)) {
+      filteredList.push(item);
+    }
+  });
+
+  // 3. Limit strictly to 5 - 6 choices per dropdown
+  filteredList = filteredList.slice(0, 6);
+
+  let optionsHtml = filteredList.map(item => `
     <option value="${item.id}" ${item.id === q.id ? 'selected' : ''}>
       ${item.q.substring(0, 85)}...
     </option>
@@ -1282,7 +1486,7 @@ function printCleanPdf() {
   window.print();
 }
 
-// ========== ಸಂಪೂರ್ಣ ಶುದ್ಧ Word (.doc) ರಫ್ತು (ಅನಗತ್ಯ ಅಂಶಗಳಿಲ್ಲದೆ PDF ನಂತೆಯೇ ನಿಖರ) ==========
+// ========== ಸಂಪೂರ್ಣ ಶುದ್ಧ Word (.doc) ರಫ್ತು ==========
 function downloadWordDoc() {
   const sName = document.getElementById('cfg_school').value;
   const taluk = document.getElementById('cfg_taluk').value;
@@ -1411,6 +1615,38 @@ function downloadWordDoc() {
     `;
   }
 
+  const oralQuestionsOnly = [
+    "ಕ್ರೈಸ್ತ ಧರ್ಮದ ಪವಿತ್ರ ಗ್ರಂಥ ಯಾವುದು?",
+    "ಇಸ್ಲಾಂ ಧರ್ಮದ ಸ್ಥಾಪಕರು ಯಾರು?",
+    "ಪುನರುಜ್ಜಿವನ ಎಂದರೆ ಏನು?",
+    "ಭಾರತಕ್ಕೆ ಹೊಸ ಜಲಮಾರ್ಗವನ್ನು ಕಂಡುಹಿಡಿದ ನಾವಿಕ ಯಾರು?",
+    "ಪ್ಲಾಸಿ ಕದನವು ಯಾವ ವರ್ಷದಲ್ಲಿ ನಡೆಯಿತು?",
+    "ಸಹಾಯಕ ಸೈನ್ಯ ಪದ್ಧತಿಯನ್ನು ಜಾರಿಗೆ ತಂದ ಬ್ರಿಟಿಷ್ ಗವರ್ನರ್ ಜನರಲ್ ಯಾರು?",
+    "ದತ್ತು ಮಕ್ಕಳಿಗೆ ಹಕ್ಕಿಲ್ಲ ಎಂಬ ನೀತಿಯನ್ನು ಜಾರಿಗೆ ತಂದವರು ಯಾರು?",
+    "ಖಾಯಂ ಜಮೀನ್ದಾರಿ ಪದ್ಧತಿಯನ್ನು ಜಾರಿಗೆ ತಂದವರು ಯಾರು?",
+    "ಮೈಸೂರಿನ ಹುಲಿ ಎಂದು ಯಾರನ್ನು ಕರೆಯುತ್ತಾರೆ?",
+    "ಆಧುನಿಕ ಬೆಂಗಳೂರಿನ ನಿರ್ಮಾಪಕರು ಯಾರು?",
+    "ಬ್ರಿಟಿಷರ ವಿರುದ್ಧ ಹೋರಾಡಿದ ಕಿತ್ತೂರಿನ ವೀರರಾಣಿ ಯಾರು?",
+    "ಕರ್ನಾಟಕದ ಸಂಗೀತ ಪಿತಾಮಹ ಎಂದು ಯಾರನ್ನು ಕರೆಯುತ್ತಾರೆ?",
+    "ಸರ್ಕಾರದ ಮೂರು ಪ್ರಮುಖ ಅಂಗಗಳು ಯಾವುವು?",
+    "ಭಾರತದ ಸಂಸತ್ತಿನ ಎರಡು ಸದನಗಳು ಯಾವುವು?",
+    "ಲೋಕಸಭೆಯ ಸದಸ್ಯನಾಗಲು ಕನಿಷ್ಠ ವಯಸ್ಸು ಎಷ್ಟು ವರ್ಷ?",
+    "ಕರ್ನಾಟಕ ರಾಜ್ಯದ ವಿಧಾನ ಸೌಧ ಎಲ್ಲಿದೆ?",
+    "ಭಾರತದಲ್ಲಿ ಅತಿ ಎತ್ತರವಾದ ಪರ್ವತ ಶಿಖರ ಯಾವುದು?",
+    "ಪ್ರಪಂಚದ ಗೋಧಿಯ ಕಣಜ ಎಂದು ಯಾವ ಮೈದಾನವನ್ನು ಕರೆಯುತ್ತಾರೆ?",
+    "ಪ್ರಪಂಚದಲ್ಲೇ ಅತ್ಯಂತ ಉದ್ದವಾದ ಪರ್ವತ ಸರಣಿ ಯಾವುದು?",
+    "ಪ್ರಪಂಚದ ಅತಿ ದೊಡ್ಡ ನದಿ ಯಾವುದು?"
+  ];
+
+  let oralWordHtml = '';
+  oralQuestionsOnly.forEach((item, idx) => {
+    oralWordHtml += `
+      <p style="font-size: 11.5pt; line-height: 1.6; margin: 6px 0;">
+        <strong>${idx + 1}.</strong> ${item}
+      </p>
+    `;
+  });
+
   let analysisRows = '';
   let totM_num = 0, totT_num = 0;
   ACTIVE_PAPER.forEach((q, i) => {
@@ -1459,7 +1695,6 @@ function downloadWordDoc() {
       </style>
     </head>
     <body>
-      <!-- ಪುಟ 1: ರಚನಾ ಹಂತಗಳು -->
       <div class="Section1">
         ${headerHtml("ಪ್ರಶ್ನಾಪತ್ರಿಕೆ ರಚನಾ ಹಂತಗಳು")}
         ${metaHtml("7ನೇ ತರಗತಿ", "ಸಮಾಜ ವಿಜ್ಞಾನ", `ಒಟ್ಟು ಅಂಕಗಳು: ${totM}`, `ಒಟ್ಟು ಪ್ರಶ್ನೆಗಳು: ${totQ}`)}
@@ -1503,7 +1738,6 @@ function downloadWordDoc() {
 
       <br clear="all" style="page-break-before: always; mso-break-type: section-break;" />
 
-      <!-- ಪುಟ 2: ನೀಲಿನಕ್ಷೆ (Landscape Mode) -->
       <div class="Section2">
         ${headerHtml("ನೀಲಿನಕ್ಷೆ (BLUE PRINT) - A4 LANDSCAPE")}
         ${metaHtml("7ನೇ ತರಗತಿ", "ಸಮಾಜ ವಿಜ್ಞಾನ", `ಒಟ್ಟು ಅಂಕಗಳು: ${totM}`, `ಪ್ರಶ್ನೆಗಳ ಸಂಖ್ಯೆ: ${totQ}`)}
@@ -1513,7 +1747,7 @@ function downloadWordDoc() {
               <th rowspan="2" style="width: 3%;">ಕ್ರ. ಸಂ.</th>
               <th rowspan="2" style="width: 25%;">ಘಟಕಗಳ ಹೆಸರು</th>
               <th colspan="3" style="width: 17%;">ಜ್ಞಾನ (Knowledge)</th>
-              <th colspan="3" style="width: 17%;">ತಿಳುವಳಿಕೆ (Understanding)</th>
+              <th colspan="3" style="width: 17%;">ತಿಳಿವಳಿಕೆ (Understanding)</th>
               <th colspan="3" style="width: 17%;">ಅಭಿವ್ಯಕ್ತಿ / ಅನ್ವಯ (Application)</th>
               <th colspan="3" style="width: 13%;">ಪ್ರಶಂಸೆ / ಕೌಶಲ (Skill)</th>
               <th colspan="2" style="width: 8%;">ಒಟ್ಟು</th>
@@ -1534,7 +1768,6 @@ function downloadWordDoc() {
 
       <br clear="all" style="page-break-before: always; mso-break-type: section-break;" />
 
-      <!-- ಪುಟ 3: ಪ್ರಶ್ನಾವಾರು ವಿಶ್ಲೇಷಣೆ -->
       <div class="Section1">
         ${headerHtml("ಪ್ರಶ್ನಾವಾರು ವಿಶ್ಲೇಷಣೆ (Question-wise Analysis Sheet)")}
         ${metaHtml("7ನೇ ತರಗತಿ", "ಸಮಾಜ ವಿಜ್ಞಾನ", `ಒಟ್ಟು ಪ್ರಶ್ನೆಗಳು: ${totQ}`, `ಒಟ್ಟು ಅಂಕಗಳು: ${totM}`)}
@@ -1557,7 +1790,6 @@ function downloadWordDoc() {
 
       <br clear="all" style="page-break-before: always; mso-break-type: section-break;" />
 
-      <!-- ಪುಟ 4: ಪ್ರಶ್ನೆ ಪತ್ರಿಕೆ -->
       <div class="Section1">
         ${headerHtml("ಪ್ರಶ್ನೆ ಪತ್ರಿಕೆ", exam)}
         ${metaHtml("7ನೇ ತರಗತಿ", "ಸಮಯ: " + time, "", `ಗರಿಷ್ಠ ಅಂಕಗಳು: ${totM}`)}
@@ -1566,7 +1798,6 @@ function downloadWordDoc() {
 
       <br clear="all" style="page-break-before: always; mso-break-type: section-break;" />
 
-      <!-- ಪುಟ 5: ಉತ್ತರ ಪತ್ರಿಕೆ 1 -->
       <div class="Section1">
         ${headerHtml("ಮಾದರಿ ಉತ್ತರ ಪತ್ರಿಕೆ ಮತ್ತು ಮೌಲ್ಯಮಾಪನ ಯೋಜನೆ (ಭಾಗ - ೧)")}
         ${metaHtml("7ನೇ ತರಗತಿ", "ಸಮಾಜ ವಿಜ್ಞಾನ", "ಪ್ರಶ್ನೆ 1 ರಿಂದ 12 ರ ಉತ್ತರಗಳು", "")}
@@ -1584,7 +1815,6 @@ function downloadWordDoc() {
 
       <br clear="all" style="page-break-before: always; mso-break-type: section-break;" />
 
-      <!-- ಪುಟ 6: ಉತ್ತರ ಪತ್ರಿಕೆ 2 -->
       <div class="Section1">
         ${headerHtml("ಮಾದರಿ ಉತ್ತರ ಪತ್ರಿಕೆ ಮತ್ತು ಮೌಲ್ಯಮಾಪನ ಯೋಜನೆ (ಭಾಗ - ೨)")}
         ${metaHtml("7ನೇ ತರಗತಿ", "ಸಮಾಜ ವಿಜ್ಞಾನ", "ಪ್ರಶ್ನೆ 13 ರಿಂದ 24 ರ ವಿವರವಾದ ಉತ್ತರಗಳು", "")}
@@ -1598,6 +1828,16 @@ function downloadWordDoc() {
           </thead>
           <tbody>${keyP2Rows}</tbody>
         </table>
+      </div>
+
+      <br clear="all" style="page-break-before: always; mso-break-type: section-break;" />
+
+      <div class="Section1">
+        ${headerHtml("ಮೌಖಿಕ ಮೌಲ್ಯಾಂಕನ ಪ್ರಶ್ನೆಕೋಠಿ (Oral Assessment - Semester 1)")}
+        ${metaHtml("7ನೇ ತರಗತಿ", "ಸಮಾಜ ವಿಜ್ಞಾನ", "ಮೌಲ್ಯಾಂಕನ: ಮೌಖಿಕ (ಆಲಿಸುವಿಕೆ ಮತ್ತು ಸಂವಹನ)", "20 ಪ್ರಶ್ನೆಗಳು")}
+        <div>
+          ${oralWordHtml}
+        </div>
       </div>
     </body>
     </html>
