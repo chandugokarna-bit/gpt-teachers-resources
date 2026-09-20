@@ -152,7 +152,6 @@
     border-top: 3px solid var(--primary);
   }
 
-  /* Page-Fit Floating Controls */
   .page-fit-bar {
     position: absolute;
     top: 6px;
@@ -305,7 +304,25 @@
   .q-num { font-weight: bold; min-width: 24px; }
   .q-content { flex: 1; }
 
-  /* Oral Plain Questions Styling */
+  /* ಚಿತ್ರಗಳಿಗಾಗಿ ಶೈಲಿ (Picture Question Styling) */
+  .q-picture-container {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .exam-picture-box {
+    width: 58px;
+    height: 58px;
+    border: 1.5px solid #000;
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #ffffff;
+    vertical-align: middle;
+    padding: 3px;
+  }
+
   .oral-list-container {
     margin-top: 10px;
   }
@@ -373,6 +390,7 @@
     .sheet:last-child { page-break-after: avoid !important; break-after: avoid !important; }
     th { background-color: #f1f5f9 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     .bp-select { appearance: none; -webkit-appearance: none; border: none; }
+    .exam-picture-box { border: 1.5px solid #000 !important; }
   }
 </style>
 </head>
@@ -424,7 +442,7 @@
             <input type="number" id="pct_u" value="35" min="0" max="100" oninput="syncAllSystems()">
           </div>
           <div class="field">
-            <label>अभिव್ಯक्ति %:</label>
+            <label>अभिव्यक्ति %:</label>
             <input type="number" id="pct_a" value="0" min="0" max="100" oninput="syncAllSystems()">
           </div>
           <div class="field">
@@ -518,7 +536,7 @@
       <h4 style="margin-bottom:6px; font-size:12.5px;">02. इकाईवार अंक विभाजन</h4>
       <table>
         <thead>
-          <tr><th style="width:10%;">क्र.सं.</th><th style="width:50%;">इकाई का नाम</th><th style="width:13%;">प्रश्न</th><th style="width:13%;">अंक</th><th style="width:14%;">प्रतिशत</th></tr>
+          <tr><th style="width:10%;">ಕ್ರ.ಸಂ.</th><th style="width:50%;">इकाई का नाम</th><th style="width:13%;">प्रश्न</th><th style="width:13%;">अंक</th><th style="width:14%;">प्रतिशत</th></tr>
         </thead>
         <tbody id="tbl_unit_weight"></tbody>
       </table>
@@ -627,7 +645,7 @@
   </div>
   <div class="doc-header">
     <h2><span class="dyn_school"></span>, ता: <span class="dyn_taluk"></span>, जि: <span class="dyn_dist"></span></h2>
-    <p><strong class="dyn_exam">प्रथम संकलनात्मक मूल्यांकन (SA-1) 2025-26</strong> | विषय: <strong>तृतीय भाषा हिंदी</strong></p>
+    <p><strong class="dyn_exam">प्रथम संकलनात्मक मूल्यांकन (SA-1) 2026-27</strong> | विषय: <strong>तृतीय भाषा हिंदी</strong></p>
   </div>
   <div class="meta-bar">
     <span>कक्षा: 6वीं कक्षा</span>
@@ -700,7 +718,7 @@
   </table>
 </div>
 
-<!-- पृष्ठ 7: मौखिक प्रश्न (Oral Assessment 20 Questions - Clean Layout, No Boxes/Units/Answers) -->
+<!-- पृष्ठ 7: मौखिक प्रश्न -->
 <div class="sheet tab-page" id="tab_oral">
   <div class="page-fit-bar no-print">
     <span class="page-fit-label">Page Fit:</span>
@@ -745,7 +763,17 @@
 </div>
 
 <script>
-// आधिकारिक रूपरेखा की 11 इकाइयाँ[cite: 3]
+// ಸ್ವತಂತ್ರ ಹಾಗೂ ಆಕರ್ಷಕ SVG ವೆಕ್ಟರ್ ಚಿತ್ರಗಳು
+const SVG_PICS = {
+  anar: `<svg viewBox="0 0 100 100" width="50" height="50"><path d="M45,20 L50,10 L55,20 L62,13 L60,24 C75,28 85,42 85,60 C85,76 72,88 50,88 C28,88 15,76 15,60 C15,42 25,28 40,24 L38,13 Z" fill="#ef4444" stroke="#991b1b" stroke-width="3"/><path d="M50,30 Q65,40 60,65" stroke="#fca5a5" stroke-width="3" fill="none"/></svg>`,
+  chatari: `<svg viewBox="0 0 100 100" width="50" height="50"><path d="M15,55 Q50,15 85,55 Q67,50 50,55 Q33,50 15,55 Z" fill="#3b82f6" stroke="#1e3a8a" stroke-width="3"/><line x1="50" y1="20" x2="50" y2="78" stroke="#1f2937" stroke-width="4"/><path d="M50,78 Q50,88 40,88 Q30,88 30,78" fill="none" stroke="#1f2937" stroke-width="4"/></svg>`,
+  kitab: `<svg viewBox="0 0 100 100" width="50" height="50"><path d="M20,25 Q50,32 50,80 Q50,32 80,25 L80,72 Q50,78 50,85 Q50,78 20,72 Z" fill="#fbbf24" stroke="#b45309" stroke-width="3"/><line x1="50" y1="32" x2="50" y2="85" stroke="#78350f" stroke-width="3"/></svg>`,
+  ghar: `<svg viewBox="0 0 100 100" width="50" height="50"><polygon points="50,15 15,45 85,45" fill="#f97316" stroke="#c2410c" stroke-width="3"/><rect x="25" y="45" width="50" height="42" fill="#fed7aa" stroke="#c2410c" stroke-width="3"/><rect x="42" y="58" width="16" height="29" fill="#78350f"/><rect x="58" y="20" width="8" height="15" fill="#9a3412"/></svg>`,
+  kalam: `<svg viewBox="0 0 100 100" width="50" height="50"><polygon points="25,75 20,85 30,80" fill="#1e293b"/><polygon points="25,75 30,80 75,35 70,30" fill="#0284c7" stroke="#0369a1" stroke-width="2"/><polygon points="70,30 75,35 85,25 80,20" fill="#e2e8f0" stroke="#64748b" stroke-width="2"/></svg>`,
+  magar: `<svg viewBox="0 0 100 100" width="50" height="50"><ellipse cx="50" cy="55" rx="35" ry="14" fill="#15803d" stroke="#14532d" stroke-width="3"/><polygon points="12,55 5,50 8,55 5,60" fill="#15803d"/><circle cx="70" cy="50" r="3" fill="#ffffff"/><circle cx="71" cy="50" r="1.5" fill="#000000"/><path d="M40,42 L45,46 L50,42 L55,46 L60,42" stroke="#14532d" stroke-width="2" fill="none"/></svg>`
+};
+
+// ರೂಪರೇಖೆಯ 11 ಘಟಕಗಳು
 const MASTER_UNITS = [
   { id: 1, name: "वर्णमाला" },
   { id: 2, name: "पढ़ो समझो और लिखो" },
@@ -762,7 +790,6 @@ const MASTER_UNITS = [
 
 const WEIGHTS = [1, 2, 5, 1, 2, 5, 1, 2, 5, 1, 2, 5];
 
-// Page-Fit Zoom and Spacing Controller
 const PAGE_FIT_STATE = {};
 
 function adjustPageFit(pageId, step) {
@@ -818,48 +845,47 @@ function applyPageFit(pageId) {
   });
 }
 
-// आधिकारिक पीडीएफ नील नक्शा (27 प्रश्न - 40 अंक परिपूर्ण)[cite: 3]
 const DEFAULT_BLUEPRINT_MATRIX = [
-  [0, 0, 1,  0, 0, 0,  0, 0, 0,  0, 0, 0], // U1: वर्णमाला - 1 Q, 5 M
-  [0, 0, 0,  4, 0, 0,  0, 0, 0,  0, 0, 0], // U2: पढ़ो समझो - 4 Q, 4 M
-  [0, 3, 1,  4, 0, 0,  0, 0, 0,  0, 0, 0], // U3: स्वर और मात्राएँ - 8 Q, 15 M
-  [0, 0, 0,  0, 1, 0,  0, 0, 0,  0, 0, 0], // U4: र की मात्राएँ - 1 Q, 2 M
-  [0, 1, 0,  0, 0, 0,  0, 0, 0,  0, 0, 0], // U5: संयुक्ताक्षर - 1 Q, 2 M
-  [4, 0, 0,  0, 0, 0,  0, 0, 0,  0, 0, 0], // U6: गिनती - 4 Q, 4 M
-  [0, 0, 0,  1, 0, 0,  0, 0, 0,  0, 0, 0], // U7: मैं, हम... - 1 Q, 1 M
-  [0, 0, 0,  1, 0, 0,  0, 0, 0,  0, 0, 0], // U8: यह, ये... - 1 Q, 1 M
-  [0, 0, 0,  1, 0, 0,  0, 0, 0,  0, 0, 0], // U9: मेरा, हमारा... - 1 Q, 1 M
-  [0, 0, 0,  4, 0, 0,  0, 0, 0,  0, 0, 0], // U10: इसका, इनका... - 4 Q, 4 M
-  [0, 0, 0,  1, 0, 0,  0, 0, 0,  0, 0, 0]  // U11: का, की, के - 1 Q, 1 M
+  [0, 0, 1,  0, 0, 0,  0, 0, 0,  0, 0, 0], 
+  [0, 0, 0,  4, 0, 0,  0, 0, 0,  0, 0, 0], 
+  [0, 3, 1,  4, 0, 0,  0, 0, 0,  0, 0, 0], 
+  [0, 0, 0,  0, 1, 0,  0, 0, 0,  0, 0, 0], 
+  [0, 1, 0,  0, 0, 0,  0, 0, 0,  0, 0, 0], 
+  [4, 0, 0,  0, 0, 0,  0, 0, 0,  0, 0, 0], 
+  [0, 0, 0,  1, 0, 0,  0, 0, 0,  0, 0, 0], 
+  [0, 0, 0,  1, 0, 0,  0, 0, 0,  0, 0, 0], 
+  [0, 0, 0,  1, 0, 0,  0, 0, 0,  0, 0, 0], 
+  [0, 0, 0,  4, 0, 0,  0, 0, 0,  0, 0, 0], 
+  [0, 0, 0,  1, 0, 0,  0, 0, 0,  0, 0, 0]  
 ];
 
 let BLUEPRINT_MATRIX = JSON.parse(JSON.stringify(DEFAULT_BLUEPRINT_MATRIX));
 
-// ========== आधिकारिक LBA प्रश्नोत्तरी डेटाबेस (कक्षा 6 हिंदी Semester 1)[cite: 3, 4] ==========
+// ಪ್ರಶ್ನೆಗಳ ಡೇಟಾಬೇಸ್ (SVG ಚಿತ್ರಗಳೊಂದಿಗೆ ಪರಿಷ್ಕರಿಸಲಾಗಿದೆ)
 const LBA_DATABASE = [
-  // SECTION I: वर्णमाला (दीर्घ उत्तर - 5 अंक) [5-6 Options][cite: 3, 4]
+  // SECTION I: वर्णमाला (5 अंक)
   { id: "6H_VM_01", unit: "वर्णमाला", section: "varnamala", marks: 5, obj: "ज्ञान", spec: "स्मरण", diff: "कठिन", time: 10, q: "हिंदी वर्णमाला (स्वर तथा क से ह तक के व्यंजन) क्रमानुसार लिखो।", a: "स्वर : अ, आ, इ, ई, उ, ऊ, ऋ, ए, ऐ, ओ, औ, अं, अः ।\nव्यंजन :\nक वर्ग : क ख ग घ ङ\nच वर्ग : च छ ज झ ञ\nट वर्ग : ट ठ ड ढ ण\nत वर्ग : त थ द ध न\nप वर्ग : प फ ब भ म\nअवर्गीय : य र ल व श ष स ह ।" },
   { id: "6H_VM_02", unit: "वर्णमाला", section: "varnamala", marks: 5, obj: "ज्ञान", spec: "स्मरण", diff: "कठिन", time: 10, q: "वर्गीय व्यंजन तथा संयुक्त व्यंजन अक्षरों को क्रमबद्ध लिखो।", a: "वर्गीय व्यंजन :\nक ख ग घ ङ\nच छ ज झ ञ\nट ठ ड ढ ण\nत थ द ध न\nप फ ब भ म\nसंयुक्त व्यंजन : क्ष, त्र, ज्ञ, श्र ।" },
   { id: "6H_VM_03", unit: "वर्णमाला", section: "varnamala", marks: 5, obj: "ज्ञान", spec: "स्मरण", diff: "कठिन", time: 10, q: "स्वर वर्णों को ह्रस्व, दीर्घ और अयोगवाह वर्गों में अलग करके लिखो।", a: "ह्रस्व स्वर : अ, इ, उ, ऋ ।\nदीर्घ स्वर : आ, ई, ऊ, ए, ऐ, ओ, औ ।\nअयोगवाह : अं, अः ।" },
   { id: "6H_VM_04", unit: "वर्णमाला", section: "varnamala", marks: 5, obj: "ज्ञान", spec: "स्मरण", diff: "कठिन", time: 10, q: "क से म तक के स्पर्श व्यंजन तथा य से ह तक के अवर्गीय व्यंजन लिखो।", a: "स्पर्श व्यंजन (क से म तक 25 अक्षर):\nक ख ग घ ङ, च छ ज झ ञ, ट ठ ड ढ ण, त थ द ध न, प फ ब भ म ।\nअवर्गीय व्यंजन (8 अक्षर):\nय र ल व श ष स ह ।" },
   { id: "6H_VM_05", unit: "वर्णमाला", section: "varnamala", marks: 5, obj: "ज्ञान", spec: "स्मरण", diff: "कठिन", time: 10, q: "हिंदी वर्णमाला के सभी 11 स्वर तथा 4 संयुक्त व्यंजन लिखिए।", a: "स्वर : अ, आ, इ, ई, उ, ऊ, ऋ, ए, ऐ, ओ, औ ।\nसंयुक्त व्यंजन : क्ष, त्र, ज्ञ, श्र ।" },
 
-  // SECTION II: बारहखड़ी (दीर्घ उत्तर - 5 अंक) [5-6 Options][cite: 3, 4]
+  // SECTION II: बारहखड़ी (5 अंक)
   { id: "6H_BK_01", unit: "स्वर और उनकी मात्राएँ", section: "barahkhadi", marks: 5, obj: "ज्ञान", spec: "स्मरण", diff: "कठिन", time: 10, q: "निम्नलिखित व्यंजनों की बारहखड़ी लिखिए : क, ग, ल, द, ब", a: "क - क का कि की कु कू कृ के कै को कौ कं कः\nग - ग गा गि गी गु गू गृ गे गै गो गौ गं गः\nल - ल ला लि ली लु लू लृ ले लै लो लौ लं लः\nद - द दा दि दी दु दू दृ दे दै दो दौ दं दः\nब - ब बा बि बी बु बू बृ बे बै बो बौ बं बः" },
   { id: "6H_BK_02", unit: "स्वर और उनकी मात्राएँ", section: "barahkhadi", marks: 5, obj: "ज्ञान", spec: "स्मरण", diff: "कठिन", time: 10, q: "निम्नलिखित व्यंजनों की बारहखड़ी लिखिए : च, ज, त, म, स", a: "च - च चा चि ची चु चू चृ चे चै चो चौ चं चः\nज - ज जा जि जी जु जू जृ जे जै जो जौ जं जः\nत - त ता ति ती तु तू तृ ते तै तो तौ तं तः\nम - म मा मि मी मु मू मृ मे मै मो मौ मं मः\nस - स सा सि सी सु सू सृ से सै सो सौ सं सः" },
   { id: "6H_BK_03", unit: "स्वर और उनकी मात्राएँ", section: "barahkhadi", marks: 5, obj: "ज्ञान", spec: "स्मरण", diff: "कठिन", time: 10, q: "निम्नलिखित व्यंजनों की बारहखड़ी लिखिए : ख, घ, ट, प, र", a: "ख - ख खा खि खी खु खू खृ खे खै खो खौ खं खः\nघ - घ घा घि घी घु घू घृ घे घै घो घौ घं घः\nट - ट टा टि टी टु टू टृ टे टै टो टौ टं टः\nप - प पा पि पी पु पू पृ पे पै पो पौ पं पः\nर - र रा रि री रु रू रे रै रो रौ रं रः" },
   { id: "6H_BK_04", unit: "स्वर और उनकी मात्राएँ", section: "barahkhadi", marks: 5, obj: "ज्ञान", spec: "स्मरण", diff: "कठिन", time: 10, q: "निम्नलिखित व्यंजनों की बारहखड़ी लिखिए : छ, ठ, ड, थ, भ", a: "छ - छ छा छि छी छु छू छृ छे छै छो छौ छं छः\nठ - ठ ठा ठि ठी ठु ठू ठृ ठे ठै ठो ठौ ठं ठः\nड - ड डा डि डी डु डू डृ डे डै डो डौ डं डः\nथ - थ था थि थी थु थू थृ थे थै थो थौ थं थः\nभ - भ भा भि भी भु भू भृ भे भै भो भौ भं भः" },
   { id: "6H_BK_05", unit: "स्वर और उनकी मात्राएँ", section: "barahkhadi", marks: 5, obj: "ज्ञान", spec: "स्मरण", diff: "कठिन", time: 10, q: "निम्नलिखित व्यंजनों की बारहखड़ी लिखिए : झ, ण, ध, फ, व", a: "झ - झ झा झि झी झु झू झृ झे झै झो झौ झं झः\nण - ण णा णि णी णु णू णृ णे णै णो णौ णं णः\nध - ध धा धि धी धु धू धृ धे धै धो धौ धं धः\nफ - फ फा फि फी फु फू फृ फे फै फो फौ फं फः\nव - व वा वि वी वु वू वृ वे वै वो वौ वं वः" },
 
-  // SECTION III: चित्र पहचान / शब्द (1 अंक) [6 Options][cite: 3, 4]
-  { id: "6H_PIC_01", unit: "पढ़ो समझो और लिखो", section: "picture", marks: 1, obj: "ग्रहण", spec: "लिखना", diff: "सरल", time: 2, q: "चित्र का नाम लिखो : [अनार / ದಾಳಿಂಬೆ]", a: "अनार" },
-  { id: "6H_PIC_02", unit: "पढ़ो समझो और लिखो", section: "picture", marks: 1, obj: "ग्रहण", spec: "लिखना", diff: "सरल", time: 2, q: "चित्र का नाम लिखो : [छतरी / ಛತ್ರಿ]", a: "छतरी" },
-  { id: "6H_PIC_03", unit: "पढ़ो समझो और लिखो", section: "picture", marks: 1, obj: "ग्रहण", spec: "लिखना", diff: "सरल", time: 2, q: "चित्र का नाम लिखो : [किताब / ಪುಸ್ತಕ]", a: "किताब" },
-  { id: "6H_PIC_04", unit: "पढ़ो समझो और लिखो", section: "picture", marks: 1, obj: "ग्रहण", spec: "लिखना", diff: "सरल", time: 2, q: "चित्र का नाम लिखो : [घर / ಮನೆ]", a: "घर" },
-  { id: "6H_PIC_05", unit: "पढ़ो समझो और लिखो", section: "picture", marks: 1, obj: "ग्रहण", spec: "लिखना", diff: "सरल", time: 2, q: "चित्र का नाम लिखो : [कलम / ಲೇಖನಿ]", a: "कलम" },
-  { id: "6H_PIC_06", unit: "पढ़ो समझो और लिखो", section: "picture", marks: 1, obj: "ग्रहण", spec: "लिखना", diff: "सरल", time: 2, q: "चित्र का नाम लिखो : [मगर / ಮೊಸಳೆ]", a: "मगर" },
+  // SECTION III: चित्र पहचान / शब्द (1 अंक) - SVG ಚಿತ್ರಗಳೊಂದಿಗೆ
+  { id: "6H_PIC_01", unit: "पढ़ो समझो और लिखो", section: "picture", marks: 1, obj: "ग्रहण", spec: "लिखना", diff: "सरल", time: 2, q: "चित्र पहचानकर नाम लिखो :", picSvg: SVG_PICS.anar, picLabel: "[अनार]", a: "अनार" },
+  { id: "6H_PIC_02", unit: "पढ़ो समझो और लिखो", section: "picture", marks: 1, obj: "ग्रहण", spec: "लिखना", diff: "सरल", time: 2, q: "चित्र पहचानकर नाम लिखो :", picSvg: SVG_PICS.chatari, picLabel: "[छतरी]", a: "छतरी" },
+  { id: "6H_PIC_03", unit: "पढ़ो समझो और लिखो", section: "picture", marks: 1, obj: "ग्रहण", spec: "लिखना", diff: "सरल", time: 2, q: "चित्र पहचानकर नाम लिखो :", picSvg: SVG_PICS.kitab, picLabel: "[किताब]", a: "किताब" },
+  { id: "6H_PIC_04", unit: "पढ़ो समझो और लिखो", section: "picture", marks: 1, obj: "ग्रहण", spec: "लिखना", diff: "सरल", time: 2, q: "चित्र पहचानकर नाम लिखो :", picSvg: SVG_PICS.ghar, picLabel: "[घर]", a: "घर" },
+  { id: "6H_PIC_05", unit: "पढ़ो समझो और लिखो", section: "picture", marks: 1, obj: "ग्रहण", spec: "लिखना", diff: "सरल", time: 2, q: "चित्र पहचानकर नाम लिखो :", picSvg: SVG_PICS.kalam, picLabel: "[कलम]", a: "कलम" },
+  { id: "6H_PIC_06", unit: "पढ़ो समझो और लिखो", section: "picture", marks: 1, obj: "ग्रहण", spec: "लिखना", diff: "सरल", time: 2, q: "चित्र पहचानकर नाम लिखो :", picSvg: SVG_PICS.magar, picLabel: "[मगर]", a: "मगर" },
 
-  // SECTION IV: शब्द बनाओ (वर्ण संयोजन) (1 अंक) [6 Options][cite: 3, 4]
+  // SECTION IV: शब्द बनाओ (1 अंक)
   { id: "6H_SW_01", unit: "स्वर और उनकी मात्राएँ", section: "word_make", marks: 1, obj: "ग्रहण", spec: "शब्द बनाना", diff: "सरल", time: 2, q: "अक्षर जोड़कर शब्द बनाओ : औ + र + त = ", a: "औरत" },
   { id: "6H_SW_02", unit: "स्वर और उनकी मात्राएँ", section: "word_make", marks: 1, obj: "ग्रहण", spec: "शब्द बनाना", diff: "सरल", time: 2, q: "अक्षर जोड़कर शब्द बनाओ : अं + गू + र = ", a: "अंगूर" },
   { id: "6H_SW_03", unit: "स्वर और उनकी मात्राएँ", section: "word_make", marks: 1, obj: "ग्रहण", spec: "शब्द बनाना", diff: "सरल", time: 2, q: "अक्षर जोड़कर शब्द बनाओ : वि + मा + न = ", a: "विमान" },
@@ -867,7 +893,7 @@ const LBA_DATABASE = [
   { id: "6H_SW_05", unit: "स्वर और उनकी मात्राएँ", section: "word_make", marks: 1, obj: "ग्रहण", spec: "शब्द बनाना", diff: "सरल", time: 2, q: "अक्षर जोड़कर शब्द बनाओ : सू + र + ज = ", a: "सूरज" },
   { id: "6H_SW_06", unit: "स्वर और उनकी मात्राएँ", section: "word_make", marks: 1, obj: "ग्रहण", spec: "शब्द बनाना", diff: "सरल", time: 2, q: "अक्षर जोड़कर शब्द बनाओ : दु + का + न = ", a: "दुकान" },
 
-  // SECTION V: गिनती शब्दों में लिखो (1 अंक) [6 Options][cite: 3, 4]
+  // SECTION V: गिनती शब्दों में लिखो (1 अंक)
   { id: "6H_CNT_01", unit: "गिनती", section: "ginti", marks: 1, obj: "ज्ञान", spec: "स्मरण", diff: "सरल", time: 2, q: "संख्या को हिंदी शब्दों में लिखो : 5", a: "पाँच" },
   { id: "6H_CNT_02", unit: "गिनती", section: "ginti", marks: 1, obj: "ज्ञान", spec: "स्मरण", diff: "सरल", time: 2, q: "संख्या को हिंदी शब्दों में लिखो : 8", a: "आठ" },
   { id: "6H_CNT_03", unit: "गिनती", section: "ginti", marks: 1, obj: "ज्ञान", spec: "स्मरण", diff: "सरल", time: 2, q: "संख्या को हिंदी शब्दों में लिखो : 14", a: "चौदह" },
@@ -876,35 +902,31 @@ const LBA_DATABASE = [
   { id: "6H_CNT_06", unit: "गिनती", section: "ginti", marks: 1, obj: "ज्ञान", spec: "स्मरण", diff: "सरल", time: 2, q: "संख्या को हिंदी शब्दों में लिखो : 15", a: "पंद्रह" },
 
   // SECTION VI: कोष्ठक में से सही शब्द चुनकर रिक्त स्थान भरो (1 अंक)
-  // Q15: मैं, हम, तू, तुम, आप [5 Options][cite: 3, 4]
   { id: "6H_FB_01", unit: "मैं, हम, तू, तुम, आप", section: "fill_bracket", marks: 1, obj: "ग्रहण", spec: "चुनना", diff: "सरल", time: 2, q: "मैं छात्र ______। (हूँ / हैं)", a: "हूँ" },
   { id: "6H_FB_05", unit: "मैं, हम, तू, तुम, आप", section: "fill_bracket", marks: 1, obj: "ग्रहण", spec: "चुनना", diff: "सरल", time: 2, q: "हम लड़कियाँ ______। (हूँ / हैं)", a: "हैं" },
   { id: "6H_FB_05B", unit: "मैं, हम, तू, तुम, आप", section: "fill_bracket", marks: 1, obj: "ग्रहण", spec: "चुनना", diff: "सरल", time: 2, q: "तुम किसान ______। (हो / हैं)", a: "हो" },
   { id: "6H_FB_05C", unit: "मैं, हम, तू, तुम, आप", section: "fill_bracket", marks: 1, obj: "ग्रहण", spec: "चुनना", diff: "सरल", time: 2, q: "आप अध्यापक ______। (हो / हैं)", a: "हैं" },
   { id: "6H_FB_05D", unit: "मैं, हम, तू, तुम, आप", section: "fill_bracket", marks: 1, obj: "ग्रहण", spec: "चुनना", diff: "सरल", time: 2, q: "तू लड़का ______। (है / हैं)", a: "है" },
 
-  // Q16: यह, ये, वह, वे [5 Options][cite: 3, 4]
   { id: "6H_FB_02", unit: "यह, ये, वह, वे", section: "fill_bracket", marks: 1, obj: "ग्रहण", spec: "चुनना", diff: "सरल", time: 2, q: "______ संतरा है। (यह / ये)", a: "यह" },
   { id: "6H_FB_06", unit: "यह, ये, वह, वे", section: "fill_bracket", marks: 1, obj: "ग्रहण", spec: "चुनना", diff: "सरल", time: 2, q: "______ तितलियाँ हैं। (वह / वे)", a: "वे" },
   { id: "6H_FB_06B", unit: "यह, ये, वह, वे", section: "fill_bracket", marks: 1, obj: "ग्रहण", spec: "चुनना", diff: "सरल", time: 2, q: "______ कलम है। (यह / ये)", a: "यह" },
   { id: "6H_FB_06C", unit: "यह, ये, वह, वे", section: "fill_bracket", marks: 1, obj: "ग्रहण", spec: "चुनना", diff: "सरल", time: 2, q: "______ पुस्तकें हैं। (यह / ये)", a: "ये" },
   { id: "6H_FB_06D", unit: "यह, ये, वह, वे", section: "fill_bracket", marks: 1, obj: "ग्रहण", spec: "चुनना", diff: "सरल", time: 2, q: "______ फूल है। (वह / वे)", a: "वह" },
 
-  // Q17: मेरा, हमारा, तेरा, तुम्हारा [5 Options][cite: 3, 4]
   { id: "6H_FB_03", unit: "मेरा, हमारा, तेरा, तुम्हारा", section: "fill_bracket", marks: 1, obj: "ग्रहण", spec: "चुनना", diff: "सरल", time: 2, q: "तुम्हारा नाम क्या है? यह ______ बक्सा है। (तेरी / तेरा)", a: "तेरा" },
   { id: "6H_FB_03B", unit: "मेरा, हमारा, तेरा, तुम्हारा", section: "fill_bracket", marks: 1, obj: "ग्रहण", spec: "चुनना", diff: "सरल", time: 2, q: "यह ______ देश है। (हमारा / हमारी)", a: "हमारा" },
   { id: "6H_FB_03C", unit: "मेरा, हमारा, तेरा, तुम्हारा", section: "fill_bracket", marks: 1, obj: "ग्रहण", spec: "चुनना", diff: "सरल", time: 2, q: "यह ______ बहन है। (मेरा / मेरी)", a: "मेरी" },
   { id: "6H_FB_03D", unit: "मेरा, हमारा, तेरा, तुम्हारा", section: "fill_bracket", marks: 1, obj: "ग्रहण", spec: "चुनना", diff: "सरल", time: 2, q: "सतीश ______ बड़ा भाई है। (मेरा / मेरी)", a: "मेरा" },
   { id: "6H_FB_03E", unit: "मेरा, हमारा, तेरा, तुम्हारा", section: "fill_bracket", marks: 1, obj: "ग्रहण", spec: "चुनना", diff: "सरल", time: 2, q: "यह ______ स्कूल है। (तेरा / तेरी)", a: "तेरा" },
 
-  // Q18: का, की, के [5 Options][cite: 3, 4]
   { id: "6H_FB_04", unit: "का, की, के", section: "fill_bracket", marks: 1, obj: "ग्रहण", spec: "चुनना", diff: "सरल", time: 2, q: "राजू शीला ______ भाई है। (की / का)", a: "का" },
   { id: "6H_FB_07", unit: "का, की, के", section: "fill_bracket", marks: 1, obj: "ग्रहण", spec: "चुनना", diff: "सरल", time: 2, q: "दीपक ______ बैल गाड़ी खींचते हैं। (का / के)", a: "के" },
   { id: "6H_FB_08", unit: "का, की, के", section: "fill_bracket", marks: 1, obj: "ग्रहण", spec: "चुनना", diff: "सरल", time: 2, q: "अलमारी ______ चाबी मेज पर है। (की / का)", a: "की" },
   { id: "6H_FB_08B", unit: "का, की, के", section: "fill_bracket", marks: 1, obj: "ग्रहण", spec: "चुनना", diff: "सरल", time: 2, q: "राजा दशरथ ______ चार बेटे थे। (का / के)", a: "के" },
   { id: "6H_FB_08C", unit: "का, की, के", section: "fill_bracket", marks: 1, obj: "ग्रहण", spec: "चुनना", diff: "सरल", time: 2, q: "फूल ______ रंग लाल है। (का / की)", a: "का" },
 
-  // SECTION VII: जोड़कर लिखो (Q19 - Q22: इसका, इनका, उसका, उनका) [5 Options][cite: 3, 4]
+  // SECTION VII: जोड़कर लिखो (1 अंक)
   { id: "6H_MT_01", unit: "इसका, इनका, उसका, उनका", section: "match", marks: 1, obj: "ग्रहण", spec: "जोड़ना", diff: "सरल", time: 2, q: "सही संबंध जोड़कर लिखो : घोड़े का चेहरा ______ (सुंदर है / वकील है / प्रधानमंत्री थे / कपड़ों का व्यापारी)", a: "सुंदर है ।" },
   { id: "6H_MT_02", unit: "इसका, इनका, उसका, उनका", section: "match", marks: 1, obj: "ग्रहण", spec: "जोड़ना", diff: "सरल", time: 2, q: "सही संबंध जोड़कर लिखो : नवीन का भाई ______ (सुंदर है / वकील है / प्रधानमंत्री थे / कपड़ों का व्यापारी)", a: "वकील है ।" },
   { id: "6H_MT_03", unit: "इसका, इनका, उसका, उनका", section: "match", marks: 1, obj: "ग्रहण", spec: "जोड़ना", diff: "सरल", time: 2, q: "सही संबंध जोड़कर लिखो : लालबहादुर शास्त्री जी ______ (सुंदर है / वकील है / प्रधानमंत्री थे / कपड़ों का व्यापारी)", a: "प्रधानमंत्री थे ।" },
@@ -912,7 +934,6 @@ const LBA_DATABASE = [
   { id: "6H_MT_05", unit: "इसका, इनका, उसका, उनका", section: "match", marks: 1, obj: "ग्रहण", spec: "जोड़ना", diff: "सरल", time: 2, q: "सही संबंध जोड़कर लिखो : यह घोड़ा है ______ (इसका रंग काला है / इनका परिवार बड़ा है)", a: "इसका रंग काला है ।" },
 
   // SECTION VIII: लघु उत्तरीय प्रश्न (2 अंक)
-  // Q23, 24, 25: स्वर और उनकी मात्राएँ [6 Options][cite: 3, 4]
   { id: "6H_SA_01", unit: "स्वर और उनकी मात्राएँ", section: "short_q", marks: 2, obj: "ज्ञान", spec: "स्मरण", diff: "साधारण", time: 6, q: "'आ' (T) की मात्रा वाले 4 शब्द लिखो।", a: "काम, जाल, गाय, बादल" },
   { id: "6H_SA_02", unit: "स्वर और उनकी मात्राएँ", section: "short_q", marks: 2, obj: "ज्ञान", spec: "स्मरण", diff: "साधारण", time: 6, q: "'ई' (१) की मात्रा वाले 4 शब्द लिखो।", a: "चील, खीरा, नीला, पीला" },
   { id: "6H_SA_03", unit: "स्वर और उनकी मात्राएँ", section: "short_q", marks: 2, obj: "ज्ञान", spec: "स्मरण", diff: "साधारण", time: 6, q: "'ऊ' (ू) की मात्रा वाले 4 शब्द लिखो।", a: "दूध, मूली, धूप, पूजा" },
@@ -920,14 +941,12 @@ const LBA_DATABASE = [
   { id: "6H_SA_07", unit: "स्वर और उनकी मात्राएँ", section: "short_q", marks: 2, obj: "ज्ञान", spec: "स्मरण", diff: "साधारण", time: 6, q: "'ए' (े) की मात्रा वाले 4 शब्द लिखो।", a: "रेल, खेल, केला, मेला" },
   { id: "6H_SA_08", unit: "स्वर और उनकी मात्राएँ", section: "short_q", marks: 2, obj: "ज्ञान", spec: "स्मरण", diff: "साधारण", time: 6, q: "'ओ' (ो) की मात्रा वाले 4 शब्द लिखो।", a: "रोटी, गोल, छोटा, मोर" },
 
-  // Q26: संयुक्ताक्षर (2 अंक) [5 Options][cite: 3, 4]
   { id: "6H_SA_04", unit: "संयुक्ताक्षर", section: "short_q", marks: 2, obj: "ज्ञान", spec: "स्मरण", diff: "साधारण", time: 6, q: "संयुक्त अक्षरों से बने 4 शब्दों को लिखो।", a: "पत्र, रक्षक, श्रमिक, नेत्र" },
   { id: "6H_SA_04B", unit: "संयुक्ताक्षर", section: "short_q", marks: 2, obj: "ज्ञान", spec: "स्मरण", diff: "साधारण", time: 6, q: "अंत्य खड़ीपाई वाले संयुक्ताक्षरों के 4 उदाहरण लिखो।", a: "बच्चा, प्यासा, पत्ता, ग्वारी" },
   { id: "6H_SA_04C", unit: "संयुक्ताक्षर", section: "short_q", marks: 2, obj: "ज्ञान", spec: "स्मरण", diff: "साधारण", time: 6, q: "मध्य खड़ीपाई वाले संयुक्ताक्षरों के 4 उदाहरण लिखो।", a: "भक्ति, हफ्ता, क्यारी, दफ्तर" },
   { id: "6H_SA_04D", unit: "संयुक्ताक्षर", section: "short_q", marks: 2, obj: "ज्ञान", spec: "स्मरण", diff: "साधारण", time: 6, q: "बिना खड़ीपाई वाले संयुक्ताक्षरों के 4 उदाहरण लिखो।", a: "छुट्टी, विद्या, खड्ग, लट्टू" },
   { id: "6H_SA_04E", unit: "संयुक्ताक्षर", section: "short_q", marks: 2, obj: "ज्ञान", spec: "स्मरण", diff: "साधारण", time: 6, q: "क्ष और त्र से बने दो-दो शब्द लिखो।", a: "क्ष: क्षत्रिय, क्षमा | त्र: त्रिशूल, मित्र |" },
 
-  // Q27: र की मात्राएँ (2 अंक) [5 Options][cite: 3, 4]
   { id: "6H_SA_05", unit: "र की मात्राएँ", section: "short_q", marks: 2, obj: "ग्रहण", spec: "लिखना", diff: "साधारण", time: 6, q: "'रेफ़' () और 'पदेन' (,) लगाकर शब्द पूरे करो : गव, डम, चक, सप", a: "गर्व, ड्रम, चक्र, सर्प" },
   { id: "6H_SA_05B", unit: "र की मात्राएँ", section: "short_q", marks: 2, obj: "ग्रहण", spec: "लिखना", diff: "साधारण", time: 6, q: "'रेफ़' (c) मात्रा वाले कोई 4 शब्द लिखो।", a: "कर्म, धर्म, सूर्य, मार्ग" },
   { id: "6H_SA_05C", unit: "र की मात्राएँ", section: "short_q", marks: 2, obj: "ग्रहण", spec: "लिखना", diff: "साधारण", time: 6, q: "'पदेन' (,) मात्रा वाले कोई 4 शब्द लिखो।", a: "क्रम, प्रकाश, प्राण, ग्राम" },
@@ -935,7 +954,6 @@ const LBA_DATABASE = [
   { id: "6H_SA_05E", unit: "र की मात्राएँ", section: "short_q", marks: 2, obj: "ग्रहण", spec: "लिखना", diff: "साधारण", time: 6, q: "'ऋ' मात्रा वाले कोई 4 शब्द लिखो।", a: "कृषक, अमृत, मातृ, पितृ" }
 ];
 
-// SA-1 आधिकारिक मॉडल प्रश्न पत्र के प्रारंभिक 27 सक्रिय प्रश्न[cite: 3]
 const INITIAL_ACTIVE_IDS = [
   "6H_VM_01",
   "6H_BK_01",
@@ -1233,14 +1251,11 @@ function renderQuestionPaperUI() {
   container.innerHTML = h;
 }
 
-// ========== STRICT DROPDOWN FILTERING (SAME UNIT, SAME SECTION, SAME MARKS, EXACTLY 5-6 OPTIONS)[cite: 3] ==========
 function renderSingleQuestion(q, num, requiredType) {
-  // 1. Strictly filter by exact Unit, exact Section type, and exact Marks
   let dbMatches = LBA_DATABASE.filter(item => {
     return item.unit === q.unit && item.section === requiredType && item.marks === q.marks;
   });
 
-  // 2. Keep the current active question at top if matched
   let filteredList = [];
   let currentFound = dbMatches.find(item => item.id === q.id);
   if (currentFound) {
@@ -1252,21 +1267,34 @@ function renderSingleQuestion(q, num, requiredType) {
     }
   });
 
-  // 3. Limit strictly to 5 - 6 choices per dropdown
   filteredList = filteredList.slice(0, 6);
 
   let optionsHtml = filteredList.map(item => `
     <option value="${item.id}" ${item.id === q.id ? 'selected' : ''}>
-      ${item.q.replace(/\n/g, ' ').substring(0, 85)}...
+      ${(item.q + (item.picLabel || '')).replace(/\n/g, ' ').substring(0, 85)}...
     </option>
   `).join('');
 
   let idx = num - 1;
 
+  // ಚಿತ್ರವಿದ್ದರೆ ಬಾಕ್ಸ್ ರೂಪದಲ್ಲಿ SVG ಚಿತ್ರ ಪ್ರದರ್ಶನ
+  let contentHtml = '';
+  if (q.section === 'picture' && q.picSvg) {
+    contentHtml = `
+      <div class="q-picture-container">
+        <span>${q.q}</span>
+        <div class="exam-picture-box">${q.picSvg}</div>
+        <span style="letter-spacing: 2px;">: _______________</span>
+      </div>
+    `;
+  } else {
+    contentHtml = `<div id="q_display_text_${idx}" style="white-space: pre-line;">${q.q}</div>`;
+  }
+
   return `<div class="q-row">
     <div class="q-num">${num}.</div>
     <div class="q-content">
-      <div id="q_display_text_${idx}" style="white-space: pre-line;">${q.q}</div>
+      ${contentHtml}
       <div class="q-tools-bar no-print">
         <select class="q-changer-select" onchange="onQuestionSelectChange(${idx}, this.value)">
           <option value="CUSTOM" style="background:#dcfce7; color:#15803d; font-weight:bold;">➕ अपना स्वयं का प्रश्न एवं उत्तर टाइप करें (Custom)</option>
@@ -1295,7 +1323,7 @@ function onQuestionSelectChange(activeIdx, selectedId) {
         obj: ACTIVE_PAPER[activeIdx].obj,
         section: ACTIVE_PAPER[activeIdx].section
       };
-      document.getElementById(`q_display_text_${activeIdx}`).innerText = original.q;
+      renderQuestionPaperUI();
       renderAnalysisTable();
       renderKeyAnswersUI();
     }
@@ -1308,7 +1336,8 @@ function onCustomTextUpdate(activeIdx) {
 
   ACTIVE_PAPER[activeIdx].q = customQ;
   ACTIVE_PAPER[activeIdx].a = customA;
-  document.getElementById(`q_display_text_${activeIdx}`).innerText = customQ;
+  let displayEl = document.getElementById(`q_display_text_${activeIdx}`);
+  if (displayEl) displayEl.innerText = customQ;
 
   renderKeyAnswersUI();
 }
@@ -1318,9 +1347,10 @@ function renderKeyAnswersUI() {
 
   for (let i = 0; i < 14; i++) {
     let q = ACTIVE_PAPER[i];
+    let qTitle = q.section === 'picture' ? `${q.q} ${q.picLabel || ''}` : q.q;
     h1 += `<tr>
       <td>${i+1}</td>
-      <td class="text-left"><strong style="white-space: pre-line;">${q.q}</strong><br><span style="color:#15803d; font-weight:bold;">उत्तर:</span> <span style="white-space: pre-line;">${q.a}</span></td>
+      <td class="text-left"><strong style="white-space: pre-line;">${qTitle}</strong><br><span style="color:#15803d; font-weight:bold;">उत्तर:</span> <span style="white-space: pre-line;">${q.a}</span></td>
       <td>${q.marks} अंक</td>
     </tr>`;
   }
@@ -1388,7 +1418,7 @@ function printCleanPdf() {
   window.print();
 }
 
-// ========== शुद्ध पेशेवर Word (.doc) निर्यात (हिंदी माध्यम) ==========
+// Word (.doc) ಡೌನ್‌ಲೋಡ್ - ಚಿತ್ರದ ಲೇಬಲ್‌ಗಳೊಂದಿಗೆ
 function downloadWordDoc() {
   const sName = document.getElementById('cfg_school').value;
   const taluk = document.getElementById('cfg_taluk').value;
@@ -1476,9 +1506,10 @@ function downloadWordDoc() {
     `;
     for (let i = sec.start; i < sec.end; i++) {
       let q = ACTIVE_PAPER[i];
+      let displayContent = (q.section === 'picture') ? `${q.q} [चित्र: ${q.picLabel || q.a}] : _______________` : q.q;
       cleanQpHtml += `
         <div style="margin-bottom: 6px; font-size: 11pt; line-height: 1.4;">
-          <strong>${i + 1}.</strong> <span style="white-space: pre-line;">${q.q}</span>
+          <strong>${i + 1}.</strong> <span style="white-space: pre-line;">${displayContent}</span>
         </div>
       `;
     }
@@ -1487,10 +1518,11 @@ function downloadWordDoc() {
   let keyP1Rows = '', keyP2Rows = '';
   for (let i = 0; i < 14; i++) {
     let q = ACTIVE_PAPER[i];
+    let qTitle = q.section === 'picture' ? `${q.q} ${q.picLabel || ''}` : q.q;
     keyP1Rows += `
       <tr>
         <td style="border: 1px solid #000; padding: 4px; text-align: center;">${i + 1}</td>
-        <td style="border: 1px solid #000; padding: 4px; text-align: left;"><strong style="white-space: pre-line;">${q.q}</strong><br><span style="color: #15803d; font-weight: bold;">उत्तर:</span> <span style="white-space: pre-line;">${q.a}</span></td>
+        <td style="border: 1px solid #000; padding: 4px; text-align: left;"><strong style="white-space: pre-line;">${qTitle}</strong><br><span style="color: #15803d; font-weight: bold;">उत्तर:</span> <span style="white-space: pre-line;">${q.a}</span></td>
         <td style="border: 1px solid #000; padding: 4px; text-align: center;">${q.marks} अंक</td>
       </tr>
     `;
