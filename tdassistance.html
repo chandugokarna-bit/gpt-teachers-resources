@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ಟೀಚರ್ಸ್ ಡಿಜಿಟಲ್ ಅಸಿಸ್ಟೆಂಟ್ | Teacher's Digital Assistant</title>
+  <style>
+    :root {
+      --primary: #1e40af;
+      --primary-light: #3b82f6;
+      --accent: #f59e0b;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --radius: 14px;
+      --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Noto Sans Kannada', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 24px 16px;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    /* Hero Header */
+    header {
+      text-align: center;
+      padding: 30px 16px 20px;
+      margin-bottom: 24px;
+      background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #2563eb 100%);
+      color: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(30, 58, 138, 0.2);
+    }
+
+    .header-badge {
+      display: inline-block;
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(4px);
+      padding: 5px 16px;
+      border-radius: 9999px;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+    }
+
+    header h1 {
+      font-size: 28px;
+      font-weight: 800;
+      margin-bottom: 8px;
+      letter-spacing: -0.5px;
+    }
+
+    header p {
+      font-size: 15px;
+      color: #e0e7ff;
+      max-width: 650px;
+      margin: 0 auto;
+      line-height: 1.5;
+    }
+
+    /* Search & Filter Bar */
+    .controls-bar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .search-box {
+      flex: 1;
+      min-width: 260px;
+      position: relative;
+    }
+
+    .search-box input {
+      width: 100%;
+      padding: 12px 16px 12px 42px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: 14px;
+      background: #ffffff;
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    .search-box input:focus {
+      border-color: var(--primary-light);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+    }
+
+    .search-box svg {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 18px;
+      height: 18px;
+      fill: var(--text-muted);
+    }
+
+    .category-chips {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .chip {
+      padding: 8px 16px;
+      border-radius: 9999px;
+      font-size: 13px;
+      font-weight: 600;
+      background: #ffffff;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .chip:hover, .chip.active {
+      background: var(--primary);
+      color: #ffffff;
+      border-color: var(--primary);
+    }
+
+    /* Grid Layout */
+    .tools-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 20px;
+    }
+
+    /* Tool Card */
+    .tool-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .tool-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 16px 30px -8px rgba(0, 0, 0, 0.1);
+      border-color: #cbd5e1;
+    }
+
+    .card-top {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+
+    .icon-badge {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .icon-badge svg {
+      width: 26px;
+      height: 26px;
+    }
+
+    .card-title h3 {
+      font-size: 17px;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 4px;
+    }
+
+    .card-tag {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      display: inline-block;
+    }
+
+    .card-desc {
+      font-size: 13.5px;
+      color: #475569;
+      line-height: 1.5;
+      margin-bottom: 18px;
+      flex-grow: 1;
+    }
+
+    .card-path-box {
+      background: #f1f5f9;
+      border-radius: 6px;
+      padding: 6px 10px;
+      font-family: ui-monospace, Menlo, Monaco, Consolas, monospace;
+      font-size: 11.5px;
+      color: #475569;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-launch {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      padding: 10px 16px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 600;
+      color: #ffffff;
+      background: var(--primary);
+      transition: background 0.2s;
+    }
+
+    .btn-launch:hover {
+      background: #1d4ed8;
+    }
+
+    .btn-launch svg {
+      width: 16px;
+      height: 16px;
+      fill: currentColor;
+    }
+
+    .btn-coming-soon {
+      background: #e2e8f0;
+      color: #94a3b8;
+      cursor: not-allowed;
+    }
+
+    .btn-coming-soon:hover {
+      background: #e2e8f0;
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 30px 16px;
+      margin-top: 36px;
+      color: var(--text-muted);
+      font-size: 13px;
+      border-top: 1px solid var(--border);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <div class="header-badge">🛠️ ಶಿಕ್ಷಕರ ಡಿಜಿಟಲ್ ಸಂಪನ್ಮೂಲ ವೇದಿಕೆ</div>
+      <h1>ಟೀಚರ್ಸ್ ಡಿಜಿಟಲ್ ಅಸಿಸ್ಟೆಂಟ್ (Teacher's Digital Assistant)</h1>
+      <p>ಶಾಲಾ ಪ್ರಶ್ನೆಪತ್ರಿಕೆಗಳು, ಫೋಟೋಗಳು, ಬೃಹತ್ PDF ದಾಖಲೆಗಳ ನಿರ್ವಹಣೆ ಮತ್ತು ದೈನಂದಿನ ಶೈಕ್ಷಣಿಕ ಕೆಲಸಗಳಿಗೆ ಅಗತ್ಯವಿರುವ ಎಲ್ಲಾ ಡಿಜಿಟಲ್ ಸಾಧನಗಳ ಸಮಗ್ರ ಕೇಂದ್ರ.</p>
+    </header>
+
+    <!-- Search & Filter Controls -->
+    <div class="controls-bar">
+      <div class="search-box">
+        <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+        <input type="text" id="searchInput" placeholder="ಟೂಲ್ ಹೆಸರು ಅಥವಾ ವಿವರವನ್ನು ಹುಡುಕಿ...">
+      </div>
+
+      <div class="category-chips">
+        <button class="chip active" onclick="filterCategory('all', this)">ಎಲ್ಲಾ ಸಾಧನಗಳು</button>
+        <button class="chip" onclick="filterCategory('pdf', this)">PDF ಪರಿಕರಗಳು</button>
+        <button class="chip" onclick="filterCategory('image', this)">ಫೋಟೋ ಸಾಧನಗಳು</button>
+        <button class="chip" onclick="filterCategory('classroom', this)">ತರಗತಿ & ಬೋಧನೆ</button>
+      </div>
+    </div>
+
+    <!-- Tools Grid -->
+    <div class="tools-grid" id="toolsGrid">
+      
+      <!-- Tool 1: Heavy PDF Compressor -->
+      <div class="tool-card" data-category="pdf" data-title="ದೊಡ್ಡ PDF ಸೈಜ್ ಕಂಪ್ರೆಸರ್ heavy pdf compressor">
+        <div>
+          <div class="card-top">
+            <div class="icon-badge" style="background: #e0f2fe; color: #0284c7;">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+            </div>
+            <div class="card-title">
+              <span class="card-tag" style="background: #dbeafe; color: #1e40af;">PDF Utility</span>
+              <h3>ಹೆವಿ PDF ಕಂಪ್ರೆಸರ್ (50MB - 100MB)</h3>
+            </div>
+          </div>
+          <p class="card-desc">ಅತಿ ದೊಡ್ಡದಾದ 50MB, 100MB ಯ ಸ್ಕ್ಯಾನ್ ದಾಖಲೆಗಳು ಹಾಗೂ PDF ಗಳ ಗುಣಮಟ್ಟ ಹಾಳಾಗದಂತೆ 70% ರಿಂದ 80% ಗಾತ್ರ ಕಡಿತಗೊಳಿಸುತ್ತದೆ.</p>
+          <div class="card-path-box">
+            📁 Tdassistance/heavy_pdf_compressor.html
+          </div>
+        </div>
+        <a href="Tdassistance/heavy_pdf_compressor.html" class="btn-launch" target="_blank">
+          ಟೂಲ್ ತೆರೆಯಿರಿ
+          <svg viewBox="0 0 24 24"><path d="M5 13h11.86l-5.43 5.43 1.42 1.42L21.14 12l-8.29-8.29-1.42 1.42L16.86 11H5v2z"/></svg>
+        </a>
+      </div>
+
+      <!-- Tool 2: Smart Photo to PDF Converter -->
+      <div class="tool-card" data-category="image pdf" data-title="ಸ್ಮಾರ್ಟ್ ಫೋಟೋ ಟು ಪಿಡಿಎಫ್ smart photo pdf compressor">
+        <div>
+          <div class="card-top">
+            <div class="icon-badge" style="background: #dcfce7; color: #16a34a;">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+            </div>
+            <div class="card-title">
+              <span class="card-tag" style="background: #dcfce7; color: #15803d;">Smart Optimize</span>
+              <h3>ಸ್ಮಾರ್ಟ್ ಫೋಟೋ ಟು PDF ಕನ್ವರ್ಟರ್</h3>
+            </div>
+          </div>
+          <p class="card-desc">ಕ್ಯಾಮೆರಾ ಫೋಟೋಗಳ ನೈಜ ಸ್ಪಷ್ಟತೆಯನ್ನು ಹಾಗೇ ಇಟ್ಟುಕೊಂಡು, MB/KB ಸೈಜ್ ಅನ್ನು ಗಣನೀಯವಾಗಿ ಕಡಿಮೆ ಮಾಡಿ ಅಚ್ಚುಕಟ್ಟಾದ PDF ರಚಿಸುತ್ತದೆ.</p>
+          <div class="card-path-box">
+            📁 Tdassistance/smart_photo_to_pdf_converter.html
+          </div>
+        </div>
+        <a href="Tdassistance/smart_photo_to_pdf_converter.html" class="btn-launch" target="_blank">
+          ಟೂಲ್ ತೆರೆಯಿರಿ
+          <svg viewBox="0 0 24 24"><path d="M5 13h11.86l-5.43 5.43 1.42 1.42L21.14 12l-8.29-8.29-1.42 1.42L16.86 11H5v2z"/></svg>
+        </a>
+      </div>
+
+      <!-- Tool 3: Basic Photos to PDF Converter -->
+      <div class="tool-card" data-category="image pdf" data-title="ಫೋಟೋಸ್ ಟು ಪಿಡಿಎಫ್ photos to pdf converter fit fine">
+        <div>
+          <div class="card-top">
+            <div class="icon-badge" style="background: #fef3c7; color: #d97706;">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/></svg>
+            </div>
+            <div class="card-title">
+              <span class="card-tag" style="background: #fef3c7; color: #b45309;">Simple & Fast</span>
+              <h3>ಫೋಟೋಸ್ ಟು PDF (ಫಿಟ್ & ಫೈನ್)</h3>
+            </div>
+          </div>
+          <p class="card-desc">ಯಾವುದೇ ಸೈಜ್‌ನ ಎಷ್ಟು ಬೇಕಾದರೂ ಫೋಟೋಗಳನ್ನು ಡ್ರ್ಯಾಗ್ ಮಾಡಿ, ನೇರವಾಗಿ A4 ಅಥವಾ ಮೂಲ ಅಳತೆಯ ಪುಟಗಳಿಗೆ ಹೊಂದಿಸಿ PDF ರಚಿಸುವ ಸರಳ ಸಾಧನ.</p>
+          <div class="card-path-box">
+            📁 Tdassistance/photos_to_pdf_converter.html
+          </div>
+        </div>
+        <a href="Tdassistance/photos_to_pdf_converter.html" class="btn-launch" target="_blank">
+          ಟೂಲ್ ತೆರೆಯಿರಿ
+          <svg viewBox="0 0 24 24"><path d="M5 13h11.86l-5.43 5.43 1.42 1.42L21.14 12l-8.29-8.29-1.42 1.42L16.86 11H5v2z"/></svg>
+        </a>
+      </div>
+
+      <!-- Slot 4: Future Tool (PDF Splitter & Merger) -->
+      <div class="tool-card" data-category="pdf" data-title="ಪಿಡಿಎಫ್ ವಿಭಜಕ ಮತ್ತು ಸಂಯೋಜಕ pdf split merge">
+        <div>
+          <div class="card-top">
+            <div class="icon-badge" style="background: #f3e8ff; color: #9333ea;">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 3L5 6.99h3V14h2V6.99h3L9 3zm7 14.01V10h-2v7.01h-3L15 21l4-3.99h-3z"/></svg>
+            </div>
+            <div class="card-title">
+              <span class="card-tag" style="background: #f3e8ff; color: #7e22ce;">ಹೊಸ ಸೇರ್ಪಡೆ</span>
+              <h3>PDF ಸ್ಪ್ಲಿಟ್ & ಮರ್ಜ್ (Split & Merge)</h3>
+            </div>
+          </div>
+          <p class="card-desc">ಹಲವಾರು PDF ಫೈಲ್‌ಗಳನ್ನು ಒಂದಾಗಿ ಜೋಡಿಸಲು ಅಥವಾ ದೊಡ್ಡ PDF ನಿಂದ ಬೇಕಾದ ಪುಟಗಳನ್ನು ಮಾತ್ರ ಪ್ರತ್ಯೇಕಿಸಲು ಮುಂಬರುವ ಹೊಸ ಟೂಲ್.</p>
+          <div class="card-path-box">
+            📁 Tdassistance/pdf_split_merge.html
+          </div>
+        </div>
+        <a href="Tdassistance/pdf_split_merge.html" class="btn-launch">
+          ಟೂಲ್ ತೆರೆಯಿರಿ
+          <svg viewBox="0 0 24 24"><path d="M5 13h11.86l-5.43 5.43 1.42 1.42L21.14 12l-8.29-8.29-1.42 1.42L16.86 11H5v2z"/></svg>
+        </a>
+      </div>
+
+      <!-- Slot 5: Future Tool (Question Paper Formatter) -->
+      <div class="tool-card" data-category="classroom" data-title="ಪ್ರಶ್ನೆಪತ್ರಿಕೆ ಫಾರ್ಮ್ಯಾಟರ್ question paper maker formatter">
+        <div>
+          <div class="card-top">
+            <div class="icon-badge" style="background: #fee2e2; color: #dc2626;">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+            </div>
+            <div class="card-title">
+              <span class="card-tag" style="background: #fee2e2; color: #b91c1c;">ಬೋಧನಾ ಸಹಾಯಕ</span>
+              <h3>ಪ್ರಶ್ನೆ ಪತ್ರಿಕೆ ಫಾರ್ಮ್ಯಾಟರ್ & ಜನರೇಟರ್</h3>
+            </div>
+          </div>
+          <p class="card-desc">ಪರೀಕ್ಷಾ ಪ್ರಶ್ನೆಪತ್ರಿಕೆಗಳು ಹಾಗೂ ನೀಲನಕ್ಷೆ (Blueprints) ಗಳನ್ನು ಸುಲಭವಾಗಿ ಸಿದ್ಧಪಡಿಸಿ ಪ್ರಿಂಟ್‌ಗೆ ಕಳುಹಿಸುವ ಡಿಜಿಟಲ್ ಟೆಂಪ್ಲೇಟ್.</p>
+          <div class="card-path-box">
+            📁 Tdassistance/qp_formatter.html
+          </div>
+        </div>
+        <a href="Tdassistance/qp_formatter.html" class="btn-launch">
+          ಟೂಲ್ ತೆರೆಯಿರಿ
+          <svg viewBox="0 0 24 24"><path d="M5 13h11.86l-5.43 5.43 1.42 1.42L21.14 12l-8.29-8.29-1.42 1.42L16.86 11H5v2z"/></svg>
+        </a>
+      </div>
+
+      <!-- Slot 6: Add Custom File Placeholder -->
+      <div class="tool-card" style="border: 2px dashed #cbd5e1; background: #fafafa;" data-category="all" data-title="ಹೊಸ ಫೈಲ್ ಸೇರಿಸಿ add new tool">
+        <div>
+          <div class="card-top">
+            <div class="icon-badge" style="background: #e2e8f0; color: #475569;">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+            </div>
+            <div class="card-title">
+              <span class="card-tag" style="background: #f1f5f9; color: #475569;">ವಿಸ್ತರಣೆ</span>
+              <h3>ನಿಮ್ಮದೇ ಹೊಸ ಫೈಲ್ ಸೇರಿಸಿ</h3>
+            </div>
+          </div>
+          <p class="card-desc">ಈ HTML ಕೋಡ್‌ನಲ್ಲಿ ನೀವು ರಚಿಸಿದ ಇತರೆ ಯಾವುದೇ HTML ಅಥವಾ ವೆಬ್ ಫೈಲ್‌ಗಳನ್ನು Tdassistance ಫೋಲ್ಡರ್‌ಗೆ ಹಾಕಿ ಸುಲಭವಾಗಿ ಲಿಂಕ್ ಮಾಡಬಹುದು.</p>
+          <div class="card-path-box">
+            📁 Tdassistance/ನಿಮ್ಮ_ಹೊಸ_ಫೈಲ್.html
+          </div>
+        </div>
+        <button class="btn-launch btn-coming-soon" disabled>
+          + ಶೀಘ್ರದಲ್ಲೇ ಹೆಚ್ಚಿನ ಸಾಧನಗಳು
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Footer -->
+    <footer>
+      <p>💡 ಎಲ್ಲಾ ಸಾಧನಗಳು ಆಫ್‌ಲೈನ್ ಹಾಗೂ ಬ್ರೌಸರ್ ಆಧಾರಿತವಾಗಿದ್ದು, ಶಿಕ್ಷಕರ ಡೇಟಾ ಸುರಕ್ಷಿತವಾಗಿರುತ್ತದೆ.</p>
+      <p style="margin-top: 6px;">ಟೀಚರ್ಸ್ ಡಿಜಿಟಲ್ ಅಸಿಸ್ಟೆಂಟ್ &copy; 2026</p>
+    </footer>
+  </div>
+
+  <script>
+    const searchInput = document.getElementById('searchInput');
+    const cards = document.querySelectorAll('.tool-card');
+
+    // Live search
+    searchInput.addEventListener('input', (e) => {
+      const query = e.target.value.toLowerCase().trim();
+      cards.forEach(card => {
+        const titleData = card.dataset.title.toLowerCase();
+        if (titleData.includes(query)) {
+          card.style.display = 'flex';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    });
+
+    // Category filter
+    function filterCategory(category, buttonElement) {
+      document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+      buttonElement.classList.add('active');
+
+      cards.forEach(card => {
+        const cat = card.dataset.category || '';
+        if (category === 'all' || cat.includes(category)) {
+          card.style.display = 'flex';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
+  </script>
+</body>
+</html>
