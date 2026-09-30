@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ದೊಡ್ಡ PDF ಕಂಪ್ರೆಸರ್ | Smart Heavy PDF Size Reducer</title>
+  <!-- PDF.js for rendering existing heavy PDFs -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <!-- jsPDF for regenerating clean, lightweight vector/image stream PDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    :root {
+      --primary: #0284c7;
+      --primary-hover: #0369a1;
+      --success: #15803d;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --radius: 14px;
+      --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Noto Sans Kannada', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 24px 14px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .badge-tag {
+      display: inline-block;
+      background: #e0f2fe;
+      color: #0369a1;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 4px 14px;
+      border-radius: 9999px;
+      margin-bottom: 8px;
+    }
+
+    header h1 {
+      font-size: 26px;
+      color: #0f172a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+
+    header p {
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 22px;
+      margin-bottom: 20px;
+      border: 1px solid var(--border);
+    }
+
+    /* Drop Zone */
+    .drop-zone {
+      border: 2px dashed #7dd3fc;
+      background: #f0f9ff;
+      border-radius: var(--radius);
+      padding: 38px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.25s ease;
+    }
+
+    .drop-zone:hover, .drop-zone.dragover {
+      border-color: var(--primary);
+      background: #e0f2fe;
+      transform: translateY(-2px);
+    }
+
+    .drop-zone svg {
+      width: 52px;
+      height: 52px;
+      fill: var(--primary);
+      margin-bottom: 12px;
+    }
+
+    .drop-zone h3 {
+      font-size: 17px;
+      color: #0369a1;
+      margin-bottom: 4px;
+    }
+
+    .drop-zone p {
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+
+    #fileInput {
+      display: none;
+    }
+
+    /* Info Strip */
+    .info-strip {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+    }
+
+    .info-strip .label {
+      font-size: 13px;
+      color: #334155;
+      font-weight: 500;
+    }
+
+    .info-strip .stats {
+      font-weight: 700;
+      color: var(--primary);
+      font-size: 14px;
+    }
+
+    /* Options Grid */
+    .options-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+    }
+
+    .option-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: #334155;
+      margin-bottom: 6px;
+    }
+
+    .option-group select, .option-group input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 13px;
+      background: #fff;
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    .option-group select:focus, .option-group input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
+    }
+
+    /* Compression Report Box */
+    .report-card {
+      display: none;
+      background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+      border: 1px solid #86efac;
+      border-radius: 12px;
+      padding: 18px;
+      margin-top: 18px;
+      text-align: center;
+    }
+
+    .report-card h4 {
+      color: #15803d;
+      font-size: 16px;
+      margin-bottom: 10px;
+    }
+
+    .report-metrics {
+      display: flex;
+      justify-content: space-around;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .metric-box {
+      background: #fff;
+      padding: 10px 18px;
+      border-radius: 8px;
+      border: 1px solid #bbf7d0;
+    }
+
+    .metric-box .metric-label {
+      font-size: 11px;
+      color: #64748b;
+      margin-bottom: 2px;
+    }
+
+    .metric-box .metric-val {
+      font-size: 16px;
+      font-weight: 700;
+      color: #1e293b;
+    }
+
+    /* Action bar */
+    .action-bar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-top: 20px;
+      padding-top: 18px;
+      border-top: 1px solid #f1f5f9;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 24px;
+      font-size: 14px;
+      font-weight: 600;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #0284c7, #0369a1);
+      color: #fff;
+      box-shadow: 0 4px 10px rgba(2, 132, 199, 0.25);
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #0369a1, #075985);
+    }
+
+    .btn-success {
+      background: linear-gradient(135deg, #16a34a, #15803d);
+      color: #fff;
+      box-shadow: 0 4px 10px rgba(22, 163, 74, 0.25);
+    }
+
+    .btn:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    /* Progress bar */
+    .progress-container {
+      display: none;
+      margin-top: 16px;
+    }
+
+    .progress-bar-bg {
+      height: 9px;
+      background: #e2e8f0;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #0284c7, #16a34a);
+      transition: width 0.2s ease;
+    }
+
+    .progress-text {
+      font-size: 12px;
+      color: #475569;
+      margin-top: 6px;
+      text-align: center;
+      font-weight: 500;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <div class="badge-tag">🚀 50MB - 100MB PDF ಕಂಪ್ರೆಸರ್</div>
+      <h1>
+        <svg style="width:28px;height:28px;fill:#0284c7" viewBox="0 0 24 24">
+          <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
+        </svg>
+        ದೊಡ್ಡ PDF ಸೈಜ್ ಕಡಿಮೆ ಮಾಡುವ ಟೂಲ್
+      </h1>
+      <p>ಅತಿ ಹೆಚ್ಚು MB ಇರುವ PDF ಫೈಲ್‌ಗಳನ್ನು ಅಕ್ಷರ ಮತ್ತು ಚಿತ್ರಗಳ ಸ್ಪಷ್ಟತೆ ಹಾಳಾಗದಂತೆ ಅತಿ ಕಡಿಮೆ MB ಗೆ ಪರಿವರ್ತಿಸಿ</p>
+    </header>
+
+    <!-- Upload Card -->
+    <div class="card">
+      <div class="drop-zone" id="dropZone">
+        <svg viewBox="0 0 24 24">
+          <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/>
+        </svg>
+        <h3>ಇಲ್ಲಿ ದೊಡ್ಡ PDF ಫೈಲ್ ಅನ್ನು ಆಯ್ಕೆ ಮಾಡಿ ಅಥವಾ ಡ್ರ್ಯಾಗ್ ಮಾಡಿ ಹಾಕಿ</h3>
+        <p>50MB, 100MB ಅಥವಾ ಅದಕ್ಕಿಂತ ದೊಡ್ಡದಾದ ಯಾವುದೇ ಸ್ಕ್ಯಾನ್ಡ್ ಅಥವಾ ಡಾಕ್ಯುಮೆಂಟ್ PDF ಬೆಂಬಲಿತವಾಗಿದೆ</p>
+      </div>
+      <input type="file" id="fileInput" accept="application/pdf">
+    </div>
+
+    <!-- Optimization Controls -->
+    <div class="card" id="settingsCard">
+      <div class="info-strip">
+        <div class="label" id="fileInfoText">ಯಾವುದೇ ಫೈಲ್ ಆಯ್ಕೆಯಾಗಿಲ್ಲ</div>
+        <div class="stats" id="fileSizeText">-</div>
+      </div>
+
+      <div class="options-grid">
+        <!-- Compression Level -->
+        <div class="option-group">
+          <label>🎯 ಕಂಪ್ರೆಷನ್ ಮೋಡ್ (Compression Profile)</label>
+          <select id="compressionMode">
+            <option value="balanced" selected>⚡ ಸ್ಮಾರ್ಟ್ ಬ್ಯಾಲೆನ್ಸ್ಡ್ (ಉತ್ತಮ ಕ್ಲಾರಿಟಿ + 75% ಗಾತ್ರ ಕಡಿತ - ಬೆಸ್ಟ್)</option>
+            <option value="high_clarity">💎 ಹೈ-ರೆಸಲ್ಯೂಶನ್ ಟೆಕ್ಸ್ಟ್ (ಪ್ರಿಂಟ್‌ಗೆ ಸೂಕ್ತ, ಅತ್ಯಂತ ತೀಕ್ಷ್ಣ ಅಕ್ಷರಗಳು)</option>
+            <option value="extreme">🪶 ಅಲ್ಟ್ರಾ ಲೈಟ್ (ವಾಟ್ಸಾಪ್ / ಇಮೇಲ್‌ಗೆ ಅತ್ಯಂತ ಕಡಿಮೆ MB/KB)</option>
+          </select>
+        </div>
+
+        <!-- Custom Output Name -->
+        <div class="option-group">
+          <label>📝 ಹೊಸ PDF ಹೆಸರು (Output Name)</label>
+          <input type="text" id="outputFileName" value="Compressed_Document.pdf" placeholder="ಫೈಲ್ ಹೆಸರು ನಮೂದಿಸಿ">
+        </div>
+      </div>
+
+      <!-- Progress -->
+      <div class="progress-container" id="progressContainer">
+        <div class="progress-bar-bg">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <div class="progress-text" id="progressText">ಪುಟಗಳನ್ನು ಸ್ಮಾರ್ಟ್ ಪ್ರಕ್ರಿಯೆಗೊಳಿಸಲಾಗುತ್ತಿದೆ...</div>
+      </div>
+
+      <!-- Compression Report -->
+      <div class="report-card" id="reportCard">
+        <h4>🎉 PDF ಗಾತ್ರ ಯಶಸ್ವಿಯಾಗಿ ಕಡಿಮೆಯಾಗಿದೆ!</h4>
+        <div class="report-metrics">
+          <div class="metric-box">
+            <div class="metric-label">ಮೊದಲಿನ ಗಾತ್ರ</div>
+            <div class="metric-val" id="origSizeVal">0 MB</div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-label">ಹೊಸ ಗಾತ್ರ</div>
+            <div class="metric-val" style="color: #15803d;" id="newSizeVal">0 MB</div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-label">ಉಳಿಕೆಯಾದ ಸ್ಥಳ</div>
+            <div class="metric-val" style="color: #0284c7;" id="savingsVal">0%</div>
+          </div>
+        </div>
+        <button class="btn btn-success" id="downloadBtn">
+          📥 ಕಂಪ್ರೆಸ್ಡ್ PDF ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ
+        </button>
+      </div>
+
+      <div class="action-bar" id="actionBar">
+        <div style="font-size: 13px; color: #64748b;">
+          💡 <em>ಇಂಟರ್ನೆಟ್ ಇಲ್ಲದೆಯೂ ನಿಮ್ಮ ಬ್ರೌಸರ್‌ನಲ್ಲೇ ಸಂಪೂರ್ಣ ಸುರಕ್ಷಿತವಾಗಿ ಕಂಪ್ರೆಸ್ ಆಗುತ್ತದೆ.</em>
+        </div>
+        <button class="btn btn-primary" id="startCompressBtn" disabled>
+          ⚡ PDF ಕಂಪ್ರೆಸ್ ಮಾಡಲು ಪ್ರಾರಂಭಿಸಿ
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Initialize PDF.js worker
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('fileInput');
+    const fileInfoText = document.getElementById('fileInfoText');
+    const fileSizeText = document.getElementById('fileSizeText');
+    const startCompressBtn = document.getElementById('startCompressBtn');
+    const progressContainer = document.getElementById('progressContainer');
+    const progressFill = document.getElementById('progressFill');
+    const progressText = document.getElementById('progressText');
+    const reportCard = document.getElementById('reportCard');
+    const origSizeVal = document.getElementById('origSizeVal');
+    const newSizeVal = document.getElementById('newSizeVal');
+    const savingsVal = document.getElementById('savingsVal');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const outputFileName = document.getElementById('outputFileName');
+
+    let currentFile = null;
+    let compressedPdfBlob = null;
+
+    dropZone.addEventListener('click', () => fileInput.click());
+
+    ['dragenter', 'dragover'].forEach(name => {
+      dropZone.addEventListener(name, (e) => {
+        e.preventDefault();
+        dropZone.classList.add('dragover');
+      });
+    });
+
+    ['dragleave', 'drop'].forEach(name => {
+      dropZone.addEventListener(name, (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('dragover');
+      });
+    });
+
+    dropZone.addEventListener('drop', (e) => {
+      const file = e.dataTransfer.files[0];
+      if (file && file.type === 'application/pdf') {
+        loadPdfFile(file);
+      } else {
+        alert('ದಯವಿಟ್ಟು PDF ಫೈಲ್ ಮಾತ್ರ ಆಯ್ಕೆ ಮಾಡಿ.');
+      }
+    });
+
+    fileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) loadPdfFile(file);
+    });
+
+    function formatBytes(bytes) {
+      if (bytes < 1024) return bytes + ' B';
+      if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+      return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+    }
+
+    function loadPdfFile(file) {
+      currentFile = file;
+      fileInfoText.innerText = `ಆಯ್ಕೆಯಾದ ಫೈಲ್: ${file.name}`;
+      fileSizeText.innerText = `ಮೂಲ ಗಾತ್ರ: ${formatBytes(file.size)}`;
+      outputFileName.value = file.name.replace(/\.pdf$/i, '') + '_compressed.pdf';
+      startCompressBtn.disabled = false;
+      reportCard.style.display = 'none';
+    }
+
+    startCompressBtn.addEventListener('click', async () => {
+      if (!currentFile) return;
+
+      startCompressBtn.disabled = true;
+      reportCard.style.display = 'none';
+      progressContainer.style.display = 'block';
+      progressFill.style.width = '0%';
+      progressText.innerText = 'PDF ಓದಲಾಗುತ್ತಿದೆ...';
+
+      const mode = document.getElementById('compressionMode').value;
+      
+      // Smart Profiles for Rendering & Compression
+      let renderScale = 1.5; // High pixel sharpness
+      let jpegQuality = 0.80; // High visual fidelity
+
+      if (mode === 'high_clarity') {
+        renderScale = 2.0; // Ultra sharp rendering
+        jpegQuality = 0.88;
+      } else if (mode === 'balanced') {
+        renderScale = 1.5; // Optimal sharp balance
+        jpegQuality = 0.78;
+      } else if (mode === 'extreme') {
+        renderScale = 1.2;
+        jpegQuality = 0.65;
+      }
+
+      try {
+        const arrayBuffer = await currentFile.arrayBuffer();
+        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+        const totalPages = pdf.numPages;
+
+        const { jsPDF } = window.jspdf;
+        let newDoc = null;
+
+        for (let pageNum = 1; pageNum <= totalPages; pageNum++) {
+          progressText.innerText = `ಪುಟ ${pageNum} / ${totalPages} ಸಂಸ್ಕರಿಸಲಾಗುತ್ತಿದೆ...`;
+          
+          const page = await pdf.getPage(pageNum);
+          const originalViewport = page.getViewport({ scale: 1.0 });
+          const viewport = page.getViewport({ scale: renderScale });
+
+          // Render page to an offscreen high-definition canvas
+          const canvas = document.createElement('canvas');
+          canvas.width = viewport.width;
+          canvas.height = viewport.height;
+          const ctx = canvas.getContext('2d', { alpha: false });
+
+          // Fill white background (ensures clear contrast for scanned documents)
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+          await page.render({
+            canvasContext: ctx,
+            viewport: viewport
+          }).promise;
+
+          // Convert canvas directly to optimized JPEG stream
+          const imgData = canvas.toDataURL('image/jpeg', jpegQuality);
+
+          // Get dimensions in mm for standard PDF page size match
+          // 1 point = 0.352778 mm
+          const pageW_mm = originalViewport.width * 0.352778;
+          const pageH_mm = originalViewport.height * 0.352778;
+          const orientation = pageW_mm > pageH_mm ? 'l' : 'p';
+
+          if (pageNum === 1) {
+            newDoc = new jsPDF({
+              orientation: orientation,
+              unit: 'mm',
+              format: [pageW_mm, pageH_mm],
+              compress: true
+            });
+          } else {
+            newDoc.addPage([pageW_mm, pageH_mm], orientation);
+          }
+
+          // Place the optimized raster page fitting 100% border-to-border
+          newDoc.addImage(imgData, 'JPEG', 0, 0, pageW_mm, pageH_mm, undefined, 'FAST');
+
+          const progress = Math.round((pageNum / totalPages) * 100);
+          progressFill.style.width = progress + '%';
+        }
+
+        progressText.innerText = 'ಅಂತಿಮ ಫೈಲ್ ಸಿದ್ಧಪಡಿಸಲಾಗುತ್ತಿದೆ...';
+        compressedPdfBlob = newDoc.output('blob');
+
+        // Show Results
+        const origSize = currentFile.size;
+        const newSize = compressedPdfBlob.size;
+        const savedPercent = Math.max(0, Math.round(((origSize - newSize) / origSize) * 100));
+
+        origSizeVal.innerText = formatBytes(origSize);
+        newSizeVal.innerText = formatBytes(newSize);
+        savingsVal.innerText = `${savedPercent}% ಉಳಿತಾಯ`;
+
+        progressContainer.style.display = 'none';
+        reportCard.style.display = 'block';
+        startCompressBtn.disabled = false;
+
+      } catch (err) {
+        console.error(err);
+        alert('ದೋಷ ಸಂಭವಿಸಿದೆ: ' + err.message);
+        progressContainer.style.display = 'none';
+        startCompressBtn.disabled = false;
+      }
+    });
+
+    downloadBtn.addEventListener('click', () => {
+      if (!compressedPdfBlob) return;
+      const url = URL.createObjectURL(compressedPdfBlob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = outputFileName.value.trim() || 'Compressed_Document.pdf';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    });
+  </script>
+</body>
+</html>

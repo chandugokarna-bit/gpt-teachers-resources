@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="kn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ಸ್ಮಾರ್ಟ್ ಫೋಟೋ ಕಂಪ್ರೆಸರ್ ಮತ್ತು PDF ರಚನಕಾರ | Smart Photo to PDF</title>
+  <!-- jsPDF Library for high quality client-side PDF generation -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <!-- SortableJS for drag-and-drop reordering -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --success: #16a34a;
+      --danger: #dc2626;
+      --accent: #8b5cf6;
+      --bg: #f1f5f9;
+      --card-bg: #ffffff;
+      --text: #1e293b;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --radius: 14px;
+      --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Noto Sans Kannada', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 24px 14px;
+    }
+
+    .container {
+      max-width: 950px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .badge-tag {
+      display: inline-block;
+      background: #e0e7ff;
+      color: #3730a3;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: 9999px;
+      margin-bottom: 8px;
+    }
+
+    header h1 {
+      font-size: 26px;
+      color: #0f172a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+
+    header p {
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 22px;
+      margin-bottom: 20px;
+      border: 1px solid var(--border);
+    }
+
+    /* Drop Zone */
+    .drop-zone {
+      border: 2px dashed #93c5fd;
+      background: #eff6ff;
+      border-radius: var(--radius);
+      padding: 34px 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.25s ease;
+    }
+
+    .drop-zone:hover, .drop-zone.dragover {
+      border-color: var(--primary);
+      background: #dbeafe;
+      transform: translateY(-2px);
+    }
+
+    .drop-zone svg {
+      width: 48px;
+      height: 48px;
+      fill: var(--primary);
+      margin-bottom: 10px;
+    }
+
+    .drop-zone h3 {
+      font-size: 17px;
+      color: #1e40af;
+      margin-bottom: 4px;
+    }
+
+    .drop-zone p {
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+
+    #fileInput {
+      display: none;
+    }
+
+    /* Smart Compression Banner */
+    .compression-banner {
+      background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+      border: 1px solid #bbf7d0;
+      border-radius: 10px;
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+    }
+
+    .compression-banner .info-text {
+      font-size: 13px;
+      color: #166534;
+      line-height: 1.4;
+    }
+
+    .stat-pill {
+      background: #ffffff;
+      border: 1px solid #86efac;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #15803d;
+      white-space: nowrap;
+    }
+
+    /* Options Panel */
+    .options-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 16px;
+    }
+
+    .option-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: #334155;
+      margin-bottom: 6px;
+    }
+
+    .option-group select, .option-group input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 13px;
+      background: #fff;
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    .option-group select:focus, .option-group input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.15);
+    }
+
+    /* Images Grid */
+    .section-title {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: #1e293b;
+    }
+
+    .images-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 14px;
+      min-height: 80px;
+    }
+
+    .image-card {
+      position: relative;
+      background: #fff;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.04);
+      cursor: grab;
+      display: flex;
+      flex-direction: column;
+      height: 180px;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+
+    .image-card:hover {
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    }
+
+    .image-card img {
+      width: 100%;
+      height: 110px;
+      object-fit: cover;
+      background: #f8fafc;
+    }
+
+    .image-card .card-info {
+      padding: 6px 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      font-size: 11px;
+      background: #fff;
+      border-top: 1px solid #f1f5f9;
+    }
+
+    .image-card .file-name {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-weight: 600;
+      color: #334155;
+    }
+
+    .image-card .file-meta {
+      display: flex;
+      justify-content: space-between;
+      color: #64748b;
+      font-size: 10px;
+    }
+
+    .image-card .delete-btn {
+      background: rgba(220, 38, 38, 0.9);
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 22px;
+      height: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    .badge-order {
+      position: absolute;
+      top: 6px;
+      left: 6px;
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(2px);
+      color: #fff;
+      border-radius: 4px;
+      padding: 2px 6px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    /* Action Bar */
+    .action-bar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-top: 18px;
+      padding-top: 16px;
+      border-top: 1px solid #f1f5f9;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      font-size: 14px;
+      font-weight: 600;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn-success {
+      background: linear-gradient(135deg, #16a34a, #15803d);
+      color: #fff;
+      padding: 12px 26px;
+      font-size: 15px;
+      box-shadow: 0 4px 10px rgba(22,163,74,0.25);
+    }
+
+    .btn-success:hover {
+      background: linear-gradient(135deg, #15803d, #166534);
+    }
+
+    .btn-danger {
+      background: #fee2e2;
+      color: var(--danger);
+      border: 1px solid #fecaca;
+    }
+
+    .btn-danger:hover {
+      background: #fecaca;
+    }
+
+    .btn:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    /* Progress bar */
+    .progress-container {
+      display: none;
+      margin-top: 15px;
+    }
+
+    .progress-bar-bg {
+      height: 8px;
+      background: #e2e8f0;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      transition: width 0.2s ease;
+    }
+
+    .progress-text {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 6px;
+      text-align: center;
+      font-weight: 500;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 30px;
+      color: #94a3b8;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <div class="badge-tag">⚡ ಹೈ-ಕ್ವಾಲಿಟಿ & ಲೈಟ್-ವೇಟ್ PDF</div>
+      <h1>
+        <svg style="width:28px;height:28px;fill:#2563eb" viewBox="0 0 24 24">
+          <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-9 14l-3.5-4.5 2.5-3.01L11.5 13l3.5-4.51 4.5 6.01H10z"/>
+        </svg>
+        ಫೋಟೋಗಳಿಂದ ಸ್ಮಾರ್ಟ್ PDF ತಯಾರಿಸಿ
+      </h1>
+      <p>ಚಿತ್ರದ ಸ್ಪಷ್ಟತೆ ಅಚ್ಚುಕಟ್ಟಾಗಿ ಉಳಿಸಿಕೊಂಡು, MB / KB ಗಾತ್ರವನ್ನು ಗಣನೀಯವಾಗಿ ಕಡಿತಗೊಳಿಸಿ PDF ರಚಿಸಿ</p>
+    </header>
+
+    <!-- Upload Card -->
+    <div class="card">
+      <div class="drop-zone" id="dropZone">
+        <svg viewBox="0 0 24 24">
+          <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/>
+        </svg>
+        <h3>ಇಲ್ಲಿ ಫೋಟೋಗಳನ್ನು ಡ್ರ್ಯಾಗ್ ಮಾಡಿ ಅಥವಾ ಕ್ಲಿಕ್ ಮಾಡಿ ಅಪ್‌ಲೋಡ್ ಮಾಡಿ</h3>
+        <p>ಯಾವುದೇ ಸೈಜ್ ಹಾಗೂ ಎಷ್ಟು ಬೇಕಾದರೂ ಚಿತ್ರಗಳನ್ನು ಆಯ್ಕೆ ಮಾಡಬಹುದು (JPG, PNG, WebP)</p>
+      </div>
+      <input type="file" id="fileInput" multiple accept="image/*">
+    </div>
+
+    <!-- Smart Optimization & PDF Settings Card -->
+    <div class="card">
+      <!-- Feature Banner -->
+      <div class="compression-banner">
+        <div class="info-text">
+          ✨ <strong>ಸ್ಮಾರ್ಟ್ ಆಪ್ಟಿಮೈಸೇಶನ್:</strong> ಕ್ಯಾಮೆರಾದ 5MB-10MB ಬೃಹತ್ ಫೋಟೋಗಳ ಅತಿಯಾದ ಪಿಕ್ಸೆಲ್ ಡೆನ್ಸಿಟಿಯನ್ನು PDF ಗೆ ಬೇಕಾದ ಪರಿಪೂರ್ಣ ಪ್ರಮಾಣಕ್ಕೆ (Smart Downscaling) ಹೊಂದಿಸಿ, ಕಣ್ಣಿಗೆ ಸ್ಪಷ್ಟತೆ ಕಡಿಮೆಯಾಗದಂತೆ ಸೈಜ್ ಅನ್ನು 70% ವರೆಗೆ ತಗ್ಗಿಸುತ್ತದೆ.
+        </div>
+        <div class="stat-pill" id="totalSizePill">ಆಯ್ಕೆಯಾದ ಫೈಲ್‌ಗಳು: 0 MB</div>
+      </div>
+
+      <div class="options-grid">
+        <!-- Smart Compression Mode -->
+        <div class="option-group">
+          <label>📉 ಸ್ಮಾರ್ಟ್ ಗಾತ್ರ ಕಡಿತ (MB/KB Optimization)</label>
+          <select id="smartMode">
+            <option value="balanced" selected>⚡ ಸ್ಮಾರ್ಟ್ ಬ್ಯಾಲೆನ್ಸ್ಡ್ (ಉತ್ತಮ ಕ್ಲಾರಿಟಿ + ಕಡಿಮೆ ಗಾತ್ರ - ರೆಕಮೆಂಡೆಡ್)</option>
+            <option value="high_clarity">💎 ಹೈ-ಕ್ಲಾರಿಟಿ ಫೋಕಸ್ (ಗರಿಷ್ಠ ತೀಕ್ಷ್ಣತೆ, ಸಾಧಾರಣ MB)</option>
+            <option value="ultra_light">🪶 ಅಲ್ಟ್ರಾ-ಲೈಟ್ (ವಾಟ್ಸಾಪ್/ಇಮೇಲ್‌ಗೆ ಅತೀ ಕಡಿಮೆ KB ಗಾತ್ರ)</option>
+            <option value="original">📁 ಒರಿಜಿನಲ್ (ಯಾವುದೇ ಕಡಿತವಿಲ್ಲದೆ ಮೂಲ ಫೈಲ್ ಗಾತ್ರ)</option>
+          </select>
+        </div>
+
+        <!-- Orientation -->
+        <div class="option-group">
+          <label>📐 ಪುಟದ ಶೈಲಿ (Page Orientation)</label>
+          <select id="orientation">
+            <option value="auto">ಸ್ವಯಂಚಾಲಿತ (Auto - ಫೋಟೋದಂತೆ)</option>
+            <option value="p">ಭಾವಚಿತ್ರ (Portrait - ಲಂಬ)</option>
+            <option value="l">ಲ್ಯಾಂಡ್‌ಸ್ಕೇಪ್ (Landscape - ಅಡ್ಡ)</option>
+          </select>
+        </div>
+
+        <!-- Page Size -->
+        <div class="option-group">
+          <label>📄 ಪುಟದ ಅಳತೆ (Page Size)</label>
+          <select id="pageSize">
+            <option value="a4" selected>A4 (ಪ್ರಿಂಟ್ ಮಾಡಲು ಅತ್ಯುತ್ತಮ)</option>
+            <option value="original">ಫೋಟೋದ ಮೂಲ ಗಾತ್ರಕ್ಕೆ ಹೊಂದುವಂತೆ (Fit Exact Image)</option>
+            <option value="legal">Legal</option>
+            <option value="letter">Letter</option>
+          </select>
+        </div>
+
+        <!-- Margin -->
+        <div class="option-group">
+          <label>🔲 ಮಾರ್ಜಿನ್ (Page Margin)</label>
+          <select id="margin">
+            <option value="0">ಮಾರ್ಜಿನ್ ಇಲ್ಲ (No Margin - Full Page)</option>
+            <option value="5" selected>ಸ್ವಲ್ಪ ಅಂತರ (Small - 5mm)</option>
+            <option value="10">ಸಾಧಾರಣ (Normal - 10mm)</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Images Preview Card -->
+    <div class="card">
+      <div class="section-title">
+        <span>ಆಯ್ಕೆಯಾದ ಚಿತ್ರಗಳು (<span id="imgCount">0</span>) <small style="font-weight: normal; color: #64748b;">(ಡ್ರ್ಯಾಗ್ ಮಾಡಿ ಕ್ರಮ ಬದಲಾಯಿಸಿ)</small></span>
+        <button class="btn btn-danger" id="clearBtn" style="padding: 6px 12px; font-size: 12px;" disabled>ಎಲ್ಲವನ್ನೂ ಅಳಿಸಿ</button>
+      </div>
+
+      <div class="images-grid" id="imagesGrid">
+        <div class="empty-state" id="emptyState">ಯಾವುದೇ ಫೋಟೋಗಳು ಆಯ್ಕೆಯಾಗಿಲ್ಲ. ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ ಫೋಟೋ ಸೇರಿಸಿ.</div>
+      </div>
+
+      <!-- Progress display -->
+      <div class="progress-container" id="progressContainer">
+        <div class="progress-bar-bg">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <div class="progress-text" id="progressText">ಚಿತ್ರಗಳನ್ನು ಸಂಸ್ಕರಿಸಿ PDF ರಚಿಸಲಾಗುತ್ತಿದೆ...</div>
+      </div>
+
+      <div class="action-bar">
+        <div>
+          <input type="text" id="pdfFileName" value="Smart_Optimized_Document" placeholder="PDF ಫೈಲ್ ಹೆಸರು" style="padding: 9px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; width: 230px;">
+        </div>
+        <button class="btn btn-success" id="generateBtn" disabled>
+          <svg style="width:18px;height:18px;fill:currentColor" viewBox="0 0 24 24">
+            <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+          </svg>
+          ಆಪ್ಟಿಮೈಸ್ಡ್ PDF ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('fileInput');
+    const imagesGrid = document.getElementById('imagesGrid');
+    const emptyState = document.getElementById('emptyState');
+    const imgCount = document.getElementById('imgCount');
+    const generateBtn = document.getElementById('generateBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const totalSizePill = document.getElementById('totalSizePill');
+    const progressContainer = document.getElementById('progressContainer');
+    const progressFill = document.getElementById('progressFill');
+    const progressText = document.getElementById('progressText');
+
+    let imageList = []; // Array of { id, file, dataUrl, width, height, sizeBytes, name }
+
+    dropZone.addEventListener('click', () => fileInput.click());
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+      dropZone.addEventListener(eventName, (e) => {
+        e.preventDefault();
+        dropZone.classList.add('dragover');
+      });
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+      dropZone.addEventListener(eventName, (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('dragover');
+      });
+    });
+
+    dropZone.addEventListener('drop', (e) => {
+      const files = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/'));
+      handleFiles(files);
+    });
+
+    fileInput.addEventListener('change', (e) => {
+      const files = Array.from(e.target.files);
+      handleFiles(files);
+      fileInput.value = '';
+    });
+
+    // Sortable drag-and-drop
+    new Sortable(imagesGrid, {
+      animation: 150,
+      ghostClass: 'sortable-ghost',
+      onEnd: () => {
+        const items = imagesGrid.querySelectorAll('.image-card');
+        const newOrder = [];
+        items.forEach((item, index) => {
+          const id = item.dataset.id;
+          const found = imageList.find(img => img.id === id);
+          if (found) newOrder.push(found);
+          const badge = item.querySelector('.badge-order');
+          if (badge) badge.innerText = index + 1;
+        });
+        imageList = newOrder;
+      }
+    });
+
+    function formatBytes(bytes) {
+      if (bytes < 1024) return bytes + ' B';
+      if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+      return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+    }
+
+    function handleFiles(files) {
+      if (!files.length) return;
+
+      files.forEach(file => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const img = new Image();
+          img.onload = () => {
+            const item = {
+              id: 'img_' + Math.random().toString(36).substr(2, 9),
+              file: file,
+              dataUrl: e.target.result,
+              width: img.naturalWidth,
+              height: img.naturalHeight,
+              sizeBytes: file.size,
+              name: file.name
+            };
+            imageList.push(item);
+            renderGrid();
+          };
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function renderGrid() {
+      if (imageList.length === 0) {
+        imagesGrid.innerHTML = '';
+        imagesGrid.appendChild(emptyState);
+        generateBtn.disabled = true;
+        clearBtn.disabled = true;
+        imgCount.innerText = '0';
+        totalSizePill.innerText = 'ಆಯ್ಕೆಯಾದ ಫೈಲ್‌ಗಳು: 0 MB';
+        return;
+      }
+
+      imagesGrid.innerHTML = '';
+      let totalSize = 0;
+
+      imageList.forEach((item, index) => {
+        totalSize += item.sizeBytes;
+        const card = document.createElement('div');
+        card.className = 'image-card';
+        card.dataset.id = item.id;
+
+        card.innerHTML = `
+          <div class="badge-order">${index + 1}</div>
+          <button class="delete-btn" onclick="removeImage('${item.id}')" title="ತೆಗೆದುಹಾಕಿ">×</button>
+          <img src="${item.dataUrl}" alt="${item.name}">
+          <div class="card-info">
+            <div class="file-name" title="${item.name}">${item.name}</div>
+            <div class="file-meta">
+              <span>${item.width}×${item.height}</span>
+              <span>${formatBytes(item.sizeBytes)}</span>
+            </div>
+          </div>
+        `;
+        imagesGrid.appendChild(card);
+      });
+
+      imgCount.innerText = imageList.length;
+      totalSizePill.innerText = `ಒಟ್ಟು ಮೂಲ ಗಾತ್ರ: ${formatBytes(totalSize)}`;
+      generateBtn.disabled = false;
+      clearBtn.disabled = false;
+    }
+
+    window.removeImage = function(id) {
+      imageList = imageList.filter(item => item.id !== id);
+      renderGrid();
+    };
+
+    clearBtn.addEventListener('click', () => {
+      if (confirm('ಎಲ್ಲಾ ಫೋಟೋಗಳನ್ನು ಪಟ್ಟಿಯಿಂದ ತೆಗೆದುಹಾಕಬೇಕೆ?')) {
+        imageList = [];
+        renderGrid();
+      }
+    });
+
+    /**
+     * Smart Canvas-based Downscaler & Quality Compressor
+     * Preserves visual crispness using bicubic canvas downsampling
+     */
+    function smartProcessImage(dataUrl, mode, origWidth, origHeight) {
+      return new Promise((resolve) => {
+        if (mode === 'original') {
+          resolve({ dataUrl: dataUrl, format: 'JPEG' });
+          return;
+        }
+
+        let maxDimension = 2000; // max width or height in px (print standard)
+        let quality = 0.85; // high visual fidelity
+
+        if (mode === 'high_clarity') {
+          maxDimension = 2600;
+          quality = 0.92;
+        } else if (mode === 'balanced') {
+          maxDimension = 1920; // Full HD equivalent per page
+          quality = 0.82;
+        } else if (mode === 'ultra_light') {
+          maxDimension = 1280;
+          quality = 0.68;
+        }
+
+        const img = new Image();
+        img.onload = () => {
+          let targetW = origWidth;
+          let targetH = origHeight;
+
+          // Downscale proportionally only if image is larger than target max dimension
+          if (targetW > maxDimension || targetH > maxDimension) {
+            if (targetW > targetH) {
+              targetH = Math.round((targetH * maxDimension) / targetW);
+              targetW = maxDimension;
+            } else {
+              targetW = Math.round((targetW * maxDimension) / targetH);
+              targetH = maxDimension;
+            }
+          }
+
+          const canvas = document.createElement('canvas');
+          canvas.width = targetW;
+          canvas.height = targetH;
+          const ctx = canvas.getContext('2d');
+
+          // High quality image smoothing
+          ctx.imageSmoothingEnabled = true;
+          ctx.imageSmoothingQuality = 'high';
+
+          // Draw white background for transparent PNGs converted to JPEG
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(0, 0, targetW, targetH);
+          ctx.drawImage(img, 0, 0, targetW, targetH);
+
+          resolve({
+            dataUrl: canvas.toDataURL('image/jpeg', quality),
+            format: 'JPEG'
+          });
+        };
+        img.src = dataUrl;
+      });
+    }
+
+    // Generate PDF
+    generateBtn.addEventListener('click', async () => {
+      if (imageList.length === 0) return;
+
+      const { jsPDF } = window.jspdf;
+      generateBtn.disabled = true;
+      progressContainer.style.display = 'block';
+      progressFill.style.width = '0%';
+      progressText.innerText = 'ಸ್ಮಾರ್ಟ್ ಕಂಪ್ರೆಷನ್ ಪ್ರಕ್ರಿಯೆ ಪ್ರಾರಂಭವಾಗಿದೆ... 0%';
+
+      const smartMode = document.getElementById('smartMode').value;
+      const orientationChoice = document.getElementById('orientation').value;
+      const pageSizeChoice = document.getElementById('pageSize').value;
+      const marginMm = parseFloat(document.getElementById('margin').value);
+
+      let doc = null;
+
+      for (let i = 0; i < imageList.length; i++) {
+        const imgObj = imageList[i];
+        const isLandscape = imgObj.width > imgObj.height;
+
+        let pageOrient = 'p';
+        if (orientationChoice === 'auto') {
+          pageOrient = isLandscape ? 'l' : 'p';
+        } else {
+          pageOrient = orientationChoice;
+        }
+
+        let pdfPageFormat = pageSizeChoice;
+        if (pageSizeChoice === 'original') {
+          const pxToMm = 0.264583;
+          pdfPageFormat = [imgObj.width * pxToMm, imgObj.height * pxToMm];
+          pageOrient = isLandscape ? 'l' : 'p';
+        }
+
+        if (i === 0) {
+          doc = new jsPDF({
+            orientation: pageOrient,
+            unit: 'mm',
+            format: pdfPageFormat,
+            compress: true // Internal PDF stream compression
+          });
+        } else {
+          doc.addPage(pdfPageFormat, pageOrient);
+        }
+
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const pageHeight = doc.internal.pageSize.getHeight();
+
+        const availWidth = Math.max(10, pageWidth - (marginMm * 2));
+        const availHeight = Math.max(10, pageHeight - (marginMm * 2));
+
+        const imgRatio = imgObj.width / imgObj.height;
+        let targetW = availWidth;
+        let targetH = targetW / imgRatio;
+
+        if (targetH > availHeight) {
+          targetH = availHeight;
+          targetW = targetH * imgRatio;
+        }
+
+        const posX = marginMm + (availWidth - targetW) / 2;
+        const posY = marginMm + (availHeight - targetH) / 2;
+
+        // Smart image downscaling + compression
+        const processed = await smartProcessImage(imgObj.dataUrl, smartMode, imgObj.width, imgObj.height);
+
+        // Add to PDF
+        doc.addImage(processed.dataUrl, processed.format, posX, posY, targetW, targetH, undefined, 'FAST');
+
+        const percent = Math.round(((i + 1) / imageList.length) * 100);
+        progressFill.style.width = percent + '%';
+        progressText.innerText = `ಪುಟ ${i + 1} / ${imageList.length} ಸಂಸ್ಕರಿಸಲಾಗಿದೆ... (${percent}%)`;
+      }
+
+      const fileNameInput = document.getElementById('pdfFileName').value.trim() || 'Smart_Optimized_Document';
+      doc.save(fileNameInput.endsWith('.pdf') ? fileNameInput : fileNameInput + '.pdf');
+
+      setTimeout(() => {
+        progressContainer.style.display = 'none';
+        generateBtn.disabled = false;
+      }, 700);
+    });
+  </script>
+</body>
+</html>
