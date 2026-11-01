@@ -16,6 +16,8 @@
       --neon-cyan: #00f2fe;
       --neon-violet: #9d4edd;
       --neon-gold: #ffeb3b;
+      --neon-green: #00ff88;
+      --neon-orange: #ff7700;
       --grid-glow: rgba(255, 0, 127, 0.12);
     }
 
@@ -126,7 +128,8 @@
     .control-panel {
       display: flex;
       justify-content: center;
-      gap: 20px;
+      flex-wrap: wrap;
+      gap: 12px;
       margin-top: 15px;
     }
 
@@ -134,15 +137,15 @@
       background: linear-gradient(135deg, #1f2937, #111827);
       border: 2px solid var(--neon-pink);
       color: #fff;
-      padding: 10px 25px;
-      font-size: 15px;
+      padding: 9px 18px;
+      font-size: 14px;
       font-weight: bold;
       border-radius: 30px;
       cursor: pointer;
       transition: all 0.3s ease;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
     }
 
     .control-btn:hover {
@@ -158,6 +161,25 @@
       background: var(--neon-cyan);
       color: #000;
       box-shadow: 0 0 15px var(--neon-cyan);
+    }
+
+    /* ಹೊಸ ಡೌನ್‌ಲೋಡ್ ಬಟನ್‌ಗಳ ಶೈಲಿ */
+    .download-pdf-btn {
+      border-color: var(--neon-orange);
+    }
+    .download-pdf-btn:hover {
+      background: var(--neon-orange);
+      color: #fff;
+      box-shadow: 0 0 15px var(--neon-orange);
+    }
+
+    .download-ppt-btn {
+      border-color: var(--neon-green);
+    }
+    .download-ppt-btn:hover {
+      background: var(--neon-green);
+      color: #000;
+      box-shadow: 0 0 15px var(--neon-green);
     }
 
     /* 🎛️ ತರಗತಿವಾರು ವಿಷಯವಾರು ಸೆಂಟರ್ ಹಬ್ */
@@ -268,11 +290,14 @@
       <iframe id="ppt-frame" src="" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true"></iframe>
     </div>
 
-    <!-- ಸಿನಿಮಾ ಕಂಟ್ರೋಲರ್ ಬಟನ್ ಪ್ಯಾನಲ್ (ಲ್ಯಾಪ್ಟಾಪ್‌ನಂತೆಯೇ ಅಡ್ಡಲಾಗಿ ಇರುತ್ತದೆ) -->
+    <!-- ಸಿನಿಮಾ ಕಂಟ್ರೋಲರ್ ಬಟನ್ ಪ್ಯಾನಲ್ -->
     <div class="control-panel">
       <button class="control-btn" onclick="controlSlide('prev')">⬅️ ಹಿಂದಿನ ಸ್ಲೈಡ್ (Prev)</button>
       <button class="control-btn" onclick="controlSlide('next')">ಮುಂದಿನ ಸ್ಲೈಡ್ (Next) ➡️</button>
       <button class="control-btn fullscreen-btn" onclick="toggleTheatreFullscreen()">🔲 ಪೂರ್ತಿ ಪರದೆ (Full Screen)</button>
+      <!-- ಹೊಸದಾಗಿ ಸೇರಿಸಲಾದ ಡೌನ್‌ಲೋಡ್ ಆಯ್ಕೆಗಳು -->
+      <button class="control-btn download-pdf-btn" onclick="downloadResource('pdf')">📥 ಡೌನ್‌ಲೋಡ್ PDF</button>
+      <button class="control-btn download-ppt-btn" onclick="downloadResource('ppt')">📊 ಡೌನ್‌ಲೋಡ್ PPT</button>
     </div>
   </div>
 
@@ -367,7 +392,7 @@
 </div>
 
 <script>
-  let currentPptUrl = "";
+  let rawPptUrl = "";
 
   function loadGoogleSlide(url, name) {
     if(!url || url === "") {
@@ -375,6 +400,7 @@
       return;
     }
     
+    rawPptUrl = url;
     document.getElementById('ppt-placeholder').style.display = 'none';
     
     let cleanUrl = url;
@@ -384,9 +410,7 @@
       cleanUrl += '?rm=minimal&start=false&loop=false';
     }
     
-    currentPptUrl = cleanUrl;
     document.getElementById('ppt-frame').src = cleanUrl;
-    
     document.getElementById('ppt-theatre-screen').scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 
@@ -436,6 +460,42 @@
         document.webkitExitFullscreen();
       }
     }
+  }
+
+  // PDF ಅಥವಾ PPT ಡೌನ್‌ಲೋಡ್ ಮಾಡುವ ಫಂಕ್ಷನ್
+  function downloadResource(type) {
+    if (!rawPptUrl || rawPptUrl === "") {
+      alert("ದಯವಿಟ್ಟು ಮೊದಲು ಯಾವುದಾದರೂ ಒಂದು ಪಾಠವನ್ನು ಆಯ್ಕೆ ಮಾಡಿ ಗೆಳೆಯ!");
+      return;
+    }
+
+    let downloadUrl = "";
+    
+    // ಗೂಗಲ್ ಸ್ಲೈಡ್ ಲಿಂಕ್ ಆಗಿದ್ದರೆ ಎಕ್ಸ್‌ಪೋರ್ಟ್ ಲಿಂಕ್ ರಚಿಸುತ್ತದೆ
+    if (rawPptUrl.includes("docs.google.com/presentation")) {
+      let baseUrl = rawPptUrl.split("/embed")[0].split("/preview")[0].split("/edit")[0];
+      if (type === 'pdf') {
+        downloadUrl = baseUrl + "/export/pdf";
+      } else if (type === 'ppt') {
+        downloadUrl = baseUrl + "/export/pptx";
+      }
+    } else {
+      // ಲೋಕಲ್ ಫೈಲ್ ಆಗಿದ್ದರೆ (.html ಬದಲಿಗೆ ಅದೇ ಹೆಸರಿನ .pdf ಅಥವಾ .pptx ಫೈಲ್‌ಗೆ ಲಿಂಕ್ ಮಾಡುತ್ತದೆ)
+      let baseFile = rawPptUrl.replace(/\.html$/i, "");
+      if (type === 'pdf') {
+        downloadUrl = baseFile + ".pdf";
+      } else if (type === 'ppt') {
+        downloadUrl = baseFile + ".pptx";
+      }
+    }
+
+    const link = document.createElement('a');
+    link.href = downloadUrl;
+    link.target = '_blank';
+    link.download = '';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   }
 </script>
 
