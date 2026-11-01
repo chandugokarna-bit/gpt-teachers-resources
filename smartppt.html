@@ -16,8 +16,6 @@
       --neon-cyan: #00f2fe;
       --neon-violet: #9d4edd;
       --neon-gold: #ffeb3b;
-      --neon-green: #00ff88;
-      --neon-orange: #ff7700;
       --grid-glow: rgba(255, 0, 127, 0.12);
     }
 
@@ -124,31 +122,27 @@
       margin-bottom: 15px;
     }
 
-    /* 🎮 ಸಿನಿಮಾ ಕಂಟ್ರೋಲ್ ಪ್ಯಾನಲ್ ಬಟನ್ಸ್ (ಒಂದೇ ಸಾಲಿನಲ್ಲಿ ಜೋಡಿಸಲಾಗಿದೆ) */
+    /* 🎮 ಸಿನಿಮಾ ಕಂಟ್ರೋಲ್ ಪ್ಯಾನಲ್ ಬಟನ್ಸ್ (ಒಂದೇ ಸಾಲಿನಲ್ಲಿ) */
     .control-panel {
       display: flex;
       justify-content: center;
-      align-items: center;
-      gap: 12px;
+      gap: 20px;
       margin-top: 15px;
-      flex-wrap: nowrap;
     }
 
     .control-btn {
       background: linear-gradient(135deg, #1f2937, #111827);
       border: 2px solid var(--neon-pink);
       color: #fff;
-      padding: 8px 16px;
-      font-size: 13.5px;
+      padding: 10px 25px;
+      font-size: 15px;
       font-weight: bold;
       border-radius: 30px;
       cursor: pointer;
       transition: all 0.3s ease;
-      display: inline-flex;
+      display: flex;
       align-items: center;
-      justify-content: center;
-      gap: 6px;
-      white-space: nowrap;
+      gap: 8px;
     }
 
     .control-btn:hover {
@@ -164,24 +158,6 @@
       background: var(--neon-cyan);
       color: #000;
       box-shadow: 0 0 15px var(--neon-cyan);
-    }
-
-    .download-pdf-btn {
-      border-color: var(--neon-orange);
-    }
-    .download-pdf-btn:hover {
-      background: var(--neon-orange);
-      color: #fff;
-      box-shadow: 0 0 15px var(--neon-orange);
-    }
-
-    .download-ppt-btn {
-      border-color: var(--neon-green);
-    }
-    .download-ppt-btn:hover {
-      background: var(--neon-green);
-      color: #000;
-      box-shadow: 0 0 15px var(--neon-green);
     }
 
     /* 🎛️ ತರಗತಿವಾರು ವಿಷಯವಾರು ಸೆಂಟರ್ ಹಬ್ */
@@ -292,13 +268,11 @@
       <iframe id="ppt-frame" src="" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true"></iframe>
     </div>
 
-    <!-- ಸಿನಿಮಾ ಕಂಟ್ರೋಲರ್ ಬಟನ್ ಪ್ಯಾನಲ್ -->
+    <!-- ಸಿನಿಮಾ ಕಂಟ್ರೋಲರ್ ಬಟನ್ ಪ್ಯಾನಲ್ (ಲ್ಯಾಪ್ಟಾಪ್‌ನಂತೆಯೇ ಅಡ್ಡಲಾಗಿ ಇರುತ್ತದೆ) -->
     <div class="control-panel">
       <button class="control-btn" onclick="controlSlide('prev')">⬅️ ಹಿಂದಿನ ಸ್ಲೈಡ್ (Prev)</button>
       <button class="control-btn" onclick="controlSlide('next')">ಮುಂದಿನ ಸ್ಲೈಡ್ (Next) ➡️</button>
       <button class="control-btn fullscreen-btn" onclick="toggleTheatreFullscreen()">🔲 ಪೂರ್ತಿ ಪರದೆ (Full Screen)</button>
-      <button class="control-btn download-pdf-btn" onclick="downloadGoogleSlideResource('pdf')">📥 ಡೌನ್‌ಲೋಡ್ PDF</button>
-      <button class="control-btn download-ppt-btn" onclick="downloadGoogleSlideResource('ppt')">📊 ಡೌನ್‌ಲೋಡ್ PPT</button>
     </div>
   </div>
 
@@ -393,9 +367,9 @@
 </div>
 
 <script>
-  let activePresentationId = ""; // ಗೂಗಲ್ ಸ್ಲೈಡ್ ಐಡಿ ಶೇಖರಣೆಗೆ
+  let currentPptUrl = "";
 
-  async function loadGoogleSlide(url, name) {
+  function loadGoogleSlide(url, name) {
     if(!url || url === "") {
       alert("ಈ ಪಾಠದ ಪಿಪಿಟಿ ಇನ್ನು ಲಭ್ಯವಿಲ್ಲ ಗೆಳೆಯ!");
       return;
@@ -410,21 +384,10 @@
       cleanUrl += '?rm=minimal&start=false&loop=false';
     }
     
+    currentPptUrl = cleanUrl;
     document.getElementById('ppt-frame').src = cleanUrl;
+    
     document.getElementById('ppt-theatre-screen').scrollIntoView({ behavior: 'smooth', block: 'center' });
-
-    // HTML ಫೈಲ್‌ನೊಳಗಿರುವ ಮೂಲ ಗೂಗಲ್ ಪ್ರೆಸೆಂಟೇಷನ್ ಐಡಿಯನ್ನು ಹುಡುಕುವುದು
-    activePresentationId = "";
-    try {
-      let res = await fetch(url);
-      let content = await res.text();
-      let match = content.match(/docs\.google\.com\/presentation\/d\/([a-zA-Z0-9_-]+)/);
-      if(match && match[1]) {
-        activePresentationId = match[1];
-      }
-    } catch(e) {
-      console.log("Error extracting Google Slide ID: ", e);
-    }
   }
 
   function controlSlide(action) {
@@ -472,43 +435,6 @@
       } else if (document.webkitExitFullscreen) {
         document.webkitExitFullscreen();
       }
-    }
-  }
-
-  // ಗೂಗಲ್ ಸ್ಲೈಡ್ ಅನ್ನು ನೇರವಾಗಿ PDF ಅಥವಾ PPTX ಆಗಿ ಕನ್ವರ್ಟ್ ಮಾಡಿ ಡೌನ್‌ಲೋಡ್ ಮಾಡುವ ಫಂಕ್ಷನ್
-  async function downloadGoogleSlideResource(type) {
-    let frame = document.getElementById('ppt-frame');
-    if(!frame.src || frame.src === "" || frame.src === window.location.href) {
-      alert("ದಯವಿಟ್ಟು ಮೊದಲು ಯಾವುದಾದರೂ ಒಂದು ಪಾಠವನ್ನು ಆಯ್ಕೆ ಮಾಡಿ ಗೆಳೆಯ!");
-      return;
-    }
-
-    // ಒಂದುವೇಳೆ fetch ಮೂಲಕ ಐಡಿ ಸಿಕ್ಕಿಲ್ಲದಿದ್ದರೆ ಮತ್ತೊಮ್ಮೆ ಹುಡುಕಲು ಪ್ರಯತ್ನಿಸುತ್ತದೆ
-    if(!activePresentationId) {
-      try {
-        let res = await fetch(frame.src);
-        let content = await res.text();
-        let match = content.match(/docs\.google\.com\/presentation\/d\/([a-zA-Z0-9_-]+)/);
-        if(match && match[1]) {
-          activePresentationId = match[1];
-        }
-      } catch(err) {
-        console.error(err);
-      }
-    }
-
-    if(activePresentationId) {
-      let downloadUrl = "";
-      if (type === 'pdf') {
-        downloadUrl = `https://docs.google.com/presentation/d/${activePresentationId}/export/pdf`;
-      } else {
-        downloadUrl = `https://docs.google.com/presentation/d/${activePresentationId}/export/pptx`;
-      }
-      
-      // ನೇರವಾಗಿ ಗೂಗಲ್‌ನಿಂದಲೇ ಡೌನ್‌ಲೋಡ್ ಪ್ರಾರಂಭಿಸುತ್ತದೆ
-      window.open(downloadUrl, '_blank');
-    } else {
-      alert("ಗೂಗಲ್ ಸ್ಲೈಡ್ ಲಿಂಕ್ ಪತ್ತೆಯಾಗುತ್ತಿಲ್ಲ, ದಯವಿಟ್ಟು HTML ಫೈಲ್ ಒಳಗೆ ಗೂಗಲ್ ಪ್ರೆಸೆಂಟೇಷನ್ ಲಿಂಕ್ ಸರಿಯಾಗಿದೆಯೇ ಎಂದು ಪರಿಶೀಲಿಸಿ.");
     }
   }
 </script>
